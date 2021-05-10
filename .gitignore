@@ -83,3 +83,7 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# keystore
+*.jks
+/buildSrc/src/main/kotlin/SigningConfigs.kt

@@ -1,0 +1,205 @@
+plugins {
+    id("com.android.application")
+    kotlin("android")
+    kotlin("kapt")
+    kotlin("plugin.serialization") version Dependencies.Kotlin.version
+    id("kotlin-parcelize")
+}
+
+android {
+
+    // 编译 SDK 版本
+    compileSdkVersion(AppConfigs.compileSdkVersion)
+    // 编译工具版本
+    buildToolsVersion(AppConfigs.buildToolsVersion)
+
+    defaultConfig {
+        // 应用 id
+        applicationId = "cn.wj.android.cashbook"
+
+        // 最低支持版本
+        minSdkVersion(AppConfigs.minSdkVersion)
+        // 目标 SDK 版本
+        targetSdkVersion(AppConfigs.targetSdkVersion)
+
+        // 应用版本号
+        versionCode = AppConfigs.versionCode
+        // 应用版本名
+        versionName = AppConfigs.versionName
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 开启 Dex 分包
+        multiDexEnabled = true
+    }
+
+    signingConfigs {
+        // 签名配置
+        getByName("debug") {
+            keyAlias = SigningConfigs.keyAlias
+            keyPassword = SigningConfigs.keyPassword
+            storeFile = file(SigningConfigs.storeFile)
+            storePassword = SigningConfigs.storePassword
+        }
+        create("release") {
+            keyAlias = SigningConfigs.keyAlias
+            keyPassword = SigningConfigs.keyPassword
+            storeFile = file(SigningConfigs.storeFile)
+            storePassword = SigningConfigs.storePassword
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.findByName("debug")
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.findByName("release")
+        }
+    }
+
+    // 源文件路径设置
+    sourceSets {
+        named("main") {
+            java.srcDirs("src/main/java", "src/main/kotlin")
+        }
+    }
+
+    buildFeatures {
+        // DataBinding 开启
+        dataBinding = true
+    }
+
+    lintOptions {
+        // 出现错误不终止编译
+        isAbortOnError = false
+    }
+
+    // 配置 APK 输出路径
+    applicationVariants.all {
+        if (buildType.name == "release") {
+            packageApplicationProvider?.get()?.outputDirectory?.set(
+                File(
+                    project.rootDir,
+                    "/outputs/app"
+                )
+            )
+            outputs.all {
+                if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
+                    this.outputFileName = "IflytekFeedback_${versionName}.apk"
+                }
+            }
+        }
+    }
+
+    // Java 版本配置
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    // kotlin Jvm 版本
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs =
+            freeCompilerArgs + arrayOf("-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi")
+    }
+}
+
+dependencies {
+
+    // Kotlin
+    implementation(Dependencies.Kotlin.stdlib)
+    // 协程
+    implementation(Dependencies.Kotlinx.coroutines)
+    // Json 序列化
+    implementation(Dependencies.Kotlinx.serialization)
+
+    // Dex 分包
+    implementation(Dependencies.Androidx.multidex)
+
+    // v4
+    implementation(Dependencies.Androidx.legacy)
+    // v7
+    implementation(Dependencies.Androidx.appcompat)
+    // RecyclerView
+    implementation(Dependencies.Androidx.recyclerview)
+    // 约束性布局
+    implementation(Dependencies.Androidx.constraint)
+
+    // activity
+    implementation(Dependencies.Androidx.Activity.ktx)
+    // fragment
+    implementation(Dependencies.Androidx.Fragment.ktx)
+
+    // core-ktx
+    implementation(Dependencies.Androidx.Core.ktx)
+
+    // LifeCycle 拓展
+    implementation(Dependencies.Androidx.Lifecycle.runtimeKtx)
+    implementation(Dependencies.Androidx.Lifecycle.extensions)
+    // ViewModel 拓展
+    implementation(Dependencies.Androidx.Lifecycle.viewModelKtx)
+    // LiveData 拓展
+    implementation(Dependencies.Androidx.Lifecycle.liveDataKtx)
+
+    // Room
+    implementation(Dependencies.Androidx.Room.common)
+    implementation(Dependencies.Androidx.Room.ktx)
+    implementation(Dependencies.Androidx.Room.coroutines)
+
+    // Navigation
+    implementation(Dependencies.Androidx.Navigation.common)
+    implementation(Dependencies.Androidx.Navigation.commonKtx)
+
+    // Material
+    implementation(Dependencies.Google.material)
+
+    // Logger
+    implementation(Dependencies.logger)
+
+    // LiveEventBus
+    implementation(Dependencies.liveEventBus)
+
+    // Koin
+    implementation(Dependencies.Koin.ext)
+    implementation(Dependencies.Koin.scope)
+    implementation(Dependencies.Koin.viewModel)
+
+    // OkHttp
+    implementation(Dependencies.Squareup.OkHttp.okhttp)
+
+    // Coil
+    implementation(Dependencies.Coil.coil)
+
+    // SmartRefreshLayout
+    implementation(Dependencies.SmartRefresh.smartRefresh)
+    implementation(Dependencies.SmartRefresh.headerClassics)
+    implementation(Dependencies.SmartRefresh.footerClassics)
+
+    // 换肤
+    implementation(Dependencies.SkinSupport.skinSupport)
+    implementation(Dependencies.SkinSupport.constraint)
+    implementation(Dependencies.SkinSupport.appcompat)
+    implementation(Dependencies.SkinSupport.cardView)
+    implementation(Dependencies.SkinSupport.material)
+
+    // 测试
+    testImplementation(Dependencies.testJunit)
+    androidTestImplementation(Dependencies.Androidx.Test.rules)
+    androidTestImplementation(Dependencies.Androidx.Test.runner)
+    androidTestImplementation(Dependencies.Androidx.Test.Espresso.core)
+    androidTestImplementation(Dependencies.Androidx.Test.Ext.junit)
+}
