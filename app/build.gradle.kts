@@ -158,7 +158,6 @@ dependencies {
     // Room
     implementation(Dependencies.Androidx.Room.common)
     implementation(Dependencies.Androidx.Room.ktx)
-    implementation(Dependencies.Androidx.Room.coroutines)
 
     // Navigation
     implementation(Dependencies.Androidx.Navigation.common)
@@ -174,9 +173,8 @@ dependencies {
     implementation(Dependencies.liveEventBus)
 
     // Koin
-    implementation(Dependencies.Koin.ext)
-    implementation(Dependencies.Koin.scope)
-    implementation(Dependencies.Koin.viewModel)
+    implementation(Dependencies.Koin3.android)
+    implementation(Dependencies.Koin3.androidExt)
 
     // OkHttp
     implementation(Dependencies.Squareup.OkHttp.okhttp)

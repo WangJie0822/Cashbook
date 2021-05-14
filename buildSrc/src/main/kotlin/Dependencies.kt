@@ -258,7 +258,6 @@ object Dependencies {
             const val process = "androidx.lifecycle:lifecycle-process:$version"
             const val common = "androidx.lifecycle:lifecycle-common:$version"
             const val commonJava8 = "androidx.lifecycle:lifecycle-common-java8:$version"
-            const val extensions = "androidx.lifecycle:lifecycle-extensions:$version"
             const val liveData = "androidx.lifecycle:lifecycle-livedata:$version"
             const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:$version"
             const val liveDataCore = "androidx.lifecycle:lifecycle-livedata-core:$version"
@@ -273,6 +272,7 @@ object Dependencies {
             const val viewModelSavedState =
                 "androidx.lifecycle:lifecycle-viewmodel-savedstate:$version"
 
+            const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
             const val viewModelCompose =
                 "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha02"
         }
@@ -418,10 +418,10 @@ object Dependencies {
      * Koin
      * - Github：[https://github.com/InsertKoinIO/koin]
      */
-    object Koin {
+    object Koin2 {
 
         /** koin 版本 */
-        private const val version = "3.0.1"
+        private const val version = "2.2.2"
 
         const val scope = "org.koin:koin-androidx-scope:$version"
         const val viewModel = "org.koin:koin-androidx-viewmodel:$version"
@@ -429,6 +429,22 @@ object Dependencies {
         const val workManager = "org.koin:koin-androidx-workmanager:$version"
         const val compose = "org.koin:koin-androidx-compose:$version"
         const val ext = "org.koin:koin-androidx-ext:$version"
+    }
+
+
+    /**
+     * Koin3
+     * - Github：[https://github.com/InsertKoinIO/koin]
+     */
+    object Koin3 {
+
+        /** koin 版本 */
+        private const val version = "3.0.1"
+
+        const val android = "io.insert-koin:koin-android:$version"
+        const val androidExt = "io.insert-koin:koin-android-ext:$version"
+        const val workManager = "io.insert-koin:koin-androidx-workmanager:$version"
+        const val compose = "io.insert-koin:koin-androidx-compose:$version"
     }
 
     /**

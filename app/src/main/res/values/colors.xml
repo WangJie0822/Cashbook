@@ -7,4 +7,34 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="primary">#03A9F4</color>
+    <color name="primary_dark">#0288D1</color>
+    <color name="primary_light">#B3E5FC</color>
+    <color name="accent">#FF5722</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFF</color>
+
+    <!-- 应用主色调 -->
+    <color name="colorPrimary">#03A9F4</color>
+    <!-- 主色调替代阴影 -->
+    <color name="colorPrimaryVariant">#0288D1</color>
+    <!-- 主色调对比色 -->
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <!-- 应用次要色调，主色调的明亮补充 -->
+    <color name="colorSecondary">#B3E5FC</color>
+    <!-- 次元色调对比色 -->
+    <color name="colorOnSecondary">#FFF</color>
+    <!-- 组件表面颜色 -->
+    <color name="colorSurface">#FFF</color>
+    <!-- 显示错误颜色 -->
+    <color name="colorError">#FF5722</color>
+    <!-- 分隔颜色 -->
+    <color name="colorDivider">#BDBDBD</color>
+
+    <!-- 文本主色调 -->
+    <color name="textColorPrimary">#212121</color>
+    <!-- 文本次要色调 -->
+    <color name="textColorSecondary">#757575</color>
 </resources>
