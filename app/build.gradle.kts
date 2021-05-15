@@ -103,7 +103,7 @@ android {
             )
             outputs.all {
                 if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
-                    this.outputFileName = "IflytekFeedback_${versionName}.apk"
+                    this.outputFileName = "Cashbook_${versionName}.apk"
                 }
             }
         }
@@ -120,6 +120,12 @@ android {
         jvmTarget = "1.8"
         freeCompilerArgs =
             freeCompilerArgs + arrayOf("-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi")
+    }
+}
+
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.name)
     }
 }
 
@@ -186,6 +192,13 @@ dependencies {
 
     // Coil
     implementation(Dependencies.Coil.coil)
+
+    // MMKV 数据存储
+    implementation(Dependencies.Tencent.mmkv)
+
+    // ARouter 路由
+    implementation(Dependencies.Alibaba.ARouter.api)
+    kapt(Dependencies.Alibaba.ARouter.compiler)
 
     // SmartRefreshLayout
     implementation(Dependencies.SmartRefresh.smartRefresh)

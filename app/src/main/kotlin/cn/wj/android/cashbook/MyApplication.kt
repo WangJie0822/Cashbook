@@ -3,7 +3,7 @@ package cn.wj.android.cashbook
 import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
-import cn.wj.android.cashbook.BuildConfig
+import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.viewModelModule
 import cn.wj.android.cashbook.ext.base.logger
 import cn.wj.android.cashbook.manager.AppManager
@@ -51,7 +51,7 @@ class MyApplication : Application() {
         startKoin {
             androidLogger(Level.NONE)
             androidContext(this@MyApplication)
-            modules(listOf(viewModelModule))
+            modules(listOf(dbModule, viewModelModule))
         }
 
         // 初始化换肤框架

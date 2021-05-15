@@ -21,13 +21,15 @@
     <!-- 主色调替代阴影 -->
     <color name="colorPrimaryVariant">#0288D1</color>
     <!-- 主色调对比色 -->
-    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorOnPrimary">@color/white</color>
     <!-- 应用次要色调，主色调的明亮补充 -->
-    <color name="colorSecondary">#B3E5FC</color>
+    <color name="colorSecondary">#FF03DAC5</color>
+    <!-- 次要色调替代阴影 -->
+    <color name="colorSecondaryVariant">#FF018786</color>
     <!-- 次元色调对比色 -->
-    <color name="colorOnSecondary">#FFF</color>
+    <color name="colorOnSecondary">@color/black</color>
     <!-- 组件表面颜色 -->
-    <color name="colorSurface">#FFF</color>
+    <color name="colorSurface">@color/white</color>
     <!-- 显示错误颜色 -->
     <color name="colorError">#FF5722</color>
     <!-- 分隔颜色 -->
