@@ -9,10 +9,10 @@
 >     const val keyAlias = ""
 > 
 >     /** 别名密码 */
->     const val keyPassword = ".t"
+>     const val keyPassword = ""
 > 
 >     /** 密钥文件路径 */
->     const val storeFile = "../xxx.jks"
+>     const val storeFile = "xxx.jks"
 > 
 >     /** 密钥密码 */
 >     const val storePassword = ""

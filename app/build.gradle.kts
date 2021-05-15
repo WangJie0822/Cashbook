@@ -1,8 +1,13 @@
 plugins {
+    // Android 应用
     id("com.android.application")
+    // Android Kotlin 支持
     kotlin("android")
+    // Kotlin 注解处理
     kotlin("kapt")
+    // Kotlin json 转换
     kotlin("plugin.serialization") version Dependencies.Kotlin.version
+    // Kotlin Parcelize 序列化
     id("kotlin-parcelize")
 }
 
