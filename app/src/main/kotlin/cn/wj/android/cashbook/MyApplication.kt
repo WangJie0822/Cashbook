@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package cn.wj.android.cashbook
 
 import android.app.Application
@@ -9,6 +11,7 @@ import cn.wj.android.cashbook.ext.base.logger
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.manager.SkinManager
 import cn.wj.android.cashbook.third.logger.MyFormatStrategy
+import com.alibaba.android.arouter.launcher.ARouter
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import org.koin.android.ext.koin.androidContext
@@ -53,6 +56,14 @@ class MyApplication : Application() {
             androidContext(this@MyApplication)
             modules(listOf(dbModule, viewModelModule))
         }
+
+        // 初始化 ARouter
+        if (BuildConfig.DEBUG) {
+            // Debug 模式或非线上模式
+            ARouter.openLog()
+            ARouter.openDebug()
+        }
+        ARouter.init(this)
 
         // 初始化换肤框架
         SkinManager.init(this)
