@@ -1,7 +1,7 @@
 package cn.wj.android.cashbook.manager
 
 import android.app.Application
-import cn.wj.android.cashbook.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.third.skin.SkinMaterialViewInflaterCompat
 import skin.support.SkinCompatManager
 import skin.support.app.SkinAppCompatViewInflater

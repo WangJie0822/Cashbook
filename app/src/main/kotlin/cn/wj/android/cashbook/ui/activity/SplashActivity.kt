@@ -2,9 +2,12 @@ package cn.wj.android.cashbook.ui.activity
 
 import android.os.Bundle
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.BaseActivity
+import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.data.contants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.databinding.ActivitySplashBinding
 import cn.wj.android.cashbook.ui.viewmodel.SplashViewModel
+import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.gyf.immersionbar.ImmersionBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -19,5 +22,26 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
+        // 初始化数据
+        viewModel.init()
+    }
+
+    override fun beforeOnCreate() {
+        window.run {
+            enterTransition = MaterialFadeThrough().apply {
+                duration = ACTIVITY_ANIM_DURATION
+            }
+            exitTransition = MaterialFadeThrough().apply {
+                duration = ACTIVITY_ANIM_DURATION
+            }
+        }
+    }
+
+    override fun initImmersionbar(immersionBar: ImmersionBar) {
+        immersionBar.run {
+            statusBarColor(R.color.white)
+            statusBarDarkFont(true)
+        }
     }
 }

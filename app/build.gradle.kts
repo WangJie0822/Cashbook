@@ -169,6 +169,7 @@ dependencies {
     // Room
     implementation(Dependencies.Androidx.Room.common)
     implementation(Dependencies.Androidx.Room.ktx)
+    kapt(Dependencies.Androidx.Room.compiler)
 
     // Navigation
     implementation(Dependencies.Androidx.Navigation.common)
@@ -199,6 +200,10 @@ dependencies {
     // ARouter 路由
     implementation(Dependencies.Alibaba.ARouter.api)
     kapt(Dependencies.Alibaba.ARouter.compiler)
+
+    // 状态栏工具
+    implementation(Dependencies.ImmersionBar.immersionBar)
+    implementation(Dependencies.ImmersionBar.ktx)
 
     // SmartRefreshLayout
     implementation(Dependencies.SmartRefresh.smartRefresh)

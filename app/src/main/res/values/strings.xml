@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">记账本</string>
+    <string name="default_books">默认账本</string>
 </resources>

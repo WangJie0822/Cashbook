@@ -8,10 +8,9 @@
             type="cn.wj.android.cashbook.ui.viewmodel.SplashViewModel" />
     </data>
 
-    <ImageView
+    <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@null"
-        android:src="@drawable/layer_list_splash_bg" />
+        android:background="@drawable/layer_list_splash_bg" />
 
 </layout>

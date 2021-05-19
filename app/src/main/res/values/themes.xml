@@ -11,15 +11,26 @@
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+
+        <!-- 窗口背景 -->
+        <item name="android:windowBackground">@color/white</item>
+
+        <!-- 动画相关 -->
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
     </style>
 
     <!-- 闪屏界面主题 -->
     <style name="Theme.Cashbook.Splash">
         <!-- 应用主色调，ActionBar 等默认颜色 -->
         <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/white</item>
         <!-- 应用主要暗色调，StatusBar 默认颜色 -->
         <item name="colorPrimaryDark">@color/white</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <!-- 窗口背景 -->
         <item name="android:windowBackground">@drawable/layer_list_splash_bg</item>
     </style>

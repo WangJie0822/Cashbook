@@ -1,10 +1,12 @@
 package cn.wj.android.cashbook.di
 
 import androidx.room.Room
-import cn.wj.android.cashbook.contants.DB_FILE_NAME
-import cn.wj.android.cashbook.db.CashbookDatabase
+import cn.wj.android.cashbook.data.contants.DB_FILE_NAME
+import cn.wj.android.cashbook.data.database.CashbookDatabase
+import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.ui.viewmodel.MainViewModel
+import cn.wj.android.cashbook.ui.viewmodel.SplashViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -17,7 +19,7 @@ import org.koin.dsl.module
 
 /** 数据库相关依赖注入 */
 val dbModule = module {
-    single {
+    single<CashbookDatabase> {
         Room.databaseBuilder(
             AppManager.getContext().applicationContext,
             CashbookDatabase::class.java,
@@ -26,8 +28,18 @@ val dbModule = module {
     }
 }
 
+/** 数据存储相关依赖注入 */
+val dataStoreModule = module {
+    factory {
+        LocalDataStore(get())
+    }
+}
+
 /** ViewModel 相关依赖注入 */
 val viewModelModule = module {
+    viewModel {
+        SplashViewModel(get())
+    }
     viewModel {
         MainViewModel()
     }

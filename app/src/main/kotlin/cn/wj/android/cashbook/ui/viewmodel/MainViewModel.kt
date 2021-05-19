@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.ui.viewmodel
 
-import cn.wj.android.cashbook.base.BaseViewModel
+import cn.wj.android.cashbook.base.ui.BaseViewModel
 
 /**
  * 主界面 ViewModel
