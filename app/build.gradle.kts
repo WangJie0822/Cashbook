@@ -172,8 +172,8 @@ dependencies {
     kapt(Dependencies.Androidx.Room.compiler)
 
     // Navigation
-    implementation(Dependencies.Androidx.Navigation.common)
-    implementation(Dependencies.Androidx.Navigation.commonKtx)
+    implementation(Dependencies.Androidx.Navigation.uiKtx)
+    implementation(Dependencies.Androidx.Navigation.fragmentKtx)
 
     // Material
     implementation(Dependencies.Google.material)
