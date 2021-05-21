@@ -9,6 +9,8 @@
     <color name="read_700">#D32F2F</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparentLight">#00FFFFFF</color>
+    <color name="transparentDark">#00000000</color>
 
     <!-- 应用主色调 -->
     <color name="color_primary">@color/blue_500</color>
