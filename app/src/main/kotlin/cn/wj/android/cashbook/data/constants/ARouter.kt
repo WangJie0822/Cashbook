@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.data.contants
+package cn.wj.android.cashbook.data.constants
 
 /**
  * 路由相关

@@ -16,7 +16,7 @@ import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.tag
-import cn.wj.android.cashbook.data.contants.ACTIVITY_ANIM_DURATION
+import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
@@ -58,32 +58,32 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
 
         // 订阅数据
         observe()
-        logger().i("onCreate")
+        logger().d("onCreate")
     }
 
     override fun onStart() {
         super.onStart()
-        logger().i("onStart")
+        logger().d("onStart")
     }
 
     override fun onResume() {
         super.onResume()
-        logger().i("onResume")
+        logger().d("onResume")
     }
 
     override fun onPause() {
         super.onPause()
-        logger().i("onPause")
+        logger().d("onPause")
     }
 
     override fun onStop() {
         super.onStop()
-        logger().i("onStop")
+        logger().d("onStop")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        logger().i("onDestroy")
+        logger().d("onDestroy")
     }
 
     override fun setContentView(layoutResID: Int) {
@@ -131,7 +131,7 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
     /** 初始化状态栏相关配置 */
     private fun initImmersionbar() {
         immersionBar {
-            statusBarColor(R.color.colorPrimaryVariant)
+            statusBarColor(R.color.color_primary_variant)
             statusBarDarkFont(true)
             fitsSystemWindows(true)
             initImmersionbar(this)
@@ -149,11 +149,11 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
 
             // 转换处理
             val model = snackbarTransform?.invoke(it) ?: it
-
+            logger().d("showSnackbar: $model")
             val view = if (model.targetId == 0) {
                 binding.root
             } else {
-                binding.root.findViewById(model.targetId)
+                findViewById(model.targetId)
             }
             val snackBar = Snackbar.make(view, model.content.orEmpty(), model.duration)
             snackBar.setTextColor(model.contentColor)
@@ -169,6 +169,7 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
         })
         // Ui 界面处理
         viewModel.uiNavigationData.observe(this, {
+            logger().d("uiNavigation: $it")
             it.jump?.let { model ->
                 ARouter.getInstance().build(model.path).with(model.data).navigation(context)
             }

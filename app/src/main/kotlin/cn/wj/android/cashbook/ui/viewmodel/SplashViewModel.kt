@@ -5,7 +5,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.contants.AROUTER_PATH_MAIN
+import cn.wj.android.cashbook.data.constants.AROUTER_PATH_MAIN
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -46,7 +46,10 @@ class SplashViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 logger().e(throwable, "init")
             } finally {
                 // 跳转首页
-                uiNavigationData.value = UiNavigationModel.jump(AROUTER_PATH_MAIN)
+                uiNavigationData.value = UiNavigationModel.builder {
+                    jump(AROUTER_PATH_MAIN)
+                    close()
+                }
             }
         }
     }

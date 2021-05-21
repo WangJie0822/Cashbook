@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">记账本</string>
     <string name="default_books">默认账本</string>
+    <string name="press_again_to_exit">再次返回退出</string>
 </resources>

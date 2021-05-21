@@ -7,6 +7,7 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.tools.getStatusBarHeight
 
 /** 默认点击过滤间隔时间，单位：ms */
 const val DEFAULT_CLICK_THROTTLE_MS = 250L
@@ -60,5 +61,19 @@ inline fun View.setOnThrottleClickListener(
         this.disposeThrottleClick({
             onClick.invoke()
         }, interval)
+    }
+}
+
+/**
+ * 通过给 [View] 增加 **状态栏高度** 的高度并增加相同高度的 [View.getPaddingTop]，
+ * 来适应延伸到状态栏底部的布局
+ * > [getStatusBarHeight] 获取状态栏高度
+ */
+fun View.fitsStatusBar() {
+    post {
+        layoutParams = layoutParams.apply {
+            height = measuredHeight + getStatusBarHeight()
+        }
+        setPadding(paddingLeft, paddingTop + getStatusBarHeight(), paddingRight, paddingBottom)
     }
 }

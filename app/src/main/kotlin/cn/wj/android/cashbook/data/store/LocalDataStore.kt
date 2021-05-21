@@ -3,9 +3,9 @@ package cn.wj.android.cashbook.data.store
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.BooksDao
 import cn.wj.android.cashbook.data.database.table.BooksTable
-import cn.wj.android.cashbook.data.database.table.toBooksEntity
-import cn.wj.android.cashbook.data.database.table.toBooksTable
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.transform.toBooksEntity
+import cn.wj.android.cashbook.data.transform.toBooksTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

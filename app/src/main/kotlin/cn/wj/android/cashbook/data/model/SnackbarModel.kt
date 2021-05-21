@@ -28,12 +28,12 @@ import com.google.android.material.snackbar.Snackbar
  */
 data class SnackbarModel(
     val content: String? = "",
-    @ColorInt val contentBgColor: Int = R.color.colorSecondary.color,
-    @ColorInt val contentColor: Int = R.color.colorOnSecondary.color,
+    @ColorInt val contentBgColor: Int = R.color.color_secondary.color,
+    @ColorInt val contentColor: Int = R.color.color_on_secondary.color,
     @IdRes val targetId: Int = 0,
     val duration: Int = Snackbar.LENGTH_SHORT,
     val actionText: String? = null,
-    @ColorInt val actionColor: Int = R.color.colorPrimary.color,
+    @ColorInt val actionColor: Int = R.color.color_primary.color,
     val onAction: View.OnClickListener? = null,
     val onCallback: Snackbar.Callback? = null
 ) {
@@ -53,12 +53,12 @@ data class SnackbarModel(
      */
     constructor(
         @StringRes resId: Int,
-        @ColorInt contentBgColor: Int = R.color.colorSecondary.color,
-        @ColorInt contentColor: Int = R.color.colorOnSecondary.color,
+        @ColorInt contentBgColor: Int = R.color.color_secondary.color,
+        @ColorInt contentColor: Int = R.color.color_on_secondary.color,
         @IdRes targetId: Int = 0,
         duration: Int = Snackbar.LENGTH_SHORT,
         actionText: String? = null,
-        @ColorInt actionColor: Int = R.color.colorPrimary.color,
+        @ColorInt actionColor: Int = R.color.color_primary.color,
         onAction: View.OnClickListener? = null,
         onCallback: Snackbar.Callback? = null
     ) : this(

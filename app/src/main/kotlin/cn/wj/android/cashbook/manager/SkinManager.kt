@@ -18,7 +18,7 @@ object SkinManager {
 
     /** 使用 [application] 对象对皮肤管理进行初始化 */
     fun init(application: Application) {
-        logger().i("init $application")
+        logger().d("init $application")
         SkinCompatManager.withoutActivity(application)
             .addInflater(SkinAppCompatViewInflater())
             .addInflater(SkinMaterialViewInflater())
@@ -30,6 +30,6 @@ object SkinManager {
 
     /** 加载 [skin] 对应的皮肤 */
     fun loadSkin(skin: String) {
-        logger().i("loadSkin skin: $skin")
+        logger().d("loadSkin skin: $skin")
     }
 }

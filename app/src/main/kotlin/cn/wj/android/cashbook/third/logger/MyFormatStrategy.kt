@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package cn.wj.android.cashbook.third.logger
 
 import android.util.Log
@@ -24,7 +26,9 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
     override fun log(priority: Int, onceOnlyTag: String?, message: String) {
         val tag = formatTag(onceOnlyTag)
 
-        logTopBorder(priority, tag)
+        if (priority >= Log.INFO) {
+            logTopBorder(priority, tag)
+        }
 
         if (priority >= Log.WARN) {
             logHeaderContent(priority, tag, methodCount)
@@ -40,7 +44,9 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
                 logDivider(priority, tag)
             }
             logContent(priority, tag, message)
-            logBottomBorder(priority, tag)
+            if (priority >= Log.INFO) {
+                logBottomBorder(priority, tag)
+            }
             return
         }
 
@@ -115,7 +121,12 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
     private fun logContent(logType: Int, tag: String?, chunk: String) {
         val lines = chunk.split(System.getProperty("line.separator").orEmpty()).toTypedArray()
         for (line in lines) {
-            logChunk(logType, tag, "$HORIZONTAL_LINE $line")
+            val printChunk = if (logType >= Log.INFO) {
+                "$HORIZONTAL_LINE $line"
+            } else {
+                line
+            }
+            logChunk(logType, tag, printChunk)
         }
     }
 

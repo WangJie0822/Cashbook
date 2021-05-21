@@ -1,7 +1,7 @@
 package cn.wj.android.cashbook.di
 
 import androidx.room.Room
-import cn.wj.android.cashbook.data.contants.DB_FILE_NAME
+import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager

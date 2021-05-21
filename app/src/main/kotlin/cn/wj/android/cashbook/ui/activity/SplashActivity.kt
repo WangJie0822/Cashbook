@@ -3,7 +3,7 @@ package cn.wj.android.cashbook.ui.activity
 import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.contants.ACTIVITY_ANIM_DURATION
+import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.databinding.ActivitySplashBinding
 import cn.wj.android.cashbook.ui.viewmodel.SplashViewModel
 import com.google.android.material.transition.platform.MaterialFadeThrough

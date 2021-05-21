@@ -49,7 +49,7 @@ class MyApplication : Application() {
                 return true
             }
         })
-        logger().i("MyApplication onCreate ${BuildConfig.VERSION_NAME}")
+        logger().d("MyApplication onCreate ${BuildConfig.VERSION_NAME}")
 
         // 初始化 Koin
         startKoin {

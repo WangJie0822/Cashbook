@@ -18,6 +18,18 @@ data class UiNavigationModel(
     val close: UiCloseModel? = null
 ) {
     companion object {
+        fun builder(block: Builder.() -> Unit): UiNavigationModel {
+            val builder = Builder()
+            builder.block()
+            return builder.build()
+        }
+    }
+
+    class Builder {
+
+        private var close: UiCloseModel? = null
+        private var jump: UiJumpModel? = null
+
         /**
          * 关闭界面
          *
@@ -27,12 +39,11 @@ data class UiNavigationModel(
         fun close(
             resultCode: Int = Activity.RESULT_CANCELED,
             result: Bundle? = null
-        ): UiNavigationModel {
-            return UiNavigationModel(
-                jump = null,
-                close = UiCloseModel(resultCode, result)
-            )
+        ): Builder {
+            this.close = UiCloseModel(resultCode, result)
+            return this
         }
+
 
         /**
          * 界面跳转
@@ -40,11 +51,13 @@ data class UiNavigationModel(
          * @param path 界面路径
          * @param data 跳转数据，默认 `null`
          */
-        fun jump(path: String, data: Bundle? = null): UiNavigationModel {
-            return UiNavigationModel(
-                jump = UiJumpModel(path, data),
-                close = null
-            )
+        fun jump(path: String, data: Bundle? = null): Builder {
+            this.jump = UiJumpModel(path, data)
+            return this
+        }
+
+        fun build(): UiNavigationModel {
+            return UiNavigationModel(jump, close)
         }
     }
 }
