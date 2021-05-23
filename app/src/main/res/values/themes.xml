@@ -11,9 +11,8 @@
         <item name="colorOnSecondary">@color/color_on_secondary</item>
         <!-- 正常控制颜色 -->
         <item name="colorControlNormal">@color/icons</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <!-- 状态栏颜色 -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
 
         <!-- 窗口背景 -->
         <item name="android:windowBackground">@color/white</item>
@@ -27,12 +26,6 @@
 
     <!-- 闪屏界面主题 -->
     <style name="Theme.Cashbook.Splash">
-        <!-- 应用主色调，ActionBar 等默认颜色 -->
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorPrimaryVariant">@color/white</item>
-        <!-- 应用主要暗色调，StatusBar 默认颜色 -->
-        <item name="colorPrimaryDark">@color/white</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <!-- 窗口背景 -->
         <item name="android:windowBackground">@drawable/layer_splash_bg</item>
     </style>

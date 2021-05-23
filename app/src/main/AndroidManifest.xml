@@ -13,6 +13,7 @@
         android:label="@string/app_name"
         android:maxAspectRatio="2.4"
         android:resizeableActivity="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cashbook"
         tools:targetApi="o">

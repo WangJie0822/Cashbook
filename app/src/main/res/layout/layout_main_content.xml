@@ -24,8 +24,8 @@
                 android:id="@+id/ctl"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:bind_ctl_collapsedTitleTextColor="@{@color/text_color_primary}"
-                android:bind_ctl_expandedTitleColor="@{@color/transparentDark}"
+                android:bind_ctl_collapsedTitleTextColor="@{@color/color_on_primary}"
+                android:bind_ctl_expandedTitleColor="@{@color/transparentLight}"
                 android:elevation="4dp"
                 app:contentScrim="@color/color_primary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
@@ -45,6 +45,7 @@
                     android:bind_toolbar_title="@{viewModel.booksName}"
                     app:layout_collapseMode="pin"
                     app:navigationIcon="@drawable/vector_baseline_menu_24"
+                    app:navigationIconTint="@color/color_on_primary"
                     app:popupTheme="@style/Theme.Cashbook.PopupOverlay"
                     tools:title="默认账本" />
 
