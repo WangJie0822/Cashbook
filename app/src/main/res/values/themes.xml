@@ -15,7 +15,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
 
         <!-- 窗口背景 -->
-        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowBackground">@color/color_window_background</item>
 
         <!-- 动画相关 -->
         <item name="android:windowActivityTransitions">true</item>
@@ -31,5 +31,6 @@
     </style>
 
     <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="Theme.Cashbook.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

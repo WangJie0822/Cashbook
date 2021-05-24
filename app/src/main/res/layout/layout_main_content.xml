@@ -13,7 +13,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/cl_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:showIn="@layout/activity_main">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
@@ -24,8 +25,8 @@
                 android:id="@+id/ctl"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:bind_ctl_collapsedTitleTextColor="@{@color/color_on_primary}"
-                android:bind_ctl_expandedTitleColor="@{@color/transparentLight}"
+                android:bind_ctl_collapsedTitleTextColor="@{@color/toolbar_collapsed_title_text}"
+                android:bind_ctl_expandedTitleTextColor="@{@color/toolbar_expanded_title_text}"
                 android:elevation="4dp"
                 app:contentScrim="@color/color_primary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">

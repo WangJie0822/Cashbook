@@ -9,8 +9,8 @@
     <color name="read_700">#D32F2F</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="transparentLight">#00FFFFFF</color>
-    <color name="transparentDark">#00000000</color>
+    <color name="transparent_light">#00FFFFFF</color>
+    <color name="transparent_dark">#00000000</color>
 
     <!-- 应用主色调 -->
     <color name="color_primary">@color/blue_500</color>
@@ -30,6 +30,8 @@
     <color name="color_error">#FF5722</color>
     <!-- 分隔颜色 -->
     <color name="color_divider">#BDBDBD</color>
+    <!-- 窗口背景色 -->
+    <color name="color_window_background">#F6F6F6</color>
 
     <!-- 图标色 -->
     <color name="icons">@color/black</color>
@@ -38,4 +40,8 @@
     <color name="text_color_primary">#212121</color>
     <!-- 文本次要色调 -->
     <color name="text_color_secondary">#757575</color>
+
+    <!-- toolbar 展开折叠标题文本颜色 -->
+    <color name="toolbar_expanded_title_text">@color/transparent_light</color>
+    <color name="toolbar_collapsed_title_text">@color/color_on_primary</color>
 </resources>

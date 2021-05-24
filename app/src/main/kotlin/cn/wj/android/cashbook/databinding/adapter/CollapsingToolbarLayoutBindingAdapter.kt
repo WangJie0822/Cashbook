@@ -31,7 +31,7 @@ fun setCollapsedTitleTextColor(ctl: CollapsingToolbarLayout, @ColorInt color: In
  * 为 [ctl] 设置展开时标题文本颜色 [color]，[Int]类型颜色值
  * > 可使用资源类型 android:bind_params="@{@color/app_white}"
  */
-@BindingAdapter("android:bind_ctl_expandedTitleColor")
+@BindingAdapter("android:bind_ctl_expandedTitleTextColor")
 fun setExpandedTitleColor(ctl: CollapsingToolbarLayout, @ColorInt color: Int?) {
     if (null == color) {
         return
