@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
 import cn.wj.android.cashbook.ui.viewmodel.MainViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.gyf.immersionbar.ImmersionBar
 import kotlin.math.absoluteValue
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -52,6 +53,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         } else {
             // 间隔时间内，退到后台
             moveTaskToBack(true)
+        }
+    }
+
+    override fun initImmersionbar(immersionBar: ImmersionBar) {
+        immersionBar.run {
+            transparentStatusBar()
+            fitsSystemWindows(false)
         }
     }
 }

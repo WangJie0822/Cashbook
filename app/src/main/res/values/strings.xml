@@ -2,4 +2,9 @@
     <string name="app_name">记账本</string>
     <string name="default_books">默认账本</string>
     <string name="press_again_to_exit">再次返回退出</string>
+    <string name="search">搜索</string>
+    <string name="my_books">我的账本</string>
+    <string name="current_month_spending">本月支出</string>
+    <string name="current_month_income">本月收入</string>
+    <string name="current_month_balance">本月结余</string>
 </resources>

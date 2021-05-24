@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.activity.MainActivity">
@@ -26,14 +25,13 @@
             android:layout_height="match_parent"
             bind:viewModel="@{viewModel}" />
 
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
+        <include
+            android:id="@+id/include_drawer"
+            layout="@layout/layout_main_drawer"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-            app:headerLayout="@layout/layout_main_nav_header"
-            app:menu="@menu/menu_main_nav" />
+            bind:viewModel="@{viewModel}" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
 

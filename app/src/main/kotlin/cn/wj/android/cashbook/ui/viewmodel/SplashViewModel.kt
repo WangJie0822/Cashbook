@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.AROUTER_PATH_MAIN
 import cn.wj.android.cashbook.data.entity.BooksEntity
@@ -31,13 +32,16 @@ class SplashViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     books
                 } else {
                     // 没有默认账本新增
+                    val currentTime = System.currentTimeMillis().dateFormat()
                     val default = BooksEntity(
                         -1,
                         R.string.default_books.string,
-                        "",
+                        "@drawable/img_default_top_bg",
                         "0",
                         0,
-                        true
+                        true,
+                        currentTime,
+                        currentTime
                     )
                     local.insertBooks(default)
                     default

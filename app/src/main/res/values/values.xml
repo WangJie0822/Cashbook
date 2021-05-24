@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 黄金比例 -->
+    <string name="app_golden_ratio_horizontal">1:0.618</string>
+    <string name="app_golden_ratio_vertical">0.618:1</string>
+
+</resources>

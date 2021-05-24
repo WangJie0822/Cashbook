@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.data.database.table
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -12,6 +13,8 @@ import androidx.room.PrimaryKey
  * @param amount 账本金额
  * @param sort 排序字段
  * @param selected 是否默认选中
+ * @param createTime 创建时间
+ * @param modifyTime 修改时间
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/15
  */
@@ -23,5 +26,7 @@ data class BooksTable(
     val imageUrl: String,
     val amount: String,
     val sort: Int,
-    val selected: Int
+    val selected: Int,
+    @ColumnInfo(name = "create_time") val createTime: Long,
+    @ColumnInfo(name = "modify_time") val modifyTime: Long
 )

@@ -27,7 +27,8 @@
     <!-- 组件表面颜色 -->
     <color name="color_surface">@color/white</color>
     <!-- 显示错误颜色 -->
-    <color name="color_error">#FF5722</color>
+    <color name="color_error">#D50000</color>
+    <color name="color_on_error">#FFD600</color>
     <!-- 分隔颜色 -->
     <color name="color_divider">#BDBDBD</color>
     <!-- 窗口背景色 -->
@@ -44,4 +45,9 @@
     <!-- toolbar 展开折叠标题文本颜色 -->
     <color name="toolbar_expanded_title_text">@color/transparent_light</color>
     <color name="toolbar_collapsed_title_text">@color/color_on_primary</color>
+
+    <!-- 支出文本颜色 -->
+    <color name="spending_text">#FF1744</color>
+    <!-- 收入文本颜色 -->
+    <color name="income_text">#00E676</color>
 </resources>

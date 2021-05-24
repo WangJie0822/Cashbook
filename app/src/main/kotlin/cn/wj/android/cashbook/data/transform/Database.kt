@@ -4,6 +4,8 @@
 package cn.wj.android.cashbook.data.transform
 
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.tools.dateFormat
+import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.table.BooksTable
@@ -24,7 +26,9 @@ internal fun BooksTable.toBooksEntity(): BooksEntity {
         imageUrl = imageUrl,
         amount = amount,
         sort = sort,
-        selected = selected == SWITCH_INT_ON
+        selected = selected == SWITCH_INT_ON,
+        createTime = createTime.dateFormat(),
+        modifyTime = modifyTime.dateFormat()
     )
 }
 
@@ -36,6 +40,8 @@ internal fun BooksEntity.toBooksTable(): BooksTable {
         imageUrl = imageUrl,
         amount = amount,
         sort = sort,
-        selected = if (selected) SWITCH_INT_ON else SWITCH_INT_OFF
+        selected = if (selected) SWITCH_INT_ON else SWITCH_INT_OFF,
+        createTime = createTime.toLongTime().orElse(0L),
+        modifyTime = modifyTime.toLongTime().orElse(0L)
     )
 }

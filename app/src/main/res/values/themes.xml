@@ -9,10 +9,16 @@
         <item name="colorSecondary">@color/color_secondary</item>
         <item name="colorSecondaryVariant">@color/color_secondary_variant</item>
         <item name="colorOnSecondary">@color/color_on_secondary</item>
-        <!-- 正常控制颜色 -->
-        <item name="colorControlNormal">@color/icons</item>
+        <!-- 材质颜色 -->
+        <item name="colorSurface">@color/color_surface</item>
+        <!-- 错误颜色 -->
+        <item name="colorError">@color/color_error</item>
+        <item name="colorOnError">@color/color_on_error</item>
         <!-- 状态栏颜色 -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+
+        <item name="android:textColorPrimary">@color/color_on_primary</item>
+        <item name="android:textColorSecondary">@color/color_on_secondary</item>
 
         <!-- 窗口背景 -->
         <item name="android:windowBackground">@color/color_window_background</item>
