@@ -8,6 +8,9 @@ import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import cn.wj.android.cashbook.base.ext.base.color
+import cn.wj.android.cashbook.databinding.constants.COLOR_MARK
+import cn.wj.android.cashbook.databinding.constants.RESOURCE_MARK
 import cn.wj.android.databinding.adapter.getIdentifier
 
 /*
@@ -38,15 +41,16 @@ fun setSwipeRefreshLayoutSchemeColors(srl: SwipeRefreshLayout, colorStr: String?
     val colorLs = arrayListOf<Int>()
     // 统计颜色
     colorStrLs.forEach {
-        colorLs.add(
-            if (colorStr.contains("#")) {
-                // 颜色值
-                Color.parseColor(it)
-            } else {
-                // 颜色 id 字符串
-                it.getIdentifier(srl.context, "color")
+        if (colorStr.startsWith(COLOR_MARK)) {
+            // 颜色值
+            colorLs.add(Color.parseColor(it))
+        } else if (colorStr.startsWith(RESOURCE_MARK)) {
+            // 颜色 id 字符串
+            val colorId = it.getIdentifier(srl.context)
+            if (colorId != 0) {
+                colorLs.add(colorId.color)
             }
-        )
+        }
     }
     srl.setColorSchemeColors(*colorLs.toIntArray())
 }

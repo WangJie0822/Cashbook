@@ -6,8 +6,7 @@ import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.databinding.BindingAdapter
-import cn.wj.android.cashbook.databinding.constants.IMG_RESOURCE_MARK
-import cn.wj.android.cashbook.databinding.constants.IMG_RESOURCE_SPLIT
+import cn.wj.android.cashbook.databinding.constants.RESOURCE_MARK
 import cn.wj.android.databinding.adapter.getIdentifier
 import coil.load
 import java.io.File
@@ -30,16 +29,11 @@ fun src(iv: ImageView, @DrawableRes resId: Int?) {
  */
 @BindingAdapter("android:bind_src")
 fun setImageResource(iv: ImageView, res: String?) {
-    if (res.isNullOrBlank() || !res.startsWith(IMG_RESOURCE_MARK)) {
+    if (res.isNullOrBlank() || !res.startsWith(RESOURCE_MARK)) {
         // 资源为空或者不以资源标识开头
         return
     }
-    val params = res.replace(IMG_RESOURCE_MARK, "").split(IMG_RESOURCE_SPLIT)
-    if (params.size != 2) {
-        // 非有效格式
-        return
-    }
-    iv.setImageResource(params[1].getIdentifier(iv.context, params[0]))
+    iv.setImageResource(res.getIdentifier(iv.context))
 }
 
 
@@ -137,7 +131,7 @@ fun setImageViewImg(
     if (img.startsWith("http:") || img.contains("https:")) {
         // url
         setImageViewUrl(iv, img, placeholder, default)
-    } else if (img.startsWith(IMG_RESOURCE_MARK)) {
+    } else if (img.startsWith(RESOURCE_MARK)) {
         // Resource
         setImageResource(iv, img)
     } else {
