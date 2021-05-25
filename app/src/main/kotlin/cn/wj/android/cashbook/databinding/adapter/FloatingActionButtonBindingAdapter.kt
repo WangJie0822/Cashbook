@@ -15,13 +15,13 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
  */
 
 /**
- * 设置 [efab] 是否展开 [extend]
+ * 设置 [ExtendedFloatingActionButton] 是否展开 [extend]
  */
 @BindingAdapter("android:bind_efab_extend")
-fun setExtendedFloatingActionButtonStrategy(efab: ExtendedFloatingActionButton, extend: Boolean?) {
+fun ExtendedFloatingActionButton.setExtendedFloatingActionButtonStrategy(extend: Boolean?) {
     if (extend.condition) {
-        efab.extend()
+        extend()
     } else {
-        efab.shrink()
+        shrink()
     }
 }

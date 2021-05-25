@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ResourceName">
+
+    <declare-styleable name="FixedTextView">
+        <attr name="ftv_showDrawableStart" format="boolean" />
+        <attr name="ftv_drawableStart" format="reference" />
+        <attr name="ftv_drawableStartWidth" format="dimension|reference" />
+        <attr name="ftv_drawableStartHeight" format="dimension|reference" />
+
+        <attr name="ftv_showDrawableEnd" format="boolean" />
+        <attr name="ftv_drawableEnd" format="reference" />
+        <attr name="ftv_drawableEndWidth" format="dimension|reference" />
+        <attr name="ftv_drawableEndHeight" format="dimension|reference" />
+
+        <attr name="ftv_showDrawableTop" format="boolean" />
+        <attr name="ftv_drawableTop" format="reference" />
+        <attr name="ftv_drawableTopWidth" format="dimension|reference" />
+        <attr name="ftv_drawableTopHeight" format="dimension|reference" />
+
+        <attr name="ftv_showDrawableBottom" format="boolean" />
+        <attr name="ftv_drawableBottom" format="reference" />
+        <attr name="ftv_drawableBottomWidth" format="dimension|reference" />
+        <attr name="ftv_drawableBottomHeight" format="dimension|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="FixedEditText">
+        <attr name="fet_showDrawableStart" format="boolean" />
+        <attr name="fet_drawableStart" format="reference" />
+        <attr name="fet_drawableStartWidth" format="dimension|reference" />
+        <attr name="fet_drawableStartHeight" format="dimension|reference" />
+
+        <attr name="fet_showDrawableEnd" format="boolean" />
+        <attr name="fet_drawableEnd" format="reference" />
+        <attr name="fet_drawableEndWidth" format="dimension|reference" />
+        <attr name="fet_drawableEndHeight" format="dimension|reference" />
+
+        <attr name="fet_showDrawableTop" format="boolean" />
+        <attr name="fet_drawableTop" format="reference" />
+        <attr name="fet_drawableTopWidth" format="dimension|reference" />
+        <attr name="fet_drawableTopHeight" format="dimension|reference" />
+
+        <attr name="fet_showDrawableBottom" format="boolean" />
+        <attr name="fet_drawableBottom" format="reference" />
+        <attr name="fet_drawableBottomWidth" format="dimension|reference" />
+        <attr name="fet_drawableBottomHeight" format="dimension|reference" />
+    </declare-styleable>
+
+</resources>

@@ -122,7 +122,7 @@ var SmartRefreshLayout.loadMoreState: SmartRefreshState?
     }
 
 /**
- * 给 [srl] 设置刷新回调 [onRefresh]
+ * 给 [SmartRefreshLayout] 设置刷新回调 [onRefresh]
  * > [onRefresh] 无入参，无返回值
  *
  * > [listener] 为属性变化监听，`DataBinding` 自动实现，无需配置
@@ -132,19 +132,18 @@ var SmartRefreshLayout.loadMoreState: SmartRefreshState?
     "android:bind_smart_refreshingAttrChanged",
     requireAll = false
 )
-fun setSmartRefreshLayoutOnRefresh(
-    srl: SmartRefreshLayout,
+fun SmartRefreshLayout.setSmartRefreshLayoutOnRefresh(
     onRefresh: (() -> Unit)?,
     listener: InverseBindingListener?
 ) {
-    srl.setOnRefreshListener {
+   setOnRefreshListener {
         listener?.onChange()
         onRefresh?.invoke()
     }
 }
 
 /**
- * 给 [srl] 设置刷新回调 [onRefresh]
+ * 给 [SmartRefreshLayout] 设置刷新回调 [onRefresh]
  * > [onRefresh] 参见 [SmartLoadDataListener]
  *
  * > [listener] 为属性变化监听，`DataBinding` 自动实现，无需配置
@@ -154,27 +153,26 @@ fun setSmartRefreshLayoutOnRefresh(
     "android:bind_smart_refreshingAttrChanged",
     requireAll = false
 )
-fun setSmartRefreshLayoutOnRefresh(
-    srl: SmartRefreshLayout,
+fun SmartRefreshLayout.setSmartRefreshLayoutOnRefresh(
     onRefresh: SmartLoadDataListener?,
     listener: InverseBindingListener?
 ) {
-    srl.setOnRefreshListener {
+    setOnRefreshListener {
         listener?.onChange()
         onRefresh?.onLoadData()
     }
 }
 
 /**
- * 给 [srl] 设置是否允许下拉刷新 [enable]
+ * 给 [SmartRefreshLayout] 设置是否允许下拉刷新 [enable]
  */
 @BindingAdapter("android:bind_smart_refresh_enable")
-fun setSmartRefreshLayoutRefreshEnable(srl: SmartRefreshLayout, enable: Boolean) {
-    srl.setEnableRefresh(enable)
+fun SmartRefreshLayout. setSmartRefreshLayoutRefreshEnable( enable: Boolean) {
+    setEnableRefresh(enable)
 }
 
 /**
- * 给 [srl] 设置加载更多回调 [onLoadMore]
+ * 给 [SmartRefreshLayout] 设置加载更多回调 [onLoadMore]
  * > [onLoadMore] 无入参，无返回值
  *
  * > [listener] 为属性变化监听，`DataBinding` 自动实现，无需配置
@@ -184,19 +182,18 @@ fun setSmartRefreshLayoutRefreshEnable(srl: SmartRefreshLayout, enable: Boolean)
     "android:bind_smart_loadMoreAttrChanged",
     requireAll = false
 )
-fun setSmartRefreshLayoutOnLoadMore(
-    srl: SmartRefreshLayout,
+fun SmartRefreshLayout.setSmartRefreshLayoutOnLoadMore(
     onLoadMore: (() -> Unit)?,
     listener: InverseBindingListener?
 ) {
-    srl.setOnLoadMoreListener {
+    setOnLoadMoreListener {
         listener?.onChange()
         onLoadMore?.invoke()
     }
 }
 
 /**
- * 给 [srl] 设置加载更多回调 [onLoadMore]
+ * 给 [SmartRefreshLayout] 设置加载更多回调 [onLoadMore]
  * > [onLoadMore] 参见 [SmartLoadDataListener]
  *
  * > [listener] 为属性变化监听，`DataBinding` 自动实现，无需配置
@@ -206,31 +203,30 @@ fun setSmartRefreshLayoutOnLoadMore(
     "android:bind_smart_loadMoreAttrChanged",
     requireAll = false
 )
-fun setSmartRefreshLayoutOnLoadMore(
-    srl: SmartRefreshLayout,
+fun SmartRefreshLayout.setSmartRefreshLayoutOnLoadMore(
     onLoadMore: SmartLoadDataListener?,
     listener: InverseBindingListener?
 ) {
-    srl.setOnLoadMoreListener {
+   setOnLoadMoreListener {
         listener?.onChange()
         onLoadMore?.onLoadData()
     }
 }
 
 /**
- * 给 [srl] 设置是否允许上拉加载更多 [enable]
+ * 给 [SmartRefreshLayout] 设置是否允许上拉加载更多 [enable]
  */
 @BindingAdapter("android:bind_smart_loadMore_enable")
-fun setSmartRefreshLayoutLoadMoreEnable(srl: SmartRefreshLayout, enable: Boolean) {
-    srl.setEnableLoadMore(enable)
+fun SmartRefreshLayout.setSmartRefreshLayoutLoadMoreEnable( enable: Boolean) {
+    setEnableLoadMore(enable)
 }
 
 /**
- * 给 [srl] 设置是否显示没有更多 [noMore]
+ * 给 [SmartRefreshLayout] 设置是否显示没有更多 [noMore]
  */
 @BindingAdapter("android:bind_smart_noMore")
-fun setSmartRefreshLayoutNoMore(srl: SmartRefreshLayout, noMore: Boolean) {
-    srl.setNoMoreData(noMore)
+fun SmartRefreshLayout.setSmartRefreshLayoutNoMore( noMore: Boolean) {
+   setNoMoreData(noMore)
 }
 
 /**

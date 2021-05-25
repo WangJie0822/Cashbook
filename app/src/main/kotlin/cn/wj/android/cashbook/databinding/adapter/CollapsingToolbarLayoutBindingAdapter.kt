@@ -16,35 +16,36 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
  */
 
 /**
- * 为 [ctl] 设置折叠时标题文本颜色 [color]，[Int]类型颜色值
+ * 为 [CollapsingToolbarLayout] 设置折叠时标题文本颜色 [color]，[Int]类型颜色值
  * > 可使用资源类型 android:bind_params="@{@color/app_white}"
  */
 @BindingAdapter("android:bind_ctl_collapsedTitleTextColor")
-fun setCollapsedTitleTextColor(ctl: CollapsingToolbarLayout, @ColorInt color: Int?) {
+fun CollapsingToolbarLayout.setCollapsedTitleTextColor(@ColorInt color: Int?) {
     if (null == color) {
         return
     }
-    ctl.setCollapsedTitleTextColor(color)
+    setCollapsedTitleTextColor(color)
 }
 
 /**
- * 为 [ctl] 设置展开时标题文本颜色 [color]，[Int]类型颜色值
+ * 为 [CollapsingToolbarLayout] 设置展开时标题文本颜色 [color]，[Int]类型颜色值
  * > 可使用资源类型 android:bind_params="@{@color/app_white}"
  */
 @BindingAdapter("android:bind_ctl_expandedTitleTextColor")
-fun setExpandedTitleColor(ctl: CollapsingToolbarLayout, @ColorInt color: Int?) {
+fun CollapsingToolbarLayout.setExpandedTitleColor(@ColorInt color: Int?) {
     if (null == color) {
         return
     }
-    ctl.setExpandedTitleColor(color)
+    setExpandedTitleColor(color)
 }
 
+/** 添加折叠进度监听 */
 @BindingAdapter("android:bind_ctl_onOffsetChanged")
-fun addOnOffsetChangedListener(ctl: CollapsingToolbarLayout, onChanged: ((Int, Int) -> Unit)?) {
+fun CollapsingToolbarLayout.addOnOffsetChangedListener(onChanged: ((Int, Int) -> Unit)?) {
     if (null == onChanged) {
         return
     }
-    val parent = ctl.parent
+    val parent = this.parent
     if (parent is AppBarLayout) {
         parent.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
             onChanged.invoke(verticalOffset, parent.totalScrollRange)

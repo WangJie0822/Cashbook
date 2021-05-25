@@ -19,20 +19,19 @@ import cn.wj.android.cashbook.base.tools.parseHtmlFromString
  * TextView DataBinding 适配器
  */
 
-/** 给 [tv] 设置文本变化监听 [before] & [on] & [after] */
+/** 给 [TextView] 设置文本变化监听 [before] & [on] & [after] */
 @BindingAdapter(
     "android:bind_tv_textChange_before",
     "android:bind_tv_textChange_on",
     "android:bind_tv_textChange_after",
     requireAll = false
 )
-fun addTextChangedListener(
-    tv: TextView,
+fun TextView.addTextChangedListener(
     before: ((CharSequence?, Int, Int, Int) -> Unit)?,
     on: ((CharSequence?, Int, Int, Int) -> Unit)?,
     after: ((Editable?) -> Unit)?
 ) {
-    tv.addTextChangedListener(object : TextWatcher {
+    this.addTextChangedListener(object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             before?.invoke(s, start, count, after)
         }
@@ -47,77 +46,77 @@ fun addTextChangedListener(
     })
 }
 
-/** 根据颜色值 [color] 给 [tv] 设置文本颜色，颜色值 `0x000000` */
+/** 根据颜色值 [color] 给 [TextView] 设置文本颜色，颜色值 `0x000000` */
 @BindingAdapter("android:bind_tv_textColor")
-fun setTextColor(tv: TextView, @ColorInt color: Int?) {
+fun TextView.setTextColor(@ColorInt color: Int?) {
     if (null == color) {
         return
     }
-    tv.setTextColor(color)
+    this.setTextColor(color)
 }
 
-/** 根据颜色字符串 [colorStr] 给 [tv] 设置文本颜色，颜色值 `"#FFFFFF"` */
+/** 根据颜色字符串 [colorStr] 给 [TextView] 设置文本颜色，颜色值 `"#FFFFFF"` */
 @BindingAdapter("android:bind_tv_textColor")
-fun setTextColor(tv: TextView, colorStr: String?) {
+fun TextView.setTextColor(colorStr: String?) {
     if (colorStr.isNullOrBlank()) {
         return
     }
     val color = parseColorFromString(colorStr) ?: return
-    tv.setTextColor(color)
+    this.setTextColor(color)
 }
 
-/** 根据资源id [resId] 为 [tv] 设置文本 */
+/** 根据资源id [resId] 为 [TextView] 设置文本 */
 @BindingAdapter("android:bind_tv_text")
-fun setText(tv: TextView, @StringRes resId: Int?) {
+fun TextView.setText(@StringRes resId: Int?) {
     if (null != resId || resId == 0) {
         return
     }
-    tv.text = resId
+    this.text = resId
 }
 
-/** 将 [tv] 文本设置为 [cs] 并执行 [textSpan] 方法块设置富文本 */
+/** 将 [TextView] 文本设置为 [cs] 并执行 [textSpan] 方法块设置富文本 */
 @BindingAdapter("android:bind_tv_text", "android:bind_tv_text_span", requireAll = false)
-fun setText(tv: TextView, cs: CharSequence?, textSpan: (SpannableString.() -> Unit)?) {
+fun TextView.setText(cs: CharSequence?, textSpan: (SpannableString.() -> Unit)?) {
     if (null != cs && null != textSpan) {
-        tv.movementMethod = LinkMovementMethod.getInstance()
+        this.movementMethod = LinkMovementMethod.getInstance()
         val ss = SpannableString(cs)
         ss.textSpan()
-        tv.text = ss
+        this.text = ss
     } else {
-        tv.text = cs
+        this.text = cs
     }
 }
 
-/** 将 [html] 解析为 **Html** 格式并设置 [tv] 显示 */
+/** 将 [html] 解析为 **Html** 格式并设置 [TextView] 显示 */
 @BindingAdapter("android:bind_tv_html")
-fun setText(tv: TextView, html: String?) {
-    tv.text = parseHtmlFromString(html.orEmpty())
+fun TextView.setTextHtml(html: String?) {
+    this.text = parseHtmlFromString(html.orEmpty())
 }
 
-/** 将 [tv] 的最大行数设置为 [maxLines] */
+/** 将 [TextView] 的最大行数设置为 [maxLines] */
 @BindingAdapter("android:bind_tv_maxLines")
-fun setMaxLines(tv: TextView, maxLines: Int?) {
+fun TextView.setMaxLines(maxLines: Int?) {
     if (null == maxLines) {
         return
     }
-    tv.maxLines = maxLines
+    this.maxLines = maxLines
 }
 
-/** 将 [tv] 文本重心设置为 [gravity] */
+/** 将 [TextView] 文本重心设置为 [gravity] */
 @BindingAdapter("android:bind_tv_gravity")
-fun setGravity(tv: TextView, gravity: Int?) {
+fun TextView.setGravity(gravity: Int?) {
     if (null == gravity) {
         return
     }
-    tv.gravity = gravity
+    this.gravity = gravity
 }
 
-/** 设置 [tv] 是否显示中划线 [show] */
+/** 设置 [TextView] 是否显示中划线 [show] */
 @BindingAdapter("android:bind_tv_show_strike_thru")
-fun showStrikeThru(tv: TextView, show: Boolean?) {
-    if (show.condition) {
-        tv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+fun TextView.showStrikeThru(show: Boolean?) {
+    paintFlags = if (show.condition) {
+        Paint.STRIKE_THRU_TEXT_FLAG
     } else {
-        tv.paintFlags = 0
+        0
     }
 }

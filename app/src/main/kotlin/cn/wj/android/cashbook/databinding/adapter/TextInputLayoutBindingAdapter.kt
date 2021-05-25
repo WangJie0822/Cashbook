@@ -17,13 +17,13 @@ import com.google.android.material.textfield.TextInputLayout
  * 设置错误提示
  */
 @BindingAdapter("android:bind_til_error")
-fun setError(til: TextInputLayout, error: CharSequence?) {
+fun TextInputLayout.setErrorHint(error: CharSequence?) {
     if (error.isNullOrBlank()) {
-        til.isErrorEnabled = false
+        isErrorEnabled = false
         return
     }
-    til.error = error
-    til.editText?.run {
+    this.error = error
+    editText?.run {
         if (!isFocusable) {
             isFocusable = true
             isFocusableInTouchMode = true

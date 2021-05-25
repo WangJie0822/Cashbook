@@ -15,30 +15,30 @@ import java.io.File
  * ImageView DataBinding 适配器
  */
 
-/** 根据资源id [resId] 给 [iv] 加载图片 */
+/** 根据资源id [resId] 给 [ImageView] 加载图片 */
 @BindingAdapter("android:bind_src")
-fun src(iv: ImageView, @DrawableRes resId: Int?) {
+fun ImageView.src(@DrawableRes resId: Int?) {
     if (null != resId && 0 != resId) {
-        iv.setImageResource(resId)
+        setImageResource(resId)
     }
 }
 
 /**
- * 根据资源字符串 [res] 给 [iv] 加载图片
+ * 根据资源字符串 [res] 给 [ImageView] 加载图片
  * > [res]: @drawable/xxx or @mipmap/xxx
  */
 @BindingAdapter("android:bind_src")
-fun setImageResource(iv: ImageView, res: String?) {
+fun ImageView.setImageResource(res: String?) {
     if (res.isNullOrBlank() || !res.startsWith(RESOURCE_MARK)) {
         // 资源为空或者不以资源标识开头
         return
     }
-    iv.setImageResource(res.getIdentifier(iv.context))
+    setImageResource(res.getIdentifier(context))
 }
 
 
 /**
- * 为 [iv] 设置网络图片 [imgUrl] 显示，占位图为 [placeholder]
+ * 为 [ImageView] 设置网络图片 [imgUrl] 显示，占位图为 [placeholder]
  * > 当 [imgUrl] 为空或者加载失败时，显示 [default]
  *
  * > [placeholder] [default] 可使用资源类型 android:bind_params="@{@drawable/app_drawable_id}"
@@ -49,13 +49,12 @@ fun setImageResource(iv: ImageView, res: String?) {
     "android:bind_iv_img_default",
     requireAll = false
 )
-fun setImageViewUrl(
-    iv: ImageView,
+fun ImageView.setImageViewUrl(
     imgUrl: String?,
     placeholder: Drawable?,
     default: Drawable?
 ) {
-    iv.load(imgUrl) {
+    load(imgUrl) {
         if (null != placeholder) {
             placeholder(placeholder)
         }
@@ -66,7 +65,7 @@ fun setImageViewUrl(
 }
 
 /**
- * 为 [iv] 设置本地图片 [path] 显示，占位图为 [placeholder]
+ * 为 [ImageView] 设置本地图片 [path] 显示，占位图为 [placeholder]
  * > 当 [path] 为空或者加载失败时，显示 [default]
  *
  * > [placeholder] [default] 可使用资源类型 android:bind_params="@{@drawable/app_drawable_id}"
@@ -77,8 +76,7 @@ fun setImageViewUrl(
     "android:bind_iv_img_default",
     requireAll = false
 )
-fun setImageViewPath(
-    iv: ImageView,
+fun ImageView.setImageViewPath(
     path: String?,
     placeholder: Drawable?,
     default: Drawable?
@@ -86,11 +84,11 @@ fun setImageViewPath(
 
     if (path.isNullOrBlank()) {
         if (null != default) {
-            iv.setImageDrawable(default)
+            setImageDrawable(default)
         }
         return
     }
-    iv.load(File(path)) {
+    load(File(path)) {
         if (null != placeholder) {
             placeholder(placeholder)
         }
@@ -101,7 +99,7 @@ fun setImageViewPath(
 }
 
 /**
- * 为 [iv] 设置图片 [img] 显示，占位图为 [placeholder]
+ * 为 [ImageView] 设置图片 [img] 显示，占位图为 [placeholder]
  * > 根据 [img] 数据类型加载不同类型数据
  *
  * > [placeholder] [default] 可使用资源类型 android:bind_params="@{@drawable/app_drawable_id}"
@@ -116,26 +114,25 @@ fun setImageViewPath(
     "android:bind_iv_img_default",
     requireAll = false
 )
-fun setImageViewImg(
-    iv: ImageView,
+fun ImageView.setImageViewImg(
     img: String?,
     placeholder: Drawable?,
     default: Drawable?
 ) {
     if (img.isNullOrBlank()) {
         if (null != default) {
-            iv.setImageDrawable(default)
+            setImageDrawable(default)
         }
         return
     }
     if (img.startsWith("http:") || img.contains("https:")) {
         // url
-        setImageViewUrl(iv, img, placeholder, default)
+        setImageViewUrl(img, placeholder, default)
     } else if (img.startsWith(RESOURCE_MARK)) {
         // Resource
-        setImageResource(iv, img)
+        setImageResource(img)
     } else {
         // path
-        setImageViewPath(iv, img, placeholder, default)
+        setImageViewPath(img, placeholder, default)
     }
 }

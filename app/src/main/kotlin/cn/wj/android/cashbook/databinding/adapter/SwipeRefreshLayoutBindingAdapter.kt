@@ -17,21 +17,21 @@ import cn.wj.android.databinding.adapter.getIdentifier
  * SwipeRefreshLayout DataBinding 适配器
  */
 
-/** 为 [srl] 设置进度条颜色 [color] */
+/** 为 [SwipeRefreshLayout] 设置进度条颜色 [color] */
 @BindingAdapter("android:bind_srl_schemeColors")
-fun setSwipeRefreshLayoutSchemeColors(srl: SwipeRefreshLayout, @ColorInt color: Int?) {
+fun SwipeRefreshLayout.setSwipeRefreshLayoutSchemeColors(@ColorInt color: Int?) {
     if (null == color) {
         return
     }
-    srl.setColorSchemeColors(color)
+    setColorSchemeColors(color)
 }
 
 /**
- * 为 [srl] 设置进度条颜色 [colorStr]
+ * 为 [SwipeRefreshLayout] 设置进度条颜色 [colorStr]
  * > [colorStr] 多个使用 `,` 分隔，可使用颜色id `"app_color_white"` 或色值 `"#FFFFFF"`
  */
 @BindingAdapter("android:bind_srl_schemeColors")
-fun setSwipeRefreshLayoutSchemeColors(srl: SwipeRefreshLayout, colorStr: String?) {
+fun SwipeRefreshLayout.setSwipeRefreshLayoutSchemeColors(colorStr: String?) {
     if (null == colorStr) {
         return
     }
@@ -46,29 +46,29 @@ fun setSwipeRefreshLayoutSchemeColors(srl: SwipeRefreshLayout, colorStr: String?
             colorLs.add(Color.parseColor(it))
         } else if (colorStr.startsWith(RESOURCE_MARK)) {
             // 颜色 id 字符串
-            val colorId = it.getIdentifier(srl.context)
+            val colorId = it.getIdentifier(context)
             if (colorId != 0) {
                 colorLs.add(colorId.color)
             }
         }
     }
-    srl.setColorSchemeColors(*colorLs.toIntArray())
+    setColorSchemeColors(*colorLs.toIntArray())
 }
 
-/** 给 [srl] 设置刷新状态 [refreshing] */
-@BindingAdapter("android:bind_srl_refreshing")
-fun setSwipeRefreshLayoutRefreshing(srl: SwipeRefreshLayout, refreshing: Boolean) {
-    srl.isRefreshing = refreshing
-}
-
-/** 获取 [srl] 的刷新状态 */
-@InverseBindingAdapter(attribute = "android:bind_srl_refreshing")
-fun getSwipeRefreshLayoutRefreshing(srl: SwipeRefreshLayout): Boolean {
-    return srl.isRefreshing
-}
+/** [SwipeRefreshLayout] 刷新状态 */
+@set:BindingAdapter("android:bind_srl_refreshing")
+@get:InverseBindingAdapter(
+    attribute = "android:bind_srl_refreshing",
+    event = "android:bind_srl_refreshingAttrChanged"
+)
+var SwipeRefreshLayout.refreshing: Boolean
+    get() = isRefreshing
+    set(value) {
+        isRefreshing = value
+    }
 
 /**
- * 给 [srl] 设置刷新事件 [refresh]
+ * 给 [SwipeRefreshLayout] 设置刷新事件 [refresh]
  * > [refresh]: () -> [Unit]
  *
  * > [listener] 为属性变化监听，`DataBinding` 自动实现，无需传递
@@ -78,12 +78,11 @@ fun getSwipeRefreshLayoutRefreshing(srl: SwipeRefreshLayout): Boolean {
     "android:bind_srl_refreshingAttrChanged",
     requireAll = false
 )
-fun setSwipeRefreshLayoutRefreshListener(
-    srl: SwipeRefreshLayout,
+fun SwipeRefreshLayout.setSwipeRefreshLayoutRefreshListener(
     refresh: (() -> Unit)?,
     listener: InverseBindingListener?
 ) {
-    srl.setOnRefreshListener {
+    setOnRefreshListener {
         refresh?.invoke()
         listener?.onChange()
     }
