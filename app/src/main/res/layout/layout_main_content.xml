@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.activity.MainActivity">
 
@@ -28,119 +29,30 @@
                 android:layout_height="match_parent"
                 android:bind_ctl_collapsedTitleTextColor="@{@color/toolbar_collapsed_title_text}"
                 android:bind_ctl_expandedTitleTextColor="@{@color/toolbar_expanded_title_text}"
+                android:bind_ctl_onExpandOffsetChanged="@{viewModel.onCollapsingChanged}"
+                android:bind_ctl_title="@{viewModel.booksName}"
+                android:bind_ctl_title_enable="@{viewModel.titleEnable}"
                 android:elevation="4dp"
                 app:contentScrim="@color/color_primary"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:scrimVisibleHeightTrigger="@dimen/main_header_scrim_visible_height"
+                app:toolbarId="@id/toolbar">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/main_header_height"
-                    app:layout_collapseMode="parallax">
-
-                    <ImageView
-                        android:id="@+id/iv_top_bg"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:bind_iv_img="@{viewModel.topBgImage}"
-                        android:contentDescription="@null"
-                        android:scaleType="centerCrop"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:src="@drawable/img_default_top_bg" />
-
-                    <TextView
-                        android:id="@+id/tv_current_month_spending"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:text="@string/current_month_spending"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.4" />
-
-                    <TextView
-                        android:id="@+id/tv_spending"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginTop="@dimen/content_vertical_spacing"
-                        android:text="@{viewModel.spending}"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_current_month_spending"
-                        tools:text="2000" />
-
-                    <TextView
-                        android:id="@+id/tv_current_month_income"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginBottom="@dimen/content_vertical_spacing"
-                        android:text="@string/current_month_income"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        app:layout_constraintBottom_toTopOf="@id/tv_income"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_income"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:text="@{viewModel.income}"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        tools:text="2000" />
-
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/guideline_vertical_center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.5" />
-
-                    <TextView
-                        android:id="@+id/tv_current_month_balance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginBottom="@dimen/content_vertical_spacing"
-                        android:text="@string/current_month_balance"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        app:layout_constraintBottom_toTopOf="@id/tv_balance"
-                        app:layout_constraintStart_toStartOf="@id/guideline_vertical_center" />
-
-                    <TextView
-                        android:id="@+id/tv_balance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:text="@{viewModel.balance}"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/guideline_vertical_center"
-                        tools:text="2000" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <include
+                    android:id="@+id/include_collapsing_content"
+                    layout="@layout/layout_main_collapsing_content"
+                    bind:viewModel="@{viewModel}" />
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:bind_fits_status_bar="@{true}"
-                    android:bind_toolbar_title="@{viewModel.booksName}"
                     app:layout_collapseMode="pin"
                     app:menu="@menu/main_toolbar"
                     app:navigationIcon="@drawable/vector_baseline_menu_24"
                     app:navigationIconTint="@color/color_on_primary"
-                    app:popupTheme="@style/Theme.Cashbook.PopupOverlay"
-                    tools:title="默认账本" />
+                    app:popupTheme="@style/Theme.Cashbook.PopupOverlay" />
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 

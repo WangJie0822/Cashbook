@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.databinding.ActivitySplashBinding
 import cn.wj.android.cashbook.ui.viewmodel.SplashViewModel
 import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.gyf.immersionbar.ImmersionBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -34,6 +35,13 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
             exitTransition = MaterialFadeThrough().apply {
                 duration = ACTIVITY_ANIM_DURATION
             }
+        }
+    }
+
+    override fun initImmersionbar(immersionBar: ImmersionBar) {
+        immersionBar.run {
+            transparentStatusBar()
+            fitsSystemWindows(false)
         }
     }
 }

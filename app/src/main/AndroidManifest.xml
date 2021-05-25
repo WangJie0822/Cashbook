@@ -49,6 +49,12 @@
             android:name=".ui.activity.MainActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
+
+        <!-- 我的账本 -->
+        <activity
+            android:name=".ui.activity.MyBooksActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="fullSensor" />
     </application>
 
 </manifest>

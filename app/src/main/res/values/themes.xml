@@ -11,6 +11,9 @@
         <item name="colorOnSecondary">@color/color_on_secondary</item>
         <!-- 材质颜色 -->
         <item name="colorSurface">@color/color_surface</item>
+        <item name="colorOnSurface">@color/color_on_surface</item>
+        <item name="colorPrimarySurface">@color/color_primary_surface</item>
+        <item name="colorOnPrimarySurface">@color/color_on_primary_surface</item>
         <!-- 错误颜色 -->
         <item name="colorError">@color/color_error</item>
         <item name="colorOnError">@color/color_on_error</item>

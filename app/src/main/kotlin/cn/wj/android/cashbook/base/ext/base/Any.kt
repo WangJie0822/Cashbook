@@ -25,3 +25,12 @@ fun <T> T?.orElse(t: T): T {
 fun Any.logger(tag: String? = null): Printer {
     return funLogger(tag ?: this.tag)
 }
+
+/** 如果满足 [condition] 返回 [defaultValue] 的值，否则返回当前值 */
+fun <T> T.ifCondition(condition: Boolean, defaultValue: () -> T): T {
+    return if (condition) {
+        defaultValue.invoke()
+    } else {
+        this
+    }
+}

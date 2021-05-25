@@ -6,6 +6,7 @@ import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.ui.viewmodel.MainViewModel
+import cn.wj.android.cashbook.ui.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.viewmodel.SplashViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -42,5 +43,8 @@ val viewModelModule = module {
     }
     viewModel {
         MainViewModel(get())
+    }
+    viewModel {
+        MyBooksViewModel(get())
     }
 }

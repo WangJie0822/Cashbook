@@ -26,6 +26,9 @@
     <color name="color_on_secondary">@color/black</color>
     <!-- 组件表面颜色 -->
     <color name="color_surface">@color/white</color>
+    <color name="color_on_surface">@color/text_color_primary</color>
+    <color name="color_primary_surface">@color/white</color>
+    <color name="color_on_primary_surface">@color/text_color_primary</color>
     <!-- 显示错误颜色 -->
     <color name="color_error">#D50000</color>
     <color name="color_on_error">#FFD600</color>

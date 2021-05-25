@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -52,7 +53,20 @@
             android:background="?attr/colorSurface"
             android:orientation="vertical">
 
-
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/item_height"
+                android:layout_marginTop="@dimen/content_horizontal_spacing"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMyBooksClick}"
+                android:drawablePadding="@dimen/drawable_vertical_spacing"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/activity_vertical_margin"
+                android:paddingEnd="@dimen/zero"
+                android:text="@string/my_books"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@color/color_on_secondary"
+                app:drawableStartCompat="@drawable/vector_baseline_library_books_24" />
 
         </LinearLayout>
 

@@ -48,6 +48,15 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        if (binding.dlRoot.isOpen) {
+            // 抽屉开启时关闭
+            binding.dlRoot.close()
+        }
+    }
+
     override fun onBackPressed() {
         if (binding.dlRoot.isOpen) {
             // 抽屉开启时关闭
