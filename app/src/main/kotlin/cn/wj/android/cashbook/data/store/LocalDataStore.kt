@@ -1,9 +1,13 @@
 package cn.wj.android.cashbook.data.store
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.liveData
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.BooksDao
 import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.source.BillPagingSource
 import cn.wj.android.cashbook.data.transform.toBooksEntity
 import cn.wj.android.cashbook.data.transform.toBooksTable
 import kotlinx.coroutines.Dispatchers
@@ -43,4 +47,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getDefaultBooks(): BooksEntity? = withContext(Dispatchers.IO) {
         booksDao.queryDefault().firstOrNull()?.toBooksEntity()
     }
+
+    fun getBillList() = Pager(
+        config = PagingConfig(20),
+        pagingSourceFactory = { BillPagingSource() }
+    ).liveData
 }

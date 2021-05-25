@@ -151,13 +151,15 @@
             android:id="@+id/srl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:bind_srl_refreshing="@={viewModel.refreshing}"
             android:bind_srl_schemeColors="@{`@color/color_primary,@color/color_secondary`}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                tools:listitem="@layout/recycler_item_bill" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

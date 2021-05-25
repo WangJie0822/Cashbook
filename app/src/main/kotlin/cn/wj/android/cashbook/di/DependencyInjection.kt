@@ -41,6 +41,6 @@ val viewModelModule = module {
         SplashViewModel(get())
     }
     viewModel {
-        MainViewModel()
+        MainViewModel(get())
     }
 }

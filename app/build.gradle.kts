@@ -175,6 +175,9 @@ dependencies {
     implementation(Dependencies.Androidx.Navigation.uiKtx)
     implementation(Dependencies.Androidx.Navigation.fragmentKtx)
 
+    // Paging
+    implementation(Dependencies.Androidx.Paging.runtimeKtx)
+
     // Material
     implementation(Dependencies.Google.material)
 
