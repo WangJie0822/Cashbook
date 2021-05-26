@@ -7,4 +7,7 @@
     <string name="current_month_spending">本月支出</string>
     <string name="current_month_income">本月收入</string>
     <string name="current_month_balance">本月结余</string>
+    <string name="confirm">确认</string>
+    <string name="modify">修改</string>
+    <string name="delete">删除</string>
 </resources>

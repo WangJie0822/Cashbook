@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- 应用主题 -->
-    <style name="Theme.Cashbook" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Cashbook" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- 主要颜色 -->
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryVariant">@color/color_primary_variant</item>
@@ -23,6 +23,9 @@
         <item name="android:textColorPrimary">@color/color_on_primary</item>
         <item name="android:textColorSecondary">@color/color_on_secondary</item>
 
+        <!-- 字体设置 -->
+        <item name="textAppearanceLargePopupMenu">@style/TextAppearance.Cashbook.PopupMenu</item>
+
         <!-- 窗口背景 -->
         <item name="android:windowBackground">@color/color_window_background</item>
 
@@ -39,7 +42,20 @@
         <item name="android:windowBackground">@drawable/layer_splash_bg</item>
     </style>
 
+    <!-- AppBar 样式 -->
     <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+    <!-- Popup 样式 -->
     <style name="Theme.Cashbook.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- 默认字体样式 -->
+    <style name="TextAppearance.Cashbook" parent="android:TextAppearance.Material" />
+
+    <!-- 次要字体样式 -->
+    <style name="TextAppearance.Cashbook.Secondary" parent="android:TextAppearance.Material">
+        <item name="android:textColor">@android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- PopupMenu 字体样式 -->
+    <style name="TextAppearance.Cashbook.PopupMenu" parent="android:TextAppearance.Material.Caption" />
 </resources>

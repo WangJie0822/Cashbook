@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="toolbar">
+
+    <item
+        android:id="@+id/confirm"
+        android:icon="@drawable/vector_baseline_check_24"
+        android:iconTint="@color/color_on_primary"
+        android:title="@string/confirm"
+        app:iconTint="@color/color_on_primary"
+        app:showAsAction="ifRoom"
+        tools:targetApi="o" />
+
+</menu>

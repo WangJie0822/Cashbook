@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.model.CurrencyModel
 
 /**
  * 数据库数据转换相关
@@ -24,8 +25,8 @@ internal fun BooksTable.toBooksEntity(): BooksEntity {
         id = id.orElse(-1L),
         name = name,
         imageUrl = imageUrl,
-        amount = amount,
-        sort = sort,
+        description = description,
+        currency = CurrencyModel.fromCode(currency),
         selected = selected == SWITCH_INT_ON,
         createTime = createTime.dateFormat(),
         modifyTime = modifyTime.dateFormat()
@@ -38,8 +39,8 @@ internal fun BooksEntity.toBooksTable(): BooksTable {
         id = if (-1L == id) null else id,
         name = name,
         imageUrl = imageUrl,
-        amount = amount,
-        sort = sort,
+        description = description,
+        currency = currency?.code.orEmpty(),
         selected = if (selected) SWITCH_INT_ON else SWITCH_INT_OFF,
         createTime = createTime.toLongTime().orElse(0L),
         modifyTime = modifyTime.toLongTime().orElse(0L)

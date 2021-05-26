@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.AROUTER_PATH_MAIN
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
+import cn.wj.android.cashbook.data.model.CurrencyModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import kotlinx.coroutines.launch
@@ -37,8 +38,8 @@ class SplashViewModel(private val local: LocalDataStore) : BaseViewModel() {
                         -1,
                         R.string.default_books.string,
                         "@drawable/img_default_top_bg",
-                        "0",
-                        0,
+                        "日常账本",
+                        CurrencyModel.CNY,
                         true,
                         currentTime,
                         currentTime

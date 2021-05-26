@@ -1,13 +1,15 @@
 package cn.wj.android.cashbook.data.entity
 
+import cn.wj.android.cashbook.data.model.CurrencyModel
+
 /**
  * 账本数据实体类
  *
  * @param id 账本 id 主键自增长
  * @param name 账本名
  * @param imageUrl 账本封面地址
- * @param amount 账本金额
- * @param sort 排序字段
+ * @param description 描述
+ * @param currency [CurrencyModel] 默认货币信息
  * @param selected 是否默认选中
  * @param createTime 创建时间
  * @param modifyTime 修改时间
@@ -18,8 +20,8 @@ data class BooksEntity(
     val id: Long,
     val name: String,
     val imageUrl: String,
-    val amount: String,
-    val sort: Int,
+    val description: String,
+    val currency: CurrencyModel?,
     val selected: Boolean,
     val createTime: String,
     val modifyTime: String

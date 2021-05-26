@@ -12,6 +12,19 @@ fun Toolbar.setToolbarMenuItemClick(itemClick: ((MenuItem) -> Boolean)?) {
     this.setOnMenuItemClickListener(itemClick)
 }
 
+/** [Toolbar] 设置菜单点击回调，有且仅有一个菜单时使用 */
+@BindingAdapter("android:bind_toolbar_onClick")
+fun Toolbar.setToolbarMenuClick(click: (() -> Unit)?) {
+    if (null == click) {
+        this.setOnMenuItemClickListener(null)
+        return
+    }
+    this.setOnMenuItemClickListener {
+        click.invoke()
+        true
+    }
+}
+
 /** 为 [Toolbar] 设置导航按钮点击监听 [click] */
 @BindingAdapter("android:bind_toolbar_navigationClick")
 fun Toolbar.setToolbarNavigationClick(click: (() -> Unit)?) {

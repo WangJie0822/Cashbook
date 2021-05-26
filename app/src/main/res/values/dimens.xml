@@ -10,6 +10,8 @@
     <dimen name="content_vertical_spacing">8dp</dimen>
     <dimen name="content_horizontal_spacing">8dp</dimen>
 
+    <dimen name="icon_size">24dp</dimen>
+
     <dimen name="item_height">48dp</dimen>
     <dimen name="main_header_height">220dp</dimen>
 
