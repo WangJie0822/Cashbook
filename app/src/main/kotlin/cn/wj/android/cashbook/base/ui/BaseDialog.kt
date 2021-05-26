@@ -2,40 +2,37 @@
 
 package cn.wj.android.cashbook.base.ui
 
-import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.SkinAppCompatDelegateImpl
+import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.tag
-import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.gyf.immersionbar.ImmersionBar
 import com.gyf.immersionbar.ktx.immersionBar
 
 /**
- * 应用 [AppCompatActivity] 基类
+ * 应用 [DialogFragment] 基类
  * - [VM] 为 [BaseViewModel] 泛型，[DB] 为 [ViewDataBinding] 泛型
  *
  * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/3/8
  */
-abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
-    AppCompatActivity() {
+abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
+    DialogFragment() {
 
-    /** 当前界面对应 [Context] 对象 */
-    protected val context: Context
-        get() = this
+    /** 布局 id */
+    protected abstract val layoutResId: Int
 
     /** 界面 [BaseViewModel] 对象 */
     protected abstract val viewModel: VM
@@ -46,12 +43,14 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
     /** [Snackbar] 转换接口 */
     protected var snackbarTransform: ((SnackbarModel) -> SnackbarModel)? = null
 
+    /** Dialog 隐藏回调 */
+    private var onDialogDismissListener: OnDialogDismissListener? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        beforeOnCreate()
         super.onCreate(savedInstanceState)
 
-        // 初始化状态栏工具
-        initImmersionbar()
+        // 设置样式
+        setStyle(STYLE_NO_TITLE, R.style.Theme_Cashbook_Dialog)
 
         // 订阅基本数据
         observeBaseModel()
@@ -59,6 +58,28 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
         // 订阅数据
         observe()
         logger().d("onCreate")
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // 取消标题栏
+//        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+        // 加载布局
+        binding = DataBindingUtil.inflate(inflater, layoutResId, container, false)
+
+        // 绑定生命周期管理
+        binding.lifecycleOwner = this
+
+        // 绑定 ViewModel
+        binding.setVariable(BR.viewModel, viewModel)
+
+        // 初始化状态栏工具
+        initImmersionbar()
+
+        // 初始化布局
+        initView()
+
+        return binding.root
     }
 
     override fun onStart() {
@@ -86,38 +107,19 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
         logger().d("onDestroy")
     }
 
-    override fun setContentView(layoutResID: Int) {
-        // 初始化 DataBinding
-        binding = DataBindingUtil.inflate(
-            LayoutInflater.from(context),
-            layoutResID, null, false
-        )
-
-        // 绑定生命周期管理
-        binding.lifecycleOwner = this
-
-        // 绑定 ViewModel
-        binding.setVariable(BR.viewModel, viewModel)
-
-        // 设置布局
-        super.setContentView(binding.root)
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        onDialogDismissListener?.invoke()
     }
 
-    override fun getDelegate(): AppCompatDelegate {
-        // 支持 SkinSupport 换肤
-        return SkinAppCompatDelegateImpl.get(this, this)
+    override fun setCancelable(cancelable: Boolean) {
+        super.setCancelable(cancelable)
+        dialog?.setCanceledOnTouchOutside(cancelable)
     }
 
-    /** [onCreate] 之前执行，可用于配置动画 */
-    protected open fun beforeOnCreate() {
-        window.run {
-            enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-                duration = ACTIVITY_ANIM_DURATION
-            }
-            exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-                duration = ACTIVITY_ANIM_DURATION
-            }
-        }
+    /** 设置 Dialog 隐藏回调 [listener] */
+    fun setOnDialogDismissListener(listener: OnDialogDismissListener?) {
+        onDialogDismissListener = listener
     }
 
     /** 订阅数据 */
@@ -131,10 +133,9 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
     /** 初始化状态栏相关配置 */
     private fun initImmersionbar() {
         immersionBar {
-            statusBarColor(R.color.color_primary)
-            fitsSystemWindows(true)
+            // 同步所在 Activity 状态栏
+            getTag(requireActivity().tag)
             initImmersionbar(this)
-            addTag(tag)
         }
     }
 
@@ -152,7 +153,7 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
             val view = if (model.targetId == 0) {
                 binding.root
             } else {
-                findViewById(model.targetId)
+                binding.root.findViewById(model.targetId)
             }
             val snackBar = Snackbar.make(view, model.content.orEmpty(), model.duration)
             snackBar.setTextColor(model.contentColor)
@@ -173,13 +174,27 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
                 ARouter.getInstance().build(model.path).with(model.data).navigation(context)
             }
             it.close?.let { model ->
-                if (null == model.result) {
-                    setResult(model.resultCode)
-                } else {
-                    setResult(model.resultCode, Intent().putExtras(model.result))
+                dismiss()
+                if (model.both) {
+                    requireActivity().run {
+                        if (null == model.result) {
+                            setResult(model.resultCode)
+                        } else {
+                            setResult(model.resultCode, Intent().putExtras(model.result))
+                        }
+                        finish()
+                    }
                 }
-                finish()
+
             }
         })
     }
+
+    /**
+     * 初始化布局
+     */
+    abstract fun initView()
 }
+
+/** 弹窗隐藏回调 */
+typealias OnDialogDismissListener = () -> Unit

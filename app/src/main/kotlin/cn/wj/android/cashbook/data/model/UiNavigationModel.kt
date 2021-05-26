@@ -38,9 +38,10 @@ data class UiNavigationModel(
          */
         fun close(
             resultCode: Int = Activity.RESULT_CANCELED,
-            result: Bundle? = null
+            result: Bundle? = null,
+            both: Boolean = false
         ): Builder {
-            this.close = UiCloseModel(resultCode, result)
+            this.close = UiCloseModel(resultCode, result, both)
             return this
         }
 
@@ -67,10 +68,12 @@ data class UiNavigationModel(
  *
  * @param resultCode 返回码，默认 [Activity.RESULT_OK]
  * @param result 返回数据，默认 `null`
+ * @param both Dialog 中使用，为 `true` 时同步关闭 Activity
  */
 data class UiCloseModel(
-    var resultCode: Int = Activity.RESULT_CANCELED,
-    var result: Bundle? = null
+    val resultCode: Int = Activity.RESULT_CANCELED,
+    val result: Bundle? = null,
+    val both: Boolean = false
 )
 
 /**

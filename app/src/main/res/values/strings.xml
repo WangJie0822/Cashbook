@@ -10,4 +10,9 @@
     <string name="confirm">确认</string>
     <string name="modify">修改</string>
     <string name="delete">删除</string>
+    <string name="cancel">取消</string>
+    <string name="no_longer_prompt">不再提示</string>
+    <string name="delete_books_confirm">删除账本将同步删除账本下所有记账记录，是否确认？</string>
+    <string name="add">添加</string>
+    <string name="cannot_delete_selected_books">无法删除已选中账本</string>
 </resources>

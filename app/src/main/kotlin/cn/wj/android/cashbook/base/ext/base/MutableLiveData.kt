@@ -38,3 +38,10 @@ fun <E> MutableLiveData<ArrayList<E>>.add(index: Int, item: E) {
     ls.add(index, item)
     this.value = ls
 }
+
+/** 当 [MutableLiveData] 泛型类型为 [ArrayList] 时移除 [item] 数据并更新 */
+fun <E> MutableLiveData<ArrayList<E>>.remove(item: E) {
+    val ls = this.value.toNewList()
+    ls.remove(item)
+    this.value = ls
+}

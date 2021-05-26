@@ -5,8 +5,8 @@ package cn.wj.android.cashbook.widget.recyclerview.adapter.base
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
+import cn.wj.android.cashbook.widget.recyclerview.adapter.ADAPTER_ANIM_ALL
 import cn.wj.android.cashbook.widget.recyclerview.adapter.callback.AdapterListUpdateCallback
-import cn.wj.android.cashbook.widget.recyclerview.adapter.callback.AdapterListUpdateNoAnimCallback
 import cn.wj.android.cashbook.widget.recyclerview.defaultDiffCallback
 import cn.wj.android.cashbook.widget.recyclerview.holder.BaseRvViewHolder
 
@@ -35,13 +35,8 @@ abstract class BaseRvListAdapter<VH : BaseRvViewHolder<E>, E>
      * @param anim 是否使用动画
      * @param config Differ config
      */
-    constructor(anim: Boolean, config: AsyncDifferConfig<E>) {
-        val listUpdateCallback = if (anim) {
-            AdapterListUpdateCallback(this)
-        } else {
-            AdapterListUpdateNoAnimCallback(this)
-        }
-        mDiffer = AsyncListDiffer(listUpdateCallback, config)
+    constructor(anim: Int, config: AsyncDifferConfig<E>) {
+        mDiffer = AsyncListDiffer(AdapterListUpdateCallback(this, anim), config)
         mDiffer.addListListener(mListener)
     }
 
@@ -51,7 +46,7 @@ abstract class BaseRvListAdapter<VH : BaseRvViewHolder<E>, E>
      * @param anim 是否使用动画
      * @param diffCallback 数据是否相同回调
      */
-    constructor(anim: Boolean = true, diffCallback: DiffUtil.ItemCallback<E> = defaultDiffCallback())
+    constructor(anim: Int = ADAPTER_ANIM_ALL, diffCallback: DiffUtil.ItemCallback<E> = defaultDiffCallback())
             : this(anim, AsyncDifferConfig.Builder(diffCallback).build())
 
     override fun getDataCount(): Int {

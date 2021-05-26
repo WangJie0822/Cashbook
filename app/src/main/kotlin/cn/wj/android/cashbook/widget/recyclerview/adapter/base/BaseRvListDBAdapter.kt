@@ -10,6 +10,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import cn.wj.android.cashbook.BR
+import cn.wj.android.cashbook.widget.recyclerview.adapter.ADAPTER_ANIM_ALL
 import cn.wj.android.cashbook.widget.recyclerview.defaultDiffCallback
 import cn.wj.android.cashbook.widget.recyclerview.holder.BaseRvDBViewHolder
 import cn.wj.android.cashbook.widget.recyclerview.holder.BaseRvViewHolder
@@ -34,7 +35,7 @@ abstract class BaseRvListDBAdapter<out VH : BaseRvDBViewHolder<DB, E>, DB : View
      * @param config Differ config
      * @param anim 是否使用动画
      */
-    constructor(anim: Boolean, config: AsyncDifferConfig<E>) : super(anim, config)
+    constructor(anim: Int = ADAPTER_ANIM_ALL, config: AsyncDifferConfig<E>) : super(anim, config)
 
     /**
      * 构造方法
@@ -43,7 +44,7 @@ abstract class BaseRvListDBAdapter<out VH : BaseRvDBViewHolder<DB, E>, DB : View
      * @param diffCallback 数据是否相同回调
      */
     constructor(
-        anim: Boolean = true,
+        anim: Int = ADAPTER_ANIM_ALL,
         diffCallback: DiffUtil.ItemCallback<E> = defaultDiffCallback()
     ) : super(anim, diffCallback)
 
@@ -62,7 +63,7 @@ abstract class BaseRvListDBAdapter<out VH : BaseRvDBViewHolder<DB, E>, DB : View
         // 加载布局，初始化 DataBinding
         val binding = DataBindingUtil.inflate<DB>(
             LayoutInflater.from(parent.context),
-            layoutResID, parent, false
+            layoutResId, parent, false
         )
         // 绑定事件处理
         binding.setVariable(BR.viewModel, viewModel)
@@ -97,5 +98,5 @@ abstract class BaseRvListDBAdapter<out VH : BaseRvDBViewHolder<DB, E>, DB : View
     }
 
     /** 布局 id */
-    abstract val layoutResID: Int
+    abstract val layoutResId: Int
 }

@@ -42,6 +42,9 @@
         <item name="android:windowBackground">@drawable/layer_splash_bg</item>
     </style>
 
+    <!-- 弹窗默认主题 -->
+    <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.AppCompat.Dialog.Alert"/>
+
     <!-- AppBar 样式 -->
     <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

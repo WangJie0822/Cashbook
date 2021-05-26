@@ -36,6 +36,29 @@ class LocalDataStore(private val database: CashbookDatabase) {
         booksDao.insert(*ls.toTypedArray())
     }
 
+    /** 将账本数据 [books] 插入到数据库中 */
+    suspend fun insertBooks(books: BooksEntity) = withContext(Dispatchers.IO) {
+        booksDao.insert(books.toBooksTable())
+    }
+
+    /** 从数据库中删除 [books] */
+    suspend fun deleteBooks(vararg books: BooksEntity) = withContext(Dispatchers.IO) {
+        val ls = arrayListOf<BooksTable>()
+        books.forEach {
+            ls.add(it.toBooksTable())
+        }
+        booksDao.delete(*ls.toTypedArray())
+    }
+
+    /** 从数据库中删除 [books] */
+    suspend fun updateBooks(vararg books: BooksEntity) = withContext(Dispatchers.IO) {
+        val ls = arrayListOf<BooksTable>()
+        books.forEach {
+            ls.add(it.toBooksTable())
+        }
+        booksDao.update(*ls.toTypedArray())
+    }
+
     /** 获取所有账本数据并返回 */
     suspend fun getBooksList(): List<BooksEntity> = withContext(Dispatchers.IO) {
         booksDao.queryAll().map {

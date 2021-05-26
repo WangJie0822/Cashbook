@@ -5,6 +5,7 @@ import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager
+import cn.wj.android.cashbook.ui.viewmodel.GeneralViewModel
 import cn.wj.android.cashbook.ui.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.viewmodel.SplashViewModel
@@ -20,7 +21,7 @@ import org.koin.dsl.module
 
 /** 数据库相关依赖注入 */
 val dbModule = module {
-    single<CashbookDatabase> {
+    single {
         Room.databaseBuilder(
             AppManager.getContext().applicationContext,
             CashbookDatabase::class.java,
@@ -38,6 +39,10 @@ val dataStoreModule = module {
 
 /** ViewModel 相关依赖注入 */
 val viewModelModule = module {
+    viewModel {
+        GeneralViewModel()
+    }
+
     viewModel {
         SplashViewModel(get())
     }

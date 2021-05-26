@@ -5,10 +5,10 @@
     tools:showIn="toolbar">
 
     <item
-        android:id="@+id/confirm"
-        android:icon="@drawable/vector_baseline_check_24"
+        android:id="@+id/add"
+        android:icon="@drawable/vector_baseline_add_24"
         android:iconTint="@color/color_on_primary"
-        android:title="@string/confirm"
+        android:title="@string/add"
         app:iconTint="@color/color_on_primary"
         app:showAsAction="ifRoom"
         tools:targetApi="o" />
