@@ -53,20 +53,49 @@
             android:background="?attr/colorSurface"
             android:orientation="vertical">
 
-            <TextView
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/item_height"
-                android:layout_marginTop="@dimen/content_horizontal_spacing"
+                android:layout_marginTop="@dimen/content_vertical_spacing"
                 android:background="?selectableItemBackground"
-                android:bind_onClick="@{viewModel.onMyBooksClick}"
-                android:drawablePadding="@dimen/drawable_vertical_spacing"
-                android:gravity="start|center_vertical"
-                android:paddingStart="@dimen/activity_vertical_margin"
-                android:paddingEnd="@dimen/zero"
-                android:text="@string/my_books"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/color_on_secondary"
-                app:drawableStartCompat="@drawable/vector_baseline_library_books_24" />
+                android:bind_onClick="@{viewModel.onMyBooksClick}">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_my_books"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_vertical_margin"
+                    android:drawablePadding="@dimen/drawable_vertical_spacing"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/my_books"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textColor="@color/color_on_secondary"
+                    app:drawableStartCompat="@drawable/vector_baseline_library_books_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="@{viewModel.booksName}"
+                    android:textAppearance="?attr/textAppearanceListItemSecondary"
+                    android:textColor="@color/text_color_secondary"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toEndOf="@id/tv_my_books"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="默认账本" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         </LinearLayout>
 
