@@ -13,75 +13,74 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:bind_onClick="@{viewModel.onBackgroundClick}">
+        android:bind_onClick="@{viewModel.onBackgroundClick}"
+        tools:background="@color/white">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guide_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="16dp" />
+            app:layout_constraintGuide_begin="@dimen/activity_vertical_margin" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_title"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_marginStart="@dimen/dialog_title_horizontal_margin"
+            android:layout_marginEnd="@dimen/dialog_title_horizontal_margin"
             android:bind_visibility="@{viewModel.showTitle}"
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
             android:text="@{viewModel.titleStr}"
-            android:textColor="@color/text_color_primary"
-            android:textSize="20sp"
+            android:textAppearance="?attr/textAppearanceHeadline5"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guide_top"
-            tools:text="标题标题标题标题标题标题标题标题标题"
+            tools:text="温馨提示"
             tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_content"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/content_vertical_spacing"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:bind_tv_gravity="@{viewModel.contentGravity}"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
-            android:lineSpacingExtra="5dp"
             android:maxLines="5"
-            android:minHeight="40dp"
+            android:minHeight="@dimen/item_height"
             android:text="@{viewModel.contentStr}"
-            android:textColor="@color/text_color_primary"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_title"
-            app:layout_goneMarginTop="0dp"
-            tools:text="内容内容内容内容内容内容内容内容内容内容内容内容内容内容" />
+            app:layout_goneMarginTop="@dimen/zero"
+            tools:text="你确定要放弃干饭吗？" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/mcb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:bind_visibility="@{viewModel.showSelect}"
             android:checked="@={viewModel.checked}"
             android:text="@{viewModel.selectStr}"
+            android:textAppearance="?attr/textAppearanceBody2"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_content"
             tools:checked="true"
-            tools:text="不再提示不再提示不再提示不再提示不再提示"
+            tools:text="不再提示"
             tools:visibility="visible" />
 
         <Space
             android:id="@+id/space_horizontal"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -90,15 +89,15 @@
 
         <TextView
             android:id="@+id/tv_negative"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_width="@dimen/zero"
+            android:layout_height="@dimen/item_height"
             android:background="?selectableItemBackground"
             android:bind_onClick="@{viewModel.onNegativeClick}"
             android:bind_visibility="@{viewModel.showNegativeButton}"
             android:gravity="center"
             android:text="@{viewModel.negativeButtonStr}"
+            android:textAppearance="?attr/textAppearanceButton"
             android:textColor="@color/text_color_secondary"
-            android:textSize="15sp"
             app:layout_constraintEnd_toStartOf="@id/space_vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/space_horizontal"
@@ -108,7 +107,7 @@
         <Space
             android:id="@+id/space_vertical"
             android:layout_width="1dp"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/zero"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_positive"
             app:layout_constraintStart_toEndOf="@id/tv_negative"
@@ -116,15 +115,15 @@
 
         <TextView
             android:id="@+id/tv_positive"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_width="@dimen/zero"
+            android:layout_height="@dimen/item_height"
             android:background="?selectableItemBackground"
             android:bind_onClick="@{viewModel.onPositiveClick}"
             android:bind_visibility="@{viewModel.showPositiveButton}"
             android:gravity="center"
             android:text="@{viewModel.positiveButtonStr}"
+            android:textAppearance="?attr/textAppearanceButton"
             android:textColor="@color/color_secondary"
-            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/space_vertical"
             app:layout_constraintTop_toBottomOf="@id/space_horizontal"

@@ -20,8 +20,8 @@
         <!-- 状态栏颜色 -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
 
-        <item name="android:textColorPrimary">@color/color_on_primary</item>
-        <item name="android:textColorSecondary">@color/color_on_secondary</item>
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorSecondary">@color/text_color_secondary</item>
 
         <!-- 字体设置 -->
         <item name="textAppearanceLargePopupMenu">@style/TextAppearance.Cashbook.PopupMenu</item>
@@ -51,14 +51,7 @@
     <!-- Popup 样式 -->
     <style name="Theme.Cashbook.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <!-- 默认字体样式 -->
-    <style name="TextAppearance.Cashbook" parent="android:TextAppearance.Material" />
-
-    <!-- 次要字体样式 -->
-    <style name="TextAppearance.Cashbook.Secondary" parent="android:TextAppearance.Material">
-        <item name="android:textColor">@android:attr/textColorSecondary</item>
-    </style>
-
     <!-- PopupMenu 字体样式 -->
     <style name="TextAppearance.Cashbook.PopupMenu" parent="android:TextAppearance.Material.Caption" />
+
 </resources>
