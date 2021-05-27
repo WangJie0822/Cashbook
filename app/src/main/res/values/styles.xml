@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- 圆角图片 -->
+    <!-- CardView 样式 -->
+    <style name="cardviewStyle" parent="Widget.MaterialComponents.CardView" />
+
+    <!-- 圆角图片样式 -->
     <style name="roundedCornerImageStyle">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/cardview_default_radius</item>

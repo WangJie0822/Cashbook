@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.wj.android.cashbook">
 
+    <!-- 网络请求 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 关闭后台进程 -->
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
 
     <application
@@ -53,6 +56,12 @@
         <!-- 我的账本 -->
         <activity
             android:name=".ui.activity.MyBooksActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="fullSensor" />
+
+        <!-- 编辑账本 -->
+        <activity
+            android:name=".ui.activity.EditBooksActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
     </application>

@@ -2,8 +2,8 @@
 
 package cn.wj.android.cashbook.data.model
 
-import android.app.Activity
 import android.os.Bundle
+import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_CANCELED
 
 /**
  * 界面跳转数据
@@ -33,11 +33,11 @@ data class UiNavigationModel(
         /**
          * 关闭界面
          *
-         * @param resultCode 返回码，默认 [Activity.RESULT_OK]
+         * @param resultCode 返回码，默认 [ACTIVITY_RESULT_CANCELED]
          * @param result 返回数据，默认 `null`
          */
         fun close(
-            resultCode: Int = Activity.RESULT_CANCELED,
+            resultCode: Int = ACTIVITY_RESULT_CANCELED,
             result: Bundle? = null,
             both: Boolean = false
         ): Builder {
@@ -66,12 +66,12 @@ data class UiNavigationModel(
 /**
  * 界面关闭数据
  *
- * @param resultCode 返回码，默认 [Activity.RESULT_OK]
+ * @param resultCode 返回码，默认 [ACTIVITY_RESULT_CANCELED]
  * @param result 返回数据，默认 `null`
  * @param both Dialog 中使用，为 `true` 时同步关闭 Activity
  */
 data class UiCloseModel(
-    val resultCode: Int = Activity.RESULT_CANCELED,
+    val resultCode: Int = ACTIVITY_RESULT_CANCELED,
     val result: Bundle? = null,
     val both: Boolean = false
 )

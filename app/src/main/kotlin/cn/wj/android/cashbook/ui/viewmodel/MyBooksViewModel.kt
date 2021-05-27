@@ -8,7 +8,6 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.remove
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
-import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
@@ -30,6 +29,9 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 显示弹窗数据 */
     val showPopupMenuData: MutableLiveData<BooksEntity> = MutableLiveData()
 
+    /** 跳转新增账本数据 */
+    val jumpToAddBooksData: MutableLiveData<Int> = MutableLiveData()
+
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
@@ -40,11 +42,8 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 添加按钮点击 */
     val onAddClick: () -> Unit = {
-        // TODO 跳转新增
-        val time = System.currentTimeMillis().dateFormat()
-        val random = Math.random()
-        val item = BooksEntity(-1, "默认$random", "", "说明$random", null, false, time, time)
-        insertBooks(item)
+        // 跳转新增
+        jumpToAddBooksData.value = 0
     }
 
     /** 账本 item 点击 */
@@ -56,7 +55,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 it.selected
             }
             // 更新数据
-            updateBooks(
+            updateBooksSelected(
                 ls.indexOf(item) to item.copy(selected = true),
                 ls.indexOf(selectedItem) to selectedItem?.copy(selected = false)
             )
@@ -86,10 +85,12 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     fun insertBooks(books: BooksEntity) {
         viewModelScope.launch {
             try {
+                // 插入数据
                 val id = local.insertBooks(books)
+                // 插入完成，更新列表
                 booksListData.add(books.copy(id = id))
             } catch (throwable: Throwable) {
-
+                logger().e(throwable, "insertBooks")
             }
         }
     }
@@ -113,8 +114,26 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
     }
 
-    /** 更新账本信息 */
-    private fun updateBooks(selected: Pair<Int, BooksEntity>, unSelected: Pair<Int, BooksEntity?>) {
+    /** 更新 [books] 账本信息 */
+    fun updateBooks(books: BooksEntity) {
+        viewModelScope.launch {
+            // 更新数据
+            local.updateBooks(books)
+            // 更新成功，刷新列表
+            val ls = booksListData.value.toNewList()
+            val index = ls.indexOfFirst {
+                it.id == books.id
+            }
+            if (index >= 0) {
+                // 有对应数据
+                ls[index] = books
+                booksListData.value = ls
+            }
+        }
+    }
+
+    /** 更新账本选中状态信息 */
+    private fun updateBooksSelected(selected: Pair<Int, BooksEntity>, unSelected: Pair<Int, BooksEntity?>) {
         viewModelScope.launch {
             try {
                 // 更新数据

@@ -14,95 +14,102 @@
             type="cn.wj.android.cashbook.data.entity.BooksEntity" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
+        style="@style/cardviewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/content_vertical_spacing"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:background="?selectableItemBackground"
-        android:bind_onClick="@{viewModel.onBooksItemClick}"
-        android:bind_onClick_item="@{item}">
+        android:layout_marginEnd="@dimen/activity_horizontal_margin">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/siv_bg"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:bind_iv_img="@{item.imageUrl}"
-            android:bind_iv_img_default="@{@drawable/img_default_top_bg}"
-            android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="@string/books_card_ratio_horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/roundedCornerImageStyle"
-            tools:src="@drawable/img_default_top_bg" />
-
-        <ImageView
-            android:id="@+id/iv_check"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
-            android:layout_marginTop="@dimen/content_vertical_spacing"
-            android:layout_marginEnd="@dimen/content_horizontal_spacing"
-            android:bind_visibility="@{item.selected}"
-            android:contentDescription="@null"
-            android:src="@drawable/vector_baseline_check_circle_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/color_on_primary" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_horizontal_center"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.5" />
+            android:background="?selectableItemBackground"
+            android:bind_onClick="@{viewModel.onBooksItemClick}"
+            android:bind_onClick_item="@{item}">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_books_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/content_vertical_spacing"
-            android:text="@{item.name}"
-            android:textAppearance="?attr/textAppearanceHeadline5"
-            android:textColor="@color/color_on_primary"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="默认账单" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/siv_bg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:bind_iv_img="@{item.imageUrl}"
+                android:bind_iv_img_default="@{@drawable/img_default_top_bg}"
+                android:scaleType="centerCrop"
+                app:layout_constraintDimensionRatio="@string/books_card_ratio_horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/roundedCornerImageStyle"
+                tools:src="@drawable/img_default_top_bg" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/content_horizontal_spacing"
-            android:layout_marginEnd="@dimen/content_horizontal_spacing"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="2"
-            android:text="@{item.description}"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:textColor="@color/color_on_primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_center"
-            tools:text="默认账单的说明说什么默认账单的说明说什么默认账单的说明说什么" />
+            <ImageView
+                android:id="@+id/iv_check"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_marginTop="@dimen/content_vertical_spacing"
+                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:bind_visibility="@{item.selected}"
+                android:contentDescription="@null"
+                android:src="@drawable/vector_baseline_check_circle_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/color_on_primary" />
 
-        <ImageView
-            android:id="@+id/iv_more"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
-            android:layout_marginEnd="@dimen/content_horizontal_spacing"
-            android:layout_marginBottom="@dimen/content_vertical_spacing"
-            android:background="?selectableItemBackgroundBorderless"
-            android:bind_onClick="@{viewModel.onBooksItemMoreClick}"
-            android:bind_onClick_item="@{item}"
-            android:contentDescription="@null"
-            android:src="@drawable/vector_baseline_more_vert_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/color_on_primary" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_horizontal_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_books_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/content_vertical_spacing"
+                android:text="@{item.name}"
+                android:textAppearance="?attr/textAppearanceHeadline5"
+                android:textColor="@color/color_on_primary"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="默认账单" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/content_horizontal_spacing"
+                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="2"
+                android:text="@{item.description}"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textColor="@color/color_on_primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_center"
+                tools:text="默认账单的说明说什么默认账单的说明说什么默认账单的说明说什么" />
+
+            <ImageView
+                android:id="@+id/iv_more"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:layout_marginBottom="@dimen/content_vertical_spacing"
+                android:background="?selectableItemBackgroundBorderless"
+                android:bind_onClick="@{viewModel.onBooksItemMoreClick}"
+                android:bind_onClick_item="@{item}"
+                android:contentDescription="@null"
+                android:src="@drawable/vector_baseline_more_vert_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:tint="@color/color_on_primary" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </layout>

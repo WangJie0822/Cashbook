@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.activity.EditBooksActivity">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.viewmodel.EditBooksViewModel" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/ll_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
+            android:bind_toolbar_onClick="@{viewModel.onConfirmClick}"
+            app:menu="@menu/edit_books_toolbar"
+            app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
+            app:navigationIconTint="@color/color_on_primary"
+            app:popupTheme="@style/Theme.Cashbook.PopupOverlay"
+            app:title="@string/edit_books"
+            app:titleTextColor="@color/color_on_primary" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorSurface"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/blank_bottom_size">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:text="@string/top_preview"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/main_header_height"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin">
+
+                    <ImageView
+                        android:id="@+id/iv_top_bg"
+                        android:layout_width="@dimen/zero"
+                        android:layout_height="@dimen/zero"
+                        android:bind_iv_img="@{viewModel.imgPreviewUrl}"
+                        android:bind_iv_img_default="@{@drawable/img_default_top_bg}"
+                        android:bind_iv_img_placeholder="@{@drawable/img_default_top_bg}"
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:src="@drawable/img_default_top_bg" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_current_month_spending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:text="@string/current_month_spending"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="@color/color_on_primary"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.4" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_spending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:layout_marginTop="@dimen/content_vertical_spacing"
+                        android:text="@string/top_preview_num"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="@color/color_on_primary"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_current_month_spending" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_current_month_income"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:layout_marginBottom="@dimen/content_vertical_spacing"
+                        android:text="@string/current_month_income"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="@color/color_on_primary"
+                        app:layout_constraintBottom_toTopOf="@id/tv_income"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_income"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:layout_marginBottom="@dimen/activity_vertical_margin"
+                        android:text="@string/top_preview_num"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="@color/color_on_primary"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline_vertical_center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.5" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_current_month_balance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:layout_marginBottom="@dimen/content_vertical_spacing"
+                        android:text="@string/current_month_balance"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="@color/color_on_primary"
+                        app:layout_constraintBottom_toTopOf="@id/tv_balance"
+                        app:layout_constraintStart_toStartOf="@id/guideline_vertical_center" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_balance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:layout_marginBottom="@dimen/activity_vertical_margin"
+                        android:text="@string/top_preview_num"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="@color/color_on_primary"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/guideline_vertical_center" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:hint="@string/top_img_bg_optional"
+                    app:endIconMode="clear_text"
+                    app:hintTextAppearance="?attr/textAppearanceCaption"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:inputType="text"
+                        android:text="@={viewModel.imgPreviewUrl}"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="https://" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:bind_til_error="@{viewModel.booksNameError}"
+                    android:hint="@string/books_name"
+                    app:endIconMode="clear_text"
+                    app:errorIconTint="?attr/colorError"
+                    app:errorTextColor="?attr/colorError"
+                    app:hintTextAppearance="?attr/textAppearanceCaption"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:inputType="text"
+                        android:maxLength="20"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:text="@={viewModel.booksName}"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="账本名称" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:bind_til_error="@{viewModel.booksDescriptionError}"
+                    android:hint="@string/books_description_optional"
+                    app:endIconMode="clear_text"
+                    app:errorIconTint="?attr/colorError"
+                    app:errorTextColor="?attr/colorError"
+                    app:hintTextAppearance="?attr/textAppearanceCaption"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:inputType="text"
+                        android:text="@={viewModel.booksDescription}"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="账本说明账本说明账本说明" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_height"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:background="?selectableItemBackground"
+                    android:bind_onClick="@{viewModel.onCurrencyClick}"
+                    android:gravity="center"
+                    android:text="@{viewModel.currencyStr}"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    tools:text="人民币" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+</layout>

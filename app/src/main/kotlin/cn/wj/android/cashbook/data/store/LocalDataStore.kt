@@ -59,6 +59,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
         booksDao.update(*ls.toTypedArray())
     }
 
+    /** 获取名称为 [name] 的账本数量 */
+    suspend fun getBooksCountByName(name: String) = withContext(Dispatchers.IO) {
+        booksDao.getCountByName(name)
+    }
+
     /** 获取所有账本数据并返回 */
     suspend fun getBooksList(): List<BooksEntity> = withContext(Dispatchers.IO) {
         booksDao.queryAll().map {

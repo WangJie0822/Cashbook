@@ -3,6 +3,8 @@
 package cn.wj.android.cashbook.data.model
 
 import android.os.Parcelable
+import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.string
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -172,11 +174,11 @@ enum class CurrencyModel(
         get() = name
 
     val summary: String
-        get() = "%1\$s\\u0020\\u0020%2\$s\\u0020(%3\$s)".format(flag, title, code)
+        get() = R.string.currency_summary_format.string.format(flag, title, code)
 
     companion object {
 
-        fun fromCode(code: String): CurrencyModel? {
+        fun fromCode(code: String?): CurrencyModel? {
             return values().firstOrNull { currency -> currency.code == code }
         }
     }

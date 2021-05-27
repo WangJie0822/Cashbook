@@ -1,6 +1,8 @@
 package cn.wj.android.cashbook.data.entity
 
+import android.os.Parcelable
 import cn.wj.android.cashbook.data.model.CurrencyModel
+import kotlinx.parcelize.Parcelize
 
 /**
  * 账本数据实体类
@@ -16,6 +18,7 @@ import cn.wj.android.cashbook.data.model.CurrencyModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/15
  */
+@Parcelize
 data class BooksEntity(
     val id: Long,
     val name: String,
@@ -25,4 +28,4 @@ data class BooksEntity(
     val selected: Boolean,
     val createTime: String,
     val modifyTime: String
-)
+) : Parcelable

@@ -10,3 +10,5 @@ package cn.wj.android.cashbook.data.constants
 const val AROUTER_PATH_MAIN = "/path/main"
 /** 路由路径 - 我的账本 */
 const val AROUTER_PATH_MY_BOOKS = "/path/mybooks"
+/** 路由路径 - 编辑账本 */
+const val AROUTER_PATH_EDIT_BOOKS = "/path/editbooks"

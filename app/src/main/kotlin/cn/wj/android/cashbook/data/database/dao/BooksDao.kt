@@ -21,7 +21,7 @@ interface BooksDao {
 
     /** 新增账本数据 [books] 到数据库 */
     @Insert
-    suspend fun insert(books: BooksTable):Long
+    suspend fun insert(books: BooksTable): Long
 
     /** 从数据库中删除账本数据 [books]*/
     @Delete
@@ -30,6 +30,10 @@ interface BooksDao {
     /** 更新数据库中的 [books] 数据 */
     @Update
     suspend fun update(vararg books: BooksTable)
+
+    /** 获取 name 是 [name] 的数据数量 */
+    @Query("SELECT COUNT(*) FROM db_books WHERE name=:name")
+    suspend fun getCountByName(name: String): Long
 
     /** 从数据库中查询所有账本数据并返回 */
     @Query("SELECT * FROM db_books")
