@@ -1,7 +1,10 @@
 package cn.wj.android.cashbook.data.entity
 
 import android.os.Parcelable
+import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.data.model.CurrencyModel
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -28,4 +31,10 @@ data class BooksEntity(
     val selected: Boolean,
     val createTime: String,
     val modifyTime: String
-) : Parcelable
+) : Parcelable {
+
+    /** 带提示的修改时间 */
+    @IgnoredOnParcel
+    val modifyTimeWithHint: String
+        get() = R.string.modify_time_with_colon.string + modifyTime
+}

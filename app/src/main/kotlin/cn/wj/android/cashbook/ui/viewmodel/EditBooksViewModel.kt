@@ -10,7 +10,7 @@ import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedString
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
-import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_CANCELED
+import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_CURRENCY
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.model.CurrencyModel
@@ -129,7 +129,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 // 设置返回数据并关闭当前界面
                 uiNavigationData.value = UiNavigationModel.builder {
                     close(
-                        resultCode = ACTIVITY_RESULT_CANCELED,
+                        resultCode = ACTIVITY_RESULT_OK,
                         result = bundleOf(
                             ACTION_BOOKS to resultData
                         )

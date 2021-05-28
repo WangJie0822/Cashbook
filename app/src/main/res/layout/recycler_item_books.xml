@@ -108,6 +108,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:tint="@color/color_on_primary" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/content_horizontal_spacing"
+                android:layout_marginBottom="@dimen/content_vertical_spacing"
+                android:text="@{item.modifyTimeWithHint}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="@color/color_on_primary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="修改时间：2021-01-01 21:00:00" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

@@ -43,7 +43,10 @@
     </style>
 
     <!-- 弹窗默认主题 -->
-    <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.AppCompat.Dialog.Alert"/>
+    <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.AppCompat.Dialog"/>
+
+    <!-- 弹窗默认主题 -->
+    <style name="Theme.Cashbook.Dialog.Alert" parent="ThemeOverlay.AppCompat.Dialog.Alert"/>
 
     <!-- AppBar 样式 -->
     <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

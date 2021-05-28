@@ -5,9 +5,11 @@ package cn.wj.android.cashbook.base.ui
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
@@ -37,6 +39,18 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
     /** 界面 [BaseViewModel] 对象 */
     protected abstract val viewModel: VM
 
+    /** 主题 id，按需重写 */
+    protected open val themeId: Int = R.style.Theme_Cashbook_Dialog
+
+    /** Dialog 宽度，按需重写 单位：px  */
+    protected open val dialogWidth: Int = WindowManager.LayoutParams.WRAP_CONTENT
+
+    /** Dialog 高度，按需重写 单位：px */
+    protected open val dialogHeight: Int = WindowManager.LayoutParams.WRAP_CONTENT
+
+    /** Dialog 重心 [Gravity]，按需重写 */
+    protected open val gravity: Int = Gravity.CENTER
+
     /** 界面 [ViewDataBinding] 对象 */
     protected lateinit var binding: DB
 
@@ -50,7 +64,7 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
         super.onCreate(savedInstanceState)
 
         // 设置样式
-        setStyle(STYLE_NO_TITLE, R.style.Theme_Cashbook_Dialog)
+        setStyle(STYLE_NO_TITLE, themeId)
 
         // 订阅基本数据
         observeBaseModel()
@@ -61,8 +75,6 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // 取消标题栏
-//        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
 
         // 加载布局
         binding = DataBindingUtil.inflate(inflater, layoutResId, container, false)
@@ -80,6 +92,17 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
         initView()
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 配置 Dialog 宽高、重心
+        val layoutParams = dialog?.window?.attributes
+        layoutParams?.width = dialogWidth
+        layoutParams?.height = dialogHeight
+        layoutParams?.gravity = gravity
+        dialog?.window?.attributes = layoutParams
     }
 
     override fun onStart() {

@@ -26,6 +26,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class GeneralDialog
     : BaseDialog<GeneralViewModel, DialogGeneralBinding>() {
 
+    override val themeId: Int = R.style.Theme_Cashbook_Dialog_Alert
+
     /** 消极按钮点击  */
     private var onNegativeClick: OnDialogClickListener? = null
 
