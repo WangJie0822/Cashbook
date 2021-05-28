@@ -11,7 +11,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
-import cn.wj.android.cashbook.data.constants.AROUTER_PATH_MY_BOOKS
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.databinding.ActivityMyBooksBinding
 import cn.wj.android.cashbook.databinding.RecyclerItemBooksBinding
@@ -30,7 +30,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于2021/5/25
  */
-@Route(path = AROUTER_PATH_MY_BOOKS)
+@Route(path = ROUTE_PATH_MY_BOOKS)
 class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>() {
 
     override val viewModel: MyBooksViewModel by viewModel()

@@ -64,6 +64,12 @@
             android:name=".ui.activity.EditBooksActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
+
+        <!-- 编辑记录 -->
+        <activity
+            android:name=".ui.activity.EditRecordActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="fullSensor" />
     </application>
 
 </manifest>

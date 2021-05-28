@@ -2,4 +2,9 @@
 <resources>
     <!-- 控件点击标记 -->
     <item name="view_click_tag" type="id" />
+
+    <!-- TabLayout ViewPager2 标记 -->
+    <item name="tag_tablayout_viewpager2" type="id" />
+    <item name="tag_tablayout_pageChangeCallback" type="id" />
+    <item name="tag_tablayout_currentVp2SelectedListener" type="id" />
 </resources>

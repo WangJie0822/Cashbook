@@ -44,13 +44,10 @@
     <color name="text_color_primary">#212121</color>
     <!-- 文本次要色调 -->
     <color name="text_color_secondary">#757575</color>
+    <!-- 浅色文本 -->
+    <color name="text_color_light">#E3E3E3</color>
 
     <!-- toolbar 展开折叠标题文本颜色 -->
     <color name="toolbar_expanded_title_text">@color/transparent_light</color>
     <color name="toolbar_collapsed_title_text">@color/color_on_primary</color>
-
-    <!-- 支出文本颜色 -->
-    <color name="spending_text">#FF1744</color>
-    <!-- 收入文本颜色 -->
-    <color name="income_text">#00E676</color>
 </resources>

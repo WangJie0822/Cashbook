@@ -8,7 +8,7 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.constants.AROUTER_PATH_MAIN
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
 import cn.wj.android.cashbook.data.constants.SPLASH_WAIT_MS
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
@@ -72,7 +72,7 @@ class SplashViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 }
                 // 跳转首页并关闭启动页
                 uiNavigationData.value = UiNavigationModel.builder {
-                    jump(AROUTER_PATH_MAIN)
+                    jump(ROUTE_PATH_MAIN)
                     close()
                 }
             }

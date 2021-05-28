@@ -1,18 +1,15 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package cn.wj.android.cashbook.base.ui
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
@@ -25,13 +22,12 @@ import com.gyf.immersionbar.ImmersionBar
 import com.gyf.immersionbar.ktx.immersionBar
 
 /**
- * 应用 [DialogFragment] 基类
+ * 应用 [Fragment] 基类
  * - [VM] 为 [BaseViewModel] 泛型，[DB] 为 [ViewDataBinding] 泛型
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/3/8
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
-abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
-    DialogFragment() {
+abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment() {
 
     /** 布局 id */
     protected abstract val layoutResId: Int
@@ -39,20 +35,12 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
     /** 界面 [BaseViewModel] 对象 */
     protected abstract val viewModel: VM
 
-    /** 主题 id，按需重写 */
-    protected open val themeId: Int = R.style.Theme_Cashbook_Dialog
-
-    /** Dialog 宽度，按需重写 单位：px  */
-    protected open val dialogWidth: Int = WindowManager.LayoutParams.WRAP_CONTENT
-
-    /** Dialog 高度，按需重写 单位：px */
-    protected open val dialogHeight: Int = WindowManager.LayoutParams.WRAP_CONTENT
-
-    /** Dialog 重心 [Gravity]，按需重写 */
-    protected open val gravity: Int = Gravity.CENTER
-
     /** 界面 [ViewDataBinding] 对象 */
     protected lateinit var binding: DB
+
+    /** 标记 - 第一次加载 */
+    protected var firstLoad = true
+        private set
 
     /** 根布局对象 */
     protected var rootView: View? = null
@@ -60,14 +48,8 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
     /** [Snackbar] 转换接口 */
     protected var snackbarTransform: ((SnackbarModel) -> SnackbarModel)? = null
 
-    /** Dialog 隐藏回调 */
-    private var onDialogDismissListener: OnDialogDismissListener? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // 设置样式
-        setStyle(STYLE_NO_TITLE, themeId)
 
         // 订阅基本数据
         observeBaseModel()
@@ -79,7 +61,7 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        // 加载布局
+        // 初始化 DataBinding
         binding = DataBindingUtil.inflate(inflater, layoutResId, container, false)
 
         // 绑定生命周期管理
@@ -104,17 +86,6 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
         return rootView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // 配置 Dialog 宽高、重心
-        val layoutParams = dialog?.window?.attributes
-        layoutParams?.width = dialogWidth
-        layoutParams?.height = dialogHeight
-        layoutParams?.gravity = gravity
-        dialog?.window?.attributes = layoutParams
-    }
-
     override fun onStart() {
         super.onStart()
         logger().d("onStart")
@@ -128,6 +99,9 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
     override fun onPause() {
         super.onPause()
         logger().d("onPause")
+
+        // 标记不是第一次加载
+        firstLoad = false
     }
 
     override fun onStop() {
@@ -140,20 +114,6 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
         logger().d("onDestroy")
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        onDialogDismissListener?.invoke()
-    }
-
-    override fun setCancelable(cancelable: Boolean) {
-        super.setCancelable(cancelable)
-        dialog?.setCanceledOnTouchOutside(cancelable)
-    }
-
-    /** 设置 Dialog 隐藏回调 [listener] */
-    fun setOnDialogDismissListener(listener: OnDialogDismissListener?) {
-        onDialogDismissListener = listener
-    }
 
     /** 订阅数据 */
     protected open fun observe() {
@@ -166,9 +126,10 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
     /** 初始化状态栏相关配置 */
     private fun initImmersionbar() {
         immersionBar {
-            // 同步所在 Activity 状态栏
-            getTag(requireActivity().tag)
+            statusBarColor(R.color.color_primary)
+            fitsSystemWindows(true)
             initImmersionbar(this)
+            addTag(tag)
         }
     }
 
@@ -207,7 +168,6 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
                 ARouter.getInstance().build(model.path).with(model.data).navigation(context)
             }
             it.close?.let { model ->
-                dismiss()
                 if (model.both) {
                     requireActivity().run {
                         if (null == model.result) {
@@ -218,6 +178,7 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
                         finish()
                     }
                 }
+
             }
         })
     }
@@ -227,6 +188,3 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
      */
     abstract fun initView()
 }
-
-/** 弹窗隐藏回调 */
-typealias OnDialogDismissListener = () -> Unit

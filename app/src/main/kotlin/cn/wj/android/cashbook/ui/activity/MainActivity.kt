@@ -5,7 +5,7 @@ import androidx.lifecycle.lifecycleScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.AROUTER_PATH_MAIN
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
 import cn.wj.android.cashbook.data.constants.MAIN_BACK_PRESS_INTERVAL_MS
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
@@ -22,7 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
-@Route(path = AROUTER_PATH_MAIN)
+@Route(path = ROUTE_PATH_MAIN)
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override val viewModel: MainViewModel by viewModel()
@@ -84,17 +84,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun observe() {
-        // 列表刷新状态
-        viewModel.refreshing.observe(this, { refreshing ->
-            if (refreshing) {
-                billListRvAdapter.refresh()
-            }
-        })
         // 账单列表
         viewModel.billListData.observe(this, { pagingData ->
             lifecycleScope.launchWhenCreated {
                 billListRvAdapter.submitData(pagingData)
-                viewModel.refreshing.value = false
             }
         })
     }

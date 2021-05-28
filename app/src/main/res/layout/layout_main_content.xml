@@ -58,21 +58,12 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/srl"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:bind_srl_refreshing="@={viewModel.refreshing}"
-            android:bind_srl_schemeColors="@{`@color/color_primary,@color/color_secondary`}"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:listitem="@layout/recycler_item_bill" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/recycler_item_bill" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
@@ -80,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
+            android:bind_onClick="@{viewModel.onAddClick}"
             android:contentDescription="@null"
             android:tint="@color/color_on_secondary"
             app:srcCompat="@drawable/vector_baseline_add_24" />

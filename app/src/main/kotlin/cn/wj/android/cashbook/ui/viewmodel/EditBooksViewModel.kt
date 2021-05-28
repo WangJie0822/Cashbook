@@ -64,7 +64,6 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
     }
 
-
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面

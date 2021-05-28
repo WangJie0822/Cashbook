@@ -10,7 +10,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.constants.AROUTER_PATH_MY_BOOKS
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.observable.ObservableMoney
@@ -31,9 +32,6 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 顶部背景图片 */
     val topBgImage: LiveData<String> = CurrentBooksLiveData.map { it.imageUrl }
-
-    /** 列表刷新状态 */
-    val refreshing: MutableLiveData<Boolean> = MutableLiveData()
 
     /** 账单数据 */
     val billListData: LiveData<PagingData<String>>
@@ -74,7 +72,15 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val onMyBooksClick: () -> Unit = {
         // 跳转我的账本界面
         uiNavigationData.value = UiNavigationModel.builder {
-            jump(AROUTER_PATH_MY_BOOKS)
+            jump(ROUTE_PATH_MY_BOOKS)
+        }
+    }
+
+    /** 添加点击 */
+    val onAddClick: () -> Unit = {
+        // 跳转编辑记录界面
+        uiNavigationData.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_EDIT_RECORD)
         }
     }
 }

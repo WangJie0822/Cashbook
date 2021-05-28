@@ -7,7 +7,7 @@ import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
-import cn.wj.android.cashbook.data.constants.AROUTER_PATH_EDIT_BOOKS
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_BOOKS
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.databinding.ActivityEditBooksBinding
 import cn.wj.android.cashbook.ui.viewmodel.EditBooksViewModel
@@ -19,7 +19,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/27
  */
-@Route(path = AROUTER_PATH_EDIT_BOOKS)
+@Route(path = ROUTE_PATH_EDIT_BOOKS)
 class EditBooksActivity : BaseActivity<EditBooksViewModel, ActivityEditBooksBinding>() {
 
     override val viewModel: EditBooksViewModel by viewModel()
