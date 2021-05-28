@@ -58,6 +58,10 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
+            // 应用包名后缀
+            applicationIdSuffix = ".debug"
+            // 版本名后缀
+            versionNameSuffix = "_debug"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -67,6 +71,10 @@ android {
         getByName("release") {
             isMinifyEnabled = false
             isShrinkResources = false
+            // 应用包名后缀
+            applicationIdSuffix = ""
+            // 版本名后缀
+            versionNameSuffix = "_release"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -98,7 +106,7 @@ android {
             packageApplicationProvider?.get()?.outputDirectory?.set(
                 File(
                     project.rootDir,
-                    "/outputs/app"
+                    "/outputs/apk"
                 )
             )
             outputs.all {

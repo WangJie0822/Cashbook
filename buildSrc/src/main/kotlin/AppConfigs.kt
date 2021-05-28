@@ -1,7 +1,9 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 /**
  * 应用配置
@@ -23,16 +25,18 @@ object AppConfigs {
     const val targetSdkVersion = 30
 
     /** 应用版本号 */
-    val versionCode = formatDate.toIntOrNull() ?: 10001
+    val versionCode = getVersionCode()
 
     /** 应用版本名 */
-    val versionName = "$versionCode"
+    val versionName = "v1.0_$versionCode"
 }
 
-/** 格式化后的日期字符串，用于生成应用版本号 */
-internal val formatDate: String
-    get() {
-        val sdf = SimpleDateFormat("yyyyMMddHHmm", Locale.CHINA)
-        sdf.timeZone = TimeZone.getTimeZone("UTC")
-        return sdf.format(Date())
-    }
+/** 根据日期时间获取对应版本号 */
+private fun getVersionCode(): Int {
+    val sdf = SimpleDateFormat("yyMMddHH", Locale.CHINA)
+    sdf.timeZone = TimeZone.getTimeZone("UTC")
+    val formatDate = sdf.format(Date())
+    val versionCode = formatDate.toIntOrNull() ?: 10001
+    println("> Task :buildSrc:AppConfigs getVersionCode formatDate: $formatDate versionCode: $versionCode")
+    return versionCode
+}

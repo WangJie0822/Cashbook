@@ -16,6 +16,9 @@ const val DB_FILE_NAME = "cashbook.db"
 /** Activity 界面跳转动画时长 ms */
 const val ACTIVITY_ANIM_DURATION = 230L
 
+/** 启动页等待时长 */
+const val SPLASH_WAIT_MS = 200L
+
 /** 首页返回点击间隔 */
 const val MAIN_BACK_PRESS_INTERVAL_MS = 2_000L
 
