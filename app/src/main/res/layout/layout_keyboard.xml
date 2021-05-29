@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/keyboard_height">
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/space_vertical_1"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/space_vertical_2"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/space_vertical_3"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/space_horizontal_1"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2" />
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/space_horizontal_2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/space_horizontal_3"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.6" />
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/space_horizontal_4"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.8" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_clear"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="C"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_1"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_div"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="÷"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_1"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_2"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_times"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="×"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_1"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_3"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btn_backspace"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:contentDescription="@null"
+        android:src="@drawable/vector_baseline_backspace_24"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="@color/text_color_primary"
+        android:tint="@color/black"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_1"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="1"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_2"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_2"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="2"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_2"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_2"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_1"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_3"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="3"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_2"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_3"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_2"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_minus"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="—"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_3"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_4"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="4"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_3"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_5"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="5"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_3"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_2"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_1"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_6"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="6"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_3"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_3"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_2"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_plus"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="+"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_3"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_7"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="7"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_4"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_3" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_8"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="8"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_4"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_2"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_1"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_3" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_9"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="9"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/space_horizontal_4"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_3"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_2"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_3" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_equal"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="="
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_3"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_3" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_bracket"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="()"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_4" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_zero"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="0"
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_2"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_1"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_4" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_point"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:background="@drawable/selector_default_ripple"
+        android:text="."
+        android:textColor="@color/text_color_primary"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/space_vertical_3"
+        app:layout_constraintStart_toEndOf="@id/space_vertical_2"
+        app:layout_constraintTop_toBottomOf="@id/space_horizontal_4" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

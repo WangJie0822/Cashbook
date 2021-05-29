@@ -28,6 +28,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_record)
+        1 + 2
 
         // 配置 ViewPager2
         binding.vpType.adapter = typesVpAdapter
