@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.databinding.adapter
 
 import android.view.View
+import androidx.annotation.IdRes
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,8 +16,11 @@ import cn.wj.android.databinding.adapter.getIdentifier
 
 /** 将 [DrawerLayout] 开启关联到对应 [toolbarId] 的 [Toolbar] */
 @BindingAdapter("android:bind_dl_toolbar")
-fun DrawerLayout.bindToToolbar(toolbarId: String) {
-    val v = findViewById<View>(toolbarId.getIdentifier(context, "id"))
+fun DrawerLayout.bindToToolbar(@IdRes toolbarId: Int?) {
+    if (null == toolbarId) {
+        return
+    }
+    val v = findViewById<View>(toolbarId)
     if (null == v) {
         logger().w("View with R.id.$toolbarId not found!")
         return

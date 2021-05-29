@@ -12,7 +12,6 @@ import cn.wj.android.cashbook.base.tools.getStatusBarHeight
 /** 默认点击过滤间隔时间，单位：ms */
 const val DEFAULT_CLICK_THROTTLE_MS = 250L
 
-
 /** 隐藏软键盘 */
 fun View?.hideSoftKeyboard() {
     if (this == null) {

@@ -28,4 +28,7 @@
     <string name="books_name_cannot_be_empty">账本名称不能为空</string>
     <string name="books_name_already_exists">账本名称已存在</string>
     <string name="modify_time_with_colon">修改时间：</string>
+    <string name="spending">支出</string>
+    <string name="income">收入</string>
+    <string name="transfer">转账</string>
 </resources>

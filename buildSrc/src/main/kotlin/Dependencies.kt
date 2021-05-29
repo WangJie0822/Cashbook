@@ -46,7 +46,7 @@ object Dependencies {
     object Kotlin {
 
         /** Kotlin 版本 */
-        const val version = "1.5.0"
+        const val version = "1.5.10"
 
         /** 标准库 */
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"

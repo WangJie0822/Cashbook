@@ -5,6 +5,8 @@
 
     <!-- TabLayout ViewPager2 标记 -->
     <item name="tag_tablayout_viewpager2" type="id" />
+    <item name="tag_tablayout_pager2adapter" type="id" />
     <item name="tag_tablayout_pageChangeCallback" type="id" />
     <item name="tag_tablayout_currentVp2SelectedListener" type="id" />
+    <item name="tag_tablayout_pagerAdapterObserver" type="id" />
 </resources>

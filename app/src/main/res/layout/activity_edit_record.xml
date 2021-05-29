@@ -32,6 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?attr/colorPrimary"
+                android:bind_tl_viewpager2="@{@id/vp_type}"
                 app:tabSelectedTextColor="@color/color_on_primary"
                 app:tabTextAppearance="?attr/textAppearanceSubtitle1"
                 app:tabTextColor="@color/text_color_light" />

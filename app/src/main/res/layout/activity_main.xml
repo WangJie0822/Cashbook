@@ -15,7 +15,7 @@
         android:id="@+id/dl_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:bind_dl_toolbar="@{`toolbar`}"
+        android:bind_dl_toolbar="@{@id/toolbar}"
         tools:openDrawer="start">
 
         <include

@@ -5,6 +5,7 @@ import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager
+import cn.wj.android.cashbook.ui.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.ui.viewmodel.EditBooksViewModel
 import cn.wj.android.cashbook.ui.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.viewmodel.GeneralViewModel
@@ -59,5 +60,8 @@ val viewModelModule = module {
     }
     viewModel {
         EditRecordViewModel(get())
+    }
+    viewModel {
+        ConsumptionTypeViewModel(get())
     }
 }

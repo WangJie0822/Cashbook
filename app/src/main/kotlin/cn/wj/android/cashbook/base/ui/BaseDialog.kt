@@ -17,12 +17,9 @@ import androidx.lifecycle.Observer
 import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.tag
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
-import com.gyf.immersionbar.ImmersionBar
-import com.gyf.immersionbar.ktx.immersionBar
 
 /**
  * 应用 [DialogFragment] 基类
@@ -87,9 +84,6 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
 
         // 绑定 ViewModel
         binding.setVariable(BR.viewModel, viewModel)
-
-        // 初始化状态栏工具
-        initImmersionbar()
 
         // 初始化布局
         initView()
@@ -157,19 +151,6 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
 
     /** 订阅数据 */
     protected open fun observe() {
-    }
-
-    /** 初始化状态栏相关配置 */
-    protected open fun initImmersionbar(immersionBar: ImmersionBar) {
-    }
-
-    /** 初始化状态栏相关配置 */
-    private fun initImmersionbar() {
-        immersionBar {
-            // 同步所在 Activity 状态栏
-            getTag(requireActivity().tag)
-            initImmersionbar(this)
-        }
     }
 
     /** 订阅基本数据 */

@@ -3,9 +3,12 @@
 
 package cn.wj.android.cashbook.base.ext
 
+import androidx.core.view.doOnDetach
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.logger
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import java.lang.ref.WeakReference
@@ -22,7 +25,13 @@ var TabLayout.viewPager2: ViewPager2?
         setTag(R.id.tag_tablayout_viewpager2, value)
     }
 
-var TabLayout.pageChangeCallback: TabLayoutOnPageChangeCallback?
+var TabLayout.pager2Adapter: RecyclerView.Adapter<*>?
+    get() = getTag(R.id.tag_tablayout_pager2adapter) as? RecyclerView.Adapter<*>
+    set(value) {
+        setTag(R.id.tag_tablayout_pager2adapter, value)
+    }
+
+var TabLayout.pager2ChangeCallback: TabLayoutOnPageChangeCallback?
     get() = getTag(R.id.tag_tablayout_pageChangeCallback) as? TabLayoutOnPageChangeCallback
     set(value) {
         setTag(R.id.tag_tablayout_pageChangeCallback, value)
@@ -34,18 +43,14 @@ var TabLayout.currentVp2SelectedListener: ViewPagerOnTabSelectedListener?
         setTag(R.id.tag_tablayout_currentVp2SelectedListener, value)
     }
 
-fun TabLayout.setupWithViewPager2(vp: ViewPager2) {
-    // 绑定前必须设置适配器
-    val adapter = vp.adapter ?: throw IllegalStateException("Please setup adapter first!")
-    if (adapter !is TabsAdapter) {
-        // 适配器必须实现 TabsAdapter 接口
-        throw IllegalArgumentException("ViewPager2's adapter must implementation TabsAdapter")
+var TabLayout.pager2AdapterObserver: Pager2AdapterObserver?
+    get() = getTag(R.id.tag_tablayout_pagerAdapterObserver) as? Pager2AdapterObserver
+    set(value) {
+        setTag(R.id.tag_tablayout_pagerAdapterObserver, value)
     }
-    // 添加 Tabs
-    adapter.getTabs().forEach { tabText ->
-        addTab(newTab().setText(tabText))
-    }
-    pageChangeCallback?.let { callback ->
+
+fun TabLayout.setupWithViewPager2(vp: ViewPager2?, autoRefresh: Boolean = true, implicitSetup: Boolean = false) {
+    pager2ChangeCallback?.let { callback ->
         viewPager2?.unregisterOnPageChangeCallback(callback)
     }
 
@@ -56,10 +61,10 @@ fun TabLayout.setupWithViewPager2(vp: ViewPager2) {
 
     viewPager2 = vp
     viewPager2?.let { vp2 ->
-        if (null == pageChangeCallback) {
-            pageChangeCallback = TabLayoutOnPageChangeCallback(this)
+        if (null == pager2ChangeCallback) {
+            pager2ChangeCallback = TabLayoutOnPageChangeCallback(this)
         }
-        pageChangeCallback?.let { callback ->
+        pager2ChangeCallback?.let { callback ->
             callback.reset()
             vp2.registerOnPageChangeCallback(callback)
         }
@@ -67,9 +72,73 @@ fun TabLayout.setupWithViewPager2(vp: ViewPager2) {
             currentVp2SelectedListener = ViewPagerOnTabSelectedListener(vp2)
             addOnTabSelectedListener(currentVp2SelectedListener as OnTabSelectedListener)
         }
-        // TODO
+        val pagerAdapter = vp2.adapter
+        if (null != pagerAdapter) {
+            setPager2Adapter(pagerAdapter, autoRefresh)
+        }
+
+        // Now update the scroll position to match the ViewPager's current item
+        setScrollPosition(vp2.currentItem, 0f, true)
+    }
+    if (null == vp) {
+        viewPager2 = null
+        setPager2Adapter(null, false)
+    }
+    doOnDetach {
+        if (implicitSetup) {
+            // If we've been setup with a ViewPager implicitly, let's clear out any listeners, etc
+            setupWithViewPager(null)
+        }
+    }
+}
+
+fun TabLayout.setPager2Adapter(adapter: RecyclerView.Adapter<*>?, addObserver: Boolean) {
+    pager2AdapterObserver?.let { observer ->
+        adapter?.unregisterAdapterDataObserver(observer)
+    }
+    pager2Adapter = adapter
+    if (addObserver) {
+        if (null == pager2AdapterObserver) {
+            pager2AdapterObserver = Pager2AdapterObserver(this)
+        }
+        pager2AdapterObserver?.let { observer ->
+            pager2Adapter?.registerAdapterDataObserver(observer)
+        }
+    }
+    populateFromPager2Adapter()
+}
+
+fun TabLayout.populateFromPager2Adapter() {
+    removeAllTabs()
+    pager2Adapter?.let { adapter ->
+        if (adapter !is TabsAdapter) {
+            // 适配器必须实现 TabsAdapter 接口
+            logger().e(IllegalArgumentException("ViewPager2's adapter must implementation TabsAdapter"), "populateFromPager2Adapter")
+            return
+        }
+        for (i in 0 until adapter.itemCount) {
+            addTab(newTab().setText(adapter.getPageTitle(i)), false)
+        }
+
+        viewPager2?.let { vp2 ->
+            if (adapter.itemCount > 0) {
+                val curItem = vp2.currentItem
+                if (curItem != selectedTabPosition && curItem < tabCount) {
+                    selectTab(getTabAt(curItem))
+                }
+            }
+        }
+    }
+}
+
+class Pager2AdapterObserver(private val tabLayout: TabLayout) : RecyclerView.AdapterDataObserver() {
+    override fun onChanged() {
+        tabLayout.populateFromPager2Adapter()
     }
 
+    override fun onStateRestorationPolicyChanged() {
+        tabLayout.populateFromPager2Adapter()
+    }
 }
 
 class ViewPagerOnTabSelectedListener(private val viewPager: ViewPager2) : OnTabSelectedListener {
@@ -130,6 +199,8 @@ class TabLayoutOnPageChangeCallback(tabLayout: TabLayout) : ViewPager2.OnPageCha
 
 }
 
+/** 和 [TabLayout] 绑定使用的 [ViewPager2] 适配器接口 */
 interface TabsAdapter {
-    fun getTabs(): Array<String>
+    /** 根据下标 [position] 获取并返回当前 Tab 标签 */
+    fun getPageTitle(position: Int): String?
 }
