@@ -26,10 +26,8 @@ fun TabLayout.bindViewPager2(viewPager2Id: Int?) {
 
     val window = (context as? Activity)?.window
     val v = if (null != window) {
-        logger().w("window")
-        window.decorView.findViewById<View>(viewPager2Id)
+        window.decorView.findViewById(viewPager2Id)
     } else {
-        logger().w("view")
         var parentView = parent as? ViewGroup
         var vp2View = parentView?.findViewById<View>(viewPager2Id)
         while (null != parentView && null == vp2View) {

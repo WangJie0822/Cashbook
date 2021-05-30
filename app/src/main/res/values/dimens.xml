@@ -17,6 +17,7 @@
     <dimen name="item_height">48dp</dimen>
     <dimen name="main_header_height">220dp</dimen>
     <dimen name="keyboard_height">240dp</dimen>
+    <dimen name="divider_height">0.5dp</dimen>
 
     <dimen name="main_header_scrim_visible_height">100dp</dimen>
 </resources>

@@ -51,4 +51,8 @@
     <!-- toolbar 展开折叠标题文本颜色 -->
     <color name="toolbar_expanded_title_text">@color/transparent_light</color>
     <color name="toolbar_collapsed_title_text">@color/color_on_primary</color>
+
+    <color name="keyboard_background_primary">@color/white</color>
+    <color name="keyboard_background_secondary">#F4F4F4</color>
+    <color name="calculator_divider_background">#D4D4D4</color>
 </resources>

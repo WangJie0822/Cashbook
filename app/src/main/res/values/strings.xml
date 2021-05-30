@@ -2,6 +2,27 @@
     <string name="currency_summary_format" translatable="false">%1$s  %2$s (%3$s)</string>
     <string name="default_currency_format">%1$s（默认）</string>
 
+    <string name="symbol_calculator_clear" translatable="false">C</string>
+    <string name="symbol_calculator_equals" translatable="false">=</string>
+    <string name="symbol_calculator_plus" translatable="false">+</string>
+    <string name="symbol_calculator_minus" translatable="false">-</string>
+    <string name="symbol_calculator_times" translatable="false">×</string>
+    <string name="symbol_calculator_div" translatable="false">÷</string>
+    <string name="symbol_calculator_bracket" translatable="false">()</string>
+    <string name="symbol_calculator_bracket_start" translatable="false">(</string>
+    <string name="symbol_calculator_bracket_end" translatable="false">)</string>
+    <string name="symbol_calculator_point" translatable="false">.</string>
+    <string name="symbol_calculator_zero" translatable="false">0</string>
+    <string name="symbol_calculator_one" translatable="false">1</string>
+    <string name="symbol_calculator_two" translatable="false">2</string>
+    <string name="symbol_calculator_three" translatable="false">3</string>
+    <string name="symbol_calculator_four" translatable="false">4</string>
+    <string name="symbol_calculator_five" translatable="false">5</string>
+    <string name="symbol_calculator_six" translatable="false">6</string>
+    <string name="symbol_calculator_seven" translatable="false">7</string>
+    <string name="symbol_calculator_eight" translatable="false">8</string>
+    <string name="symbol_calculator_nine" translatable="false">9</string>
+
     <string name="app_name">记账本</string>
     <string name="default_books">默认账本</string>
     <string name="press_again_to_exit">再次返回退出</string>

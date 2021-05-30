@@ -50,9 +50,26 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <include
-                android:id="@+id/include_keyboard"
-                layout="@layout/layout_keyboard" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_vertical_margin"
+                    android:text="@{viewModel.calculatorStr}"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    tools:text="1000" />
+
+                <cn.wj.android.cashbook.widget.calculator.CalculatorView
+                    android:id="@+id/cv"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/keyboard_height"
+                    android:bind_cv_calculator_text="@{viewModel.calculatorStr}" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
