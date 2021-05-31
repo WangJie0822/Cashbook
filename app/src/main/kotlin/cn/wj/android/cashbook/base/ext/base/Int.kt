@@ -3,8 +3,10 @@
 
 package cn.wj.android.cashbook.base.ext.base
 
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import cn.wj.android.cashbook.base.tools.getColorById
+import cn.wj.android.cashbook.base.tools.getColorStateListById
 import cn.wj.android.cashbook.base.tools.getDrawableById
 import cn.wj.android.cashbook.base.tools.getStringById
 
@@ -23,6 +25,10 @@ val Int.string: String
 /** 颜色值 */
 val Int.color: Int
     get() = getColorById(this)
+
+/** 颜色值 */
+val Int.colorStateList: ColorStateList?
+    get() = getColorStateListById(this)
 
 /** 图片资源 */
 val Int.drawable: Drawable?

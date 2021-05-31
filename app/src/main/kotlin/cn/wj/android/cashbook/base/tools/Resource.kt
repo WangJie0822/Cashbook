@@ -4,6 +4,7 @@
 package cn.wj.android.cashbook.base.tools
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
@@ -32,6 +33,15 @@ import java.util.Properties
 @JvmOverloads
 fun getColorById(@ColorRes colorResId: Int, context: Context = AppManager.getContext()): Int {
     return ContextCompat.getColor(context, colorResId)
+}
+
+/**
+ * 根据资源id[colorResId] 获取颜色值[Int]
+ * > [context] 可选，默认[AppManager.getContext]
+ */
+@JvmOverloads
+fun getColorStateListById(@ColorRes colorResId: Int, context: Context = AppManager.getContext()): ColorStateList? {
+    return ContextCompat.getColorStateList(context, colorResId)
 }
 
 /**

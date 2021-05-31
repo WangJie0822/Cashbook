@@ -353,7 +353,7 @@
             android:bind_onClick="@{viewModel.onEqualsClick}"
             android:bind_onClick_throttle="@{0L}"
             android:text="@{viewModel.equalsStr}"
-            android:textColor="?attr/colorOnSurface"
+            android:textColor="?attr/colorOnPrimary"
             app:backgroundTint="?attr/colorPrimary"
             app:layout_constraintBottom_toTopOf="@id/v_bottom"
             app:layout_constraintEnd_toEndOf="parent"

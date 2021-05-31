@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.SkinAppCompatDelegateImpl
@@ -16,6 +17,8 @@ import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.tag
+import cn.wj.android.cashbook.base.ext.hideSoftKeyboard
+import cn.wj.android.cashbook.base.tools.shouldHideInput
 import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import com.alibaba.android.arouter.launcher.ARouter
@@ -45,6 +48,9 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
 
     /** [Snackbar] 转换接口 */
     protected var snackbarTransform: ((SnackbarModel) -> SnackbarModel)? = null
+
+    /** 标记 - 触摸输入框以外范围是否隐藏软键盘*/
+    protected var touchToHideInput = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         beforeOnCreate()
@@ -101,6 +107,24 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
 
         // 设置布局
         super.setContentView(binding.root)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (touchToHideInput) {
+            if (ev.action == MotionEvent.ACTION_DOWN) {
+                if (shouldHideInput(currentFocus, ev)) {
+                    // 需要隐藏软键盘
+                    currentFocus?.hideSoftKeyboard()
+                }
+                return super.dispatchTouchEvent(ev)
+            }
+            if (window.superDispatchTouchEvent(ev)) {
+                return true
+            }
+            return onTouchEvent(ev)
+        } else {
+            return super.dispatchTouchEvent(ev)
+        }
     }
 
     override fun getDelegate(): AppCompatDelegate {

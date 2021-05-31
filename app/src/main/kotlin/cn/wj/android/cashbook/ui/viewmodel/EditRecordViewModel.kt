@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.color
+import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
@@ -18,14 +20,77 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
  */
 class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
-    /** 当前下标 */
+    /** 选择日期弹窗 */
+    val showSelectDateData: MutableLiveData<String> = MutableLiveData()
+
+    /** 账户信息 */
+    val accountData: MutableLiveData<String> = MutableLiveData("")
+
+    /** 标签数据 */
+    val tagsData: MutableLiveData<String> = MutableLiveData("")
+
+    /** 选中时间 */
+    val dateData: MutableLiveData<String> = MutableLiveData(System.currentTimeMillis().dateFormat())
+
+    /** 当前界面下标 */
     val currentItem: MutableLiveData<Int> = MutableLiveData(0)
+
+    /** 账户文本 */
+    val accountStr: LiveData<String> = accountData.map {
+        if (it.isNullOrBlank()) {
+            R.string.account.string
+        } else {
+            it
+        }
+    }
+
+    /** 账户选中状态 */
+    val accountChecked: LiveData<Boolean> = accountData.map {
+        !it.isNullOrBlank()
+    }
+
+    /** 标签文本 */
+    val tagsStr: LiveData<String> = MutableLiveData(R.string.tags.string)
+
+    /** 标签选中状态 */
+    val tagsChecked: LiveData<Boolean> = tagsData.map {
+        !it.isNullOrBlank()
+    }
+
+    /** 日期文本 */
+    val dateStr: LiveData<String> = dateData.map {
+        it.split(" ").firstOrNull().orEmpty()
+    }
+
+    /** 时间文本 */
+    val timeStr: LiveData<String> = dateData.map {
+        it.split(" ").lastOrNull().orEmpty()
+    }
+
+    /** 手续费文本 */
+    val chargeStr: LiveData<String> = MutableLiveData(R.string.charge.string)
+
+    /** 手续费选中状态 */
+    val chargeChecked: LiveData<Boolean> = MutableLiveData(false)
+
+    /** 是否显示手续费 */
+    val showCharge: LiveData<Boolean> = currentItem.map {
+        it == 2
+    }
+
+    /** 可报销选中状态 */
+    val reimbursableChecked: MutableLiveData<Boolean> = MutableLiveData()
+
+    /** 是否显示可报销 */
+    val showReimbursable: LiveData<Boolean> = currentItem.map {
+        it == 0
+    }
 
     /** 计算结果显示 */
     val calculatorStr: ObservableField<String> = ObservableField()
 
-    /** 等号背景颜色 */
-    val equalsBackgroundTint: LiveData<Int> = currentItem.map {
+    /** 界面主色调 */
+    val primaryTint: LiveData<Int> = currentItem.map {
         when (it) {
             0 -> {
                 // 支出
@@ -48,6 +113,37 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         uiNavigationData.value = UiNavigationModel.builder {
             close()
         }
+    }
+
+    /** 账户点击 */
+    val onAccountClick: () -> Unit = {
+        snackbarData.value = "账户点击".toSnackbarModel()
+    }
+
+    /** 标签点击 */
+    val onTagsClick: () -> Unit = {
+        snackbarData.value = "标签点击".toSnackbarModel()
+    }
+
+    /** 日期点击 */
+    val onDateClick: () -> Unit = {
+        // 以当前选中时间显示弹窗
+        showSelectDateData.value = dateData.value?.split(" ")?.firstOrNull().orEmpty()
+    }
+
+    /** 时间点击 */
+    val onTimeClick: () -> Unit = {
+        snackbarData.value = "时间点击".toSnackbarModel()
+    }
+
+    /** 手续费点击 */
+    val onChargeClick: () -> Unit = {
+        snackbarData.value = "手续费点击".toSnackbarModel()
+    }
+
+    /** 可报销点击 */
+    val onReimbursableClick: () -> Unit = {
+        snackbarData.value = "可报销点击".toSnackbarModel()
     }
 
     /** 确认点击 */

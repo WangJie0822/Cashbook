@@ -52,4 +52,9 @@
     <string name="spending">支出</string>
     <string name="income">收入</string>
     <string name="transfer">转账</string>
+    <string name="account">账户</string>
+    <string name="tags">标签</string>
+    <string name="charge">手续费</string>
+    <string name="reimbursable">可报销</string>
+    <string name="please_enter_remarks_here">请在此输入备注</string>
 </resources>

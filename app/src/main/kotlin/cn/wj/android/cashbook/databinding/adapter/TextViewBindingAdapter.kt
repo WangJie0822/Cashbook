@@ -9,8 +9,10 @@ import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.databinding.BindingAdapter
+import cn.wj.android.cashbook.base.ext.base.colorStateList
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.tools.parseColorFromString
 import cn.wj.android.cashbook.base.tools.parseHtmlFromString
@@ -53,6 +55,15 @@ fun TextView.setTextColor(@ColorInt color: Int?) {
         return
     }
     this.setTextColor(color)
+}
+
+/** 根据资源 [color] 给 [TextView] 设置文本颜色，状态选择器 */
+@BindingAdapter("android:bind_tv_textColorStateList")
+fun TextView.setTextColorStateList(@ColorRes color: Int?) {
+    if (null == color) {
+        return
+    }
+    this.setTextColor(color.colorStateList)
 }
 
 /** 根据颜色字符串 [colorStr] 给 [TextView] 设置文本颜色，颜色值 `"#FFFFFF"` */

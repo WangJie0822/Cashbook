@@ -15,6 +15,7 @@
         android:id="@+id/ll_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/colorSurface"
         android:orientation="vertical">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -58,20 +59,148 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.google.android.material.textview.MaterialTextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/activity_vertical_margin"
-                    android:text="@{viewModel.calculatorStr}"
-                    android:textAppearance="?attr/textAppearanceBody1"
-                    tools:text="1000" />
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:layout_marginTop="@dimen/content_vertical_spacing"
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:layout_weight="1"
+                        android:hint="@string/please_enter_remarks_here"
+                        app:endIconMode="clear_text"
+                        app:hintTextAppearance="?attr/textAppearanceCaption"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/item_height"
+                            android:gravity="center_vertical"
+                            android:inputType="text"
+                            android:textAppearance="?attr/textAppearanceBody2" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:gravity="end"
+                        android:padding="@dimen/content_horizontal_spacing"
+                        android:singleLine="true"
+                        android:text="@{viewModel.calculatorStr}"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="@{viewModel.primaryTint}"
+                        android:textStyle="bold"
+                        tools:text="100000.00"
+                        tools:textColor="@color/color_secondary" />
+
+                </LinearLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/activity_horizontal_margin"
+                        android:paddingEnd="@dimen/activity_horizontal_margin"
+                        app:chipSpacingHorizontal="@dimen/content_horizontal_spacing"
+                        app:singleLine="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_account"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:bind_chip_freezeChecked="@{viewModel.accountChecked}"
+                            android:bind_onClick="@{viewModel.onAccountClick}"
+                            android:text="@{viewModel.accountStr}"
+                            android:textColor="@color/selector_record_options"
+                            tools:text="@string/account" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_tags"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:bind_chip_freezeChecked="@{viewModel.tagsChecked}"
+                            android:bind_onClick="@{viewModel.onTagsClick}"
+                            android:text="@{viewModel.tagsStr}"
+                            android:textColor="@color/selector_record_options"
+                            tools:text="@string/tags" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_date"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:bind_chip_freezeChecked="@{true}"
+                            android:bind_onClick="@{viewModel.onDateClick}"
+                            android:text="@{viewModel.dateStr}"
+                            android:textColor="@color/selector_record_options"
+                            tools:text="今天" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_time"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:bind_chip_freezeChecked="@{true}"
+                            android:bind_onClick="@{viewModel.onTimeClick}"
+                            android:checked="true"
+                            android:text="@{viewModel.timeStr}"
+                            android:textColor="@color/selector_record_options"
+                            tools:text="19:00" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_charge"
+                            style="@style/Widget.MaterialComponents.Chip.Entry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:bind_chip_freezeChecked="@{viewModel.chargeChecked}"
+                            android:bind_onClick="@{viewModel.onChargeClick}"
+                            android:bind_visibility="@{viewModel.showCharge}"
+                            android:text="@{viewModel.chargeStr}"
+                            android:textColor="@color/selector_record_options"
+                            app:checkedIconTint="@color/selector_record_options"
+                            app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
+                            tools:checked="true"
+                            tools:text="@string/charge" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_reimbursable"
+                            style="@style/Widget.MaterialComponents.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:bind_chip_freezeChecked="@{viewModel.reimbursableChecked}"
+                            android:bind_onClick="@{viewModel.onReimbursableClick}"
+                            android:bind_visibility="@{viewModel.showReimbursable}"
+                            android:text="@string/reimbursable"
+                            android:textColor="@color/selector_record_options"
+                            app:checkedIconTint="@color/selector_record_options"
+                            app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
+                            tools:checked="true" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                </HorizontalScrollView>
 
                 <cn.wj.android.cashbook.widget.calculator.CalculatorView
                     android:id="@+id/cv"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/keyboard_height"
                     android:bind_cv_calculator_text="@{viewModel.calculatorStr}"
-                    android:bind_cv_equals_backgroundTint="@{viewModel.equalsBackgroundTint}"
+                    android:bind_cv_equals_backgroundTint="@{viewModel.primaryTint}"
                     android:bind_cv_onConfirmClick="@{viewModel.onConfirmClick}" />
 
             </LinearLayout>
