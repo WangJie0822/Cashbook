@@ -349,15 +349,17 @@
             android:layout_width="@dimen/zero"
             android:layout_height="@dimen/zero"
             android:background="@drawable/selector_default_ripple"
+            android:bind_backgroundTint="@{viewModel.equalsBackground}"
             android:bind_onClick="@{viewModel.onEqualsClick}"
             android:bind_onClick_throttle="@{0L}"
-            android:text="@string/symbol_calculator_equals"
+            android:text="@{viewModel.equalsStr}"
             android:textColor="?attr/colorOnSurface"
             app:backgroundTint="?attr/colorPrimary"
             app:layout_constraintBottom_toTopOf="@id/v_bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/space_vertical_3"
-            app:layout_constraintTop_toBottomOf="@id/space_horizontal_3" />
+            app:layout_constraintTop_toBottomOf="@id/space_horizontal_3"
+            tools:text="@string/symbol_calculator_equals" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_bracket"

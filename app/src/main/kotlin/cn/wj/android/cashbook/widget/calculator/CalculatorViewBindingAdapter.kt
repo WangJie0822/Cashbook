@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package cn.wj.android.cashbook.widget.calculator
 
 import androidx.databinding.BindingAdapter
@@ -11,7 +13,7 @@ import androidx.lifecycle.MutableLiveData
 
 /** 绑定计算器显示 */
 @BindingAdapter("android:bind_cv_calculator_text")
-fun CalculatorView.bindStr(field:ObservableField<String>?) {
+fun CalculatorView.bindStr(field: ObservableField<String>?) {
     if (null == field) {
         return
     }
@@ -25,4 +27,13 @@ fun CalculatorView.bindStr(liveData: MutableLiveData<String>?) {
         return
     }
     this.bindCalculatorStr(liveData)
+}
+
+/** 绑定等于号背景着色 */
+@BindingAdapter("android:bind_cv_equals_backgroundTint")
+fun CalculatorView.bindEqualsBackgroundTint(color: Int?) {
+    if (null == color) {
+        return
+    }
+    this.setEqualsBackground(color)
 }

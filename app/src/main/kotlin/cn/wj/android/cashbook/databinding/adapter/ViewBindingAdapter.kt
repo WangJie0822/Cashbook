@@ -3,10 +3,12 @@
 package cn.wj.android.cashbook.databinding.adapter
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.core.view.ViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
@@ -423,4 +425,13 @@ fun View.fitsStatusBar(fits: Boolean?) {
         return
     }
     this.fitsStatusBar()
+}
+
+/** 给 [View] 设置背景着色 [color] */
+@BindingAdapter("android:bind_backgroundTint")
+fun View.setBackgroundTint(@ColorInt color: Int?) {
+    if (null == color) {
+        return
+    }
+    ViewCompat.setBackgroundTintList(this, ColorStateList.valueOf(color))
 }

@@ -32,7 +32,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?attr/colorPrimary"
+                android:bind_tl_currentItem="@={viewModel.currentItem}"
                 android:bind_tl_viewpager2="@{@id/vp_type}"
+                app:tabIndicatorColor="@color/color_on_primary"
+                app:tabIndicatorHeight="2dp"
                 app:tabSelectedTextColor="@color/color_on_primary"
                 app:tabTextAppearance="?attr/textAppearanceSubtitle1"
                 app:tabTextColor="@color/text_color_light" />
@@ -67,7 +70,8 @@
                     android:id="@+id/cv"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/keyboard_height"
-                    android:bind_cv_calculator_text="@{viewModel.calculatorStr}" />
+                    android:bind_cv_calculator_text="@{viewModel.calculatorStr}"
+                    android:bind_cv_equals_backgroundTint="@{viewModel.equalsBackgroundTint}" />
 
             </LinearLayout>
 

@@ -6,6 +6,8 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
+import androidx.databinding.InverseBindingListener
 import androidx.viewpager2.widget.ViewPager2
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.setupWithViewPager2
@@ -45,4 +47,37 @@ fun TabLayout.bindViewPager2(viewPager2Id: Int?) {
         return
     }
     setupWithViewPager2(v)
+}
+
+@set:BindingAdapter("android:bind_tl_currentItem")
+@get:InverseBindingAdapter(
+    attribute = "android:bind_tl_currentItem",
+    event = "android:bind_srl_currentItemAttrChanged"
+)
+var TabLayout.currentItem: Int
+    get() = selectedTabPosition
+    set(value) {
+        selectTab(getTabAt(value))
+    }
+
+/** 设置选中回调 */
+@BindingAdapter("android:bind_tl_onSelected", "android:bind_srl_currentItemAttrChanged", requireAll = false)
+fun TabLayout.addOnSelectedListener(
+    onSelected: ((Int) -> Unit)?,
+    listener: InverseBindingListener?
+) {
+    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            onSelected?.invoke(tab.position)
+            listener?.onChange()
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+        }
+
+        override fun onTabReselected(tab: TabLayout.Tab?) {
+
+        }
+    })
 }

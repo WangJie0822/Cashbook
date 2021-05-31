@@ -7,9 +7,11 @@ import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
+import androidx.databinding.ObservableInt
 import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.tools.getStringById
 import cn.wj.android.cashbook.databinding.LayoutCalculatorBinding
 
 /**
@@ -39,7 +41,6 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
     private fun initView(binding: LayoutCalculatorBinding) {
         binding.viewModel = viewModel
-
     }
 
     fun bindCalculatorStr(liveData: MutableLiveData<String>) {
@@ -60,11 +61,33 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         })
     }
 
+    fun setEqualsBackground(color: Int) {
+        viewModel.equalsBackground.set(color)
+    }
 
     inner class CalculatorViewModel {
 
         /** 计算显示文本 */
         val calculatorStr: ObservableField<String> = ObservableField(SYMBOL_ZERO)
+
+        /** 等号按钮文本 */
+        val equalsStr: ObservableField<String> = object : ObservableField<String>(calculatorStr) {
+            override fun get(): String {
+                val current = calculatorStr.get().orElse(SYMBOL_ZERO)
+                return getStringById(
+                    if (current == SYMBOL_ZERO || CalculatorUtils.hasComputeSign(current) || !CalculatorUtils.hasNumber(current)) {
+                        // 为0或有运算符或没有数字时显示等号
+                        R.string.symbol_calculator_equals
+                    } else {
+                        // 有结果，显示确认
+                        R.string.confirm
+                    }, context
+                )
+            }
+        }
+
+        /** 等号背景颜色 */
+        val equalsBackground: ObservableInt = ObservableInt()
 
         /** 清除点击 */
         val onClearClick: () -> Unit = {
@@ -188,7 +211,9 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
             val result = CalculatorUtils.calculatorFromString(current)
             calculatorStr.set(
                 if (result.startsWith(SYMBOL_ERROR)) {
-                    history = current
+                    if (history.isBlank()) {
+                        history = current
+                    }
                     result.replace(SYMBOL_ERROR, "")
                 } else {
                     result

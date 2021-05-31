@@ -2,6 +2,8 @@ package cn.wj.android.cashbook.widget.calculator
 
 import cn.wj.android.cashbook.base.ext.base.logger
 import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.util.regex.Pattern
 
 /**
@@ -37,9 +39,21 @@ object CalculatorUtils {
             return calculatorCompatBracket(text.replace(bracket, bracketResult))
         } else {
             // 没有括号，直接计算
-            return calculator(text).toEngineeringString()
+            return calculator(text).formatToNumber()
         }
     }
+
+    private fun BigDecimal.formatToNumber(): String {
+        val df = DecimalFormat("#.##")
+        return if (compareTo(BigDecimal.ZERO) == 0) {
+            SYMBOL_ZERO
+        } else if (compareTo(BigDecimal.ZERO) > 0 && compareTo(BigDecimal(1)) < 0) {
+            SYMBOL_ZERO + df.format(this).toString()
+        } else {
+            df.format(this).toString()
+        }
+    }
+
 
     private fun calculator(text: String): BigDecimal {
         if (!hasComputeSign(text)) {
@@ -50,10 +64,10 @@ object CalculatorUtils {
             // 有加号，按照加号拆分
             var result = "0".toBigDecimal()
             text.split(SYMBOL_PLUS).forEachIndexed { index, s ->
-                if (index == 0) {
-                    result = calculator(s)
+                result = if (index == 0) {
+                    calculator(s)
                 } else {
-                    result += calculator(s)
+                    result.add(calculator(s))
                 }
             }
             return result
@@ -62,10 +76,10 @@ object CalculatorUtils {
             // 有减号，按照减号拆分
             var result = "0".toBigDecimal()
             text.split(SYMBOL_MINUS).forEachIndexed { index, s ->
-                if (index == 0) {
-                    result = calculator(s)
+                result = if (index == 0) {
+                    calculator(s)
                 } else {
-                    result -= calculator(s)
+                    result.minus(calculator(s))
                 }
             }
             return result
@@ -74,10 +88,10 @@ object CalculatorUtils {
             // 有乘号，按照乘号拆分
             var result = "0".toBigDecimal()
             text.split(SYMBOL_TIMES).forEachIndexed { index, s ->
-                if (index == 0) {
-                    result = calculator(s)
+                result = if (index == 0) {
+                    calculator(s)
                 } else {
-                    result *= calculator(s)
+                    result.times(calculator(s))
                 }
             }
             return result
@@ -86,10 +100,10 @@ object CalculatorUtils {
             // 有除号，按照除号拆分
             var result = "0".toBigDecimal()
             text.split(SYMBOL_DIV).forEachIndexed { index, s ->
-                if (index == 0) {
-                    result = calculator(s)
+                result = if (index == 0) {
+                    calculator(s)
                 } else {
-                    result /= calculator(s)
+                    result.divide(calculator(s), 10, RoundingMode.HALF_EVEN)
                 }
             }
             return result
