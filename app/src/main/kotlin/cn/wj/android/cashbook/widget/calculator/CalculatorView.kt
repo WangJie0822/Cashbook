@@ -27,6 +27,9 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         CalculatorViewModel()
     }
 
+    /** 确认点击 */
+    private var onConfirmClick: (() -> Unit)? = null
+
     init {
         removeAllViews()
         if (isInEditMode) {
@@ -63,6 +66,10 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
     fun setEqualsBackground(color: Int) {
         viewModel.equalsBackground.set(color)
+    }
+
+    fun setOnConfirmClick(onClick: () -> Unit) {
+        onConfirmClick = onClick
     }
 
     inner class CalculatorViewModel {
@@ -207,6 +214,10 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
         /** 等号点击 */
         val onEqualsClick: () -> Unit = fun() {
+            if (equalsStr.get() != SYMBOL_EQUALS) {
+                onConfirmClick?.invoke()
+                return
+            }
             val current = calculatorStr.get().orElse(SYMBOL_ZERO)
             val result = CalculatorUtils.calculatorFromString(current)
             calculatorStr.set(

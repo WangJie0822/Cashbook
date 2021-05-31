@@ -71,7 +71,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/keyboard_height"
                     android:bind_cv_calculator_text="@{viewModel.calculatorStr}"
-                    android:bind_cv_equals_backgroundTint="@{viewModel.equalsBackgroundTint}" />
+                    android:bind_cv_equals_backgroundTint="@{viewModel.equalsBackgroundTint}"
+                    android:bind_cv_onConfirmClick="@{viewModel.onConfirmClick}" />
 
             </LinearLayout>
 

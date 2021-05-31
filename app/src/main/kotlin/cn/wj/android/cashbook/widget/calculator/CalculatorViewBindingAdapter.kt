@@ -37,3 +37,12 @@ fun CalculatorView.bindEqualsBackgroundTint(color: Int?) {
     }
     this.setEqualsBackground(color)
 }
+
+/** 确认点击 */
+@BindingAdapter("android:bind_cv_onConfirmClick")
+fun CalculatorView.setOnConfirmClickListener(onClick: (() -> Unit)?) {
+    if (null == onClick) {
+        return
+    }
+    setOnConfirmClick(onClick)
+}

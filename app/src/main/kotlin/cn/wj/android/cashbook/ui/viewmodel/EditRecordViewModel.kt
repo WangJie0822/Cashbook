@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.base.ext.base.color
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 
 /**
  * 编辑记录 ViewModel
@@ -49,4 +50,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
     }
 
+    /** 确认点击 */
+    val onConfirmClick: () -> Unit = {
+        snackbarData.value = "确认保存".toSnackbarModel()
+    }
 }

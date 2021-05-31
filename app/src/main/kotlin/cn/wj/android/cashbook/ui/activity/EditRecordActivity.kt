@@ -31,6 +31,5 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
 
         // 配置 ViewPager2
         binding.vpType.adapter = typesVpAdapter
-
     }
 }
