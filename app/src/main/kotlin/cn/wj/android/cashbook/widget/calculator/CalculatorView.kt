@@ -10,7 +10,6 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.tools.getStringById
 import cn.wj.android.cashbook.databinding.LayoutCalculatorBinding
 
 /**
@@ -24,38 +23,6 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
     private val viewModel: CalculatorViewModel by lazy {
         CalculatorViewModel()
-    }
-
-    private val symbolZero: String by lazy {
-        getStringById(R.string.symbol_calculator_zero, context)
-    }
-
-    private val symbolPlus: String by lazy {
-        getStringById(R.string.symbol_calculator_plus, context)
-    }
-
-    private val symbolMinus: String by lazy {
-        getStringById(R.string.symbol_calculator_minus, context)
-    }
-
-    private val symbolTimes: String by lazy {
-        getStringById(R.string.symbol_calculator_times, context)
-    }
-
-    private val symbolDiv: String by lazy {
-        getStringById(R.string.symbol_calculator_div, context)
-    }
-
-    private val symbolBracketStart: String by lazy {
-        getStringById(R.string.symbol_calculator_bracket_start, context)
-    }
-
-    private val symbolBracketEnd: String by lazy {
-        getStringById(R.string.symbol_calculator_bracket_end, context)
-    }
-
-    private val symbolPoint: String by lazy {
-        getStringById(R.string.symbol_calculator_point, context)
     }
 
     init {
@@ -93,52 +60,46 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         })
     }
 
-    private fun String.isComputeSign(): Boolean {
-        return this in arrayOf(symbolPlus, symbolMinus, symbolTimes, symbolDiv)
-    }
-
-    private fun String.isSymbol(): Boolean {
-        return this in arrayOf(symbolPlus, symbolMinus, symbolTimes, symbolDiv, symbolBracketStart, symbolBracketEnd)
-    }
-
-    private fun String.isNumber(): Boolean {
-        return !isSymbol() && this != symbolPoint
-    }
 
     inner class CalculatorViewModel {
 
         /** 计算显示文本 */
-        val calculatorStr: ObservableField<String> = ObservableField(symbolZero)
+        val calculatorStr: ObservableField<String> = ObservableField(SYMBOL_ZERO)
 
         /** 清除点击 */
         val onClearClick: () -> Unit = {
             // 默认为 0
-            calculatorStr.set(symbolZero)
+            calculatorStr.set(SYMBOL_ZERO)
         }
 
         /** 退格点击 */
         val onBackspaceClick: () -> Unit = {
-            val current = calculatorStr.get().orElse(symbolZero)
-            calculatorStr.set(
-                if (current.length > 1) {
-                    // 长度大于 1，移除最后一个
-                    current.dropLast(1)
-                } else {
-                    // 默认为 0
-                    symbolZero
-                }
-            )
+            if (history.isNotBlank()) {
+                calculatorStr.set(history)
+                history = ""
+            } else {
+                val current = calculatorStr.get().orElse(SYMBOL_ZERO)
+                calculatorStr.set(
+                    if (current.length > 1) {
+                        // 长度大于 1，移除最后一个
+                        current.dropLast(1)
+                    } else {
+                        // 默认为 0
+                        SYMBOL_ZERO
+                    }
+                )
+            }
         }
 
         /** 计算符号点击 */
         val onComputeSignClick: (String) -> Unit = { symbol ->
-            val current = calculatorStr.get().orElse(symbolZero)
+            val current = calculatorStr.get().orElse(SYMBOL_ZERO)
             val last = current.last().toString()
             calculatorStr.set(
-                if (last.isComputeSign() || last == symbolPoint) {
+                if (CalculatorUtils.hasComputeSign(last) || last == SYMBOL_POINT) {
                     // 最后一个是计算符号或者小数点，直接替换
                     current.dropLast(1) + symbol
-                } else if (last == symbolBracketStart) {
+                } else if (last == SYMBOL_BRACKET_START) {
                     // 最后一个是括号开始，不变
                     current
                 } else {
@@ -150,16 +111,16 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
         /** 数字点击 */
         val onNumberClick: (String) -> Unit = { num ->
-            val current = calculatorStr.get().orElse(symbolZero)
+            val current = calculatorStr.get().orElse(SYMBOL_ZERO)
             calculatorStr.set(
                 when {
-                    current == symbolZero -> {
+                    current == SYMBOL_ZERO -> {
                         // 为 0 时直接替换值
                         num
                     }
-                    current.endsWith(symbolBracketEnd) -> {
+                    current.endsWith(SYMBOL_BRACKET_END) -> {
                         // 以括号结尾，添加乘号
-                        current + symbolTimes + num
+                        current + SYMBOL_TIMES + num
                     }
                     else -> {
                         // 其他，直接拼接
@@ -171,47 +132,66 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
         /** 小数点点击 */
         val onPointClick: () -> Unit = {
-            val current = calculatorStr.get().orElse(symbolZero)
+            val current = calculatorStr.get().orElse(SYMBOL_ZERO)
             val last = current.last().toString()
             calculatorStr.set(
-                if (last.isSymbol()) {
+                if (CalculatorUtils.hasSymbol(last)) {
                     // 是计算符号或括号，添加 0
-                    current + symbolZero + symbolPoint
+                    current + SYMBOL_ZERO + SYMBOL_POINT
                 } else {
                     // 直接添加
-                    current + symbolPoint
+                    current + SYMBOL_POINT
                 }
             )
         }
 
         /** 括号点击 */
         val onBracketClick: () -> Unit = {
-            val current = calculatorStr.get().orElse(symbolZero)
+            val current = calculatorStr.get().orElse(SYMBOL_ZERO)
             val last = current.last().toString()
-            val startCount = current.count { it.toString() == symbolBracketStart }
-            val endCount = current.count { it.toString() == symbolBracketEnd }
+            val startCount = current.count { it.toString() == SYMBOL_BRACKET_START }
+            val endCount = current.count { it.toString() == SYMBOL_BRACKET_END }
             calculatorStr.set(
-                if (last == symbolBracketStart || last.isComputeSign()) {
+                if (current == SYMBOL_ZERO) {
+                    // 默认 0，替换为括号
+                    SYMBOL_BRACKET_START
+                } else if (last == SYMBOL_BRACKET_START || CalculatorUtils.hasComputeSign(last)) {
                     // 是括号开始或是计算符号，继续添加括号开始
-                    current + symbolBracketStart
-                } else if (last == symbolPoint) {
+                    current + SYMBOL_BRACKET_START
+                } else if (last == SYMBOL_POINT) {
                     // 小数点
                     if (startCount == endCount) {
                         // 括号已完成匹配，将小数点替换为乘号并添加括号
-                        current.dropLast(1) + symbolTimes + symbolBracketStart
+                        current.dropLast(1) + SYMBOL_TIMES + SYMBOL_BRACKET_START
                     } else {
                         // 括号不匹配，移除小数点并添加括号
-                        current.dropLast(1) + symbolBracketEnd
+                        current.dropLast(1) + SYMBOL_BRACKET_END
                     }
                 } else {
                     // 其他情况
                     if (startCount == endCount) {
                         // 括号已完成匹配，添加乘号及括号
-                        current + symbolTimes + symbolBracketStart
+                        current + SYMBOL_TIMES + SYMBOL_BRACKET_START
                     } else {
                         // 括号未完成匹配，添加括号结束
-                        current + symbolBracketEnd
+                        current + SYMBOL_BRACKET_END
                     }
+                }
+            )
+        }
+
+        private var history = ""
+
+        /** 等号点击 */
+        val onEqualsClick: () -> Unit = fun() {
+            val current = calculatorStr.get().orElse(SYMBOL_ZERO)
+            val result = CalculatorUtils.calculatorFromString(current)
+            calculatorStr.set(
+                if (result.startsWith(SYMBOL_ERROR)) {
+                    history = current
+                    result.replace(SYMBOL_ERROR, "")
+                } else {
+                    result
                 }
             )
         }
