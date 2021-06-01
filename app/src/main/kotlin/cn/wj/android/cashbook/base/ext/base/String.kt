@@ -9,3 +9,11 @@ fun String?.orEmpty(vararg strArray: String?): String {
         null != it
     } ?: "")
 }
+
+/** 字符串不为 `null` 且内容不为空时执行 [block] */
+fun String?.runIfNotNullAndBlank(block: String.() -> Unit) {
+    if (this.isNullOrBlank()) {
+        return
+    }
+    this.block()
+}

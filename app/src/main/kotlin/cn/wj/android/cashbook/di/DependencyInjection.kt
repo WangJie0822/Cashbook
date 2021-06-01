@@ -6,6 +6,7 @@ import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.ui.viewmodel.ConsumptionTypeViewModel
+import cn.wj.android.cashbook.ui.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.viewmodel.EditBooksViewModel
 import cn.wj.android.cashbook.ui.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.viewmodel.GeneralViewModel
@@ -42,10 +43,7 @@ val dataStoreModule = module {
 
 /** ViewModel 相关依赖注入 */
 val viewModelModule = module {
-    viewModel {
-        GeneralViewModel()
-    }
-
+    // Activity
     viewModel {
         SplashViewModel(get())
     }
@@ -61,7 +59,17 @@ val viewModelModule = module {
     viewModel {
         EditRecordViewModel(get())
     }
+
+    // Fragment
     viewModel {
         ConsumptionTypeViewModel(get())
+    }
+
+    // Dialog
+    viewModel {
+        GeneralViewModel()
+    }
+    viewModel {
+        DateTimePickerViewModel()
     }
 }

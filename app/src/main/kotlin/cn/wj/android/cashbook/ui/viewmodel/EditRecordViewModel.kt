@@ -7,6 +7,7 @@ import androidx.lifecycle.map
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.color
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -21,7 +22,7 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
 class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 选择日期弹窗 */
-    val showSelectDateData: MutableLiveData<String> = MutableLiveData()
+    val showSelectDateData: MutableLiveData<Int> = MutableLiveData()
 
     /** 账户信息 */
     val accountData: MutableLiveData<String> = MutableLiveData("")
@@ -30,7 +31,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val tagsData: MutableLiveData<String> = MutableLiveData("")
 
     /** 选中时间 */
-    val dateData: MutableLiveData<String> = MutableLiveData(System.currentTimeMillis().dateFormat())
+    val dateData: MutableLiveData<String> = MutableLiveData(System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS))
 
     /** 当前界面下标 */
     val currentItem: MutableLiveData<Int> = MutableLiveData(0)
@@ -55,16 +56,6 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 标签选中状态 */
     val tagsChecked: LiveData<Boolean> = tagsData.map {
         !it.isNullOrBlank()
-    }
-
-    /** 日期文本 */
-    val dateStr: LiveData<String> = dateData.map {
-        it.split(" ").firstOrNull().orEmpty()
-    }
-
-    /** 时间文本 */
-    val timeStr: LiveData<String> = dateData.map {
-        it.split(" ").lastOrNull().orEmpty()
     }
 
     /** 手续费文本 */
@@ -128,7 +119,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 日期点击 */
     val onDateClick: () -> Unit = {
         // 以当前选中时间显示弹窗
-        showSelectDateData.value = dateData.value?.split(" ")?.firstOrNull().orEmpty()
+        showSelectDateData.value = 0
     }
 
     /** 时间点击 */
@@ -139,11 +130,6 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 手续费点击 */
     val onChargeClick: () -> Unit = {
         snackbarData.value = "手续费点击".toSnackbarModel()
-    }
-
-    /** 可报销点击 */
-    val onReimbursableClick: () -> Unit = {
-        snackbarData.value = "可报销点击".toSnackbarModel()
     }
 
     /** 确认点击 */

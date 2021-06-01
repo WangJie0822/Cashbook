@@ -146,21 +146,10 @@
                             android:layout_height="wrap_content"
                             android:bind_chip_freezeChecked="@{true}"
                             android:bind_onClick="@{viewModel.onDateClick}"
-                            android:text="@{viewModel.dateStr}"
-                            android:textColor="@color/selector_record_options"
-                            tools:text="今天" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_time"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:bind_chip_freezeChecked="@{true}"
-                            android:bind_onClick="@{viewModel.onTimeClick}"
                             android:checked="true"
-                            android:text="@{viewModel.timeStr}"
+                            android:text="@{viewModel.dateData}"
                             android:textColor="@color/selector_record_options"
-                            tools:text="19:00" />
+                            tools:text="2021-06-01 12:00" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_charge"
@@ -182,9 +171,8 @@
                             style="@style/Widget.MaterialComponents.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:bind_chip_freezeChecked="@{viewModel.reimbursableChecked}"
-                            android:bind_onClick="@{viewModel.onReimbursableClick}"
                             android:bind_visibility="@{viewModel.showReimbursable}"
+                            android:checked="@={viewModel.reimbursableChecked}"
                             android:text="@string/reimbursable"
                             android:textColor="@color/selector_record_options"
                             app:checkedIconTint="@color/selector_record_options"

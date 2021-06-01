@@ -16,6 +16,15 @@ import java.util.Locale
 /** 默认时间格式化 */
 const val DATE_FORMAT_DEFAULT = "yyyy-MM-dd HH:mm:ss"
 
+/** 日期时间格式化 */
+const val DATE_FORMAT_DATE = "yyyy-MM-dd"
+
+/** 时间格式化 */
+const val DATE_FORMAT_TIME = "HH:mm"
+
+/** 没有秒的时间格式化 */
+const val DATE_FORMAT_NO_SECONDS = "yyyy-MM-dd HH:mm"
+
 /** 根据[format]格式化时间，[format]默认[DATE_FORMAT_DEFAULT] */
 @JvmOverloads
 fun <N : Number> N.dateFormat(format: String = DATE_FORMAT_DEFAULT): String {
