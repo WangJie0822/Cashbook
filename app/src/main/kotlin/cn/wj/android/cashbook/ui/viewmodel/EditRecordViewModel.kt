@@ -21,6 +21,9 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
  */
 class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
+    /** 显示选择账号弹窗 */
+    val showSelectAccountData: MutableLiveData<Int> = MutableLiveData()
+
     /** 选择日期弹窗 */
     val showSelectDateData: MutableLiveData<Int> = MutableLiveData()
 
@@ -108,7 +111,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 账户点击 */
     val onAccountClick: () -> Unit = {
-        snackbarData.value = "账户点击".toSnackbarModel()
+        showSelectAccountData.value = 0
     }
 
     /** 标签点击 */

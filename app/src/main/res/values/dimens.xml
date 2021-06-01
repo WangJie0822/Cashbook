@@ -14,6 +14,9 @@
     <dimen name="icon_size">24dp</dimen>
     <dimen name="blank_bottom_size">32dp</dimen>
 
+    <dimen name="dialog_corners">4dp</dimen>
+    <dimen name="bottom_sheet_peek_height">250dp</dimen>
+
     <dimen name="item_height">48dp</dimen>
     <dimen name="main_header_height">220dp</dimen>
     <dimen name="keyboard_height">225dp</dimen>

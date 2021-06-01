@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.firstVisibleFragmentOrNull
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
@@ -23,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
-abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment() {
+abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment(), OnBackPressedWatcher {
 
     /** 布局 id */
     protected abstract val layoutResId: Int
@@ -107,6 +108,33 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
         logger().d("onDestroy")
     }
 
+    override fun handleOnBackPressed(): Boolean {
+        val visibleFragment = childFragmentManager.firstVisibleFragmentOrNull()
+        if (null == visibleFragment) {
+            // 没有子 Fragment，返回当前处理
+            return onBackPressed()
+        } else {
+            // 有子 Fragment
+            return if (visibleFragment is OnBackPressedWatcher) {
+                // 关注返回事件，有处理返回逻辑
+                if (visibleFragment.handleOnBackPressed()) {
+                    // 子 Fragment 已消费
+                    true
+                } else {
+                    // 子 Fragment 未消费，返回当前处理
+                    onBackPressed()
+                }
+            } else {
+                // 子 Fragment 没有返回逻辑，返回当前处理
+                onBackPressed()
+            }
+        }
+    }
+
+    /** 返回按键点击 */
+    protected open fun onBackPressed(): Boolean {
+        return false
+    }
 
     /** 订阅数据 */
     protected open fun observe() {

@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.tag
+import cn.wj.android.cashbook.base.ext.firstVisibleFragmentOrNull
 import cn.wj.android.cashbook.base.ext.hideSoftKeyboard
 import cn.wj.android.cashbook.base.tools.shouldHideInput
 import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
@@ -130,6 +131,26 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
     override fun getDelegate(): AppCompatDelegate {
         // 支持 SkinSupport 换肤
         return SkinAppCompatDelegateImpl.get(this, this)
+    }
+
+    override fun onBackPressed() {
+        val visibleFragment = supportFragmentManager.firstVisibleFragmentOrNull()
+        if (null == visibleFragment) {
+            // 没有子 Fragment，返回当前处理
+            super.onBackPressed()
+        } else {
+            // 有子 Fragment
+            if (visibleFragment is OnBackPressedWatcher) {
+                // 关注返回事件，有处理返回逻辑
+                if (!visibleFragment.handleOnBackPressed()) {
+                    // 子 Fragment 未消费，返回当前处理
+                    super.onBackPressed()
+                }
+            } else {
+                // 子 Fragment 没有返回逻辑，返回当前处理
+                super.onBackPressed()
+            }
+        }
     }
 
     /** [onCreate] 之前执行，可用于配置动画 */

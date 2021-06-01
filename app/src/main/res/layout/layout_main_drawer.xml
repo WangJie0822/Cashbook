@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/main_header_height"
             android:layout_gravity="start"
-            android:background="@drawable/shape_main_nav_header_bg"
+            android:background="@drawable/shape_main_nav_header_background"
             android:gravity="bottom"
             android:orientation="vertical"
             android:paddingLeft="@dimen/activity_horizontal_margin"

@@ -39,14 +39,17 @@
     <!-- 闪屏界面主题 -->
     <style name="Theme.Cashbook.Splash">
         <!-- 窗口背景 -->
-        <item name="android:windowBackground">@drawable/layer_splash_bg</item>
+        <item name="android:windowBackground">@drawable/layer_splash_background</item>
     </style>
 
     <!-- 弹窗默认主题 -->
-    <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.AppCompat.Dialog"/>
+    <style name="Theme.Cashbook.Dialog" parent="Theme.MaterialComponents.Dialog" />
 
-    <!-- 弹窗默认主题 -->
-    <style name="Theme.Cashbook.Dialog.Alert" parent="ThemeOverlay.AppCompat.Dialog.Alert"/>
+    <!-- 底部抽屉弹窗 -->
+    <style name="Theme.Cashbook.Dialog.BottomSheet" parent="Theme.MaterialComponents.BottomSheetDialog" />
+
+    <!-- 警告弹窗 -->
+    <style name="Theme.Cashbook.Dialog.Alert" parent="Theme.MaterialComponents.Dialog.Alert" />
 
     <!-- AppBar 样式 -->
     <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

@@ -2,14 +2,17 @@
 
 package cn.wj.android.cashbook.base.ui
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
@@ -17,6 +20,7 @@ import androidx.lifecycle.Observer
 import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.firstVisibleFragmentOrNull
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
@@ -27,8 +31,7 @@ import com.google.android.material.snackbar.Snackbar
  *
  * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/3/8
  */
-abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
-    DialogFragment() {
+abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatDialogFragment(), OnBackPressedWatcher {
 
     /** 布局 id */
     protected abstract val layoutResId: Int
@@ -72,6 +75,18 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
         // 订阅数据
         observe()
         logger().d("onCreate")
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return super.onCreateDialog(savedInstanceState).apply {
+            setOnKeyListener { _, keyCode, _ ->
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    handleOnBackPressed()
+                } else {
+                    false
+                }
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -144,9 +159,38 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> :
         dialog?.setCanceledOnTouchOutside(cancelable)
     }
 
+    override fun handleOnBackPressed(): Boolean {
+        val visibleFragment = childFragmentManager.firstVisibleFragmentOrNull()
+        if (null == visibleFragment) {
+            // 没有子 Fragment，返回当前处理
+            return onBackPressed()
+        } else {
+            // 有子 Fragment
+            return if (visibleFragment is OnBackPressedWatcher) {
+                // 关注返回事件，有处理返回逻辑
+                if (visibleFragment.handleOnBackPressed()) {
+                    // 子 Fragment 已消费
+                    true
+                } else {
+                    // 子 Fragment 未消费，返回当前处理
+                    onBackPressed()
+                }
+            } else {
+                // 子 Fragment 没有返回逻辑，返回当前处理
+                onBackPressed()
+            }
+        }
+    }
+
     /** 设置 Dialog 隐藏回调 [listener] */
     fun setOnDialogDismissListener(listener: OnDialogDismissListener?) {
         onDialogDismissListener = listener
+    }
+
+    /** 返回按键点击 */
+    protected open fun onBackPressed(): Boolean {
+        dismiss()
+        return false
     }
 
     /** 订阅数据 */
