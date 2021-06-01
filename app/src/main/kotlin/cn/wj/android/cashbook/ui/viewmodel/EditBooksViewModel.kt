@@ -13,7 +13,7 @@ import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
 import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_CURRENCY
 import cn.wj.android.cashbook.data.entity.BooksEntity
-import cn.wj.android.cashbook.data.model.CurrencyModel
+import cn.wj.android.cashbook.data.enum.CurrencyEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
@@ -34,7 +34,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 imgPreviewUrl.set(books.imageUrl)
                 booksName.set(books.name)
                 booksDescription.set(books.description)
-                currencyModel.set(books.currency)
+                currencyData.set(books.currency)
             }
         }
 
@@ -54,13 +54,13 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val booksDescriptionError: ObservableField<String> = ObservableField()
 
     /** 货币信息 */
-    val currencyModel: ObservableField<CurrencyModel> = ObservableField()
+    val currencyData: ObservableField<CurrencyEnum> = ObservableField()
 
     /** 货币聚合信息 */
-    val currencyStr: ObservableField<String> = object : ObservableField<String>(currencyModel) {
+    val currencyStr: ObservableField<String> = object : ObservableField<String>(currencyData) {
         override fun get(): String {
-            val currency = currencyModel.get()
-            return currency?.summary ?: R.string.default_currency_format.string.format(CurrencyModel.fromCode(getSharedString(SHARED_KEY_CURRENCY)) ?: CurrencyModel.CNY.summary)
+            val currency = currencyData.get()
+            return currency?.summary ?: R.string.default_currency_format.string.format(CurrencyEnum.fromCode(getSharedString(SHARED_KEY_CURRENCY)) ?: CurrencyEnum.CNY.summary)
         }
     }
 
@@ -102,7 +102,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 }
                 val imgUrl = imgPreviewUrl.get().orEmpty()
                 val description = booksDescription.get().orEmpty()
-                val currency = currencyModel.get()
+                val currency = currencyData.get()
                 val currentTime = System.currentTimeMillis().dateFormat()
                 val resultData = if (null == oldBooks) {
                     // 新增

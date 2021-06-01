@@ -10,7 +10,7 @@ import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.entity.BooksEntity
-import cn.wj.android.cashbook.data.model.CurrencyModel
+import cn.wj.android.cashbook.data.enum.CurrencyEnum
 
 /**
  * 数据库数据转换相关
@@ -26,7 +26,7 @@ internal fun BooksTable.toBooksEntity(): BooksEntity {
         name = name,
         imageUrl = imageUrl,
         description = description,
-        currency = CurrencyModel.fromCode(currency),
+        currency = CurrencyEnum.fromCode(currency),
         selected = selected == SWITCH_INT_ON,
         createTime = createTime.dateFormat(),
         modifyTime = modifyTime.dateFormat()

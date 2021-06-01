@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "logo": "@sample/banks",
+      "name": "支付宝"
+    },
+    {
+      "logo": "@sample/banks",
+      "name": "微信钱包"
+    },
+    {
+      "logo": "@sample/banks",
+      "name": "工商银行"
+    },
+    {
+      "logo": "@sample/banks",
+      "name": "光大银行"
+    },
+    {
+      "logo": "@sample/banks",
+      "name": "广发银行"
+    },
+    {
+      "logo": "@sample/banks",
+      "name": "华夏银行"
+    },
+    {
+      "logo": "@sample/banks",
+      "name": "建设银行"
+    },
+    {
+      "logo": "@sample/banks",
+      "name": "交通银行"
+    }
+  ]
+}

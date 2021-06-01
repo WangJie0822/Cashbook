@@ -3,7 +3,7 @@ package cn.wj.android.cashbook.data.entity
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.data.model.CurrencyModel
+import cn.wj.android.cashbook.data.enum.CurrencyEnum
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -14,7 +14,7 @@ import kotlinx.parcelize.Parcelize
  * @param name 账本名
  * @param imageUrl 账本封面地址
  * @param description 描述
- * @param currency [CurrencyModel] 默认货币信息
+ * @param currency [CurrencyEnum] 默认货币信息
  * @param selected 是否默认选中
  * @param createTime 创建时间
  * @param modifyTime 修改时间
@@ -27,7 +27,7 @@ data class BooksEntity(
     val name: String,
     val imageUrl: String,
     val description: String,
-    val currency: CurrencyModel?,
+    val currency: CurrencyEnum?,
     val selected: Boolean,
     val createTime: String,
     val modifyTime: String

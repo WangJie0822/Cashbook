@@ -1,0 +1,43 @@
+<resources>
+    <string name="currency_summary_format" translatable="false">%1$s  %2$s (%3$s)</string>
+    <string name="default_currency_format">%1$s（默认）</string>
+
+    <string name="app_name">记账本</string>
+    <string name="default_books">默认账本</string>
+    <string name="press_again_to_exit">再次返回退出</string>
+    <string name="search">搜索</string>
+    <string name="my_books">我的账本</string>
+    <string name="current_month_spending">本月支出</string>
+    <string name="current_month_income">本月收入</string>
+    <string name="current_month_balance">本月结余</string>
+    <string name="confirm">确认</string>
+    <string name="modify">修改</string>
+    <string name="delete">删除</string>
+    <string name="cancel">取消</string>
+    <string name="no_longer_prompt">不再提示</string>
+    <string name="delete_books_confirm">删除账本将同步删除账本下所有记账记录，是否确认？</string>
+    <string name="add">添加</string>
+    <string name="cannot_delete_selected_books">无法删除已选中账本</string>
+    <string name="edit_books">编辑账本</string>
+    <string name="top_preview_num">2000</string>
+    <string name="top_preview">预览效果</string>
+    <string name="top_img_bg_optional">顶部图片背景（可选）</string>
+    <string name="books_name">账本名称</string>
+    <string name="books_description">账本说明</string>
+    <string name="books_description_optional">账本说明（可选）</string>
+    <string name="books_name_cannot_be_empty">账本名称不能为空</string>
+    <string name="books_name_already_exists">账本名称已存在</string>
+    <string name="modify_time_with_colon">修改时间：</string>
+    <string name="spending">支出</string>
+    <string name="income">收入</string>
+    <string name="transfer">转账</string>
+    <string name="account">账户</string>
+    <string name="tags">标签</string>
+    <string name="charge">手续费</string>
+    <string name="reimbursable">可报销</string>
+    <string name="please_enter_remarks_here">请在此输入备注</string>
+    <string name="today">今天</string>
+    <string name="select_an_asset">选择一个资产账户</string>
+    <string name="select_asset_classification">选择资产分类</string>
+    <string name="sort_by_frequency_of_use">根据使用频率排序</string>
+</resources>
