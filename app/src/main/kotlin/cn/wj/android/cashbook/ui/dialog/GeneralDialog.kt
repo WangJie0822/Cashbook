@@ -4,8 +4,6 @@ package cn.wj.android.cashbook.ui.dialog
 
 import android.view.Gravity
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import cn.wj.android.cashbook.R
@@ -380,18 +378,8 @@ class GeneralDialog
         /** 使用 [fm] 创建、显示并返回 [GeneralDialog] */
         fun show(fm: FragmentManager): GeneralDialog {
             return build().apply {
-                show(fm, "GeneralDialog")
+                show(fm)
             }
-        }
-
-        /** 使用 [fragment] 创建、显示并返回 [GeneralDialog] */
-        fun show(fragment: Fragment): GeneralDialog {
-            return show(fragment.childFragmentManager)
-        }
-
-        /** 使用 [activity] 创建、显示并返回 [GeneralDialog] */
-        fun show(activity: FragmentActivity): GeneralDialog {
-            return show(activity.supportFragmentManager)
         }
 
         /** 建造并返回 [GeneralDialog] 对象 */

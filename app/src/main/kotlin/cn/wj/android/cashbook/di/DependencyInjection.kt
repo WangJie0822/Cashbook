@@ -12,7 +12,8 @@ import cn.wj.android.cashbook.ui.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.viewmodel.GeneralViewModel
 import cn.wj.android.cashbook.ui.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.viewmodel.MyBooksViewModel
-import cn.wj.android.cashbook.ui.viewmodel.SelectAccountViewModel
+import cn.wj.android.cashbook.ui.viewmodel.SelectAssetClassificationViewModel
+import cn.wj.android.cashbook.ui.viewmodel.SelectAssetViewModel
 import cn.wj.android.cashbook.ui.viewmodel.SplashViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -74,6 +75,9 @@ val viewModelModule = module {
         DateTimePickerViewModel()
     }
     viewModel {
-        SelectAccountViewModel(get())
+        SelectAssetViewModel(get())
+    }
+    viewModel {
+        SelectAssetClassificationViewModel(get())
     }
 }

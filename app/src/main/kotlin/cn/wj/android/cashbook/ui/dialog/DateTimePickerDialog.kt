@@ -44,10 +44,6 @@ class DateTimePickerDialog : BaseDialog<DateTimePickerViewModel, DialogDateTimeP
         })
     }
 
-    fun show(manager: FragmentManager) {
-        show(manager, tag)
-    }
-
     class Builder {
 
         private var date = ""

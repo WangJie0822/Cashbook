@@ -103,7 +103,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
                                         .setOnPositiveAction {
                                             // 删除账本
                                             viewModel.deleteBooks(item)
-                                        }.show(this@MyBooksActivity)
+                                        }.show(this@MyBooksActivity.supportFragmentManager)
                                 }
                             }
                             true
