@@ -29,6 +29,8 @@ const val SWITCH_INT_ON = 1
 /** 开关 - 关 */
 const val SWITCH_INT_OFF = 0
 
+/** 资产类型大类 */
+
 
 /** Activity 返回码  */
 const val ACTIVITY_RESULT_CANCELED = Activity.RESULT_CANCELED

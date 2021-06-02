@@ -3,13 +3,13 @@ package cn.wj.android.cashbook.data.store
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.liveData
-import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.BooksDao
 import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
+import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.source.BillPagingSource
 import cn.wj.android.cashbook.data.transform.toBooksEntity
 import cn.wj.android.cashbook.data.transform.toBooksTable
@@ -89,27 +89,27 @@ class LocalDataStore(private val database: CashbookDatabase) {
         arrayListOf(
             // 资金账户
             AssetClassificationListEntity(
-                groupNameResId = R.string.asset_classifications_capital_account,
+                classificationType = ClassificationTypeEnum.CAPITAL_ACCOUNT,
                 classifications = arrayListOf(*AssetClassificationEnum.CAPITAL_ACCOUNT)
             ),
             // 信用卡账户
             AssetClassificationListEntity(
-                groupNameResId = R.string.asset_classifications_credit_card_account,
+                classificationType = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
                 classifications = arrayListOf(*AssetClassificationEnum.CREDIT_CARD_ACCOUNT)
             ),
             // 充值账户
             AssetClassificationListEntity(
-                groupNameResId = R.string.asset_classifications_top_up_account,
+                classificationType = ClassificationTypeEnum.TOP_UP_ACCOUNT,
                 classifications = arrayListOf(*AssetClassificationEnum.TOP_UP_ACCOUNT)
             ),
             // 投资理财账户
             AssetClassificationListEntity(
-                groupNameResId = R.string.asset_classifications_investment_financial_account,
+                classificationType = ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT,
                 classifications = arrayListOf(*AssetClassificationEnum.INVESTMENT_FINANCIAL_ACCOUNT)
             ),
             // 债务
             AssetClassificationListEntity(
-                groupNameResId = R.string.asset_classifications_debt_account,
+                classificationType = ClassificationTypeEnum.DEBT_ACCOUNT,
                 classifications = arrayListOf(*AssetClassificationEnum.DEBT_ACCOUNT)
             )
         )

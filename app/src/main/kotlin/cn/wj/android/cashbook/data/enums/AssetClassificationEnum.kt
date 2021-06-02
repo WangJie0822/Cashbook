@@ -67,6 +67,17 @@ enum class AssetClassificationEnum(
     val needSelectBank: Boolean
         get() = this == BANK_CARD || this == CREDIT_CARD
 
+    /** 分类对应大类 */
+    val parentType: ClassificationTypeEnum
+        get() = when (this) {
+            in CAPITAL_ACCOUNT -> ClassificationTypeEnum.CAPITAL_ACCOUNT
+            in CREDIT_CARD_ACCOUNT -> ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
+            in TOP_UP_ACCOUNT -> ClassificationTypeEnum.TOP_UP_ACCOUNT
+            in INVESTMENT_FINANCIAL_ACCOUNT -> ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT
+            in DEBT_ACCOUNT -> ClassificationTypeEnum.DEBT_ACCOUNT
+            else -> ClassificationTypeEnum.CAPITAL_ACCOUNT
+        }
+
     companion object {
 
         /** 资金账户 */

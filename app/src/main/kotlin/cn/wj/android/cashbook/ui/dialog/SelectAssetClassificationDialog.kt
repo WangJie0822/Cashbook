@@ -2,11 +2,13 @@ package cn.wj.android.cashbook.ui.dialog
 
 import android.view.Gravity
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.recyclerview.widget.ConcatAdapter
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.tag
 import cn.wj.android.cashbook.base.ui.BaseDialog
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
+import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.databinding.DialogSelectAssetClassificationBinding
 import cn.wj.android.cashbook.ui.adapter.AssetClassificationGroupRvAdapter
 import cn.wj.android.cashbook.ui.viewmodel.SelectAssetClassificationViewModel
@@ -34,6 +36,8 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
 
     override val dialogHeight: Int = WindowManager.LayoutParams.MATCH_PARENT
 
+    private var onClassificationSelectListener: ((ClassificationTypeEnum, AssetClassificationEnum) -> Unit)? = null
+
     override fun initView() {
         // 更新状态栏相关状态
         immersionBar {
@@ -51,7 +55,7 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
         viewModel.assetClassificationListData.observe(this, { list ->
             binding.rvAssetClassification.adapter = ConcatAdapter().apply {
                 list.forEach {
-                    addAdapter(AssetClassificationGroupRvAdapter(it.groupNameResId))
+                    addAdapter(AssetClassificationGroupRvAdapter(it.classificationType.titleResId))
                     addAdapter(SimpleRvListAdapter<AssetClassificationEnum>(R.layout.recycler_item_asset_classification).apply {
                         viewModel = this@SelectAssetClassificationDialog.viewModel
                         submitList(it.classifications)
@@ -66,5 +70,24 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
                 submitList(list)
             }
         })
+        // 选中的数据
+        viewModel.selectedAssetClassificationData.observe(this, { selected ->
+            onClassificationSelectListener?.invoke(viewModel.classificationType, selected)
+            if (!selected.needSelectBank) {
+                // 不需要选择银行
+                if (null == onClassificationSelectListener) {
+                    // TODO 没有回调，跳转新增资产
+                    Toast.makeText(context, "新增资产 ${viewModel.classificationType.name} - ${selected.name}", Toast.LENGTH_SHORT).show()
+                }
+                // 隐藏弹窗
+                dismiss()
+            }
+        })
+    }
+
+    /** 设置选中类型回调 [listener] */
+    fun setOnClassificationSelectListener(listener: (ClassificationTypeEnum, AssetClassificationEnum) -> Unit): SelectAssetClassificationDialog {
+        this.onClassificationSelectListener = listener
+        return this
     }
 }

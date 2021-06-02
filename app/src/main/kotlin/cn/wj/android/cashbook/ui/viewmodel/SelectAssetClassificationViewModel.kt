@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.data.constants.BOTTOM_SHEET_STATE_HALF_EXPANDED
 import cn.wj.android.cashbook.data.constants.BOTTOM_SHEET_STATE_HIDDEN
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
+import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.interfaces.AssetClassificationListClickListener
@@ -22,8 +23,14 @@ import kotlinx.coroutines.launch
  */
 class SelectAssetClassificationViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetClassificationListClickListener {
 
+    /** 资产类型大类 */
+    var classificationType = ClassificationTypeEnum.CAPITAL_ACCOUNT
+
     /** 标记 - 是否选择资产分类 */
     private val selectClassification: MutableLiveData<Boolean> = MutableLiveData(true)
+
+    /** 选中的资产类型数据 */
+    val selectedAssetClassificationData: MutableLiveData<AssetClassificationEnum> = MutableLiveData()
 
     /** 资产分类状态 */
     val assetClassificationState: LiveData<Int> = selectClassification.map {
@@ -82,7 +89,10 @@ class SelectAssetClassificationViewModel(private val local: LocalDataStore) : Ba
             // 需要选择银行
             selectClassification.value = false
         }
-
+        // 更新大类
+        classificationType = item.parentType
+        // 更新选中的数据
+        selectedAssetClassificationData.value = item
     }
 
     /** 获取分类列表数据 */
