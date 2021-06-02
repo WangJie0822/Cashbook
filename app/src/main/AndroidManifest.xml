@@ -36,7 +36,7 @@
 
         <!-- 闪屏界面 -->
         <activity
-            android:name=".ui.activity.SplashActivity"
+            android:name=".ui.main.activity.SplashActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.Cashbook.Splash">
@@ -49,25 +49,25 @@
 
         <!-- 主界面 -->
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".ui.main.activity.MainActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
 
         <!-- 我的账本 -->
         <activity
-            android:name=".ui.activity.MyBooksActivity"
+            android:name=".ui.books.activity.MyBooksActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
 
         <!-- 编辑账本 -->
         <activity
-            android:name=".ui.activity.EditBooksActivity"
+            android:name=".ui.books.activity.EditBooksActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
 
         <!-- 编辑记录 -->
         <activity
-            android:name=".ui.activity.EditRecordActivity"
+            android:name=".ui.record.activity.EditRecordActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
     </application>

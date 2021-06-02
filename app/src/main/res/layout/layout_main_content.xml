@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.main.activity.MainActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.viewmodel.MainViewModel" />
+            type="cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

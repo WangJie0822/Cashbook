@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.viewmodel.DateTimePickerViewModel" />
+            type="cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

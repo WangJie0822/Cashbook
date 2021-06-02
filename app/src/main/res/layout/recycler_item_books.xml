@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.viewmodel.MyBooksViewModel" />
+            type="cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel" />
 
         <variable
             name="item"

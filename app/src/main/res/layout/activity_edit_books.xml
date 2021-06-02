@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.activity.EditBooksActivity">
+    tools:context=".ui.books.activity.EditBooksActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.viewmodel.EditBooksViewModel" />
+            type="cn.wj.android.cashbook.ui.books.viewmodel.EditBooksViewModel" />
     </data>
 
     <LinearLayout

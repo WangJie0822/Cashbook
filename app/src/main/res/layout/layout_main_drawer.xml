@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.viewmodel.MainViewModel" />
+            type="cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel" />
     </data>
 
     <LinearLayout

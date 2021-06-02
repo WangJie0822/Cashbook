@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.viewmodel.SelectAssetViewModel" />
+            type="cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
