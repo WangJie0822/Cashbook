@@ -77,12 +77,12 @@ fun TextView.setTextColor(colorStr: String?) {
 }
 
 /** 根据资源id [resId] 为 [TextView] 设置文本 */
-@BindingAdapter("android:bind_tv_text")
+@BindingAdapter("android:bind_tv_textResId")
 fun TextView.setText(@StringRes resId: Int?) {
-    if (null != resId || resId == 0) {
+    if (null == resId || resId == 0) {
         return
     }
-    this.text = resId
+    this.setText(resId)
 }
 
 /** 将 [TextView] 文本设置为 [cs] 并执行 [textSpan] 方法块设置富文本 */

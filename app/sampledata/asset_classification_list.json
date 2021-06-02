@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "logo": "@sample/classifications",
+      "name": "现金"
+    },
+    {
+      "logo": "@sample/classifications",
+      "name": "支付宝"
+    },,
+    {
+      "logo": "@sample/classifications",
+      "name": "微信"
+    },
+    {
+      "logo": "@sample/classifications",
+      "name": "银行卡"
+    },
+    {
+      "logo": "@sample/classifications",
+      "name": "其他"
+    }
+  ]
+}

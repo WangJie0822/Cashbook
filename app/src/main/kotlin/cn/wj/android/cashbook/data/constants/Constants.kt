@@ -3,6 +3,7 @@
 package cn.wj.android.cashbook.data.constants
 
 import android.app.Activity
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 /**
  * 常量
@@ -29,11 +30,15 @@ const val SWITCH_INT_ON = 1
 const val SWITCH_INT_OFF = 0
 
 
-/** Activity 返回码 - 取消 */
+/** Activity 返回码  */
 const val ACTIVITY_RESULT_CANCELED = Activity.RESULT_CANCELED
-
-/** Activity 返回码 - 成功 */
 const val ACTIVITY_RESULT_OK = Activity.RESULT_OK
-
-/** Activity 返回码 - 自定义活动 */
 const val ACTIVITY_RESULT_FIRST_USER = Activity.RESULT_FIRST_USER
+
+/** [BottomSheetBehavior] 状态码 */
+const val BOTTOM_SHEET_STATE_COLLAPSED = BottomSheetBehavior.STATE_COLLAPSED
+const val BOTTOM_SHEET_STATE_DRAGGING = BottomSheetBehavior.STATE_DRAGGING
+const val BOTTOM_SHEET_STATE_EXPANDED = BottomSheetBehavior.STATE_EXPANDED
+const val BOTTOM_SHEET_STATE_HALF_EXPANDED = BottomSheetBehavior.STATE_HALF_EXPANDED
+const val BOTTOM_SHEET_STATE_HIDDEN = BottomSheetBehavior.STATE_HIDDEN
+const val BOTTOM_SHEET_STATE_SETTLING = BottomSheetBehavior.STATE_SETTLING

@@ -34,7 +34,7 @@
     <color name="color_error">#D50000</color>
     <color name="color_on_error">#FFD600</color>
     <!-- 分隔颜色 -->
-    <color name="color_divider">#BDBDBD</color>
+    <color name="color_divider">#DEDEDE</color>
     <!-- 窗口背景色 -->
     <color name="color_window_background">#F6F6F6</color>
 

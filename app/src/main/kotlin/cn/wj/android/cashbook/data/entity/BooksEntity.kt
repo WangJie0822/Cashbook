@@ -3,7 +3,7 @@ package cn.wj.android.cashbook.data.entity
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.data.enum.CurrencyEnum
+import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 

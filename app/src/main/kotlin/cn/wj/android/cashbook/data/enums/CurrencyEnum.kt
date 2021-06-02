@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package cn.wj.android.cashbook.data.enum
+package cn.wj.android.cashbook.data.enums
 
 import android.os.Parcelable
 import androidx.annotation.StringRes
@@ -173,16 +173,13 @@ enum class CurrencyEnum(
     ZAR(R.string.currency_title_zar, "R", "🇿🇦"),
     ZMW(R.string.currency_title_zmw, "ZK", "\uD83C\uDDFF\uD83C\uDDF2");
 
-    val code: String
-        get() = name
-
     val summary: String
-        get() = R.string.currency_summary_format.string.format(flag, titleResId.string, code)
+        get() = R.string.currency_summary_format.string.format(flag, titleResId.string, name)
 
     companion object {
 
-        fun fromCode(code: String?): CurrencyEnum? {
-            return values().firstOrNull { currency -> currency.code == code }
+        fun fromName(name: String?): CurrencyEnum? {
+            return values().firstOrNull { currency -> currency.name == name }
         }
     }
 }
