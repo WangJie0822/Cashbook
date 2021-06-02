@@ -1,5 +1,4 @@
 <resources>
-    <string name="currency_summary_format" translatable="false">%1$s  %2$s (%3$s)</string>
     <string name="default_currency_format">%1$s（默认）</string>
 
     <string name="app_name">记账本</string>

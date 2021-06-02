@@ -2,6 +2,7 @@
 <resources>
     <string name="currency_title_aed">阿联酋迪拉姆</string>
     <string name="currency_title_afn">阿富汗尼</string>
+    <string name="currency_title_all">阿尔巴尼亚列克</string>
     <string name="currency_title_amd">亚美尼亚德拉姆</string>
     <string name="currency_title_aoa">安哥拉宽扎</string>
     <string name="currency_title_ars">阿根廷比索</string>

@@ -2,6 +2,7 @@
 <resources>
     <string name="currency_title_aed">Emirati Dirham</string>
     <string name="currency_title_afn">Afghanistan Afghani</string>
+    <string name="currency_title_all">Albanian Lek</string>
     <string name="currency_title_amd">Armenian Dram</string>
     <string name="currency_title_aoa">Angolan Kwanza</string>
     <string name="currency_title_ars">Argentine Peso</string>
