@@ -16,7 +16,7 @@ import java.io.File
  */
 
 /** 根据资源id [resId] 给 [ImageView] 加载图片 */
-@BindingAdapter("android:bind_src")
+@BindingAdapter("android:bind_iv_srcResId")
 fun ImageView.src(@DrawableRes resId: Int?) {
     if (null != resId && 0 != resId) {
         setImageResource(resId)
@@ -27,7 +27,7 @@ fun ImageView.src(@DrawableRes resId: Int?) {
  * 根据资源字符串 [res] 给 [ImageView] 加载图片
  * > [res]: @drawable/xxx or @mipmap/xxx
  */
-@BindingAdapter("android:bind_src")
+@BindingAdapter("android:bind_iv_srcResIdStr")
 fun ImageView.setImageResource(res: String?) {
     if (res.isNullOrBlank() || !res.startsWith(RESOURCE_MARK)) {
         // 资源为空或者不以资源标识开头

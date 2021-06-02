@@ -2,7 +2,6 @@ package cn.wj.android.cashbook.ui.asset.dialog
 
 import android.view.Gravity
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.recyclerview.widget.ConcatAdapter
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.tag
@@ -10,6 +9,7 @@ import cn.wj.android.cashbook.base.ui.BaseDialog
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.databinding.DialogSelectAssetClassificationBinding
+import cn.wj.android.cashbook.ui.asset.activity.EditAssetActivity
 import cn.wj.android.cashbook.ui.asset.adapter.AssetClassificationGroupRvAdapter
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetClassificationViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
@@ -77,7 +77,7 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
                 // 不需要选择银行
                 if (null == onClassificationSelectListener) {
                     // TODO 没有回调，跳转新增资产
-                    Toast.makeText(context, "新增资产 ${viewModel.classificationType.name} - ${selected.name}", Toast.LENGTH_SHORT).show()
+                    EditAssetActivity.actionStart(requireActivity())
                 }
                 // 隐藏弹窗
                 dismiss()

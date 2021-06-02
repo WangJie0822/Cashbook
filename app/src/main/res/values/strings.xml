@@ -62,4 +62,9 @@
     <string name="select_asset_classification">选择资产分类</string>
     <string name="sort_by_frequency_of_use">根据使用频率排序</string>
     <string name="select_bank">选择银行</string>
+    <string name="new_asset">新建资产</string>
+    <string name="asset_classification">资产分类</string>
+    <string name="asset_name">资产名称</string>
+    <string name="asset_balance">资产余额</string>
+    <string name="total_amount">总额度</string>
 </resources>

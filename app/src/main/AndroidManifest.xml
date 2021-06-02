@@ -70,6 +70,12 @@
             android:name=".ui.record.activity.EditRecordActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
+
+        <!-- 编辑资产 -->
+        <activity
+            android:name=".ui.asset.activity.EditAssetActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="fullSensor" />
     </application>
 
 </manifest>
