@@ -17,15 +17,11 @@ interface BooksDao {
 
     /** 新增账本数据 [books] 到数据库 */
     @Insert
-    suspend fun insert(vararg books: BooksTable)
-
-    /** 新增账本数据 [books] 到数据库 */
-    @Insert
     suspend fun insert(books: BooksTable): Long
 
     /** 从数据库中删除账本数据 [books]*/
     @Delete
-    suspend fun delete(vararg books: BooksTable)
+    suspend fun delete(books: BooksTable)
 
     /** 更新数据库中的 [books] 数据 */
     @Update

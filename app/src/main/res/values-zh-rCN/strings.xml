@@ -52,4 +52,7 @@
     <string name="invisible_asset_hint">隐藏不使用的资产，将不会在资产列表显示</string>
     <string name="save">保存</string>
     <string name="current_arrears">当前欠款</string>
+    <string name="edit_asset">编辑资产</string>
+    <string name="asset_name_cannot_be_empty">资产名称不能为空</string>
+    <string name="save_success">保存成功</string>
 </resources>

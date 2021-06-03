@@ -1,14 +1,16 @@
 package cn.wj.android.cashbook.data.store
 
 import cn.wj.android.cashbook.data.database.CashbookDatabase
+import cn.wj.android.cashbook.data.database.dao.AssetDao
 import cn.wj.android.cashbook.data.database.dao.BooksDao
 import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
+import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
-import cn.wj.android.cashbook.data.transform.toBooksTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -26,34 +28,26 @@ class LocalDataStore(private val database: CashbookDatabase) {
         database.booksDao()
     }
 
-    /** 将账本数据 [books] 插入到数据库中 */
-    suspend fun insertBooks(vararg books: BooksEntity) = withContext(Dispatchers.IO) {
-        val ls = arrayListOf<BooksTable>()
-        books.forEach {
-            ls.add(it.toBooksTable())
-        }
-        booksDao.insert(*ls.toTypedArray())
+    /** 资产数据库操作对象 */
+    private val assetDao: AssetDao by lazy {
+        database.assetDao()
     }
 
     /** 将账本数据 [books] 插入到数据库中 */
     suspend fun insertBooks(books: BooksEntity) = withContext(Dispatchers.IO) {
-        booksDao.insert(books.toBooksTable())
+        booksDao.insert(books.toAssetTable())
     }
 
     /** 从数据库中删除 [books] */
-    suspend fun deleteBooks(vararg books: BooksEntity) = withContext(Dispatchers.IO) {
-        val ls = arrayListOf<BooksTable>()
-        books.forEach {
-            ls.add(it.toBooksTable())
-        }
-        booksDao.delete(*ls.toTypedArray())
+    suspend fun deleteBooks(books: BooksEntity) = withContext(Dispatchers.IO) {
+        booksDao.delete(books.toAssetTable())
     }
 
     /** 从数据库中删除 [books] */
     suspend fun updateBooks(vararg books: BooksEntity) = withContext(Dispatchers.IO) {
         val ls = arrayListOf<BooksTable>()
         books.forEach {
-            ls.add(it.toBooksTable())
+            ls.add(it.toAssetTable())
         }
         booksDao.update(*ls.toTypedArray())
     }
@@ -106,9 +100,18 @@ class LocalDataStore(private val database: CashbookDatabase) {
         )
     }
 
-
     /** 获取银行列表 */
     suspend fun getBankList() = withContext(Dispatchers.IO) {
         arrayListOf(*AssetClassificationEnum.BANK_LIST)
+    }
+
+    /** 插入新的资产 [asset] 到数据库 */
+    suspend fun insertAsset(asset: AssetEntity) = withContext(Dispatchers.IO) {
+        assetDao.insert(asset.toAssetTable())
+    }
+
+    /** 更新资产 [asset] 到数据库 */
+    suspend fun updateAsset(asset: AssetEntity) = withContext(Dispatchers.IO) {
+        assetDao.update(asset.toAssetTable())
     }
 }

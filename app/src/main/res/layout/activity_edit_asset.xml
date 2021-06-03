@@ -105,6 +105,7 @@
                         android:id="@+id/til_asset_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:bind_til_error="@{viewModel.nameError}"
                         android:hint="@string/asset_name"
                         app:endIconMode="clear_text"
                         app:errorIconTint="?attr/colorError"
@@ -316,6 +317,7 @@
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginEnd="@dimen/activity_horizontal_margin"
                     android:bind_onClick="@{viewModel.onSaveClick}"
+                    android:enabled="@{viewModel.saveEnable}"
                     android:text="@string/save" />
 
             </LinearLayout>

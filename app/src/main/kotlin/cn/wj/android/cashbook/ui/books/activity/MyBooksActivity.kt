@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMyBooksBinding
 import cn.wj.android.cashbook.databinding.RecyclerItemBooksBinding
 import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
@@ -98,6 +99,11 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
                                 }
                                 R.id.delete -> {
                                     // 删除
+                                    if (item.selected) {
+                                        // 已选择账本不能删除
+                                        viewModel.snackbarData.value = R.string.cannot_delete_selected_books.string.toSnackbarModel()
+                                        return@setOnMenuItemClickListener true
+                                    }
                                     GeneralDialog.newBuilder()
                                         .contentStr(R.string.delete_books_confirm.string)
                                         .setOnPositiveAction {

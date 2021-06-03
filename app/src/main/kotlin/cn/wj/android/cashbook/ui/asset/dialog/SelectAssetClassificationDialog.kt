@@ -76,8 +76,8 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
             if (!selected.needSelectBank) {
                 // 不需要选择银行
                 if (null == onClassificationSelectListener) {
-                    // TODO 没有回调，跳转新增资产
-                    EditAssetActivity.actionStart(requireActivity())
+                    // 没有回调，跳转新增资产
+                    EditAssetActivity.actionStart(requireActivity(), viewModel.classificationType, selected)
                 }
                 // 隐藏弹窗
                 dismiss()
