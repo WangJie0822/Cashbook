@@ -1,6 +1,5 @@
 <resources>
     <string name="currency_summary_format" translatable="false">%1$s  %2$s (%3$s)</string>
-    <string name="default_currency_format">%1$s（默认）</string>
 
     <string name="symbol_calculator_clear" translatable="false">C</string>
     <string name="symbol_calculator_equals" translatable="false">=</string>
@@ -22,6 +21,8 @@
     <string name="symbol_calculator_seven" translatable="false">7</string>
     <string name="symbol_calculator_eight" translatable="false">8</string>
     <string name="symbol_calculator_nine" translatable="false">9</string>
+
+    <string name="default_currency_format">%1$s（默认）</string>
 
     <string name="app_name">记账本</string>
     <string name="default_books">默认账本</string>
@@ -77,4 +78,9 @@
     <string name="edit_asset">编辑资产</string>
     <string name="asset_name_cannot_be_empty">资产名称不能为空</string>
     <string name="save_success">保存成功</string>
+    <string name="my_asset">我的资产</string>
+    <string name="net_assets">净资产</string>
+    <string name="total_assets">总资产</string>
+    <string name="total_liabilities">总负债</string>
+    <string name="nothing">无</string>
 </resources>

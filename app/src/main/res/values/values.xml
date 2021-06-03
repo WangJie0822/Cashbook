@@ -2,10 +2,13 @@
 <resources>
 
     <!-- 黄金比例 -->
-    <string name="golden_ratio_horizontal">1:0.618</string>
-    <string name="golden_ratio_vertical">0.618:1</string>
+    <string name="golden_ratio_horizontal" translatable="false">1:0.618</string>
+    <string name="golden_ratio_vertical" translatable="false">0.618:1</string>
 
     <!-- 账本卡片比例 -->
-    <string name="books_card_ratio_horizontal">2:1</string>
+    <string name="books_card_ratio_horizontal" translatable="false">2:1</string>
+
+    <!-- SwipeRefresh 进度条颜色 -->
+    <string name="swipe_refresh_scheme_colors" translatable="false">\@color/color_primary,\@color/color_secondary_variant,\@color/color_secondary,\@color/color_primary_variant</string>
 
 </resources>

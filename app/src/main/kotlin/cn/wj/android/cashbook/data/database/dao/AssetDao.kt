@@ -19,5 +19,5 @@ interface AssetDao {
 
     /** 更新资产 [asset] 到数据库 */
     @Update
-    suspend fun update(asset: AssetTable): Long
+    suspend fun update(asset: AssetTable)
 }

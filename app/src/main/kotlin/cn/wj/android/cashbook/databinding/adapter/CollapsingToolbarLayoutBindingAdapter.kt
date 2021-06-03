@@ -4,6 +4,7 @@ package cn.wj.android.cashbook.databinding.adapter
 
 import androidx.annotation.ColorInt
 import androidx.databinding.BindingAdapter
+import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orTrue
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -63,6 +64,24 @@ fun CollapsingToolbarLayout.addOnExpandOffsetChangedListener(onChanged: ((Float)
         parent.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
             val total = parent.totalScrollRange.toFloat()
             onChanged.invoke((total + verticalOffset.toFloat()) / total)
+        })
+    }
+}
+
+/** 添加标题显示进度设置 */
+@BindingAdapter("android:bind_ctl_titleEnabledPercent")
+fun CollapsingToolbarLayout.setTitleEnabledPercent(percent: Float?) {
+    if (null == percent) {
+        return
+    }
+    val parent = this.parent
+    if (parent is AppBarLayout) {
+        parent.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
+            val total = parent.totalScrollRange.toFloat()
+            val currentPercent = (total + verticalOffset.toFloat()) / total
+            val enabled = currentPercent <= percent
+            logger().i("percent: $percent current: $currentPercent enabled: $enabled")
+            isTitleEnabled = enabled
         })
     }
 }

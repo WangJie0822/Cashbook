@@ -55,4 +55,9 @@
     <string name="edit_asset">编辑资产</string>
     <string name="asset_name_cannot_be_empty">资产名称不能为空</string>
     <string name="save_success">保存成功</string>
+    <string name="my_asset">我的资产</string>
+    <string name="net_assets">净资产</string>
+    <string name="total_assets">总资产</string>
+    <string name="total_liabilities">总负债</string>
+    <string name="nothing">无</string>
 </resources>

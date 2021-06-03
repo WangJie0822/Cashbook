@@ -7,9 +7,29 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
 
 /** 为 [Toolbar] 设置菜单点击监听 [itemClick] */
-@BindingAdapter("android:bind_toolbar_itemClick")
-fun Toolbar.setToolbarMenuItemClick(itemClick: ((MenuItem) -> Boolean)?) {
-    this.setOnMenuItemClickListener(itemClick)
+@BindingAdapter("android:bind_toolbar_menuItemClick")
+fun Toolbar.setToolbarMenuItemClick(itemClick: ((MenuItem) -> Unit)?) {
+    if (null == itemClick) {
+        this.setOnMenuItemClickListener(null)
+        return
+    }
+    this.setOnMenuItemClickListener {
+        itemClick.invoke(it)
+        true
+    }
+}
+
+/** 为 [Toolbar] 设置菜单点击监听 [itemClick] */
+@BindingAdapter("android:bind_toolbar_menuItemClickId")
+fun Toolbar.setToolbarMenuItemIdClick(itemClick: ((Int) -> Unit)?) {
+    if (null == itemClick) {
+        this.setOnMenuItemClickListener(null)
+        return
+    }
+    this.setOnMenuItemClickListener {
+        itemClick.invoke(it.itemId)
+        true
+    }
 }
 
 /** [Toolbar] 设置菜单点击回调，有且仅有一个菜单时使用 */

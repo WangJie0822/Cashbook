@@ -76,6 +76,12 @@
             android:name=".ui.asset.activity.EditAssetActivity"
             android:configChanges="screenSize"
             android:screenOrientation="fullSensor" />
+
+        <!-- 我的资产 -->
+        <activity
+            android:name=".ui.asset.activity.MyAssetActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="fullSensor" />
     </application>
 
 </manifest>

@@ -14,10 +14,10 @@
         tools:targetApi="o" />
 
     <item
-        android:id="@+id/my_books"
-        android:icon="@drawable/vector_baseline_library_books_24"
+        android:id="@+id/my_asset"
+        android:icon="@drawable/vector_baseline_web_asset_24"
         android:iconTint="@color/color_on_primary"
-        android:title="@string/my_books"
+        android:title="@string/my_asset"
         app:iconTint="@color/color_on_primary"
         app:showAsAction="ifRoom"
         tools:targetApi="o" />

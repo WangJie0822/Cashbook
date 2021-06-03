@@ -32,7 +32,6 @@
                 android:bind_ctl_onExpandOffsetChanged="@{viewModel.onCollapsingChanged}"
                 android:bind_ctl_title="@{viewModel.booksName}"
                 android:bind_ctl_title_enable="@{viewModel.titleEnable}"
-                android:elevation="4dp"
                 app:contentScrim="@color/color_primary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:scrimVisibleHeightTrigger="@dimen/main_header_scrim_visible_height"
@@ -48,6 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:bind_fits_status_bar="@{true}"
+                    android:bind_toolbar_menuItemClickId="@{viewModel.onToolbarMenuClick}"
                     app:layout_collapseMode="pin"
                     app:menu="@menu/main_toolbar"
                     app:navigationIcon="@drawable/vector_baseline_menu_24"
@@ -62,8 +62,7 @@
             android:id="@+id/rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:listitem="@layout/recycler_item_bill" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

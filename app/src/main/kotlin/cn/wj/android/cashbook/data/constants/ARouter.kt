@@ -10,10 +10,16 @@ package cn.wj.android.cashbook.data.constants
 const val ROUTE_PATH_MAIN = "/path/main"
 
 /** 路由路径 - 我的账本 */
-const val ROUTE_PATH_MY_BOOKS = "/path/my_books"
+const val ROUTE_PATH_MY_BOOKS = "/path/books/my"
 
 /** 路由路径 - 编辑账本 */
-const val ROUTE_PATH_EDIT_BOOKS = "/path/edit_books"
+const val ROUTE_PATH_EDIT_BOOKS = "/path/books/edit"
 
 /** 路由路径 - 编辑记录 */
-const val ROUTE_PATH_EDIT_RECORD = "/path/edit_record"
+const val ROUTE_PATH_EDIT_RECORD = "/path/record/edit"
+
+/** 路由路径 - 编辑资产 */
+const val ROUTE_PATH_EDIT_ASSET = "/path/asset/edit"
+
+/** 路由路径 - 我的资产 */
+const val ROUTE_PATH_MY_ASSET = "/path/asset/my"

@@ -18,7 +18,7 @@ import cn.wj.android.databinding.adapter.getIdentifier
  */
 
 /** 为 [SwipeRefreshLayout] 设置进度条颜色 [color] */
-@BindingAdapter("android:bind_srl_schemeColors")
+@BindingAdapter("android:bind_srl_schemeColorsInt")
 fun SwipeRefreshLayout.setSwipeRefreshLayoutSchemeColors(@ColorInt color: Int?) {
     if (null == color) {
         return
@@ -30,7 +30,7 @@ fun SwipeRefreshLayout.setSwipeRefreshLayoutSchemeColors(@ColorInt color: Int?) 
  * 为 [SwipeRefreshLayout] 设置进度条颜色 [colorStr]
  * > [colorStr] 多个使用 `,` 分隔，可使用颜色id `"app_color_white"` 或色值 `"#FFFFFF"`
  */
-@BindingAdapter("android:bind_srl_schemeColors")
+@BindingAdapter("android:bind_srl_schemeColorsStr")
 fun SwipeRefreshLayout.setSwipeRefreshLayoutSchemeColors(colorStr: String?) {
     if (null == colorStr) {
         return
@@ -41,12 +41,13 @@ fun SwipeRefreshLayout.setSwipeRefreshLayoutSchemeColors(colorStr: String?) {
     val colorLs = arrayListOf<Int>()
     // 统计颜色
     colorStrLs.forEach {
+        val value = it.trim()
         if (colorStr.startsWith(COLOR_MARK)) {
             // 颜色值
-            colorLs.add(Color.parseColor(it))
+            colorLs.add(Color.parseColor(value))
         } else if (colorStr.startsWith(RESOURCE_MARK)) {
             // 颜色 id 字符串
-            val colorId = it.getIdentifier(context)
+            val colorId = value.getIdentifier(context)
             if (colorId != 0) {
                 colorLs.add(colorId.color)
             }

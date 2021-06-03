@@ -51,6 +51,8 @@
     <!-- toolbar 展开折叠标题文本颜色 -->
     <color name="toolbar_expanded_title_text">@color/transparent_light</color>
     <color name="toolbar_collapsed_title_text">@color/color_on_primary</color>
+    <color name="toolbar_expanded_title_text_on_surface">@color/transparent_dark</color>
+    <color name="toolbar_collapsed_title_text_on_surface">@color/color_on_surface</color>
 
     <color name="color_spending">#FF1744</color>
     <color name="color_income">#00E676</color>
