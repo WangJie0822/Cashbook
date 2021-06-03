@@ -31,3 +31,9 @@ fun TextInputLayout.setErrorHint(error: CharSequence?) {
         }
     }
 }
+
+/** 设置提示文本 */
+@BindingAdapter("android_bind_til_hint")
+fun TextInputLayout.setHintCS(text: CharSequence?) {
+    hint = text
+}

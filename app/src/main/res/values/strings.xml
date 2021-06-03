@@ -67,4 +67,11 @@
     <string name="asset_name">资产名称</string>
     <string name="asset_balance">资产余额</string>
     <string name="total_amount">总额度</string>
+    <string name="billing_date">账单日</string>
+    <string name="please_select">请选择</string>
+    <string name="repayment_date">还款日</string>
+    <string name="invisible_asset">隐藏资产</string>
+    <string name="invisible_asset_hint">隐藏不使用的资产，将不会在资产列表显示</string>
+    <string name="save">保存</string>
+    <string name="current_arrears">当前欠款</string>
 </resources>
