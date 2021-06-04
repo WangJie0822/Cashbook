@@ -149,6 +149,7 @@
             android:id="@+id/srl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:bind_srl_refreshing="@={viewModel.refreshing}"
             android:bind_srl_schemeColorsStr="@{@string/swipe_refresh_scheme_colors}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -166,7 +167,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:bind_visibility="@{viewModel.hasCapitalAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -188,17 +190,20 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
+                                android:bind_onClick="@{viewModel.onCapitalArrowClick}"
+                                android:bind_selected="@{viewModel.hideCapitalAccountList}"
                                 android:contentDescription="@null"
-                                android:src="@drawable/vector_baseline_keyboard_arrow_down_24"
+                                android:src="@drawable/selector_arrow_up_down"
                                 app:layout_constraintBottom_toBottomOf="@id/tv_capital_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_capital_label" />
 
-                            <Space
-                                android:id="@+id/space_capital"
+                            <View
+                                android:id="@+id/v_capital"
                                 android:layout_width="0dp"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/divider_height"
                                 android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:bind_visibility="@{!viewModel.hideCapitalAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/tv_capital_label" />
@@ -207,7 +212,8 @@
                                 android:id="@+id/rv_capital"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                app:layout_constraintTop_toBottomOf="@id/space_capital"
+                                android:bind_rv_isNestedScrollingEnabled="@{false}"
+                                app:layout_constraintTop_toBottomOf="@id/v_capital"
                                 tools:itemCount="1"
                                 tools:listitem="@layout/recycler_item_asset_list" />
 
@@ -220,7 +226,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:bind_visibility="@{viewModel.hasCreditCardAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -242,17 +249,21 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
+                                android:bind_onClick="@{viewModel.onCreditCardArrowClick}"
+                                android:bind_selected="@{viewModel.hideCreditCardAccountList}"
                                 android:contentDescription="@null"
-                                android:src="@drawable/vector_baseline_keyboard_arrow_down_24"
+                                android:src="@drawable/selector_arrow_up_down"
                                 app:layout_constraintBottom_toBottomOf="@id/tv_credit_card_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_credit_card_label" />
 
-                            <Space
-                                android:id="@+id/space_credit_card"
+                            <View
+                                android:id="@+id/v_credit_card"
                                 android:layout_width="0dp"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/divider_height"
                                 android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:background="@color/color_divider"
+                                android:bind_visibility="@{!viewModel.hideCreditCardAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/tv_credit_card_label" />
@@ -261,7 +272,8 @@
                                 android:id="@+id/rv_credit_card"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                app:layout_constraintTop_toBottomOf="@id/space_credit_card"
+                                android:bind_rv_isNestedScrollingEnabled="@{false}"
+                                app:layout_constraintTop_toBottomOf="@id/v_credit_card"
                                 tools:itemCount="1"
                                 tools:listitem="@layout/recycler_item_asset_list" />
 
@@ -274,7 +286,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:bind_visibility="@{viewModel.hasTopUpAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -296,17 +309,21 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
+                                android:bind_onClick="@{viewModel.onTopUpArrowClick}"
+                                android:bind_selected="@{viewModel.hideTopUpAccountList}"
                                 android:contentDescription="@null"
-                                android:src="@drawable/vector_baseline_keyboard_arrow_down_24"
+                                android:src="@drawable/selector_arrow_up_down"
                                 app:layout_constraintBottom_toBottomOf="@id/tv_top_up_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_top_up_label" />
 
-                            <Space
-                                android:id="@+id/space_top_up"
+                            <View
+                                android:id="@+id/v_top_up"
                                 android:layout_width="0dp"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/divider_height"
                                 android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:background="@color/color_divider"
+                                android:bind_visibility="@{!viewModel.hideTopUpAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/tv_top_up_label" />
@@ -315,7 +332,8 @@
                                 android:id="@+id/rv_top_up"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                app:layout_constraintTop_toBottomOf="@id/space_top_up"
+                                android:bind_rv_isNestedScrollingEnabled="@{false}"
+                                app:layout_constraintTop_toBottomOf="@id/v_top_up"
                                 tools:itemCount="1"
                                 tools:listitem="@layout/recycler_item_asset_list" />
 
@@ -328,7 +346,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:bind_visibility="@{viewModel.hasInvestmentFinancialAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -350,17 +369,21 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
+                                android:bind_onClick="@{viewModel.onInvestmentFinancialArrowClick}"
+                                android:bind_selected="@{viewModel.hideInvestmentFinancialAccountList}"
                                 android:contentDescription="@null"
-                                android:src="@drawable/vector_baseline_keyboard_arrow_down_24"
+                                android:src="@drawable/selector_arrow_up_down"
                                 app:layout_constraintBottom_toBottomOf="@id/tv_investment_financial_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_investment_financial_label" />
 
-                            <Space
-                                android:id="@+id/space_investment_financial"
+                            <View
+                                android:id="@+id/v_investment_financial"
                                 android:layout_width="0dp"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/divider_height"
                                 android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:background="@color/color_divider"
+                                android:bind_visibility="@{!viewModel.hideInvestmentFinancialAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/tv_investment_financial_label" />
@@ -369,7 +392,8 @@
                                 android:id="@+id/rv_investment_financial"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                app:layout_constraintTop_toBottomOf="@id/space_investment_financial"
+                                android:bind_rv_isNestedScrollingEnabled="@{false}"
+                                app:layout_constraintTop_toBottomOf="@id/v_investment_financial"
                                 tools:itemCount="1"
                                 tools:listitem="@layout/recycler_item_asset_list" />
 
@@ -382,7 +406,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:bind_visibility="@{viewModel.hasDebtAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -404,17 +429,21 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
+                                android:bind_onClick="@{viewModel.onDebtArrowClick}"
+                                android:bind_selected="@{viewModel.hideDebtAccountList}"
                                 android:contentDescription="@null"
-                                android:src="@drawable/vector_baseline_keyboard_arrow_down_24"
+                                android:src="@drawable/selector_arrow_up_down"
                                 app:layout_constraintBottom_toBottomOf="@id/tv_debt_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_debt_label" />
 
-                            <Space
-                                android:id="@+id/space_debt"
+                            <View
+                                android:id="@+id/v_debt"
                                 android:layout_width="0dp"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/divider_height"
                                 android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:background="@color/color_divider"
+                                android:bind_visibility="@{!viewModel.hideDebtAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/tv_debt_label" />
@@ -423,13 +452,18 @@
                                 android:id="@+id/rv_debt"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                app:layout_constraintTop_toBottomOf="@id/space_debt"
+                                android:bind_rv_isNestedScrollingEnabled="@{false}"
+                                app:layout_constraintTop_toBottomOf="@id/v_debt"
                                 tools:itemCount="1"
                                 tools:listitem="@layout/recycler_item_asset_list" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </com.google.android.material.card.MaterialCardView>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/blank_bottom_size" />
 
                 </LinearLayout>
 

@@ -93,6 +93,7 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
                     classification = classification,
                     false,
                     "",
+                    "",
                     ""
                 )
             )

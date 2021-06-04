@@ -1,9 +1,9 @@
 package cn.wj.android.cashbook.widget.calculator
 
+import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.logger
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.DecimalFormat
 import java.util.regex.Pattern
 
 /**
@@ -42,18 +42,6 @@ object CalculatorUtils {
             return calculator(text).formatToNumber()
         }
     }
-
-    private fun BigDecimal.formatToNumber(): String {
-        val df = DecimalFormat("#.##")
-        return if (compareTo(BigDecimal.ZERO) == 0) {
-            SYMBOL_ZERO
-        } else if (compareTo(BigDecimal.ZERO) > 0 && compareTo(BigDecimal(1)) < 0) {
-            SYMBOL_ZERO + df.format(this).toString()
-        } else {
-            df.format(this).toString()
-        }
-    }
-
 
     private fun calculator(text: String): BigDecimal {
         if (!hasComputeSign(text)) {

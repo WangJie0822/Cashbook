@@ -83,4 +83,5 @@
     <string name="total_assets">总资产</string>
     <string name="total_liabilities">总负债</string>
     <string name="nothing">无</string>
+    <string name="used_with_colon_format">已用：%1$s</string>
 </resources>

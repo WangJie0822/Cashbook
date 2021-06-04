@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
 import kotlinx.coroutines.Dispatchers
@@ -113,5 +114,12 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 更新资产 [asset] 到数据库 */
     suspend fun updateAsset(asset: AssetEntity) = withContext(Dispatchers.IO) {
         assetDao.update(asset.toAssetTable())
+    }
+
+    /** 获取可见资产数据并返回 */
+    suspend fun getVisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
+        assetDao.queryVisible().map {
+            it.toAssetEntity()
+        }
     }
 }

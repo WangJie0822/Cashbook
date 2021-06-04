@@ -63,7 +63,9 @@ internal fun AssetTable.toAssetEntity(): AssetEntity {
         classification = AssetClassificationEnum.fromName(classification).orElse(AssetClassificationEnum.CASH),
         invisible = invisible == SWITCH_INT_ON,
         createTime = createTime.dateFormat(),
-        modifyTime = modifyTime.dateFormat()
+        modifyTime = modifyTime.dateFormat(),
+        // TODO
+        balance = "200.00"
     )
 }
 

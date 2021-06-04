@@ -5,11 +5,23 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.interfaces.AssetListClickListener" />
+
+        <variable
+            name="item"
+            type="cn.wj.android.cashbook.data.entity.AssetEntity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/asset_item_height"
+        android:background="?selectableItemBackground"
+        android:bind_onClick="@{viewModel.onAssetItemClick}"
+        android:bind_onClick_item="@{item}"
+        android:bind_onLongClick="@{viewModel.onAssetItemLongClick}"
+        android:bind_onLongClick_item="@{item}"
         android:paddingStart="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/content_vertical_spacing"
         android:paddingEnd="@dimen/activity_horizontal_margin"
@@ -20,6 +32,7 @@
             android:id="@+id/iv_logo"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
+            android:bind_iv_srcResId="@{item.classification.logoResId}"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/content_horizontal_spacing"
+            android:text="@{item.name}"
             android:textAppearance="?attr/textAppearanceListItem"
+            app:layout_constraintBottom_toTopOf="@id/progress"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@sample/asset_list.json/data/name" />
@@ -40,21 +55,24 @@
             android:id="@+id/tv_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{item.balanceStr}"
             android:textAppearance="?attr/textAppearanceListItem"
+            app:layout_constraintBottom_toBottomOf="@id/tv_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_name"
-            app:layout_constraintBottom_toBottomOf="@id/tv_name"
             tools:text="￥2000" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress"
             android:layout_width="0dp"
-            android:layout_height="10dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/content_horizontal_spacing"
-            android:layout_marginTop="4dp"
+            android:bind_pb_progress="@{item.progress}"
+            app:layout_constraintBottom_toTopOf="@id/tv_used"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toBottomOf="@id/tv_name"
+            app:trackCornerRadius="@dimen/indicator_corner_radius"
             tools:progress="30" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -62,6 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/content_horizontal_spacing"
+            android:text="@{item.creditCardUsed}"
             android:textAppearance="?attr/textAppearanceBody2"
             android:textColor="@color/text_color_secondary"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -72,6 +91,7 @@
         <androidx.constraintlayout.widget.Group
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:bind_visibility="@{item.creditCardAccount}"
             android:visibility="gone"
             app:constraint_referenced_ids="progress,tv_used"
             tools:visibility="visible" />

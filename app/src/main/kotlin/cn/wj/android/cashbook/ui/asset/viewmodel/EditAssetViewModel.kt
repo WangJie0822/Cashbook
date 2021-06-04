@@ -151,7 +151,8 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             classification = classification,
                             invisible = invisible,
                             createTime = createTime,
-                            modifyTime = currentTime
+                            modifyTime = currentTime,
+                            balance = balance
                         )
                     )
                     if (balance == oldBalance) {
@@ -174,7 +175,8 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             classification = classification,
                             invisible = invisible,
                             createTime = currentTime,
-                            modifyTime = currentTime
+                            modifyTime = currentTime,
+                            balance = balance
                         )
                     )
                     // 保存资产余额
