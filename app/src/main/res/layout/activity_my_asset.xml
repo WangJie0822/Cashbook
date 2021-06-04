@@ -477,6 +477,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
+            android:bind_onClick="@{viewModel.onMoreClick}"
             android:contentDescription="@null"
             app:srcCompat="@drawable/vector_baseline_more_vert_24" />
 

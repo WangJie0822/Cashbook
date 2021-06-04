@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -67,6 +68,9 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 信用卡总额度 */
     val totalAmount: MutableLiveData<String> = MutableLiveData()
+
+    /** 总额度错误提示 */
+    val totalAmountError: ObservableField<String> = ObservableField()
 
     /** 余额、信用卡欠款 */
     val balance: MutableLiveData<String> = MutableLiveData()
@@ -130,6 +134,14 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
             return
         }
         val totalAmount = totalAmount.value.orEmpty()
+        if (type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+            // 信用卡，判断总额度
+            if (totalAmount.toFloatOrNull().orElse(0f) <= 0f) {
+                // 总额度必填且大于0
+                totalAmountError.set(R.string.total_amount_must_be_greater_than_zero.string)
+                return
+            }
+        }
         val balance = balance.value.orEmpty()
         val billingDate = billingDate.value.orEmpty()
         val repaymentDate = repaymentDate.value.orEmpty()

@@ -83,19 +83,7 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
         /** 使用 [context] 对象打开 [EditAssetActivity] 界面，新建使用 */
         fun actionStart(context: Context, type: ClassificationTypeEnum, classification: AssetClassificationEnum) {
             actionStart(
-                context, AssetEntity(
-                    id = -1,
-                    name = "",
-                    totalAmount = "",
-                    billingDate = "",
-                    repaymentDate = "",
-                    type = type,
-                    classification = classification,
-                    false,
-                    "",
-                    "",
-                    ""
-                )
+                context, AssetEntity.newAsset(type, classification)
             )
         }
     }

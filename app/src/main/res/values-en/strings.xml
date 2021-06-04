@@ -61,4 +61,5 @@
     <string name="total_liabilities">总负债</string>
     <string name="nothing">无</string>
     <string name="used_with_colon_format">已用：%1$s</string>
+    <string name="total_amount_must_be_greater_than_zero">总额度必须大于0</string>
 </resources>

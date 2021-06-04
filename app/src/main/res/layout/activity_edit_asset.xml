@@ -133,6 +133,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/content_vertical_spacing"
+                        android:bind_til_error="@{viewModel.totalAmountError}"
                         android:bind_visibility="@{viewModel.creditCardType}"
                         android:hint="@string/total_amount"
                         app:endIconMode="clear_text"

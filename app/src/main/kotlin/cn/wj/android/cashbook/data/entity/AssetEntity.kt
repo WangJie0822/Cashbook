@@ -78,4 +78,23 @@ data class AssetEntity(
         } else {
             ""
         }
+
+    companion object {
+        /** 创建新建资产数据 */
+        fun newAsset(type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT, classification: AssetClassificationEnum = AssetClassificationEnum.CASH): AssetEntity {
+            return AssetEntity(
+                id = -1,
+                name = "",
+                totalAmount = "",
+                billingDate = "",
+                repaymentDate = "",
+                type = type,
+                classification = classification,
+                false,
+                "",
+                "",
+                ""
+            )
+        }
+    }
 }

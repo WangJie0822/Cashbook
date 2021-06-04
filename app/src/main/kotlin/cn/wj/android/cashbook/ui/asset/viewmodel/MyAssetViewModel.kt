@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.ui.asset.viewmodel
 
 import androidx.core.math.MathUtils
+import androidx.core.os.bundleOf
 import androidx.databinding.ObservableFloat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,8 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ACTION_ASSET
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_ASSET
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
@@ -250,6 +253,18 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     override val onAssetItemLongClick: (AssetEntity) -> Unit = { item ->
         // TODO
         snackbarData.value = "${item.name} long".toSnackbarModel()
+    }
+
+    /** 更多菜单点击 */
+    val onMoreClick: () -> Unit = {
+        // TODO 跳转新建资产
+        uiNavigationData.value = UiNavigationModel.builder {
+            jump(
+                ROUTE_PATH_EDIT_ASSET, bundleOf(
+                    ACTION_ASSET to AssetEntity.newAsset()
+                )
+            )
+        }
     }
 
     /** 加载可见资产数据 */

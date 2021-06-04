@@ -120,6 +120,19 @@ fun <T> View.setViewOnClick(click: ((T) -> Unit)?, item: T, throttle: Long?) {
 
 /** 给 [View] 设置长点击事件 [click] */
 @BindingAdapter("android:bind_onLongClick")
+fun View.setViewOnLongClickUnit(click: ((View) -> Unit)?) {
+    if (null == click) {
+        this.setOnLongClickListener(null)
+        return
+    }
+    this.setOnLongClickListener {
+        click.invoke(it)
+        true
+    }
+}
+
+/** 给 [View] 设置长点击事件 [click] */
+@BindingAdapter("android:bind_onLongClick")
 fun View.setViewOnLongClick(click: ((View) -> Boolean)?) {
     this.setOnLongClickListener(click)
 }
@@ -152,6 +165,19 @@ fun <T> View.setViewOnLongClick(click: ((T) -> Boolean)?, item: T) {
         return
     }
     this.setOnLongClickListener { click.invoke(item) }
+}
+
+/** 给 [View] 设置长点击事件 [click] 并传递数据 [item] */
+@BindingAdapter("android:bind_onLongClick", "android:bind_onLongClick_item")
+fun <T> View.setViewOnLongClickUnit(click: ((T) -> Unit)?, item: T) {
+    if (null == click) {
+        this.setOnLongClickListener(null)
+        return
+    }
+    this.setOnLongClickListener {
+        click.invoke(item)
+        true
+    }
 }
 
 /** 设置 [View] 显示状态 [visibility] */
