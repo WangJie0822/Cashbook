@@ -88,4 +88,5 @@
     <string name="edit">编辑</string>
     <string name="hidden">隐藏</string>
     <string name="hidden_hint">隐藏后将不在此列表展示，且不计入总资产</string>
+    <string name="add_asset">添加资产</string>
 </resources>

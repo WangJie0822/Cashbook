@@ -8,7 +8,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.databinding.ActivityMyAssetBinding
 import cn.wj.android.cashbook.ui.asset.dialog.AssetLongClickMenuDialog
-import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetClassificationDialog
+import cn.wj.android.cashbook.ui.asset.dialog.AssetMoreMenuDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.MyAssetViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
@@ -162,9 +162,9 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
                     viewModel.hideAsset(asset)
                 })
         })
-        // 显示选择资产类型弹窗
-        viewModel.showSelectAssetClassificationData.observe(this, {
-            SelectAssetClassificationDialog().show(supportFragmentManager)
+        // 显示更多菜单
+        viewModel.showMoreMenuData.observe(this, {
+            AssetMoreMenuDialog().show(supportFragmentManager)
         })
     }
 

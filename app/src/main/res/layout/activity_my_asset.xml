@@ -472,56 +472,16 @@
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <View
-            android:id="@+id/v_mask"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/translucent_light"
-            android:bind_onClick="@{viewModel.onMoreClick}"
-            android:bind_visibility="@{viewModel.showMore}"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_more"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:bind_iv_srcResId="@{viewModel.moreResId}"
             android:bind_onClick="@{viewModel.onMoreClick}"
             android:contentDescription="@null"
-            tools:srcCompat="@drawable/vector_baseline_more_vert_24" />
+            app:srcCompat="@drawable/vector_baseline_more_vert_24" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_invisible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="96dp"
-            android:bind_onClick="@{viewModel.onInvisibleClick}"
-            android:bind_visibility="@{viewModel.showMore}"
-            android:contentDescription="@null"
-            android:visibility="gone"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/vector_baseline_visibility_off_24"
-            tools:visibility="visible" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="160dp"
-            android:bind_onClick="@{viewModel.onAddClick}"
-            android:bind_visibility="@{viewModel.showMore}"
-            android:contentDescription="@null"
-            android:visibility="gone"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/vector_baseline_add_24"
-            tools:visibility="visible" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
