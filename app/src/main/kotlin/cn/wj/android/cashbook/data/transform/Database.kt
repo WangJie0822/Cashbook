@@ -55,6 +55,7 @@ internal fun BooksEntity.toAssetTable(): BooksTable {
 internal fun AssetTable.toAssetEntity(): AssetEntity {
     return AssetEntity(
         id = id.orElse(-1),
+        booksId = booksId,
         name = name,
         totalAmount = totalAmount,
         billingDate = billingDate,
@@ -73,6 +74,7 @@ internal fun AssetTable.toAssetEntity(): AssetEntity {
 internal fun AssetEntity.toAssetTable(): AssetTable {
     return AssetTable(
         id = if (-1L == id) null else id,
+        booksId = booksId,
         name = name,
         totalAmount = totalAmount,
         billingDate = billingDate,

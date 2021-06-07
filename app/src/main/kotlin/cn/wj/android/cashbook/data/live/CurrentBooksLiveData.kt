@@ -17,4 +17,7 @@ object CurrentBooksLiveData : MutableLiveData<BooksEntity>() {
 
     val currency: CurrencyEnum
         get() = value?.currency.orElse(CurrencyEnum.CNY)
+
+    val booksId: Long
+        get() = value?.id.orElse(-1L)
 }

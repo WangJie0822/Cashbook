@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
@@ -16,6 +17,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
@@ -133,7 +135,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
             nameError.set(R.string.asset_name_cannot_be_empty.string)
             return
         }
-        val totalAmount = totalAmount.value.orEmpty()
+        val totalAmount = totalAmount.value.moneyFormat()
         if (type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
             // 信用卡，判断总额度
             if (totalAmount.toFloatOrNull().orElse(0f) <= 0f) {
@@ -142,7 +144,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 return
             }
         }
-        val balance = balance.value.orEmpty()
+        val balance = balance.value.moneyFormat()
         val billingDate = billingDate.value.orEmpty()
         val repaymentDate = repaymentDate.value.orEmpty()
         val invisible = invisibleAsset.value.condition
@@ -155,6 +157,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     local.updateAsset(
                         AssetEntity(
                             id = id,
+                            booksId = CurrentBooksLiveData.booksId,
                             name = name,
                             totalAmount = totalAmount,
                             billingDate = billingDate,
@@ -179,6 +182,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     val id = local.insertAsset(
                         AssetEntity(
                             id = -1,
+                            booksId = CurrentBooksLiveData.booksId,
                             name = name,
                             totalAmount = totalAmount,
                             billingDate = billingDate,

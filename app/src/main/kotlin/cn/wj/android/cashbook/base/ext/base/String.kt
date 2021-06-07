@@ -17,3 +17,8 @@ fun String?.runIfNotNullAndBlank(block: String.() -> Unit) {
     }
     this.block()
 }
+
+/** 对金额字符串进行格式化 */
+fun String?.moneyFormat(): String {
+    return this.orElse("0").toBigDecimal().formatToNumber()
+}

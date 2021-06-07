@@ -24,6 +24,6 @@ interface AssetDao {
     suspend fun update(asset: AssetTable)
 
     /** 从数据库中查询所有资产数据并返回 */
-    @Query("SELECT * FROM db_asset WHERE invisible=${SWITCH_INT_OFF}")
-    suspend fun queryVisible(): List<AssetTable>
+    @Query("SELECT * FROM db_asset WHERE books_id=:booksId AND invisible=${SWITCH_INT_OFF}")
+    suspend fun queryVisibleByBooksId(booksId: Long): List<AssetTable>
 }

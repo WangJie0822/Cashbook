@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
  * 资产信息数据库表
  *
  * @param id 资产主键，自增长
+ * @param booksId 所属账本主键
  * @param name 资产名称
  * @param totalAmount 总额度，信用卡使用
  * @param billingDate 账单日，信用卡使用
@@ -23,6 +24,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "db_asset")
 data class AssetTable(
     @PrimaryKey(autoGenerate = true) val id: Long?,
+    @ColumnInfo(name = "books_id") val booksId:Long,
     val name: String,
     val totalAmount: String,
     val billingDate: String,

@@ -271,7 +271,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     private fun loadVisibleAssetData() {
         viewModelScope.launch {
             try {
-                assetListData.value = local.getVisibleAssetList()
+                assetListData.value = local.getVisibleAssetListByBooksId(CurrentBooksLiveData.booksId)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadAssetData")
             } finally {

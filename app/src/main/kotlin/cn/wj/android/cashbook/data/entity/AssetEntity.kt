@@ -16,6 +16,7 @@ import kotlinx.parcelize.Parcelize
  * 资产信息数据库表
  *
  * @param id 资产主键，自增长
+ * @param booksId 所属账本 id
  * @param name 资产名称
  * @param totalAmount 总额度，信用卡使用
  * @param billingDate 账单日，信用卡使用
@@ -31,6 +32,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class AssetEntity(
     val id: Long,
+    val booksId: Long,
     val name: String,
     val totalAmount: String,
     val billingDate: String,
@@ -84,6 +86,7 @@ data class AssetEntity(
         fun newAsset(type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT, classification: AssetClassificationEnum = AssetClassificationEnum.CASH): AssetEntity {
             return AssetEntity(
                 id = -1,
+                booksId = CurrentBooksLiveData.booksId,
                 name = "",
                 totalAmount = "",
                 billingDate = "",
