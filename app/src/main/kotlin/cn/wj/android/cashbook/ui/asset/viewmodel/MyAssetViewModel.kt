@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
@@ -139,6 +140,11 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
 
     /** 是否隐藏债务账户列表 */
     val hideDebtAccountList: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    /** 标记 - 是否显示无数据 */
+    val showNoData: LiveData<Boolean> = maps(hasCapitalAccount, hasCreditCardAccount, hasTopUpAccount, hasInvestmentFinancialAccount, hasDebtAccount) {
+        !(hasCapitalAccount.value.condition || hasCreditCardAccount.value.condition || hasTopUpAccount.value.condition || hasInvestmentFinancialAccount.value.condition || hasDebtAccount.value.condition)
+    }
 
     /** 净资产 */
     val netAssets: LiveData<String> = assetListData.map {

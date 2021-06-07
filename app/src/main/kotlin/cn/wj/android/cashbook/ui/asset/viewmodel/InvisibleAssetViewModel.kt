@@ -7,6 +7,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
@@ -127,6 +128,10 @@ class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel
     /** 是否隐藏债务账户列表 */
     val hideDebtAccountList: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    /** 标记 - 是否显示无数据 */
+    val showNoData: LiveData<Boolean> = maps(hasCapitalAccount, hasCreditCardAccount, hasTopUpAccount, hasInvestmentFinancialAccount, hasDebtAccount) {
+        !(hasCapitalAccount.value.condition || hasCreditCardAccount.value.condition || hasTopUpAccount.value.condition || hasInvestmentFinancialAccount.value.condition || hasDebtAccount.value.condition)
+    }
 
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {

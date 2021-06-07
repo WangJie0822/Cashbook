@@ -1,11 +1,13 @@
 package cn.wj.android.cashbook.ui.asset.activity
 
 import android.os.Bundle
+import android.view.View
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.entity.AssetEntity
+import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.databinding.ActivityMyAssetBinding
 import cn.wj.android.cashbook.ui.asset.dialog.AssetLongClickMenuDialog
 import cn.wj.android.cashbook.ui.asset.dialog.AssetMoreMenuDialog
@@ -55,6 +57,9 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_asset)
 
+        // 配置无数据界面
+        binding.includeNoData.viewModel = NoDataModel(R.string.no_asset_hint)
+
         // 配置 RecyclerView
         binding.rvCapital.run {
             layoutManager = WrapContentLinearLayoutManager()
@@ -87,6 +92,14 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
     }
 
     override fun observe() {
+        // 无数据界面
+        viewModel.showNoData.observe(this, {
+            binding.includeNoData.root.visibility = if (it) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        })
         // 绑定列表数据
         viewModel.capitalListData.observe(this, { list ->
             capitalAdapter.submitList(list)

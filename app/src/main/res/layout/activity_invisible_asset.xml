@@ -45,6 +45,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <include
+                        android:id="@+id/include_no_data"
+                        layout="@layout/layout_no_data_record"
+                        tools:visibility="gone" />
+
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

@@ -90,4 +90,7 @@
     <string name="hidden_hint">隐藏后将不在此列表展示，且记账时不能选择</string>
     <string name="add_asset">添加资产</string>
     <string name="cancel_hidden">取消隐藏</string>
+    <string name="no_bill_hint">还没有账单哦，赶紧来记上一笔吧！</string>
+    <string name="no_asset_hint">你还没有资产哦，快来添加吧！</string>
+    <string name="no_invisible_asset_hint">隐藏的资产将不会显示在资产列表，并且记账时也无法选择</string>
 </resources>

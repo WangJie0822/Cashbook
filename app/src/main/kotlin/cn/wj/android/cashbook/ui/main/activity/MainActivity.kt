@@ -1,14 +1,18 @@
 package cn.wj.android.cashbook.ui.main.activity
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.MAIN_BACK_PRESS_INTERVAL_MS
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
+import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
+import cn.wj.android.cashbook.databinding.LayoutNoDataRecordBinding
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
+import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
@@ -28,6 +32,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     /** 上次返回点击时间 */
     private var lastBackPressMs = 0L
 
+    /** TODO 列表适配器对象 */
+    private val adapter = SimpleRvListAdapter<String>(R.layout.recycler_item_blank)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,6 +47,11 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 配置 RecyclerView
         binding.includeContent.rv.run {
             layoutManager = WrapContentLinearLayoutManager()
+            adapter = this@MainActivity.adapter.apply {
+                setEmptyView(LayoutNoDataRecordBinding.inflate(LayoutInflater.from(context)).apply {
+                    viewModel = NoDataModel(R.string.no_bill_hint)
+                }.root)
+            }
         }
     }
 
