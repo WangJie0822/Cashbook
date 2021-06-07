@@ -43,7 +43,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
         override fun onActive() {
             // 进入自动加载数据
-            loadVisibleAssetData()
+            loadAssetData()
         }
 
         override fun setValue(value: Boolean?) {
@@ -55,7 +55,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
                 hideTopUpAccountList.value = false
                 hideInvestmentFinancialAccountList.value = false
                 hideDebtAccountList.value = false
-                loadVisibleAssetData()
+                loadAssetData()
             }
         }
     }
@@ -66,7 +66,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 资金账户数据列表 */
     val capitalListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
-            asset.type == ClassificationTypeEnum.CAPITAL_ACCOUNT
+            !asset.invisible && asset.type == ClassificationTypeEnum.CAPITAL_ACCOUNT
         }
     }
 
@@ -81,7 +81,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 信用卡账户数据列表 */
     val creditCardListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
-            asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
+            !asset.invisible && asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
         }
     }
 
@@ -96,7 +96,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 充值账户数据列表 */
     val topUpListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
-            asset.type == ClassificationTypeEnum.TOP_UP_ACCOUNT
+            !asset.invisible && asset.type == ClassificationTypeEnum.TOP_UP_ACCOUNT
         }
     }
 
@@ -111,7 +111,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 理财账户数据列表 */
     val investmentFinancialListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
-            asset.type == ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT
+            !asset.invisible && asset.type == ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT
         }
     }
 
@@ -126,7 +126,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 债务账户数据列表 */
     val debtListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
-            asset.type == ClassificationTypeEnum.DEBT_ACCOUNT
+            !asset.invisible && asset.type == ClassificationTypeEnum.DEBT_ACCOUNT
         }
     }
 
@@ -262,11 +262,11 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         showMoreMenuData.value = 0
     }
 
-    /** 加载可见资产数据 */
-    private fun loadVisibleAssetData() {
+    /** 加载所有资产数据 */
+    private fun loadAssetData() {
         viewModelScope.launch {
             try {
-                assetListData.value = local.getVisibleAssetListByBooksId(CurrentBooksLiveData.booksId)
+                assetListData.value = local.getAssetListByBooksId(CurrentBooksLiveData.booksId)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadAssetData")
             } finally {
@@ -281,7 +281,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             try {
                 local.updateAsset(asset.copy(invisible = true))
                 // 隐藏资产成功，更新列表
-                loadVisibleAssetData()
+                loadAssetData()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "hideAsset")
             }

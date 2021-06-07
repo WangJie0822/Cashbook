@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.database.table.AssetTable
 
 /**
@@ -23,7 +22,7 @@ interface AssetDao {
     @Update
     suspend fun update(asset: AssetTable)
 
-    /** 从数据库中查询所有资产数据并返回 */
-    @Query("SELECT * FROM db_asset WHERE books_id=:booksId AND invisible=${SWITCH_INT_OFF}")
-    suspend fun queryVisibleByBooksId(booksId: Long): List<AssetTable>
+    /** 根据 [booksId] 从数据库中查询所有资产数据并返回 */
+    @Query("SELECT * FROM db_asset WHERE books_id=:booksId")
+    suspend fun queryByBooksId(booksId: Long): List<AssetTable>
 }

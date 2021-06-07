@@ -116,9 +116,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
         assetDao.update(asset.toAssetTable())
     }
 
-    /** 根据账本id [booksId] 获取可见资产数据并返回 */
-    suspend fun getVisibleAssetListByBooksId(booksId:Long): List<AssetEntity> = withContext(Dispatchers.IO) {
-        assetDao.queryVisibleByBooksId(booksId).map {
+    /** 根据账本id [booksId] 获取资产数据并返回 */
+    suspend fun getAssetListByBooksId(booksId:Long): List<AssetEntity> = withContext(Dispatchers.IO) {
+        assetDao.queryByBooksId(booksId).map {
             it.toAssetEntity()
         }
     }
