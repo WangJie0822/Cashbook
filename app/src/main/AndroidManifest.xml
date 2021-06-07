@@ -19,6 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cashbook"
+        tools:ignore="LockedOrientationActivity"
         tools:targetApi="o">
 
         <!-- 全面屏适配 -->
@@ -38,7 +39,7 @@
         <activity
             android:name=".ui.main.activity.SplashActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Cashbook.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,7 +52,7 @@
         <activity
             android:name=".ui.main.activity.MainActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="portrait" />
 
         <!-- 我的账本 -->
         <activity
@@ -63,25 +64,25 @@
         <activity
             android:name=".ui.books.activity.EditBooksActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="portrait" />
 
         <!-- 编辑记录 -->
         <activity
             android:name=".ui.record.activity.EditRecordActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="portrait" />
 
         <!-- 编辑资产 -->
         <activity
             android:name=".ui.asset.activity.EditAssetActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="portrait" />
 
         <!-- 我的资产 -->
         <activity
             android:name=".ui.asset.activity.MyAssetActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
