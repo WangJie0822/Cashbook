@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.ui.asset.viewmodel
 
 import androidx.core.math.MathUtils
+import androidx.core.os.bundleOf
 import androidx.databinding.ObservableFloat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,13 +14,14 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ACTION_ASSET
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
-import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
 import kotlinx.coroutines.launch
 
@@ -248,8 +250,13 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
 
     /** 资产列表 item 点击 */
     override val onAssetItemClick: (AssetEntity) -> Unit = { item ->
-        // TODO
-        snackbarData.value = item.name.toSnackbarModel()
+        uiNavigationData.value = UiNavigationModel.builder {
+            jump(
+                ROUTE_PATH_ASSET_INFO, bundleOf(
+                    ACTION_ASSET to item
+                )
+            )
+        }
     }
 
     /** 资产列表 item 长点击 */

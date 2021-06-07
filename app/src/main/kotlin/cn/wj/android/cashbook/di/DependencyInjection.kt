@@ -5,6 +5,7 @@ import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager
+import cn.wj.android.cashbook.ui.asset.viewmodel.AssetInfoViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetLongClickMenuViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetMoreMenuViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.EditAssetViewModel
@@ -75,6 +76,9 @@ val viewModelModule = module {
     }
     viewModel {
         InvisibleAssetViewModel(get())
+    }
+    viewModel {
+        AssetInfoViewModel(get())
     }
 
     // Fragment

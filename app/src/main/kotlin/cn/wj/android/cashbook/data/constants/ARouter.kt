@@ -26,3 +26,6 @@ const val ROUTE_PATH_MY_ASSET = "/path/asset/my"
 
 /** 路由路径 - 隐藏资产 */
 const val ROUTE_PATH_INVISIBLE_ASSET = "/path/asset/invisible"
+
+/** 路由路径 - 资产信息 */
+const val ROUTE_PATH_ASSET_INFO = "/path/asset/info"
