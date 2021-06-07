@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.databinding.ActivityMyAssetBinding
+import cn.wj.android.cashbook.ui.asset.dialog.AssetLongClickMenuDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.MyAssetViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
@@ -146,6 +147,19 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
                     viewModel.debtListData.value
                 }
             )
+        })
+        // 显示资产长按菜单
+        viewModel.showLongClickMenuData.observe(this, { asset ->
+            AssetLongClickMenuDialog.actionShow(
+                manager = supportFragmentManager,
+                onEditClick = {
+                    // 跳转编辑资产
+                    EditAssetActivity.actionStart(context, asset)
+                },
+                onHiddenClick = {
+                    // 隐藏资产
+                    viewModel.hideAsset(asset)
+                })
         })
     }
 

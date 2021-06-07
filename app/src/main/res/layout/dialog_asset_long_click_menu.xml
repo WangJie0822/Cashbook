@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.asset.viewmodel.AssetLongClickMenuViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_bottom_sheet_dialog_background"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/blank_bottom_size"
+        tools:layout_gravity="bottom">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:background="?selectableItemBackground"
+            android:bind_onClick="@{viewModel.onEditClick}"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:text="@string/edit"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:background="?selectableItemBackground"
+            android:bind_onClick="@{viewModel.onHiddenClick}"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hidden"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:text="@string/hidden_hint"
+                android:textAppearance="?attr/textAppearanceCaption" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

@@ -33,6 +33,9 @@ import kotlinx.coroutines.launch
  */
 class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetListClickListener {
 
+    /** 显示资产菜单数据 */
+    val showLongClickMenuData: MutableLiveData<AssetEntity> = MutableLiveData()
+
     /** 标记 - 是否允许标题 */
     val titleEnable: MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -251,8 +254,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
 
     /** 资产列表 item 长点击 */
     override val onAssetItemLongClick: (AssetEntity) -> Unit = { item ->
-        // TODO
-        snackbarData.value = "${item.name} long".toSnackbarModel()
+        showLongClickMenuData.value = item
     }
 
     /** 更多菜单点击 */
@@ -276,6 +278,19 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
                 logger().e(throwable, "loadAssetData")
             } finally {
                 refreshing.value = false
+            }
+        }
+    }
+
+    /** 隐藏资产 */
+    fun hideAsset(asset: AssetEntity) {
+        viewModelScope.launch {
+            try {
+                local.updateAsset(asset.copy(invisible = true))
+                // 隐藏资产成功，更新列表
+                loadVisibleAssetData()
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "hideAsset")
             }
         }
     }

@@ -5,6 +5,7 @@ import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.manager.AppManager
+import cn.wj.android.cashbook.ui.asset.viewmodel.AssetLongClickMenuViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.EditAssetViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.MyAssetViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetClassificationViewModel
@@ -87,5 +88,8 @@ val viewModelModule = module {
     }
     viewModel {
         SelectAssetClassificationViewModel(get())
+    }
+    viewModel {
+        AssetLongClickMenuViewModel()
     }
 }

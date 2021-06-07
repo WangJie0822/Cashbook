@@ -62,4 +62,7 @@
     <string name="nothing">无</string>
     <string name="used_with_colon_format">已用：%1$s</string>
     <string name="total_amount_must_be_greater_than_zero">总额度必须大于0</string>
+    <string name="edit">编辑</string>
+    <string name="hidden">隐藏</string>
+    <string name="hidden_hint">隐藏后将不在此列表展示，且不计入总资产</string>
 </resources>

@@ -15,10 +15,10 @@ fun <E> MutableList<E>.toArrayList(): ArrayList<E> {
 }
 
 /** 将当前 [ArrayList] 中的数据转移到新的 [ArrayList] 中并返回 */
-fun <E> ArrayList<E>?.toNewList(): ArrayList<E> {
-    val ls = arrayListOf<E>()
-    if (!this.isNullOrEmpty()) {
-        ls.addAll(this)
+fun <E> List<E>?.toNewList(): ArrayList<E> {
+    return if (null == this) {
+        arrayListOf()
+    } else {
+        ArrayList(this)
     }
-    return ls
 }
