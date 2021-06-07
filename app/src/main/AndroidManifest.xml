@@ -83,6 +83,12 @@
             android:name=".ui.asset.activity.MyAssetActivity"
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
+
+        <!-- 隐藏资产 -->
+        <activity
+            android:name=".ui.asset.activity.InvisibleAssetActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

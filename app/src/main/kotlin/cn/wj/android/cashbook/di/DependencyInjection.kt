@@ -8,6 +8,8 @@ import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetLongClickMenuViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetMoreMenuViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.EditAssetViewModel
+import cn.wj.android.cashbook.ui.asset.viewmodel.InvisibleAssetLongClickMenuViewModel
+import cn.wj.android.cashbook.ui.asset.viewmodel.InvisibleAssetViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.MyAssetViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetClassificationViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetViewModel
@@ -71,6 +73,9 @@ val viewModelModule = module {
     viewModel {
         MyAssetViewModel(get())
     }
+    viewModel {
+        InvisibleAssetViewModel(get())
+    }
 
     // Fragment
     viewModel {
@@ -95,5 +100,8 @@ val viewModelModule = module {
     }
     viewModel {
         AssetMoreMenuViewModel()
+    }
+    viewModel {
+        InvisibleAssetLongClickMenuViewModel()
     }
 }

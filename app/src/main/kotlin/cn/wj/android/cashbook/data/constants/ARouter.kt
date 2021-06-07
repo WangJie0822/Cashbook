@@ -23,3 +23,6 @@ const val ROUTE_PATH_EDIT_ASSET = "/path/asset/edit"
 
 /** 路由路径 - 我的资产 */
 const val ROUTE_PATH_MY_ASSET = "/path/asset/my"
+
+/** 路由路径 - 隐藏资产 */
+const val ROUTE_PATH_INVISIBLE_ASSET = "/path/asset/invisible"

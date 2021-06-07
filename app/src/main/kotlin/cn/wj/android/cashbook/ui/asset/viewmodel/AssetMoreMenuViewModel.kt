@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.ui.asset.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_INVISIBLE_ASSET
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 
 /**
@@ -26,8 +27,11 @@ class AssetMoreMenuViewModel : BaseViewModel() {
         showSelectAssetClassificationData.value = 0
     }
 
-    /** TODO 隐藏资产点击 */
+    /** 隐藏资产点击 */
     val onInvisibleAssetClick: () -> Unit = {
-
+        uiNavigationData.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_INVISIBLE_ASSET)
+            close()
+        }
     }
 }

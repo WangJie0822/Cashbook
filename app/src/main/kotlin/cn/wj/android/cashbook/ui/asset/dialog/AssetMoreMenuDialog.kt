@@ -18,7 +18,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class AssetMoreMenuDialog : BaseDialog<AssetMoreMenuViewModel, DialogAssetMoreMenuBinding>() {
 
-    override val themeId: Int = R.style.Theme_Cashbook_Dialog_Translucent
+    override val themeId: Int = R.style.Theme_Cashbook_Dialog_Transparent
 
     override val viewModel: AssetMoreMenuViewModel by viewModel()
 

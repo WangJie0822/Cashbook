@@ -46,8 +46,8 @@
     <style name="Theme.Cashbook.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog" />
 
     <!-- 全半透明背景 -->
-    <style name="Theme.Cashbook.Dialog.Translucent" parent="Theme.MaterialComponents.DayNight.Dialog">
-        <item name="android:windowBackground">@drawable/shape_window_background_translucent</item>
+    <style name="Theme.Cashbook.Dialog.Transparent" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="android:windowBackground">@drawable/shape_window_background_transparent</item>
     </style>
 
     <!-- 底部抽屉弹窗 -->
