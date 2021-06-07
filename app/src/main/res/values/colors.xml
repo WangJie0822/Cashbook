@@ -11,6 +11,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="transparent_light">#00FFFFFF</color>
     <color name="transparent_dark">#00000000</color>
+    <color name="translucent_light">#80FFFFFF</color>
+    <color name="translucent_dark">#80000000</color>
 
     <!-- 应用主色调 -->
     <color name="color_primary">@color/blue_500</color>

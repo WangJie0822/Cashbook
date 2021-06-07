@@ -1,7 +1,6 @@
 package cn.wj.android.cashbook.ui.asset.viewmodel
 
 import androidx.core.math.MathUtils
-import androidx.core.os.bundleOf
 import androidx.databinding.ObservableFloat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,8 +13,6 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.constants.ACTION_ASSET
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_ASSET
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
@@ -35,6 +32,9 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
 
     /** 显示资产菜单数据 */
     val showLongClickMenuData: MutableLiveData<AssetEntity> = MutableLiveData()
+
+    /** 显示选择资产类型弹窗 */
+    val showSelectAssetClassificationData: MutableLiveData<Int> = MutableLiveData()
 
     /** 标记 - 是否允许标题 */
     val titleEnable: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -203,6 +203,18 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 总资产、总负债透明度 */
     val totalAlpha = ObservableFloat(1f)
 
+    /** 标记 - 是否显示更多菜单 */
+    val showMore: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    /** 更多按钮图片资源 id */
+    val moreResId: LiveData<Int> = showMore.map {
+        if (it) {
+            R.drawable.vector_baseline_close_24
+        } else {
+            R.drawable.vector_baseline_more_vert_24
+        }
+    }
+
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
@@ -259,14 +271,20 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
 
     /** 更多菜单点击 */
     val onMoreClick: () -> Unit = {
-        // TODO 跳转新建资产
-        uiNavigationData.value = UiNavigationModel.builder {
-            jump(
-                ROUTE_PATH_EDIT_ASSET, bundleOf(
-                    ACTION_ASSET to AssetEntity.newAsset()
-                )
-            )
-        }
+        showMore.value = !showMore.value.condition
+    }
+
+    /** 添加点击 */
+    val onAddClick: () -> Unit = {
+        // 显示选择资产类型弹窗
+        showSelectAssetClassificationData.value = 0
+        // 隐藏更多菜单
+        showMore.value = false
+    }
+
+    /** 不可见资产点击 */
+    val onInvisibleClick: () -> Unit = {
+        // TODO 跳转不可见资产
     }
 
     /** 加载可见资产数据 */
