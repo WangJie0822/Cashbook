@@ -16,6 +16,9 @@ enum class AssetClassificationEnum(
     @StringRes val nameResId: Int
 ) {
 
+    // 未选择
+    NOT_SELECT(R.drawable.vector_baseline_not_select_24, 0),
+
     // 资金账户
     CASH(R.drawable.vector_cash_circle_24, R.string.asset_classifications_cash),
     WECHAT(R.drawable.vector_wechat_circle_24, R.string.asset_classifications_wechat),

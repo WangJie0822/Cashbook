@@ -5,9 +5,9 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
+import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
 import cn.wj.android.cashbook.ui.record.dialog.DateTimePickerDialog
-import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -38,7 +38,9 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
     override fun observe() {
         // 选择资产弹窗
         viewModel.showSelectAssetData.observe(this, {
-            SelectAssetDialog().show(supportFragmentManager, "fff")
+            SelectAssetDialog.actionShow(supportFragmentManager) { selected ->
+                viewModel.accountData.value = selected
+            }
         })
         // 选择日期弹窗
         viewModel.showSelectDateData.observe(this, {

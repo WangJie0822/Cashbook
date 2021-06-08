@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="cn.wj.android.cashbook.data.entity.TypeEntity" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:paddingTop="@dimen/content_vertical_spacing"
+        android:paddingBottom="@dimen/content_vertical_spacing">
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="@dimen/icon_size_larger"
+            android:layout_height="@dimen/icon_size_larger"
+            android:background="@drawable/selector_type_icon_background"
+            android:bind_iv_srcResIdStr="@{item.iconResName}"
+            android:contentDescription="@null"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorOnSurface"
+            tools:src="@drawable/vector_type_dining_24" />
+
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:background="@drawable/selector_type_icon_background"
+            android:contentDescription="@null"
+            android:src="@drawable/vector_baseline_more_horiz_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/iv_icon"
+            app:layout_constraintEnd_toEndOf="@id/iv_icon"
+            app:tint="?attr/colorOnSurface"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{item.name}"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_icon"
+            tools:text="餐饮" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

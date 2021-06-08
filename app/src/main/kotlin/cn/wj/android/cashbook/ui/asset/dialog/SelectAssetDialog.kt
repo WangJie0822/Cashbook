@@ -2,12 +2,15 @@ package cn.wj.android.cashbook.ui.asset.dialog
 
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.fragment.app.FragmentManager
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.tag
 import cn.wj.android.cashbook.base.ui.BaseDialog
+import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.databinding.DialogSelectAssetBinding
-import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetClassificationDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetViewModel
+import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
+import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.gyf.immersionbar.ktx.immersionBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -30,19 +33,53 @@ class SelectAssetDialog : BaseDialog<SelectAssetViewModel, DialogSelectAssetBind
 
     override val dialogHeight: Int = WindowManager.LayoutParams.MATCH_PARENT
 
+    /** 选中回调 */
+    private var onSelectedListener: ((AssetEntity) -> Unit)? = null
+
+    /** 资产列表适配器 */
+    private val assetAdapter: SimpleRvListAdapter<AssetEntity> by lazy {
+        SimpleRvListAdapter<AssetEntity>(R.layout.recycler_item_asset_list).apply {
+            this.viewModel = this@SelectAssetDialog.viewModel
+        }
+    }
+
     override fun initView() {
         // 更新状态栏相关状态
         immersionBar {
             getTag(requireActivity().tag)
             fitsSystemWindows(true)
         }
+
+        // 配置 RecyclerView
+        binding.rvAsset.run {
+            layoutManager = WrapContentLinearLayoutManager()
+            adapter = assetAdapter
+        }
     }
 
     override fun observe() {
         // 显示选择资产类型弹窗
         viewModel.showSelectAssetTypeData.observe(this, {
-            dismiss()
             SelectAssetClassificationDialog().show(requireActivity().supportFragmentManager)
+            dismiss()
         })
+        // 资产列表
+        viewModel.assetListData.observe(this, { list ->
+            assetAdapter.submitList(list)
+        })
+        // 选中资产
+        viewModel.selectedAssetData.observe(this, { selected ->
+            onSelectedListener?.invoke(selected)
+            dismiss()
+        })
+    }
+
+    companion object {
+        fun actionShow(manager: FragmentManager, onSelected: (AssetEntity) -> Unit) {
+            SelectAssetDialog().run {
+                onSelectedListener = onSelected
+                show(manager)
+            }
+        }
     }
 }

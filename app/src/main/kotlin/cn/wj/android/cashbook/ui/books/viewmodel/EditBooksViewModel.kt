@@ -7,11 +7,9 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
-import cn.wj.android.cashbook.base.tools.getSharedString
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
 import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_CURRENCY
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -60,7 +58,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val currencyStr: ObservableField<String> = object : ObservableField<String>(currencyData) {
         override fun get(): String {
             val currency = currencyData.get()
-            return currency?.summary ?: R.string.default_currency_format.string.format(CurrencyEnum.fromName(getSharedString(SHARED_KEY_CURRENCY)) ?: CurrencyEnum.CNY.summary)
+            return currency?.summary ?: CurrencyEnum.CNY.summary
         }
     }
 

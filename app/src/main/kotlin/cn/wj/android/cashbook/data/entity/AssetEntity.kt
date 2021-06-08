@@ -62,15 +62,25 @@ data class AssetEntity(
     /** 余额显示文本 */
     @IgnoredOnParcel
     val balanceStr: String
-        get() = "${CurrentBooksLiveData.currency.orElse(CurrencyEnum.CNY).symbol}${
-            if (creditCardAccount) {
+        get() {
+            val symbol = if (classification == AssetClassificationEnum.NOT_SELECT) {
+                ""
+            } else {
+                CurrentBooksLiveData.currency.orElse(CurrencyEnum.CNY).symbol
+            }
+            val num = if (creditCardAccount) {
                 // 信用卡类型，显示总额度
                 totalAmount
             } else {
                 // 其他类型，显示余额
                 balance
             }
-        }"
+            return symbol + num
+        }
+
+    /** 显示文本：支付宝（￥200）*/
+    val showStr: String
+        get() = R.string.account_show_format.string.format(name, balanceStr)
 
     /** 信用卡已用文本 */
     @IgnoredOnParcel
@@ -93,6 +103,24 @@ data class AssetEntity(
                 repaymentDate = "",
                 type = type,
                 classification = classification,
+                false,
+                "",
+                "",
+                ""
+            )
+        }
+
+        /** 不选择账户资产 */
+        fun notSelectAsset(): AssetEntity {
+            return AssetEntity(
+                id = -1L,
+                booksId = CurrentBooksLiveData.booksId,
+                name = R.string.do_not_select_account.string,
+                totalAmount = "",
+                billingDate = "",
+                repaymentDate = "",
+                type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
+                classification = AssetClassificationEnum.NOT_SELECT,
                 false,
                 "",
                 "",

@@ -61,7 +61,7 @@
     <string name="today">今天</string>
     <string name="select_an_asset">选择一个资产账户</string>
     <string name="select_asset_classification">选择资产分类</string>
-    <string name="sort_by_frequency_of_use">根据使用频率排序</string>
+    <string name="select_asset_dialog_hint">不能选择隐藏的资产</string>
     <string name="select_bank">选择银行</string>
     <string name="new_asset">新建资产</string>
     <string name="asset_classification">资产分类</string>
@@ -93,4 +93,6 @@
     <string name="no_bill_hint">还没有账单哦，赶紧来记上一笔吧！</string>
     <string name="no_asset_hint">你还没有资产哦，快来添加吧！</string>
     <string name="no_invisible_asset_hint">隐藏的资产将不会显示在资产列表，并且记账时也无法选择</string>
+    <string name="do_not_select_account">不选择账户</string>
+    <string name="account_show_format">%1$s（%2$s）</string>
 </resources>

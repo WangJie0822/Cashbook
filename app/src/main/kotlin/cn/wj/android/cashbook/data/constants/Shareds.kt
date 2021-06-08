@@ -1,4 +1,7 @@
 package cn.wj.android.cashbook.data.constants
 
-/** 默认货币 */
-const val SHARED_KEY_CURRENCY = "shared_key_currency"
+/** 上次使用资产 */
+const val SHARED_KEY_LAST_ASSET = "shared_key_last_asset"
+
+/** 类型是否初始化 */
+const val SHARED_KEY_TYPE_INITIALIZED = "SHARED_KEY_TYPE_INITIALIZED"

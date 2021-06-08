@@ -12,6 +12,9 @@
     <dimen name="content_horizontal_spacing">8dp</dimen>
 
     <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_size_larger">32dp</dimen>
+    <dimen name="icon_size_small">12dp</dimen>
+    <dimen name="icon_padding">8dp</dimen>
     <dimen name="blank_bottom_size">32dp</dimen>
 
     <dimen name="dialog_corners">4dp</dimen>

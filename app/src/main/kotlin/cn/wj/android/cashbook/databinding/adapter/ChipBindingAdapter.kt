@@ -27,10 +27,10 @@ fun Chip.freezeCheckedState(checked: Boolean?) {
     if (null == checked) {
         return
     }
-    isChecked = checked
     setOnCheckedChangeListener { _, isChecked ->
         if (isChecked != checked) {
             setChecked(checked)
         }
     }
+    isChecked = checked
 }

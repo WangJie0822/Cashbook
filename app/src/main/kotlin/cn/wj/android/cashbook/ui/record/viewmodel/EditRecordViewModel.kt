@@ -9,7 +9,14 @@ import cn.wj.android.cashbook.base.ext.base.color
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
+import cn.wj.android.cashbook.base.tools.getSharedParcelable
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET
+import cn.wj.android.cashbook.data.entity.AssetEntity
+import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
+import cn.wj.android.cashbook.data.enums.CurrencyEnum
+import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
@@ -28,29 +35,29 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val showSelectDateData: MutableLiveData<Int> = MutableLiveData()
 
     /** 账户信息 */
-    val accountData: MutableLiveData<String> = MutableLiveData("")
+    val accountData: MutableLiveData<AssetEntity> = MutableLiveData(getSharedParcelable(SHARED_KEY_LAST_ASSET))
 
-    /** 标签数据 */
+    /** TODO 标签数据 */
     val tagsData: MutableLiveData<String> = MutableLiveData("")
 
     /** 选中时间 */
     val dateData: MutableLiveData<String> = MutableLiveData(System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS))
 
     /** 当前界面下标 */
-    val currentItem: MutableLiveData<Int> = MutableLiveData(0)
+    val currentItem: MutableLiveData<Int> = MutableLiveData(RecordTypeEnum.INCOME.position)
 
     /** 账户文本 */
     val accountStr: LiveData<String> = accountData.map {
-        if (it.isNullOrBlank()) {
+        if (null == it || it.classification == AssetClassificationEnum.NOT_SELECT) {
             R.string.account.string
         } else {
-            it
+            it.showStr
         }
     }
 
     /** 账户选中状态 */
     val accountChecked: LiveData<Boolean> = accountData.map {
-        !it.isNullOrBlank()
+        null != it && it.classification !== AssetClassificationEnum.NOT_SELECT
     }
 
     /** 标签文本 */
@@ -69,7 +76,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 是否显示手续费 */
     val showCharge: LiveData<Boolean> = currentItem.map {
-        it == 2
+        it == RecordTypeEnum.TRANSFER.position
     }
 
     /** 可报销选中状态 */
@@ -77,7 +84,12 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 是否显示可报销 */
     val showReimbursable: LiveData<Boolean> = currentItem.map {
-        it == 0
+        it == RecordTypeEnum.INCOME.position
+    }
+
+    /** 货币符号 */
+    val currencySymbol: LiveData<String> = CurrentBooksLiveData.map {
+        (it.currency ?: CurrencyEnum.CNY).symbol
     }
 
     /** 计算结果显示 */
@@ -86,11 +98,11 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 界面主色调 */
     val primaryTint: LiveData<Int> = currentItem.map {
         when (it) {
-            0 -> {
+            RecordTypeEnum.INCOME.position -> {
                 // 支出
                 R.color.color_spending
             }
-            1 -> {
+            RecordTypeEnum.EXPENDITURE.position -> {
                 // 收入
                 R.color.color_income
             }

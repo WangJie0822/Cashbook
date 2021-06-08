@@ -3,15 +3,19 @@ package cn.wj.android.cashbook.data.store
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.AssetDao
 import cn.wj.android.cashbook.data.database.dao.BooksDao
+import cn.wj.android.cashbook.data.database.dao.TypeDao
 import cn.wj.android.cashbook.data.database.table.BooksTable
+import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
+import cn.wj.android.cashbook.data.transform.toTypeTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -32,6 +36,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 资产数据库操作对象 */
     private val assetDao: AssetDao by lazy {
         database.assetDao()
+    }
+
+    /** 类型数据库操作对象 */
+    private val typeDao: TypeDao by lazy {
+        database.typeDao()
     }
 
     /** 将账本数据 [books] 插入到数据库中 */
@@ -128,5 +137,31 @@ class LocalDataStore(private val database: CashbookDatabase) {
         assetDao.queryInvisibleByBooksId(booksId).map {
             it.toAssetEntity()
         }
+    }
+
+    /** 根据账本id [booksId] 获取未隐藏资产数据并返回 */
+    suspend fun getVisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
+        assetDao.queryVisibleByBooksId(booksId).map {
+            it.toAssetEntity()
+        }
+    }
+
+    /** 返回数据库是否存在类型数据 */
+    suspend fun hasType(): Boolean = withContext(Dispatchers.IO) {
+        typeDao.getCount() > 0
+    }
+
+    /** 将 [type] 插入数据库并返回 id */
+    suspend fun insertType(type: TypeEntity): Long = withContext(Dispatchers.IO) {
+        typeDao.insert(type.toTypeTable())
+    }
+
+    /** 将 [types] 插入数据库 */
+    suspend fun insertTypes(vararg types: TypeEntity) = withContext(Dispatchers.IO) {
+        val ls = arrayListOf<TypeTable>()
+        types.forEach {
+            ls.add(it.toTypeTable())
+        }
+        typeDao.insert(*ls.toTypedArray())
     }
 }

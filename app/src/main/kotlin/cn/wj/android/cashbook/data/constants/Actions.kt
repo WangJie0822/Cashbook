@@ -5,3 +5,6 @@ const val ACTION_BOOKS = "action_books"
 
 /** 资产数据 */
 const val ACTION_ASSET = "action_asset"
+
+/** 消费类型 */
+const val ACTION_TYPE = "action_type"

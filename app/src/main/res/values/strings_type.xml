@@ -1,0 +1,48 @@
+<resources>
+    <string name="type_icon_name_dining" translatable="false">vector_type_dining_24</string>
+    <string name="type_icon_name_three_meals" translatable="false">vector_type_three_meals_24</string>
+    <string name="type_icon_name_supper" translatable="false">vector_type_supper_24</string>
+    <string name="type_icon_name_kitchen_daily_necessities" translatable="false">vector_type_kitchen_daily_necessities_24</string>
+
+    <string name="type_icon_name_food_ingredient" translatable="false">vector_type_food_ingredient_24</string>
+    <string name="type_icon_name_ats" translatable="false">vector_type_ats_24</string>
+    <string name="type_icon_name_fruit" translatable="false">vector_type_fruit_24</string>
+    <string name="type_icon_name_dessert" translatable="false">vector_type_dessert_24</string>
+    <string name="type_icon_name_snacks" translatable="false">vector_type_snacks_24</string>
+    <string name="type_icon_name_drinks" translatable="false">vector_type_drinks_24</string>
+    <string name="type_icon_name_at" translatable="false">vector_type_at_24</string>
+
+    <string name="type_icon_name_shopping" translatable="false">vector_type_shopping_24</string>
+    <string name="type_icon_name_digital_products" translatable="false">vector_type_digital_product_24</string>
+    <string name="type_icon_name_daily_necessities" translatable="false">vector_type_daily_necessities_24</string>
+    <string name="type_icon_name_toy" translatable="false">vector_type_toy_24</string>
+    <string name="type_icon_name_electrical_appliances" translatable="false">vector_type_electrical_appliance_24</string>
+    <string name="type_icon_name_beauty" translatable="false">vector_type_beauty_24</string>
+    <string name="type_icon_name_clothes" translatable="false">vector_type_clothes_24</string>
+    <string name="type_icon_name_accessories" translatable="false">vector_type_accessories_24</string>
+    <string name="type_icon_name_housing" translatable="false">vector_type_housing_24</string>
+
+    <string name="type_dining">餐饮</string>
+    <string name="type_three_meals">三餐</string>
+    <string name="type_supper">夜宵</string>
+    <string name="type_kitchen_daily_necessities">柴米油盐</string>
+    <string name="type_food_ingredient">食材</string>
+
+    <string name="type_ats">烟酒零食</string>
+    <string name="type_fruit">水果</string>
+    <string name="type_dessert">甜点</string>
+    <string name="type_snacks">零食</string>
+    <string name="type_drinks">饮料</string>
+    <string name="type_at">烟酒</string>
+
+    <string name="type_shopping">购物</string>
+    <string name="type_digital_products">数码</string>
+    <string name="type_daily_necessities">日用</string>
+    <string name="type_toy">玩具</string>
+    <string name="type_electrical_appliances">电器</string>
+    <string name="type_beauty">美妆</string>
+    <string name="type_clothes">鞋服</string>
+    <string name="type_accessories">饰品</string>
+
+    <string name="type_housing">住房</string>
+</resources>
