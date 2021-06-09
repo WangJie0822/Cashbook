@@ -59,9 +59,8 @@ object DatabaseManager {
         }
         // 未初始化
         if (local.hasType()) {
-            // TODO 已有数据
-            local.clearTypes()
-//            return
+            // 已有数据
+            return
         }
         initExpenditureTypeData(local)
         initIncomeTypeData(local)
@@ -282,7 +281,24 @@ object DatabaseManager {
 
     /** 初始化转账类型 */
     private suspend fun initTransferTypeData(local: LocalDataStore) {
-
+        // 账户互转
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_account_transfer.string, R.string.type_icon_name_account_transfer.drawableString, false))
+        // 还信用卡
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_credit_card_payment.string, R.string.type_icon_name_credit_card_payment.drawableString, false))
+        // 取款
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_withdrawals.string, R.string.type_icon_name_withdrawals.drawableString, false))
+        // 存款
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_deposit.string, R.string.type_icon_name_deposit.drawableString, false))
+        // 借入
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_borrow.string, R.string.type_icon_name_borrow.drawableString, false))
+        // 借出
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_lend.string, R.string.type_icon_name_lend.drawableString, false))
+        // 还款
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_repayment.string, R.string.type_icon_name_repayment.drawableString, false))
+        // 收款
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_proceeds.string, R.string.type_icon_name_proceeds.drawableString, false))
+        // 其它
+        local.insertType(TypeEntity.newFirstTransfer(R.string.type_other.string, R.string.type_icon_name_other.drawableString, false))
     }
 
     private val Int.drawableString: String

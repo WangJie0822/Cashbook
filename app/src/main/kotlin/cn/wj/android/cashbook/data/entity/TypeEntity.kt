@@ -100,5 +100,37 @@ data class TypeEntity(
                 childList = arrayListOf()
             )
         }
+
+        fun newFirstTransfer(name: String, iconResName: String, childEnable: Boolean = true): TypeEntity {
+            val time = System.currentTimeMillis().dateFormat()
+            return TypeEntity(
+                id = -1L,
+                parentId = -1L,
+                name = name,
+                iconResName = iconResName,
+                type = TypeEnum.FIRST,
+                recordType = RecordTypeEnum.TRANSFER,
+                childEnable = childEnable,
+                createTime = time,
+                modifyTime = time,
+                childList = arrayListOf()
+            )
+        }
+
+        fun newSecondTransfer(parentId: Long, name: String, iconResName: String): TypeEntity {
+            val time = System.currentTimeMillis().dateFormat()
+            return TypeEntity(
+                id = -1L,
+                parentId = parentId,
+                name = name,
+                iconResName = iconResName,
+                type = TypeEnum.SECOND,
+                recordType = RecordTypeEnum.TRANSFER,
+                childEnable = false,
+                createTime = time,
+                modifyTime = time,
+                childList = arrayListOf()
+            )
+        }
     }
 }

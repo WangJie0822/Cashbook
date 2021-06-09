@@ -102,6 +102,15 @@
     <string name="type_icon_name_investment" translatable="false">vector_type_investment_24</string>
     <string name="type_icon_name_windfall" translatable="false">vector_type_windfall_24</string>
 
+    <string name="type_icon_name_account_transfer" translatable="false">vector_type_account_transfer_24</string>
+    <string name="type_icon_name_credit_card_payment" translatable="false">vector_type_credit_card_payment_24</string>
+    <string name="type_icon_name_withdrawals" translatable="false">vector_type_withdrawals_24</string>
+    <string name="type_icon_name_deposit" translatable="false">vector_type_deposit_24</string>
+    <string name="type_icon_name_borrow" translatable="false">vector_type_borrow_24</string>
+    <string name="type_icon_name_lend" translatable="false">vector_type_lend_24</string>
+    <string name="type_icon_name_repayment" translatable="false">vector_type_repayment_24</string>
+    <string name="type_icon_name_proceeds" translatable="false">vector_type_type_proceeds_24</string>
+
     <string name="type_dining">餐饮</string>
     <string name="type_three_meals">三餐</string>
     <string name="type_supper">夜宵</string>
@@ -204,4 +213,13 @@
     <string name="type_bonus">奖金</string>
     <string name="type_investment">投资</string>
     <string name="type_windfall">外快</string>
+
+    <string name="type_account_transfer">账户互转</string>
+    <string name="type_credit_card_payment">还信用卡</string>
+    <string name="type_withdrawals">取款</string>
+    <string name="type_deposit">存款</string>
+    <string name="type_borrow">借入</string>
+    <string name="type_lend">借出</string>
+    <string name="type_repayment">还款</string>
+    <string name="type_proceeds">收款</string>
 </resources>
