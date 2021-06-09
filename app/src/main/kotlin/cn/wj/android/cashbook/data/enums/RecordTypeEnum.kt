@@ -13,11 +13,11 @@ enum class RecordTypeEnum(
     val position: Int
 ) : Parcelable {
 
-    // 收入
-    INCOME(0),
-
     // 支出
-    EXPENDITURE(1),
+    EXPENDITURE(0),
+
+    // 收入
+    INCOME(1),
 
     // 转账
     TRANSFER(2);

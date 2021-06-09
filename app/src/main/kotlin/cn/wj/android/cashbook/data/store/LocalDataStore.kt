@@ -12,9 +12,12 @@ import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
+import cn.wj.android.cashbook.data.transform.toTypeEntity
 import cn.wj.android.cashbook.data.transform.toTypeTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -163,5 +166,21 @@ class LocalDataStore(private val database: CashbookDatabase) {
             ls.add(it.toTypeTable())
         }
         typeDao.insert(*ls.toTypedArray())
+    }
+
+    /** 清空类型数据 */
+    suspend fun clearTypes() = withContext(Dispatchers.IO) {
+        typeDao.deleteAll()
+    }
+
+    /** 查询并返回记录类型为 [type] 的类型数据列表 */
+    suspend fun getTypeListByType(type: RecordTypeEnum): List<TypeEntity> = withContext(Dispatchers.IO) {
+        typeDao.queryByPosition(TypeEnum.FIRST.name, type.position).map { first ->
+            first.toTypeEntity().copy(
+                childList = typeDao.queryByParentId(TypeEnum.SECOND.name, first.parentId).map { second ->
+                    second.toTypeEntity()
+                }
+            )
+        }
     }
 }

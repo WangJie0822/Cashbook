@@ -11,7 +11,11 @@ import androidx.room.PrimaryKey
  * @param parentId 子类时父类id
  * @param name 类型名称
  * @param iconResName 图标资源名称
- * @param type 类型类别
+ * @param type 类型类别 一级类别、二级类别
+ * @param recordType 记录类型 收入、支出、转账
+ * @param childEnable 是否允许子类型
+ * @param createTime 创建时间
+ * @param modifyTime 修改时间
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
  */
@@ -21,5 +25,9 @@ data class TypeTable(
     @ColumnInfo(name = "parent_id") val parentId: Long,
     val name: String,
     @ColumnInfo(name = "icon_res_name") val iconResName: String,
-    val type: String
+    val type: String,
+    @ColumnInfo(name = "record_type") val recordType: Int,
+    @ColumnInfo(name = "child_enable") val childEnable: Int,
+    @ColumnInfo(name = "create_time") val createTime: Long,
+    @ColumnInfo(name = "modify_time") val modifyTime: Long
 )

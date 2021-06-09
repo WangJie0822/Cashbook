@@ -15,12 +15,67 @@
     <string name="type_icon_name_shopping" translatable="false">vector_type_shopping_24</string>
     <string name="type_icon_name_digital_products" translatable="false">vector_type_digital_product_24</string>
     <string name="type_icon_name_daily_necessities" translatable="false">vector_type_daily_necessities_24</string>
-    <string name="type_icon_name_toy" translatable="false">vector_type_toy_24</string>
     <string name="type_icon_name_electrical_appliances" translatable="false">vector_type_electrical_appliance_24</string>
     <string name="type_icon_name_beauty" translatable="false">vector_type_beauty_24</string>
     <string name="type_icon_name_clothes" translatable="false">vector_type_clothes_24</string>
     <string name="type_icon_name_accessories" translatable="false">vector_type_accessories_24</string>
+
     <string name="type_icon_name_housing" translatable="false">vector_type_housing_24</string>
+    <string name="type_icon_name_house_rent" translatable="false">vector_type_house_rent_24</string>
+    <string name="type_icon_name_house_loan" translatable="false">vector_type_house_loan_24</string>
+
+    <string name="type_icon_name_traffic" translatable="false">vector_type_traffic_24</string>
+    <string name="type_icon_name_bus" translatable="false">vector_type_bus_24</string>
+    <string name="type_icon_name_subway" translatable="false">vector_type_subway_24</string>
+    <string name="type_icon_name_taxi" translatable="false">vector_type_taxi_24</string>
+    <string name="type_icon_name_train" translatable="false">vector_type_train_24</string>
+    <string name="type_icon_name_plane" translatable="false">vector_type_plane_24</string>
+
+    <string name="type_icon_name_amusement" translatable="false">vector_type_amusement_24</string>
+    <string name="type_icon_name_game" translatable="false">vector_type_game_24</string>
+    <string name="type_icon_name_party" translatable="false">vector_type_party_24</string>
+    <string name="type_icon_name_pet" translatable="false">vector_type_pet_24</string>
+    <string name="type_icon_name_sing" translatable="false">vector_type_sing_24</string>
+    <string name="type_icon_name_movie" translatable="false">vector_type_movie_24</string>
+    <string name="type_icon_name_show" translatable="false">vector_type_show_24</string>
+
+    <string name="type_icon_name_life" translatable="false">vector_type_life_24</string>
+    <string name="type_icon_name_water_rate" translatable="false">vector_type_water_rate_24</string>
+    <string name="type_icon_name_electricity" translatable="false">vector_type_electricity_24</string>
+    <string name="type_icon_name_gas_charge" translatable="false">vector_type_gas_charge_24</string>
+    <string name="type_icon_name_garbage_fee" translatable="false">vector_type_garbage_fee_24</string>
+    <string name="type_icon_name_property_costs" translatable="false">vector_type_property_costs_24</string>
+    <string name="type_icon_name_heating_fee" translatable="false">vector_type_heating_fee_24</string>
+
+    <string name="type_icon_name_book_education" translatable="false">vector_type_books_education_24</string>
+    <string name="type_icon_name_tuition" translatable="false">vector_type_study_24</string>
+    <string name="type_icon_name_stationery" translatable="false">vector_type_stationery_24</string>
+    <string name="type_icon_name_exam" translatable="false">vector_type_exam_24</string>
+    <string name="type_icon_name_training" translatable="false">vector_type_training_24</string>
+    <string name="type_icon_name_books" translatable="false">vector_type_books_24</string>
+
+    <string name="type_icon_name_car" translatable="false">vector_type_car_24</string>
+    <string name="type_icon_name_parking" translatable="false">vector_type_parking_24</string>
+    <string name="type_icon_name_refuel" translatable="false">vector_type_refuel_24</string>
+    <string name="type_icon_name_charge" translatable="false">vector_type_car_charge_24</string>
+    <string name="type_icon_name_car_maintenance" translatable="false">vector_type_car_maintenance_24</string>
+    <string name="type_icon_name_car_wash" translatable="false">vector_type_car_wash_24</string>
+    <string name="type_icon_name_repair" translatable="false">vector_type_repair_24</string>
+    <string name="type_icon_name_illegal" translatable="false">vector_type_illegal_24</string>
+    <string name="type_icon_name_car_insurance" translatable="false">vector_type_car_insurance_24</string>
+    <string name="type_icon_name_car_inspection" translatable="false">vector_type_car_inspection_24</string>
+    <string name="type_icon_name_car_loan" translatable="false">vector_type_car_loan_24</string>
+
+    <string name="type_icon_name_communication" translatable="false">vector_type_communication_24</string>
+    <string name="type_icon_name_call_charge" translatable="false">vector_type_call_charge_24</string>
+    <string name="type_icon_name_net_fee" translatable="false">vector_type_net_fee_24</string>
+
+    <string name="type_icon_name_parenting" translatable="false">vector_type_parenting_24</string>
+    <string name="type_icon_name_milk_powder" translatable="false">vector_type_milk_powder_24</string>
+    <string name="type_icon_name_supplementary_food" translatable="false">vector_type_supplementary_food_24</string>
+    <string name="type_icon_name_body_hair" translatable="false">vector_type_body_hair_24</string>
+    <string name="type_icon_name_toy" translatable="false">vector_type_toy_24</string>
+    <string name="type_icon_name_kids" translatable="false">vector_type_kids_24</string>
 
     <string name="type_dining">餐饮</string>
     <string name="type_three_meals">三餐</string>
@@ -38,11 +93,65 @@
     <string name="type_shopping">购物</string>
     <string name="type_digital_products">数码</string>
     <string name="type_daily_necessities">日用</string>
-    <string name="type_toy">玩具</string>
     <string name="type_electrical_appliances">电器</string>
     <string name="type_beauty">美妆</string>
     <string name="type_clothes">鞋服</string>
     <string name="type_accessories">饰品</string>
 
     <string name="type_housing">住房</string>
+    <string name="type_house_rent">房租</string>
+    <string name="type_house_loan">房贷</string>
+
+    <string name="type_traffic">交通</string>
+    <string name="type_bus">公交</string>
+    <string name="type_subway">地铁</string>
+    <string name="type_taxi">打车</string>
+    <string name="type_train">火车</string>
+    <string name="type_plane">飞机</string>
+
+    <string name="type_amusement">娱乐</string>
+    <string name="type_game">游戏</string>
+    <string name="type_party">聚会</string>
+    <string name="type_pet">宠物</string>
+    <string name="type_sing">K歌</string>
+    <string name="type_movie">电影</string>
+    <string name="type_show">演出</string>
+
+    <string name="type_life">生活</string>
+    <string name="type_water_rate">水费</string>
+    <string name="type_electricity">电费</string>
+    <string name="type_gas_charge">燃气费</string>
+    <string name="type_garbage_fee">垃圾费</string>
+    <string name="type_property_costs">物业费</string>
+    <string name="type_heating_fee">取暖费</string>
+
+    <string name="type_book_education">文教</string>
+    <string name="type_tuition">学费</string>
+    <string name="type_stationery">文具</string>
+    <string name="type_exam">考试</string>
+    <string name="type_training">培训</string>
+    <string name="type_books">书籍</string>
+
+    <string name="type_car">汽车</string>
+    <string name="type_parking">停车</string>
+    <string name="type_refuel">加油</string>
+    <string name="type_charge">充电</string>
+    <string name="type_car_maintenance">保养</string>
+    <string name="type_car_wash">洗车</string>
+    <string name="type_repair">维修</string>
+    <string name="type_illegal">违章</string>
+    <string name="type_car_insurance">车险</string>
+    <string name="type_car_inspection">车检</string>
+    <string name="type_car_loan">车贷</string>
+
+    <string name="type_communication">通讯</string>
+    <string name="type_call_charge">话费</string>
+    <string name="type_net_fee">网费</string>
+
+    <string name="type_parenting">育儿</string>
+    <string name="type_milk_powder">奶粉</string>
+    <string name="type_supplementary_food">辅食</string>
+    <string name="type_body_hair">洗护</string>
+    <string name="type_toy">玩具</string>
+    <string name="type_kids">童装</string>
 </resources>

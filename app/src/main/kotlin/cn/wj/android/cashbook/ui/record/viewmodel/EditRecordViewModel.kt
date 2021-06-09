@@ -44,7 +44,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val dateData: MutableLiveData<String> = MutableLiveData(System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS))
 
     /** 当前界面下标 */
-    val currentItem: MutableLiveData<Int> = MutableLiveData(RecordTypeEnum.INCOME.position)
+    val currentItem: MutableLiveData<Int> = MutableLiveData(RecordTypeEnum.EXPENDITURE.position)
 
     /** 账户文本 */
     val accountStr: LiveData<String> = accountData.map {

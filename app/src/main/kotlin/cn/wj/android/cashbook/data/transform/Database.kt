@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
+import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
 
 /**
@@ -98,6 +99,10 @@ internal fun TypeTable.toTypeEntity(): TypeEntity {
         name = name,
         iconResName = iconResName,
         type = TypeEnum.fromName(type).orElse(TypeEnum.FIRST),
+        recordType = RecordTypeEnum.fromPosition(recordType).orElse(RecordTypeEnum.INCOME),
+        childEnable = childEnable == SWITCH_INT_ON,
+        createTime = createTime.dateFormat(),
+        modifyTime = modifyTime.dateFormat(),
         childList = arrayListOf()
     )
 }
@@ -109,6 +114,10 @@ internal fun TypeEntity.toTypeTable(): TypeTable {
         parentId = parentId,
         name = name,
         iconResName = iconResName,
-        type = type.name
+        type = type.name,
+        recordType = recordType.position,
+        childEnable = if (childEnable) SWITCH_INT_ON else SWITCH_INT_OFF,
+        createTime = createTime.toLongTime().orElse(0L),
+        modifyTime = modifyTime.toLongTime().orElse(0L)
     )
 }
