@@ -77,6 +77,26 @@
     <string name="type_icon_name_toy" translatable="false">vector_type_toy_24</string>
     <string name="type_icon_name_kids" translatable="false">vector_type_kids_24</string>
 
+    <string name="type_icon_name_interpersonal" translatable="false">vector_type_interpersonal_24</string>
+    <string name="type_icon_name_cash_gift" translatable="false">vector_type_cash_gift_24</string>
+    <string name="type_icon_name_gift" translatable="false">vector_type_gift_24</string>
+    <string name="type_icon_name_treat" translatable="false">vector_type_treat_24</string>
+
+    <string name="type_icon_name_medical" translatable="false">vector_type_medical_24</string>
+    <string name="type_icon_name_registration" translatable="false">vector_type_registration_24</string>
+    <string name="type_icon_name_diagnose" translatable="false">vector_type_diagnose_24</string>
+    <string name="type_icon_name_drug" translatable="false">vector_type_drug_24</string>
+    <string name="type_icon_name_hospitalization" translatable="false">vector_type_hospitalization_24</string>
+    <string name="type_icon_name_hygiene" translatable="false">vector_type_hygiene_24</string>
+
+    <string name="type_icon_name_travel" translatable="false">vector_type_travel_24</string>
+    <string name="type_icon_name_excursion_fare" translatable="false">vector_type_excursion_fare_24</string>
+    <string name="type_icon_name_tickets" translatable="false">vector_type_tickets_24</string>
+    <string name="type_icon_name_souvenir" translatable="false">vector_type_souvenir_24</string>
+    <string name="type_icon_name_hotel" translatable="false">vector_type_hotel_24</string>
+
+    <string name="type_icon_name_other" translatable="false">vector_type_other_24</string>
+
     <string name="type_dining">餐饮</string>
     <string name="type_three_meals">三餐</string>
     <string name="type_supper">夜宵</string>
@@ -154,4 +174,24 @@
     <string name="type_body_hair">洗护</string>
     <string name="type_toy">玩具</string>
     <string name="type_kids">童装</string>
+
+    <string name="type_interpersonal">人际关系</string>
+    <string name="type_cash_gift">礼金</string>
+    <string name="type_gift">礼品</string>
+    <string name="type_treat">请客</string>
+
+    <string name="type_medical">医疗</string>
+    <string name="type_registration">挂号</string>
+    <string name="type_diagnose">看诊</string>
+    <string name="type_drug">药品</string>
+    <string name="type_hospitalization">住院</string>
+    <string name="type_hygiene">保健</string>
+
+    <string name="type_travel">旅行</string>
+    <string name="type_excursion_fare">团费</string>
+    <string name="type_tickets">门票</string>
+    <string name="type_souvenir">纪念品</string>
+    <string name="type_hotel">酒店</string>
+
+    <string name="type_other">其它</string>
 </resources>

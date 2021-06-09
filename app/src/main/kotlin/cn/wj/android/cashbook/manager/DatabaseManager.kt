@@ -63,6 +63,11 @@ object DatabaseManager {
             local.clearTypes()
 //            return
         }
+        initExpenditureTypeData(local)
+    }
+
+    /*** 初始化支出类型 */
+    private suspend fun initExpenditureTypeData(local: LocalDataStore) {
         // 餐饮数据
         val diningId = local.insertType(TypeEntity.newFirstExpenditure(R.string.type_dining.string, R.string.type_icon_name_dining.drawableString))
         local.insertTypes(
@@ -144,7 +149,7 @@ object DatabaseManager {
             TypeEntity.newSecondExpenditure(parentId = amusementId, name = R.string.type_show.string, R.string.type_icon_name_show.drawableString)
         )
         // 生活
-        val lifeId = local.insertType(TypeEntity.newFirstExpenditure(R.string.type_amusement.string, R.string.type_icon_name_amusement.drawableString))
+        val lifeId = local.insertType(TypeEntity.newFirstExpenditure(R.string.type_life.string, R.string.type_icon_name_life.drawableString))
         local.insertTypes(
             // 水费
             TypeEntity.newSecondExpenditure(parentId = lifeId, name = R.string.type_water_rate.string, R.string.type_icon_name_water_rate.drawableString),
@@ -219,6 +224,44 @@ object DatabaseManager {
             // 童装
             TypeEntity.newSecondExpenditure(parentId = parentingId, name = R.string.type_kids.string, R.string.type_icon_name_kids.drawableString)
         )
+        // 人际交往
+        val interpersonalId = local.insertType(TypeEntity.newFirstExpenditure(R.string.type_interpersonal.string, R.string.type_icon_name_interpersonal.drawableString))
+        local.insertTypes(
+            // 礼金
+            TypeEntity.newSecondExpenditure(parentId = interpersonalId, name = R.string.type_cash_gift.string, R.string.type_icon_name_cash_gift.drawableString),
+            // 礼品
+            TypeEntity.newSecondExpenditure(parentId = interpersonalId, name = R.string.type_gift.string, R.string.type_icon_name_gift.drawableString),
+            // 请客
+            TypeEntity.newSecondExpenditure(parentId = interpersonalId, name = R.string.type_treat.string, R.string.type_icon_name_treat.drawableString)
+        )
+        // 医疗
+        val medicalId = local.insertType(TypeEntity.newFirstExpenditure(R.string.type_medical.string, R.string.type_icon_name_medical.drawableString))
+        local.insertTypes(
+            // 挂号
+            TypeEntity.newSecondExpenditure(parentId = medicalId, name = R.string.type_registration.string, R.string.type_icon_name_registration.drawableString),
+            // 看诊
+            TypeEntity.newSecondExpenditure(parentId = medicalId, name = R.string.type_diagnose.string, R.string.type_icon_name_diagnose.drawableString),
+            // 药品
+            TypeEntity.newSecondExpenditure(parentId = medicalId, name = R.string.type_drug.string, R.string.type_icon_name_drug.drawableString),
+            // 住院
+            TypeEntity.newSecondExpenditure(parentId = medicalId, name = R.string.type_hospitalization.string, R.string.type_icon_name_hospitalization.drawableString),
+            // 保健
+            TypeEntity.newSecondExpenditure(parentId = medicalId, name = R.string.type_hygiene.string, R.string.type_icon_name_hygiene.drawableString)
+        )
+        // 旅行
+        val travelId = local.insertType(TypeEntity.newFirstExpenditure(R.string.type_travel.string, R.string.type_icon_name_travel.drawableString))
+        local.insertTypes(
+            // 团费
+            TypeEntity.newSecondExpenditure(parentId = travelId, name = R.string.type_excursion_fare.string, R.string.type_icon_name_excursion_fare.drawableString),
+            // 门票
+            TypeEntity.newSecondExpenditure(parentId = travelId, name = R.string.type_tickets.string, R.string.type_icon_name_tickets.drawableString),
+            // 纪念品
+            TypeEntity.newSecondExpenditure(parentId = travelId, name = R.string.type_souvenir.string, R.string.type_icon_name_souvenir.drawableString),
+            // 酒店
+            TypeEntity.newSecondExpenditure(parentId = travelId, name = R.string.type_hotel.string, R.string.type_icon_name_hotel.drawableString)
+        )
+        // 其它
+        local.insertType(TypeEntity.newFirstExpenditure(R.string.type_other.string, R.string.type_icon_name_other.drawableString, false))
     }
 
     private val Int.drawableString: String
