@@ -28,6 +28,9 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
  */
 class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
+    /** 显示计算器弹窗数据 */
+    val showCalculatorData: MutableLiveData<Int> = MutableLiveData()
+
     /** 显示选择账号弹窗 */
     val showSelectAssetData: MutableLiveData<Int> = MutableLiveData()
 
@@ -147,8 +150,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         snackbarData.value = "手续费点击".toSnackbarModel()
     }
 
-    /** 确认点击 */
-    val onConfirmClick: () -> Unit = {
-        snackbarData.value = "确认保存".toSnackbarModel()
+    /** 金额点击 */
+    val onAmountClick: () -> Unit = {
+        showCalculatorData.value = 0
     }
 }

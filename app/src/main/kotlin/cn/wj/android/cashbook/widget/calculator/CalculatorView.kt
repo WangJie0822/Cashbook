@@ -10,6 +10,7 @@ import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.ifNullOrBlank
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.tools.getStringById
 import cn.wj.android.cashbook.databinding.LayoutCalculatorBinding
@@ -47,7 +48,7 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
     }
 
     fun bindCalculatorStr(liveData: MutableLiveData<String>) {
-        liveData.value = viewModel.calculatorStr.get()
+        viewModel.calculatorStr.set(liveData.value.ifNullOrBlank { SYMBOL_ZERO })
         viewModel.calculatorStr.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 liveData.value = viewModel.calculatorStr.get()
@@ -56,7 +57,7 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
     }
 
     fun bindCalculatorStr(field: ObservableField<String>) {
-        field.set(viewModel.calculatorStr.get())
+        viewModel.calculatorStr.set(field.get().ifNullOrBlank { SYMBOL_ZERO })
         viewModel.calculatorStr.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 field.set(viewModel.calculatorStr.get())

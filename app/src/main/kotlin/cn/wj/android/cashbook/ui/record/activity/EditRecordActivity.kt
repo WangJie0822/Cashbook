@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
+import cn.wj.android.cashbook.ui.record.dialog.CalculatorDialog
 import cn.wj.android.cashbook.ui.record.dialog.DateTimePickerDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
@@ -50,6 +51,10 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
                     viewModel.dateData.value = date
                 }.show(supportFragmentManager)
 
+        })
+        // 计算器弹窗
+        viewModel.showCalculatorData.observe(this, {
+            CalculatorDialog.actionShow(supportFragmentManager)
         })
     }
 }

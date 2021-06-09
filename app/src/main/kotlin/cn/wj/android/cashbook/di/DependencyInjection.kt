@@ -19,6 +19,7 @@ import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.general.viewmodel.GeneralViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
@@ -107,5 +108,8 @@ val viewModelModule = module {
     }
     viewModel {
         InvisibleAssetLongClickMenuViewModel()
+    }
+    viewModel {
+        CalculatorViewModel()
     }
 }

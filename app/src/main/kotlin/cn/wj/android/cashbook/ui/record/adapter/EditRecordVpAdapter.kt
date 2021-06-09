@@ -6,7 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.TabsAdapter
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.ui.type.fragment.ConsumptionTypeFragment
+import cn.wj.android.cashbook.ui.record.fragment.EditRecordFragment
 
 /**
  * 编辑记录界面 ViewPager 适配器
@@ -27,7 +27,7 @@ class EditRecordVpAdapter(fragmentActivity: FragmentActivity) : FragmentStateAda
     }
 
     override fun createFragment(position: Int): Fragment {
-        return ConsumptionTypeFragment.newInstance(position)
+        return EditRecordFragment.newInstance(position)
     }
 
     companion object {

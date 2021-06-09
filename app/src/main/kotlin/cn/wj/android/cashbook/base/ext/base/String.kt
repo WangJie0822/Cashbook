@@ -18,6 +18,14 @@ fun String?.runIfNotNullAndBlank(block: String.() -> Unit) {
     this.block()
 }
 
+fun String?.ifNullOrBlank(block: () -> String): String {
+    return if (this.isNullOrBlank()) {
+        block.invoke()
+    } else {
+        this
+    }
+}
+
 /** 对金额字符串进行格式化 */
 fun String?.moneyFormat(): String {
     return this.orElse("0").toBigDecimal().formatToNumber()

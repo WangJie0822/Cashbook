@@ -102,6 +102,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:bind_onClick="@{viewModel.onAmountClick}"
                         android:gravity="end"
                         android:padding="@dimen/content_horizontal_spacing"
                         android:singleLine="true"
@@ -192,14 +193,6 @@
                     </com.google.android.material.chip.ChipGroup>
 
                 </HorizontalScrollView>
-
-                <cn.wj.android.cashbook.widget.calculator.CalculatorView
-                    android:id="@+id/cv"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/keyboard_height"
-                    android:bind_cv_calculator_text="@{viewModel.calculatorStr}"
-                    android:bind_cv_equals_backgroundTint="@{viewModel.primaryTint}"
-                    android:bind_cv_onConfirmClick="@{viewModel.onConfirmClick}" />
 
             </LinearLayout>
 
