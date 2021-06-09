@@ -95,4 +95,5 @@
     <string name="no_invisible_asset_hint">隐藏的资产将不会显示在资产列表，并且记账时也无法选择</string>
     <string name="do_not_select_account">不选择账户</string>
     <string name="account_show_format">%1$s（%2$s）</string>
+    <string name="classification">分类</string>
 </resources>

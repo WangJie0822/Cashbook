@@ -32,6 +32,9 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
     /** 界面 [BaseViewModel] 对象 */
     protected abstract val viewModel: VM
 
+    /** 标记 - 是否从 Activity 获取 ViewModel */
+    protected open val activityViewModel: Boolean = false
+
     /** 界面 [ViewDataBinding] 对象 */
     protected lateinit var binding: DB
 
@@ -49,7 +52,9 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
         super.onCreate(savedInstanceState)
 
         // 订阅基本数据
-        observeBaseModel()
+        if (!activityViewModel) {
+            observeBaseModel(viewModel)
+        }
 
         // 订阅数据
         observe()
@@ -141,7 +146,7 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
     }
 
     /** 订阅基本数据 */
-    private fun observeBaseModel() {
+    protected fun observeBaseModel(viewModel: BaseViewModel) {
         // snackbar 提示
         viewModel.snackbarData.observe(this, Observer {
             if (it.content.isNullOrBlank()) {

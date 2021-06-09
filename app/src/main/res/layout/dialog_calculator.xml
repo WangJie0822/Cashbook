@@ -22,7 +22,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/item_height"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -41,7 +42,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:gravity="end"
-                android:padding="@dimen/content_horizontal_spacing"
                 android:singleLine="true"
                 android:text="@{viewModel.calculatorStr}"
                 android:textAppearance="?attr/textAppearanceHeadline6"

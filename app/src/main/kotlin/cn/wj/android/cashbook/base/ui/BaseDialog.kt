@@ -37,6 +37,9 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
     /** 界面 [BaseViewModel] 对象 */
     protected abstract val viewModel: VM
 
+    /** 标记 - 是否从 Activity 获取 ViewModel */
+    protected open val activityViewModel: Boolean = false
+
     /** 主题 id，按需重写 */
     protected open val themeId: Int = R.style.Theme_Cashbook_Dialog
 
@@ -68,7 +71,9 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
         setStyle(STYLE_NO_TITLE, themeId)
 
         // 订阅基本数据
-        observeBaseModel()
+        if (!activityViewModel) {
+            observeBaseModel(viewModel)
+        }
 
         // 订阅数据
         observe()
@@ -155,7 +160,7 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
     }
 
     /** 订阅基本数据 */
-    private fun observeBaseModel() {
+    protected fun observeBaseModel(viewModel: BaseViewModel) {
         // snackbar 提示
         viewModel.snackbarData.observe(this, Observer {
             if (it.content.isNullOrBlank()) {

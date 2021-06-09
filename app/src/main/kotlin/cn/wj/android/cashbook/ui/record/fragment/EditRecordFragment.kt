@@ -26,6 +26,8 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
 
     override val viewModel: EditRecordViewModel by activityViewModels()
 
+    override val activityViewModel: Boolean = true
+
     val typeViewModel: ConsumptionTypeViewModel by viewModel()
 
     /** 类型列表适配器 */

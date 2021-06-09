@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
+import cn.wj.android.cashbook.widget.calculator.SYMBOL_ZERO
 
 /**
  * 编辑记录 ViewModel
@@ -96,22 +97,22 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     }
 
     /** 计算结果显示 */
-    val calculatorStr: ObservableField<String> = ObservableField()
+    val calculatorStr: ObservableField<String> = ObservableField(SYMBOL_ZERO)
 
     /** 界面主色调 */
     val primaryTint: LiveData<Int> = currentItem.map {
         when (it) {
-            RecordTypeEnum.INCOME.position -> {
+            RecordTypeEnum.EXPENDITURE.position -> {
                 // 支出
                 R.color.color_spending
             }
-            RecordTypeEnum.EXPENDITURE.position -> {
+            RecordTypeEnum.INCOME.position -> {
                 // 收入
                 R.color.color_income
             }
             else -> {
                 // 转账
-                R.color.color_secondary
+                R.color.color_primary
             }
         }.color
     }
@@ -153,5 +154,10 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 金额点击 */
     val onAmountClick: () -> Unit = {
         showCalculatorData.value = 0
+    }
+
+    /** 保存点击 */
+    val onSaveClick: () -> Unit = {
+        snackbarData.value = "保存".toSnackbarModel()
     }
 }

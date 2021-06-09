@@ -56,8 +56,8 @@
     <color name="toolbar_expanded_title_text_on_surface">@color/transparent_dark</color>
     <color name="toolbar_collapsed_title_text_on_surface">@color/color_on_surface</color>
 
-    <color name="color_spending">#FF1744</color>
-    <color name="color_income">#00E676</color>
+    <color name="color_spending">#D7072F</color>
+    <color name="color_income">#009688</color>
 
     <color name="keyboard_background_primary">@color/white</color>
     <color name="keyboard_background_secondary">#F4F4F4</color>
