@@ -97,6 +97,11 @@
 
     <string name="type_icon_name_other" translatable="false">vector_type_other_24</string>
 
+    <string name="type_icon_name_salary" translatable="false">vector_type_salary_24</string>
+    <string name="type_icon_name_bonus" translatable="false">vector_type_bonus_24</string>
+    <string name="type_icon_name_investment" translatable="false">vector_type_investment_24</string>
+    <string name="type_icon_name_windfall" translatable="false">vector_type_windfall_24</string>
+
     <string name="type_dining">餐饮</string>
     <string name="type_three_meals">三餐</string>
     <string name="type_supper">夜宵</string>
@@ -194,4 +199,9 @@
     <string name="type_hotel">酒店</string>
 
     <string name="type_other">其它</string>
+
+    <string name="type_salary">薪资</string>
+    <string name="type_bonus">奖金</string>
+    <string name="type_investment">投资</string>
+    <string name="type_windfall">外快</string>
 </resources>

@@ -68,5 +68,37 @@ data class TypeEntity(
                 childList = arrayListOf()
             )
         }
+
+        fun newFirstIncome(name: String, iconResName: String, childEnable: Boolean = true): TypeEntity {
+            val time = System.currentTimeMillis().dateFormat()
+            return TypeEntity(
+                id = -1L,
+                parentId = -1L,
+                name = name,
+                iconResName = iconResName,
+                type = TypeEnum.FIRST,
+                recordType = RecordTypeEnum.INCOME,
+                childEnable = childEnable,
+                createTime = time,
+                modifyTime = time,
+                childList = arrayListOf()
+            )
+        }
+
+        fun newSecondIncome(parentId: Long, name: String, iconResName: String): TypeEntity {
+            val time = System.currentTimeMillis().dateFormat()
+            return TypeEntity(
+                id = -1L,
+                parentId = parentId,
+                name = name,
+                iconResName = iconResName,
+                type = TypeEnum.SECOND,
+                recordType = RecordTypeEnum.INCOME,
+                childEnable = false,
+                createTime = time,
+                modifyTime = time,
+                childList = arrayListOf()
+            )
+        }
     }
 }

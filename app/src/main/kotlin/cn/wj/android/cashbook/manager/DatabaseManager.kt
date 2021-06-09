@@ -64,9 +64,11 @@ object DatabaseManager {
 //            return
         }
         initExpenditureTypeData(local)
+        initIncomeTypeData(local)
+        initTransferTypeData(local)
     }
 
-    /*** 初始化支出类型 */
+    /** 初始化支出类型 */
     private suspend fun initExpenditureTypeData(local: LocalDataStore) {
         // 餐饮数据
         val diningId = local.insertType(TypeEntity.newFirstExpenditure(R.string.type_dining.string, R.string.type_icon_name_dining.drawableString))
@@ -262,6 +264,25 @@ object DatabaseManager {
         )
         // 其它
         local.insertType(TypeEntity.newFirstExpenditure(R.string.type_other.string, R.string.type_icon_name_other.drawableString, false))
+    }
+
+    /** 初始化收入类型 */
+    private suspend fun initIncomeTypeData(local: LocalDataStore) {
+        // 薪资
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_salary.string, R.string.type_icon_name_salary.drawableString, false))
+        // 奖金
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_bonus.string, R.string.type_icon_name_bonus.drawableString, false))
+        // 投资
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_investment.string, R.string.type_icon_name_investment.drawableString, false))
+        // 外快
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_windfall.string, R.string.type_icon_name_windfall.drawableString, false))
+        // 其它
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_other.string, R.string.type_icon_name_other.drawableString, false))
+    }
+
+    /** 初始化转账类型 */
+    private suspend fun initTransferTypeData(local: LocalDataStore) {
+
     }
 
     private val Int.drawableString: String
