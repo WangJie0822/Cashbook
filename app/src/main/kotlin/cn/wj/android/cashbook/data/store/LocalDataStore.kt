@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.data.store
 
+import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.AssetDao
 import cn.wj.android.cashbook.data.database.dao.BooksDao
@@ -177,7 +178,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getTypeListByType(type: RecordTypeEnum): List<TypeEntity> = withContext(Dispatchers.IO) {
         typeDao.queryByPosition(TypeEnum.FIRST.name, type.position).map { first ->
             first.toTypeEntity().copy(
-                childList = typeDao.queryByParentId(TypeEnum.SECOND.name, first.parentId).map { second ->
+                childList = typeDao.queryByParentId(TypeEnum.SECOND.name, first.id.orElse(-1L)).map { second ->
                     second.toTypeEntity()
                 }
             )
