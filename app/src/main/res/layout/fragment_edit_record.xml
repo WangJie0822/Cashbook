@@ -98,10 +98,10 @@
                 app:hintTextAppearance="?attr/textAppearanceCaption">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    style="@style/textInputEditTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:inputType="textMultiLine" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

@@ -169,12 +169,12 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        style="@style/textInputEditTextStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:inputType="text"
                         android:text="@={viewModel.imgPreviewUrl}"
-                        android:textAppearance="?attr/textAppearanceBody2"
                         tools:text="https://" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -197,6 +197,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        style="@style/textInputEditTextStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -206,7 +207,6 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:text="@={viewModel.booksName}"
-                        android:textAppearance="?attr/textAppearanceBody2"
                         tools:text="账本名称" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -229,12 +229,12 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        style="@style/textInputEditTextStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:inputType="text"
                         android:text="@={viewModel.booksDescription}"
-                        android:textAppearance="?attr/textAppearanceBody2"
                         tools:text="账本说明账本说明账本说明" />
 
                 </com.google.android.material.textfield.TextInputLayout>
