@@ -101,8 +101,7 @@ internal fun TypeTable.toTypeEntity(): TypeEntity {
         type = TypeEnum.fromName(type).orElse(TypeEnum.FIRST),
         recordType = RecordTypeEnum.fromPosition(recordType).orElse(RecordTypeEnum.INCOME),
         childEnable = childEnable == SWITCH_INT_ON,
-        createTime = createTime.dateFormat(),
-        modifyTime = modifyTime.dateFormat(),
+        sort = sort,
         childList = arrayListOf()
     )
 }
@@ -117,7 +116,6 @@ internal fun TypeEntity.toTypeTable(): TypeTable {
         type = type.name,
         recordType = recordType.position,
         childEnable = if (childEnable) SWITCH_INT_ON else SWITCH_INT_OFF,
-        createTime = createTime.toLongTime().orElse(0L),
-        modifyTime = modifyTime.toLongTime().orElse(0L)
+        sort = sort
     )
 }

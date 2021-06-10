@@ -10,4 +10,14 @@
         <item name="cornerSize">@dimen/cardview_default_radius</item>
     </style>
 
+    <style name="topArrowImageStyle">
+
+        <item name="cornerFamilyTopRight">cut</item>
+        <item name="cornerSizeTopRight">160%</item>
+
+        <item name="cornerFamilyTopLeft">cut</item>
+        <item name="cornerSizeTopLeft">160%</item>
+    </style>
+
+
 </resources>

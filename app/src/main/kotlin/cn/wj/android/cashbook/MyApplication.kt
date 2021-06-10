@@ -10,7 +10,6 @@ import cn.wj.android.cashbook.di.dataStoreModule
 import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.viewModelModule
 import cn.wj.android.cashbook.manager.AppManager
-import cn.wj.android.cashbook.manager.SkinManager
 import cn.wj.android.cashbook.third.logger.MyFormatStrategy
 import com.alibaba.android.arouter.launcher.ARouter
 import com.orhanobut.logger.AndroidLogAdapter
@@ -65,8 +64,5 @@ class MyApplication : Application() {
             ARouter.openDebug()
         }
         ARouter.init(this)
-
-        // 初始化换肤框架
-        SkinManager.init(this)
     }
 }

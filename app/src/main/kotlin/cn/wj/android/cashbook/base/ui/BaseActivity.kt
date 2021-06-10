@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.SkinAppCompatDelegateImpl
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
@@ -126,11 +124,6 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
         } else {
             return super.dispatchTouchEvent(ev)
         }
-    }
-
-    override fun getDelegate(): AppCompatDelegate {
-        // 支持 SkinSupport 换肤
-        return SkinAppCompatDelegateImpl.get(this, this)
     }
 
     override fun onBackPressed() {
