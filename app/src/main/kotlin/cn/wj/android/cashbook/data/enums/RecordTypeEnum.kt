@@ -20,7 +20,10 @@ enum class RecordTypeEnum(
     INCOME(1),
 
     // 转账
-    TRANSFER(2);
+    TRANSFER(2),
+
+    // 修改余额
+    MODIFY_BALANCE(3);
 
     companion object {
 

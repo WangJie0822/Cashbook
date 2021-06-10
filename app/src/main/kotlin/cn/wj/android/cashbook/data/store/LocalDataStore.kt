@@ -4,8 +4,10 @@ import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.AssetDao
 import cn.wj.android.cashbook.data.database.dao.BooksDao
+import cn.wj.android.cashbook.data.database.dao.RecordDao
 import cn.wj.android.cashbook.data.database.dao.TypeDao
 import cn.wj.android.cashbook.data.database.table.BooksTable
+import cn.wj.android.cashbook.data.database.table.RecordTable
 import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.entity.AssetEntity
@@ -45,6 +47,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 类型数据库操作对象 */
     private val typeDao: TypeDao by lazy {
         database.typeDao()
+    }
+
+    /** 记录数据库操作对象 */
+    private val recordDao: RecordDao by lazy {
+        database.recordDao()
     }
 
     /** 将账本数据 [books] 插入到数据库中 */
@@ -121,33 +128,41 @@ class LocalDataStore(private val database: CashbookDatabase) {
 
     /** 插入新的资产 [asset] 到数据库 */
     suspend fun insertAsset(asset: AssetEntity) = withContext(Dispatchers.IO) {
-        assetDao.insert(asset.toAssetTable())
+        // 插入资产
+        val assetId = assetDao.insert(asset.toAssetTable())
+        // 插入余额记录
+        recordDao.insert(RecordTable.newModifyBalance(assetId, asset.balance))
+        assetId
     }
 
     /** 更新资产 [asset] 到数据库 */
-    suspend fun updateAsset(asset: AssetEntity) = withContext(Dispatchers.IO) {
+    suspend fun updateAsset(asset: AssetEntity, balanceChanged: Boolean = false) = withContext(Dispatchers.IO) {
         assetDao.update(asset.toAssetTable())
+        if (balanceChanged) {
+            // 插入余额记录
+            recordDao.insert(RecordTable.newModifyBalance(asset.id, asset.balance))
+        }
     }
 
     /** 根据账本id [booksId] 获取资产数据并返回 */
     suspend fun getAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryByBooksId(booksId).map {
-            // TODO 获取余额
-            val balance = "200.00"
+            // 获取余额
+            val balance = getAssetBalanceById(it.id)
             it.toAssetEntity(balance)
         }
     }
 
     /** 根据账本id [booksId] 获取资产数据并返回 */
-    suspend fun queryMaxSortByBooksId(booksId: Long): Int = withContext(Dispatchers.IO) {
+    suspend fun queryMaxSortByBooksId(booksId: Long): Int? = withContext(Dispatchers.IO) {
         assetDao.queryMaxSortByBooksId(booksId)
     }
 
     /** 根据账本id [booksId] 获取隐藏资产数据并返回 */
     suspend fun getInvisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryInvisibleByBooksId(booksId).map {
-            // TODO 获取余额
-            val balance = "200.00"
+            //  获取余额
+            val balance = getAssetBalanceById(it.id)
             it.toAssetEntity(balance)
         }
     }
@@ -155,8 +170,8 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 根据账本id [booksId] 获取未隐藏资产数据并返回 */
     suspend fun getVisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryVisibleByBooksId(booksId).map {
-            // TODO 获取余额
-            val balance = "200.00"
+            //  获取余额
+            val balance = getAssetBalanceById(it.id)
             it.toAssetEntity(balance)
         }
     }
@@ -198,5 +213,37 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }.sortedBy {
             it.sort
         }
+    }
+
+    /** 获取 id 为 [assetId] 的资产余额 */
+    suspend fun getAssetBalanceById(assetId: Long?): String = withContext(Dispatchers.IO) {
+        if (null == assetId) {
+            return@withContext "0"
+        }
+        val modifyList = recordDao.queryLastModifyRecord(assetId)
+        if (modifyList.isEmpty()) {
+            return@withContext "0"
+        }
+        // 获取最后一条修改数据
+        val lastModify = modifyList.first()
+        // 获取在此之后的所有记录
+        var result = lastModify.amount.toFloatOrNull() ?: 0f
+        recordDao.queryAfterRecordTime(assetId, lastModify.recordTime).forEach {
+            when (it.type) {
+                RecordTypeEnum.INCOME.name -> {
+                    // 收入
+                    result += it.amount.toFloatOrNull() ?: 0f
+                }
+                RecordTypeEnum.EXPENDITURE.name -> {
+                    // 支出
+                    result -= it.amount.toFloatOrNull() ?: 0f
+                }
+                RecordTypeEnum.TRANSFER.name -> {
+                    // 转账
+                    result -= it.charge.toFloatOrNull() ?: 0f
+                }
+            }
+        }
+        result.toString()
     }
 }

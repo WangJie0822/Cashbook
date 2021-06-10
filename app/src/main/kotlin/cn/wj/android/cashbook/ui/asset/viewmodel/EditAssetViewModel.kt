@@ -41,7 +41,11 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
     var sort = -1
 
     /** 标记资产余额 */
-    private var oldBalance = ""
+    var oldBalance = ""
+        set(value) {
+            field = value
+            balance.value = value
+        }
 
     /** 资产分类大类 */
     val classificationType: MutableLiveData<ClassificationTypeEnum> = MutableLiveData(ClassificationTypeEnum.CAPITAL_ACCOUNT)
@@ -172,18 +176,11 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             createTime = createTime,
                             modifyTime = currentTime,
                             balance = balance
-                        )
+                        ), balance != oldBalance
                     )
-                    if (balance == oldBalance) {
-                        // 余额没有修改
-                        callOnSaveSuccess()
-                    } else {
-                        // 保存余额
-                        saveBalance(id, balance)
-                    }
                 } else {
                     // 新建
-                    val id = local.insertAsset(
+                    local.insertAsset(
                         AssetEntity(
                             id = -1,
                             booksId = CurrentBooksLiveData.booksId,
@@ -194,25 +191,19 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             type = type,
                             classification = classification,
                             invisible = invisible,
-                            sort = local.queryMaxSortByBooksId(CurrentBooksLiveData.booksId) + 1,
+                            sort = local.queryMaxSortByBooksId(CurrentBooksLiveData.booksId).orElse(-1) + 1,
                             createTime = currentTime,
                             modifyTime = currentTime,
                             balance = balance
                         )
                     )
-                    // 保存资产余额
-                    saveBalance(id, balance)
                 }
+                callOnSaveSuccess()
             } catch (throwable: Throwable) {
                 saveEnable.set(true)
                 logger().e(throwable, "saveAsset")
             }
         }
-    }
-
-    /** TODO 保存资产余额 */
-    private fun saveBalance(id: Long, balance: String) {
-        callOnSaveSuccess()
     }
 
     /** 保存成功 */
@@ -225,14 +216,5 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 }
             }
         })
-    }
-
-    /** TODO 刷新资产对应余额 */
-    fun refreshBalance() {
-        if (id < 0) {
-            return
-        }
-        oldBalance = "1000.00"
-        balance.value = oldBalance
     }
 }

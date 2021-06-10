@@ -38,5 +38,5 @@ interface AssetDao {
 
     /** 从数据库中查询账本id为 [booksId] 的资产中最大的排序*/
     @Query("SELECT MAX(sort) FROM db_asset WHERE books_id=:booksId")
-    suspend fun queryMaxSortByBooksId(booksId: Long): Int
+    suspend fun queryMaxSortByBooksId(booksId: Long): Int?
 }

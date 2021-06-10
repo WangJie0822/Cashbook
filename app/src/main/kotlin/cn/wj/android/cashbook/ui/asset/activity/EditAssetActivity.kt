@@ -50,7 +50,7 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
                 viewModel.repaymentDate.value = value.repaymentDate
                 viewModel.invisibleAsset.value = value.invisible
                 // 刷新余额
-                viewModel.refreshBalance()
+                viewModel.oldBalance = value.balance
             } else {
                 viewModel.assetName.value = value.classification.nameResId.string
             }
