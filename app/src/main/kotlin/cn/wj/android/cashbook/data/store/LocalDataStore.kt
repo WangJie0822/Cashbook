@@ -132,21 +132,32 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 根据账本id [booksId] 获取资产数据并返回 */
     suspend fun getAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryByBooksId(booksId).map {
-            it.toAssetEntity()
+            // TODO 获取余额
+            val balance = "200.00"
+            it.toAssetEntity(balance)
         }
+    }
+
+    /** 根据账本id [booksId] 获取资产数据并返回 */
+    suspend fun queryMaxSortByBooksId(booksId: Long): Int = withContext(Dispatchers.IO) {
+        assetDao.queryMaxSortByBooksId(booksId)
     }
 
     /** 根据账本id [booksId] 获取隐藏资产数据并返回 */
     suspend fun getInvisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryInvisibleByBooksId(booksId).map {
-            it.toAssetEntity()
+            // TODO 获取余额
+            val balance = "200.00"
+            it.toAssetEntity(balance)
         }
     }
 
     /** 根据账本id [booksId] 获取未隐藏资产数据并返回 */
     suspend fun getVisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryVisibleByBooksId(booksId).map {
-            it.toAssetEntity()
+            // TODO 获取余额
+            val balance = "200.00"
+            it.toAssetEntity(balance)
         }
     }
 
@@ -180,8 +191,12 @@ class LocalDataStore(private val database: CashbookDatabase) {
             first.toTypeEntity().copy(
                 childList = typeDao.queryByParentId(TypeEnum.SECOND.name, first.id.orElse(-1L)).map { second ->
                     second.toTypeEntity()
+                }.sortedBy {
+                    it.sort
                 }
             )
+        }.sortedBy {
+            it.sort
         }
     }
 }

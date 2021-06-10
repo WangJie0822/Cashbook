@@ -70,6 +70,8 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     val capitalListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
             !asset.invisible && asset.type == ClassificationTypeEnum.CAPITAL_ACCOUNT
+        }.sortedBy { asset ->
+            asset.sort
         }
     }
 
@@ -85,6 +87,8 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     val creditCardListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
             !asset.invisible && asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
+        }.sortedBy { asset ->
+            asset.sort
         }
     }
 
@@ -100,6 +104,8 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     val topUpListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
             !asset.invisible && asset.type == ClassificationTypeEnum.TOP_UP_ACCOUNT
+        }.sortedBy { asset ->
+            asset.sort
         }
     }
 
@@ -115,6 +121,8 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     val investmentFinancialListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
             !asset.invisible && asset.type == ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT
+        }.sortedBy { asset ->
+            asset.sort
         }
     }
 
@@ -130,6 +138,8 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     val debtListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
             !asset.invisible && asset.type == ClassificationTypeEnum.DEBT_ACCOUNT
+        }.sortedBy { asset ->
+            asset.sort
         }
     }
 

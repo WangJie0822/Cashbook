@@ -37,6 +37,9 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 编辑资产创建时间 */
     var createTime = ""
 
+    /** 排序数据 */
+    var sort = -1
+
     /** 标记资产余额 */
     private var oldBalance = ""
 
@@ -165,6 +168,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             type = type,
                             classification = classification,
                             invisible = invisible,
+                            sort = sort,
                             createTime = createTime,
                             modifyTime = currentTime,
                             balance = balance
@@ -190,6 +194,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             type = type,
                             classification = classification,
                             invisible = invisible,
+                            sort = local.queryMaxSortByBooksId(CurrentBooksLiveData.booksId) + 1,
                             createTime = currentTime,
                             modifyTime = currentTime,
                             balance = balance

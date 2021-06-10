@@ -24,8 +24,10 @@ import kotlinx.parcelize.Parcelize
  * @param type 资产大类
  * @param classification 资产分类
  * @param invisible 是否隐藏
+ * @param sort 排序
  * @param createTime 创建时间
  * @param modifyTime 修改时间
+ * @param balance 显示余额
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/3
  */
@@ -40,6 +42,7 @@ data class AssetEntity(
     val type: ClassificationTypeEnum,
     val classification: AssetClassificationEnum,
     val invisible: Boolean,
+    val sort: Int,
     val createTime: String,
     val modifyTime: String,
     val balance: String
@@ -104,6 +107,7 @@ data class AssetEntity(
                 type = type,
                 classification = classification,
                 false,
+                -1,
                 "",
                 "",
                 ""
@@ -122,6 +126,7 @@ data class AssetEntity(
                 type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
                 classification = AssetClassificationEnum.NOT_SELECT,
                 false,
+                -1,
                 "",
                 "",
                 ""

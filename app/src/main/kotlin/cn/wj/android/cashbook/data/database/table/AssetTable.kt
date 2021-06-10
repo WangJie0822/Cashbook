@@ -16,6 +16,7 @@ import androidx.room.PrimaryKey
  * @param type 资产大类
  * @param classification 资产分类
  * @param invisible 是否隐藏
+ * @param sort 排序
  * @param createTime 创建时间
  * @param modifyTime 修改时间
  *
@@ -32,6 +33,7 @@ data class AssetTable(
     val type: String,
     val classification: String,
     val invisible: Int,
+    val sort:Int,
     @ColumnInfo(name = "create_time") val createTime: Long,
     @ColumnInfo(name = "modify_time") val modifyTime: Long
 )

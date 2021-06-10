@@ -40,6 +40,7 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
             if (value.id >= 0) {
                 viewModel.id = value.id
                 viewModel.createTime = value.createTime
+                viewModel.sort = value.sort
                 // 编辑资产，设置标题
                 viewModel.titleStr.set(R.string.edit_asset.string)
                 // 更新资产数据
