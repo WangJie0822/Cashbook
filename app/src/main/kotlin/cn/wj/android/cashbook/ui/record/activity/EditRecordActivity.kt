@@ -40,7 +40,11 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         // 选择资产弹窗
         viewModel.showSelectAssetData.observe(this, {
             SelectAssetDialog.actionShow(supportFragmentManager) { selected ->
-                viewModel.accountData.value = selected
+                if (it) {
+                    viewModel.accountData
+                } else {
+                    viewModel.transferAccountData
+                }.value = selected
             }
         })
         // 选择日期弹窗

@@ -97,4 +97,7 @@
     <string name="account_show_format">%1$s（%2$s）</string>
     <string name="classification">分类</string>
     <string name="setting">设置</string>
+    <string name="record_charge_hint">扣款金额=转账金额+手续费</string>
+    <string name="into_account">转入账户</string>
+    <string name="into_with_colon">转入：</string>
 </resources>

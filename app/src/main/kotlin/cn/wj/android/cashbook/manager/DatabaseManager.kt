@@ -5,6 +5,7 @@ import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
+import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_TYPE_INITIALIZED
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
@@ -65,6 +66,7 @@ object DatabaseManager {
         initExpenditureTypeData(local)
         initIncomeTypeData(local)
         initTransferTypeData(local)
+        setSharedBoolean(SHARED_KEY_TYPE_INITIALIZED, true)
     }
 
     /** 初始化支出类型 */

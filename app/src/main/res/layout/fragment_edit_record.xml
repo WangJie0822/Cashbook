@@ -105,6 +105,26 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/content_vertical_spacing"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:bind_visibility="@{viewModel.showCharge &amp;&amp; viewModel.chargeChecked}"
+                android:hint="@string/record_charge_hint"
+                app:endIconMode="clear_text"
+                app:hintTextAppearance="?attr/textAppearanceCaption">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    style="@style/textInputEditTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text="@={viewModel.chargeStr}" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.chip.ChipGroup
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -122,6 +142,18 @@
                     android:text="@{viewModel.accountStr}"
                     android:textColor="@color/selector_record_options"
                     tools:text="@string/account" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_in_account"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:bind_chip_freezeChecked="@{viewModel.transferAccountChecked}"
+                    android:bind_onClick="@{viewModel.onTransferAccountClick}"
+                    android:bind_visibility="@{viewModel.showTransferAccount}"
+                    android:text="@{viewModel.transferAccountStr}"
+                    android:textColor="@color/selector_record_options"
+                    tools:text="@string/into_account" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_date"
@@ -148,18 +180,16 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_charge"
-                    style="@style/Widget.MaterialComponents.Chip.Entry"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:bind_chip_freezeChecked="@{viewModel.chargeChecked}"
-                    android:bind_onClick="@{viewModel.onChargeClick}"
                     android:bind_visibility="@{viewModel.showCharge}"
-                    android:text="@{viewModel.chargeStr}"
+                    android:checked="@={viewModel.chargeChecked}"
+                    android:text="@string/charge"
                     android:textColor="@color/selector_record_options"
                     app:checkedIconTint="@color/selector_record_options"
                     app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
-                    tools:checked="true"
-                    tools:text="@string/charge" />
+                    tools:checked="true" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_reimbursable"

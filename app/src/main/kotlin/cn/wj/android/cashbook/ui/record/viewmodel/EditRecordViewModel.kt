@@ -33,13 +33,16 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val showCalculatorData: MutableLiveData<Int> = MutableLiveData()
 
     /** 显示选择账号弹窗 */
-    val showSelectAssetData: MutableLiveData<Int> = MutableLiveData()
+    val showSelectAssetData: MutableLiveData<Boolean> = MutableLiveData()
 
     /** 选择日期弹窗 */
     val showSelectDateData: MutableLiveData<Int> = MutableLiveData()
 
     /** 账户信息 */
     val accountData: MutableLiveData<AssetEntity> = MutableLiveData(getSharedParcelable(SHARED_KEY_LAST_ASSET))
+
+    /** 转账转入账户信息 */
+    val transferAccountData: MutableLiveData<AssetEntity> = MutableLiveData(null)
 
     /** TODO 标签数据 */
     val tagsData: MutableLiveData<String> = MutableLiveData("")
@@ -64,6 +67,25 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         null != it && it.classification !== AssetClassificationEnum.NOT_SELECT
     }
 
+    /** 是否显示转入账户 */
+    val showTransferAccount: LiveData<Boolean> = currentItem.map {
+        it == RecordTypeEnum.TRANSFER.position
+    }
+
+    /** 转账转入账户文本 */
+    val transferAccountStr: LiveData<String> = transferAccountData.map {
+        if (null == it || it.classification == AssetClassificationEnum.NOT_SELECT) {
+            R.string.into_account.string
+        } else {
+            R.string.into_with_colon.string + it.showStr
+        }
+    }
+
+    /** 转账转入账户选中状态 */
+    val transferAccountChecked: LiveData<Boolean> = transferAccountData.map {
+        null != it && it.classification !== AssetClassificationEnum.NOT_SELECT
+    }
+
     /** 标签文本 */
     val tagsStr: LiveData<String> = MutableLiveData(R.string.tags.string)
 
@@ -73,10 +95,10 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     }
 
     /** 手续费文本 */
-    val chargeStr: LiveData<String> = MutableLiveData(R.string.charge.string)
+    val chargeStr: MutableLiveData<String> = MutableLiveData()
 
     /** 手续费选中状态 */
-    val chargeChecked: LiveData<Boolean> = MutableLiveData(false)
+    val chargeChecked: MutableLiveData<Boolean> = MutableLiveData(false)
 
     /** 是否显示手续费 */
     val showCharge: LiveData<Boolean> = currentItem.map {
@@ -88,7 +110,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 是否显示可报销 */
     val showReimbursable: LiveData<Boolean> = currentItem.map {
-        it == RecordTypeEnum.INCOME.position
+        it == RecordTypeEnum.EXPENDITURE.position
     }
 
     /** 货币符号 */
@@ -127,7 +149,12 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 账户点击 */
     val onAccountClick: () -> Unit = {
-        showSelectAssetData.value = 0
+        showSelectAssetData.value = true
+    }
+
+    /** 转账转入账户点击 */
+    val onTransferAccountClick: () -> Unit = {
+        showSelectAssetData.value = false
     }
 
     /** 标签点击 */
@@ -144,11 +171,6 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 时间点击 */
     val onTimeClick: () -> Unit = {
         snackbarData.value = "时间点击".toSnackbarModel()
-    }
-
-    /** 手续费点击 */
-    val onChargeClick: () -> Unit = {
-        snackbarData.value = "手续费点击".toSnackbarModel()
     }
 
     /** 金额点击 */
