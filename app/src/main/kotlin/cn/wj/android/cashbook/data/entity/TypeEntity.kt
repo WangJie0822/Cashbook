@@ -46,8 +46,22 @@ data class TypeEntity(
     }
 
     companion object {
+
+        fun empty(): TypeEntity {
+            return TypeEntity(
+                id = -1L,
+                parentId = -1L,
+                name = "",
+                iconResName = "",
+                type = TypeEnum.FIRST,
+                recordType = RecordTypeEnum.EXPENDITURE,
+                childEnable = false,
+                sort = -1,
+                childList = arrayListOf()
+            )
+        }
+
         fun newFirstExpenditure(name: String, iconResName: String, sort: Int, childEnable: Boolean = true): TypeEntity {
-            val time = System.currentTimeMillis().dateFormat()
             return TypeEntity(
                 id = -1L,
                 parentId = -1L,
@@ -62,7 +76,6 @@ data class TypeEntity(
         }
 
         fun newSecondExpenditure(parentId: Long, name: String, iconResName: String, sort: Int): TypeEntity {
-            val time = System.currentTimeMillis().dateFormat()
             return TypeEntity(
                 id = -1L,
                 parentId = parentId,
@@ -77,7 +90,6 @@ data class TypeEntity(
         }
 
         fun newFirstIncome(name: String, iconResName: String, sort: Int, childEnable: Boolean = true): TypeEntity {
-            val time = System.currentTimeMillis().dateFormat()
             return TypeEntity(
                 id = -1L,
                 parentId = -1L,
@@ -92,7 +104,6 @@ data class TypeEntity(
         }
 
         fun newSecondIncome(parentId: Long, name: String, iconResName: String, sort: Int): TypeEntity {
-            val time = System.currentTimeMillis().dateFormat()
             return TypeEntity(
                 id = -1L,
                 parentId = parentId,
@@ -107,7 +118,6 @@ data class TypeEntity(
         }
 
         fun newFirstTransfer(name: String, iconResName: String, sort: Int, childEnable: Boolean = true): TypeEntity {
-            val time = System.currentTimeMillis().dateFormat()
             return TypeEntity(
                 id = -1L,
                 parentId = -1L,
@@ -122,7 +132,6 @@ data class TypeEntity(
         }
 
         fun newSecondTransfer(parentId: Long, name: String, iconResName: String, sort: Int): TypeEntity {
-            val time = System.currentTimeMillis().dateFormat()
             return TypeEntity(
                 id = -1L,
                 parentId = parentId,

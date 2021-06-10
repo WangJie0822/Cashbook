@@ -21,6 +21,9 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
     /** 更新二级类型列表数据 */
     val secondTypeData: MutableLiveData<TypeEntity> = MutableLiveData()
 
+    /** 选中类型数据 */
+    val selectTypeData: MutableLiveData<TypeEntity> = MutableLiveData()
+
     /** 记录类型数据 */
     val typeData: MutableLiveData<RecordTypeEnum> = MutableLiveData()
 
@@ -55,6 +58,7 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
             // 更新二级列表
             secondTypeData.value = item
         }
+        selectTypeData.value = item
     }
 
     /** TODO 类型设置点击 */

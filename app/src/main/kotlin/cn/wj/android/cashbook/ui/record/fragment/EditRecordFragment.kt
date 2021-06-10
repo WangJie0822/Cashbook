@@ -89,6 +89,23 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
                 }
             }
         })
+        // 选中类型
+        typeViewModel.selectTypeData.observe(this, { selected ->
+            when (typeViewModel.typeData.value) {
+                RecordTypeEnum.EXPENDITURE -> {
+                    // 支出
+                    viewModel.expenditureType
+                }
+                RecordTypeEnum.INCOME -> {
+                    // 收入
+                    viewModel.incomeType
+                }
+                else -> {
+                    // 转账
+                    viewModel.transferType
+                }
+            }.value = selected
+        })
     }
 
     private fun createTypeAdapter(ls: List<TypeEntity>): SimpleRvListAdapter<TypeEntity> {

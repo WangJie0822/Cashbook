@@ -77,4 +77,6 @@
     <string name="record_charge_hint">扣款金额=转账金额+手续费</string>
     <string name="into_account">转入账户</string>
     <string name="into_with_colon">转入：</string>
+    <string name="amount_can_not_be_zero">金额不能为0</string>
+    <string name="please_select_type">请选择类型</string>
 </resources>

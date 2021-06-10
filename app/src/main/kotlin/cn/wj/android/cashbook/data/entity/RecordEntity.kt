@@ -27,7 +27,7 @@ data class RecordEntity(
     val type: RecordTypeEnum,
     val firstType: TypeEntity,
     val secondType: TypeEntity?,
-    val asset: AssetEntity,
+    val asset: AssetEntity?,
     val intoAsset: AssetEntity?,
     val amount: String,
     val charge: String,

@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
@@ -20,6 +21,7 @@ import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
+import cn.wj.android.cashbook.data.transform.toRecordTable
 import cn.wj.android.cashbook.data.transform.toTypeEntity
 import cn.wj.android.cashbook.data.transform.toTypeTable
 import kotlinx.coroutines.Dispatchers
@@ -228,7 +230,8 @@ class LocalDataStore(private val database: CashbookDatabase) {
         val lastModify = modifyList.first()
         // 获取在此之后的所有记录
         var result = lastModify.amount.toFloatOrNull() ?: 0f
-        recordDao.queryAfterRecordTime(assetId, lastModify.recordTime).forEach {
+        val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
+        recordList.forEach {
             when (it.type) {
                 RecordTypeEnum.INCOME.name -> {
                     // 收入
@@ -245,5 +248,10 @@ class LocalDataStore(private val database: CashbookDatabase) {
             }
         }
         result.toString()
+    }
+
+    /** 将记录 [record] 插入到数据库并返回生成的主键 id */
+    suspend fun insertRecord(record: RecordEntity): Long = withContext(Dispatchers.IO) {
+        recordDao.insert(record.toRecordTable())
     }
 }
