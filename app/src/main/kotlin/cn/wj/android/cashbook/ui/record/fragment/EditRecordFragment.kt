@@ -67,6 +67,10 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
                 }
             }
             adapter.addAdapter(TypeSettingRvAdapter(typeViewModel))
+            // 默认选中第一条
+            list.firstOrNull()?.let { first->
+                typeViewModel.onTypeItemClick.invoke(first)
+            }
         })
         // 二级类型状态
         typeViewModel.secondTypeData.observe(this, { item ->

@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.ui.record.activity
 
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
@@ -34,6 +35,11 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
 
         // 配置 ViewPager2
         binding.vpType.adapter = typesVpAdapter
+
+        lifecycleScope.launchWhenResumed {
+            // 自动弹出计算弹出
+            viewModel.showCalculatorData.value = 0
+        }
     }
 
     override fun observe() {
