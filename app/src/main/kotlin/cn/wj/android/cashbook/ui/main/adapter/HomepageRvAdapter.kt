@@ -39,6 +39,7 @@ class HomepageRvAdapter : BaseRvListDBAdapter<
             mBinding.rvRecord.run {
                 layoutManager = WrapContentLinearLayoutManager()
                 adapter = SimpleRvListAdapter<RecordEntity>(R.layout.recycler_item_record).apply {
+                    this.viewModel = this@HomepageRvAdapter.viewModel
                     submitList(entity.list)
                 }
             }

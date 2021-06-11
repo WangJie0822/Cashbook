@@ -1,9 +1,12 @@
 package cn.wj.android.cashbook.data.entity
 
+import android.os.Parcelable
 import androidx.databinding.ObservableBoolean
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 /**
  * 类型数据实体类
@@ -19,6 +22,7 @@ import cn.wj.android.cashbook.data.enums.TypeEnum
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
  */
+@Parcelize
 data class TypeEntity(
     val id: Long,
     val parentId: Long,
@@ -29,18 +33,21 @@ data class TypeEntity(
     val childEnable: Boolean,
     val sort: Int,
     val childList: List<TypeEntity>
-) {
+) : Parcelable {
 
     /** 是否显示更多图标 */
+    @IgnoredOnParcel
     val showMore: Boolean
         get() = type == TypeEnum.FIRST && childEnable && childList.isNotEmpty()
 
     /** 标记 - 是否选中 */
+    @IgnoredOnParcel
     val selected: ObservableBoolean by lazy {
         ObservableBoolean(false)
     }
 
     /** 标记 - 是否展开 */
+    @IgnoredOnParcel
     val expand: ObservableBoolean by lazy {
         ObservableBoolean(false)
     }

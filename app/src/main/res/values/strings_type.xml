@@ -111,6 +111,8 @@
     <string name="type_icon_name_repayment" translatable="false">vector_type_repayment_24</string>
     <string name="type_icon_name_proceeds" translatable="false">vector_type_type_proceeds_24</string>
 
+    <string name="type_icon_name_balance_adjustment" translatable="false">vector_type_balance_adjustment_24</string>
+
     <string name="type_dining">餐饮</string>
     <string name="type_three_meals">三餐</string>
     <string name="type_supper">夜宵</string>

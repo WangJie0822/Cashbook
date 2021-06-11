@@ -1,6 +1,7 @@
 <resources>
     <string name="currency_summary_format" translatable="false">%1$s  %2$s (%3$s)</string>
 
+    <string name="symbol_transfer" translatable="false"><![CDATA[->]]></string>
     <string name="symbol_calculator_clear" translatable="false">C</string>
     <string name="symbol_calculator_equals" translatable="false">=</string>
     <string name="symbol_calculator_plus" translatable="false">+</string>
@@ -103,4 +104,9 @@
     <string name="amount_can_not_be_zero">金额不能为0</string>
     <string name="please_select_type">请选择类型</string>
     <string name="balance_adjustment">余额调整</string>
+    <string name="billing_details">账单详情</string>
+    <string name="amount">金额</string>
+    <string name="asset">资产</string>
+    <string name="remark">备注</string>
+    <string name="time">时间</string>
 </resources>

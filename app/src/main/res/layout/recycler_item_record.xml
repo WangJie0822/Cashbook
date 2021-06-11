@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -7,23 +8,34 @@
         <variable
             name="item"
             type="cn.wj.android.cashbook.data.entity.RecordEntity" />
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel" />
     </data>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/record_item_height"
+        android:background="?selectableItemBackground"
+        android:bind_onClick="@{viewModel.onRecordItemClick}"
+        android:bind_onClick_item="@{item}"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:paddingStart="@dimen/content_horizontal_spacing"
+        android:paddingEnd="@dimen/content_horizontal_spacing"
         tools:background="@color/white">
 
         <ImageView
-            android:layout_width="@dimen/icon_size_small"
-            android:layout_height="@dimen/icon_size_small"
-            android:bind_iv_tint="@{item.colorTint}"
+            android:layout_width="@dimen/icon_size_larger"
+            android:layout_height="@dimen/icon_size_larger"
+            android:background="@drawable/selector_type_icon_background"
+            android:bind_iv_srcResIdStr="@{item.typeIconResIdStr}"
             android:contentDescription="@null"
-            android:src="@drawable/vector_baseline_center_dot_24"
-            tools:tint="@color/color_spending" />
+            android:padding="@dimen/icon_padding"
+            app:tint="@color/selector_type_icon_tint"
+            tools:src="@drawable/vector_type_dining_24" />
 
         <LinearLayout
             android:layout_width="0dp"

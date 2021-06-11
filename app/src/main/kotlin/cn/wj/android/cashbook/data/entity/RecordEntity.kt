@@ -1,11 +1,16 @@
 package cn.wj.android.cashbook.data.entity
 
+import android.os.Parcelable
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.color
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
+import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 /**
  * 记录数据实体类
@@ -27,6 +32,7 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
+@Parcelize
 data class RecordEntity(
     val id: Long,
     val type: RecordTypeEnum,
@@ -43,17 +49,25 @@ data class RecordEntity(
     val recordTime: Long,
     val createTime: String,
     val modifyTime: String
-) {
+) : Parcelable {
 
     /** 分类文本 */
+    @IgnoredOnParcel
     val typeStr: String
         get() = secondType?.name.orElse(firstType?.name).orElse(R.string.balance_adjustment.string)
 
+    /** 类型图标显示 */
+    @IgnoredOnParcel
+    val typeIconResIdStr: String
+        get() = secondType?.iconResName.orElse(firstType?.iconResName).orElse("@drawable/${R.string.type_icon_name_balance_adjustment.string}")
+
     /** 是否显示备注 */
+    @IgnoredOnParcel
     val showRemark: Boolean
         get() = remark.isNotBlank()
 
     /** 金额文本 */
+    @IgnoredOnParcel
     val amountStr: String
         get() = when (type) {
             RecordTypeEnum.EXPENDITURE -> {
@@ -68,10 +82,32 @@ data class RecordEntity(
         } + CurrentBooksLiveData.currency.symbol + amount
 
     /** 是否显示资产信息 */
+    @IgnoredOnParcel
     val showAssetInfo: Boolean
         get() = null != asset
 
+    @IgnoredOnParcel
+    val assetName: String
+        get() = asset?.name.orEmpty()
+
+    @IgnoredOnParcel
+    val assetLogoResId: Int?
+        get() = asset?.classification?.logoResId
+
+    @IgnoredOnParcel
+    val intoAssetName: String
+        get() = intoAsset?.name.orEmpty()
+
+    @IgnoredOnParcel
+    val intoAssetLogoResId: Int?
+        get() = intoAsset?.classification?.logoResId
+
+    @IgnoredOnParcel
+    val showIntoAsset: Boolean
+        get() = type == RecordTypeEnum.TRANSFER
+
     /** 资产信息文本 */
+    @IgnoredOnParcel
     val assetInfoStr: String
         get() = if (type == RecordTypeEnum.TRANSFER) {
             "${asset?.name}->${intoAsset?.name}"
@@ -79,7 +115,12 @@ data class RecordEntity(
             asset?.name.orEmpty()
         }
 
+    @IgnoredOnParcel
+    val recordTimeStr: String
+        get() = recordTime.dateFormat(DATE_FORMAT_NO_SECONDS)
+
     /** 不同类型着色 */
+    @IgnoredOnParcel
     val colorTint: Int
         get() = when (type) {
             RecordTypeEnum.MODIFY_BALANCE -> {

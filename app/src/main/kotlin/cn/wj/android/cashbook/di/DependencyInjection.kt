@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -111,5 +112,8 @@ val viewModelModule = module {
     }
     viewModel {
         CalculatorViewModel()
+    }
+    viewModel {
+        RecordInfoViewModel(get())
     }
 }

@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.databinding.ActivityMainBinding
 import cn.wj.android.cashbook.databinding.LayoutNoDataRecordBinding
 import cn.wj.android.cashbook.ui.main.adapter.HomepageRvAdapter
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
+import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
@@ -33,7 +34,11 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var lastBackPressMs = 0L
 
     /** 列表适配器对象 */
-    private val adapter = HomepageRvAdapter()
+    private val adapter: HomepageRvAdapter by lazy {
+        HomepageRvAdapter().apply {
+            this.viewModel = this@MainActivity.viewModel
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +99,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 首页列表
         viewModel.listData.observe(this, { list ->
             adapter.submitList(list)
+        })
+        // 显示记录详情弹窗
+        viewModel.showRecordDetailsDialogData.observe(this, { record ->
+            RecordInfoDialog.actionShow(supportFragmentManager, record)
         })
     }
 }

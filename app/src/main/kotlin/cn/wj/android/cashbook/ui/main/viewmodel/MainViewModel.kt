@@ -14,6 +14,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
 import cn.wj.android.cashbook.data.entity.HomepageEntity
+import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.observable.ObservableMoney
@@ -26,6 +27,9 @@ import kotlinx.coroutines.launch
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
 class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
+
+    /** 显示记录详情弹窗数据 */
+    val showRecordDetailsDialogData: MutableLiveData<RecordEntity> = MutableLiveData()
 
     /** 首页列表数据 */
     val listData: MutableLiveData<List<HomepageEntity>> = MutableLiveData()
@@ -114,6 +118,11 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
         uiNavigationData.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_EDIT_RECORD)
         }
+    }
+
+    /** 记录数据点击 */
+    val onRecordItemClick: (RecordEntity) -> Unit = { item ->
+        showRecordDetailsDialogData.value = item
     }
 
     /** 获取最近一周数据 */

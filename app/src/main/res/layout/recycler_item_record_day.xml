@@ -41,8 +41,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:bind_rv_isNestedScrollingEnabled="@{false}"
-                android:paddingStart="@dimen/content_horizontal_spacing"
-                android:paddingEnd="@dimen/content_horizontal_spacing"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_date"
