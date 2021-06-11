@@ -286,7 +286,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 // TODO
                 tags = arrayListOf(),
                 reimbursable = item.reimbursable == SWITCH_INT_ON,
-                recordTime = item.recordTime.dateFormat(DATE_FORMAT_NO_SECONDS),
+                recordTime = item.recordTime,
                 createTime = item.createTime.dateFormat(),
                 modifyTime = item.modifyTime.dateFormat()
             )

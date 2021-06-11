@@ -140,7 +140,7 @@ internal fun RecordEntity.toRecordTable(): RecordTable {
         // TODO
         tagIds = "",
         reimbursable = if (reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
-        recordTime = recordTime.toLongTime(DATE_FORMAT_NO_SECONDS).orElse(0L),
+        recordTime = recordTime,
         createTime = createTime.toLongTime().orElse(0L),
         modifyTime = modifyTime.toLongTime().orElse(0L)
     )

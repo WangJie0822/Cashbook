@@ -40,7 +40,7 @@ data class RecordEntity(
     val remark: String,
     val tags: List<String>,
     val reimbursable: Boolean,
-    val recordTime: String,
+    val recordTime: Long,
     val createTime: String,
     val modifyTime: String
 ) {

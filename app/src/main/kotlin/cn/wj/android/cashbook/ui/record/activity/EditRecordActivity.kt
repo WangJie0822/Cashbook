@@ -3,6 +3,8 @@ package cn.wj.android.cashbook.ui.record.activity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.tools.dateFormat
+import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
@@ -56,9 +58,10 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         // 选择日期弹窗
         viewModel.showSelectDateData.observe(this, {
             DateTimePickerDialog.Builder()
-                .setDate(viewModel.dateData.value.orEmpty())
+                .setDate(viewModel.dateStr.value.orEmpty())
                 .setOnDatePickerListener { date ->
-                    viewModel.dateData.value = date
+                    val seconds = System.currentTimeMillis().dateFormat().split(":").last()
+                    viewModel.dateData.value = "$date:$seconds".toLongTime()
                 }.show(supportFragmentManager)
 
         })

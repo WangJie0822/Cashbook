@@ -71,7 +71,12 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val tagsData: MutableLiveData<List<String>> = MutableLiveData(arrayListOf())
 
     /** 选中时间 */
-    val dateData: MutableLiveData<String> = MutableLiveData(System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS))
+    val dateData: MutableLiveData<Long> = MutableLiveData(System.currentTimeMillis())
+
+    /** 显示时间 */
+    val dateStr: LiveData<String> = dateData.map {
+        it.dateFormat(DATE_FORMAT_NO_SECONDS)
+    }
 
     /** 账户文本 */
     val accountStr: LiveData<String> = accountData.map {
@@ -277,7 +282,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                         remark = remarkStr.value.orEmpty(),
                         tags = tagsData.value.orEmpty(),
                         reimbursable = reimbursableChecked.value.condition,
-                        recordTime = dateData.value.orElse(currentDate),
+                        recordTime = dateData.value.orElse(System.currentTimeMillis()),
                         createTime = currentDate,
                         modifyTime = currentDate
                     )

@@ -164,7 +164,7 @@
                     android:bind_chip_freezeChecked="@{true}"
                     android:bind_onClick="@{viewModel.onDateClick}"
                     android:checked="true"
-                    android:text="@{viewModel.dateData}"
+                    android:text="@{viewModel.dateStr}"
                     android:textColor="@color/selector_record_options"
                     tools:text="2021-06-01 12:00" />
 
