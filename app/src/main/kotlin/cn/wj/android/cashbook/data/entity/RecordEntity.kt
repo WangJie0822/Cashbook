@@ -1,6 +1,11 @@
 package cn.wj.android.cashbook.data.entity
 
+import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.color
+import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
 /**
  * 记录数据实体类
@@ -25,10 +30,11 @@ import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 data class RecordEntity(
     val id: Long,
     val type: RecordTypeEnum,
-    val firstType: TypeEntity,
+    val firstType: TypeEntity?,
     val secondType: TypeEntity?,
     val asset: AssetEntity?,
     val intoAsset: AssetEntity?,
+    val booksId: Long,
     val amount: String,
     val charge: String,
     val remark: String,
@@ -37,4 +43,56 @@ data class RecordEntity(
     val recordTime: String,
     val createTime: String,
     val modifyTime: String
-)
+) {
+
+    /** 分类文本 */
+    val typeStr: String
+        get() = secondType?.name.orElse(firstType?.name).orElse(R.string.balance_adjustment.string)
+
+    /** 是否显示备注 */
+    val showRemark: Boolean
+        get() = remark.isNotBlank()
+
+    /** 金额文本 */
+    val amountStr: String
+        get() = when (type) {
+            RecordTypeEnum.EXPENDITURE -> {
+                "-"
+            }
+            RecordTypeEnum.INCOME -> {
+                "+"
+            }
+            else -> {
+                ""
+            }
+        } + CurrentBooksLiveData.currency.symbol + amount
+
+    /** 是否显示资产信息 */
+    val showAssetInfo: Boolean
+        get() = null != asset
+
+    /** 资产信息文本 */
+    val assetInfoStr: String
+        get() = if (type == RecordTypeEnum.TRANSFER) {
+            "${asset?.name}->${intoAsset?.name}"
+        } else {
+            asset?.name.orEmpty()
+        }
+
+    /** 不同类型着色 */
+    val colorTint: Int
+        get() = when (type) {
+            RecordTypeEnum.MODIFY_BALANCE -> {
+                R.color.color_on_secondary
+            }
+            RecordTypeEnum.EXPENDITURE -> {
+                R.color.color_spending
+            }
+            RecordTypeEnum.INCOME -> {
+                R.color.color_income
+            }
+            RecordTypeEnum.TRANSFER -> {
+                R.color.color_primary
+            }
+        }.color
+}

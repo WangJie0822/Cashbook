@@ -36,4 +36,8 @@ interface TypeDao {
     /** 查询并返回类型为 [type] 父类型id为 [parentId] 的二级级类型数据列表 */
     @Query("SELECT * FROM db_type WHERE type=:type AND parent_id=:parentId")
     suspend fun queryByParentId(type: String, parentId: Long): List<TypeTable>
+
+    /** 获取 id 为 [id] 的类型 */
+    @Query("SELECT * FROM db_type WHERE id=:id")
+    suspend fun queryById(id: Long): TypeTable?
 }

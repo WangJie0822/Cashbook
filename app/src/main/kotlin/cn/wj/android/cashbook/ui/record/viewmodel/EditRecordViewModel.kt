@@ -271,6 +271,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                         secondType = secondType,
                         asset = accountData.value,
                         intoAsset = intoAsset,
+                        booksId = CurrentBooksLiveData.booksId,
                         amount = amount,
                         charge = charge,
                         remark = remarkStr.value.orEmpty(),

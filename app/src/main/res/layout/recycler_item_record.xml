@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="cn.wj.android.cashbook.data.entity.RecordEntity" />
+    </data>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/record_item_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        tools:background="@color/white">
+
+        <ImageView
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:bind_iv_tint="@{item.colorTint}"
+            android:contentDescription="@null"
+            android:src="@drawable/vector_baseline_center_dot_24"
+            tools:tint="@color/color_spending" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/content_horizontal_spacing"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{item.typeStr}"
+                android:textAppearance="?attr/textAppearanceBody1"
+                tools:text="三餐" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:bind_visibility="@{item.showRemark}"
+                android:text="@{item.remark}"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:visibility="gone"
+                tools:text="备注"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:bind_tv_textColor="@{item.colorTint}"
+                android:text="@{item.amountStr}"
+                android:textAppearance="?attr/textAppearanceBody1"
+                tools:text="-￥2444.00"
+                tools:textColor="@color/color_spending" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:bind_visibility="@{item.showAssetInfo}"
+                android:text="@{item.assetInfoStr}"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:visibility="gone"
+                tools:text="张三->李四"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

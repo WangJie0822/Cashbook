@@ -5,16 +5,20 @@ import androidx.databinding.ObservableFloat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
+import cn.wj.android.cashbook.data.entity.HomepageEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.observable.ObservableMoney
 import cn.wj.android.cashbook.data.store.LocalDataStore
+import kotlinx.coroutines.launch
 
 /**
  * 主界面 ViewModel
@@ -22,6 +26,9 @@ import cn.wj.android.cashbook.data.store.LocalDataStore
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
 class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
+
+    /** 首页列表数据 */
+    val listData: MutableLiveData<List<HomepageEntity>> = MutableLiveData()
 
     /** 账本名称 */
     val booksName: LiveData<String> = CurrentBooksLiveData.map { it.name }
@@ -50,6 +57,23 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 本月收入、结余透明度 */
     val incomeAndBalanceAlpha = ObservableFloat(1f)
+
+
+    /** 刷新状态 */
+    val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
+        override fun onActive() {
+            // 进入自动加载数据
+            loadHomepageList()
+        }
+
+        override fun setValue(value: Boolean?) {
+            super.setValue(value)
+            if (value.condition) {
+                // 刷新
+                loadHomepageList()
+            }
+        }
+    }
 
     /** 状态栏折叠进度监听 */
     val onCollapsingChanged: (Float) -> Unit = { percent ->
@@ -89,6 +113,19 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
         // 跳转编辑记录界面
         uiNavigationData.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_EDIT_RECORD)
+        }
+    }
+
+    /** 获取最近一周数据 */
+    private fun loadHomepageList() {
+        viewModelScope.launch {
+            try {
+                listData.value = local.getHomepageList(CurrentBooksLiveData.booksId)
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "loadHomepageList")
+            } finally {
+                refreshing.value = false
+            }
         }
     }
 }

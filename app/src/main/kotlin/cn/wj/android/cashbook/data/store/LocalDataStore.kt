@@ -1,6 +1,10 @@
 package cn.wj.android.cashbook.data.store
 
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
+import cn.wj.android.cashbook.base.tools.dateFormat
+import cn.wj.android.cashbook.base.tools.toLongTime
+import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.AssetDao
 import cn.wj.android.cashbook.data.database.dao.BooksDao
@@ -12,6 +16,7 @@ import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.entity.HomepageEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
@@ -24,6 +29,7 @@ import cn.wj.android.cashbook.data.transform.toBooksEntity
 import cn.wj.android.cashbook.data.transform.toRecordTable
 import cn.wj.android.cashbook.data.transform.toTypeEntity
 import cn.wj.android.cashbook.data.transform.toTypeTable
+import java.util.Calendar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -253,5 +259,54 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 将记录 [record] 插入到数据库并返回生成的主键 id */
     suspend fun insertRecord(record: RecordEntity): Long = withContext(Dispatchers.IO) {
         recordDao.insert(record.toRecordTable())
+    }
+
+    /** 获取账本 id 为 [booksId] 的首页数据 */
+    suspend fun getHomepageList(booksId: Long): List<HomepageEntity> = withContext(Dispatchers.IO) {
+        // 首页显示一周内数据
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_MONTH, -7)
+        val recordTime = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.DAY_OF_MONTH)} 00:00".toLongTime(DATE_FORMAT_NO_SECONDS)
+            .orElse(System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L))
+        val list = recordDao.queryAfterRecordTimeByBooksId(booksId, recordTime)
+        val map = hashMapOf<String, MutableList<RecordEntity>>()
+        for (item in list) {
+            val key = item.recordTime.dateFormat(DATE_FORMAT_NO_SECONDS).split(" ").firstOrNull().orEmpty()
+            val value = RecordEntity(
+                id = item.id.orElse(-1L),
+                type = RecordTypeEnum.fromName(item.type).orElse(RecordTypeEnum.EXPENDITURE),
+                firstType = if (item.firstTypeId < 0) null else typeDao.queryById(item.firstTypeId)?.toTypeEntity(),
+                secondType = if (item.secondTypeId < 0) null else typeDao.queryById(item.secondTypeId)?.toTypeEntity(),
+                asset = assetDao.queryById(item.assetId)?.toAssetEntity(getAssetBalanceById(item.assetId)),
+                intoAsset = assetDao.queryById(item.intoAssetId)?.toAssetEntity(getAssetBalanceById(item.intoAssetId)),
+                booksId = booksId,
+                amount = item.amount,
+                charge = item.charge,
+                remark = item.remark,
+                // TODO
+                tags = arrayListOf(),
+                reimbursable = item.reimbursable == SWITCH_INT_ON,
+                recordTime = item.recordTime.dateFormat(DATE_FORMAT_NO_SECONDS),
+                createTime = item.createTime.dateFormat(),
+                modifyTime = item.modifyTime.dateFormat()
+            )
+            if (key.isNotBlank()) {
+                if (map.containsKey(key)) {
+                    map[key]!!.add(value)
+                } else {
+                    map[key] = arrayListOf(value)
+                }
+            }
+        }
+        val result = arrayListOf<HomepageEntity>()
+        map.keys.forEach { key ->
+            result.add(
+                HomepageEntity(
+                    date = key,
+                    list = map[key].orEmpty()
+                )
+            )
+        }
+        result
     }
 }

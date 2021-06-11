@@ -11,8 +11,8 @@ import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
 import cn.wj.android.cashbook.databinding.LayoutNoDataRecordBinding
+import cn.wj.android.cashbook.ui.main.adapter.HomepageRvAdapter
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
-import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
@@ -32,8 +32,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     /** 上次返回点击时间 */
     private var lastBackPressMs = 0L
 
-    /** TODO 列表适配器对象 */
-    private val adapter = SimpleRvListAdapter<String>(R.layout.recycler_item_blank)
+    /** 列表适配器对象 */
+    private val adapter = HomepageRvAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,5 +88,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             transparentStatusBar()
             fitsSystemWindows(false)
         }
+    }
+
+    override fun observe() {
+        // 首页列表
+        viewModel.listData.observe(this, { list ->
+            adapter.submitList(list)
+        })
     }
 }

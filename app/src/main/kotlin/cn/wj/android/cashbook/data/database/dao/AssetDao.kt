@@ -36,7 +36,11 @@ interface AssetDao {
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId AND invisible=${SWITCH_INT_OFF}")
     suspend fun queryVisibleByBooksId(booksId: Long): List<AssetTable>
 
-    /** 从数据库中查询账本id为 [booksId] 的资产中最大的排序*/
+    /** 从数据库中查询账本id为 [booksId] 的资产中最大的排序 */
     @Query("SELECT MAX(sort) FROM db_asset WHERE books_id=:booksId")
     suspend fun queryMaxSortByBooksId(booksId: Long): Int?
+
+    /** 获取 id 为 [id] 的资产 */
+    @Query("SELECT * FROM db_asset WHERE id=:id")
+    suspend fun queryById(id: Long): AssetTable?
 }

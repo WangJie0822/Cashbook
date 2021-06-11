@@ -23,6 +23,7 @@
 
     <dimen name="item_height">48dp</dimen>
     <dimen name="asset_item_height">70dp</dimen>
+    <dimen name="record_item_height">55dp</dimen>
     <dimen name="main_header_height">220dp</dimen>
     <dimen name="keyboard_height">225dp</dimen>
     <dimen name="divider_height">0.5dp</dimen>

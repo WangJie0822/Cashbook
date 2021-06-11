@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
 /**
  * 记录数据库表
@@ -34,6 +35,7 @@ data class RecordTable(
     @ColumnInfo(name = "second_type_id") val secondTypeId: Long,
     @ColumnInfo(name = "asset_id") val assetId: Long,
     @ColumnInfo(name = "into_asset_id") val intoAssetId: Long,
+    @ColumnInfo(name = "books_id") val booksId: Long,
     val amount: String,
     val charge: String,
     val remark: String,
@@ -54,6 +56,7 @@ data class RecordTable(
                 secondTypeId = -1,
                 assetId = assetId,
                 intoAssetId = -1,
+                booksId = CurrentBooksLiveData.booksId,
                 amount = balance,
                 charge = "",
                 remark = "",

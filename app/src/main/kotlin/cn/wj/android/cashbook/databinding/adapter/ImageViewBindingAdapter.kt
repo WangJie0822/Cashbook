@@ -2,8 +2,10 @@
 
 package cn.wj.android.cashbook.databinding.adapter
 
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.databinding.BindingAdapter
 import cn.wj.android.cashbook.databinding.constants.RESOURCE_MARK
@@ -135,4 +137,13 @@ fun ImageView.setImageViewImg(
         // path
         setImageViewPath(img, placeholder, default)
     }
+}
+
+/** 给 [ImageView] 设置背景着色 [color] */
+@BindingAdapter("android:bind_iv_tint")
+fun ImageView.setImageTint(@ColorInt color: Int?) {
+    if (null == color) {
+        return
+    }
+    imageTintList = ColorStateList.valueOf(color)
 }
