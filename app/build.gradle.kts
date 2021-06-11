@@ -205,6 +205,10 @@ dependencies {
     // Coil
     implementation(Dependencies.Coil.coil)
 
+    // 状态栏工具
+    implementation(Dependencies.ImmersionBar.immersionBar)
+    implementation(Dependencies.ImmersionBar.ktx)
+
     // MMKV 数据存储
     implementation(Dependencies.Tencent.mmkv)
 
@@ -212,21 +216,9 @@ dependencies {
     implementation(Dependencies.Alibaba.ARouter.api)
     kapt(Dependencies.Alibaba.ARouter.compiler)
 
-    // 状态栏工具
-    implementation(Dependencies.ImmersionBar.immersionBar)
-    implementation(Dependencies.ImmersionBar.ktx)
-
-    // SmartRefreshLayout
-    implementation(Dependencies.SmartRefresh.smartRefresh)
-    implementation(Dependencies.SmartRefresh.headerClassics)
-    implementation(Dependencies.SmartRefresh.footerClassics)
-
-    // 换肤
-    implementation(Dependencies.SkinSupport.skinSupport)
-    implementation(Dependencies.SkinSupport.constraint)
-    implementation(Dependencies.SkinSupport.appcompat)
-    implementation(Dependencies.SkinSupport.cardView)
-    implementation(Dependencies.SkinSupport.material)
+    // DoraemonKit
+    debugImplementation(Dependencies.Didi.DoraemonKit.debug)
+    releaseImplementation(Dependencies.Didi.DoraemonKit.release)
 
     // 测试
     testImplementation(Dependencies.testJunit)

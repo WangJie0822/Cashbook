@@ -386,16 +386,22 @@ object Dependencies {
 
             /** 全功能 */
             const val exoplayer = "com.google.android.exoplayer:exoplayer:$version"
+
             /** 核心功能（必须） */
             const val core = "com.google.android.exoplayer:exoplayer-core:$version"
+
             /** DASH */
             const val dash = "com.google.android.exoplayer:exoplayer-dash:$version"
+
             /** HLS */
             const val hls = "com.google.android.exoplayer:exoplayer-hls:$version"
+
             /** SmoothStreaming */
             const val smoothstreaming = "com.google.android.exoplayer:exoplayer-smoothstreaming:$version"
+
             /** 媒体转换 */
             const val transformer = "com.google.android.exoplayer:exoplayer-transformer:$version"
+
             /** UI 组件 */
             const val ui = "com.google.android.exoplayer:exoplayer-ui:$version"
         }
@@ -590,5 +596,21 @@ object Dependencies {
          * - Github: [https://github.com/tencent/mmkv]
          */
         const val mmkv = "com.tencent:mmkv:1.2.7"
+    }
+
+    /** 滴滴 */
+    object Didi {
+
+        /**
+         * Doraemonkit
+         * - Github: [https://github.com/Android-MI/DoraemonKit]
+         */
+        object DoraemonKit {
+            /** 版本号 */
+            private const val version = "1.1.2"
+
+            const val debug = "com.didichuxing.doraemonkit:doraemonkit:$version"
+            const val release = "com.didichuxing.doraemonkit:doraemonkit-no-op:$version"
+        }
     }
 }
