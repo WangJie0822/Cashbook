@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.ui.main.adapter
 
+import androidx.recyclerview.widget.DiffUtil
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.data.entity.HomepageEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
@@ -20,7 +21,15 @@ class HomepageRvAdapter : BaseRvListDBAdapter<
         HomepageRvAdapter.ViewHolder,
         RecyclerItemRecordDayBinding,
         MainViewModel,
-        HomepageEntity>() {
+        HomepageEntity>(diffCallback = object : DiffUtil.ItemCallback<HomepageEntity>() {
+    override fun areItemsTheSame(oldItem: HomepageEntity, newItem: HomepageEntity): Boolean {
+        return oldItem.date == newItem.date
+    }
+
+    override fun areContentsTheSame(oldItem: HomepageEntity, newItem: HomepageEntity): Boolean {
+        return oldItem.list.toString() == newItem.list.toString()
+    }
+}) {
 
     override val layoutResId: Int = R.layout.recycler_item_record_day
 
