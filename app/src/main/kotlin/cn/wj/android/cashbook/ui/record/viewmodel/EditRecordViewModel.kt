@@ -48,7 +48,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 transferAccountData.value = intoAsset
                 tagsData.value = tags
                 dateData.value = recordTime
-                chargeStr.value = charge
+                this@EditRecordViewModel.chargeStr.value = charge
                 remarkStr.value = remark
                 reimbursableChecked.value = reimbursable
             }
@@ -194,7 +194,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         when (it) {
             RecordTypeEnum.EXPENDITURE.position -> {
                 // 支出
-                R.color.color_spending
+                R.color.color_expenditure
             }
             RecordTypeEnum.INCOME.position -> {
                 // 收入

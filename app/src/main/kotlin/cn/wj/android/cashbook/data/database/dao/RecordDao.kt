@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.data.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -18,6 +19,10 @@ interface RecordDao {
     /** 插入记录数据 [record] 并返回生成的主键 id */
     @Insert
     suspend fun insert(record: RecordTable): Long
+
+    /** 删除记录数据 [record] */
+    @Delete
+    suspend fun delete(record: RecordTable)
 
     /** 更新 [record] 数据 */
     @Update

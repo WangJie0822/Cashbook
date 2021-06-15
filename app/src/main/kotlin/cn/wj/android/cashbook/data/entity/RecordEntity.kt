@@ -70,7 +70,7 @@ data class RecordEntity(
 
     /** 金额文本 */
     @IgnoredOnParcel
-    val amountStr: String
+    val amountStrWithCharge: String
         get() {
             val symbol = CurrentBooksLiveData.currency.symbol
             return when (type) {
@@ -93,6 +93,41 @@ data class RecordEntity(
                     ""
                 }
             }
+        }
+
+    /** 资金文本 */
+    @IgnoredOnParcel
+    val amountStr: String
+        get() {
+            val symbol = CurrentBooksLiveData.currency.symbol
+            return when (type) {
+                RecordTypeEnum.EXPENDITURE -> {
+                    "-$symbol$amount"
+                }
+                RecordTypeEnum.INCOME -> {
+                    "+$symbol$amount"
+                }
+                RecordTypeEnum.TRANSFER -> {
+                    "$symbol$amount"
+                }
+                else -> {
+                    ""
+                }
+            }
+        }
+
+    /** 是否显示手续费 */
+    @IgnoredOnParcel
+    val showCharge: Boolean
+        get() = type == RecordTypeEnum.TRANSFER && charge.toFloatOrNull().orElse(0f) > 0f
+
+    /** 手续费文本 */
+    @IgnoredOnParcel
+    val chargeStr: String
+        get() = if (charge.isBlank()) {
+            ""
+        } else {
+            "-${CurrentBooksLiveData.currency.symbol}$charge"
         }
 
     /** 是否显示资产信息 */
@@ -152,7 +187,7 @@ data class RecordEntity(
                 R.color.color_on_secondary
             }
             RecordTypeEnum.EXPENDITURE -> {
-                R.color.color_spending
+                R.color.color_expenditure
             }
             RecordTypeEnum.INCOME -> {
                 R.color.color_income

@@ -5,11 +5,13 @@ import android.view.WindowManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.tag
 import cn.wj.android.cashbook.base.ui.BaseDialog
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.databinding.DialogRecordInfoBinding
+import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
 import com.gyf.immersionbar.ktx.immersionBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -52,6 +54,15 @@ class RecordInfoDialog : BaseDialog<RecordInfoViewModel, DialogRecordInfoBinding
     }
 
     override fun observe() {
+        // 显示删除确认弹窗
+        viewModel.showDeleteConfirmData.observe(this, {
+            GeneralDialog.newBuilder()
+                .contentStr(R.string.delete_record_confirm.string)
+                .setOnPositiveAction {
+                    // 删除账本
+                    viewModel.deleteRecord()
+                }.show(childFragmentManager)
+        })
     }
 
     companion object {

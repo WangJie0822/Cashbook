@@ -92,6 +92,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_height"
+            android:bind_visibility="@{item.showCharge}"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/charge"
+                android:textAppearance="?attr/textAppearanceBody1" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{item.chargeStr}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="@color/color_expenditure"
+                tools:text="-￥200.00" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="@dimen/activity_horizontal_margin"

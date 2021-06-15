@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.constants.MAIN_BACK_PRESS_INTERVAL_MS
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
 import cn.wj.android.cashbook.data.model.NoDataModel
@@ -17,6 +18,7 @@ import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlin.math.absoluteValue
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -103,6 +105,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 显示记录详情弹窗
         viewModel.showRecordDetailsDialogData.observe(this, { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
+        })
+        // 记录变化监听
+        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+            viewModel.refreshing.value = true
         })
     }
 }

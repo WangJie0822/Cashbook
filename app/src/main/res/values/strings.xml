@@ -115,4 +115,5 @@
     <string name="income_with_colon">收：</string>
     <string name="expenditure_with_colon">支：</string>
     <string name="symbol_comma">，</string>
+    <string name="delete_record_confirm">确定要删除这条记录吗？</string>
 </resources>

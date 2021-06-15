@@ -416,4 +416,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
         result
     }
+
+    /** 删除记录数据 [record] */
+    suspend fun deleteRecord(record: RecordEntity) = withContext(Dispatchers.IO) {
+        recordDao.delete(record.toRecordTable())
+    }
 }
