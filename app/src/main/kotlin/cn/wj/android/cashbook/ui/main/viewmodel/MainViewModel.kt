@@ -9,15 +9,17 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
 import cn.wj.android.cashbook.data.entity.HomepageEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.observable.ObservableMoney
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import kotlinx.coroutines.launch
 
@@ -30,6 +32,9 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 显示记录详情弹窗数据 */
     val showRecordDetailsDialogData: MutableLiveData<RecordEntity> = MutableLiveData()
+
+    /** 当前月记录列表 */
+    private val currentMonthRecord: MutableLiveData<List<RecordEntity>> = MutableLiveData()
 
     /** 首页列表数据 */
     val listData: MutableLiveData<List<HomepageEntity>> = MutableLiveData()
@@ -44,18 +49,49 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val topBgImage: LiveData<String> = CurrentBooksLiveData.map { it.imageUrl }
 
     /** 本月支出 */
-    val spending: ObservableMoney = ObservableMoney()
+    val expenditure: LiveData<String> = currentMonthRecord.map {
+        var totalExpenditure = 0f
+        it.forEach { record ->
+            if (record.type == RecordTypeEnum.EXPENDITURE) {
+                // 支出
+                totalExpenditure += record.amount.toFloatOrNull().orElse(0f)
+            }
+            if (record.type == RecordTypeEnum.TRANSFER) {
+                // 转账
+                val chargeF = record.charge.toFloatOrNull().orElse(0f)
+                if (chargeF > 0f) {
+                    totalExpenditure += chargeF
+                }
+            }
+        }
+        CurrentBooksLiveData.currency.symbol + totalExpenditure.toString()
+    }
 
     /** 本月支出透明度 */
-    val spendingAlpha = ObservableFloat(1f)
+    val expenditureAlpha = ObservableFloat(1f)
 
     /** 本月收入 */
-    val income: ObservableMoney = ObservableMoney()
+    val income: LiveData<String> = currentMonthRecord.map {
+        var totalIncome = 0f
+        it.forEach { record ->
+            if (record.type == RecordTypeEnum.INCOME) {
+                // 支出
+                totalIncome += record.amount.toFloatOrNull().orElse(0f)
+            }
+        }
+        CurrentBooksLiveData.currency.symbol + totalIncome.toString()
+    }
 
     /** 本月结余 */
-    val balance: ObservableMoney = object : ObservableMoney(spending, income) {
-        override fun get(): String {
-            return (income.bigDecimalVal - spending.bigDecimalVal).toPlainString()
+    val balance: LiveData<String> = maps(expenditure, income) {
+        val symbol = CurrentBooksLiveData.currency.symbol
+        val income = income.value.orEmpty().replace(symbol, "").toFloatOrNull().orElse(0f)
+        val expenditure = expenditure.value.orEmpty().replace(symbol, "").toFloatOrNull().orElse(0f)
+        val balance = income - expenditure
+        if (balance >= 0) {
+            symbol + balance.toString()
+        } else {
+            "-" + symbol + (-balance).toString()
         }
     }
 
@@ -68,6 +104,8 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
         override fun onActive() {
             // 进入自动加载数据
             loadHomepageList()
+            // 获取当前月所有记录
+            getCurrentMonthRecord()
         }
 
         override fun setValue(value: Boolean?) {
@@ -75,6 +113,8 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
             if (value.condition) {
                 // 刷新
                 loadHomepageList()
+                // 获取当前月所有记录
+                getCurrentMonthRecord()
             }
         }
     }
@@ -84,7 +124,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
         // 完全折叠时才显示标题文本
         titleEnable.value = percent <= 0.13f
         // 本月支出显示逻辑
-        spendingAlpha.set(MathUtils.clamp((1 - (0.9f - percent) / 0.3f), 0f, 1f))
+        expenditureAlpha.set(MathUtils.clamp((1 - (0.9f - percent) / 0.3f), 0f, 1f))
         // 本月收入、结余显示逻辑
         incomeAndBalanceAlpha.set(MathUtils.clamp((1 - (0.4f - percent) / 0.3f), 0f, 1f))
     }
@@ -134,6 +174,17 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 logger().e(throwable, "loadHomepageList")
             } finally {
                 refreshing.value = false
+            }
+        }
+    }
+
+    /** 获取当前月所有记录 */
+    private fun getCurrentMonthRecord() {
+        viewModelScope.launch {
+            try {
+                currentMonthRecord.value = local.getCurrentMonthRecord(CurrentBooksLiveData.booksId)
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "getCurrentMonthRecord")
             }
         }
     }

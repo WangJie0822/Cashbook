@@ -36,6 +36,19 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="06-10 昨天" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:text="@{item.listInfo}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/tv_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_date"
+                tools:text="收：￥1200，支：￥1200" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_record"
                 android:layout_width="0dp"

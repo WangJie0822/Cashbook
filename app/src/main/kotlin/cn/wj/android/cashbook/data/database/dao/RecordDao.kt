@@ -21,7 +21,7 @@ interface RecordDao {
 
     /** 更新 [record] 数据 */
     @Update
-    suspend fun update(record:RecordTable)
+    suspend fun update(record: RecordTable)
 
     /** 查询最后一条修改记录 */
     @Query("SELECT * FROM db_record WHERE asset_id=:assetId AND type=:type ORDER BY record_time DESC LIMIT 1")
@@ -30,6 +30,10 @@ interface RecordDao {
     /** 查询记录时间在 [recordTime] 之后的所有记录 */
     @Query("SELECT * FROM db_record WHERE asset_id=:assetId AND record_time>=:recordTime")
     suspend fun queryAfterRecordTime(assetId: Long, recordTime: Long): List<RecordTable>
+
+    /** 查询记录时间在 [recordTime] 之后的所有 转入资产id 为 [assetId] 的转账记录 */
+    @Query("SELECT * FROM db_record WHERE into_asset_id=:assetId AND type=:type AND record_time>=:recordTime")
+    suspend fun queryByIntoAssetIdAfterRecordTime(assetId: Long, recordTime: Long, type: String = RecordTypeEnum.TRANSFER.name): List<RecordTable>
 
     /** 查询记录时间在 [recordTime] 之后且属于 id 为 [booksId] 的账本的记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND books_id=:booksId ORDER BY record_time DESC")

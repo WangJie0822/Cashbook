@@ -274,6 +274,43 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 }
             }
         }
+        // 查询转账转入数据
+        val transferRecordList = recordDao.queryByIntoAssetIdAfterRecordTime(assetId, lastModify.recordTime)
+        transferRecordList.forEach {
+            if (creditCard) {
+                when (it.type) {
+                    RecordTypeEnum.INCOME.name -> {
+                        // 收入
+                        result -= it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.EXPENDITURE.name -> {
+                        // 支出
+                        result += it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.TRANSFER.name -> {
+                        // 转账
+                        result += it.amount.toFloatOrNull() ?: 0f
+                        result += it.charge.toFloatOrNull() ?: 0f
+                    }
+                }
+            } else {
+                when (it.type) {
+                    RecordTypeEnum.INCOME.name -> {
+                        // 收入
+                        result += it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.EXPENDITURE.name -> {
+                        // 支出
+                        result -= it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.TRANSFER.name -> {
+                        // 转账
+                        result -= it.charge.toFloatOrNull() ?: 0f
+                        result -= it.charge.toFloatOrNull() ?: 0f
+                    }
+                }
+            }
+        }
         result.toString()
     }
 
@@ -341,6 +378,42 @@ class LocalDataStore(private val database: CashbookDatabase) {
             )
         }
         result.reverse()
+        result
+    }
+
+    /** 根据账本 id [booksId] 获取当前月所有记录 */
+    suspend fun getCurrentMonthRecord(booksId: Long): List<RecordEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<RecordEntity>()
+        // 获取当前月开始时间
+        val calendar = Calendar.getInstance()
+        val monthStartTime = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-01 00:00:00".toLongTime() ?: return@withContext result
+        recordDao.queryAfterRecordTimeByBooksId(booksId, monthStartTime).forEach { item ->
+            val assetTable = assetDao.queryById(item.assetId)
+            val asset = assetTable?.toAssetEntity(getAssetBalanceById(item.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            val intoAssetTable = assetDao.queryById(item.intoAssetId)
+            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(item.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            result.add(
+                RecordEntity(
+                    id = item.id.orElse(-1L),
+                    type = RecordTypeEnum.fromName(item.type).orElse(RecordTypeEnum.EXPENDITURE),
+                    firstType = if (item.firstTypeId < 0) null else typeDao.queryById(item.firstTypeId)?.toTypeEntity(),
+                    secondType = if (item.secondTypeId < 0) null else typeDao.queryById(item.secondTypeId)?.toTypeEntity(),
+                    asset = asset,
+                    intoAsset = intoAsset,
+                    booksId = booksId,
+                    amount = item.amount,
+                    charge = item.charge,
+                    remark = item.remark,
+                    // TODO
+                    tags = arrayListOf(),
+                    reimbursable = item.reimbursable == SWITCH_INT_ON,
+                    system = item.system == SWITCH_INT_ON,
+                    recordTime = item.recordTime,
+                    createTime = item.createTime.dateFormat(),
+                    modifyTime = item.modifyTime.dateFormat()
+                )
+            )
+        }
         result
     }
 }

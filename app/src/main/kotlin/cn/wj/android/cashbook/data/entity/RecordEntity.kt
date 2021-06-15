@@ -71,17 +71,29 @@ data class RecordEntity(
     /** 金额文本 */
     @IgnoredOnParcel
     val amountStr: String
-        get() = when (type) {
-            RecordTypeEnum.EXPENDITURE -> {
-                "-"
+        get() {
+            val symbol = CurrentBooksLiveData.currency.symbol
+            return when (type) {
+                RecordTypeEnum.EXPENDITURE -> {
+                    "-$symbol$amount"
+                }
+                RecordTypeEnum.INCOME -> {
+                    "+$symbol$amount"
+                }
+                RecordTypeEnum.TRANSFER -> {
+                    "$symbol$amount${
+                        if (charge.toFloatOrNull().orElse(0f) > 0f) {
+                            "(-$symbol$charge)"
+                        } else {
+                            ""
+                        }
+                    }"
+                }
+                else -> {
+                    ""
+                }
             }
-            RecordTypeEnum.INCOME -> {
-                "+"
-            }
-            else -> {
-                ""
-            }
-        } + CurrentBooksLiveData.currency.symbol + amount
+        }
 
     /** 是否显示资产信息 */
     @IgnoredOnParcel

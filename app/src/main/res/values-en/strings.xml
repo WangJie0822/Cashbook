@@ -88,4 +88,7 @@
     <string name="debt_total_format">入%1$s，出%2$s</string>
     <string name="please_select_asset">请选择资产</string>
     <string name="please_select_into_asset">请选择转入资产</string>
+    <string name="income_with_colon">收：</string>
+    <string name="expenditure_with_colon">支：</string>
+    <string name="symbol_comma">，</string>
 </resources>
