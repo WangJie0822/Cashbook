@@ -15,12 +15,13 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
-import cn.wj.android.cashbook.data.entity.HomepageEntity
+import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import kotlinx.coroutines.launch
 
 /**
@@ -28,7 +29,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
-class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
 
     /** 显示记录详情弹窗数据 */
     val showRecordDetailsDialogData: MutableLiveData<RecordEntity> = MutableLiveData()
@@ -37,7 +38,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
     private val currentMonthRecord: MutableLiveData<List<RecordEntity>> = MutableLiveData()
 
     /** 首页列表数据 */
-    val listData: MutableLiveData<List<HomepageEntity>> = MutableLiveData()
+    val listData: MutableLiveData<List<DateRecordEntity>> = MutableLiveData()
 
     /** 账本名称 */
     val booksName: LiveData<String> = CurrentBooksLiveData.map { it.name }
@@ -161,7 +162,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel() {
     }
 
     /** 记录数据点击 */
-    val onRecordItemClick: (RecordEntity) -> Unit = { item ->
+    override val onRecordItemClick: (RecordEntity) -> Unit = { item ->
         showRecordDetailsDialogData.value = item
     }
 

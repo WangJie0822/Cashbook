@@ -28,8 +28,133 @@
             app:navigationIconTint="@color/color_on_primary"
             app:popupTheme="@style/Theme.Cashbook.PopupOverlay"
             app:titleTextColor="@color/color_on_primary"
-            tools:title="现金" />
+            tools:title="京东白条" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
+            android:paddingBottom="@dimen/activity_vertical_margin">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_amount_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@{viewModel.amountLabelStr}"
+                android:textAppearance="?attr/textAppearanceCaption"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="当前余额" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.amountStr}"
+                android:textAppearance="?attr/textAppearanceHeadline5"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_amount_label"
+                tools:text="￥10000.00" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_total_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/total_amount"
+                android:textAppearance="?attr/textAppearanceCaption"
+                app:layout_constraintEnd_toStartOf="@id/tv_billing_date_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_amount" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.totalAmount}"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@id/tv_total_label"
+                app:layout_constraintStart_toStartOf="@id/tv_total_label"
+                app:layout_constraintTop_toBottomOf="@id/tv_total_label"
+                tools:text="￥10000.00" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_billing_date_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/billing_date"
+                android:textAppearance="?attr/textAppearanceCaption"
+                app:layout_constraintEnd_toStartOf="@id/tv_repayment_date_label"
+                app:layout_constraintStart_toEndOf="@id/tv_total_label"
+                app:layout_constraintTop_toBottomOf="@id/tv_amount" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_billing_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.billingDate}"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@id/tv_billing_date_label"
+                app:layout_constraintStart_toStartOf="@id/tv_billing_date_label"
+                app:layout_constraintTop_toBottomOf="@id/tv_billing_date_label"
+                tools:text="未设置" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_repayment_date_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/repayment_date"
+                android:textAppearance="?attr/textAppearanceCaption"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_billing_date_label"
+                app:layout_constraintTop_toBottomOf="@id/tv_amount" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_repayment_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.repaymentDate}"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@id/tv_repayment_date_label"
+                app:layout_constraintStart_toStartOf="@id/tv_repayment_date_label"
+                app:layout_constraintTop_toBottomOf="@id/tv_repayment_date_label"
+                tools:text="未设置" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/group_credit_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:bind_visibility="@{viewModel.showCreditCardInfo}"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tv_total_label,tv_total,tv_billing_date_label,tv_billing_date,tv_repayment_date_label,tv_repayment_date"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/srl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:bind_srl_refreshing="@={viewModel.refreshing}"
+            android:bind_srl_schemeColorsStr="@{@string/swipe_refresh_scheme_colors}"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/recycler_item_record_date" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 

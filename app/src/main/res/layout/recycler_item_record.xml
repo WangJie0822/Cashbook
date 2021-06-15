@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel" />
+            type="cn.wj.android.cashbook.interfaces.RecordListClickListener" />
     </data>
 
 

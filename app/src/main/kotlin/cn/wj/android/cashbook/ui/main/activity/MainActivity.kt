@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
 import cn.wj.android.cashbook.databinding.LayoutNoDataRecordBinding
-import cn.wj.android.cashbook.ui.main.adapter.HomepageRvAdapter
+import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
@@ -36,8 +36,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var lastBackPressMs = 0L
 
     /** 列表适配器对象 */
-    private val adapter: HomepageRvAdapter by lazy {
-        HomepageRvAdapter().apply {
+    private val adapter: DateRecordRvAdapter by lazy {
+        DateRecordRvAdapter().apply {
             this.viewModel = this@MainActivity.viewModel
         }
     }

@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedParcelable
 import cn.wj.android.cashbook.base.tools.setSharedParcelable
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
@@ -29,6 +30,7 @@ import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.widget.calculator.SYMBOL_ZERO
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 
 /**
@@ -354,6 +356,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                         )
                     )
                 }
+                // 通知记录变化
+                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 // 插入成功，保存本次资产
                 setSharedParcelable(SHARED_KEY_LAST_ASSET, accountData.value)
                 // 关闭当前界面

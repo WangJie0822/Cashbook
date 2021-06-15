@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="cn.wj.android.cashbook.data.entity.HomepageEntity" />
+            type="cn.wj.android.cashbook.data.entity.DateRecordEntity" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -34,7 +34,7 @@
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="06-10 昨天" />
+                tools:text="06.10" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_info"

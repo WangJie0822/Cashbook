@@ -22,6 +22,9 @@ const val DATE_FORMAT_DATE = "yyyy-MM-dd"
 /** 日期时间格式化 */
 const val DATE_FORMAT_MONTH_DAY = "MM.dd"
 
+/** 日期时间格式化 */
+const val DATE_FORMAT_YEAR_MONTH = "yyyy-MM"
+
 /** 时间格式化 */
 const val DATE_FORMAT_TIME = "HH:mm"
 

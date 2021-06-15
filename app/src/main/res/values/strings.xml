@@ -116,4 +116,7 @@
     <string name="expenditure_with_colon">支：</string>
     <string name="symbol_comma">，</string>
     <string name="delete_record_confirm">确定要删除这条记录吗？</string>
+    <string name="yestoday">昨天</string>
+    <string name="the_day_before_yestoday">前天</string>
+    <string name="not_set">未设置</string>
 </resources>

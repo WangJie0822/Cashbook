@@ -43,4 +43,7 @@ interface RecordDao {
     /** 查询记录时间在 [recordTime] 之后且属于 id 为 [booksId] 的账本的记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND books_id=:booksId ORDER BY record_time DESC")
     suspend fun queryAfterRecordTimeByBooksId(booksId: Long, recordTime: Long): List<RecordTable>
+
+    @Query("SELECT * FROM db_record WHERE asset_id=:assetId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
+    suspend fun queryRecordByAssetId(assetId: Long, pageNum: Int, pageSize: Int): List<RecordTable>
 }

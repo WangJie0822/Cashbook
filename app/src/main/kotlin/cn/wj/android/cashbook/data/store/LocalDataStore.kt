@@ -1,9 +1,14 @@
 package cn.wj.android.cashbook.data.store
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.liveData
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
@@ -18,13 +23,15 @@ import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
-import cn.wj.android.cashbook.data.entity.HomepageEntity
+import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
+import cn.wj.android.cashbook.data.source.RecordPagingSource
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
@@ -325,9 +332,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
     }
 
     /** 获取账本 id 为 [booksId] 的首页数据 */
-    suspend fun getHomepageList(booksId: Long): List<HomepageEntity> = withContext(Dispatchers.IO) {
+    suspend fun getHomepageList(booksId: Long): List<DateRecordEntity> = withContext(Dispatchers.IO) {
         // 首页显示一周内数据
         val calendar = Calendar.getInstance()
+        val today = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH) + 1
         calendar.add(Calendar.DAY_OF_MONTH, -7)
         val recordTime = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.DAY_OF_MONTH)} 00:00".toLongTime(DATE_FORMAT_NO_SECONDS)
             .orElse(System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L))
@@ -336,7 +345,30 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
         val map = hashMapOf<String, MutableList<RecordEntity>>()
         for (item in list) {
-            val key = item.recordTime.dateFormat(DATE_FORMAT_NO_SECONDS).split(" ").firstOrNull().orEmpty()
+            val dateKey = item.recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)
+            val dayInt = dateKey.split(".").lastOrNull()?.toIntOrNull().orElse(-1)
+            val monthInt = dateKey.split(".").firstOrNull()?.toIntOrNull().orElse(-1)
+            val key = dateKey + if (monthInt == month) {
+                when (dayInt) {
+                    today -> {
+                        // 今天
+                        " ${R.string.today.string}"
+                    }
+                    today - 1 -> {
+                        // 昨天
+                        " ${R.string.yestoday.string}"
+                    }
+                    today - 2 -> {
+                        // 前天
+                        " ${R.string.the_day_before_yestoday.string}"
+                    }
+                    else -> {
+                        ""
+                    }
+                }
+            } else {
+                ""
+            }
             val assetTable = assetDao.queryById(item.assetId)
             val asset = assetTable?.toAssetEntity(getAssetBalanceById(item.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
             val intoAssetTable = assetDao.queryById(item.intoAssetId)
@@ -368,17 +400,16 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 }
             }
         }
-        val result = arrayListOf<HomepageEntity>()
+        val result = arrayListOf<DateRecordEntity>()
         map.keys.forEach { key ->
             result.add(
-                HomepageEntity(
+                DateRecordEntity(
                     date = key,
-                    list = map[key].orEmpty()
+                    list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
                 )
             )
         }
-        result.reverse()
-        result
+        result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
     }
 
     /** 根据账本 id [booksId] 获取当前月所有记录 */
@@ -420,5 +451,61 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 删除记录数据 [record] */
     suspend fun deleteRecord(record: RecordEntity) = withContext(Dispatchers.IO) {
         recordDao.delete(record.toRecordTable())
+    }
+
+    /** 根据资产id [assetId] 获取记录 Pager 数据 */
+    fun getRecordListByAssetIdPagerData(assetId: Long) = Pager(
+        config = PagingConfig(20),
+        pagingSourceFactory = { RecordPagingSource(assetId, this) }
+    ).liveData
+
+
+    /** 根据资产 id [assetId] 页码 [pageNum] 每页数据 [pageSize] 获取记录数据 */
+    suspend fun getRecordByAssetId(assetId: Long, pageNum: Int, pageSize: Int): List<DateRecordEntity> = withContext(Dispatchers.IO) {
+        val list = recordDao.queryRecordByAssetId(assetId, pageNum * pageSize, pageSize)
+        val map = hashMapOf<String, MutableList<RecordEntity>>()
+        for (item in list) {
+            val key = item.recordTime.dateFormat(DATE_FORMAT_YEAR_MONTH)
+            val assetTable = assetDao.queryById(item.assetId)
+            val asset = assetTable?.toAssetEntity(getAssetBalanceById(item.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            val intoAssetTable = assetDao.queryById(item.intoAssetId)
+            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(item.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            val value = RecordEntity(
+                id = item.id.orElse(-1L),
+                type = RecordTypeEnum.fromName(item.type).orElse(RecordTypeEnum.EXPENDITURE),
+                firstType = if (item.firstTypeId < 0) null else typeDao.queryById(item.firstTypeId)?.toTypeEntity(),
+                secondType = if (item.secondTypeId < 0) null else typeDao.queryById(item.secondTypeId)?.toTypeEntity(),
+                asset = asset,
+                intoAsset = intoAsset,
+                booksId = CurrentBooksLiveData.booksId,
+                amount = item.amount,
+                charge = item.charge,
+                remark = item.remark,
+                // TODO
+                tags = arrayListOf(),
+                reimbursable = item.reimbursable == SWITCH_INT_ON,
+                system = item.system == SWITCH_INT_ON,
+                recordTime = item.recordTime,
+                createTime = item.createTime.dateFormat(),
+                modifyTime = item.modifyTime.dateFormat()
+            )
+            if (key.isNotBlank()) {
+                if (map.containsKey(key)) {
+                    map[key]!!.add(value)
+                } else {
+                    map[key] = arrayListOf(value)
+                }
+            }
+        }
+        val result = arrayListOf<DateRecordEntity>()
+        map.keys.forEach { key ->
+            result.add(
+                DateRecordEntity(
+                    date = key,
+                    list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+                )
+            )
+        }
+        result.sortedBy { it.date.toLongTime(DATE_FORMAT_YEAR_MONTH) }.reversed()
     }
 }
