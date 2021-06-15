@@ -1,6 +1,8 @@
 package cn.wj.android.cashbook.data.store
 
+import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
@@ -139,7 +141,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
         // 插入资产
         val assetId = assetDao.insert(asset.toAssetTable())
         // 插入余额记录
-        recordDao.insert(RecordTable.newModifyBalance(assetId, asset.balance))
+        recordDao.insert(RecordTable.newModifyBalance(assetId, asset.balance, R.string.new_asset.string, true))
         assetId
     }
 
@@ -156,7 +158,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryByBooksId(booksId).map {
             // 获取余额
-            val balance = getAssetBalanceById(it.id)
+            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
         }
     }
@@ -170,7 +172,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getInvisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryInvisibleByBooksId(booksId).map {
             //  获取余额
-            val balance = getAssetBalanceById(it.id)
+            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
         }
     }
@@ -179,7 +181,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getVisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryVisibleByBooksId(booksId).map {
             //  获取余额
-            val balance = getAssetBalanceById(it.id)
+            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
         }
     }
@@ -224,7 +226,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     }
 
     /** 获取 id 为 [assetId] 的资产余额 */
-    suspend fun getAssetBalanceById(assetId: Long?): String = withContext(Dispatchers.IO) {
+    suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
         if (null == assetId) {
             return@withContext "0"
         }
@@ -238,18 +240,37 @@ class LocalDataStore(private val database: CashbookDatabase) {
         var result = lastModify.amount.toFloatOrNull() ?: 0f
         val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
         recordList.forEach {
-            when (it.type) {
-                RecordTypeEnum.INCOME.name -> {
-                    // 收入
-                    result += it.amount.toFloatOrNull() ?: 0f
+            if (creditCard) {
+                when (it.type) {
+                    RecordTypeEnum.INCOME.name -> {
+                        // 收入
+                        result -= it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.EXPENDITURE.name -> {
+                        // 支出
+                        result += it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.TRANSFER.name -> {
+                        // 转账
+                        result += it.amount.toFloatOrNull() ?: 0f
+                        result += it.charge.toFloatOrNull() ?: 0f
+                    }
                 }
-                RecordTypeEnum.EXPENDITURE.name -> {
-                    // 支出
-                    result -= it.amount.toFloatOrNull() ?: 0f
-                }
-                RecordTypeEnum.TRANSFER.name -> {
-                    // 转账
-                    result -= it.charge.toFloatOrNull() ?: 0f
+            } else {
+                when (it.type) {
+                    RecordTypeEnum.INCOME.name -> {
+                        // 收入
+                        result += it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.EXPENDITURE.name -> {
+                        // 支出
+                        result -= it.amount.toFloatOrNull() ?: 0f
+                    }
+                    RecordTypeEnum.TRANSFER.name -> {
+                        // 转账
+                        result -= it.charge.toFloatOrNull() ?: 0f
+                        result -= it.charge.toFloatOrNull() ?: 0f
+                    }
                 }
             }
         }
@@ -261,6 +282,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
         recordDao.insert(record.toRecordTable())
     }
 
+    /** 更新 [record] 记录 */
+    suspend fun updateRecord(record: RecordEntity) = withContext(Dispatchers.IO) {
+        recordDao.update(record.toRecordTable())
+    }
+
     /** 获取账本 id 为 [booksId] 的首页数据 */
     suspend fun getHomepageList(booksId: Long): List<HomepageEntity> = withContext(Dispatchers.IO) {
         // 首页显示一周内数据
@@ -268,17 +294,23 @@ class LocalDataStore(private val database: CashbookDatabase) {
         calendar.add(Calendar.DAY_OF_MONTH, -7)
         val recordTime = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.DAY_OF_MONTH)} 00:00".toLongTime(DATE_FORMAT_NO_SECONDS)
             .orElse(System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L))
-        val list = recordDao.queryAfterRecordTimeByBooksId(booksId, recordTime)
+        val list = recordDao.queryAfterRecordTimeByBooksId(booksId, recordTime).filter {
+            it.system != SWITCH_INT_ON
+        }
         val map = hashMapOf<String, MutableList<RecordEntity>>()
         for (item in list) {
             val key = item.recordTime.dateFormat(DATE_FORMAT_NO_SECONDS).split(" ").firstOrNull().orEmpty()
+            val assetTable = assetDao.queryById(item.assetId)
+            val asset = assetTable?.toAssetEntity(getAssetBalanceById(item.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            val intoAssetTable = assetDao.queryById(item.intoAssetId)
+            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(item.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
             val value = RecordEntity(
                 id = item.id.orElse(-1L),
                 type = RecordTypeEnum.fromName(item.type).orElse(RecordTypeEnum.EXPENDITURE),
                 firstType = if (item.firstTypeId < 0) null else typeDao.queryById(item.firstTypeId)?.toTypeEntity(),
                 secondType = if (item.secondTypeId < 0) null else typeDao.queryById(item.secondTypeId)?.toTypeEntity(),
-                asset = assetDao.queryById(item.assetId)?.toAssetEntity(getAssetBalanceById(item.assetId)),
-                intoAsset = assetDao.queryById(item.intoAssetId)?.toAssetEntity(getAssetBalanceById(item.intoAssetId)),
+                asset = asset,
+                intoAsset = intoAsset,
                 booksId = booksId,
                 amount = item.amount,
                 charge = item.charge,
@@ -286,6 +318,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 // TODO
                 tags = arrayListOf(),
                 reimbursable = item.reimbursable == SWITCH_INT_ON,
+                system = item.system == SWITCH_INT_ON,
                 recordTime = item.recordTime,
                 createTime = item.createTime.dateFormat(),
                 modifyTime = item.modifyTime.dateFormat()
@@ -307,6 +340,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 )
             )
         }
+        result.reverse()
         result
     }
 }

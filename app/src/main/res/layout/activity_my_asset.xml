@@ -195,6 +195,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageButton
+                                android:id="@+id/ib_capital_arrow"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
@@ -205,6 +206,18 @@
                                 app:layout_constraintBottom_toBottomOf="@id/tv_capital_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_capital_label" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/tv_capital_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{viewModel.capitalTotal}"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/ib_capital_arrow"
+                                app:layout_constraintEnd_toStartOf="@id/ib_capital_arrow"
+                                app:layout_constraintTop_toTopOf="@id/ib_capital_arrow"
+                                tools:text="￥6500" />
 
                             <View
                                 android:id="@+id/v_capital"
@@ -255,6 +268,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageButton
+                                android:id="@+id/ib_credit_card_arrow"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
@@ -265,6 +279,18 @@
                                 app:layout_constraintBottom_toBottomOf="@id/tv_credit_card_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_credit_card_label" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/tv_credit_card_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{viewModel.creditCardTotal}"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/ib_credit_card_arrow"
+                                app:layout_constraintEnd_toStartOf="@id/ib_credit_card_arrow"
+                                app:layout_constraintTop_toTopOf="@id/ib_credit_card_arrow"
+                                tools:text="￥6500" />
 
                             <View
                                 android:id="@+id/v_credit_card"
@@ -315,6 +341,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageButton
+                                android:id="@+id/ib_top_up_arrow"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
@@ -325,6 +352,18 @@
                                 app:layout_constraintBottom_toBottomOf="@id/tv_top_up_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_top_up_label" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/tv_top_up_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{viewModel.topUpTotal}"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/ib_top_up_arrow"
+                                app:layout_constraintEnd_toStartOf="@id/ib_top_up_arrow"
+                                app:layout_constraintTop_toTopOf="@id/ib_top_up_arrow"
+                                tools:text="￥6500" />
 
                             <View
                                 android:id="@+id/v_top_up"
@@ -375,6 +414,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageButton
+                                android:id="@+id/ib_investment_financial_arrow"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
@@ -385,6 +425,18 @@
                                 app:layout_constraintBottom_toBottomOf="@id/tv_investment_financial_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_investment_financial_label" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/tv_investment_financial_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{viewModel.investmentFinancialTotal}"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/ib_investment_financial_arrow"
+                                app:layout_constraintEnd_toStartOf="@id/ib_investment_financial_arrow"
+                                app:layout_constraintTop_toTopOf="@id/ib_investment_financial_arrow"
+                                tools:text="￥6500" />
 
                             <View
                                 android:id="@+id/v_investment_financial"
@@ -435,6 +487,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageButton
+                                android:id="@+id/ib_debt_arrow"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:backgroundTint="@color/white"
@@ -445,6 +498,18 @@
                                 app:layout_constraintBottom_toBottomOf="@id/tv_debt_label"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/tv_debt_label" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/tv_debt_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{viewModel.debtTotal}"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/ib_debt_arrow"
+                                app:layout_constraintEnd_toStartOf="@id/ib_debt_arrow"
+                                app:layout_constraintTop_toTopOf="@id/ib_debt_arrow"
+                                tools:text="入￥6500，出￥2000" />
 
                             <View
                                 android:id="@+id/v_debt"

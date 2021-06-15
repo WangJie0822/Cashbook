@@ -75,6 +75,19 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         }
     }
 
+    /** 资金账户总额 */
+    val capitalTotal: LiveData<String> = capitalListData.map {
+        if (it.isEmpty()) {
+            ""
+        } else {
+            var total = "0".toBigDecimal()
+            it.forEach { asset ->
+                total += asset.balance.toBigDecimal()
+            }
+            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+        }
+    }
+
     /** 标记 - 是否存在资金账户 */
     val hasCapitalAccount: LiveData<Boolean> = capitalListData.map {
         it.isNotEmpty()
@@ -89,6 +102,22 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             !asset.invisible && asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
         }.sortedBy { asset ->
             asset.sort
+        }
+    }
+
+    /** 信用卡账户总额 */
+    val creditCardTotal: LiveData<String> = creditCardListData.map {
+        if (it.isEmpty()) {
+            ""
+        } else {
+            var total = "0".toBigDecimal()
+            it.filter { asset ->
+                asset.balance.toFloatOrNull().orElse(0f) > 0f
+            }
+                .forEach { asset ->
+                    total += asset.balance.toBigDecimal()
+                }
+            "-${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }
     }
 
@@ -109,6 +138,19 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         }
     }
 
+    /** 充值账户总额 */
+    val topUpTotal: LiveData<String> = topUpListData.map {
+        if (it.isEmpty()) {
+            ""
+        } else {
+            var total = "0".toBigDecimal()
+            it.forEach { asset ->
+                total += asset.balance.toBigDecimal()
+            }
+            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+        }
+    }
+
     /** 标记 - 是否存在充值账户 */
     val hasTopUpAccount: LiveData<Boolean> = topUpListData.map {
         it.isNotEmpty()
@@ -126,6 +168,19 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         }
     }
 
+    /** 理财账户总额 */
+    val investmentFinancialTotal: LiveData<String> = investmentFinancialListData.map {
+        if (it.isEmpty()) {
+            ""
+        } else {
+            var total = "0".toBigDecimal()
+            it.forEach { asset ->
+                total += asset.balance.toBigDecimal()
+            }
+            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+        }
+    }
+
     /** 标记 - 是否存在理财账户 */
     val hasInvestmentFinancialAccount: LiveData<Boolean> = investmentFinancialListData.map {
         it.isNotEmpty()
@@ -140,6 +195,26 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             !asset.invisible && asset.type == ClassificationTypeEnum.DEBT_ACCOUNT
         }.sortedBy { asset ->
             asset.sort
+        }
+    }
+
+    /** 债务账户总额 */
+    val debtTotal: LiveData<String> = debtListData.map {
+        if (it.isEmpty()) {
+            ""
+        } else {
+            var totalBorrow = "0".toBigDecimal()
+            var totalLend = "0".toBigDecimal()
+            it.forEach { asset ->
+                if (asset.classification == AssetClassificationEnum.BORROW) {
+                    // 借入
+                    totalBorrow += asset.balance.toBigDecimal()
+                } else {
+                    // 借出
+                    totalLend += asset.balance.toBigDecimal()
+                }
+            }
+            R.string.debt_total_format.string.format("${CurrentBooksLiveData.currency.symbol}${totalBorrow.formatToNumber()}", "${CurrentBooksLiveData.currency.symbol}${totalLend.formatToNumber()}")
         }
     }
 
@@ -211,7 +286,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             }.forEach { asset ->
                 total += asset.balance.toBigDecimal()
             }
-            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+            "-${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }
     }
 

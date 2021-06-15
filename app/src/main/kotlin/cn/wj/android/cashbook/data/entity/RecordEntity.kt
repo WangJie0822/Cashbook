@@ -26,6 +26,7 @@ import kotlinx.parcelize.Parcelize
  * @param remark 备注
  * @param tags 标签列表
  * @param reimbursable 能否报销
+ * @param system 是否是系统记录
  * @param recordTime 记录时间
  * @param createTime 创建时间
  * @param modifyTime 修改时间
@@ -46,6 +47,7 @@ data class RecordEntity(
     val remark: String,
     val tags: List<String>,
     val reimbursable: Boolean,
+    val system: Boolean,
     val recordTime: Long,
     val createTime: String,
     val modifyTime: String
@@ -86,22 +88,27 @@ data class RecordEntity(
     val showAssetInfo: Boolean
         get() = null != asset
 
+    /** 资产名称显示 */
     @IgnoredOnParcel
     val assetName: String
         get() = asset?.name.orEmpty()
 
+    /** 资产 logo 资源 id */
     @IgnoredOnParcel
     val assetLogoResId: Int?
         get() = asset?.classification?.logoResId
 
+    /** 转入资产名称 */
     @IgnoredOnParcel
     val intoAssetName: String
         get() = intoAsset?.name.orEmpty()
 
+    /** 转入资产 logo 资源 id */
     @IgnoredOnParcel
     val intoAssetLogoResId: Int?
         get() = intoAsset?.classification?.logoResId
 
+    /** 是否显示资产信息 - 区分转账情况 */
     @IgnoredOnParcel
     val showIntoAsset: Boolean
         get() = type == RecordTypeEnum.TRANSFER
@@ -115,9 +122,15 @@ data class RecordEntity(
             asset?.name.orEmpty()
         }
 
+    /** 记录时间 */
     @IgnoredOnParcel
     val recordTimeStr: String
         get() = recordTime.dateFormat(DATE_FORMAT_NO_SECONDS)
+
+    /** 能否修改，修改余额不可以修改 */
+    @IgnoredOnParcel
+    val canModify: Boolean
+        get() = type != RecordTypeEnum.MODIFY_BALANCE
 
     /** 不同类型着色 */
     @IgnoredOnParcel

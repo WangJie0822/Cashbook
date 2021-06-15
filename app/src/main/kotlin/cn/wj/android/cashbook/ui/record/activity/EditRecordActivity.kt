@@ -6,6 +6,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
@@ -35,12 +36,20 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_record)
 
+        // 获取数据
+        viewModel.record = intent.getParcelableExtra(ACTION_RECORD)
+
         // 配置 ViewPager2
         binding.vpType.adapter = typesVpAdapter
 
         lifecycleScope.launchWhenResumed {
-            // 自动弹出计算弹出
-            viewModel.showCalculatorData.value = 0
+            if (null == viewModel.record) {
+                // 自动弹出计算弹窗
+                viewModel.showCalculatorData.value = 0
+            } else {
+                // 切换到对应页面
+                viewModel.currentItem.value = viewModel.record!!.type.position
+            }
         }
     }
 

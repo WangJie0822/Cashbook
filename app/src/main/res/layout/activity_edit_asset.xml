@@ -176,7 +176,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:gravity="center_vertical"
-                            android:inputType="numberDecimal"
+                            android:inputType="numberDecimal|numberSigned"
                             android:maxLines="1"
                             android:singleLine="true"
                             android:text="@={viewModel.balance}"

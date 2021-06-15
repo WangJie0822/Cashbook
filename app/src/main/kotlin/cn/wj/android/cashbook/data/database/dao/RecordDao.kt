@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import cn.wj.android.cashbook.data.database.table.RecordTable
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 
@@ -17,6 +18,10 @@ interface RecordDao {
     /** 插入记录数据 [record] 并返回生成的主键 id */
     @Insert
     suspend fun insert(record: RecordTable): Long
+
+    /** 更新 [record] 数据 */
+    @Update
+    suspend fun update(record:RecordTable)
 
     /** 查询最后一条修改记录 */
     @Query("SELECT * FROM db_record WHERE asset_id=:assetId AND type=:type ORDER BY record_time DESC LIMIT 1")

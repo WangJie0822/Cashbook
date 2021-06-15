@@ -90,7 +90,9 @@ class SelectAssetClassificationViewModel(private val local: LocalDataStore) : Ba
             selectClassification.value = false
         }
         // 更新大类
-        classificationType = item.parentType
+        item.parentType?.let { type ->
+            classificationType = type
+        }
         // 更新选中的数据
         selectedAssetClassificationData.value = item
     }

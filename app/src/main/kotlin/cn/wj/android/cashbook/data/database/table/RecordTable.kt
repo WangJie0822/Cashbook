@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
+import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
@@ -21,6 +22,7 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
  * @param remark 备注
  * @param tagIds 标签 id
  * @param reimbursable 能否报销
+ * @param system 是否是系统记录
  * @param recordTime 记录时间
  * @param createTime 创建时间
  * @param modifyTime 修改时间
@@ -41,13 +43,14 @@ data class RecordTable(
     val remark: String,
     @ColumnInfo(name = "tag_ids") val tagIds: String,
     val reimbursable: Int,
+    val system: Int,
     @ColumnInfo(name = "record_time") val recordTime: Long,
     @ColumnInfo(name = "create_time") val createTime: Long,
     @ColumnInfo(name = "modify_time") val modifyTime: Long
 ) {
 
     companion object {
-        fun newModifyBalance(assetId: Long, balance: String): RecordTable {
+        fun newModifyBalance(assetId: Long, balance: String, remark: String = "", system: Boolean = false): RecordTable {
             val ms = System.currentTimeMillis()
             return RecordTable(
                 id = null,
@@ -59,9 +62,10 @@ data class RecordTable(
                 booksId = CurrentBooksLiveData.booksId,
                 amount = balance,
                 charge = "",
-                remark = "",
+                remark = remark,
                 tagIds = "",
                 reimbursable = SWITCH_INT_OFF,
+                system = if (system) SWITCH_INT_ON else SWITCH_INT_OFF,
                 recordTime = ms,
                 createTime = ms,
                 modifyTime = ms

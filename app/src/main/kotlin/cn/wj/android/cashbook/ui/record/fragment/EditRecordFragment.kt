@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.base.ui.BaseFragment
 import cn.wj.android.cashbook.data.constants.ACTION_TYPE
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.databinding.FragmentEditRecordBinding
 import cn.wj.android.cashbook.ui.record.adapter.TypeSecondRvAdapter
 import cn.wj.android.cashbook.ui.record.adapter.TypeSettingRvAdapter
@@ -68,8 +69,26 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
             }
             adapter.addAdapter(TypeSettingRvAdapter(typeViewModel))
             // 默认选中第一条
-            list.firstOrNull()?.let { first->
+            val firstItem = list.firstOrNull()
+            firstItem?.let { first ->
                 typeViewModel.onTypeItemClick.invoke(first)
+            }
+            viewModel.record?.let { record ->
+                val firstType = record.firstType ?: return@let
+                val selected = list.firstOrNull {
+                    it.id == firstType.id
+                }
+                if (null != selected && firstItem?.id != selected.id) {
+                    // 不是第一条，选中
+                    typeViewModel.onTypeItemClick.invoke(selected)
+                }
+                val secondType = record.secondType ?: return@let
+                val selectedSecond = selected?.childList?.firstOrNull {
+                    it.id == secondType.id
+                }
+                if (null != selectedSecond) {
+                    typeViewModel.onTypeItemClick.invoke(selectedSecond)
+                }
             }
         })
         // 二级类型状态
@@ -95,21 +114,54 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
         })
         // 选中类型
         typeViewModel.selectTypeData.observe(this, { selected ->
-            when (typeViewModel.typeData.value) {
-                RecordTypeEnum.EXPENDITURE -> {
-                    // 支出
-                    viewModel.expenditureType
+            if (selected.type == TypeEnum.FIRST) {
+                // 一级分类点击
+                notifyFirstType(selected)
+                if (selected.expand.get()) {
+                    // 已展开，选择二级分类
+                    notifySecondType(selected.childList.firstOrNull { it.selected.get() })
+                } else {
+                    notifySecondType(null)
                 }
-                RecordTypeEnum.INCOME -> {
-                    // 收入
-                    viewModel.incomeType
-                }
-                else -> {
-                    // 转账
-                    viewModel.transferType
-                }
-            }.value = selected
+            } else {
+                // 二级分类点击
+                notifySecondType(selected)
+            }
         })
+    }
+
+    private fun notifyFirstType(type: TypeEntity) {
+        when (typeViewModel.typeData.value) {
+            RecordTypeEnum.EXPENDITURE -> {
+                // 支出
+                viewModel.firstExpenditureType
+            }
+            RecordTypeEnum.INCOME -> {
+                // 收入
+                viewModel.firstIncomeType
+            }
+            else -> {
+                // 转账
+                viewModel.firstTransferType
+            }
+        }.value = type
+    }
+
+    private fun notifySecondType(type: TypeEntity?) {
+        when (typeViewModel.typeData.value) {
+            RecordTypeEnum.EXPENDITURE -> {
+                // 支出
+                viewModel.secondExpenditureType
+            }
+            RecordTypeEnum.INCOME -> {
+                // 收入
+                viewModel.secondIncomeType
+            }
+            else -> {
+                // 转账
+                viewModel.secondTransferType
+            }
+        }.value = type
     }
 
     private fun createTypeAdapter(ls: List<TypeEntity>): SimpleRvListAdapter<TypeEntity> {

@@ -4,7 +4,6 @@
 package cn.wj.android.cashbook.data.transform
 
 import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
@@ -140,6 +139,7 @@ internal fun RecordEntity.toRecordTable(): RecordTable {
         // TODO
         tagIds = "",
         reimbursable = if (reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
+        system = if (system) SWITCH_INT_ON else SWITCH_INT_OFF,
         recordTime = recordTime,
         createTime = createTime.toLongTime().orElse(0L),
         modifyTime = modifyTime.toLongTime().orElse(0L)

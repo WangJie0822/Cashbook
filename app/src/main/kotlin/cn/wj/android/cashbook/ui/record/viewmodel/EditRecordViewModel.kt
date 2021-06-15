@@ -15,6 +15,7 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedParcelable
+import cn.wj.android.cashbook.base.tools.setSharedParcelable
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET
 import cn.wj.android.cashbook.data.entity.AssetEntity
@@ -37,6 +38,22 @@ import kotlinx.coroutines.launch
  */
 class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
+    /** 编辑数据 */
+    var record: RecordEntity? = null
+        set(value) {
+            field = value
+            value?.run {
+                calculatorStr.set(amount)
+                accountData.value = asset
+                transferAccountData.value = intoAsset
+                tagsData.value = tags
+                dateData.value = recordTime
+                chargeStr.value = charge
+                remarkStr.value = remark
+                reimbursableChecked.value = reimbursable
+            }
+        }
+
     /** 显示计算器弹窗数据 */
     val showCalculatorData: MutableLiveData<Int> = MutableLiveData()
 
@@ -53,13 +70,22 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val currentItem: MutableLiveData<Int> = MutableLiveData(RecordTypeEnum.EXPENDITURE.position)
 
     /** 支出类型 */
-    val expenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
+    val firstExpenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
+
+    /** 支出类型 */
+    val secondExpenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 收入类型 */
-    val incomeType: MutableLiveData<TypeEntity> = MutableLiveData()
+    val firstIncomeType: MutableLiveData<TypeEntity> = MutableLiveData()
+
+    /** 收入类型 */
+    val secondIncomeType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 转账类型 */
-    val transferType: MutableLiveData<TypeEntity> = MutableLiveData()
+    val firstTransferType: MutableLiveData<TypeEntity> = MutableLiveData()
+
+    /** 转账类型 */
+    val secondTransferType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 账户信息 */
     val accountData: MutableLiveData<AssetEntity> = MutableLiveData(getSharedParcelable(SHARED_KEY_LAST_ASSET))
@@ -231,15 +257,15 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         val firstType = when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
             RecordTypeEnum.EXPENDITURE.position -> {
                 // 支出
-                expenditureType
+                firstExpenditureType
             }
             RecordTypeEnum.INCOME.position -> {
                 // 收入
-                incomeType
+                firstIncomeType
             }
             else -> {
                 // 转账
-                transferType
+                firstTransferType
             }
         }.value
         if (null == firstType) {
@@ -247,17 +273,36 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
             snackbarData.value = R.string.please_select_type.string.toSnackbarModel()
             return
         }
-        val secondType = if (firstType.expand.get() && firstType.childEnable) {
-            firstType.childList.firstOrNull {
-                it.selected.get()
+        val secondType = when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
+            RecordTypeEnum.EXPENDITURE.position -> {
+                // 支出
+                secondExpenditureType
             }
-        } else {
-            null
-        }
+            RecordTypeEnum.INCOME.position -> {
+                // 收入
+                secondIncomeType
+            }
+            else -> {
+                // 转账
+                secondTransferType
+            }
+        }.value
+        val asset = accountData.value
         val intoAsset = if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
             transferAccountData.value
         } else {
             null
+        }
+        if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
+            // 转账类型，转出转入资产不能为空
+            if (null == asset) {
+                snackbarData.value = R.string.please_select_asset.string.toSnackbarModel()
+                return
+            }
+            if (null == intoAsset) {
+                snackbarData.value = R.string.please_select_into_asset.string.toSnackbarModel()
+                return
+            }
         }
         val charge = if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
             chargeStr.value.moneyFormat()
@@ -268,26 +313,50 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 buttonEnable.value = false
-                local.insertRecord(
-                    RecordEntity(
-                        id = -1,
-                        type = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
-                        firstType = firstType,
-                        secondType = secondType,
-                        asset = accountData.value,
-                        intoAsset = intoAsset,
-                        booksId = CurrentBooksLiveData.booksId,
-                        amount = amount,
-                        charge = charge,
-                        remark = remarkStr.value.orEmpty(),
-                        tags = tagsData.value.orEmpty(),
-                        reimbursable = reimbursableChecked.value.condition,
-                        recordTime = dateData.value.orElse(System.currentTimeMillis()),
-                        createTime = currentDate,
-                        modifyTime = currentDate
+                if (null == record) {
+                    // 新建
+                    local.insertRecord(
+                        RecordEntity(
+                            id = -1,
+                            type = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
+                            firstType = firstType,
+                            secondType = secondType,
+                            asset = asset,
+                            intoAsset = intoAsset,
+                            booksId = CurrentBooksLiveData.booksId,
+                            amount = amount,
+                            charge = charge,
+                            remark = remarkStr.value.orEmpty(),
+                            tags = tagsData.value.orEmpty(),
+                            reimbursable = reimbursableChecked.value.condition,
+                            system = false,
+                            recordTime = dateData.value.orElse(System.currentTimeMillis()),
+                            createTime = currentDate,
+                            modifyTime = currentDate
+                        )
                     )
-                )
-                // 插入成功，关闭当前界面
+                } else {
+                    // 修改
+                    local.updateRecord(
+                        record!!.copy(
+                            type = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
+                            firstType = firstType,
+                            secondType = secondType,
+                            asset = accountData.value,
+                            intoAsset = intoAsset,
+                            amount = amount,
+                            charge = charge,
+                            remark = remarkStr.value.orEmpty(),
+                            tags = tagsData.value.orEmpty(),
+                            reimbursable = reimbursableChecked.value.condition,
+                            recordTime = dateData.value.orElse(System.currentTimeMillis()),
+                            modifyTime = System.currentTimeMillis().dateFormat()
+                        )
+                    )
+                }
+                // 插入成功，保存本次资产
+                setSharedParcelable(SHARED_KEY_LAST_ASSET, accountData.value)
+                // 关闭当前界面
                 uiNavigationData.value = UiNavigationModel.builder {
                     close()
                 }

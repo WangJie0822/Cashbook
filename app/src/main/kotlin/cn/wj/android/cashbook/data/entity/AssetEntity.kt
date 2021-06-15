@@ -66,24 +66,35 @@ data class AssetEntity(
     @IgnoredOnParcel
     val balanceStr: String
         get() {
-            val symbol = if (classification == AssetClassificationEnum.NOT_SELECT) {
+            return if (classification == AssetClassificationEnum.NOT_SELECT) {
                 ""
             } else {
-                CurrentBooksLiveData.currency.orElse(CurrencyEnum.CNY).symbol
+                val num = if (creditCardAccount) {
+                    // 信用卡类型，显示总额度
+                    totalAmount
+                } else {
+                    // 其他类型，显示余额
+                    balance
+                }
+                "${CurrentBooksLiveData.currency.symbol}$num"
             }
-            val num = if (creditCardAccount) {
-                // 信用卡类型，显示总额度
-                totalAmount
-            } else {
-                // 其他类型，显示余额
-                balance
-            }
-            return symbol + num
+
         }
 
     /** 显示文本：支付宝（￥200）*/
+    @IgnoredOnParcel
     val showStr: String
-        get() = R.string.account_show_format.string.format(name, balanceStr)
+        get() = R.string.account_show_format.string.format(
+            name, "${CurrentBooksLiveData.currency.symbol}${
+                if (creditCardAccount) {
+                    // 信用卡，显示总额度减去已使用
+                    (totalAmount.toFloatOrNull().orElse(0f) - balance.toFloatOrNull().orElse(0f)).toString()
+                } else {
+                    // 其他，显示余额
+                    balance
+                }
+            }"
+        )
 
     /** 信用卡已用文本 */
     @IgnoredOnParcel

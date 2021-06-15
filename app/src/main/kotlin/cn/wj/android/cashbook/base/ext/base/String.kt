@@ -28,5 +28,5 @@ fun String?.ifNullOrBlank(block: () -> String): String {
 
 /** 对金额字符串进行格式化 */
 fun String?.moneyFormat(): String {
-    return this.orElse("0").toBigDecimal().formatToNumber()
+    return this?.toBigDecimalOrNull().orElse("0".toBigDecimal()).formatToNumber()
 }
