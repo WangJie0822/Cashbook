@@ -90,7 +90,7 @@ data class RecordEntity(
                     }"
                 }
                 else -> {
-                    ""
+                    "$symbol$amount"
                 }
             }
         }
@@ -111,7 +111,7 @@ data class RecordEntity(
                     "$symbol$amount"
                 }
                 else -> {
-                    ""
+                    "$symbol$amount"
                 }
             }
         }

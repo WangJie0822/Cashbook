@@ -23,7 +23,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
-            android:bind_toolbar_onClick="@{viewModel.onDeleteClick}"
+            android:bind_toolbar_menuItemClickId="@{viewModel.onToolbarMenuClick}"
             android:bind_toolbar_title="@{viewModel.titleStr}"
             app:menu="@menu/asset_info_toolbar"
             app:navigationIcon="@drawable/vector_baseline_arrow_back_24"

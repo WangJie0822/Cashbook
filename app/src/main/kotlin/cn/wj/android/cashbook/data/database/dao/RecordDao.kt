@@ -48,6 +48,7 @@ interface RecordDao {
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND books_id=:booksId ORDER BY record_time DESC")
     suspend fun queryAfterRecordTimeByBooksId(booksId: Long, recordTime: Long): List<RecordTable>
 
-    @Query("SELECT * FROM db_record WHERE asset_id=:assetId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
+    /** 获取与资产有关联的所有记录 */
+    @Query("SELECT * FROM db_record WHERE (asset_id=:assetId OR into_asset_id=:assetId) ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
     suspend fun queryRecordByAssetId(assetId: Long, pageNum: Int, pageSize: Int): List<RecordTable>
 }

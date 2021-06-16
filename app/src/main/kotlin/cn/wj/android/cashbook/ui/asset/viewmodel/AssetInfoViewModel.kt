@@ -33,6 +33,9 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
     /** 显示删除确认弹窗 */
     val showDeleteConfirmDialogData: MutableLiveData<Int> = MutableLiveData()
 
+    /** 跳转编辑资产数据 */
+    val jumpEditAssetData: MutableLiveData<AssetEntity> = MutableLiveData()
+
     /** 资产信息 */
     val assetData: MutableLiveData<AssetEntity> = MutableLiveData()
 
@@ -107,10 +110,15 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         }
     }
 
-    /** 删除点击 */
-    val onDeleteClick: () -> Unit = {
-        // 显示删除确认弹窗
-        showDeleteConfirmDialogData.value = 0
+    /** 菜单点击 */
+    val onToolbarMenuClick: (Int) -> Unit = { id ->
+        if (id == R.id.edit) {
+            // 编辑
+            jumpEditAssetData.value = assetData.value
+        } else {
+            // 显示删除确认弹窗
+            showDeleteConfirmDialogData.value = 0
+        }
     }
 
     /** 隐藏状态点击 */
@@ -136,6 +144,21 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
                 assetData.value = changed
             } catch (throwable: Throwable) {
                 logger().e(throwable, "toggleInvisibleStatus")
+            }
+        }
+    }
+
+    /** 刷新资产信息 */
+    fun refreshAsset() {
+        val asset = assetData.value ?: return
+        viewModelScope.launch {
+            try {
+                // 更新余额
+                val changed = asset.copy(balance = local.getAssetBalanceById(asset.id))
+                // 更新状态
+                assetData.value = changed
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "refreshAsset")
             }
         }
     }

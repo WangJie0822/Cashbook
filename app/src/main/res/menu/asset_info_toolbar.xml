@@ -5,6 +5,15 @@
     tools:showIn="toolbar">
 
     <item
+        android:id="@+id/edit"
+        android:icon="@drawable/vector_baseline_edit_24"
+        android:iconTint="@color/color_on_primary"
+        android:title="@string/edit"
+        app:iconTint="@color/color_on_primary"
+        app:showAsAction="ifRoom"
+        tools:targetApi="o" />
+
+    <item
         android:id="@+id/delete"
         android:icon="@drawable/vector_baseline_delete_24"
         android:iconTint="@color/color_on_primary"

@@ -4,6 +4,7 @@
 package cn.wj.android.cashbook.base.tools
 
 import android.os.Parcelable
+import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.manager.AppManager
 import com.tencent.mmkv.MMKV
 
@@ -49,4 +50,15 @@ inline fun <reified T : Parcelable> getSharedParcelable(key: String, defaultValu
 /** 使用 [key] 保存对应值 [value] */
 fun <T : Parcelable> setSharedParcelable(key: String, value: T?) {
     mmkv?.encode(key, value)
+}
+
+/** 根据 [key] 获取对应 [Long] 值，没有返回默认 [defaultValue] */
+@JvmOverloads
+fun getSharedLong(key: String, defaultValue: Long? = null): Long? {
+    return mmkv?.decodeLong(key, defaultValue.orElse(-1L))
+}
+
+/** 使用 [key] 保存对应值 [value] */
+fun setSharedLong(key: String, value: Long?) {
+    mmkv?.encode(key, value.orElse(-1L))
 }

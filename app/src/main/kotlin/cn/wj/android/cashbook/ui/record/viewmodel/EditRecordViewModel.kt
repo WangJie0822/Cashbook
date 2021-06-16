@@ -14,11 +14,11 @@ import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
-import cn.wj.android.cashbook.base.tools.getSharedParcelable
-import cn.wj.android.cashbook.base.tools.setSharedParcelable
+import cn.wj.android.cashbook.base.tools.getSharedLong
+import cn.wj.android.cashbook.base.tools.setSharedLong
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET_ID
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
@@ -90,7 +90,17 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val secondTransferType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 账户信息 */
-    val accountData: MutableLiveData<AssetEntity> = MutableLiveData(getSharedParcelable(SHARED_KEY_LAST_ASSET))
+    val accountData: MutableLiveData<AssetEntity> = object : MutableLiveData<AssetEntity>() {
+        private var firstLoad = true
+        override fun onActive() {
+            if (firstLoad) {
+                viewModelScope.launch {
+                    value = local.findAssetById(getSharedLong(SHARED_KEY_LAST_ASSET_ID))
+                }
+                firstLoad = false
+            }
+        }
+    }
 
     /** 转账转入账户信息 */
     val transferAccountData: MutableLiveData<AssetEntity> = MutableLiveData(null)
@@ -359,7 +369,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 // 通知记录变化
                 LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 // 插入成功，保存本次资产
-                setSharedParcelable(SHARED_KEY_LAST_ASSET, accountData.value)
+                setSharedLong(SHARED_KEY_LAST_ASSET_ID, accountData.value?.id)
                 // 关闭当前界面
                 uiNavigationData.value = UiNavigationModel.builder {
                     close()

@@ -64,6 +64,10 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
                 pagingAdapter.refresh()
             }
         })
+        // 跳转编辑
+        viewModel.jumpEditAssetData.observe(this, { asset ->
+            EditAssetActivity.actionStart(context, asset)
+        })
         // 显示记录详情弹窗
         viewModel.showRecordDetailsDialogData.observe(this, { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
@@ -81,6 +85,7 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
         // 记录变化监听
         LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
             pagingAdapter.refresh()
+            viewModel.refreshAsset()
         })
     }
 }
