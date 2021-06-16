@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.data.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -19,6 +20,10 @@ interface AssetDao {
     /** 插入新的资产 [asset] 到数据库并返回主键id */
     @Insert
     suspend fun insert(asset: AssetTable): Long
+
+    /** 删除资产 [asset] */
+    @Delete
+    suspend fun delete(asset: AssetTable)
 
     /** 更新资产 [asset] 到数据库 */
     @Update

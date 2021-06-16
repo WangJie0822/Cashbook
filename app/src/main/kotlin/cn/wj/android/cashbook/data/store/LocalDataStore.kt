@@ -508,4 +508,15 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
         result.sortedBy { it.date.toLongTime(DATE_FORMAT_YEAR_MONTH) }.reversed()
     }
+
+    /** 从数据库中删除资产 [asset] 以及关联数据 */
+    suspend fun deleteAsset(asset: AssetEntity) = withContext(Dispatchers.IO) {
+        if (asset.id == -1L) {
+            return@withContext
+        }
+        // 删除相关的转账、修改余额记录
+        recordDao.deleteModifyAndTransferByAssetId(asset.id)
+        // 删除资产信息
+        assetDao.delete(asset.toAssetTable())
+    }
 }

@@ -3,12 +3,14 @@ package cn.wj.android.cashbook.ui.asset.activity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
 import cn.wj.android.cashbook.databinding.ActivityAssetInfoBinding
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetInfoViewModel
+import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.record.adapter.DateRecordPagingRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
@@ -65,6 +67,16 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
         // 显示记录详情弹窗
         viewModel.showRecordDetailsDialogData.observe(this, { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
+        })
+        // 显示删除确认弹窗
+        viewModel.showDeleteConfirmDialogData.observe(this, {
+            GeneralDialog.newBuilder()
+                .contentStr(R.string.delete_asset_hint.string)
+                .setOnPositiveAction {
+                    // 删除账本
+                    viewModel.deleteAsset()
+                }.show(supportFragmentManager)
+
         })
         // 记录变化监听
         LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {

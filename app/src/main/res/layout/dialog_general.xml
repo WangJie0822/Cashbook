@@ -52,7 +52,6 @@
             android:bind_tv_gravity="@{viewModel.contentGravity}"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
-            android:maxLines="5"
             android:minHeight="@dimen/item_height"
             android:text="@{viewModel.contentStr}"
             android:textAppearance="?attr/textAppearanceBody1"

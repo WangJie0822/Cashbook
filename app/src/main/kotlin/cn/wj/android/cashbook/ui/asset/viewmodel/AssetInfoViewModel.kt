@@ -30,6 +30,9 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
     /** 显示记录详情弹窗数据 */
     val showRecordDetailsDialogData: MutableLiveData<RecordEntity> = MutableLiveData()
 
+    /** 显示删除确认弹窗 */
+    val showDeleteConfirmDialogData: MutableLiveData<Int> = MutableLiveData()
+
     /** 资产信息 */
     val assetData: MutableLiveData<AssetEntity> = MutableLiveData()
 
@@ -104,6 +107,12 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         }
     }
 
+    /** 删除点击 */
+    val onDeleteClick: () -> Unit = {
+        // 显示删除确认弹窗
+        showDeleteConfirmDialogData.value = 0
+    }
+
     /** 隐藏状态点击 */
     val onInvisibleStatusClick: () -> Unit = {
         // 切换隐藏状态
@@ -127,6 +136,22 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
                 assetData.value = changed
             } catch (throwable: Throwable) {
                 logger().e(throwable, "toggleInvisibleStatus")
+            }
+        }
+    }
+
+    /** 删除资产 */
+    fun deleteAsset() {
+        val asset = assetData.value ?: return
+        viewModelScope.launch {
+            try {
+                local.deleteAsset(asset)
+                // 删除成功，退出当前界面
+                uiNavigationData.value = UiNavigationModel.builder {
+                    close()
+                }
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "deleteAsset")
             }
         }
     }

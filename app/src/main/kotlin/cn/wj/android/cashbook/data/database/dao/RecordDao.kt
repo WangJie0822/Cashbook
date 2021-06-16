@@ -24,6 +24,10 @@ interface RecordDao {
     @Delete
     suspend fun delete(record: RecordTable)
 
+    /** 删除与资产 id 为 [assetId] 相关联的所有转账、修改余额记录  */
+    @Query("DELETE FROM db_record WHERE (asset_id=:assetId OR into_asset_id=:assetId) AND (type=:modify OR type=:transfer)")
+    suspend fun deleteModifyAndTransferByAssetId(assetId: Long, modify: String = RecordTypeEnum.MODIFY_BALANCE.name, transfer: String = RecordTypeEnum.TRANSFER.name)
+
     /** 更新 [record] 数据 */
     @Update
     suspend fun update(record: RecordTable)
