@@ -21,6 +21,8 @@ import kotlinx.parcelize.Parcelize
  * @param secondType 记录二级分类
  * @param asset 关联资产
  * @param intoAsset 转账转入资产
+ * @param booksId 关联账本 id
+ * @param record 退款关联记录
  * @param amount 记录金额
  * @param charge 转账手续费
  * @param remark 备注
@@ -42,6 +44,7 @@ data class RecordEntity(
     val asset: AssetEntity?,
     val intoAsset: AssetEntity?,
     val booksId: Long,
+    val record: RecordEntity?,
     val amount: String,
     val charge: String,
     val remark: String,

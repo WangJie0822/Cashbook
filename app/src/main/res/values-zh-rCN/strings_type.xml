@@ -99,6 +99,7 @@
 
     <string name="type_salary">薪资</string>
     <string name="type_bonus">奖金</string>
+    <string name="type_refund">退款</string>
     <string name="type_investment">投资</string>
     <string name="type_windfall">外快</string>
 

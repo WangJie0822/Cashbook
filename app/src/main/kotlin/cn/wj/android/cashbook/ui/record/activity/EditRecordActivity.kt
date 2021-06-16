@@ -8,6 +8,7 @@ import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
@@ -77,6 +78,11 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         // 计算器弹窗
         viewModel.showCalculatorData.observe(this, {
             CalculatorDialog.actionShow(supportFragmentManager)
+        })
+        // 跳转选择关联记录
+        viewModel.jumpSelectAssociatedRecordData.observe(this, {
+            // TODO
+            viewModel.snackbarData.value = "选择关联记录".toSnackbarModel()
         })
     }
 }

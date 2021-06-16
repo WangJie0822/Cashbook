@@ -2,7 +2,6 @@ package cn.wj.android.cashbook.data.entity
 
 import android.os.Parcelable
 import androidx.databinding.ObservableBoolean
-import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
 import kotlinx.parcelize.IgnoredOnParcel
@@ -17,6 +16,9 @@ import kotlinx.parcelize.Parcelize
  * @param iconResName 图标资源名称
  * @param type 类型类别
  * @param recordType 记录类型
+ * @param childEnable 是否允许子类型
+ * @param refund 是否是退款
+ * @param system 是否是系统类型
  * @param sort 排序
  * @param childList 子类型列表
  *
@@ -31,6 +33,8 @@ data class TypeEntity(
     val type: TypeEnum,
     val recordType: RecordTypeEnum,
     val childEnable: Boolean,
+    val refund: Boolean,
+    val system: Boolean,
     val sort: Int,
     val childList: List<TypeEntity>
 ) : Parcelable {
@@ -63,6 +67,8 @@ data class TypeEntity(
                 type = TypeEnum.FIRST,
                 recordType = RecordTypeEnum.EXPENDITURE,
                 childEnable = false,
+                refund = false,
+                system = false,
                 sort = -1,
                 childList = arrayListOf()
             )
@@ -77,6 +83,8 @@ data class TypeEntity(
                 type = TypeEnum.FIRST,
                 recordType = RecordTypeEnum.EXPENDITURE,
                 childEnable = childEnable,
+                refund = false,
+                system = true,
                 sort = sort,
                 childList = arrayListOf()
             )
@@ -91,12 +99,14 @@ data class TypeEntity(
                 type = TypeEnum.SECOND,
                 recordType = RecordTypeEnum.EXPENDITURE,
                 childEnable = false,
+                refund = false,
+                system = true,
                 sort = sort,
                 childList = arrayListOf()
             )
         }
 
-        fun newFirstIncome(name: String, iconResName: String, sort: Int, childEnable: Boolean = true): TypeEntity {
+        fun newFirstIncome(name: String, iconResName: String, sort: Int, childEnable: Boolean = true, refund: Boolean = false): TypeEntity {
             return TypeEntity(
                 id = -1L,
                 parentId = -1L,
@@ -105,6 +115,8 @@ data class TypeEntity(
                 type = TypeEnum.FIRST,
                 recordType = RecordTypeEnum.INCOME,
                 childEnable = childEnable,
+                refund = refund,
+                system = true,
                 sort = sort,
                 childList = arrayListOf()
             )
@@ -119,6 +131,8 @@ data class TypeEntity(
                 type = TypeEnum.SECOND,
                 recordType = RecordTypeEnum.INCOME,
                 childEnable = false,
+                refund = false,
+                system = true,
                 sort = sort,
                 childList = arrayListOf()
             )
@@ -133,6 +147,8 @@ data class TypeEntity(
                 type = TypeEnum.FIRST,
                 recordType = RecordTypeEnum.TRANSFER,
                 childEnable = childEnable,
+                refund = false,
+                system = true,
                 sort = sort,
                 childList = arrayListOf()
             )
@@ -147,6 +163,8 @@ data class TypeEntity(
                 type = TypeEnum.SECOND,
                 recordType = RecordTypeEnum.TRANSFER,
                 childEnable = false,
+                refund = false,
+                system = true,
                 sort = sort,
                 childList = arrayListOf()
             )

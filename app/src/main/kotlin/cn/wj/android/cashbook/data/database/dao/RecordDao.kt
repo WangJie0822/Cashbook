@@ -32,6 +32,10 @@ interface RecordDao {
     @Update
     suspend fun update(record: RecordTable)
 
+    /** 根据 id 获取对应记录数据 */
+    @Query("SELECT * FROM db_record WHERE id=:recordId")
+    suspend fun queryById(recordId: Long): RecordTable?
+
     /** 查询最后一条修改记录 */
     @Query("SELECT * FROM db_record WHERE asset_id=:assetId AND type=:type ORDER BY record_time DESC LIMIT 1")
     suspend fun queryLastModifyRecord(assetId: Long, type: String = RecordTypeEnum.MODIFY_BALANCE.name): List<RecordTable>

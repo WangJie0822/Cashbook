@@ -15,6 +15,7 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedLong
+import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.tools.setSharedLong
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
@@ -50,11 +51,15 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 transferAccountData.value = intoAsset
                 tagsData.value = tags
                 dateData.value = recordTime
+                associatedRecord.value = record
                 this@EditRecordViewModel.chargeStr.value = charge
                 remarkStr.value = remark
                 reimbursableChecked.value = reimbursable
             }
         }
+
+    /** 跳转选择关联记录数据 */
+    val jumpSelectAssociatedRecordData: MutableLiveData<Int> = MutableLiveData()
 
     /** 显示计算器弹窗数据 */
     val showCalculatorData: MutableLiveData<Int> = MutableLiveData()
@@ -193,6 +198,28 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         it == RecordTypeEnum.EXPENDITURE.position
     }
 
+    /** 是否显示关联记录 */
+    val showAssociatedRecord: LiveData<Boolean> = maps(currentItem, firstIncomeType) {
+        currentItem.value == RecordTypeEnum.INCOME.position && firstIncomeType.value?.refund.condition
+    }
+
+    /** 关联记录数据 */
+    val associatedRecord: MutableLiveData<RecordEntity> = MutableLiveData(null)
+
+    /** 关联记录数据选中状态 */
+    val associatedRecordChecked: LiveData<Boolean> = associatedRecord.map {
+        null != it
+    }
+
+    /** 关联记录显示文本 */
+    val associatedRecordStr: LiveData<String> = associatedRecord.map {
+        if (null == it) {
+            R.string.associated_expenditure_record.string
+        } else {
+            it.type.name
+        }
+    }
+
     /** 货币符号 */
     val currencySymbol: LiveData<String> = CurrentBooksLiveData.map {
         (it.currency ?: CurrencyEnum.CNY).symbol
@@ -246,6 +273,11 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val onDateClick: () -> Unit = {
         // 以当前选中时间显示弹窗
         showSelectDateData.value = 0
+    }
+
+    /** 关联记录点击 */
+    val onAssociatedRecordClick: () -> Unit = {
+        jumpSelectAssociatedRecordData.value = 0
     }
 
     /** 金额点击 */
@@ -336,6 +368,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             asset = asset,
                             intoAsset = intoAsset,
                             booksId = CurrentBooksLiveData.booksId,
+                            record = associatedRecord.value,
                             amount = amount,
                             charge = charge,
                             remark = remarkStr.value.orEmpty(),
@@ -356,6 +389,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             secondType = secondType,
                             asset = accountData.value,
                             intoAsset = intoAsset,
+                            record = associatedRecord.value,
                             amount = amount,
                             charge = charge,
                             remark = remarkStr.value.orEmpty(),

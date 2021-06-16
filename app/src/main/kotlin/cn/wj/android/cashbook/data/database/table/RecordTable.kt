@@ -17,6 +17,8 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
  * @param secondTypeId 记录二级分类id
  * @param assetId 关联资产 id
  * @param intoAssetId 转账转入资产 id
+ * @param booksId 关联账本 id
+ * @param recordId 关联记录 id - 退款使用
  * @param amount 记录金额
  * @param charge 转账手续费
  * @param remark 备注
@@ -38,6 +40,7 @@ data class RecordTable(
     @ColumnInfo(name = "asset_id") val assetId: Long,
     @ColumnInfo(name = "into_asset_id") val intoAssetId: Long,
     @ColumnInfo(name = "books_id") val booksId: Long,
+    @ColumnInfo(name = "record_id") val recordId: Long,
     val amount: String,
     val charge: String,
     val remark: String,
@@ -55,11 +58,12 @@ data class RecordTable(
             return RecordTable(
                 id = null,
                 type = RecordTypeEnum.MODIFY_BALANCE.name,
-                firstTypeId = -1,
-                secondTypeId = -1,
+                firstTypeId = -1L,
+                secondTypeId = -1L,
                 assetId = assetId,
-                intoAssetId = -1,
+                intoAssetId = -1L,
                 booksId = CurrentBooksLiveData.booksId,
+                recordId = -1L,
                 amount = balance,
                 charge = "",
                 remark = remark,

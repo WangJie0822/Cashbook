@@ -14,6 +14,8 @@ import androidx.room.PrimaryKey
  * @param type 类型类别 一级类别、二级类别
  * @param recordType 记录类型 收入、支出、转账
  * @param childEnable 是否允许子类型
+ * @param refund 是否是退款
+ * @param system 是否是系统类型
  * @param sort 排序
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
@@ -27,5 +29,7 @@ data class TypeTable(
     val type: String,
     @ColumnInfo(name = "record_type") val recordType: Int,
     @ColumnInfo(name = "child_enable") val childEnable: Int,
+    val refund: Int,
+    val system: Int,
     val sort: Int
 )

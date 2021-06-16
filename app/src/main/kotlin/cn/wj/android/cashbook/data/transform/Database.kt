@@ -104,6 +104,8 @@ internal fun TypeTable.toTypeEntity(): TypeEntity {
         type = TypeEnum.fromName(type).orElse(TypeEnum.FIRST),
         recordType = RecordTypeEnum.fromPosition(recordType).orElse(RecordTypeEnum.INCOME),
         childEnable = childEnable == SWITCH_INT_ON,
+        refund = refund == SWITCH_INT_ON,
+        system = system == SWITCH_INT_ON,
         sort = sort,
         childList = arrayListOf()
     )
@@ -119,6 +121,8 @@ internal fun TypeEntity.toTypeTable(): TypeTable {
         type = type.name,
         recordType = recordType.position,
         childEnable = if (childEnable) SWITCH_INT_ON else SWITCH_INT_OFF,
+        refund = if (refund) SWITCH_INT_ON else SWITCH_INT_OFF,
+        system = if (system) SWITCH_INT_ON else SWITCH_INT_OFF,
         sort = sort
     )
 }
@@ -133,6 +137,7 @@ internal fun RecordEntity.toRecordTable(): RecordTable {
         assetId = asset?.id.orElse(-1L),
         intoAssetId = intoAsset?.id.orElse(-1L),
         booksId = booksId,
+        recordId = record?.id.orElse(-1L),
         amount = amount,
         charge = charge,
         remark = remark,

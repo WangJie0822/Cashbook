@@ -205,6 +205,21 @@
                     app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
                     tools:checked="true" />
 
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_associated_record"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:bind_chip_freezeChecked="@{viewModel.associatedRecordChecked}"
+                    android:bind_onClick="@{viewModel.onAssociatedRecordClick}"
+                    android:bind_visibility="@{viewModel.showAssociatedRecord}"
+                    android:text="@{viewModel.associatedRecordStr}"
+                    android:textColor="@color/selector_record_options"
+                    app:checkedIconTint="@color/selector_record_options"
+                    app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
+                    tools:checked="true"
+                    tools:text="@string/associated_expenditure_record" />
+
             </com.google.android.material.chip.ChipGroup>
 
         </LinearLayout>

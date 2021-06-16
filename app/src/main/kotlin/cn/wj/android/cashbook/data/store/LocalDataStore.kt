@@ -30,7 +30,6 @@ import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.source.RecordPagingSource
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
@@ -334,29 +333,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
             } else {
                 ""
             }
-            val assetTable = assetDao.queryById(item.assetId)
-            val asset = assetTable?.toAssetEntity(getAssetBalanceById(item.assetId))
-            val intoAssetTable = assetDao.queryById(item.intoAssetId)
-            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(item.intoAssetId))
-            val value = RecordEntity(
-                id = item.id.orElse(-1L),
-                type = RecordTypeEnum.fromName(item.type).orElse(RecordTypeEnum.EXPENDITURE),
-                firstType = if (item.firstTypeId < 0) null else typeDao.queryById(item.firstTypeId)?.toTypeEntity(),
-                secondType = if (item.secondTypeId < 0) null else typeDao.queryById(item.secondTypeId)?.toTypeEntity(),
-                asset = asset,
-                intoAsset = intoAsset,
-                booksId = booksId,
-                amount = item.amount,
-                charge = item.charge,
-                remark = item.remark,
-                // TODO
-                tags = arrayListOf(),
-                reimbursable = item.reimbursable == SWITCH_INT_ON,
-                system = item.system == SWITCH_INT_ON,
-                recordTime = item.recordTime,
-                createTime = item.createTime.dateFormat(),
-                modifyTime = item.modifyTime.dateFormat()
-            )
+            val value = loadRecordEntityFromTable(item) ?: continue
             if (key.isNotBlank()) {
                 if (map.containsKey(key)) {
                     map[key]!!.add(value)
@@ -377,6 +354,37 @@ class LocalDataStore(private val database: CashbookDatabase) {
         result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
     }
 
+    suspend fun loadRecordEntityFromTable(record: RecordTable?): RecordEntity? = withContext(Dispatchers.IO) {
+        if (null == record) {
+            null
+        } else {
+            val assetTable = assetDao.queryById(record.assetId)
+            val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId))
+            val intoAssetTable = assetDao.queryById(record.intoAssetId)
+            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId))
+            RecordEntity(
+                id = record.id.orElse(-1L),
+                type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
+                firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(),
+                secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(),
+                asset = asset,
+                intoAsset = intoAsset,
+                booksId = record.booksId,
+                record = loadRecordEntityFromTable(recordDao.queryById(record.recordId)),
+                amount = record.amount,
+                charge = record.charge,
+                remark = record.remark,
+                // TODO
+                tags = arrayListOf(),
+                reimbursable = record.reimbursable == SWITCH_INT_ON,
+                system = record.system == SWITCH_INT_ON,
+                recordTime = record.recordTime,
+                createTime = record.createTime.dateFormat(),
+                modifyTime = record.modifyTime.dateFormat()
+            )
+        }
+    }
+
     /** 根据账本 id [booksId] 获取当前月所有记录 */
     suspend fun getCurrentMonthRecord(booksId: Long): List<RecordEntity> = withContext(Dispatchers.IO) {
         val result = arrayListOf<RecordEntity>()
@@ -384,31 +392,10 @@ class LocalDataStore(private val database: CashbookDatabase) {
         val calendar = Calendar.getInstance()
         val monthStartTime = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-01 00:00:00".toLongTime() ?: return@withContext result
         recordDao.queryAfterRecordTimeByBooksId(booksId, monthStartTime).forEach { item ->
-            val assetTable = assetDao.queryById(item.assetId)
-            val asset = assetTable?.toAssetEntity(getAssetBalanceById(item.assetId))
-            val intoAssetTable = assetDao.queryById(item.intoAssetId)
-            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(item.intoAssetId))
-            result.add(
-                RecordEntity(
-                    id = item.id.orElse(-1L),
-                    type = RecordTypeEnum.fromName(item.type).orElse(RecordTypeEnum.EXPENDITURE),
-                    firstType = if (item.firstTypeId < 0) null else typeDao.queryById(item.firstTypeId)?.toTypeEntity(),
-                    secondType = if (item.secondTypeId < 0) null else typeDao.queryById(item.secondTypeId)?.toTypeEntity(),
-                    asset = asset,
-                    intoAsset = intoAsset,
-                    booksId = booksId,
-                    amount = item.amount,
-                    charge = item.charge,
-                    remark = item.remark,
-                    // TODO
-                    tags = arrayListOf(),
-                    reimbursable = item.reimbursable == SWITCH_INT_ON,
-                    system = item.system == SWITCH_INT_ON,
-                    recordTime = item.recordTime,
-                    createTime = item.createTime.dateFormat(),
-                    modifyTime = item.modifyTime.dateFormat()
-                )
-            )
+            val record = loadRecordEntityFromTable(item)
+            if (null != record) {
+                result.add(record)
+            }
         }
         result
     }
@@ -431,29 +418,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
         val map = hashMapOf<String, MutableList<RecordEntity>>()
         for (item in list) {
             val key = item.recordTime.dateFormat(DATE_FORMAT_YEAR_MONTH)
-            val assetTable = assetDao.queryById(item.assetId)
-            val asset = assetTable?.toAssetEntity(getAssetBalanceById(item.assetId))
-            val intoAssetTable = assetDao.queryById(item.intoAssetId)
-            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(item.intoAssetId))
-            val value = RecordEntity(
-                id = item.id.orElse(-1L),
-                type = RecordTypeEnum.fromName(item.type).orElse(RecordTypeEnum.EXPENDITURE),
-                firstType = if (item.firstTypeId < 0) null else typeDao.queryById(item.firstTypeId)?.toTypeEntity(),
-                secondType = if (item.secondTypeId < 0) null else typeDao.queryById(item.secondTypeId)?.toTypeEntity(),
-                asset = asset,
-                intoAsset = intoAsset,
-                booksId = CurrentBooksLiveData.booksId,
-                amount = item.amount,
-                charge = item.charge,
-                remark = item.remark,
-                // TODO
-                tags = arrayListOf(),
-                reimbursable = item.reimbursable == SWITCH_INT_ON,
-                system = item.system == SWITCH_INT_ON,
-                recordTime = item.recordTime,
-                createTime = item.createTime.dateFormat(),
-                modifyTime = item.modifyTime.dateFormat()
-            )
+            val value = loadRecordEntityFromTable(item) ?: continue
             if (key.isNotBlank()) {
                 if (map.containsKey(key)) {
                     map[key]!!.add(value)
