@@ -3,8 +3,10 @@ package cn.wj.android.cashbook.ui.asset.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -16,6 +18,7 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
+import kotlinx.coroutines.launch
 
 /**
  * 资产信息 ViewModel
@@ -42,6 +45,11 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         } else {
             R.string.asset_balance
         }.string
+    }
+
+    /** 资产隐藏状态 */
+    val invisible: LiveData<Boolean> = assetData.map {
+        it.invisible
     }
 
     /** 金额文本 */
@@ -96,8 +104,30 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         }
     }
 
+    /** 隐藏状态点击 */
+    val onInvisibleStatusClick: () -> Unit = {
+        // 切换隐藏状态
+        toggleInvisibleStatus()
+    }
+
     /** 记录 item 点击 */
     override val onRecordItemClick: (RecordEntity) -> Unit = { item ->
         showRecordDetailsDialogData.value = item
+    }
+
+    /** 切换隐藏状态 */
+    private fun toggleInvisibleStatus() {
+        val asset = assetData.value ?: return
+        viewModelScope.launch {
+            try {
+                val invisible = asset.invisible
+                val changed = asset.copy(invisible = !invisible)
+                local.updateAsset(changed)
+                // 更新成功，更新状态
+                assetData.value = changed
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "toggleInvisibleStatus")
+            }
+        }
     }
 }
