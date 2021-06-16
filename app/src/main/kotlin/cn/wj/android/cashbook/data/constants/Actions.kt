@@ -14,3 +14,9 @@ const val ACTION_CURRENT_AMOUNT = "action_current_amount"
 
 /** 记录数据 */
 const val ACTION_RECORD = "action_record"
+
+/** 日期 */
+const val ACTION_DATE = "action_date"
+
+/** 是否是退款 */
+const val ACTION_REFUND = "action_refund"

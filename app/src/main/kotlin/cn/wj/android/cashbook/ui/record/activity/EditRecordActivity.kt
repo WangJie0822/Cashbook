@@ -1,6 +1,10 @@
 package cn.wj.android.cashbook.ui.record.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.tools.dateFormat
@@ -8,7 +12,6 @@ import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
-import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
@@ -33,9 +36,18 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         EditRecordVpAdapter(this)
     }
 
+    lateinit var selectAssociatedRecordResultLauncher: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_record)
+
+        // 注册 launcher
+        selectAssociatedRecordResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // TODO
+            }
+        }
 
         // 获取数据
         viewModel.record = intent.getParcelableExtra(ACTION_RECORD)
@@ -81,8 +93,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         })
         // 跳转选择关联记录
         viewModel.jumpSelectAssociatedRecordData.observe(this, {
-            // TODO
-            viewModel.snackbarData.value = "选择关联记录".toSnackbarModel()
+            selectAssociatedRecordResultLauncher.launch(SelectAssociatedRecordActivity.parseIntent(context, viewModel.dateStr.value.orEmpty(), viewModel.calculatorStr.get().orEmpty(), it))
         })
     }
 }

@@ -275,12 +275,14 @@ object DatabaseManager {
         local.insertType(TypeEntity.newFirstIncome(R.string.type_bonus.string, R.string.type_icon_name_bonus.drawableString, 1, false))
         // 退款
         local.insertType(TypeEntity.newFirstIncome(R.string.type_refund.string, R.string.type_icon_name_refund.drawableString, 2, childEnable = false, refund = true))
+        // 报销
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_reimburse.string, R.string.type_icon_name_reimburse.drawableString, 3, childEnable = false, reimburse = true))
         // 投资
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_investment.string, R.string.type_icon_name_investment.drawableString, 3, false))
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_investment.string, R.string.type_icon_name_investment.drawableString, 4, false))
         // 外快
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_windfall.string, R.string.type_icon_name_windfall.drawableString, 4, false))
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_windfall.string, R.string.type_icon_name_windfall.drawableString, 5, false))
         // 其它
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 5, false))
+        local.insertType(TypeEntity.newFirstIncome(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 6, false))
     }
 
     /** 初始化转账类型 */

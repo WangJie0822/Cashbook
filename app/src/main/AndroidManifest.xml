@@ -72,6 +72,12 @@
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
 
+        <!-- 选择关联记录记录 -->
+        <activity
+            android:name=".ui.record.activity.SelectAssociatedRecordActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
         <!-- 编辑资产 -->
         <activity
             android:name=".ui.asset.activity.EditAssetActivity"

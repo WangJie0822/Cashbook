@@ -59,7 +59,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
 
     /** 跳转选择关联记录数据 */
-    val jumpSelectAssociatedRecordData: MutableLiveData<Int> = MutableLiveData()
+    val jumpSelectAssociatedRecordData: MutableLiveData<Boolean> = MutableLiveData()
 
     /** 显示计算器弹窗数据 */
     val showCalculatorData: MutableLiveData<Int> = MutableLiveData()
@@ -200,7 +200,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 是否显示关联记录 */
     val showAssociatedRecord: LiveData<Boolean> = maps(currentItem, firstIncomeType) {
-        currentItem.value == RecordTypeEnum.INCOME.position && firstIncomeType.value?.refund.condition
+        currentItem.value == RecordTypeEnum.INCOME.position && (firstIncomeType.value?.refund.condition || firstIncomeType.value?.reimburse.condition)
     }
 
     /** 关联记录数据 */
@@ -277,7 +277,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 关联记录点击 */
     val onAssociatedRecordClick: () -> Unit = {
-        jumpSelectAssociatedRecordData.value = 0
+        jumpSelectAssociatedRecordData.value = firstIncomeType.value?.refund.condition
     }
 
     /** 金额点击 */

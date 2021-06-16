@@ -52,7 +52,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
 
         // 注册 launcher
         editBooksResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK && null != result.data) {
+            if (result.resultCode == Activity.RESULT_OK ) {
                 result.data?.getParcelableExtra<BooksEntity>(ACTION_BOOKS)?.let { newBooks ->
                     if (newBooks.id == -1L) {
                         // 新增

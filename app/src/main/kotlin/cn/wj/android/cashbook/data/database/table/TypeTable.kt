@@ -15,6 +15,7 @@ import androidx.room.PrimaryKey
  * @param recordType 记录类型 收入、支出、转账
  * @param childEnable 是否允许子类型
  * @param refund 是否是退款
+ * @param reimburse 是否是报销
  * @param system 是否是系统类型
  * @param sort 排序
  *
@@ -30,6 +31,7 @@ data class TypeTable(
     @ColumnInfo(name = "record_type") val recordType: Int,
     @ColumnInfo(name = "child_enable") val childEnable: Int,
     val refund: Int,
+    val reimburse: Int,
     val system: Int,
     val sort: Int
 )

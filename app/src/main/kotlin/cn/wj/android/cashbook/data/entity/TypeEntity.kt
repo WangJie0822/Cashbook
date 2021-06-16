@@ -18,6 +18,7 @@ import kotlinx.parcelize.Parcelize
  * @param recordType 记录类型
  * @param childEnable 是否允许子类型
  * @param refund 是否是退款
+ * @param reimburse 是否是报销
  * @param system 是否是系统类型
  * @param sort 排序
  * @param childList 子类型列表
@@ -34,6 +35,7 @@ data class TypeEntity(
     val recordType: RecordTypeEnum,
     val childEnable: Boolean,
     val refund: Boolean,
+    val reimburse: Boolean,
     val system: Boolean,
     val sort: Int,
     val childList: List<TypeEntity>
@@ -68,6 +70,7 @@ data class TypeEntity(
                 recordType = RecordTypeEnum.EXPENDITURE,
                 childEnable = false,
                 refund = false,
+                reimburse = false,
                 system = false,
                 sort = -1,
                 childList = arrayListOf()
@@ -84,6 +87,7 @@ data class TypeEntity(
                 recordType = RecordTypeEnum.EXPENDITURE,
                 childEnable = childEnable,
                 refund = false,
+                reimburse = false,
                 system = true,
                 sort = sort,
                 childList = arrayListOf()
@@ -100,13 +104,14 @@ data class TypeEntity(
                 recordType = RecordTypeEnum.EXPENDITURE,
                 childEnable = false,
                 refund = false,
+                reimburse = false,
                 system = true,
                 sort = sort,
                 childList = arrayListOf()
             )
         }
 
-        fun newFirstIncome(name: String, iconResName: String, sort: Int, childEnable: Boolean = true, refund: Boolean = false): TypeEntity {
+        fun newFirstIncome(name: String, iconResName: String, sort: Int, childEnable: Boolean = true, refund: Boolean = false, reimburse: Boolean = false): TypeEntity {
             return TypeEntity(
                 id = -1L,
                 parentId = -1L,
@@ -116,6 +121,7 @@ data class TypeEntity(
                 recordType = RecordTypeEnum.INCOME,
                 childEnable = childEnable,
                 refund = refund,
+                reimburse = reimburse,
                 system = true,
                 sort = sort,
                 childList = arrayListOf()
@@ -132,6 +138,7 @@ data class TypeEntity(
                 recordType = RecordTypeEnum.INCOME,
                 childEnable = false,
                 refund = false,
+                reimburse = false,
                 system = true,
                 sort = sort,
                 childList = arrayListOf()
@@ -148,6 +155,7 @@ data class TypeEntity(
                 recordType = RecordTypeEnum.TRANSFER,
                 childEnable = childEnable,
                 refund = false,
+                reimburse = false,
                 system = true,
                 sort = sort,
                 childList = arrayListOf()
@@ -164,6 +172,7 @@ data class TypeEntity(
                 recordType = RecordTypeEnum.TRANSFER,
                 childEnable = false,
                 refund = false,
+                reimburse = false,
                 system = true,
                 sort = sort,
                 childList = arrayListOf()

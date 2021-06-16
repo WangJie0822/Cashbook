@@ -105,6 +105,7 @@ internal fun TypeTable.toTypeEntity(): TypeEntity {
         recordType = RecordTypeEnum.fromPosition(recordType).orElse(RecordTypeEnum.INCOME),
         childEnable = childEnable == SWITCH_INT_ON,
         refund = refund == SWITCH_INT_ON,
+        reimburse = reimburse == SWITCH_INT_ON,
         system = system == SWITCH_INT_ON,
         sort = sort,
         childList = arrayListOf()
@@ -122,6 +123,7 @@ internal fun TypeEntity.toTypeTable(): TypeTable {
         recordType = recordType.position,
         childEnable = if (childEnable) SWITCH_INT_ON else SWITCH_INT_OFF,
         refund = if (refund) SWITCH_INT_ON else SWITCH_INT_OFF,
+        reimburse = if (reimburse) SWITCH_INT_ON else SWITCH_INT_OFF,
         system = if (system) SWITCH_INT_ON else SWITCH_INT_OFF,
         sort = sort
     )

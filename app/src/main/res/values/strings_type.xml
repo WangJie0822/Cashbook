@@ -100,6 +100,7 @@
     <string name="type_icon_name_salary" translatable="false">vector_type_salary_24</string>
     <string name="type_icon_name_bonus" translatable="false">vector_type_bonus_24</string>
     <string name="type_icon_name_refund" translatable="false">vector_type_refund_24</string>
+    <string name="type_icon_name_reimburse" translatable="false">vector_type_reimburse_24</string>
     <string name="type_icon_name_investment" translatable="false">vector_type_investment_24</string>
     <string name="type_icon_name_windfall" translatable="false">vector_type_windfall_24</string>
 
@@ -215,6 +216,7 @@
     <string name="type_salary">薪资</string>
     <string name="type_bonus">奖金</string>
     <string name="type_refund">退款</string>
+    <string name="type_reimburse">报销</string>
     <string name="type_investment">投资</string>
     <string name="type_windfall">外快</string>
 
