@@ -191,7 +191,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             type = type,
                             classification = classification,
                             invisible = invisible,
-                            sort = local.queryMaxSortByBooksId(CurrentBooksLiveData.booksId).orElse(-1) + 1,
+                            sort = local.queryMaxSort().orElse(-1) + 1,
                             createTime = currentTime,
                             modifyTime = currentTime,
                             balance = balance

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.AssetEntity
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
@@ -55,7 +54,7 @@ class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(),
     private fun loadVisibleAssetData() {
         viewModelScope.launch {
             try {
-                val ls = ArrayList(local.getVisibleAssetListByBooksId(CurrentBooksLiveData.booksId))
+                val ls = ArrayList(local.getVisibleAssetList())
                 // 添加未选择资产
                 ls.add(0, AssetEntity.notSelectAsset())
                 assetListData.value = ls

@@ -55,10 +55,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:bind_visibility="@{item.showRemark}"
-                android:text="@{item.remark}"
+                android:text="@{item.remarkStr}"
                 android:textAppearance="?attr/textAppearanceCaption"
                 android:visibility="gone"
-                tools:text="备注"
+                tools:text="09.10 备注"
                 tools:visibility="visible" />
 
         </LinearLayout>
@@ -69,14 +69,31 @@
             android:gravity="end"
             android:orientation="vertical">
 
-            <com.google.android.material.textview.MaterialTextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:bind_tv_textColor="@{item.colorTint}"
-                android:text="@{item.amountStrWithCharge}"
-                android:textAppearance="?attr/textAppearanceBody1"
-                tools:text="-￥2444.00"
-                tools:textColor="@color/color_expenditure" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                    android:bind_visibility="@{item.showAssociated}"
+                    android:text="@{item.associatedStr}"
+                    android:textAppearance="?attr/textAppearanceCaption"
+                    tools:text="已报销：￥200.00" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:bind_tv_textColor="@{item.colorTint}"
+                    android:text="@{item.amountStrWithCharge}"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    tools:text="-￥2444.00"
+                    tools:textColor="@color/color_expenditure" />
+
+            </LinearLayout>
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"

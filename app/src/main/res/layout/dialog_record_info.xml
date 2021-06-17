@@ -81,6 +81,17 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:bind_visibility="@{item.showAssociatedInInfoDialog}"
+                android:text="@{item.associatedStrInInfoDialog}"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:visibility="gone"
+                tools:text="@string/reimbursable"
+                tools:visibility="visible" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@{item.amountStr}"
                 android:textAppearance="?attr/textAppearanceBody2"
                 android:textColor="@{item.colorTint}"

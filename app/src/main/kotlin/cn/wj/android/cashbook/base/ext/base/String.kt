@@ -30,3 +30,7 @@ fun String?.ifNullOrBlank(block: () -> String): String {
 fun String?.moneyFormat(): String {
     return this?.toBigDecimalOrNull().orElse("0".toBigDecimal()).formatToNumber()
 }
+
+fun String?.toMoneyFloat():Float{
+    return this?.toFloatOrNull().orElse(0f)
+}

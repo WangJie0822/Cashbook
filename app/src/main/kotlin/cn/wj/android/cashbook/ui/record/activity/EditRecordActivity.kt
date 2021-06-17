@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
+import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
@@ -45,12 +46,11 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         // 注册 launcher
         selectAssociatedRecordResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // TODO
+                result.data?.getParcelableExtra<RecordEntity>(ACTION_RECORD)?.let { selected ->
+                    viewModel.associatedRecord.value = selected
+                }
             }
         }
-
-        // 获取数据
-        viewModel.record = intent.getParcelableExtra(ACTION_RECORD)
 
         // 配置 ViewPager2
         binding.vpType.adapter = typesVpAdapter
@@ -64,6 +64,11 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
                 viewModel.currentItem.value = viewModel.record!!.type.position
             }
         }
+    }
+
+    override fun beforeOnCreate() {
+        // 获取数据
+        viewModel.record = intent.getParcelableExtra(ACTION_RECORD)
     }
 
     override fun observe() {

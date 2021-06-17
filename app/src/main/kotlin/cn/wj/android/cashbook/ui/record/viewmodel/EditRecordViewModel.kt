@@ -53,7 +53,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 dateData.value = recordTime
                 associatedRecord.value = record
                 this@EditRecordViewModel.chargeStr.value = charge
-                remarkStr.value = remark
+                this@EditRecordViewModel.remarkStr.value = remark
                 reimbursableChecked.value = reimbursable
             }
         }
@@ -99,8 +99,10 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         private var firstLoad = true
         override fun onActive() {
             if (firstLoad) {
-                viewModelScope.launch {
-                    value = local.findAssetById(getSharedLong(SHARED_KEY_LAST_ASSET_ID))
+                if (null == record) {
+                    viewModelScope.launch {
+                        value = local.findAssetById(getSharedLong(SHARED_KEY_LAST_ASSET_ID))
+                    }
                 }
                 firstLoad = false
             }
@@ -216,7 +218,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         if (null == it) {
             R.string.associated_expenditure_record.string
         } else {
-            it.type.name
+            R.string.associated_with_colon.string + it.typeStr + it.amountStr
         }
     }
 
@@ -369,6 +371,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             intoAsset = intoAsset,
                             booksId = CurrentBooksLiveData.booksId,
                             record = associatedRecord.value,
+                            beAssociated = null,
                             amount = amount,
                             charge = charge,
                             remark = remarkStr.value.orEmpty(),
@@ -377,7 +380,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             system = false,
                             recordTime = dateData.value.orElse(System.currentTimeMillis()),
                             createTime = currentDate,
-                            modifyTime = currentDate
+                            modifyTime = currentDate,
+                            showDate = false
                         )
                     )
                 } else {

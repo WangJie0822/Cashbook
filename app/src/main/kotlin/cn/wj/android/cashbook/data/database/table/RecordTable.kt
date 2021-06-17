@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.table
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cn.wj.android.cashbook.base.ext.base.toMoneyFloat
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
@@ -41,8 +42,8 @@ data class RecordTable(
     @ColumnInfo(name = "into_asset_id") val intoAssetId: Long,
     @ColumnInfo(name = "books_id") val booksId: Long,
     @ColumnInfo(name = "record_id") val recordId: Long,
-    val amount: String,
-    val charge: String,
+    val amount: Float,
+    val charge: Float,
     val remark: String,
     @ColumnInfo(name = "tag_ids") val tagIds: String,
     val reimbursable: Int,
@@ -64,13 +65,13 @@ data class RecordTable(
                 intoAssetId = -1L,
                 booksId = CurrentBooksLiveData.booksId,
                 recordId = -1L,
-                amount = balance,
-                charge = "",
+                amount = balance.toMoneyFloat(),
+                charge = 0f,
                 remark = remark,
                 tagIds = "",
                 reimbursable = SWITCH_INT_OFF,
                 system = if (system) SWITCH_INT_ON else SWITCH_INT_OFF,
-                recordTime = ms,
+                recordTime = if (system) 0L else ms,
                 createTime = ms,
                 modifyTime = ms
             )

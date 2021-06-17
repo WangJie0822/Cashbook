@@ -170,7 +170,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     private fun loadHomepageList() {
         viewModelScope.launch {
             try {
-                listData.value = local.getHomepageList(CurrentBooksLiveData.booksId)
+                listData.value = local.getHomepageList()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadHomepageList")
             } finally {
@@ -183,7 +183,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     private fun getCurrentMonthRecord() {
         viewModelScope.launch {
             try {
-                currentMonthRecord.value = local.getCurrentMonthRecord(CurrentBooksLiveData.booksId)
+                currentMonthRecord.value = local.getCurrentMonthRecord()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getCurrentMonthRecord")
             }

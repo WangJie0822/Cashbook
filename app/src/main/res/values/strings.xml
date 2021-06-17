@@ -116,8 +116,8 @@
     <string name="expenditure_with_colon">支：</string>
     <string name="symbol_comma">，</string>
     <string name="delete_record_confirm">确定要删除这条记录吗？</string>
-    <string name="yestoday">昨天</string>
-    <string name="the_day_before_yestoday">前天</string>
+    <string name="yesterday">昨天</string>
+    <string name="the_day_before_yesterday">前天</string>
     <string name="not_set">未设置</string>
     <string name="delete_asset_hint">确定要删除这个资产账户吗？将会执行如下操作：\n1.移除此资产账户相关联其他数据关系；\n2.删除与此账户相关的转账记录；\n3.移除账单中与此账户的关联信息。</string>
     <string name="associated_expenditure_record">关联的支出记录</string>
@@ -126,4 +126,7 @@
     <string name="reimburse_with_colon">报销：</string>
     <string name="refund_select_hint">近三个月大于退款金额的支出记录</string>
     <string name="reimburse_select_hint">近三个月标记为可报销支出记录</string>
+    <string name="refunded_with_colon">已退款：</string>
+    <string name="returned_with_colon">已报销：</string>
+    <string name="associated_with_colon">已关联：</string>
 </resources>

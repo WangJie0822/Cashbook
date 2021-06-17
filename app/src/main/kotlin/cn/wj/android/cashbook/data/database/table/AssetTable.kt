@@ -25,15 +25,15 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "db_asset")
 data class AssetTable(
     @PrimaryKey(autoGenerate = true) val id: Long?,
-    @ColumnInfo(name = "books_id") val booksId:Long,
+    @ColumnInfo(name = "books_id") val booksId: Long,
     val name: String,
-    val totalAmount: String,
-    val billingDate: String,
-    val repaymentDate: String,
+    @ColumnInfo(name = "total_amount") val totalAmount: Float,
+    @ColumnInfo(name = "billing_date") val billingDate: String,
+    @ColumnInfo(name = "repayment_date") val repaymentDate: String,
     val type: String,
     val classification: String,
     val invisible: Int,
-    val sort:Int,
+    val sort: Int,
     @ColumnInfo(name = "create_time") val createTime: Long,
     @ColumnInfo(name = "modify_time") val modifyTime: Long
 )

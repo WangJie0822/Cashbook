@@ -13,7 +13,6 @@ import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
@@ -186,7 +185,7 @@ class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel
     private fun loadInvisibleAssetData() {
         viewModelScope.launch {
             try {
-                assetListData.value = local.getInvisibleAssetListByBooksId(CurrentBooksLiveData.booksId)
+                assetListData.value = local.getInvisibleAssetList()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadInvisibleAssetData")
             } finally {

@@ -10,8 +10,11 @@ import cn.wj.android.cashbook.data.constants.ACTION_CURRENT_AMOUNT
 import cn.wj.android.cashbook.data.constants.ACTION_DATE
 import cn.wj.android.cashbook.data.constants.ACTION_REFUND
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SELECT_ASSOCIATED_RECORD
+import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.databinding.ActivitySelectAccosiatedRecordBinding
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
+import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
+import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -25,6 +28,12 @@ class SelectAssociatedRecordActivity : BaseActivity<SelectAssociatedRecordViewMo
 
     override val viewModel: SelectAssociatedRecordViewModel by viewModel()
 
+    private val recordAdapter: SimpleRvListAdapter<RecordEntity> by lazy {
+        SimpleRvListAdapter<RecordEntity>(R.layout.recycler_item_record).apply {
+            this.viewModel = this@SelectAssociatedRecordActivity.viewModel
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_accosiated_record)
@@ -33,6 +42,19 @@ class SelectAssociatedRecordActivity : BaseActivity<SelectAssociatedRecordViewMo
         viewModel.refund.value = intent.getBooleanExtra(ACTION_REFUND, true)
         viewModel.dateStr.value = intent.getStringExtra(ACTION_DATE)
         viewModel.amount.value = intent.getStringExtra(ACTION_CURRENT_AMOUNT)
+
+        // 配置 RecyclerView
+        binding.rvRecord.run {
+            layoutManager = WrapContentLinearLayoutManager()
+            adapter = recordAdapter
+        }
+    }
+
+    override fun observe() {
+        // 列表数据
+        viewModel.defaultListData.observe(this, { list ->
+            recordAdapter.submitList(list)
+        })
     }
 
     companion object {

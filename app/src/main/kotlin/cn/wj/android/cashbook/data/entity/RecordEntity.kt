@@ -3,8 +3,10 @@ package cn.wj.android.cashbook.data.entity
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.color
+import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
@@ -22,7 +24,7 @@ import kotlinx.parcelize.Parcelize
  * @param asset 关联资产
  * @param intoAsset 转账转入资产
  * @param booksId 关联账本 id
- * @param record 退款关联记录
+ * @param record 关联记录
  * @param amount 记录金额
  * @param charge 转账手续费
  * @param remark 备注
@@ -45,6 +47,7 @@ data class RecordEntity(
     val intoAsset: AssetEntity?,
     val booksId: Long,
     val record: RecordEntity?,
+    val beAssociated: RecordEntity?,
     val amount: String,
     val charge: String,
     val remark: String,
@@ -53,7 +56,8 @@ data class RecordEntity(
     val system: Boolean,
     val recordTime: Long,
     val createTime: String,
-    val modifyTime: String
+    val modifyTime: String,
+    val showDate: Boolean
 ) : Parcelable {
 
     /** 分类文本 */
@@ -69,7 +73,16 @@ data class RecordEntity(
     /** 是否显示备注 */
     @IgnoredOnParcel
     val showRemark: Boolean
-        get() = remark.isNotBlank()
+        get() = showDate || remark.isNotBlank()
+
+    /** 备注显示文本 */
+    @IgnoredOnParcel
+    val remarkStr: String
+        get() = if (showDate) {
+            "${recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)} $remark"
+        } else {
+            remark
+        }
 
     /** 金额文本 */
     @IgnoredOnParcel
@@ -181,6 +194,53 @@ data class RecordEntity(
     @IgnoredOnParcel
     val canModify: Boolean
         get() = type != RecordTypeEnum.MODIFY_BALANCE
+
+    /** 是否显示关联信息 */
+    @IgnoredOnParcel
+    val showAssociated: Boolean
+        get() = null != beAssociated
+
+    /** 关联信息文本 */
+    @IgnoredOnParcel
+    val associatedStr: String
+        get() = when {
+            beAssociated?.firstType?.refund.condition -> {
+                // 退款
+                R.string.refunded_with_colon.string + beAssociated?.amountStr
+            }
+            beAssociated?.firstType?.reimburse.condition -> {
+                // 报销
+                R.string.returned_with_colon.string + beAssociated?.amountStr
+            }
+            else -> {
+                ""
+            }
+        }
+
+    /** 是否在信息弹窗中显示关联信息 */
+    @IgnoredOnParcel
+    val showAssociatedInInfoDialog: Boolean
+        get() = reimbursable || showAssociated
+
+    /** 在信息弹窗中显示关联信息 */
+    @IgnoredOnParcel
+    val associatedStrInInfoDialog: String
+        get() = when {
+            beAssociated?.firstType?.refund.condition -> {
+                // 退款
+                R.string.refunded_with_colon.string + beAssociated?.amountStr
+            }
+            beAssociated?.firstType?.reimburse.condition -> {
+                // 报销
+                R.string.returned_with_colon.string + beAssociated?.amountStr
+            }
+            reimbursable -> {
+                R.string.reimbursable.string
+            }
+            else -> {
+                ""
+            }
+        }
 
     /** 不同类型着色 */
     @IgnoredOnParcel

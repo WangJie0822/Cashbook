@@ -6,6 +6,8 @@ import androidx.paging.liveData
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toMoneyFloat
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
@@ -30,6 +32,7 @@ import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.source.RecordPagingSource
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
@@ -160,9 +163,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
     }
 
-    /** 根据账本id [booksId] 获取资产数据并返回 */
-    suspend fun getAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
-        assetDao.queryByBooksId(booksId).map {
+    /** 获取资产数据并返回 */
+    suspend fun getCurrentAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
+        assetDao.queryByBooksId(CurrentBooksLiveData.booksId).map {
             // 获取余额
             val balance = getAssetBalanceById(it.id)
             it.toAssetEntity(balance)
@@ -178,23 +181,23 @@ class LocalDataStore(private val database: CashbookDatabase) {
         queryById?.toAssetEntity(getAssetBalanceById(assetId))
     }
 
-    /** 根据账本id [booksId] 获取资产数据并返回 */
-    suspend fun queryMaxSortByBooksId(booksId: Long): Int? = withContext(Dispatchers.IO) {
-        assetDao.queryMaxSortByBooksId(booksId)
+    /** 获取资产数据最大排序数字并返回 */
+    suspend fun queryMaxSort(): Int? = withContext(Dispatchers.IO) {
+        assetDao.queryMaxSortByBooksId(CurrentBooksLiveData.booksId)
     }
 
-    /** 根据账本id [booksId] 获取隐藏资产数据并返回 */
-    suspend fun getInvisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
-        assetDao.queryInvisibleByBooksId(booksId).map {
+    /** 获取隐藏资产数据并返回 */
+    suspend fun getInvisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
+        assetDao.queryInvisibleByBooksId(CurrentBooksLiveData.booksId).map {
             //  获取余额
             val balance = getAssetBalanceById(it.id)
             it.toAssetEntity(balance)
         }
     }
 
-    /** 根据账本id [booksId] 获取未隐藏资产数据并返回 */
-    suspend fun getVisibleAssetListByBooksId(booksId: Long): List<AssetEntity> = withContext(Dispatchers.IO) {
-        assetDao.queryVisibleByBooksId(booksId).map {
+    /** 获取未隐藏资产数据并返回 */
+    suspend fun getVisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
+        assetDao.queryVisibleByBooksId(CurrentBooksLiveData.booksId).map {
             //  获取余额
             val balance = getAssetBalanceById(it.id)
             it.toAssetEntity(balance)
@@ -252,22 +255,22 @@ class LocalDataStore(private val database: CashbookDatabase) {
         // 获取最后一条修改数据
         val lastModify = modifyList.first()
         // 获取在此之后的所有记录
-        var result = lastModify.amount.toFloatOrNull() ?: 0f
+        var result = lastModify.amount
         val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
         recordList.forEach {
             when (it.type) {
                 RecordTypeEnum.INCOME.name -> {
                     // 收入
-                    result += it.amount.toFloatOrNull() ?: 0f
+                    result += it.amount
                 }
                 RecordTypeEnum.EXPENDITURE.name -> {
                     // 支出
-                    result -= it.amount.toFloatOrNull() ?: 0f
+                    result -= it.amount
                 }
                 RecordTypeEnum.TRANSFER.name -> {
                     // 转账
-                    result -= it.charge.toFloatOrNull() ?: 0f
-                    result -= it.charge.toFloatOrNull() ?: 0f
+                    result -= it.charge
+                    result -= it.charge
                 }
             }
         }
@@ -277,8 +280,8 @@ class LocalDataStore(private val database: CashbookDatabase) {
             when (it.type) {
                 RecordTypeEnum.TRANSFER.name -> {
                     // 转账
-                    result += it.amount.toFloatOrNull() ?: 0f
-                    result += it.charge.toFloatOrNull() ?: 0f
+                    result += it.amount
+                    result += it.charge
                 }
             }
         }
@@ -295,16 +298,16 @@ class LocalDataStore(private val database: CashbookDatabase) {
         recordDao.update(record.toRecordTable())
     }
 
-    /** 获取账本 id 为 [booksId] 的首页数据 */
-    suspend fun getHomepageList(booksId: Long): List<DateRecordEntity> = withContext(Dispatchers.IO) {
+    /** 获取首页数据 */
+    suspend fun getHomepageList(): List<DateRecordEntity> = withContext(Dispatchers.IO) {
         // 首页显示一周内数据
+        val result = arrayListOf<DateRecordEntity>()
         val calendar = Calendar.getInstance()
         val today = calendar.get(Calendar.DAY_OF_MONTH)
         val month = calendar.get(Calendar.MONTH) + 1
         calendar.add(Calendar.DAY_OF_MONTH, -7)
-        val recordTime = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.DAY_OF_MONTH)} 00:00".toLongTime(DATE_FORMAT_NO_SECONDS)
-            .orElse(System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L))
-        val list = recordDao.queryAfterRecordTimeByBooksId(booksId, recordTime).filter {
+        val recordTime = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime(DATE_FORMAT_NO_SECONDS) ?: return@withContext result
+        val list = recordDao.queryAfterRecordTimeByBooksId(CurrentBooksLiveData.booksId, recordTime).filter {
             it.system != SWITCH_INT_ON
         }
         val map = hashMapOf<String, MutableList<RecordEntity>>()
@@ -320,11 +323,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
                     }
                     today - 1 -> {
                         // 昨天
-                        " ${R.string.yestoday.string}"
+                        " ${R.string.yesterday.string}"
                     }
                     today - 2 -> {
                         // 前天
-                        " ${R.string.the_day_before_yestoday.string}"
+                        " ${R.string.the_day_before_yesterday.string}"
                     }
                     else -> {
                         ""
@@ -333,7 +336,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
             } else {
                 ""
             }
-            val value = loadRecordEntityFromTable(item) ?: continue
+            val value = loadRecordEntityFromTable(item, false) ?: continue
             if (key.isNotBlank()) {
                 if (map.containsKey(key)) {
                     map[key]!!.add(value)
@@ -342,7 +345,6 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 }
             }
         }
-        val result = arrayListOf<DateRecordEntity>()
         map.keys.forEach { key ->
             result.add(
                 DateRecordEntity(
@@ -354,7 +356,8 @@ class LocalDataStore(private val database: CashbookDatabase) {
         result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
     }
 
-    suspend fun loadRecordEntityFromTable(record: RecordTable?): RecordEntity? = withContext(Dispatchers.IO) {
+    /** 根据 [record] 数据获取 [RecordEntity] 数据并返回 */
+    private suspend fun loadRecordEntityFromTable(record: RecordTable?, showDate: Boolean): RecordEntity? = withContext(Dispatchers.IO) {
         if (null == record) {
             null
         } else {
@@ -370,9 +373,10 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 asset = asset,
                 intoAsset = intoAsset,
                 booksId = record.booksId,
-                record = loadRecordEntityFromTable(recordDao.queryById(record.recordId)),
-                amount = record.amount,
-                charge = record.charge,
+                record = loadRecordEntityFromTable(recordDao.queryById(record.recordId), false),
+                beAssociated = loadBeAssociatedRecord(record.id.orElse(-1L)),
+                amount = record.amount.toString(),
+                charge = record.charge.toString(),
                 remark = record.remark,
                 // TODO
                 tags = arrayListOf(),
@@ -380,24 +384,96 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 system = record.system == SWITCH_INT_ON,
                 recordTime = record.recordTime,
                 createTime = record.createTime.dateFormat(),
-                modifyTime = record.modifyTime.dateFormat()
+                modifyTime = record.modifyTime.dateFormat(),
+                showDate = showDate
             )
         }
     }
 
-    /** 根据账本 id [booksId] 获取当前月所有记录 */
-    suspend fun getCurrentMonthRecord(booksId: Long): List<RecordEntity> = withContext(Dispatchers.IO) {
+    private suspend fun loadBeAssociatedRecord(id: Long): RecordEntity? = withContext(Dispatchers.IO) {
+        if (id < 0) {
+            return@withContext null
+        }
+        val record = recordDao.queryAssociatedById(id) ?: return@withContext null
+        val assetTable = assetDao.queryById(record.assetId)
+        val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId))
+        val intoAssetTable = assetDao.queryById(record.intoAssetId)
+        val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId))
+        RecordEntity(
+            id = record.id.orElse(-1L),
+            type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
+            firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(),
+            secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(),
+            asset = asset,
+            intoAsset = intoAsset,
+            booksId = record.booksId,
+            record = null,
+            beAssociated = null,
+            amount = record.amount.toString(),
+            charge = record.charge.toString(),
+            remark = record.remark,
+            // TODO
+            tags = arrayListOf(),
+            reimbursable = record.reimbursable == SWITCH_INT_ON,
+            system = record.system == SWITCH_INT_ON,
+            recordTime = record.recordTime,
+            createTime = record.createTime.dateFormat(),
+            modifyTime = record.modifyTime.dateFormat(),
+            showDate = true
+        )
+    }
+
+    /** 获取当前月所有记录 */
+    suspend fun getCurrentMonthRecord(): List<RecordEntity> = withContext(Dispatchers.IO) {
         val result = arrayListOf<RecordEntity>()
         // 获取当前月开始时间
         val calendar = Calendar.getInstance()
-        val monthStartTime = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-01 00:00:00".toLongTime() ?: return@withContext result
-        recordDao.queryAfterRecordTimeByBooksId(booksId, monthStartTime).forEach { item ->
-            val record = loadRecordEntityFromTable(item)
+        val monthStartDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00".toLongTime() ?: return@withContext result
+        recordDao.queryAfterRecordTimeByBooksId(CurrentBooksLiveData.booksId, monthStartDate).forEach { item ->
+            val record = loadRecordEntityFromTable(item, false)
             if (null != record) {
                 result.add(record)
             }
         }
         result
+    }
+
+    /** 获取最近三个月金额小于等于 [amount] 的所有支出记录 */
+    suspend fun getLastThreeMonthExpenditureRecordLargerThanAmount(amount: String): List<RecordEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<RecordEntity>()
+        // 获取最近三个月开始时间
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.DAY_OF_MONTH, -90)
+        val startDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime() ?: return@withContext result
+        recordDao.queryExpenditureRecordAfterDateLargerThanAmount(CurrentBooksLiveData.booksId, amount.toMoneyFloat(), startDate).forEach { item ->
+            val record = loadRecordEntityFromTable(item, true)
+            if (null != record) {
+                result.add(record)
+            }
+        }
+        result.filter {
+            // 排除已关联的以及标记为可报销的
+            null == it.beAssociated && !it.reimbursable
+        }
+    }
+
+    /** 获取最近三个月标记为可报销的支出记录 */
+    suspend fun getLastThreeMonthReimburseExpenditureRecord(): List<RecordEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<RecordEntity>()
+        // 获取最近三个月开始时间
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.DAY_OF_MONTH, -90)
+        val startDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime() ?: return@withContext result
+        recordDao.queryReimburseExpenditureRecordAfterDate(CurrentBooksLiveData.booksId, startDate).forEach { item ->
+            val record = loadRecordEntityFromTable(item, true)
+            if (null != record) {
+                result.add(record)
+            }
+        }
+        result.filter {
+            // 排除已关联的
+            null == it.beAssociated
+        }
     }
 
     /** 删除记录数据 [record] */
@@ -411,14 +487,13 @@ class LocalDataStore(private val database: CashbookDatabase) {
         pagingSourceFactory = { RecordPagingSource(assetId, this) }
     ).liveData
 
-
     /** 根据资产 id [assetId] 页码 [pageNum] 每页数据 [pageSize] 获取记录数据 */
     suspend fun getRecordByAssetId(assetId: Long, pageNum: Int, pageSize: Int): List<DateRecordEntity> = withContext(Dispatchers.IO) {
         val list = recordDao.queryRecordByAssetId(assetId, pageNum * pageSize, pageSize)
         val map = hashMapOf<String, MutableList<RecordEntity>>()
         for (item in list) {
             val key = item.recordTime.dateFormat(DATE_FORMAT_YEAR_MONTH)
-            val value = loadRecordEntityFromTable(item) ?: continue
+            val value = loadRecordEntityFromTable(item, true) ?: continue
             if (key.isNotBlank()) {
                 if (map.containsKey(key)) {
                     map[key]!!.add(value)
