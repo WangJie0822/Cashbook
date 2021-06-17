@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetViewModel
 import cn.wj.android.cashbook.ui.books.viewmodel.EditBooksViewModel
 import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.general.viewmodel.GeneralViewModel
+import cn.wj.android.cashbook.ui.main.viewmodel.AboutUsViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
@@ -85,6 +86,9 @@ val viewModelModule = module {
     }
     viewModel {
         SelectAssociatedRecordViewModel(get())
+    }
+    viewModel {
+        AboutUsViewModel()
     }
 
     // Fragment

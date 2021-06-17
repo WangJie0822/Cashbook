@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
@@ -21,6 +22,7 @@ import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import kotlinx.coroutines.launch
 
@@ -150,6 +152,28 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
         // 跳转我的账本界面
         uiNavigationData.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_MY_BOOKS)
+        }
+    }
+
+    /** 我的资产点击 */
+    val onMyAssetClick: () -> Unit = {
+        // 跳转我的资产
+        uiNavigationData.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_MY_ASSET)
+        }
+    }
+
+    /** 设置点击 */
+    val onSettingClick: () -> Unit = {
+        // TODO 跳转设置
+        snackbarData.value = "跳转设置".toSnackbarModel()
+    }
+
+    /** 关于我们点击 */
+    val onAboutUsClick: () -> Unit = {
+        // 跳转关于我们
+        uiNavigationData.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_ABOUT_US)
         }
     }
 

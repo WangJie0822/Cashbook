@@ -17,7 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/spacing_big"
             android:background="?attr/colorSurface"
             android:orientation="vertical">
 
@@ -27,8 +27,8 @@
                 android:background="?selectableItemBackground"
                 android:bind_onClick="@{viewModel.onAmountClick}"
                 android:orientation="horizontal"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin">
+                android:paddingStart="@dimen/spacing_big"
+                android:paddingEnd="@dimen/spacing_big">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
@@ -43,9 +43,9 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/spacing_big"
                     android:gravity="end"
-                    android:padding="@dimen/content_horizontal_spacing"
+                    android:padding="@dimen/spacing_normal"
                     android:singleLine="true"
                     android:text="@{viewModel.calculatorStr}"
                     android:textAppearance="?attr/textAppearanceHeadline6"
@@ -59,15 +59,15 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginEnd="@dimen/spacing_big"
                 android:background="@color/color_divider" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/content_vertical_spacing"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginTop="@dimen/spacing_normal"
                 android:text="@string/classification"
                 android:textAppearance="?attr/textAppearanceCaption" />
 
@@ -83,16 +83,16 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginEnd="@dimen/spacing_big"
                 android:background="@color/color_divider" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/content_vertical_spacing"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginEnd="@dimen/spacing_big"
                 android:hint="@string/please_enter_remarks_here"
                 app:endIconMode="clear_text"
                 app:hintTextAppearance="?attr/textAppearanceCaption">
@@ -109,9 +109,9 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/content_vertical_spacing"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginEnd="@dimen/spacing_big"
                 android:bind_visibility="@{viewModel.showCharge &amp;&amp; viewModel.chargeChecked}"
                 android:hint="@string/record_charge_hint"
                 app:endIconMode="clear_text"
@@ -129,9 +129,9 @@
             <com.google.android.material.chip.ChipGroup
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                app:chipSpacingHorizontal="@dimen/content_horizontal_spacing">
+                android:paddingStart="@dimen/spacing_big"
+                android:paddingEnd="@dimen/spacing_big"
+                app:chipSpacingHorizontal="@dimen/spacing_normal">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_account"

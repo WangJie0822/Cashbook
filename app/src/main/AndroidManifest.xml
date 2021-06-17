@@ -54,11 +54,17 @@
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
 
+        <!-- 关于我们界面 -->
+        <activity
+            android:name=".ui.main.activity.AboutUsActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
         <!-- 我的账本 -->
         <activity
             android:name=".ui.books.activity.MyBooksActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="portrait" />
 
         <!-- 编辑账本 -->
         <activity

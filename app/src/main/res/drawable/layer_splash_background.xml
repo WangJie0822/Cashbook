@@ -6,7 +6,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/img_rmb_shadow" />
+            android:src="@drawable/ic_rmb_shadow" />
     </item>
 
 </layer-list>

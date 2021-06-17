@@ -24,8 +24,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_height"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/content_horizontal_spacing"
+            android:layout_marginStart="@dimen/spacing_big"
+            android:layout_marginEnd="@dimen/spacing_normal"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -40,11 +40,11 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:layout_marginEnd="@dimen/spacing_normal"
                 android:background="?selectableItemBackground"
                 android:bind_onClick="@{viewModel.onEditClick}"
                 android:bind_visibility="@{item.canModify}"
-                android:padding="@dimen/content_horizontal_spacing"
+                android:padding="@dimen/spacing_normal"
                 android:text="@string/edit"
                 android:textAppearance="?attr/textAppearanceButton"
                 android:textColor="@color/color_primary" />
@@ -52,11 +52,11 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:layout_marginEnd="@dimen/spacing_normal"
                 android:background="?selectableItemBackground"
                 android:bind_onClick="@{viewModel.onDeleteClick}"
                 android:bind_visibility="@{item.canModify}"
-                android:padding="@dimen/content_horizontal_spacing"
+                android:padding="@dimen/spacing_normal"
                 android:text="@string/delete"
                 android:textAppearance="?attr/textAppearanceButton"
                 android:textColor="@color/color_error" />
@@ -68,8 +68,8 @@
             android:layout_height="@dimen/item_height"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin">
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big">
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
@@ -81,7 +81,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                android:layout_marginEnd="@dimen/spacing_normal"
                 android:bind_visibility="@{item.showAssociatedInInfoDialog}"
                 android:text="@{item.associatedStrInInfoDialog}"
                 android:textAppearance="?attr/textAppearanceCaption"
@@ -106,8 +106,8 @@
             android:bind_visibility="@{item.showCharge}"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big"
             android:visibility="gone"
             tools:visibility="visible">
 
@@ -133,8 +133,8 @@
             android:layout_height="@dimen/item_height"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin">
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big">
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
@@ -156,7 +156,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/content_horizontal_spacing"
+                android:layout_marginStart="@dimen/spacing_normal"
                 android:text="@{item.typeStr}"
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="餐饮" />
@@ -169,8 +169,8 @@
             android:bind_visibility="@{item.showAssetInfo}"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big"
             android:visibility="gone"
             tools:visibility="visible">
 
@@ -191,7 +191,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/content_horizontal_spacing"
+                android:layout_marginStart="@dimen/spacing_normal"
                 android:text="@{item.assetName}"
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="支付宝" />
@@ -199,7 +199,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/content_horizontal_spacing"
+                android:layout_marginStart="@dimen/spacing_normal"
                 android:bind_visibility="@{item.showIntoAsset}"
                 android:text="@string/symbol_transfer"
                 android:textAppearance="?attr/textAppearanceBody2"
@@ -209,7 +209,7 @@
             <ImageView
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
-                android:layout_marginStart="@dimen/content_horizontal_spacing"
+                android:layout_marginStart="@dimen/spacing_normal"
                 android:bind_iv_srcResId="@{item.intoAssetLogoResId}"
                 android:bind_visibility="@{item.showIntoAsset}"
                 android:contentDescription="@null"
@@ -220,7 +220,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/content_horizontal_spacing"
+                android:layout_marginStart="@dimen/spacing_normal"
                 android:bind_visibility="@{item.showIntoAsset}"
                 android:text="@{item.intoAssetName}"
                 android:textAppearance="?attr/textAppearanceBody2"
@@ -237,8 +237,8 @@
             android:gravity="center_vertical"
             android:minHeight="@dimen/item_height"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big"
             android:visibility="gone"
             tools:visibility="visible">
 
@@ -256,9 +256,9 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/content_horizontal_spacing"
-                android:layout_marginTop="@dimen/content_vertical_spacing"
-                android:layout_marginBottom="@dimen/content_vertical_spacing"
+                android:layout_marginStart="@dimen/spacing_normal"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_normal"
                 android:text="@{item.remark}"
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="这是个啥这是个啥这这是个啥这是个啥这" />
@@ -271,8 +271,8 @@
             android:gravity="center_vertical"
             android:minHeight="@dimen/item_height"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin">
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big">
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
@@ -284,9 +284,9 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/content_horizontal_spacing"
-                android:layout_marginTop="@dimen/content_vertical_spacing"
-                android:layout_marginBottom="@dimen/content_vertical_spacing"
+                android:layout_marginStart="@dimen/spacing_normal"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_normal"
                 android:text="@{item.recordTimeStr}"
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="2021-06-11 12:00" />

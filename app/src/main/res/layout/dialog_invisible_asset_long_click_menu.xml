@@ -22,8 +22,8 @@
             android:background="?selectableItemBackground"
             android:bind_onClick="@{viewModel.onCancelHiddenClick}"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big"
             android:text="@string/cancel_hidden"
             android:textAppearance="?attr/textAppearanceListItem" />
 

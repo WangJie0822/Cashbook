@@ -105,4 +105,10 @@
     <string name="refunded_with_colon">已退款：</string>
     <string name="returned_with_colon">已报销：</string>
     <string name="associated_with_colon">已关联：</string>
+    <string name="about_us">关于我们</string>
+    <string name="about_us_description">这是一个免费的、开源的软件，目的是为了更加便捷、稳定的记录生活中的相关开支，当然你也可以自己为它添加个性化的功能。</string>
+    <string name="contact_me">联系我</string>
+    <string name="please_select_browser">请选择浏览器</string>
+    <string name="user_agreement_and_privacy_policy">用户协议和隐私政策</string>
+    <string name="check_update">检查更新</string>
 </resources>

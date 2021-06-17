@@ -31,7 +31,7 @@
             android:id="@+id/fab_invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/content_vertical_spacing"
+            android:layout_marginBottom="@dimen/spacing_normal"
             android:bind_onClick="@{viewModel.onInvisibleAssetClick}"
             android:contentDescription="@null"
             app:fabSize="mini"
@@ -43,7 +43,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/spacing_big"
             android:bind_onClick="@{viewModel.onInvisibleAssetClick}"
             app:cardBackgroundColor="?attr/colorSecondary"
             app:layout_constraintBottom_toBottomOf="@id/fab_invisible"
@@ -53,7 +53,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/content_horizontal_spacing"
+                android:layout_marginHorizontal="@dimen/spacing_normal"
                 android:layout_marginVertical="4dp"
                 android:text="@string/invisible_asset"
                 android:textAppearance="?attr/textAppearanceSubtitle2" />
@@ -64,7 +64,7 @@
             android:id="@+id/fab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/content_vertical_spacing"
+            android:layout_marginBottom="@dimen/spacing_normal"
             android:bind_onClick="@{viewModel.onAddClick}"
             android:contentDescription="@null"
             app:fabSize="mini"
@@ -76,7 +76,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/spacing_big"
             android:bind_onClick="@{viewModel.onAddClick}"
             app:cardBackgroundColor="?attr/colorSecondary"
             app:layout_constraintBottom_toBottomOf="@id/fab_add"
@@ -86,7 +86,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/content_horizontal_spacing"
+                android:layout_marginHorizontal="@dimen/spacing_normal"
                 android:layout_marginVertical="4dp"
                 android:text="@string/add_asset"
                 android:textAppearance="?attr/textAppearanceSubtitle2" />

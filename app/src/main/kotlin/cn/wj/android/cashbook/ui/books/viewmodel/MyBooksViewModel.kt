@@ -129,6 +129,8 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 ls[index] = books
                 booksListData.value = ls
             }
+            // 更新当前账本数据
+            CurrentBooksLiveData.value = books
         }
     }
 

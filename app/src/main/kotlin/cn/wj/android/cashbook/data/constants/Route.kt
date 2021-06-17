@@ -9,6 +9,9 @@ package cn.wj.android.cashbook.data.constants
 /** 路由路径 - 主界面 */
 const val ROUTE_PATH_MAIN = "/path/main"
 
+/** 路由路径 - 关于我们 */
+const val ROUTE_PATH_ABOUT_US = "/path/main/aboutUs"
+
 /** 路由路径 - 我的账本 */
 const val ROUTE_PATH_MY_BOOKS = "/path/books/my"
 

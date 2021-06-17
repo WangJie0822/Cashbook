@@ -23,8 +23,8 @@
         android:bind_onClick_item="@{item}"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="@dimen/content_horizontal_spacing"
-        android:paddingEnd="@dimen/content_horizontal_spacing"
+        android:paddingStart="@dimen/spacing_normal"
+        android:paddingEnd="@dimen/spacing_normal"
         tools:background="@color/white">
 
         <ImageView
@@ -40,7 +40,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/content_horizontal_spacing"
+            android:layout_marginStart="@dimen/spacing_normal"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -78,7 +78,7 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/content_horizontal_spacing"
+                    android:layout_marginEnd="@dimen/spacing_normal"
                     android:bind_visibility="@{item.showAssociated}"
                     android:text="@{item.associatedStr}"
                     android:textAppearance="?attr/textAppearanceCaption"

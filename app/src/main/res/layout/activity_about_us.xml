@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.main.activity.AboutUsActivity">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.main.viewmodel.AboutUsViewModel" />
+
+        <import type="cn.wj.android.cashbook.BuildConfig" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/ll_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
+            app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
+            app:navigationIconTint="@color/color_on_primary"
+            app:title="@string/about_us"
+            app:titleTextColor="@color/color_on_primary" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorSurface"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/blank_bottom_size">
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size_launcher"
+                    android:layout_height="@dimen/icon_size_launcher"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_big"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_launcher" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/app_name"
+                    android:textAppearance="?attr/textAppearanceHeadline5" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@{BuildConfig.VERSION_NAME}"
+                    android:textAppearance="?attr/textAppearanceCaption"
+                    tools:text="v1.0.0" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_big"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:layout_marginEnd="@dimen/spacing_big"
+                    android:text="@string/about_us_description"
+                    android:textAppearance="?attr/textAppearanceListItem" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:background="?selectableItemBackground"
+                    android:bind_onClick="@{viewModel.onContactMeClick}"
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingTop="@dimen/spacing_normal"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:paddingBottom="@dimen/spacing_normal"
+                    android:text="@string/contact_me"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
+                        android:bind_onClick="@{viewModel.onGithubClick}"
+                        android:paddingStart="@dimen/spacing_big"
+                        android:paddingTop="@dimen/spacing_normal"
+                        android:paddingEnd="@dimen/spacing_big"
+                        android:paddingBottom="@dimen/spacing_normal"
+                        android:text="@string/github"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="?attr/colorSecondary"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
+                        android:bind_onClick="@{viewModel.onGiteeClick}"
+                        android:paddingStart="@dimen/spacing_big"
+                        android:paddingTop="@dimen/spacing_normal"
+                        android:paddingEnd="@dimen/spacing_big"
+                        android:paddingBottom="@dimen/spacing_normal"
+                        android:text="@string/gitee"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="?attr/colorSecondary"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:background="@color/color_divider" />
+<!--TODO-->
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_height"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:background="?selectableItemBackground"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:text="@string/check_update"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textColor="@color/color_on_secondary" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_height"
+                    android:background="?selectableItemBackground"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:text="@string/user_agreement_and_privacy_policy"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textColor="@color/color_on_secondary" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+</layout>

@@ -32,10 +32,10 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/content_vertical_spacing"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:paddingBottom="@dimen/content_vertical_spacing">
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingTop="@dimen/spacing_normal"
+            android:paddingEnd="@dimen/spacing_big"
+            android:paddingBottom="@dimen/spacing_normal">
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
@@ -83,8 +83,8 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/content_vertical_spacing"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginTop="@dimen/spacing_normal"
                 android:bind_visibility="@{viewModel.showHint}"
                 android:text="@{viewModel.hintStr}"
                 tools:text="近三个月大于退款金额的支出记录" />
@@ -93,8 +93,8 @@
                 android:id="@+id/rv_record"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingStart="@dimen/content_horizontal_spacing"
-                android:paddingEnd="@dimen/content_horizontal_spacing"
+                android:paddingStart="@dimen/spacing_normal"
+                android:paddingEnd="@dimen/spacing_normal"
                 tools:listitem="@layout/recycler_item_record" />
 
         </LinearLayout>

@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="@dimen/activity_vertical_margin" />
+            app:layout_constraintGuide_begin="@dimen/spacing_big" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_title"
@@ -46,9 +46,9 @@
             android:id="@+id/tv_content"
             android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/content_vertical_spacing"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/spacing_big"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:layout_marginEnd="@dimen/spacing_big"
             android:bind_tv_gravity="@{viewModel.contentGravity}"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
@@ -65,7 +65,7 @@
             android:id="@+id/mcb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/spacing_big"
             android:bind_visibility="@{viewModel.showSelect}"
             android:checked="@={viewModel.checked}"
             android:text="@{viewModel.selectStr}"

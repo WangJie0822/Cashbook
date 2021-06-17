@@ -31,7 +31,7 @@
             android:id="@+id/tv_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/spacing_big"
             android:bind_tv_textResId="@{viewModel.textResId}"
             android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +42,7 @@
         <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/spacing_big"
             android:bind_onClick="@{viewModel.onButtonClick}"
             android:bind_tv_textResId="@{viewModel.buttonTextResId}"
             android:bind_visibility="@{viewModel.showButton}"

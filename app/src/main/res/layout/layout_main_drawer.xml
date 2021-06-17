@@ -22,22 +22,22 @@
             android:background="@drawable/shape_main_nav_header_background"
             android:gravity="bottom"
             android:orientation="vertical"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingBottom="@dimen/activity_vertical_margin">
+            android:paddingLeft="@dimen/spacing_big"
+            android:paddingTop="@dimen/spacing_big"
+            android:paddingRight="@dimen/spacing_big"
+            android:paddingBottom="@dimen/spacing_big">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@null"
-                android:paddingTop="@dimen/content_vertical_spacing"
-                android:src="@drawable/img_rmb_shadow" />
+                android:paddingTop="@dimen/spacing_normal"
+                android:src="@drawable/ic_rmb_shadow" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/content_vertical_spacing"
+                android:paddingTop="@dimen/spacing_normal"
                 tools:text="未登录" />
 
             <TextView
@@ -56,7 +56,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/item_height"
-                android:layout_marginTop="@dimen/content_vertical_spacing"
+                android:layout_marginTop="@dimen/spacing_normal"
                 android:background="?selectableItemBackground"
                 android:bind_onClick="@{viewModel.onMyBooksClick}">
 
@@ -64,8 +64,8 @@
                     android:id="@+id/tv_my_books"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/activity_vertical_margin"
-                    android:drawablePadding="@dimen/drawable_vertical_spacing"
+                    android:layout_marginStart="@dimen/spacing_big"
+                    android:drawablePadding="@dimen/spacing_small"
                     android:gravity="start|center_vertical"
                     android:text="@string/my_books"
                     android:textAppearance="?attr/textAppearanceListItem"
@@ -78,9 +78,11 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/spacing_big"
+                    android:layout_marginEnd="@dimen/spacing_big"
+                    android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
                     android:ellipsize="end"
+                    android:gravity="center_vertical"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:text="@{viewModel.booksName}"
@@ -96,6 +98,56 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/item_height"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMyAssetClick}"
+                android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
+                android:drawablePadding="@dimen/spacing_small"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/spacing_big"
+                android:paddingEnd="@dimen/spacing_big"
+                android:text="@string/my_asset"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@color/color_on_secondary"
+                app:drawableStartCompat="@drawable/vector_baseline_web_asset_24" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="@color/color_divider" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/item_height"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onSettingClick}"
+                android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
+                android:drawablePadding="@dimen/spacing_small"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/spacing_big"
+                android:paddingEnd="@dimen/spacing_big"
+                android:text="@string/setting"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@color/color_on_secondary"
+                app:drawableStartCompat="@drawable/vector_baseline_settings_24" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/item_height"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onAboutUsClick}"
+                android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
+                android:drawablePadding="@dimen/spacing_small"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/spacing_big"
+                android:paddingEnd="@dimen/spacing_big"
+                android:text="@string/about_us"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@color/color_on_secondary"
+                app:drawableStartCompat="@drawable/vector_baseline_info_24" />
 
         </LinearLayout>
 

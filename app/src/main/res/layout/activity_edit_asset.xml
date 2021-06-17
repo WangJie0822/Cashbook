@@ -50,10 +50,10 @@
                     android:bind_onClick="@{viewModel.onAssetClassificationClick}"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingTop="@dimen/activity_vertical_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin">
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingTop="@dimen/spacing_big"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:paddingBottom="@dimen/spacing_big">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_asset_classification_title"
@@ -75,7 +75,7 @@
                         android:id="@+id/tv_asset_classification_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/content_horizontal_spacing"
+                        android:layout_marginStart="@dimen/spacing_normal"
                         android:bind_tv_textResId="@{viewModel.assetClassification.nameResId}"
                         android:textAppearance="?attr/textAppearanceSubtitle1"
                         tools:text="支付宝" />
@@ -93,13 +93,13 @@
                     android:id="@+id/ll_asset_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginTop="@dimen/spacing_normal"
                     android:background="?attr/colorSurface"
                     android:orientation="vertical"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingTop="@dimen/content_vertical_spacing"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/content_vertical_spacing">
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingTop="@dimen/spacing_normal"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:paddingBottom="@dimen/spacing_normal">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_asset_name"
@@ -132,7 +132,7 @@
                         android:id="@+id/til_total_amount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/content_vertical_spacing"
+                        android:layout_marginTop="@dimen/spacing_normal"
                         android:bind_til_error="@{viewModel.totalAmountError}"
                         android:bind_visibility="@{viewModel.creditCardType}"
                         android:hint="@string/total_amount"
@@ -162,7 +162,7 @@
                         android_bind_til_hint="@{viewModel.balanceHint}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/content_vertical_spacing"
+                        android:layout_marginTop="@dimen/spacing_normal"
                         android:hint="@string/asset_balance"
                         app:endIconMode="clear_text"
                         app:errorIconTint="?attr/colorError"
@@ -191,16 +191,16 @@
                     android:id="@+id/ll_billing_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginTop="@dimen/spacing_normal"
                     android:background="@drawable/selector_default_ripple"
                     android:bind_onClick="@{viewModel.onBillingDateClick}"
                     android:bind_visibility="@{viewModel.creditCardType}"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingTop="@dimen/activity_vertical_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin">
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingTop="@dimen/spacing_big"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:paddingBottom="@dimen/spacing_big">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_billing_date_title"
@@ -214,7 +214,7 @@
                         android:id="@+id/tv_billing_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/content_horizontal_spacing"
+                        android:layout_marginStart="@dimen/spacing_normal"
                         android:hint="@string/please_select"
                         android:text="@{viewModel.billingDate}"
                         android:textAppearance="?attr/textAppearanceSubtitle1" />
@@ -238,10 +238,10 @@
                     android:bind_visibility="@{viewModel.creditCardType}"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingTop="@dimen/activity_vertical_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin">
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingTop="@dimen/spacing_big"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:paddingBottom="@dimen/spacing_big">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_repayment_date_title"
@@ -255,7 +255,7 @@
                         android:id="@+id/tv_repayment_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/content_horizontal_spacing"
+                        android:layout_marginStart="@dimen/spacing_normal"
                         android:hint="@string/please_select"
                         android:text="@{viewModel.repaymentDate}"
                         android:textAppearance="?attr/textAppearanceSubtitle1" />
@@ -273,12 +273,12 @@
                     android:id="@+id/cl_invisible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/content_vertical_spacing"
+                    android:layout_marginTop="@dimen/spacing_normal"
                     android:background="?attr/colorSurface"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingTop="@dimen/activity_vertical_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin">
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingTop="@dimen/spacing_big"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:paddingBottom="@dimen/spacing_big">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_invisible_asset"
@@ -314,9 +314,9 @@
                     android:id="@+id/btn_save"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/item_height"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/spacing_big"
+                    android:layout_marginTop="@dimen/spacing_big"
+                    android:layout_marginEnd="@dimen/spacing_big"
                     android:bind_onClick="@{viewModel.onSaveClick}"
                     android:enabled="@{viewModel.saveEnable}"
                     android:text="@string/save" />

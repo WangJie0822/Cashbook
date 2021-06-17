@@ -83,11 +83,8 @@ fun ImageView.setImageViewPath(
     placeholder: Drawable?,
     default: Drawable?
 ) {
-
     if (path.isNullOrBlank()) {
-        if (null != default) {
-            setImageDrawable(default)
-        }
+        setImageDrawable(default)
         return
     }
     load(File(path)) {
@@ -122,9 +119,7 @@ fun ImageView.setImageViewImg(
     default: Drawable?
 ) {
     if (img.isNullOrBlank()) {
-        if (null != default) {
-            setImageDrawable(default)
-        }
+        setImageDrawable(default)
         return
     }
     if (img.startsWith("http:") || img.contains("https:")) {

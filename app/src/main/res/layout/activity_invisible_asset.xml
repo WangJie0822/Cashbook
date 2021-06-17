@@ -53,9 +53,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:layout_marginStart="@dimen/spacing_big"
+                        android:layout_marginTop="@dimen/spacing_big"
+                        android:layout_marginEnd="@dimen/spacing_big"
                         android:bind_visibility="@{viewModel.hasCapitalAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -66,8 +66,8 @@
                                 android:id="@+id/tv_capital_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginStart="@dimen/spacing_big"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:text="@string/asset_classifications_capital_account"
                                 android:textAppearance="?attr/textAppearanceBody1"
                                 android:textStyle="bold"
@@ -90,7 +90,7 @@
                                 android:id="@+id/v_capital"
                                 android:layout_width="0dp"
                                 android:layout_height="@dimen/divider_height"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:background="@color/color_divider"
                                 android:bind_visibility="@{!viewModel.hideCapitalAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -113,9 +113,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:layout_marginStart="@dimen/spacing_big"
+                        android:layout_marginTop="@dimen/spacing_big"
+                        android:layout_marginEnd="@dimen/spacing_big"
                         android:bind_visibility="@{viewModel.hasCreditCardAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -126,8 +126,8 @@
                                 android:id="@+id/tv_credit_card_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginStart="@dimen/spacing_big"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:text="@string/asset_classifications_credit_card_account"
                                 android:textAppearance="?attr/textAppearanceBody1"
                                 android:textStyle="bold"
@@ -150,7 +150,7 @@
                                 android:id="@+id/v_credit_card"
                                 android:layout_width="0dp"
                                 android:layout_height="@dimen/divider_height"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:background="@color/color_divider"
                                 android:bind_visibility="@{!viewModel.hideCreditCardAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -173,9 +173,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:layout_marginStart="@dimen/spacing_big"
+                        android:layout_marginTop="@dimen/spacing_big"
+                        android:layout_marginEnd="@dimen/spacing_big"
                         android:bind_visibility="@{viewModel.hasTopUpAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -186,8 +186,8 @@
                                 android:id="@+id/tv_top_up_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginStart="@dimen/spacing_big"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:text="@string/asset_classifications_top_up_account"
                                 android:textAppearance="?attr/textAppearanceBody1"
                                 android:textStyle="bold"
@@ -210,7 +210,7 @@
                                 android:id="@+id/v_top_up"
                                 android:layout_width="0dp"
                                 android:layout_height="@dimen/divider_height"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:background="@color/color_divider"
                                 android:bind_visibility="@{!viewModel.hideTopUpAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -233,9 +233,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:layout_marginStart="@dimen/spacing_big"
+                        android:layout_marginTop="@dimen/spacing_big"
+                        android:layout_marginEnd="@dimen/spacing_big"
                         android:bind_visibility="@{viewModel.hasInvestmentFinancialAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -246,8 +246,8 @@
                                 android:id="@+id/tv_investment_financial_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginStart="@dimen/spacing_big"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:text="@string/asset_classifications_investment_financial_account"
                                 android:textAppearance="?attr/textAppearanceBody1"
                                 android:textStyle="bold"
@@ -270,7 +270,7 @@
                                 android:id="@+id/v_investment_financial"
                                 android:layout_width="0dp"
                                 android:layout_height="@dimen/divider_height"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:background="@color/color_divider"
                                 android:bind_visibility="@{!viewModel.hideInvestmentFinancialAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -293,9 +293,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                        android:layout_marginStart="@dimen/spacing_big"
+                        android:layout_marginTop="@dimen/spacing_big"
+                        android:layout_marginEnd="@dimen/spacing_big"
                         android:bind_visibility="@{viewModel.hasDebtAccount}">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -306,8 +306,8 @@
                                 android:id="@+id/tv_debt_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginStart="@dimen/spacing_big"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:text="@string/asset_classifications_debt_account"
                                 android:textAppearance="?attr/textAppearanceBody1"
                                 android:textStyle="bold"
@@ -330,7 +330,7 @@
                                 android:id="@+id/v_debt"
                                 android:layout_width="0dp"
                                 android:layout_height="@dimen/divider_height"
-                                android:layout_marginTop="@dimen/activity_vertical_margin"
+                                android:layout_marginTop="@dimen/spacing_big"
                                 android:background="@color/color_divider"
                                 android:bind_visibility="@{!viewModel.hideDebtAccountList}"
                                 app:layout_constraintEnd_toEndOf="parent"

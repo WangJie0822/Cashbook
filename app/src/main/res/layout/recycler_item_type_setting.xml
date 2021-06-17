@@ -14,8 +14,8 @@
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
         android:bind_onClick="@{viewModel.onTypeSettingClick}"
-        android:paddingTop="@dimen/content_vertical_spacing"
-        android:paddingBottom="@dimen/content_vertical_spacing">
+        android:paddingTop="@dimen/spacing_normal"
+        android:paddingBottom="@dimen/spacing_normal">
 
         <ImageView
             android:id="@+id/iv_icon"
