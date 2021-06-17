@@ -70,6 +70,7 @@
                 android:id="@+id/search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:bind_search_text="@={viewModel.searchText}"
                 android:iconifiedByDefault="false"
                 android:queryBackground="@color/white"
                 android:queryHint="搜索全部账单备注/金额" />
@@ -84,6 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="@dimen/content_vertical_spacing"
+                android:bind_visibility="@{viewModel.showHint}"
                 android:text="@{viewModel.hintStr}"
                 tools:text="近三个月大于退款金额的支出记录" />
 

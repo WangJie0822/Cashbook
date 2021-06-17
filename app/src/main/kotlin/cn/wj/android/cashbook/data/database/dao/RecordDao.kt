@@ -68,4 +68,20 @@ interface RecordDao {
     /** 查询标记为可报销记录时间在 [recordTime] 之后的支出记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type=:type AND books_id=:booksId AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC")
     suspend fun queryReimburseExpenditureRecordAfterDate(booksId: Long, recordTime: Long, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
+
+    /** 查询备注满足 [remark] 条件的前 30 条支出记录 */
+    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND remark LIKE :remark ORDER BY record_time DESC LIMIT 30")
+    suspend fun queryExpenditureRecordByRemark(booksId: Long, remark: String, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
+
+    /** 查询金额等于 [amount] 的前 30 条支出记录 */
+    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND amount=:amount ORDER BY record_time DESC LIMIT 30")
+    suspend fun queryExpenditureRecordByAmount(booksId: Long, amount: Float, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
+
+    /** 查询备注满足 [remark] 条件的前 30 条支出记录 */
+    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND remark LIKE :remark AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
+    suspend fun queryReimburseExpenditureRecordByRemark(booksId: Long, remark: String, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
+
+    /** 查询金额等于 [amount] 的前 30 条支出记录 */
+    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND amount=:amount AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
+    suspend fun queryReimburseExpenditureRecordByAmount(booksId: Long, amount: Float, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 }

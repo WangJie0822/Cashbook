@@ -476,6 +476,50 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
     }
 
+    /** 根据关键字 [keywords] 搜索支出记录 */
+    suspend fun getExpenditureRecordByRemarkOrAmount(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<RecordEntity>()
+        val float = keywords.toFloatOrNull()
+        if (null == float) {
+            // 备注
+            recordDao.queryExpenditureRecordByRemark(CurrentBooksLiveData.booksId, "%$keywords%")
+        } else {
+            // 金额
+            recordDao.queryExpenditureRecordByAmount(CurrentBooksLiveData.booksId, float)
+        }.forEach { item ->
+            val record = loadRecordEntityFromTable(item, true)
+            if (null != record) {
+                result.add(record)
+            }
+        }
+        result.filter {
+            // 排除已关联的以及标记为可报销的
+            null == it.beAssociated && !it.reimbursable
+        }
+    }
+
+    /** 根据关键字 [keywords] 搜索支出记录 */
+    suspend fun getReimburseExpenditureRecordByRemarkOrAmount(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<RecordEntity>()
+        val float = keywords.toFloatOrNull()
+        if (null == float) {
+            // 备注
+            recordDao.queryReimburseExpenditureRecordByRemark(CurrentBooksLiveData.booksId, "%$keywords%")
+        } else {
+            // 金额
+            recordDao.queryReimburseExpenditureRecordByAmount(CurrentBooksLiveData.booksId, float)
+        }.forEach { item ->
+            val record = loadRecordEntityFromTable(item, true)
+            if (null != record) {
+                result.add(record)
+            }
+        }
+        result.filter {
+            // 排除已关联的
+            null == it.beAssociated
+        }
+    }
+
     /** 删除记录数据 [record] */
     suspend fun deleteRecord(record: RecordEntity) = withContext(Dispatchers.IO) {
         recordDao.delete(record.toRecordTable())

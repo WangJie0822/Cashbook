@@ -32,7 +32,7 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
     val refund: MutableLiveData<Boolean> = MutableLiveData()
 
     /** 默认展示记录列表 */
-    val defaultListData: LiveData<List<RecordEntity>> = refund.switchMap {
+    private val defaultListData: LiveData<List<RecordEntity>> = refund.switchMap {
         getDefaultDataList(it)
     }
 
@@ -49,6 +49,28 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
         } else {
             R.string.reimburse_with_colon
         }.string + CurrentBooksLiveData.currency.symbol + amount.value
+    }
+
+    /** 搜索框文本 */
+    val searchText: MutableLiveData<String> = MutableLiveData("")
+
+    /** 搜索结果数据 */
+    private val searchListData: LiveData<List<RecordEntity>> = searchText.switchMap {
+        searchDataListByRemarkOrAmount(it)
+    }
+
+    /** 显示列表数据 */
+    val listData: LiveData<List<RecordEntity>> = maps(searchListData, defaultListData) {
+        if (searchListData.value?.isEmpty().condition) {
+            defaultListData.value
+        } else {
+            searchListData.value
+        }.orEmpty()
+    }
+
+    /** 是否显示提示 */
+    val showHint: LiveData<Boolean> = searchListData.map {
+        it.isEmpty()
     }
 
     /** 提示文本 */
@@ -94,6 +116,31 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
                 }
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getDefaultDataList")
+            }
+        }
+        return result
+    }
+
+    /** 根据关键字 [keywords] 搜索备注或金额 */
+    private fun searchDataListByRemarkOrAmount(keywords: String): LiveData<List<RecordEntity>> {
+        val result = MutableLiveData<List<RecordEntity>>()
+        viewModelScope.launch {
+            try {
+                result.value = when {
+                    keywords.isBlank() -> {
+                        arrayListOf()
+                    }
+                    refund.value.condition -> {
+                        // 退款
+                        local.getExpenditureRecordByRemarkOrAmount(keywords)
+                    }
+                    else -> {
+                        // 报销
+                        local.getReimburseExpenditureRecordByRemarkOrAmount(keywords)
+                    }
+                }
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "searchDataListByRemarkOrAmount")
             }
         }
         return result
