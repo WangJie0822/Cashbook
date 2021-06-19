@@ -131,12 +131,13 @@
                     android:layout_height="@dimen/divider_height"
                     android:layout_marginTop="@dimen/spacing_normal"
                     android:background="@color/color_divider" />
-<!--TODO-->
+
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/item_height"
                     android:layout_marginTop="@dimen/spacing_normal"
                     android:background="?selectableItemBackground"
+                    android:bind_onClick="@{viewModel.onCheckUpdateClick}"
                     android:gravity="start|center_vertical"
                     android:paddingStart="@dimen/spacing_big"
                     android:paddingEnd="@dimen/spacing_big"
@@ -148,6 +149,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/item_height"
                     android:background="?selectableItemBackground"
+                    android:bind_onClick="@{viewModel.onUserAgreementAndPrivacyPolicyClick}"
                     android:gravity="start|center_vertical"
                     android:paddingStart="@dimen/spacing_big"
                     android:paddingEnd="@dimen/spacing_big"
