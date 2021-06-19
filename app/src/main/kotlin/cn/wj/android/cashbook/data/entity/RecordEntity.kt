@@ -200,6 +200,26 @@ data class RecordEntity(
     val showAssociated: Boolean
         get() = null != beAssociated
 
+    /** 当前记录是否有关联的记录 */
+    @IgnoredOnParcel
+    val showAssociation: Boolean
+        get() = null != record
+
+    /** 当前记录关联的记录类型 icon 资源id */
+    @IgnoredOnParcel
+    val associationTypeIconResIdStr: String
+        get() = record?.typeIconResIdStr.orEmpty()
+
+    /** 当前记录关联的记录类型名称 */
+    @IgnoredOnParcel
+    val associationTypeStr: String
+        get() = record?.typeStr.orEmpty()
+
+    /** 当前记录关联的记录金额信息 */
+    @IgnoredOnParcel
+    val associationAmountStr: String
+        get() = record?.amountStr.orEmpty()
+
     /** 关联信息文本 */
     @IgnoredOnParcel
     val associatedStr: String

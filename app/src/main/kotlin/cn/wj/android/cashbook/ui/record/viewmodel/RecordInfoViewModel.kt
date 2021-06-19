@@ -23,6 +23,9 @@ class RecordInfoViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     lateinit var record: RecordEntity
 
+    /** 显示关联记录信息弹窗数据 */
+    val showAssociatedRecordInfoData: MutableLiveData<RecordEntity> = MutableLiveData()
+
     /** 显示删除确认弹窗数据 */
     val showDeleteConfirmData: MutableLiveData<Int> = MutableLiveData()
 
@@ -43,6 +46,14 @@ class RecordInfoViewModel(private val local: LocalDataStore) : BaseViewModel() {
         showDeleteConfirmData.value = 0
     }
 
+    /** 关联的记录点击 */
+    val onAssociatedRecordClick: () -> Unit = {
+        record.record?.let {
+            showAssociatedRecordInfoData.value = it
+        }
+    }
+
+    /** 删除当前记录 [record] */
     fun deleteRecord() {
         viewModelScope.launch {
             try {

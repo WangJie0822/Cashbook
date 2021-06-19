@@ -63,6 +63,11 @@ class RecordInfoDialog : BaseDialog<RecordInfoViewModel, DialogRecordInfoBinding
                     viewModel.deleteRecord()
                 }.show(childFragmentManager)
         })
+        // 显示关联记录信息弹窗
+        viewModel.showAssociatedRecordInfoData.observe(this, { record ->
+            dismiss()
+            actionShow(requireActivity().supportFragmentManager, record)
+        })
     }
 
     companion object {

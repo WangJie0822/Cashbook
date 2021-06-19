@@ -166,6 +166,55 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_height"
+            android:background="?selectableItemBackground"
+            android:bind_onClick="@{viewModel.onAssociatedRecordClick}"
+            android:bind_visibility="@{item.showAssociation}"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/associated_record"
+                android:textAppearance="?attr/textAppearanceBody1" />
+
+            <ImageView
+                android:layout_width="@dimen/icon_size_larger"
+                android:layout_height="@dimen/icon_size_larger"
+                android:background="@drawable/selector_type_icon_background"
+                android:bind_iv_srcResIdStr="@{item.associationTypeIconResIdStr}"
+                android:contentDescription="@null"
+                android:padding="@dimen/icon_padding"
+                app:tint="@color/selector_type_icon_tint"
+                tools:src="@drawable/vector_type_balance_adjustment_24" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_normal"
+                android:layout_marginEnd="@dimen/spacing_normal"
+                android:text="@{item.associationTypeStr}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                tools:text="餐饮" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{item.associationAmountStr}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="@color/color_expenditure"
+                tools:text="-￥200.00" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
             android:bind_visibility="@{item.showAssetInfo}"
             android:gravity="center_vertical"
             android:orientation="horizontal"
