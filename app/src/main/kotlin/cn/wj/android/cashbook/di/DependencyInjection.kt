@@ -1,10 +1,18 @@
 package cn.wj.android.cashbook.di
 
 import androidx.room.Room
+import cn.wj.android.cashbook.BuildConfig
+import cn.wj.android.cashbook.base.tools.funLogger
+import cn.wj.android.cashbook.base.tools.jsonDefault
 import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
 import cn.wj.android.cashbook.data.database.CashbookDatabase
+import cn.wj.android.cashbook.data.net.UrlDefinition
+import cn.wj.android.cashbook.data.net.WebService
 import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.store.WebDataStore
 import cn.wj.android.cashbook.manager.AppManager
+import cn.wj.android.cashbook.third.okhttp.InterceptorLogger
+import cn.wj.android.cashbook.third.okhttp.LoggerInterceptor
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetInfoViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetLongClickMenuViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetMoreMenuViewModel
@@ -26,15 +34,47 @@ import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-
+import retrofit2.Retrofit
 
 /**
  * 依赖注入模块
  *
  * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/5/11
  */
+
+val netModule = module {
+    single {
+        // 日志打印
+        val logger = object : InterceptorLogger {
+            override fun invoke(msg: String) {
+                funLogger("NET").d(msg)
+            }
+        }
+        OkHttpClient.Builder()
+            .retryOnConnectionFailure(true)
+            .addNetworkInterceptor(
+                LoggerInterceptor(logger, if (BuildConfig.DEBUG) LoggerInterceptor.LEVEL_BODY else LoggerInterceptor.LEVEL_NONE)
+            )
+            .build()
+    }
+
+    single {
+        Retrofit.Builder()
+            .baseUrl(UrlDefinition.BASE_URL)
+            .addConverterFactory(jsonDefault.asConverterFactory("application/json; charset=UTF-8".toMediaType()))
+            .client(get())
+            .build()
+    }
+
+    single {
+        get<Retrofit>().create(WebService::class.java)
+    }
+}
 
 /** 数据库相关依赖注入 */
 val dbModule = module {
@@ -51,6 +91,9 @@ val dbModule = module {
 val dataStoreModule = module {
     factory {
         LocalDataStore(get())
+    }
+    factory {
+        WebDataStore(get())
     }
 }
 
@@ -88,7 +131,7 @@ val viewModelModule = module {
         SelectAssociatedRecordViewModel(get())
     }
     viewModel {
-        AboutUsViewModel()
+        AboutUsViewModel(get())
     }
 
     // Fragment

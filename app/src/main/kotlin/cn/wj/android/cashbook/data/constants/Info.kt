@@ -14,3 +14,9 @@ const val GITHUB_HOMEPAGE = "https://github.com/WangJie0822"
 
 /** Gitee 首页 */
 const val GITEE_HOMEPAGE = "https://gitee.com/wangjie0822"
+
+/** Gitee 用户名 */
+const val GITEE_OWNER = "wangjie0822"
+
+/** 项目仓库名 */
+const val GITEE_REPO = "Cashbook"

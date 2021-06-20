@@ -50,12 +50,14 @@ class GeneralDialog
         val arguments = arguments ?: return
         // 设置 UI 显示
         viewModel.showTitle.set(arguments.getBoolean(ACTION_SHOW_TITLE, false))
-        viewModel.titleStr.set(arguments.getString(ACTION_TITLE_STR, ""))
-        viewModel.contentStr.set(arguments.getString(ACTION_CONTENT_STR, ""))
+        viewModel.titleStr.set(arguments.getCharSequence(ACTION_TITLE_STR, ""))
+        viewModel.showSubtitle.set(arguments.getBoolean(ACTION_SHOW_SUBTITLE, false))
+        viewModel.subtitleStr.set(arguments.getCharSequence(ACTION_SUBTITLE_STR, ""))
+        viewModel.contentStr.set(arguments.getCharSequence(ACTION_CONTENT_STR, ""))
         viewModel.contentGravity.set(arguments.getInt(ACTION_CONTENT_GRAVITY, 0))
         viewModel.showSelect.set(arguments.getBoolean(ACTION_SHOW_SELECT, false))
         viewModel.checked.set(arguments.getBoolean(ACTION_CHECKED, false))
-        viewModel.selectStr.set(arguments.getString(ACTION_SELECT_STR, ""))
+        viewModel.selectStr.set(arguments.getCharSequence(ACTION_SELECT_STR, ""))
         viewModel.showNegativeButton.set(arguments.getBoolean(ACTION_SHOW_NEGATIVE_BUTTON, true))
         viewModel.negativeButtonStr.set(arguments.getString(ACTION_NEGATIVE_BUTTON_STR, ""))
         viewModel.showPositiveButton.set(arguments.getBoolean(ACTION_SHOW_POSITIVE_BUTTON, true))
@@ -154,11 +156,17 @@ class GeneralDialog
         /** 标记 - 是否显示标题  */
         private var showTitle = false
 
+        /** 标记 - 是否显示副标题  */
+        private var showSubtitle = false
+
         /** 标题文本  */
-        private var titleStr = ""
+        private var titleStr: CharSequence = ""
+
+        /** 副标题文本  */
+        private var subtitleStr: CharSequence = ""
 
         /** 内容文本  */
-        private var contentStr = ""
+        private var contentStr: CharSequence = ""
 
         /** 内容文本重心  */
         private var contentGravity = Gravity.START or Gravity.CENTER_VERTICAL
@@ -170,7 +178,7 @@ class GeneralDialog
         private var selected = false
 
         /** 选择器文本 - 默认：不再提示  */
-        private var selectStr = R.string.no_longer_prompt.string
+        private var selectStr: CharSequence = R.string.no_longer_prompt.string
 
         /** 标记 - 是否显示消极按钮  */
         private var showNegativeButton = true
@@ -205,6 +213,7 @@ class GeneralDialog
                 cancelable = builder.cancelable
                 showTitle = builder.showTitle
                 titleStr = builder.titleStr
+                subtitleStr = builder.subtitleStr
                 contentStr = builder.contentStr
                 contentGravity = builder.contentGravity
                 showSelect = builder.showSelect
@@ -235,13 +244,25 @@ class GeneralDialog
         }
 
         /** 设置 [GeneralDialog] 标题文本 [titleStr] 并返回 [Builder] 对象 */
-        fun titleStr(titleStr: String): Builder {
+        fun titleStr(titleStr: CharSequence): Builder {
             this.titleStr = titleStr
             return this
         }
 
+        /** 设置 [GeneralDialog] 副标题文本 [subtitleStr] 并返回 [Builder] 对象 */
+        fun subtitleStr(subtitleStr: CharSequence): Builder {
+            this.subtitleStr = subtitleStr
+            return this
+        }
+
+        /** 设置 [GeneralDialog] 是否显示标题 [showTitle] 并返回 [Builder] 对象 */
+        fun showSubtitle(showSubtitle: Boolean): Builder {
+            this.showSubtitle = showSubtitle
+            return this
+        }
+
         /** 设置 [GeneralDialog] 内容文本 并返回 [Builder] 对象 */
-        fun contentStr(contentStr: String): Builder {
+        fun contentStr(contentStr: CharSequence): Builder {
             this.contentStr = contentStr
             return this
         }
@@ -268,7 +289,7 @@ class GeneralDialog
         }
 
         /** 设置 [GeneralDialog] 选择器提示文本 [selectStr] 并返回 [Builder] 对象 */
-        fun selectTipsStr(selectStr: String): Builder {
+        fun selectTipsStr(selectStr: CharSequence): Builder {
             this.selectStr = selectStr
             return this
         }
@@ -389,6 +410,8 @@ class GeneralDialog
                 arguments = bundleOf(
                     ACTION_SHOW_TITLE to showTitle,
                     ACTION_TITLE_STR to titleStr,
+                    ACTION_SHOW_SUBTITLE to showSubtitle,
+                    ACTION_SUBTITLE_STR to subtitleStr,
                     ACTION_CONTENT_STR to contentStr,
                     ACTION_CONTENT_GRAVITY to contentGravity,
                     ACTION_SHOW_SELECT to showSelect,
@@ -416,6 +439,12 @@ class GeneralDialog
 
         /** 参数 Key - 标题文本  */
         private const val ACTION_TITLE_STR = "action_title_str"
+
+        /** 参数 Key - 是否显示副标题  */
+        private const val ACTION_SHOW_SUBTITLE = "action_show_subtitle"
+
+        /** 参数 Key - 副标题文本 */
+        private const val ACTION_SUBTITLE_STR = "action_subtitle_str"
 
         /** 参数 Key - 内容文本  */
         private const val ACTION_CONTENT_STR = "action_content_str"

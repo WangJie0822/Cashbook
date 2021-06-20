@@ -28,7 +28,7 @@ class GeneralViewModel : BaseViewModel() {
     val positiveClickData = MutableLiveData<Int>()
 
     /** 标题文本  */
-    val titleStr: ObservableField<String> = ObservableField("")
+    val titleStr: ObservableField<CharSequence> = ObservableField("")
 
     /** 标记 - 是否显示标题  */
     val showTitle: ObservableBoolean = object : ObservableBoolean(titleStr) {
@@ -37,8 +37,18 @@ class GeneralViewModel : BaseViewModel() {
         }
     }
 
+    /** 副标题文本 */
+    val subtitleStr: ObservableField<CharSequence> = ObservableField("")
+
+    /** 标记 - 是否显示副标题  */
+    val showSubtitle: ObservableBoolean = object : ObservableBoolean(subtitleStr) {
+        override fun get(): Boolean {
+            return !subtitleStr.get().isNullOrBlank()
+        }
+    }
+
     /** 内容文本  */
-    val contentStr: ObservableField<String> = ObservableField("")
+    val contentStr: ObservableField<CharSequence> = ObservableField("")
 
     /** 内容文本重心  */
     val contentGravity: ObservableInt = ObservableInt(Gravity.START or Gravity.CENTER_VERTICAL)
@@ -50,7 +60,7 @@ class GeneralViewModel : BaseViewModel() {
     val checked: ObservableBoolean = ObservableBoolean(false)
 
     /** 选择器文本 - 默认：不再提示  */
-    val selectStr: ObservableField<String> = ObservableField(R.string.no_longer_prompt.string)
+    val selectStr: ObservableField<CharSequence> = ObservableField(R.string.no_longer_prompt.string)
 
     /** 标记 - 是否显示消极按钮  */
     val showNegativeButton: ObservableBoolean = ObservableBoolean(true)

@@ -347,6 +347,19 @@ object Dependencies {
 
             const val compose = "androidx.navigation:navigation-compose:1.0.0-alpha08"
         }
+
+        /** WorkManager 相关 */
+        object Work {
+
+            /** 版本号 */
+            const val version = "2.5.0"
+
+            const val runtime = "androidx.work:work-runtime:$version"
+            const val runtimeKtx = "androidx.work:work-runtime-ktx:$version"
+            const val rxjava2 = "androidx.work:work-rxjava2:$version"
+            const val rxjava3 = "androidx.work:work-rxjava3:$version"
+            const val testing = "androidx.work:work-testing:$version"
+        }
     }
 
     /**
@@ -484,7 +497,7 @@ object Dependencies {
         object OkHttp {
 
             /** okhttp 版本 */
-            private const val version = "3.12.1"
+            private const val version = "4.9.1"
 
             const val okhttp = "com.squareup.okhttp3:okhttp:$version"
             const val urlConnection = "com.squareup.okhttp3:okhttp-urlconnection:$version"

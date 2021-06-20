@@ -8,6 +8,7 @@ import androidx.multidex.MultiDex
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.di.dataStoreModule
 import cn.wj.android.cashbook.di.dbModule
+import cn.wj.android.cashbook.di.netModule
 import cn.wj.android.cashbook.di.viewModelModule
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.third.logger.MyFormatStrategy
@@ -55,7 +56,7 @@ class MyApplication : Application() {
         startKoin {
             androidLogger(Level.NONE)
             androidContext(this@MyApplication)
-            modules(listOf(dbModule, dataStoreModule, viewModelModule))
+            modules(listOf(netModule, dbModule, dataStoreModule, viewModelModule))
         }
 
         // 初始化 ARouter

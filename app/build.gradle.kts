@@ -186,6 +186,9 @@ dependencies {
     // Paging
     implementation(Dependencies.Androidx.Paging.runtimeKtx)
 
+    // WorkManager
+    implementation(Dependencies.Androidx.Work.runtimeKtx)
+
     // Material
     implementation(Dependencies.Google.material)
 
@@ -201,6 +204,10 @@ dependencies {
 
     // OkHttp
     implementation(Dependencies.Squareup.OkHttp.okhttp)
+
+    // Retrofit
+    implementation(Dependencies.Squareup.Retrofit.retrofit)
+    implementation(Dependencies.Squareup.Retrofit.converterKt)
 
     // Coil
     implementation(Dependencies.Coil.coil)

@@ -112,4 +112,7 @@
     <string name="user_agreement_and_privacy_policy">用户协议和隐私政策</string>
     <string name="check_update">检查更新</string>
     <string name="associated_record">关联的记录</string>
+    <string name="it_is_the_latest_version">已是最新版本</string>
+    <string name="new_versions">新版本</string>
+    <string name="update">更新</string>
 </resources>

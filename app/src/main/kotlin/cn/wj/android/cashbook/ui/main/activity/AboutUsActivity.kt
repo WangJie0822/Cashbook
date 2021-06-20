@@ -3,11 +3,14 @@ package cn.wj.android.cashbook.ui.main.activity
 import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.runIfNotNullAndBlank
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.jumpBrowser
 import cn.wj.android.cashbook.base.tools.jumpSendEmail
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityAboutUsBinding
+import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.AboutUsViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -39,6 +42,18 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
             url.runIfNotNullAndBlank {
                 jumpBrowser(this)
             }
+        })
+        // 升级提示弹窗
+        viewModel.showUpdateDialogData.observe(this, { info ->
+            GeneralDialog.newBuilder()
+                .titleStr(R.string.new_versions.string)
+                .subtitleStr(info.name.orEmpty())
+                .contentStr(info.body.orEmpty())
+                .setPositiveAction(R.string.update.string) {
+                    // TODO 下载升级
+                    viewModel.snackbarData.value = "下载升级".toSnackbarModel()
+                }
+                .show(supportFragmentManager)
         })
     }
 }
