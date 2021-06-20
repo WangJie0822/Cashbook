@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
@@ -82,7 +83,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         } else {
             var total = "0".toBigDecimal()
             it.forEach { asset ->
-                total += asset.balance.toBigDecimal()
+                total += asset.balance.toBigDecimalOrZero()
             }
             "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }
@@ -115,7 +116,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
                 asset.balance.toFloatOrNull().orElse(0f) > 0f
             }
                 .forEach { asset ->
-                    total += asset.balance.toBigDecimal()
+                    total += asset.balance.toBigDecimalOrZero()
                 }
             "-${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }
@@ -145,7 +146,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         } else {
             var total = "0".toBigDecimal()
             it.forEach { asset ->
-                total += asset.balance.toBigDecimal()
+                total += asset.balance.toBigDecimalOrZero()
             }
             "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }
@@ -173,9 +174,9 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         if (it.isEmpty()) {
             ""
         } else {
-            var total = "0".toBigDecimal()
+            var total = "0".toBigDecimalOrZero()
             it.forEach { asset ->
-                total += asset.balance.toBigDecimal()
+                total += asset.balance.toBigDecimalOrZero()
             }
             "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }
@@ -208,10 +209,10 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             it.forEach { asset ->
                 if (asset.classification == AssetClassificationEnum.BORROW) {
                     // 借入
-                    totalBorrow += asset.balance.toBigDecimal()
+                    totalBorrow += asset.balance.toBigDecimalOrZero()
                 } else {
                     // 借出
-                    totalLend += asset.balance.toBigDecimal()
+                    totalLend += asset.balance.toBigDecimalOrZero()
                 }
             }
             R.string.debt_total_format.string.format("${CurrentBooksLiveData.currency.symbol}${totalBorrow.formatToNumber()}", "${CurrentBooksLiveData.currency.symbol}${totalLend.formatToNumber()}")
@@ -243,15 +244,15 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             it.forEach { asset ->
                 if (asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.classification != AssetClassificationEnum.BORROW) {
                     // 总资产
-                    total += asset.balance.toBigDecimal()
+                    total += asset.balance.toBigDecimalOrZero()
                 }
                 if (asset.classification == AssetClassificationEnum.BORROW) {
                     // 借入
-                    totalBorrow += asset.balance.toBigDecimal()
+                    totalBorrow += asset.balance.toBigDecimalOrZero()
                 }
                 if (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull().orElse(0f) > 0) {
                     // 信用卡且有欠款
-                    totalCreditCard += asset.balance.toBigDecimal()
+                    totalCreditCard += asset.balance.toBigDecimalOrZero()
                 }
             }
             "${CurrentBooksLiveData.currency.symbol}${(total - totalBorrow - totalCreditCard).formatToNumber()}"
@@ -268,7 +269,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             it.filter { asset ->
                 asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.classification != AssetClassificationEnum.BORROW
             }.forEach { asset ->
-                total += asset.balance.toBigDecimal()
+                total += asset.balance.toBigDecimalOrZero()
             }
             "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }
@@ -284,7 +285,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
             it.filter { asset ->
                 (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull().orElse(0f) > 0) || asset.classification == AssetClassificationEnum.BORROW
             }.forEach { asset ->
-                total += asset.balance.toBigDecimal()
+                total += asset.balance.toBigDecimalOrZero()
             }
             "-${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
         }

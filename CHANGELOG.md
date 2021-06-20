@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Fixed
+- 修复资产信息界面金额显示异常问题；
 
 ## [0.1.0]
 ### Added

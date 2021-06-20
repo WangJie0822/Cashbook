@@ -5,6 +5,7 @@ package cn.wj.android.cashbook.base.ext.base
 
 import cn.wj.android.cashbook.base.tools.dip2px
 import cn.wj.android.cashbook.base.tools.sp2px
+import java.math.BigDecimal
 import kotlin.math.roundToInt
 
 /**
@@ -26,3 +27,11 @@ val Number.sp: Float
 /** 单位标记 - DP 单位 */
 val Number.dpi: Int
     get() = dip2px(this).roundToInt()
+
+fun String?.toBigDecimalOrZero(): BigDecimal {
+    return this?.toBigDecimalOrNull() ?: "0".toBigDecimal()
+}
+
+fun Number?.toBigDecimalOrZero(): BigDecimal {
+    return this?.toString().toBigDecimalOrZero()
+}

@@ -8,8 +8,10 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
+import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
@@ -53,21 +55,21 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
 
     /** 本月支出 */
     val expenditure: LiveData<String> = currentMonthRecord.map {
-        var totalExpenditure = 0f
+        var totalExpenditure = "0".toBigDecimal()
         it.forEach { record ->
             if (record.type == RecordTypeEnum.EXPENDITURE) {
                 // 支出
-                totalExpenditure += record.amount.toFloatOrNull().orElse(0f)
+                totalExpenditure += record.amount.toBigDecimalOrZero()
             }
             if (record.type == RecordTypeEnum.TRANSFER) {
                 // 转账
                 val chargeF = record.charge.toFloatOrNull().orElse(0f)
                 if (chargeF > 0f) {
-                    totalExpenditure += chargeF
+                    totalExpenditure += chargeF.toBigDecimalOrZero()
                 }
             }
         }
-        CurrentBooksLiveData.currency.symbol + totalExpenditure.toString()
+        CurrentBooksLiveData.currency.symbol + totalExpenditure.formatToNumber()
     }
 
     /** 本月支出透明度 */
@@ -75,14 +77,14 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
 
     /** 本月收入 */
     val income: LiveData<String> = currentMonthRecord.map {
-        var totalIncome = 0f
+        var totalIncome = "0".toBigDecimal()
         it.forEach { record ->
             if (record.type == RecordTypeEnum.INCOME) {
                 // 支出
-                totalIncome += record.amount.toFloatOrNull().orElse(0f)
+                totalIncome += record.amount.toBigDecimalOrZero()
             }
         }
-        CurrentBooksLiveData.currency.symbol + totalIncome.toString()
+        CurrentBooksLiveData.currency.symbol + totalIncome.formatToNumber()
     }
 
     /** 本月结余 */

@@ -4,6 +4,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
@@ -28,16 +29,16 @@ data class DateRecordEntity(
                 when (it.type) {
                     RecordTypeEnum.EXPENDITURE -> {
                         // 支出
-                        totalExpend += it.amount.toBigDecimal()
+                        totalExpend += it.amount.toBigDecimalOrZero()
                     }
                     RecordTypeEnum.INCOME -> {
                         // 收入
-                        totalIncome += it.amount.toBigDecimal()
+                        totalIncome += it.amount.toBigDecimalOrZero()
                     }
                     RecordTypeEnum.TRANSFER -> {
                         // 转账
                         if (it.charge.toFloatOrNull().orElse(0f) > 0) {
-                            totalExpend += it.amount.toBigDecimal()
+                            totalExpend += it.amount.toBigDecimalOrZero()
                         }
                     }
                     else -> {

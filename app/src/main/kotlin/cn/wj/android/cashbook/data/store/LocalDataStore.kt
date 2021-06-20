@@ -4,8 +4,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.liveData
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.ext.base.toMoneyFloat
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
@@ -255,22 +257,22 @@ class LocalDataStore(private val database: CashbookDatabase) {
         // 获取最后一条修改数据
         val lastModify = modifyList.first()
         // 获取在此之后的所有记录
-        var result = lastModify.amount
+        var result = lastModify.amount.toBigDecimalOrZero()
         val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
         recordList.forEach {
             when (it.type) {
                 RecordTypeEnum.INCOME.name -> {
                     // 收入
-                    result += it.amount
+                    result += it.amount.toBigDecimalOrZero()
                 }
                 RecordTypeEnum.EXPENDITURE.name -> {
                     // 支出
-                    result -= it.amount
+                    result -= it.amount.toBigDecimalOrZero()
                 }
                 RecordTypeEnum.TRANSFER.name -> {
                     // 转账
-                    result -= it.charge
-                    result -= it.charge
+                    result -= it.amount.toBigDecimalOrZero()
+                    result -= it.charge.toBigDecimalOrZero()
                 }
             }
         }
@@ -280,12 +282,12 @@ class LocalDataStore(private val database: CashbookDatabase) {
             when (it.type) {
                 RecordTypeEnum.TRANSFER.name -> {
                     // 转账
-                    result += it.amount
-                    result += it.charge
+                    result += it.amount.toBigDecimalOrZero()
+                    result += it.charge.toBigDecimalOrZero()
                 }
             }
         }
-        result.toString()
+        result.formatToNumber()
     }
 
     /** 将记录 [record] 插入到数据库并返回生成的主键 id */
