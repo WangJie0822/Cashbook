@@ -141,4 +141,8 @@
     <string name="it_is_the_latest_version">已是最新版本</string>
     <string name="new_versions">新版本</string>
     <string name="update">更新</string>
+    <string name="version_info">版本信息</string>
+    <string name="update_resource">更新资源</string>
+    <string name="update_need_permission">更新升级需要您同意权限申请</string>
+    <string name="no_wifi_available_hint">未连接Wi-Fi，确定使用数据流量下载吗？</string>
 </resources>

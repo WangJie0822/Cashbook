@@ -12,31 +12,31 @@ object Dependencies {
 
     /**
      * Logger 日志打印
-     * - Github: [https://github.com/orhanobut/logger]
+     * - [Github](https://github.com/orhanobut/logger)
      */
     const val logger = "com.orhanobut:logger:2.2.0"
 
     /**
      * Klaxon
-     * - Github: [https://github.com/cbeust/klaxon]
+     * - [Github](https://github.com/cbeust/klaxon)
      */
     const val klaxon = "com.beust:klaxon:5.4"
 
     /**
      * 美团多渠道
-     * - Github：[https://github.com/Meituan-Dianping/walle]
+     * - [Github](https://github.com/Meituan-Dianping/walle)
      */
     const val walleChannel = "com.meituan.android.walle:library:1.1.7"
 
     /**
      * LiveEventBus
-     * - Github：[https://github.com/JeremyLiao/LiveEventBus]
+     * - [Github](https://github.com/JeremyLiao/LiveEventBus)
      */
     const val liveEventBus = "com.jeremyliao:live-event-bus-x:1.7.3"
 
     /**
      * TabLayout
-     * - Github: [https://github.com/H07000223/FlycoTabLayout]
+     * - [Github](https://github.com/H07000223/FlycoTabLayout)
      */
     const val tabLayout = "com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar"
 
@@ -68,14 +68,14 @@ object Dependencies {
 
         /**
          * kotlin 协程
-         * - 指南：[https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html]
-         * - Github：[https://github.com/Kotlin/kotlinx.coroutines]
+         * - [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
+         * - [Github](https://github.com/Kotlin/kotlinx.coroutines)
          */
         const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3"
 
         /**
          * kotlin Json 序列化
-         * - Github: [https://github.com/Kotlin/kotlinx.serialization]
+         * - [Github](https://github.com/Kotlin/kotlinx.serialization)
          */
         const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0"
     }
@@ -129,8 +129,7 @@ object Dependencies {
                 const val core = "androidx.test.espresso:espresso-core:$version"
                 const val accessibility = "androidx.test.espresso:espresso-accessibility:$version"
                 const val contrib = "androidx.test.espresso:espresso-contrib:$version"
-                const val idlingResource =
-                    "androidx.test.espresso:espresso-idling-resource:$version"
+                const val idlingResource = "androidx.test.espresso:espresso-idling-resource:$version"
                 const val intents = "androidx.test.espresso:espresso-intents:$version"
                 const val remote = "androidx.test.espresso:espresso-remote:$version"
                 const val web = "androidx.test.espresso:espresso-web:$version"
@@ -143,8 +142,7 @@ object Dependencies {
                     /** idling 版本号 */
                     private const val version = "3.3.0"
 
-                    const val concurrent =
-                        "androidx.test.espresso.idling:idling-concurrent:$version"
+                    const val concurrent = "androidx.test.espresso.idling:idling-concurrent:$version"
                     const val net = "androidx.test.espresso.idling:idling-net:$version"
                 }
             }
@@ -253,8 +251,7 @@ object Dependencies {
             private const val version = "2.3.1"
 
             const val reactivestreams = "androidx.lifecycle:lifecycle-reactivestreams:$version"
-            const val reactivestreamsKtx =
-                "androidx.lifecycle:lifecycle-reactivestreams-ktx:$version"
+            const val reactivestreamsKtx = "androidx.lifecycle:lifecycle-reactivestreams-ktx:$version"
             const val process = "androidx.lifecycle:lifecycle-process:$version"
             const val common = "androidx.lifecycle:lifecycle-common:$version"
             const val commonJava8 = "androidx.lifecycle:lifecycle-common-java8:$version"
@@ -269,12 +266,10 @@ object Dependencies {
             const val service = "androidx.lifecycle:lifecycle-service:$version"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel:$version"
             const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
-            const val viewModelSavedState =
-                "androidx.lifecycle:lifecycle-viewmodel-savedstate:$version"
+            const val viewModelSavedState = "androidx.lifecycle:lifecycle-viewmodel-savedstate:$version"
 
             const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
-            const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha02"
+            const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha02"
         }
 
         /**
@@ -329,10 +324,8 @@ object Dependencies {
 
             const val fragment = "androidx.navigation:navigation-fragment:$version"
             const val fragmentKtx = "androidx.navigation:navigation-fragment-ktx:$version"
-            const val safeArgsGenerator =
-                "androidx.navigation:navigation-safe-args-generator:$version"
-            const val safeArgsGradlePlugin =
-                "androidx.navigation:navigation-safe-args-gradle-plugin:$version"
+            const val safeArgsGenerator = "androidx.navigation:navigation-safe-args-generator:$version"
+            const val safeArgsGradlePlugin = "androidx.navigation:navigation-safe-args-gradle-plugin:$version"
             const val ui = "androidx.navigation:navigation-ui:$version"
             const val uiKtx = "androidx.navigation:navigation-ui-ktx:$version"
             const val runtime = "androidx.navigation:navigation-runtime:$version"
@@ -340,10 +333,8 @@ object Dependencies {
             const val common = "androidx.navigation:navigation-common:$version"
             const val commonKtx = "androidx.navigation:navigation-common-ktx:$version"
             const val testing = "androidx.navigation:navigation-testing:$version"
-            const val dynamicFeaturesFragment =
-                "androidx.navigation:navigation-dynamic-features-fragment:$version"
-            const val dynamicFeaturesRuntime =
-                "androidx.navigation:navigation-dynamic-features-runtime:$version"
+            const val dynamicFeaturesFragment = "androidx.navigation:navigation-dynamic-features-fragment:$version"
+            const val dynamicFeaturesRuntime = "androidx.navigation:navigation-dynamic-features-runtime:$version"
 
             const val compose = "androidx.navigation:navigation-compose:1.0.0-alpha08"
         }
@@ -372,7 +363,7 @@ object Dependencies {
 
         /**
          * Zxing
-         * - Github：[https://github.com/zxing/zxing]
+         * - [Github](https://github.com/zxing/zxing)
          */
         const val zxing = "com.google.zxing:core:3.4.1"
 
@@ -386,7 +377,7 @@ object Dependencies {
 
             /**
              * Gson
-             * - Github：[https://github.com/google/gson]
+             * - [Github](https://github.com/google/gson)
              */
             const val gson = "com.google.code.gson:gson:2.8.6"
         }
@@ -422,7 +413,7 @@ object Dependencies {
 
     /**
      * Moshi
-     * - Github: [https://github.com/square/moshi]
+     * - [Github](https://github.com/square/moshi)
      */
     object Moshi {
 
@@ -435,7 +426,7 @@ object Dependencies {
 
     /**
      * Koin
-     * - Github：[https://github.com/InsertKoinIO/koin]
+     * - [Github](https://github.com/InsertKoinIO/koin)
      */
     object Koin2 {
 
@@ -453,7 +444,7 @@ object Dependencies {
 
     /**
      * Koin3
-     * - Github：[https://github.com/InsertKoinIO/koin]
+     * - [Github](https://github.com/InsertKoinIO/koin)
      */
     object Koin3 {
 
@@ -468,7 +459,7 @@ object Dependencies {
 
     /**
      * Glide
-     * - Github：[https://github.com/bumptech/glide]
+     * - [Github](https://github.com/bumptech/glide)
      */
     object Glide {
 
@@ -486,13 +477,13 @@ object Dependencies {
 
         /**
          * okio
-         * - Github: [https://github.com/square/okio]
+         * - [Github](https://github.com/square/okio)
          */
         const val okio = "com.squareup.okio:okio:2.10.0"
 
         /**
          * okhttp
-         * - Github：[https://github.com/square/okhttp]
+         * - [Github](https://github.com/square/okhttp)
          */
         object OkHttp {
 
@@ -506,7 +497,7 @@ object Dependencies {
 
         /**
          * Retrofit
-         * - Github：[https://github.com/square/retrofit]
+         * - [Github](https://github.com/square/retrofit)
          */
         object Retrofit {
 
@@ -523,7 +514,7 @@ object Dependencies {
 
     /**
      * SmartRefreshLayout
-     * - Github：[https://github.com/scwang90/SmartRefreshLayout]
+     * - [Github](https://github.com/scwang90/SmartRefreshLayout)
      */
     object SmartRefresh {
 
@@ -537,7 +528,7 @@ object Dependencies {
 
     /**
      * 状态栏工具
-     * - Github: [https://github.com/gyf-dev/ImmersionBar]
+     * - [Github](https://github.com/gyf-dev/ImmersionBar)
      */
     object ImmersionBar {
 
@@ -550,7 +541,7 @@ object Dependencies {
 
     /**
      * Coil 图片加载
-     * - Github: [https://github.com/coil-kt/coil]
+     * - [Github](https://github.com/coil-kt/coil)
      */
     object Coil {
 
@@ -566,7 +557,7 @@ object Dependencies {
 
     /**
      * 换肤支持
-     * - GitHub: [https://github.com/ximsfei/Android-skin-support]
+     * - [Github](https://github.com/ximsfei/Android-skin-support)
      */
     object SkinSupport {
 
@@ -587,7 +578,7 @@ object Dependencies {
 
         /**
          * ARouter 路由
-         * - Github: [https://github.com/alibaba/ARouter]
+         * - [Github](https://github.com/alibaba/ARouter)
          */
         object ARouter {
 
@@ -606,7 +597,7 @@ object Dependencies {
 
         /**
          * MMKV
-         * - Github: [https://github.com/tencent/mmkv]
+         * - [Github](https://github.com/tencent/mmkv)
          */
         const val mmkv = "com.tencent:mmkv:1.2.7"
     }
@@ -616,7 +607,7 @@ object Dependencies {
 
         /**
          * Doraemonkit
-         * - Github: [https://github.com/Android-MI/DoraemonKit]
+         * - [Github](https://github.com/Android-MI/DoraemonKit)
          */
         object DoraemonKit {
             /** 版本号 */
@@ -625,5 +616,17 @@ object Dependencies {
             const val debug = "com.didichuxing.doraemonkit:doraemonkit:$version"
             const val release = "com.didichuxing.doraemonkit:doraemonkit-no-op:$version"
         }
+    }
+
+    /**
+     * Markdown 解析
+     * - [文档](https://noties.io/Markwon/)
+     * - [Github](https://github.com/noties/Markwon)
+     */
+    object Markwon {
+
+        private const val version = "4.6.2"
+
+        const val markwon = "io.noties.markwon:core:$version"
     }
 }

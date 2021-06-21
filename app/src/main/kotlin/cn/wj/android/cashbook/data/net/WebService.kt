@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.data.net
 
-import cn.wj.android.cashbook.data.entity.GiteeReleaseEntity
+import cn.wj.android.cashbook.data.entity.GitReleaseEntity
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -17,5 +17,13 @@ interface WebService {
         @Path("owner") owner: String,
         @Path("repo") repo: String,
         @Path("id") id: String
-    ): GiteeReleaseEntity
+    ): GitReleaseEntity
+
+    /** 从 Github 中根据用户名 [owner] 仓库名 [repo] 以及 Release id [id] 查询相关 Release 信息 */
+    @GET(UrlDefinition.GITHUB_QUERY_RELEASE)
+    suspend fun githubQueryRelease(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("id") id: String
+    ): GitReleaseEntity
 }

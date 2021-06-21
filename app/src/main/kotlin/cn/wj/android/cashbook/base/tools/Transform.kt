@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+@file:JvmName("TransformTools")
 
 package cn.wj.android.cashbook.base.tools
 

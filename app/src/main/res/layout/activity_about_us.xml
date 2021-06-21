@@ -57,14 +57,6 @@
                     android:textAppearance="?attr/textAppearanceHeadline5" />
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@{BuildConfig.VERSION_NAME}"
-                    android:textAppearance="?attr/textAppearanceCaption"
-                    tools:text="v1.0.0" />
-
-                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/spacing_big"
@@ -107,7 +99,7 @@
                         android:paddingBottom="@dimen/spacing_normal"
                         android:text="@string/github"
                         android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="?attr/colorSecondary"
+                        android:textColor="?attr/colorOnSurface"
                         android:textStyle="bold" />
 
                     <com.google.android.material.textview.MaterialTextView
@@ -121,7 +113,7 @@
                         android:paddingBottom="@dimen/spacing_normal"
                         android:text="@string/gitee"
                         android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="?attr/colorSecondary"
+                        android:textColor="?attr/colorError"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -132,10 +124,98 @@
                     android:layout_marginTop="@dimen/spacing_normal"
                     android:background="@color/color_divider" />
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_height"
+                    android:layout_marginTop="@dimen/spacing_normal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_big"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/update_resource"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:textColor="@color/color_on_secondary"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_gitee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spacing_big"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/gitee"
+                        android:textAppearance="?attr/textAppearanceCaption"
+                        android:textColor="?attr/colorError"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_res"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spacing_small"
+                        android:checked="@={viewModel.useGitee}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv_gitee"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:thumbTint="@color/selector_resource_thumb_tint"
+                        app:trackTint="@color/selector_resource_track_tint" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_github"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spacing_small"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/github"
+                        android:textAppearance="?attr/textAppearanceCaption"
+                        android:textColor="?attr/colorOnSurface"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/switch_res"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_height"
+                    android:background="?selectableItemBackground">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_big"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/version_info"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:textColor="@color/color_on_secondary"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spacing_big"
+                        android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
+                        android:gravity="start|center_vertical"
+                        android:text="@{BuildConfig.VERSION_NAME}"
+                        android:textAppearance="?attr/textAppearanceCaption"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="v1.0.0_21060112_debug" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/item_height"
-                    android:layout_marginTop="@dimen/spacing_normal"
                     android:background="?selectableItemBackground"
                     android:bind_onClick="@{viewModel.onCheckUpdateClick}"
                     android:gravity="start|center_vertical"
@@ -150,6 +230,7 @@
                     android:layout_height="@dimen/item_height"
                     android:background="?selectableItemBackground"
                     android:bind_onClick="@{viewModel.onUserAgreementAndPrivacyPolicyClick}"
+                    android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
                     android:gravity="start|center_vertical"
                     android:paddingStart="@dimen/spacing_big"
                     android:paddingEnd="@dimen/spacing_big"

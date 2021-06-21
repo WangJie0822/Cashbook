@@ -1,9 +1,11 @@
 package cn.wj.android.cashbook.data.store
 
 import cn.wj.android.cashbook.data.constants.GITEE_OWNER
-import cn.wj.android.cashbook.data.constants.GITEE_REPO
-import cn.wj.android.cashbook.data.entity.GiteeReleaseEntity
+import cn.wj.android.cashbook.data.constants.GITHUB_OWNER
+import cn.wj.android.cashbook.data.constants.REPO_NAME
+import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.net.WebService
+import cn.wj.android.cashbook.data.transform.toUpdateInfoEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,7 +19,11 @@ import kotlinx.coroutines.withContext
 class WebDataStore(private val service: WebService) {
 
     /** 获取 Gitee 最新 Release 信息 */
-    suspend fun giteeQueryLatestRelease(): GiteeReleaseEntity = withContext(Dispatchers.IO) {
-        service.giteeQueryRelease(GITEE_OWNER, GITEE_REPO, "latest")
+    suspend fun queryLatestRelease(useGitee: Boolean): UpdateInfoEntity = withContext(Dispatchers.IO) {
+        if (useGitee) {
+            service.giteeQueryRelease(GITEE_OWNER, REPO_NAME, "latest")
+        } else {
+            service.githubQueryRelease(GITHUB_OWNER, REPO_NAME, "latest")
+        }.toUpdateInfoEntity()
     }
 }

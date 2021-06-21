@@ -20,3 +20,9 @@ const val ACTION_DATE = "action_date"
 
 /** 是否是退款 */
 const val ACTION_REFUND = "action_refund"
+
+/** 下载地址 */
+const val ACTION_DOWNLOAD_URL = "action_download_url"
+
+/** APK 名称 */
+const val ACTION_APK_NAME = "action_apk_name"

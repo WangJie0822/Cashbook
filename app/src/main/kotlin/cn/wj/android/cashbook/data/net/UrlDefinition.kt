@@ -11,5 +11,8 @@ object UrlDefinition {
     const val BASE_URL = "https://gitee.com/api/v5/"
 
     /** 查询 Gitee 中的 Release 信息 */
-    const val GITEE_QUERY_RELEASE = "repos/{owner}/{repo}/releases/{id}"
+    const val GITEE_QUERY_RELEASE = "https://gitee.com/api/v5/repos/{owner}/{repo}/releases/{id}"
+
+    /** 查询 Github 中的 Release 信息 */
+    const val GITHUB_QUERY_RELEASE = "https://api.github.com/repos/{owner}/{repo}/releases/{id}"
 }

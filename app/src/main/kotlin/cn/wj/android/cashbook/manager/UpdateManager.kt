@@ -1,7 +1,14 @@
 package cn.wj.android.cashbook.manager
 
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import cn.wj.android.cashbook.BuildConfig
-import cn.wj.android.cashbook.data.entity.GiteeReleaseEntity
+import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.data.constants.ACTION_APK_NAME
+import cn.wj.android.cashbook.data.constants.ACTION_DOWNLOAD_URL
+import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.work.ApkDownloadWorker
 
 /**
  * 更新管理类
@@ -12,17 +19,15 @@ import cn.wj.android.cashbook.data.entity.GiteeReleaseEntity
  */
 object UpdateManager {
 
-    fun checkFromInfo(info: GiteeReleaseEntity, need: () -> Unit, noNeed: () -> Unit) {
-        if (!needUpdate(info.name)) {
+    fun checkFromInfo(info: UpdateInfoEntity, need: () -> Unit, noNeed: () -> Unit) {
+        logger().d("checkFromInfo info: $info")
+        if (!needUpdate(info.versionName)) {
             // 已是最新版本
             noNeed.invoke()
             return
         }
-        // 不是最新版本，获取升级地址
-        val asset = info.assets?.firstOrNull {
-            it.name.orEmpty().endsWith(".apk")
-        }
-        if (null == asset || asset.browser_download_url.isNullOrBlank()) {
+        // 不是最新版本
+        if (info.downloadUrl.isBlank()) {
             // 没有下载资源
             noNeed.invoke()
             return
@@ -48,5 +53,19 @@ object UpdateManager {
             }
         }
         return false
+    }
+
+    fun startDownload(info: UpdateInfoEntity) {
+        val manager = WorkManager.getInstance(AppManager.getContext())
+        manager.enqueue(
+            OneTimeWorkRequestBuilder<ApkDownloadWorker>()
+                .setInputData(
+                    Data.Builder()
+                        .putString(ACTION_APK_NAME, info.apkName)
+                        .putString(ACTION_DOWNLOAD_URL, info.downloadUrl)
+                        .build()
+                )
+                .build()
+        )
     }
 }

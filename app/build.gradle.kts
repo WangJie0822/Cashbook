@@ -227,6 +227,9 @@ dependencies {
     debugImplementation(Dependencies.Didi.DoraemonKit.debug)
     releaseImplementation(Dependencies.Didi.DoraemonKit.release)
 
+    // Markdown 解析
+    implementation(Dependencies.Markwon.markwon)
+
     // 测试
     testImplementation(Dependencies.testJunit)
     androidTestImplementation(Dependencies.Androidx.Test.rules)
