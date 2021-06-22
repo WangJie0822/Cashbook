@@ -38,7 +38,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_big"
                 android:background="?attr/colorSurface"
-                android:bind_tv_text="@{viewModel.contentStr}" />
+                android:bind_tv_text="@{viewModel.contentStr}"
+                android:padding="@dimen/spacing_normal"
+                tools:text="w偶尔玩i杰佛i额外wejfoewi\n蜂窝i就发我i俄方" />
 
         </androidx.core.widget.NestedScrollView>
 
