@@ -26,4 +26,13 @@ class WebDataStore(private val service: WebService) {
             service.githubQueryRelease(GITHUB_OWNER, REPO_NAME, "latest")
         }.toUpdateInfoEntity()
     }
+
+    suspend fun getChangelog(useGitee: Boolean): String = withContext(Dispatchers.IO) {
+        @Suppress("BlockingMethodInNonBlockingContext")
+        if (useGitee) {
+            service.giteeChangelog(GITEE_OWNER, REPO_NAME)
+        } else {
+            service.githubChangelog(GITHUB_OWNER, REPO_NAME)
+        }.string()
+    }
 }

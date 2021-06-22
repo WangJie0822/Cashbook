@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.ui.main.viewmodel
 
+import androidx.core.os.bundleOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
@@ -10,9 +11,12 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ACTION_CONTENT
+import cn.wj.android.cashbook.data.constants.ACTION_TITLE
 import cn.wj.android.cashbook.data.constants.EMAIL_ADDRESS
 import cn.wj.android.cashbook.data.constants.GITEE_HOMEPAGE
 import cn.wj.android.cashbook.data.constants.GITHUB_HOMEPAGE
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MARKDOWN
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -76,8 +80,9 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
         checkUpdate()
     }
 
-    /** TODO 版本信息点击 */
+    /** 版本信息点击 */
     val onVersionInfoClick: () -> Unit = {
+        loadChangelog()
     }
 
     /** TODO 用户协议和隐私协议点击 */
@@ -100,6 +105,27 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
                 })
             } catch (throwable: Throwable) {
                 logger().e(throwable, "checkUpdate")
+            }
+        }
+    }
+
+    /** 加载修改日志信息 */
+    private fun loadChangelog() {
+        viewModelScope.launch {
+            try {
+                val changelog = web.getChangelog(useGitee.value.condition)
+                logger().d("loadChangelog: $changelog")
+                // 跳转 Markdown 界面打开
+                uiNavigationData.value = UiNavigationModel.builder {
+                    jump(
+                        ROUTE_PATH_MARKDOWN, bundleOf(
+                            ACTION_TITLE to R.string.changelog.string,
+                            ACTION_CONTENT to changelog
+                        )
+                    )
+                }
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "loadChangelog")
             }
         }
     }

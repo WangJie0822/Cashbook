@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.general.viewmodel.GeneralViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.AboutUsViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
+import cn.wj.android.cashbook.ui.main.viewmodel.MarkdownViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
@@ -132,6 +133,9 @@ val viewModelModule = module {
     }
     viewModel {
         AboutUsViewModel(get())
+    }
+    viewModel {
+        MarkdownViewModel()
     }
 
     // Fragment

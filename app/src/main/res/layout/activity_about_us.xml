@@ -184,7 +184,8 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/item_height"
-                    android:background="?selectableItemBackground">
+                    android:background="?selectableItemBackground"
+                    android:bind_onClick="@{viewModel.onVersionInfoClick}">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"

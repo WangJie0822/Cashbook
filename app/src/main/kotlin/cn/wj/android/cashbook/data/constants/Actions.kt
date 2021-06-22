@@ -26,3 +26,9 @@ const val ACTION_DOWNLOAD_URL = "action_download_url"
 
 /** APK 名称 */
 const val ACTION_APK_NAME = "action_apk_name"
+
+/** 标题 */
+const val ACTION_TITLE = "action_title"
+
+/** 内容 */
+const val ACTION_CONTENT = "action_content"
