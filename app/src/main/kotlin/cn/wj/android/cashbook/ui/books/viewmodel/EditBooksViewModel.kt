@@ -65,7 +65,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -78,7 +78,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** TODO 货币点击 */
     val onCurrencyClick: () -> Unit = {
-        snackbarData.value = "修改货币".toSnackbarModel()
+        snackbarEvent.value = "修改货币".toSnackbarModel()
     }
 
     /** 检查数据并保存 */
@@ -124,7 +124,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     )
                 }
                 // 设置返回数据并关闭当前界面
-                uiNavigationData.value = UiNavigationModel.builder {
+                uiNavigationEvent.value = UiNavigationModel.builder {
                     close(
                         resultCode = ACTIVITY_RESULT_OK,
                         result = bundleOf(

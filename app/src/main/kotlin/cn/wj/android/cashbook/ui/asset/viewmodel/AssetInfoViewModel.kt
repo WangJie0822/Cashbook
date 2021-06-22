@@ -14,6 +14,7 @@ import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
@@ -27,14 +28,14 @@ import kotlinx.coroutines.launch
  */
 class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
 
-    /** 显示记录详情弹窗数据 */
-    val showRecordDetailsDialogData: MutableLiveData<RecordEntity> = MutableLiveData()
+    /** 显示记录详情弹窗事件 */
+    val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
 
-    /** 显示删除确认弹窗 */
-    val showDeleteConfirmDialogData: MutableLiveData<Int> = MutableLiveData()
+    /** 显示删除确认事件 */
+    val showDeleteConfirmDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
 
-    /** 跳转编辑资产数据 */
-    val jumpEditAssetData: MutableLiveData<AssetEntity> = MutableLiveData()
+    /** 跳转编辑资产事件 */
+    val jumpEditAssetEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 资产信息 */
     val assetData: MutableLiveData<AssetEntity> = MutableLiveData()
@@ -105,7 +106,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
 
     /** 返回点击 */
     val onBackClick: () -> Unit = {
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -114,10 +115,10 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
     val onToolbarMenuClick: (Int) -> Unit = { id ->
         if (id == R.id.edit) {
             // 编辑
-            jumpEditAssetData.value = assetData.value
+            jumpEditAssetEvent.value = assetData.value
         } else {
             // 显示删除确认弹窗
-            showDeleteConfirmDialogData.value = 0
+            showDeleteConfirmDialogEvent.value = 0
         }
     }
 
@@ -129,7 +130,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
 
     /** 记录 item 点击 */
     override val onRecordItemClick: (RecordEntity) -> Unit = { item ->
-        showRecordDetailsDialogData.value = item
+        showRecordDetailsDialogEvent.value = item
     }
 
     /** 切换隐藏状态 */
@@ -170,7 +171,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
             try {
                 local.deleteAsset(asset)
                 // 删除成功，退出当前界面
-                uiNavigationData.value = UiNavigationModel.builder {
+                uiNavigationEvent.value = UiNavigationModel.builder {
                     close()
                 }
             } catch (throwable: Throwable) {

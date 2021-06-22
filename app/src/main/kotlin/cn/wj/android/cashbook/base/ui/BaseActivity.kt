@@ -178,8 +178,8 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
 
     /** 订阅基本数据 */
     private fun observeBaseModel() {
-        // snackbar 提示
-        viewModel.snackbarData.observe(this, Observer {
+        // Snackbar 提示
+        viewModel.snackbarEvent.observe(this, Observer {
             if (it.content.isNullOrBlank()) {
                 return@Observer
             }
@@ -204,8 +204,8 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
             }
             snackBar.show()
         })
-        // Ui 界面处理
-        viewModel.uiNavigationData.observe(this, {
+        // UI 界面处理
+        viewModel.uiNavigationEvent.observe(this, {
             logger().d("uiNavigation: $it")
             it.jump?.let { model ->
                 ARouter.getInstance().build(model.path).with(model.data).navigation(context)

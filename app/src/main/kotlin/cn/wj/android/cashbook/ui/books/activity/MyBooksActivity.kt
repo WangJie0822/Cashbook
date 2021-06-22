@@ -83,7 +83,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
             booksListRvAdapter.submitList(list)
         })
         // PopupMenu 弹窗
-        viewModel.showPopupMenuData.observe(this, { item ->
+        viewModel.showPopupMenuEvent.observe(this, { item ->
             val viewHolder = binding.rv.findViewHolderForAdapterPosition(
                 booksListRvAdapter.mDiffer.currentList.indexOf(item)
             )
@@ -101,7 +101,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
                                     // 删除
                                     if (item.selected) {
                                         // 已选择账本不能删除
-                                        viewModel.snackbarData.value = R.string.cannot_delete_selected_books.string.toSnackbarModel()
+                                        viewModel.snackbarEvent.value = R.string.cannot_delete_selected_books.string.toSnackbarModel()
                                         return@setOnMenuItemClickListener true
                                     }
                                     GeneralDialog.newBuilder()
@@ -120,7 +120,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
             }
         })
         // 跳转新增
-        viewModel.jumpToAddBooksData.observe(this, {
+        viewModel.jumpToAddBooksEvent.observe(this, {
             editBooksResultLauncher.launch(EditBooksActivity.parseIntent(context))
         })
     }

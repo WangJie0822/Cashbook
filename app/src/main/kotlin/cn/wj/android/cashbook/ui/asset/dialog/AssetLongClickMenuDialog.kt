@@ -43,11 +43,11 @@ class AssetLongClickMenuDialog : BaseDialog<AssetLongClickMenuViewModel, DialogA
 
     override fun observe() {
         // 点击事件
-        viewModel.editClickData.observe(this, {
+        viewModel.editClickEvent.observe(this, {
             onEditClickListener?.invoke()
             dismiss()
         })
-        viewModel.hiddenClickData.observe(this, {
+        viewModel.hiddenClickEvent.observe(this, {
             onHiddenClickListener?.invoke()
             dismiss()
         })

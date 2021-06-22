@@ -67,7 +67,7 @@ class DateTimePickerViewModel : BaseViewModel() {
 
     /** 取消点击 */
     val onCancelClick: () -> Unit = {
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }

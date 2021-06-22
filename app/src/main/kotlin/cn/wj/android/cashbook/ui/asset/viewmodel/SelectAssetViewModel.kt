@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.AssetEntity
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
@@ -17,8 +18,8 @@ import kotlinx.coroutines.launch
  */
 class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetListClickListener {
 
-    /** 显示选择资产类别弹窗 */
-    val showSelectAssetTypeData: MutableLiveData<Int> = MutableLiveData()
+    /** 显示选择资产类别弹窗事件 */
+    val showSelectAssetTypeEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 选中的资产数据 */
     val selectedAssetData: MutableLiveData<AssetEntity> = MutableLiveData()
@@ -32,14 +33,14 @@ class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(),
 
     /** 底部隐藏 */
     val onBottomSheetHidden: () -> Unit = {
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
 
     /** 添加点击 */
     val onAddClick: () -> Unit = {
-        showSelectAssetTypeData.value = 0
+        showSelectAssetTypeEvent.value = 0
     }
 
     /** 资产 item 点击 */

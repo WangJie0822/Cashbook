@@ -85,7 +85,7 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -93,7 +93,7 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
     /** 记录 item 点击 */
     override val onRecordItemClick: (RecordEntity) -> Unit = { item ->
         // 设置返回数据并结束当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close(
                 ACTIVITY_RESULT_OK, bundleOf(
                     ACTION_RECORD to item

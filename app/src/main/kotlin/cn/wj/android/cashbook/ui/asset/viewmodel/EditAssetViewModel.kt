@@ -105,7 +105,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -118,13 +118,13 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 账单日点击 */
     val onBillingDateClick: () -> Unit = {
         // TODO
-        snackbarData.value = "账单日".toSnackbarModel()
+        snackbarEvent.value = "账单日".toSnackbarModel()
     }
 
     /** 还款日点击 */
     val onRepaymentDateClick: () -> Unit = {
         // TODO
-        snackbarData.value = "还款日".toSnackbarModel()
+        snackbarEvent.value = "还款日".toSnackbarModel()
     }
 
     /** 保存点击 */
@@ -209,9 +209,9 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 保存成功 */
     private fun callOnSaveSuccess() {
         // 保存成功，提示并关闭界面
-        snackbarData.value = R.string.save_success.string.toSnackbarModel(onCallback = object : Snackbar.Callback() {
+        snackbarEvent.value = R.string.save_success.string.toSnackbarModel(onCallback = object : Snackbar.Callback() {
             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                uiNavigationData.value = UiNavigationModel.builder {
+                uiNavigationEvent.value = UiNavigationModel.builder {
                     close()
                 }
             }

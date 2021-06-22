@@ -63,7 +63,7 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
 
     /** TODO 类型设置点击 */
     val onTypeSettingClick: () -> Unit = {
-        snackbarData.value = "类型设置".toSnackbarModel()
+        snackbarEvent.value = "类型设置".toSnackbarModel()
     }
 
     /** 根据记录类型 [recordType] 加载记录分类 */

@@ -44,30 +44,30 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grantedMap ->
             if (grantedMap.count { !it.value } <= 0) {
                 // 权限获取申请成功，开始下载
-                val info = viewModel.showUpdateDialogData.value ?: return@registerForActivityResult
+                val info = viewModel.showUpdateDialogEvent.value ?: return@registerForActivityResult
                 UpdateManager.startDownload(info)
             } else {
                 // 提示需要权限
-                viewModel.snackbarData.value = R.string.update_need_permission.string.toSnackbarModel()
+                viewModel.snackbarEvent.value = R.string.update_need_permission.string.toSnackbarModel()
             }
         }
     }
 
     override fun observe() {
         // 跳转发送邮件
-        viewModel.jumpSendEmailData.observe(this, { email ->
+        viewModel.jumpSendEmailEvent.observe(this, { email ->
             email.runIfNotNullAndBlank {
                 jumpSendEmail(this)
             }
         })
         // 跳转浏览器打开
-        viewModel.jumpBrowserData.observe(this, { url ->
+        viewModel.jumpBrowserEvent.observe(this, { url ->
             url.runIfNotNullAndBlank {
                 jumpBrowser(this)
             }
         })
         // 升级提示弹窗
-        viewModel.showUpdateDialogData.observe(this, { info ->
+        viewModel.showUpdateDialogEvent.observe(this, { info ->
             GeneralDialog.newBuilder()
                 .titleStr(R.string.new_versions.string)
                 .subtitleStr(info.versionName)

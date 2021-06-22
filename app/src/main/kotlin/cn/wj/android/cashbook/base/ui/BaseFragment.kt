@@ -148,7 +148,7 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
     /** 订阅基本数据 */
     protected fun observeBaseModel(viewModel: BaseViewModel) {
         // snackbar 提示
-        viewModel.snackbarData.observe(this, Observer {
+        viewModel.snackbarEvent.observe(this, Observer {
             if (it.content.isNullOrBlank()) {
                 return@Observer
             }
@@ -174,7 +174,7 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
             snackBar.show()
         })
         // Ui 界面处理
-        viewModel.uiNavigationData.observe(this, {
+        viewModel.uiNavigationEvent.observe(this, {
             logger().d("uiNavigation: $it")
             it.jump?.let { model ->
                 ARouter.getInstance().build(model.path).with(model.data).navigation(context)

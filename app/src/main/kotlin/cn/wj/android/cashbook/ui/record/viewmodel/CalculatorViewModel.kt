@@ -1,8 +1,8 @@
 package cn.wj.android.cashbook.ui.record.viewmodel
 
 import androidx.databinding.ObservableField
-import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 
 /**
  * 计算器弹窗 ViewModel
@@ -11,14 +11,14 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
  */
 class CalculatorViewModel : BaseViewModel() {
 
-    /** 确认点击数据 */
-    val confirmClickData: MutableLiveData<Int> = MutableLiveData()
+    /** 确认点击事件 */
+    val confirmClickEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 计算结果显示 */
     val calculatorStr: ObservableField<String> = ObservableField()
 
     /** 确认点击 */
     val onConfirmClick: () -> Unit = {
-        confirmClickData.value = 0
+        confirmClickEvent.value = 0
     }
 }

@@ -62,3 +62,14 @@ fun getSharedLong(key: String, defaultValue: Long? = null): Long? {
 fun setSharedLong(key: String, value: Long?) {
     mmkv?.encode(key, value.orElse(-1L))
 }
+
+/** 根据 [key] 获取对应 [Int] 值，没有返回默认 [defaultValue] */
+@JvmOverloads
+fun getSharedInt(key: String, defaultValue: Int? = null): Int? {
+    return mmkv?.decodeInt(key, defaultValue.orElse(-1))
+}
+
+/** 使用 [key] 保存对应值 [value] */
+fun setSharedInt(key: String, value: Int?) {
+    mmkv?.encode(key, value.orElse(-1))
+}

@@ -66,13 +66,13 @@ class GeneralDialog
 
     override fun observe() {
         // 背景点击
-        viewModel.tryDismissData.observe(this, {
+        viewModel.tryDismissEvent.observe(this, {
             if (isCancelable) {
                 dismiss()
             }
         })
         // 消极按钮点击
-        viewModel.negativeClickData.observe(this, Observer {
+        viewModel.negativeClickEvent.observe(this, Observer {
             // 选中状态
             val checked = viewModel.checked.get()
 
@@ -95,7 +95,7 @@ class GeneralDialog
         })
 
         // 积极按钮点击
-        viewModel.positiveClickData.observe(this, Observer {
+        viewModel.positiveClickEvent.observe(this, Observer {
             // 选中状态
             val checked = viewModel.checked.get()
 

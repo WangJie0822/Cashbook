@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
@@ -58,17 +59,17 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
             }
         }
 
-    /** 跳转选择关联记录数据 */
-    val jumpSelectAssociatedRecordData: MutableLiveData<Boolean> = MutableLiveData()
+    /** 跳转选择关联记录事件 */
+    val jumpSelectAssociatedRecordEvent: LifecycleEvent<Boolean> = LifecycleEvent()
 
-    /** 显示计算器弹窗数据 */
-    val showCalculatorData: MutableLiveData<Int> = MutableLiveData()
+    /** 显示计算器弹窗事件 */
+    val showCalculatorEvent: LifecycleEvent<Int> = LifecycleEvent()
 
-    /** 显示选择账号弹窗 */
-    val showSelectAssetData: MutableLiveData<Boolean> = MutableLiveData()
+    /** 显示选择账号弹窗事件 */
+    val showSelectAssetEvent: LifecycleEvent<Boolean> = LifecycleEvent()
 
-    /** 选择日期弹窗 */
-    val showSelectDateData: MutableLiveData<Int> = MutableLiveData()
+    /** 选择日期弹窗事件 */
+    val showSelectDateEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 按钮是否允许点击 */
     val buttonEnable: MutableLiveData<Boolean> = MutableLiveData(true)
@@ -251,40 +252,40 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
 
     /** 账户点击 */
     val onAccountClick: () -> Unit = {
-        showSelectAssetData.value = true
+        showSelectAssetEvent.value = true
     }
 
     /** 转账转入账户点击 */
     val onTransferAccountClick: () -> Unit = {
-        showSelectAssetData.value = false
+        showSelectAssetEvent.value = false
     }
 
     /** 标签点击 */
     val onTagsClick: () -> Unit = {
-        snackbarData.value = "标签点击".toSnackbarModel()
+        snackbarEvent.value = "标签点击".toSnackbarModel()
     }
 
     /** 日期点击 */
     val onDateClick: () -> Unit = {
         // 以当前选中时间显示弹窗
-        showSelectDateData.value = 0
+        showSelectDateEvent.value = 0
     }
 
     /** 关联记录点击 */
     val onAssociatedRecordClick: () -> Unit = {
-        jumpSelectAssociatedRecordData.value = firstIncomeType.value?.refund.condition
+        jumpSelectAssociatedRecordEvent.value = firstIncomeType.value?.refund.condition
     }
 
     /** 金额点击 */
     val onAmountClick: () -> Unit = {
-        showCalculatorData.value = 0
+        showCalculatorEvent.value = 0
     }
 
     /** 保存点击 */
@@ -296,7 +297,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     private fun checkToSave() {
         if (calculatorStr.get()?.toFloatOrNull().orElse(0f) == 0f) {
             // 金额不能为 0
-            snackbarData.value = R.string.amount_can_not_be_zero.string.toSnackbarModel()
+            snackbarEvent.value = R.string.amount_can_not_be_zero.string.toSnackbarModel()
             return
         }
         val amount = calculatorStr.get().moneyFormat()
@@ -316,7 +317,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }.value
         if (null == firstType) {
             // 未选择类型
-            snackbarData.value = R.string.please_select_type.string.toSnackbarModel()
+            snackbarEvent.value = R.string.please_select_type.string.toSnackbarModel()
             return
         }
         val secondType = when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
@@ -342,11 +343,11 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
             // 转账类型，转出转入资产不能为空
             if (null == asset) {
-                snackbarData.value = R.string.please_select_asset.string.toSnackbarModel()
+                snackbarEvent.value = R.string.please_select_asset.string.toSnackbarModel()
                 return
             }
             if (null == intoAsset) {
-                snackbarData.value = R.string.please_select_into_asset.string.toSnackbarModel()
+                snackbarEvent.value = R.string.please_select_into_asset.string.toSnackbarModel()
                 return
             }
         }
@@ -409,7 +410,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 // 插入成功，保存本次资产
                 setSharedLong(SHARED_KEY_LAST_ASSET_ID, accountData.value?.id)
                 // 关闭当前界面
-                uiNavigationData.value = UiNavigationModel.builder {
+                uiNavigationEvent.value = UiNavigationModel.builder {
                     close()
                 }
             } catch (throwable: Throwable) {

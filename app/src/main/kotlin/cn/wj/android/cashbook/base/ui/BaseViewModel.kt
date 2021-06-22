@@ -1,7 +1,7 @@
 package cn.wj.android.cashbook.base.ui
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 
@@ -12,9 +12,9 @@ import cn.wj.android.cashbook.data.model.UiNavigationModel
  */
 abstract class BaseViewModel : ViewModel() {
 
-    /** Snackbar 控制 */
-    val snackbarData = MutableLiveData<SnackbarModel>()
+    /** Snackbar 显示事件 */
+    val snackbarEvent = LifecycleEvent<SnackbarModel>()
 
-    /** 界面跳转控制 */
-    val uiNavigationData = MutableLiveData<UiNavigationModel>()
+    /** 界面跳转事件 */
+    val uiNavigationEvent = LifecycleEvent<UiNavigationModel>()
 }

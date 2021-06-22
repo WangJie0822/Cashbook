@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Added
+- 新增设置界面；
 
 ## [0.1.1_21062202]
 ### Added

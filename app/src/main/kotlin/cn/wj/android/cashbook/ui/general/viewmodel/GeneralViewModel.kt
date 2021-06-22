@@ -4,10 +4,10 @@ import android.view.Gravity
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 
 /**
  * 通用弹窗 ViewModel
@@ -18,14 +18,14 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
  */
 class GeneralViewModel : BaseViewModel() {
 
-    /** 尝试隐藏弹窗数据 */
-    val tryDismissData = MutableLiveData<Int>()
+    /** 尝试隐藏弹窗事件 */
+    val tryDismissEvent = LifecycleEvent<Int>()
 
-    /** 消极按钮点击  */
-    val negativeClickData = MutableLiveData<Int>()
+    /** 消极按钮点击事件  */
+    val negativeClickEvent = LifecycleEvent<Int>()
 
-    /** 积极按钮点击  */
-    val positiveClickData = MutableLiveData<Int>()
+    /** 积极按钮点击事件  */
+    val positiveClickEvent = LifecycleEvent<Int>()
 
     /** 标题文本  */
     val titleStr: ObservableField<CharSequence> = ObservableField("")
@@ -76,16 +76,16 @@ class GeneralViewModel : BaseViewModel() {
 
     /** 背景点击 */
     val onBackgroundClick: () -> Unit = {
-        tryDismissData.value = 0
+        tryDismissEvent.value = 0
     }
 
     /** 消极按钮点击  */
     val onNegativeClick: () -> Unit = {
-        negativeClickData.value = 0
+        negativeClickEvent.value = 0
     }
 
     /** 积极按钮点击  */
     val onPositiveClick: () -> Unit = {
-        positiveClickData.value = 0
+        positiveClickEvent.value = 0
     }
 }

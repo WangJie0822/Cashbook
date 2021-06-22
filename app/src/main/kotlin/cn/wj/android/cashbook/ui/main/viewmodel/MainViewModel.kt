@@ -18,13 +18,14 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
-import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import kotlinx.coroutines.launch
 
@@ -35,8 +36,8 @@ import kotlinx.coroutines.launch
  */
 class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
 
-    /** 显示记录详情弹窗数据 */
-    val showRecordDetailsDialogData: MutableLiveData<RecordEntity> = MutableLiveData()
+    /** 显示记录详情弹窗事件 */
+    val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
 
     /** 当前月记录列表 */
     private val currentMonthRecord: MutableLiveData<List<RecordEntity>> = MutableLiveData()
@@ -142,7 +143,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
             }
             R.id.my_asset -> {
                 // 跳转我的资产
-                uiNavigationData.value = UiNavigationModel.builder {
+                uiNavigationEvent.value = UiNavigationModel.builder {
                     jump(ROUTE_PATH_MY_ASSET)
                 }
             }
@@ -152,7 +153,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     /** 我的账本点击 */
     val onMyBooksClick: () -> Unit = {
         // 跳转我的账本界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_MY_BOOKS)
         }
     }
@@ -160,21 +161,23 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     /** 我的资产点击 */
     val onMyAssetClick: () -> Unit = {
         // 跳转我的资产
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_MY_ASSET)
         }
     }
 
     /** 设置点击 */
     val onSettingClick: () -> Unit = {
-        // TODO 跳转设置
-        snackbarData.value = "跳转设置".toSnackbarModel()
+        // 跳转设置
+        uiNavigationEvent.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_SETTING)
+        }
     }
 
     /** 关于我们点击 */
     val onAboutUsClick: () -> Unit = {
         // 跳转关于我们
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_ABOUT_US)
         }
     }
@@ -182,14 +185,14 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     /** 添加点击 */
     val onAddClick: () -> Unit = {
         // 跳转编辑记录界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_EDIT_RECORD)
         }
     }
 
     /** 记录数据点击 */
     override val onRecordItemClick: (RecordEntity) -> Unit = { item ->
-        showRecordDetailsDialogData.value = item
+        showRecordDetailsDialogEvent.value = item
     }
 
     /** 获取最近一周数据 */

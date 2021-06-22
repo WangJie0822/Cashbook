@@ -1,7 +1,7 @@
 package cn.wj.android.cashbook.ui.asset.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 
 /**
  * 资产长按菜单 ViewModel
@@ -10,19 +10,19 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
  */
 class AssetLongClickMenuViewModel : BaseViewModel() {
 
-    /** 编辑点击数据 */
-    val editClickData: MutableLiveData<Int> = MutableLiveData()
+    /** 编辑点击事件 */
+    val editClickEvent: LifecycleEvent<Int> = LifecycleEvent()
 
-    /** 隐藏点击数据 */
-    val hiddenClickData: MutableLiveData<Int> = MutableLiveData()
+    /** 隐藏点击事件 */
+    val hiddenClickEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 编辑点击 */
     val onEditClick: () -> Unit = {
-        editClickData.value = 0
+        editClickEvent.value = 0
     }
 
     /** 隐藏点击 */
     val onHiddenClick: () -> Unit = {
-        hiddenClickData.value = 0
+        hiddenClickEvent.value = 0
     }
 }

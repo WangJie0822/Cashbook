@@ -19,6 +19,7 @@ import cn.wj.android.cashbook.data.constants.GITHUB_HOMEPAGE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MARKDOWN
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.WebDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
@@ -32,14 +33,14 @@ import kotlinx.coroutines.launch
  */
 class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
 
-    /** 显示升级提示弹窗 */
-    val showUpdateDialogData: MutableLiveData<UpdateInfoEntity> = MutableLiveData()
+    /** 显示升级提示事件 */
+    val showUpdateDialogEvent: LifecycleEvent<UpdateInfoEntity> = LifecycleEvent()
 
-    /** 跳转发送邮件数据 */
-    val jumpSendEmailData: MutableLiveData<String> = MutableLiveData()
+    /** 跳转发送邮件事件 */
+    val jumpSendEmailEvent: LifecycleEvent<String> = LifecycleEvent()
 
-    /** 跳转浏览器打开数据 */
-    val jumpBrowserData: MutableLiveData<String> = MutableLiveData()
+    /** 跳转浏览器打开事件 */
+    val jumpBrowserEvent: LifecycleEvent<String> = LifecycleEvent()
 
     /** 是否使用 Gitee */
     val useGitee: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(getSharedBoolean(SHARED_KEY_USE_GITEE).orElse(true)) {
@@ -55,24 +56,24 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
 
     /** 联系我点击 */
     val onContactMeClick: () -> Unit = {
-        jumpSendEmailData.value = EMAIL_ADDRESS
+        jumpSendEmailEvent.value = EMAIL_ADDRESS
     }
 
     /** Github 点击 */
     val onGithubClick: () -> Unit = {
-        jumpBrowserData.value = GITHUB_HOMEPAGE
+        jumpBrowserEvent.value = GITHUB_HOMEPAGE
     }
 
     /** Gitee 点击 */
     val onGiteeClick: () -> Unit = {
-        jumpBrowserData.value = GITEE_HOMEPAGE
+        jumpBrowserEvent.value = GITEE_HOMEPAGE
     }
 
     /** 检查更新点击 */
@@ -87,7 +88,7 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
 
     /** TODO 用户协议和隐私协议点击 */
     val onUserAgreementAndPrivacyPolicyClick: () -> Unit = {
-        snackbarData.value = "用户协议和隐私协议".toSnackbarModel()
+        snackbarEvent.value = "用户协议和隐私协议".toSnackbarModel()
     }
 
     /** 检查更新 */
@@ -98,10 +99,10 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
                 val info = web.queryLatestRelease(useGitee.value.condition)
                 UpdateManager.checkFromInfo(info, {
                     // 显示升级提示弹窗
-                    showUpdateDialogData.value = info
+                    showUpdateDialogEvent.value = info
                 }, {
                     // 不需要升级
-                    snackbarData.value = R.string.it_is_the_latest_version.string.toSnackbarModel()
+                    snackbarEvent.value = R.string.it_is_the_latest_version.string.toSnackbarModel()
                 })
             } catch (throwable: Throwable) {
                 logger().e(throwable, "checkUpdate")
@@ -116,7 +117,7 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
                 val changelog = web.getChangelog(useGitee.value.condition)
                 logger().d("loadChangelog: $changelog")
                 // 跳转 Markdown 界面打开
-                uiNavigationData.value = UiNavigationModel.builder {
+                uiNavigationEvent.value = UiNavigationModel.builder {
                     jump(
                         ROUTE_PATH_MARKDOWN, bundleOf(
                             ACTION_TITLE to R.string.changelog.string,

@@ -65,15 +65,15 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
             }
         })
         // 跳转编辑
-        viewModel.jumpEditAssetData.observe(this, { asset ->
+        viewModel.jumpEditAssetEvent.observe(this, { asset ->
             EditAssetActivity.actionStart(context, asset)
         })
         // 显示记录详情弹窗
-        viewModel.showRecordDetailsDialogData.observe(this, { record ->
+        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
         })
         // 显示删除确认弹窗
-        viewModel.showDeleteConfirmDialogData.observe(this, {
+        viewModel.showDeleteConfirmDialogEvent.observe(this, {
             GeneralDialog.newBuilder()
                 .contentStr(R.string.delete_asset_hint.string)
                 .setOnPositiveAction {

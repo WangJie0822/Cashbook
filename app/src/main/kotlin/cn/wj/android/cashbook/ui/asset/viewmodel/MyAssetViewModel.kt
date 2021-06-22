@@ -21,6 +21,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
@@ -34,11 +35,11 @@ import kotlinx.coroutines.launch
  */
 class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetListClickListener {
 
-    /** 显示资产菜单数据 */
-    val showLongClickMenuData: MutableLiveData<AssetEntity> = MutableLiveData()
+    /** 显示资产菜单事件 */
+    val showLongClickMenuEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
-    /** 显示更多菜单数据 */
-    val showMoreMenuData: MutableLiveData<Int> = MutableLiveData()
+    /** 显示更多菜单事件 */
+    val showMoreMenuEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 标记 - 是否允许标题 */
     val titleEnable: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -300,7 +301,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -342,7 +343,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
 
     /** 资产列表 item 点击 */
     override val onAssetItemClick: (AssetEntity) -> Unit = { item ->
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             jump(
                 ROUTE_PATH_ASSET_INFO, bundleOf(
                     ACTION_ASSET to item
@@ -353,12 +354,12 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
 
     /** 资产列表 item 长点击 */
     override val onAssetItemLongClick: (AssetEntity) -> Unit = { item ->
-        showLongClickMenuData.value = item
+        showLongClickMenuEvent.value = item
     }
 
     /** 更多菜单点击 */
     val onMoreClick: () -> Unit = {
-        showMoreMenuData.value = 0
+        showMoreMenuEvent.value = 0
     }
 
     /** 加载所有资产数据 */

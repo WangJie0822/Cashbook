@@ -15,6 +15,9 @@ const val ROUTE_PATH_ABOUT_US = "/path/main/aboutUs"
 /** 路由路径 - Markdown 显示 */
 const val ROUTE_PATH_MARKDOWN = "/path/main/markdown"
 
+/** 路由路径 - 设置 */
+const val ROUTE_PATH_SETTING = "/path/main/setting"
+
 /** 路由路径 - 我的账本 */
 const val ROUTE_PATH_MY_BOOKS = "/path/books/my"
 

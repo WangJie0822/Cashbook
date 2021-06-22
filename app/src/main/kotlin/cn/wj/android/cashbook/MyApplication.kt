@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
 import cn.wj.android.cashbook.di.dataStoreModule
 import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.netModule
@@ -66,6 +67,9 @@ class MyApplication : Application() {
             ARouter.openDebug()
         }
         ARouter.init(this)
+
+        // 应用主题
+        CurrentThemeLiveData.applyTheme()
 
         // 初始化 DoraemonKit
         DoraemonKit.install(this)

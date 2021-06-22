@@ -46,21 +46,25 @@
     <style name="Theme.Cashbook.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog" />
 
     <!-- 全半透明背景 -->
-    <style name="Theme.Cashbook.Dialog.Transparent" parent="Theme.MaterialComponents.DayNight.Dialog">
+    <style name="Theme.Cashbook.Dialog.Transparent" >
         <item name="android:windowBackground">@drawable/shape_window_background_transparent</item>
     </style>
 
     <!-- 底部抽屉弹窗 -->
-    <style name="Theme.Cashbook.Dialog.BottomSheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog" />
+    <style name="Theme.Cashbook.Dialog.BottomSheet">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/Animation.MaterialComponents.BottomSheetDialog</item>
+        <item name="bottomSheetStyle">@style/Widget.MaterialComponents.BottomSheet.Modal</item>
+    </style>
 
     <!-- 警告弹窗 -->
-    <style name="Theme.Cashbook.Dialog.Alert" parent="Theme.MaterialComponents.DayNight.Dialog.Alert" />
+    <style name="Theme.Cashbook.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert" />
 
     <!-- AppBar 样式 -->
-    <style name="Theme.Cashbook.AppBarOverlay" parent="Theme.MaterialComponents.DayNight.DarkActionBar" />
+    <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
 
     <!-- Popup 样式 -->
-    <style name="Theme.Cashbook.PopupOverlay" parent="Theme.MaterialComponents.DayNight" />
+    <style name="Theme.Cashbook.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
     <!-- PopupMenu 字体样式 -->
     <style name="TextAppearance.Cashbook.PopupMenu" parent="android:TextAppearance.Material.Caption" />

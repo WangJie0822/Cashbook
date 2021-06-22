@@ -11,3 +11,6 @@ const val SHARED_KEY_USE_GITEE = "shared_key_use_gitee"
 
 /** 是否可用使用移动网络下载 */
 const val SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE = "shared_key_mobile_network_download_enable"
+
+/** 主题 mode */
+const val SHARED_KEY_THEME_MODE = "shared_key_theme_mode"

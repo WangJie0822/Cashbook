@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
@@ -25,8 +26,8 @@ import kotlinx.coroutines.launch
  */
 class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetListClickListener {
 
-    /** 显示资产菜单数据 */
-    val showLongClickMenuData: MutableLiveData<AssetEntity> = MutableLiveData()
+    /** 显示资产菜单事件 */
+    val showLongClickMenuEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 刷新状态 */
     val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
@@ -135,7 +136,7 @@ class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -167,7 +168,7 @@ class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel
 
     /** 资产列表 item 点击 */
     override val onAssetItemClick: (AssetEntity) -> Unit = { item ->
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             jump(
                 ROUTE_PATH_ASSET_INFO, bundleOf(
                     ACTION_ASSET to item
@@ -178,7 +179,7 @@ class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel
 
     /** 资产列表 item 长点击 */
     override val onAssetItemLongClick: (AssetEntity) -> Unit = { item ->
-        showLongClickMenuData.value = item
+        showLongClickMenuEvent.value = item
     }
 
     /** 加载隐藏资产数据 */

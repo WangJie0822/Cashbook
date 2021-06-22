@@ -55,7 +55,7 @@ class RecordInfoDialog : BaseDialog<RecordInfoViewModel, DialogRecordInfoBinding
 
     override fun observe() {
         // 显示删除确认弹窗
-        viewModel.showDeleteConfirmData.observe(this, {
+        viewModel.showDeleteConfirmEvent.observe(this, {
             GeneralDialog.newBuilder()
                 .contentStr(R.string.delete_record_confirm.string)
                 .setOnPositiveAction {
@@ -64,7 +64,7 @@ class RecordInfoDialog : BaseDialog<RecordInfoViewModel, DialogRecordInfoBinding
                 }.show(childFragmentManager)
         })
         // 显示关联记录信息弹窗
-        viewModel.showAssociatedRecordInfoData.observe(this, { record ->
+        viewModel.showAssociatedRecordInfoEvent.observe(this, { record ->
             dismiss()
             actionShow(requireActivity().supportFragmentManager, record)
         })

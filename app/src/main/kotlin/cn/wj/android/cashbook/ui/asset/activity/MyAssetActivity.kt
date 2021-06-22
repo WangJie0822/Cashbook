@@ -163,7 +163,7 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
             )
         })
         // 显示资产长按菜单
-        viewModel.showLongClickMenuData.observe(this, { asset ->
+        viewModel.showLongClickMenuEvent.observe(this, { asset ->
             AssetLongClickMenuDialog.actionShow(
                 manager = supportFragmentManager,
                 onEditClick = {
@@ -176,7 +176,7 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
                 })
         })
         // 显示更多菜单
-        viewModel.showMoreMenuData.observe(this, {
+        viewModel.showMoreMenuEvent.observe(this, {
             AssetMoreMenuDialog().show(supportFragmentManager)
         })
     }

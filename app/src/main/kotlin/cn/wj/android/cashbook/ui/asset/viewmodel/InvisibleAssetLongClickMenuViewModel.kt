@@ -1,7 +1,7 @@
 package cn.wj.android.cashbook.ui.asset.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 
 /**
  * 隐藏资产长按菜单 ViewModel
@@ -10,11 +10,11 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
  */
 class InvisibleAssetLongClickMenuViewModel : BaseViewModel() {
 
-    /** 隐藏点击数据 */
-    val cancelHiddenClickData: MutableLiveData<Int> = MutableLiveData()
+    /** 隐藏点击事件 */
+    val cancelHiddenClickEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 隐藏点击 */
     val onCancelHiddenClick: () -> Unit = {
-        cancelHiddenClickData.value = 0
+        cancelHiddenClickEvent.value = 0
     }
 }

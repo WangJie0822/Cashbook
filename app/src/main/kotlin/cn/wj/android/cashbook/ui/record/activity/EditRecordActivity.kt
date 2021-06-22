@@ -58,7 +58,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         lifecycleScope.launchWhenResumed {
             if (null == viewModel.record) {
                 // 自动弹出计算弹窗
-                viewModel.showCalculatorData.value = 0
+                viewModel.showCalculatorEvent.value = 0
             } else {
                 // 切换到对应页面
                 viewModel.currentItem.value = viewModel.record!!.type.position
@@ -73,7 +73,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
 
     override fun observe() {
         // 选择资产弹窗
-        viewModel.showSelectAssetData.observe(this, {
+        viewModel.showSelectAssetEvent.observe(this, {
             SelectAssetDialog.actionShow(supportFragmentManager) { selected ->
                 if (it) {
                     viewModel.accountData
@@ -83,7 +83,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
             }
         })
         // 选择日期弹窗
-        viewModel.showSelectDateData.observe(this, {
+        viewModel.showSelectDateEvent.observe(this, {
             DateTimePickerDialog.Builder()
                 .setDate(viewModel.dateStr.value.orEmpty())
                 .setOnDatePickerListener { date ->
@@ -93,11 +93,11 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
 
         })
         // 计算器弹窗
-        viewModel.showCalculatorData.observe(this, {
+        viewModel.showCalculatorEvent.observe(this, {
             CalculatorDialog.actionShow(supportFragmentManager)
         })
         // 跳转选择关联记录
-        viewModel.jumpSelectAssociatedRecordData.observe(this, {
+        viewModel.jumpSelectAssociatedRecordEvent.observe(this, {
             selectAssociatedRecordResultLauncher.launch(SelectAssociatedRecordActivity.parseIntent(context, viewModel.dateStr.value.orEmpty(), viewModel.calculatorStr.get().orEmpty(), it))
         })
     }

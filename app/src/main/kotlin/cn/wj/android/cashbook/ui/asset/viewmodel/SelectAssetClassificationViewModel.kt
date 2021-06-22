@@ -58,7 +58,7 @@ class SelectAssetClassificationViewModel(private val local: LocalDataStore) : Ba
 
     /** 背景点击 */
     val onBackgroundClick: () -> Unit = {
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -67,7 +67,7 @@ class SelectAssetClassificationViewModel(private val local: LocalDataStore) : Ba
     val onAssetClassificationHidden: () -> Unit = {
         if (selectClassification.value.condition) {
             // 当前在选择分类
-            uiNavigationData.value = UiNavigationModel.builder {
+            uiNavigationEvent.value = UiNavigationModel.builder {
                 close()
             }
         }
@@ -77,7 +77,7 @@ class SelectAssetClassificationViewModel(private val local: LocalDataStore) : Ba
     val onBankHidden: () -> Unit = {
         if (!selectClassification.value.condition) {
             // 当前在选择银行
-            uiNavigationData.value = UiNavigationModel.builder {
+            uiNavigationEvent.value = UiNavigationModel.builder {
                 close()
             }
         }

@@ -1,8 +1,8 @@
 package cn.wj.android.cashbook.ui.asset.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_INVISIBLE_ASSET
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 
 /**
@@ -12,12 +12,12 @@ import cn.wj.android.cashbook.data.model.UiNavigationModel
  */
 class AssetMoreMenuViewModel : BaseViewModel() {
 
-    /** 显示选择资产类型弹窗 */
-    val showSelectAssetClassificationData: MutableLiveData<Int> = MutableLiveData()
+    /** 显示选择资产类型事件 */
+    val showSelectAssetClassificationData: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 关闭点击 */
     val onCloseClick: () -> Unit = {
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -29,7 +29,7 @@ class AssetMoreMenuViewModel : BaseViewModel() {
 
     /** 隐藏资产点击 */
     val onInvisibleAssetClick: () -> Unit = {
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_INVISIBLE_ASSET)
             close()
         }

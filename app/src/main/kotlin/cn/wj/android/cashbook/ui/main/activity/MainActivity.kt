@@ -81,7 +81,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         val currentBackPressMs = System.currentTimeMillis()
         if ((currentBackPressMs - lastBackPressMs).absoluteValue > MAIN_BACK_PRESS_INTERVAL_MS) {
             // 间隔时间外，提示
-            viewModel.snackbarData.value = R.string.press_again_to_exit.string.toSnackbarModel()
+            viewModel.snackbarEvent.value = R.string.press_again_to_exit.string.toSnackbarModel()
             // 保存时间
             lastBackPressMs = currentBackPressMs
         } else {
@@ -103,7 +103,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             adapter.submitList(list)
         })
         // 显示记录详情弹窗
-        viewModel.showRecordDetailsDialogData.observe(this, { record ->
+        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
         })
         // 记录变化监听

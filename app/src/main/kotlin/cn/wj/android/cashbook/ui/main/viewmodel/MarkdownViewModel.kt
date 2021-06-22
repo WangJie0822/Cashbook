@@ -19,7 +19,7 @@ class MarkdownViewModel : BaseViewModel() {
 
     /** 返回点击 */
     val onBackClick: () -> Unit = {
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }

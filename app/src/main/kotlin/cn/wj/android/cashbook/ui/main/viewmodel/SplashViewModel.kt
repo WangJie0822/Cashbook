@@ -52,7 +52,7 @@ class SplashViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     delay(SPLASH_WAIT_MS - spendMs)
                 }
                 // 跳转首页并关闭启动页
-                uiNavigationData.value = UiNavigationModel.builder {
+                uiNavigationEvent.value = UiNavigationModel.builder {
                     jump(ROUTE_PATH_MAIN)
                     close()
                 }

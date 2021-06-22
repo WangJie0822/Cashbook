@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
@@ -23,19 +24,19 @@ import kotlinx.coroutines.launch
  */
 class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
+    /** 显示弹窗事件 */
+    val showPopupMenuEvent: LifecycleEvent<BooksEntity> = LifecycleEvent()
+
+    /** 跳转新增账本事件 */
+    val jumpToAddBooksEvent: LifecycleEvent<Int> = LifecycleEvent()
+
     /** 账本列表数据 */
     val booksListData: MutableLiveData<ArrayList<BooksEntity>> = MutableLiveData()
-
-    /** 显示弹窗数据 */
-    val showPopupMenuData: MutableLiveData<BooksEntity> = MutableLiveData()
-
-    /** 跳转新增账本数据 */
-    val jumpToAddBooksData: MutableLiveData<Int> = MutableLiveData()
 
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {
         // 退出当前界面
-        uiNavigationData.value = UiNavigationModel.builder {
+        uiNavigationEvent.value = UiNavigationModel.builder {
             close()
         }
     }
@@ -43,7 +44,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 添加按钮点击 */
     val onAddClick: () -> Unit = {
         // 跳转新增
-        jumpToAddBooksData.value = 0
+        jumpToAddBooksEvent.value = 0
     }
 
     /** 账本 item 点击 */
@@ -65,7 +66,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 账本 item 更多点击 */
     val onBooksItemMoreClick: (BooksEntity) -> Unit = { item ->
         // 显示 PopupMenu 弹窗
-        showPopupMenuData.value = item
+        showPopupMenuEvent.value = item
     }
 
     /** 加载账本列表 */
@@ -99,7 +100,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     fun deleteBooks(books: BooksEntity) {
         if (books.selected) {
             // 已选择账本不能删除
-            snackbarData.value = R.string.cannot_delete_selected_books.string.toSnackbarModel()
+            snackbarEvent.value = R.string.cannot_delete_selected_books.string.toSnackbarModel()
             return
         }
         viewModelScope.launch {

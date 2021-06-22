@@ -153,7 +153,7 @@ class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInv
             )
         })
         // 显示资产长按菜单
-        viewModel.showLongClickMenuData.observe(this, { asset ->
+        viewModel.showLongClickMenuEvent.observe(this, { asset ->
             InvisibleAssetLongClickMenuDialog.actionShow(
                 manager = supportFragmentManager,
                 onCancelHiddenClick = {

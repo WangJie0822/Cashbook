@@ -120,4 +120,10 @@
     <string name="update_need_permission">更新升级需要您同意权限申请</string>
     <string name="no_wifi_available_hint">未连接Wi-Fi，确定使用数据流量下载吗？</string>
     <string name="changelog">更新日志</string>
+    <string name="use_mobile_network_download">使用数据流量下载</string>
+    <string name="application_theme">应用主题</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_follow_system">跟随系统</string>
+    <string name="please_select_application_theme">请选择应用主题</string>
 </resources>

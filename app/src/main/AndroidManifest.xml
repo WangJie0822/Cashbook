@@ -86,6 +86,12 @@
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
 
+        <!-- 设置 -->
+        <activity
+            android:name=".ui.main.activity.SettingActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
         <!-- 我的账本 -->
         <activity
             android:name=".ui.books.activity.MyBooksActivity"
