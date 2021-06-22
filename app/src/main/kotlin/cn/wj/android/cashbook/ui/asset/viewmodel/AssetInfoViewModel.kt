@@ -154,7 +154,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         viewModelScope.launch {
             try {
                 // 更新余额
-                val changed = asset.copy(balance = local.getAssetBalanceById(asset.id))
+                val changed = asset.copy(balance = local.getAssetBalanceById(asset.id, asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT))
                 // 更新状态
                 assetData.value = changed
             } catch (throwable: Throwable) {

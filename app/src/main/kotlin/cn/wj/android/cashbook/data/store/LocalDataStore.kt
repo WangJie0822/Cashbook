@@ -169,7 +169,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getCurrentAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryByBooksId(CurrentBooksLiveData.booksId).map {
             // 获取余额
-            val balance = getAssetBalanceById(it.id)
+            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
         }
     }
@@ -180,7 +180,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
             return@withContext null
         }
         val queryById = assetDao.queryById(assetId)
-        queryById?.toAssetEntity(getAssetBalanceById(assetId))
+        queryById?.toAssetEntity(getAssetBalanceById(assetId, queryById.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
     }
 
     /** 获取资产数据最大排序数字并返回 */
@@ -192,7 +192,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getInvisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryInvisibleByBooksId(CurrentBooksLiveData.booksId).map {
             //  获取余额
-            val balance = getAssetBalanceById(it.id)
+            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
         }
     }
@@ -201,7 +201,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getVisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryVisibleByBooksId(CurrentBooksLiveData.booksId).map {
             //  获取余额
-            val balance = getAssetBalanceById(it.id)
+            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
         }
     }
@@ -246,7 +246,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     }
 
     /** 获取 id 为 [assetId] 的资产余额 */
-    suspend fun getAssetBalanceById(assetId: Long?): String = withContext(Dispatchers.IO) {
+    suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
         if (null == assetId) {
             return@withContext "0"
         }
@@ -263,16 +263,32 @@ class LocalDataStore(private val database: CashbookDatabase) {
             when (it.type) {
                 RecordTypeEnum.INCOME.name -> {
                     // 收入
-                    result += it.amount.toBigDecimalOrZero()
+                    if (creditCard) {
+                        // 信用卡，降低欠款
+                        result -= it.amount.toBigDecimalOrZero()
+                    } else {
+                        result += it.amount.toBigDecimalOrZero()
+                    }
                 }
                 RecordTypeEnum.EXPENDITURE.name -> {
                     // 支出
-                    result -= it.amount.toBigDecimalOrZero()
+                    if (creditCard) {
+                        // 信用卡，增加欠款
+                        result += it.amount.toBigDecimalOrZero()
+                    } else {
+                        result -= it.amount.toBigDecimalOrZero()
+                    }
                 }
                 RecordTypeEnum.TRANSFER.name -> {
-                    // 转账
-                    result -= it.amount.toBigDecimalOrZero()
-                    result -= it.charge.toBigDecimalOrZero()
+                    // 转账转出
+                    if (creditCard) {
+                        // 信用卡，增加欠款
+                        result += it.amount.toBigDecimalOrZero()
+                        result += it.charge.toBigDecimalOrZero()
+                    } else {
+                        result -= it.amount.toBigDecimalOrZero()
+                        result -= it.charge.toBigDecimalOrZero()
+                    }
                 }
             }
         }
@@ -281,9 +297,13 @@ class LocalDataStore(private val database: CashbookDatabase) {
         transferRecordList.forEach {
             when (it.type) {
                 RecordTypeEnum.TRANSFER.name -> {
-                    // 转账
-                    result += it.amount.toBigDecimalOrZero()
-                    result += it.charge.toBigDecimalOrZero()
+                    // 转账转入
+                    if (creditCard) {
+                        // 信用卡，减少欠款
+                        result -= it.amount.toBigDecimalOrZero()
+                    } else {
+                        result += it.amount.toBigDecimalOrZero()
+                    }
                 }
             }
         }
@@ -364,9 +384,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
             null
         } else {
             val assetTable = assetDao.queryById(record.assetId)
-            val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId))
+            val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
             val intoAssetTable = assetDao.queryById(record.intoAssetId)
-            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId))
+            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
             RecordEntity(
                 id = record.id.orElse(-1L),
                 type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
@@ -398,9 +418,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
         val record = recordDao.queryAssociatedById(id) ?: return@withContext null
         val assetTable = assetDao.queryById(record.assetId)
-        val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId))
+        val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
         val intoAssetTable = assetDao.queryById(record.intoAssetId)
-        val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId))
+        val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
         RecordEntity(
             id = record.id.orElse(-1L),
             type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
