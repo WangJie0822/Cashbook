@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.ui.record.dialog
 
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import cn.wj.android.cashbook.R
@@ -10,6 +11,7 @@ import cn.wj.android.cashbook.base.ui.BaseDialog
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.databinding.DialogSelectTagBinding
+import cn.wj.android.cashbook.databinding.RecyclerItemTagBinding
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
@@ -74,7 +76,39 @@ class SelectTagDialog : BaseDialog<SelectTagViewModel, DialogSelectTagBinding>()
         })
         // 显示新建标签弹窗
         viewModel.showCreateTagDialogEvent.observe(this, {
-            CreateTagDialog.actionShow(requireActivity().supportFragmentManager)
+            EditTagDialog.actionShow(requireActivity().supportFragmentManager, callback = { tag ->
+                viewModel.insertTag(tag)
+            })
+        })
+        // 显示菜单
+        viewModel.showMenuEvent.observe(this, { tag ->
+            val viewHolder = binding.rvTag.findViewHolderForAdapterPosition(
+                tagAdapter.mDiffer.currentList.indexOf(tag)
+            )
+            if (null != viewHolder && viewHolder is SimpleRvListAdapter.ViewHolder<*>) {
+                (viewHolder.mBinding as? RecyclerItemTagBinding)?.root?.let { anchor ->
+                    PopupMenu(requireContext(), anchor).run {
+                        inflate(R.menu.select_tag_more)
+                        setOnMenuItemClickListener { menuItem ->
+                            when (menuItem.itemId) {
+                                R.id.modify -> {
+                                    // 修改
+                                    EditTagDialog.actionShow(requireActivity().supportFragmentManager, tag) { modified ->
+                                        viewModel.updateTag(modified)
+                                    }
+                                    this@SelectTagDialog.dismiss()
+                                }
+                                R.id.delete -> {
+                                    // 删除
+                                    viewModel.deleteTag(tag)
+                                }
+                            }
+                            true
+                        }
+                        show()
+                    }
+                }
+            }
         })
     }
 

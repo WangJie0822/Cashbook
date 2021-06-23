@@ -135,4 +135,5 @@
     <string name="tag_name">标签名称</string>
     <string name="tag_name_must_not_be_blank">标签名不能为空</string>
     <string name="same_tag_exist">已存在相同名称的标签</string>
+    <string name="edit_tag">编辑标签</string>
 </resources>

@@ -35,7 +35,7 @@ import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.CreateTagViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.EditTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
@@ -196,6 +196,6 @@ val viewModelModule = module {
         SelectTagViewModel(get())
     }
     viewModel {
-        CreateTagViewModel(get())
+        EditTagViewModel(get())
     }
 }

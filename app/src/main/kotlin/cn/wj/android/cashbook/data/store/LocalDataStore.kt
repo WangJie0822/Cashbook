@@ -634,4 +634,14 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun insertTag(tag: TagEntity): Long = withContext(Dispatchers.IO) {
         tagDao.insert(tag.toTagTable())
     }
+
+    /** 更新 [tag] 数据 */
+    suspend fun updateTag(tag: TagEntity) = withContext(Dispatchers.IO) {
+        tagDao.update(tag.toTagTable())
+    }
+
+    /** 删除 [tag] 数据*/
+    suspend fun deleteTag(tag: TagEntity) = withContext(Dispatchers.IO) {
+        tagDao.delete(tag.toTagTable())
+    }
 }

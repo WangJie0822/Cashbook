@@ -317,6 +317,41 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:bind_visibility="@{item.showTags}"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/item_height"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/spacing_big"
+            android:paddingEnd="@dimen/spacing_big"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tags"
+                android:textAppearance="?attr/textAppearanceBody1" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_normal"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                android:text="@{item.tagsStr}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                tools:text="这是个啥,这是个啥,这这是个啥这,是个啥这" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:minHeight="@dimen/item_height"
             android:orientation="horizontal"

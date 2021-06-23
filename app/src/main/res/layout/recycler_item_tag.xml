@@ -7,6 +7,10 @@
         <variable
             name="item"
             type="cn.wj.android.cashbook.data.entity.TagEntity" />
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel" />
     </data>
 
     <com.google.android.material.checkbox.MaterialCheckBox
@@ -14,6 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_normal"
         android:layout_marginEnd="@dimen/spacing_normal"
+        android:bind_onLongClick="@{viewModel.onTagItemLongClick}"
+        android:bind_onLongClick_item="@{item}"
         android:checked="@={item.selected}"
         android:text="@{item.name}"
         tools:checked="true"

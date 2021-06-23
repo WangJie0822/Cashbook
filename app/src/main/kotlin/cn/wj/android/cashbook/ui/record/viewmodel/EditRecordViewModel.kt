@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedLong
@@ -424,5 +425,25 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 buttonEnable.value = true
             }
         }
+    }
+
+    /** 通知标签 [tag] 变化 */
+    fun notifyTagChanged(tag: TagEntity) {
+        val list = tagsData.value.toNewList()
+        val index = list.indexOfFirst { it.id == tag.id }
+        if (index >= 0) {
+            list[index] = tag
+        }
+        tagsData.value = list
+    }
+
+    /** 通知标签 [tag] 删除 */
+    fun notifyTagDelete(tag: TagEntity) {
+        val list = tagsData.value.toNewList()
+        val index = list.indexOfFirst { it.id == tag.id }
+        if (index >= 0) {
+            list.removeAt(index)
+        }
+        tagsData.value = list
     }
 }

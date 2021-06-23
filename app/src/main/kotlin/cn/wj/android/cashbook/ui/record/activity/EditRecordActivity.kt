@@ -11,8 +11,11 @@ import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
+import cn.wj.android.cashbook.data.constants.EVENT_TAG_CHANGE
+import cn.wj.android.cashbook.data.constants.EVENT_TAG_DELETE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
@@ -21,6 +24,7 @@ import cn.wj.android.cashbook.ui.record.dialog.DateTimePickerDialog
 import cn.wj.android.cashbook.ui.record.dialog.SelectTagDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -105,6 +109,19 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         viewModel.showSelectTagDialogEvent.observe(this, { selected ->
             SelectTagDialog.actionShow(supportFragmentManager, selected) { selectedTags ->
                 viewModel.tagsData.value = selectedTags
+            }
+        })
+
+        // 标签变化
+        LiveEventBus.get(EVENT_TAG_CHANGE).observe(this, { value ->
+            (value as? TagEntity)?.let { tag->
+                viewModel.notifyTagChanged(tag)
+            }
+        })
+        // 标签删除
+        LiveEventBus.get(EVENT_TAG_DELETE).observe(this, { value ->
+            (value as? TagEntity)?.let { tag->
+                viewModel.notifyTagDelete(tag)
             }
         })
     }

@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.record.viewmodel.CreateTagViewModel" />
+            type="cn.wj.android.cashbook.ui.record.viewmodel.EditTagViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,12 +22,13 @@
             android:layout_marginStart="@dimen/dialog_title_horizontal_margin"
             android:layout_marginTop="@dimen/spacing_big"
             android:layout_marginEnd="@dimen/dialog_title_horizontal_margin"
-            android:text="@string/create_tag"
+            android:text="@{viewModel.titleStr}"
             android:textAppearance="?attr/textAppearanceHeadline5"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/create_tag" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til"

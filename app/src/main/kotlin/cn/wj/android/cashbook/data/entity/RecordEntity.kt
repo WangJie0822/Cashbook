@@ -60,6 +60,24 @@ data class RecordEntity(
     val showDate: Boolean
 ) : Parcelable {
 
+    /** 是否显示标签 */
+    @IgnoredOnParcel
+    val showTags: Boolean
+        get() = tags.isNotEmpty()
+
+    /** 标签显示文本 */
+    @IgnoredOnParcel
+    val tagsStr: String
+        get() = with(StringBuilder()) {
+            tags.forEach {
+                if (isNotBlank()) {
+                    append(",")
+                }
+                append(it.name)
+            }
+            toString()
+        }
+
     /** 分类文本 */
     @IgnoredOnParcel
     val typeStr: String
