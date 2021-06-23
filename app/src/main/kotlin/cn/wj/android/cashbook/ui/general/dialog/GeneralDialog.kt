@@ -17,9 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * 通用弹窗
  *
- * - 创建时间：2019/9/28
- *
- * @author 王杰
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/26
  */
 class GeneralDialog
     : BaseDialog<GeneralViewModel, DialogGeneralBinding>() {

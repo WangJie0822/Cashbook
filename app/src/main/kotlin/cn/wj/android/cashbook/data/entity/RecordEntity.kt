@@ -51,7 +51,7 @@ data class RecordEntity(
     val amount: String,
     val charge: String,
     val remark: String,
-    val tags: List<String>,
+    val tags: List<TagEntity>,
     val reimbursable: Boolean,
     val system: Boolean,
     val recordTime: Long,

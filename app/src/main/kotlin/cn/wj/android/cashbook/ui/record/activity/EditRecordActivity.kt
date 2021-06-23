@@ -18,6 +18,7 @@ import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
 import cn.wj.android.cashbook.ui.record.dialog.CalculatorDialog
 import cn.wj.android.cashbook.ui.record.dialog.DateTimePickerDialog
+import cn.wj.android.cashbook.ui.record.dialog.SelectTagDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -99,6 +100,12 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         // 跳转选择关联记录
         viewModel.jumpSelectAssociatedRecordEvent.observe(this, {
             selectAssociatedRecordResultLauncher.launch(SelectAssociatedRecordActivity.parseIntent(context, viewModel.dateStr.value.orEmpty(), viewModel.calculatorStr.get().orEmpty(), it))
+        })
+        // 显示选择标签弹窗
+        viewModel.showSelectTagDialogEvent.observe(this, { selected ->
+            SelectTagDialog.actionShow(supportFragmentManager, selected) { selectedTags ->
+                viewModel.tagsData.value = selectedTags
+            }
         })
     }
 }

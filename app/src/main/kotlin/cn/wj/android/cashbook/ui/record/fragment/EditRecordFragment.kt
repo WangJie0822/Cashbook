@@ -15,7 +15,7 @@ import cn.wj.android.cashbook.databinding.FragmentEditRecordBinding
 import cn.wj.android.cashbook.ui.record.adapter.TypeSecondRvAdapter
 import cn.wj.android.cashbook.ui.record.adapter.TypeSettingRvAdapter
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

@@ -12,10 +12,12 @@ import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.table.AssetTable
 import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.database.table.RecordTable
+import cn.wj.android.cashbook.data.database.table.TagTable
 import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
@@ -130,6 +132,22 @@ internal fun TypeEntity.toTypeTable(): TypeTable {
     )
 }
 
+/** 将数据库数据转换为对应数据实体类 */
+internal fun TagTable.toTagEntity(): TagEntity {
+    return TagEntity(
+        id = id.orElse(-1L),
+        name = name
+    )
+}
+
+/** 将数据实体类转换为对应数据库数据 */
+internal fun TagEntity.toTagTable(): TagTable {
+    return TagTable(
+        id = if (-1L == id) null else id,
+        name = name
+    )
+}
+
 /** 将数据实体类转换为对应数据库数据 */
 internal fun RecordEntity.toRecordTable(): RecordTable {
     return RecordTable(
@@ -144,8 +162,15 @@ internal fun RecordEntity.toRecordTable(): RecordTable {
         amount = amount.toMoneyFloat(),
         charge = charge.toMoneyFloat(),
         remark = remark,
-        // TODO
-        tagIds = "",
+        tagIds = with(StringBuilder()) {
+            tags.forEach {
+                if (isNotBlank()) {
+                    append(",")
+                }
+                append(it.id.toString())
+            }
+            toString()
+        },
         reimbursable = if (reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
         system = if (system) SWITCH_INT_ON else SWITCH_INT_OFF,
         recordTime = recordTime,

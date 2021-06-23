@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET_ID
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
@@ -58,6 +59,9 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 reimbursableChecked.value = reimbursable
             }
         }
+
+    /** 显示选择标签弹窗事件 */
+    val showSelectTagDialogEvent: LifecycleEvent<List<TagEntity>> = LifecycleEvent()
 
     /** 跳转选择关联记录事件 */
     val jumpSelectAssociatedRecordEvent: LifecycleEvent<Boolean> = LifecycleEvent()
@@ -113,8 +117,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 转账转入账户信息 */
     val transferAccountData: MutableLiveData<AssetEntity> = MutableLiveData(null)
 
-    /** TODO 标签数据 */
-    val tagsData: MutableLiveData<List<String>> = MutableLiveData(arrayListOf())
+    /** 标签数据 */
+    val tagsData: MutableLiveData<List<TagEntity>> = MutableLiveData(arrayListOf())
 
     /** 选中时间 */
     val dateData: MutableLiveData<Long> = MutableLiveData(System.currentTimeMillis())
@@ -167,7 +171,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     if (isNotBlank()) {
                         append(",")
                     }
-                    append(tag)
+                    append(tag.name)
                 }
                 toString()
             }
@@ -269,7 +273,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 标签点击 */
     val onTagsClick: () -> Unit = {
-        snackbarEvent.value = "标签点击".toSnackbarModel()
+        // 显示选择标签弹窗
+        showSelectTagDialogEvent.value = tagsData.value.orEmpty()
     }
 
     /** 日期点击 */

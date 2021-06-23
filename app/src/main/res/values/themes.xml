@@ -43,7 +43,7 @@
     </style>
 
     <!-- 弹窗默认主题 -->
-    <style name="Theme.Cashbook.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog" />
+    <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog" />
 
     <!-- 全半透明背景 -->
     <style name="Theme.Cashbook.Dialog.Transparent" >

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.databinding.RecyclerItemTypeSecondBinding
-import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 
 /**

@@ -155,4 +155,10 @@
     <string name="select_day">选择日期</string>
     <string name="day">日</string>
     <string name="start_background_download">开始后台下载</string>
+    <string name="select_tags">选择标签</string>
+    <string name="select_tag_dialog_hint">可多选</string>
+    <string name="create_tag">新建标签</string>
+    <string name="tag_name">标签名称</string>
+    <string name="tag_name_must_not_be_blank">标签名不能为空</string>
+    <string name="same_tag_exist">已存在相同名称的标签</string>
 </resources>

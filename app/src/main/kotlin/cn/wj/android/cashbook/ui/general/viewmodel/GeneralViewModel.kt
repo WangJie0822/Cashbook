@@ -12,9 +12,7 @@ import cn.wj.android.cashbook.data.event.LifecycleEvent
 /**
  * 通用弹窗 ViewModel
  *
- * - 创建时间：2019/9/28
- *
- * @author 王杰
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/26
  */
 class GeneralViewModel : BaseViewModel() {
 

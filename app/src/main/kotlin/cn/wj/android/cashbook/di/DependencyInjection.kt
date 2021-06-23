@@ -1,6 +1,8 @@
 package cn.wj.android.cashbook.di
 
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.base.tools.funLogger
 import cn.wj.android.cashbook.base.tools.jsonDefault
@@ -32,11 +34,13 @@ import cn.wj.android.cashbook.ui.main.viewmodel.MarkdownViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.CreateTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -79,6 +83,13 @@ val netModule = module {
     }
 }
 
+/** 数据库升级 1 -> 2 */
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS `db_tag` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL)")
+    }
+}
+
 /** 数据库相关依赖注入 */
 val dbModule = module {
     single {
@@ -86,7 +97,9 @@ val dbModule = module {
             AppManager.getContext().applicationContext,
             CashbookDatabase::class.java,
             DB_FILE_NAME
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 }
 
@@ -178,5 +191,11 @@ val viewModelModule = module {
     }
     viewModel {
         SelectDayViewModel()
+    }
+    viewModel {
+        SelectTagViewModel(get())
+    }
+    viewModel {
+        CreateTagViewModel(get())
     }
 }

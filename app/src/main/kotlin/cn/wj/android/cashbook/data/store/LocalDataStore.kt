@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.AssetDao
 import cn.wj.android.cashbook.data.database.dao.BooksDao
 import cn.wj.android.cashbook.data.database.dao.RecordDao
+import cn.wj.android.cashbook.data.database.dao.TagDao
 import cn.wj.android.cashbook.data.database.dao.TypeDao
 import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.database.table.RecordTable
@@ -29,6 +30,7 @@ import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
@@ -40,6 +42,8 @@ import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
 import cn.wj.android.cashbook.data.transform.toRecordTable
+import cn.wj.android.cashbook.data.transform.toTagEntity
+import cn.wj.android.cashbook.data.transform.toTagTable
 import cn.wj.android.cashbook.data.transform.toTypeEntity
 import cn.wj.android.cashbook.data.transform.toTypeTable
 import java.util.Calendar
@@ -73,6 +77,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 记录数据库操作对象 */
     private val recordDao: RecordDao by lazy {
         database.recordDao()
+    }
+
+    /** 标签数据库操作对象 */
+    private val tagDao: TagDao by lazy {
+        database.tagDao()
     }
 
     /** 将账本数据 [books] 插入到数据库中 */
@@ -246,7 +255,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     }
 
     /** 获取 id 为 [assetId] 的资产余额 */
-    suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
+    private suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
         if (null == assetId) {
             return@withContext "0"
         }
@@ -400,8 +409,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
                 amount = record.amount.toString(),
                 charge = record.charge.toString(),
                 remark = record.remark,
-                // TODO
-                tags = arrayListOf(),
+                tags = loadTagListFromIds(record.tagIds),
                 reimbursable = record.reimbursable == SWITCH_INT_ON,
                 system = record.system == SWITCH_INT_ON,
                 recordTime = record.recordTime,
@@ -434,8 +442,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
             amount = record.amount.toString(),
             charge = record.charge.toString(),
             remark = record.remark,
-            // TODO
-            tags = arrayListOf(),
+            tags = loadTagListFromIds(record.tagIds),
             reimbursable = record.reimbursable == SWITCH_INT_ON,
             system = record.system == SWITCH_INT_ON,
             recordTime = record.recordTime,
@@ -443,6 +450,24 @@ class LocalDataStore(private val database: CashbookDatabase) {
             modifyTime = record.modifyTime.dateFormat(),
             showDate = true
         )
+    }
+
+    /** 从 id 列表获取 Tag 列表 */
+    private suspend fun loadTagListFromIds(ids: String): List<TagEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<TagEntity>()
+        if (ids.isBlank()) {
+            return@withContext result
+        }
+        val splits = ids.split(",")
+        if (splits.isEmpty()) {
+            return@withContext result
+        }
+        splits.forEach { id ->
+            tagDao.queryById(id.toLongOrNull().orElse(-1L))?.let { table ->
+                result.add(table.toTagEntity())
+            }
+        }
+        return@withContext result
     }
 
     /** 获取当前月所有记录 */
@@ -589,5 +614,24 @@ class LocalDataStore(private val database: CashbookDatabase) {
         recordDao.deleteModifyAndTransferByAssetId(asset.id)
         // 删除资产信息
         assetDao.delete(asset.toAssetTable())
+    }
+
+    /** 获取所有标签数据并返回 */
+    suspend fun getTagList(): List<TagEntity> = withContext(Dispatchers.IO) {
+        tagDao.queryAll().map {
+            it.toTagEntity()
+        }
+    }
+
+    /** 根据标签名 [name] 查询并返回标签 */
+    suspend fun queryTagByName(name: String): List<TagEntity> = withContext(Dispatchers.IO) {
+        tagDao.queryByName(name).map {
+            it.toTagEntity()
+        }
+    }
+
+    /** 将 [tag] 插入数据库并返回主键 */
+    suspend fun insertTag(tag: TagEntity): Long = withContext(Dispatchers.IO) {
+        tagDao.insert(tag.toTagTable())
     }
 }

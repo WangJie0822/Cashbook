@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.wj.android.cashbook.databinding.RecyclerItemTypeSettingBinding
-import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel
 
 /**
  * 类型设置适配器

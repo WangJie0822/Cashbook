@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.ui.type.viewmodel
+package cn.wj.android.cashbook.ui.record.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 
 /**
  * 消费类型 ViewModel
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
 class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
