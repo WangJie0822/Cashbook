@@ -46,6 +46,7 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
                 // 权限获取申请成功，开始下载
                 val info = viewModel.showUpdateDialogEvent.value ?: return@registerForActivityResult
                 UpdateManager.startDownload(info)
+                viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()
             } else {
                 // 提示需要权限
                 viewModel.snackbarEvent.value = R.string.update_need_permission.string.toSnackbarModel()
@@ -69,8 +70,6 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
         // 升级提示弹窗
         viewModel.showUpdateDialogEvent.observe(this, { info ->
             GeneralDialog.newBuilder()
-                .titleStr(R.string.new_versions.string)
-                .subtitleStr(info.versionName)
                 .contentStr(info.versionInfo.md2Spanned())
                 .setPositiveAction(R.string.update.string) {
                     // 下载升级

@@ -49,6 +49,7 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
     protected var snackbarTransform: ((SnackbarModel) -> SnackbarModel)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        beforeOnCreate()
         super.onCreate(savedInstanceState)
 
         // 订阅基本数据
@@ -139,6 +140,10 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
     /** 返回按键点击 */
     protected open fun onBackPressed(): Boolean {
         return false
+    }
+
+    /** [onCreate] 之前执行 */
+    protected open fun beforeOnCreate() {
     }
 
     /** 订阅数据 */

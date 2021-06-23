@@ -38,7 +38,11 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
     val jumpEditAssetEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 资产信息 */
-    val assetData: MutableLiveData<AssetEntity> = MutableLiveData()
+    val assetData: MutableLiveData<AssetEntity> = object : MutableLiveData<AssetEntity>() {
+        override fun onActive() {
+            refreshAsset()
+        }
+    }
 
     /** 标题文本 */
     val titleStr: LiveData<String> = assetData.map {
@@ -83,7 +87,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         if (it.billingDate.isBlank()) {
             R.string.not_set.string
         } else {
-            it.billingDate
+            it.billingDate + R.string.day.string
         }
     }
 
@@ -92,7 +96,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         if (it.repaymentDate.isBlank()) {
             R.string.not_set.string
         } else {
-            it.repaymentDate
+            it.repaymentDate + R.string.day.string
         }
     }
 
@@ -154,10 +158,8 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         val asset = assetData.value ?: return
         viewModelScope.launch {
             try {
-                // 更新余额
-                val changed = asset.copy(balance = local.getAssetBalanceById(asset.id, asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT))
-                // 更新状态
-                assetData.value = changed
+                // 更新资产信息
+                assetData.value = local.findAssetById(asset.id)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "refreshAsset")
             }

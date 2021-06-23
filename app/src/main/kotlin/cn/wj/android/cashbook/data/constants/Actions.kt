@@ -32,3 +32,6 @@ const val ACTION_TITLE = "action_title"
 
 /** 内容 */
 const val ACTION_CONTENT = "action_content"
+
+/** 已选中 */
+const val ACTION_SELECTED = "action_selected"

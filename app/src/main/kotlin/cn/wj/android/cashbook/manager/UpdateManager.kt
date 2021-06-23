@@ -21,6 +21,11 @@ object UpdateManager {
 
     fun checkFromInfo(info: UpdateInfoEntity, need: () -> Unit, noNeed: () -> Unit) {
         logger().d("checkFromInfo info: $info")
+        if (BuildConfig.DEBUG) {
+            // Debug 环境，永远需要更新
+            need.invoke()
+            return
+        }
         if (!needUpdate(info.versionName)) {
             // 已是最新版本
             noNeed.invoke()

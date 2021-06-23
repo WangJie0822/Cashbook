@@ -215,9 +215,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_normal"
+                        android:gravity="end"
                         android:hint="@string/please_select"
-                        android:text="@{viewModel.billingDate}"
-                        android:textAppearance="?attr/textAppearanceSubtitle1" />
+                        android:text="@{viewModel.billingDateStr}"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        tools:text="10" />
 
                     <ImageView
                         android:id="@+id/iv_billing_date_arrow"
@@ -256,8 +258,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_normal"
+                        android:gravity="end"
                         android:hint="@string/please_select"
-                        android:text="@{viewModel.repaymentDate}"
+                        android:text="@{viewModel.repaymentDateStr}"
                         android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                     <ImageView

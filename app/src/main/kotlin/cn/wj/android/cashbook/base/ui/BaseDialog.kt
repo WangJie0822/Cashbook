@@ -19,9 +19,11 @@ import androidx.lifecycle.Observer
 import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.platform.MaterialSharedAxis
 
 /**
  * 应用 [DialogFragment] 基类
@@ -65,6 +67,7 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
     private var onDialogDismissListener: OnDialogDismissListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        beforeOnCreate()
         super.onCreate(savedInstanceState)
 
         // 设置样式
@@ -153,6 +156,11 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
     /** 设置 Dialog 隐藏回调 [listener] */
     fun setOnDialogDismissListener(listener: OnDialogDismissListener?) {
         onDialogDismissListener = listener
+    }
+
+
+    /** [onCreate] 之前执行 */
+    protected open fun beforeOnCreate() {
     }
 
     /** 订阅数据 */

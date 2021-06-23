@@ -81,7 +81,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
         var totalIncome = "0".toBigDecimal()
         it.forEach { record ->
             if (record.type == RecordTypeEnum.INCOME) {
-                // 支出
+                // 收入
                 totalIncome += record.amount.toBigDecimalOrZero()
             }
         }
@@ -91,13 +91,13 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     /** 本月结余 */
     val balance: LiveData<String> = maps(expenditure, income) {
         val symbol = CurrentBooksLiveData.currency.symbol
-        val income = income.value.orEmpty().replace(symbol, "").toFloatOrNull().orElse(0f)
-        val expenditure = expenditure.value.orEmpty().replace(symbol, "").toFloatOrNull().orElse(0f)
+        val income = income.value.orEmpty().replace(symbol, "").toBigDecimalOrZero()
+        val expenditure = expenditure.value.orEmpty().replace(symbol, "").toBigDecimalOrZero()
         val balance = income - expenditure
-        if (balance >= 0) {
-            symbol + balance.toString()
+        if (balance.toFloat() >= 0f) {
+            symbol + balance.formatToNumber()
         } else {
-            "-" + symbol + (-balance).toString()
+            "-" + symbol + (-balance).formatToNumber()
         }
     }
 

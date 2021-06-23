@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
@@ -46,6 +47,12 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
             field = value
             balance.value = value
         }
+
+    /** 显示选择日期弹窗事件 */
+    val showSelectDayEvent: LifecycleEvent<Boolean> = LifecycleEvent()
+
+    /** 显示选择资产类型弹窗事件 */
+    val showSelectAssetClassificationEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 资产分类大类 */
     val classificationType: MutableLiveData<ClassificationTypeEnum> = MutableLiveData(ClassificationTypeEnum.CAPITAL_ACCOUNT)
@@ -87,14 +94,29 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 账单日 */
     val billingDate: MutableLiveData<String> = MutableLiveData()
 
+    /** 账单日显示文本 */
+    val billingDateStr: LiveData<String> = billingDate.map {
+        if (it.isNullOrBlank()) {
+            ""
+        } else {
+            "$it${R.string.day.string}"
+        }
+    }
+
     /** 还款日 */
     val repaymentDate: MutableLiveData<String> = MutableLiveData()
 
+    /** 还款日显示文本 */
+    val repaymentDateStr: LiveData<String> = repaymentDate.map {
+        if (it.isNullOrBlank()) {
+            ""
+        } else {
+            "$it${R.string.day.string}"
+        }
+    }
+
     /** 标记 - 是否隐藏资产 */
     val invisibleAsset: MutableLiveData<Boolean> = MutableLiveData()
-
-    /** 显示选择资产类型弹窗 */
-    val showSelectAssetClassificationData: MutableLiveData<Int> = MutableLiveData()
 
     /** 标题文本 */
     val titleStr: ObservableField<String> = ObservableField(R.string.new_asset.string)
@@ -112,19 +134,19 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 资产类型点击 */
     val onAssetClassificationClick: () -> Unit = {
-        showSelectAssetClassificationData.value = 0
+        showSelectAssetClassificationEvent.value = 0
     }
 
     /** 账单日点击 */
     val onBillingDateClick: () -> Unit = {
-        // TODO
-        snackbarEvent.value = "账单日".toSnackbarModel()
+        // 显示选择日期弹窗
+        showSelectDayEvent.value = true
     }
 
     /** 还款日点击 */
     val onRepaymentDateClick: () -> Unit = {
-        // TODO
-        snackbarEvent.value = "还款日".toSnackbarModel()
+        // 显示选择日期弹窗
+        showSelectDayEvent.value = false
     }
 
     /** 保存点击 */

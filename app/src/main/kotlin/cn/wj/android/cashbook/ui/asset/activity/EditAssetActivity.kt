@@ -14,6 +14,7 @@ import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.databinding.ActivityEditAssetBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetClassificationDialog
+import cn.wj.android.cashbook.ui.asset.dialog.SelectDayDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.EditAssetViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -58,8 +59,27 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
     }
 
     override fun observe() {
+        // 显示选择日期弹窗
+        viewModel.showSelectDayEvent.observe(this, { billingDate ->
+            val selectedDay = if (billingDate) {
+                // 账单日
+                viewModel.billingDate.value.orEmpty()
+            } else {
+                // 还款日
+                viewModel.repaymentDate.value.orEmpty()
+            }
+            SelectDayDialog.actionShow(supportFragmentManager, selectedDay) { selected ->
+                if (billingDate) {
+                    // 账单日
+                    viewModel.billingDate.value = selected
+                } else {
+                    // 还款日
+                    viewModel.repaymentDate.value = selected
+                }
+            }
+        })
         // 显示选择资产分类弹窗
-        viewModel.showSelectAssetClassificationData.observe(this, {
+        viewModel.showSelectAssetClassificationEvent.observe(this, {
             SelectAssetClassificationDialog()
                 .setOnClassificationSelectListener { classificationTypeEnum, assetClassificationEnum ->
                     viewModel.classificationType.value = classificationTypeEnum

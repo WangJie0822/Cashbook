@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.ui.asset.viewmodel.InvisibleAssetViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.MyAssetViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetClassificationViewModel
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetViewModel
+import cn.wj.android.cashbook.ui.asset.viewmodel.SelectDayViewModel
 import cn.wj.android.cashbook.ui.books.viewmodel.EditBooksViewModel
 import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.general.viewmodel.GeneralViewModel
@@ -174,5 +175,8 @@ val viewModelModule = module {
     }
     viewModel {
         RecordInfoViewModel(get())
+    }
+    viewModel {
+        SelectDayViewModel()
     }
 }
