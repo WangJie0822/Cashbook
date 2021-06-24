@@ -55,7 +55,7 @@ class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(),
     private fun loadVisibleAssetData() {
         viewModelScope.launch {
             try {
-                val ls = ArrayList(local.getVisibleAssetList())
+                val ls = ArrayList(local.getVisibleAssetListSortByRecord())
                 // 添加未选择资产
                 ls.add(0, AssetEntity.notSelectAsset())
                 assetListData.value = ls

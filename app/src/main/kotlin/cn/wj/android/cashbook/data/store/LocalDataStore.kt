@@ -206,13 +206,17 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
     }
 
-    /** 获取未隐藏资产数据并返回 */
-    suspend fun getVisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
+    /** 获取未隐藏资产数据通过记录数量排序 */
+    suspend fun getVisibleAssetListSortByRecord(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryVisibleByBooksId(CurrentBooksLiveData.booksId).map {
             //  获取余额
             val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
-            it.toAssetEntity(balance)
-        }
+            // 获取记录数
+            val count = getRecordCountByAssetId(it.id)
+            it.toAssetEntity(balance, count)
+        }.sortedBy {
+            it.sort
+        }.reversed()
     }
 
     /** 返回数据库是否存在类型数据 */
@@ -577,6 +581,15 @@ class LocalDataStore(private val database: CashbookDatabase) {
         config = PagingConfig(20),
         pagingSourceFactory = { RecordPagingSource(assetId, this) }
     ).liveData
+
+    /** 获取关联资产 id 为 [assetId] 的记录数量 */
+    suspend fun getRecordCountByAssetId(assetId: Long?): Int = withContext(Dispatchers.IO) {
+        if (assetId == null) {
+            0
+        } else {
+            recordDao.queryRecordCountByAssetId(assetId)
+        }
+    }
 
     /** 根据资产 id [assetId] 页码 [pageNum] 每页数据 [pageSize] 获取记录数据 */
     suspend fun getRecordByAssetId(assetId: Long, pageNum: Int, pageSize: Int): List<DateRecordEntity> = withContext(Dispatchers.IO) {

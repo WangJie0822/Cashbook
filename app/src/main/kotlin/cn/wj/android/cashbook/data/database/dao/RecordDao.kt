@@ -61,6 +61,10 @@ interface RecordDao {
     @Query("SELECT * FROM db_record WHERE (asset_id=:assetId OR into_asset_id=:assetId) ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
     suspend fun queryRecordByAssetId(assetId: Long, pageNum: Int, pageSize: Int): List<RecordTable>
 
+    /** 获取关联资产 id 为 [assetId] 的记录数量 */
+    @Query("SELECT COUNT(*) FROM db_record WHERE asset_id=:assetId")
+    suspend fun queryRecordCountByAssetId(assetId: Long): Int
+
     /** 查询金额小于等于 [amount] 记录时间在 [recordTime] 之后的支出记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type=:type AND books_id=:booksId AND amount>=:amount ORDER BY record_time DESC")
     suspend fun queryExpenditureRecordAfterDateLargerThanAmount(booksId: Long, amount: Float, recordTime: Long, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>

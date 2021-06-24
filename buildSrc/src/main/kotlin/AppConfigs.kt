@@ -34,7 +34,6 @@ object AppConfigs {
 /** 根据日期时间获取对应版本号 */
 private fun getVersionCode(): Int {
     val sdf = SimpleDateFormat("yyMMddHH", Locale.CHINA)
-    sdf.timeZone = TimeZone.getTimeZone("UTC")
     val formatDate = sdf.format(Date())
     val versionCode = formatDate.toIntOrNull() ?: 10001
     println("> Task :buildSrc:AppConfigs getVersionCode formatDate: $formatDate versionCode: $versionCode")

@@ -61,7 +61,7 @@ internal fun BooksEntity.toAssetTable(): BooksTable {
 }
 
 /** 将数据库数据转换为对应数据实体类 */
-internal fun AssetTable.toAssetEntity(balance: String): AssetEntity {
+internal fun AssetTable.toAssetEntity(balance: String, sort: Int = -1): AssetEntity {
     return AssetEntity(
         id = id.orElse(-1),
         booksId = booksId,
@@ -72,7 +72,7 @@ internal fun AssetTable.toAssetEntity(balance: String): AssetEntity {
         type = ClassificationTypeEnum.fromName(type).orElse(ClassificationTypeEnum.CREDIT_CARD_ACCOUNT),
         classification = AssetClassificationEnum.fromName(classification).orElse(AssetClassificationEnum.CASH),
         invisible = invisible == SWITCH_INT_ON,
-        sort = sort,
+        sort = if (sort == -1) this.sort else sort,
         createTime = createTime.dateFormat(),
         modifyTime = modifyTime.dateFormat(),
         balance = balance
