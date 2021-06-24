@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Added
+- 新增资产排序功能；
 ### Changed
 - 选资产列表根据使用频率排序；
 

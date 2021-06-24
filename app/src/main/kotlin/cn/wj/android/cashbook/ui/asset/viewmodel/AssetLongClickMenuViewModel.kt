@@ -13,12 +13,20 @@ class AssetLongClickMenuViewModel : BaseViewModel() {
     /** 编辑点击事件 */
     val editClickEvent: LifecycleEvent<Int> = LifecycleEvent()
 
+    /** 排序点击事件 */
+    val sortClickEvent: LifecycleEvent<Int> = LifecycleEvent()
+
     /** 隐藏点击事件 */
     val hiddenClickEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 编辑点击 */
     val onEditClick: () -> Unit = {
         editClickEvent.value = 0
+    }
+
+    /** 排序点击 */
+    val onSortClick: () -> Unit = {
+        sortClickEvent.value = 0
     }
 
     /** 隐藏点击 */

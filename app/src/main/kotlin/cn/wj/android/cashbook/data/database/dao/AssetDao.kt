@@ -29,6 +29,10 @@ interface AssetDao {
     @Update
     suspend fun update(asset: AssetTable)
 
+    /** 更新资产 [assets] */
+    @Update
+    suspend fun update(vararg assets: AssetTable)
+
     /** 根据 [booksId] 从数据库中查询所有资产数据并返回 */
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId")
     suspend fun queryByBooksId(booksId: Long): List<AssetTable>

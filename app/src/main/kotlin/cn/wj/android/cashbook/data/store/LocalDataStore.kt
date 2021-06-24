@@ -174,6 +174,14 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
     }
 
+    /** 更新资产 [ls] 到数据库 */
+    suspend fun updateAsset(ls: List<AssetEntity>) = withContext(Dispatchers.IO) {
+        val tables = ls.map {
+            it.toAssetTable()
+        }.toTypedArray()
+        assetDao.update(*tables)
+    }
+
     /** 获取资产数据并返回 */
     suspend fun getCurrentAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryByBooksId(CurrentBooksLiveData.booksId).map {

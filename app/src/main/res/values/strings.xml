@@ -173,4 +173,6 @@
     <string name="channel_app_description">该渠道用于通知应用信息</string>
     <string name="update_error_title">下载失败</string>
     <string name="retry">重试</string>
+    <string name="sort">排序</string>
+    <string name="sort_hint">长按可拖拽移动</string>
 </resources>

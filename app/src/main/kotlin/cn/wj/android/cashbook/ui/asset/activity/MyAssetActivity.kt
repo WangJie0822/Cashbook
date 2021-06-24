@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.ui.asset.activity
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.ItemTouchHelper
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ui.BaseActivity
@@ -13,6 +14,7 @@ import cn.wj.android.cashbook.ui.asset.dialog.AssetLongClickMenuDialog
 import cn.wj.android.cashbook.ui.asset.dialog.AssetMoreMenuDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.MyAssetViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
+import cn.wj.android.cashbook.widget.recyclerview.callback.DragItemTouchCallback
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
@@ -33,9 +35,17 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
         createAssetAdapter()
     }
 
+    private val capitalTouchHelper: ItemTouchHelper by lazy {
+        ItemTouchHelper(DragItemTouchCallback(capitalAdapter))
+    }
+
     /** 信用卡账户列表适配器对象 */
     private val creditCardAdapter: SimpleRvListAdapter<AssetEntity> by lazy {
         createAssetAdapter()
+    }
+
+    private val creditCardTouchHelper: ItemTouchHelper by lazy {
+        ItemTouchHelper(DragItemTouchCallback(creditCardAdapter))
     }
 
     /** 充值账户列表适配器对象 */
@@ -43,14 +53,26 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
         createAssetAdapter()
     }
 
+    private val topUpTouchHelper: ItemTouchHelper by lazy {
+        ItemTouchHelper(DragItemTouchCallback(topUpAdapter))
+    }
+
     /** 理财账户列表适配器对象 */
     private val investmentFinancialAdapter: SimpleRvListAdapter<AssetEntity> by lazy {
         createAssetAdapter()
     }
 
+    private val investmentFinancialTouchHelper: ItemTouchHelper by lazy {
+        ItemTouchHelper(DragItemTouchCallback(investmentFinancialAdapter))
+    }
+
     /** 债务账户列表适配器对象 */
     private val debtAdapter: SimpleRvListAdapter<AssetEntity> by lazy {
         createAssetAdapter()
+    }
+
+    private val debtTouchHelper: ItemTouchHelper by lazy {
+        ItemTouchHelper(DragItemTouchCallback(debtAdapter))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -162,6 +184,15 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
                 }
             )
         })
+        // 编辑状态
+        viewModel.edit.observe(this, {
+            // 编辑状态
+            capitalTouchHelper.attachToRecyclerView(if (it) binding.rvCapital else null)
+            creditCardTouchHelper.attachToRecyclerView(if (it) binding.rvCreditCard else null)
+            topUpTouchHelper.attachToRecyclerView(if (it) binding.rvTopUp else null)
+            investmentFinancialTouchHelper.attachToRecyclerView(if (it) binding.rvInvestmentFinancial else null)
+            debtTouchHelper.attachToRecyclerView(if (it) binding.rvDebt else null)
+        })
         // 显示资产长按菜单
         viewModel.showLongClickMenuEvent.observe(this, { asset ->
             AssetLongClickMenuDialog.actionShow(
@@ -169,6 +200,10 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
                 onEditClick = {
                     // 跳转编辑资产
                     EditAssetActivity.actionStart(context, asset)
+                },
+                onSortClick = {
+                    // 排序点击
+                    viewModel.edit.value = true
                 },
                 onHiddenClick = {
                     // 隐藏资产
@@ -178,6 +213,27 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
         // 显示更多菜单
         viewModel.showMoreMenuEvent.observe(this, {
             AssetMoreMenuDialog().show(supportFragmentManager)
+        })
+        // 保存点击
+        viewModel.saveClickEvent.observe(this, {
+            // 获取需要更新的数据列表
+            val ls = arrayListOf<AssetEntity>()
+            capitalAdapter.mDiffer.currentList.forEachIndexed { index, entity ->
+                ls.add(entity.copy(sort = index))
+            }
+            creditCardAdapter.mDiffer.currentList.forEachIndexed { index, entity ->
+                ls.add(entity.copy(sort = index))
+            }
+            topUpAdapter.mDiffer.currentList.forEachIndexed { index, entity ->
+                ls.add(entity.copy(sort = index))
+            }
+            investmentFinancialAdapter.mDiffer.currentList.forEachIndexed { index, entity ->
+                ls.add(entity.copy(sort = index))
+            }
+            debtAdapter.mDiffer.currentList.forEachIndexed { index, entity ->
+                ls.add(entity.copy(sort = index))
+            }
+            viewModel.updateAsset(ls)
         })
     }
 

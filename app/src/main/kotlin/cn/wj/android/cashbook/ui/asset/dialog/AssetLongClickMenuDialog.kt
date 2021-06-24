@@ -31,6 +31,7 @@ class AssetLongClickMenuDialog : BaseDialog<AssetLongClickMenuViewModel, DialogA
     override val dialogHeight: Int = WindowManager.LayoutParams.WRAP_CONTENT
 
     private var onEditClickListener: (() -> Unit)? = null
+    private var onSortClickListener: (() -> Unit)? = null
     private var onHiddenClickListener: (() -> Unit)? = null
 
     override fun initView() {
@@ -47,6 +48,10 @@ class AssetLongClickMenuDialog : BaseDialog<AssetLongClickMenuViewModel, DialogA
             onEditClickListener?.invoke()
             dismiss()
         })
+        viewModel.sortClickEvent.observe(this, {
+            onSortClickListener?.invoke()
+            dismiss()
+        })
         viewModel.hiddenClickEvent.observe(this, {
             onHiddenClickListener?.invoke()
             dismiss()
@@ -54,9 +59,10 @@ class AssetLongClickMenuDialog : BaseDialog<AssetLongClickMenuViewModel, DialogA
     }
 
     companion object {
-        fun actionShow(manager: FragmentManager, onEditClick: () -> Unit, onHiddenClick: () -> Unit) {
+        fun actionShow(manager: FragmentManager, onEditClick: () -> Unit, onSortClick: () -> Unit, onHiddenClick: () -> Unit) {
             AssetLongClickMenuDialog().run {
                 onEditClickListener = onEditClick
+                onSortClickListener = onSortClick
                 onHiddenClickListener = onHiddenClick
                 show(manager)
             }

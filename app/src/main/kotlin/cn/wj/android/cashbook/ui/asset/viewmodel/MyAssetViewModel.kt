@@ -41,8 +41,14 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     /** 显示更多菜单事件 */
     val showMoreMenuEvent: LifecycleEvent<Int> = LifecycleEvent()
 
+    /** 保存点击事件 */
+    val saveClickEvent: LifecycleEvent<Int> = LifecycleEvent()
+
     /** 标记 - 是否允许标题 */
     val titleEnable: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    /** 标记 - 编辑状态 */
+    val edit: MutableLiveData<Boolean> = MutableLiveData(false)
 
     /** 刷新状态 */
     val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
@@ -341,20 +347,38 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
         hideDebtAccountList.value = !hideDebtAccountList.value.condition
     }
 
+    /** 取消点击 */
+    val onCancelClick: () -> Unit = {
+        // 还原列表
+        loadAssetData()
+        // 退出编辑状态
+        edit.value = false
+    }
+
+    /** 保存点击 */
+    val onSaveClick: () -> Unit = {
+        // 保存点击事件
+        saveClickEvent.value = 0
+    }
+
     /** 资产列表 item 点击 */
     override val onAssetItemClick: (AssetEntity) -> Unit = { item ->
-        uiNavigationEvent.value = UiNavigationModel.builder {
-            jump(
-                ROUTE_PATH_ASSET_INFO, bundleOf(
-                    ACTION_ASSET to item
+        if (!edit.value.condition) {
+            uiNavigationEvent.value = UiNavigationModel.builder {
+                jump(
+                    ROUTE_PATH_ASSET_INFO, bundleOf(
+                        ACTION_ASSET to item
+                    )
                 )
-            )
+            }
         }
     }
 
     /** 资产列表 item 长点击 */
     override val onAssetItemLongClick: (AssetEntity) -> Unit = { item ->
-        showLongClickMenuEvent.value = item
+        if (!edit.value.condition) {
+            showLongClickMenuEvent.value = item
+        }
     }
 
     /** 更多菜单点击 */
@@ -384,6 +408,22 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
                 loadAssetData()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "hideAsset")
+            }
+        }
+    }
+
+    /** 更新资产列表 */
+    fun updateAsset(ls: List<AssetEntity>) {
+        viewModelScope.launch {
+            try {
+                local.updateAsset(ls)
+                // 更新资产成功，更新列表
+                loadAssetData()
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "updateAsset")
+            } finally {
+                // 退出编辑模式
+                edit.value = false
             }
         }
     }
