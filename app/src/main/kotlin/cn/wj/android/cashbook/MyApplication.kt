@@ -3,20 +3,32 @@
 package cn.wj.android.cashbook
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
 import androidx.multidex.MultiDex
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_APP
+import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_UPDATE
 import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
 import cn.wj.android.cashbook.di.dataStoreModule
 import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.netModule
 import cn.wj.android.cashbook.di.viewModelModule
 import cn.wj.android.cashbook.manager.AppManager
+import cn.wj.android.cashbook.manager.UpdateManager
 import cn.wj.android.cashbook.third.logger.MyFormatStrategy
 import com.alibaba.android.arouter.launcher.ARouter
 import com.didichuxing.doraemonkit.DoraemonKit
+import com.didichuxing.doraemonkit.kit.IKit
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -71,7 +83,76 @@ class MyApplication : Application() {
         // 应用主题
         CurrentThemeLiveData.applyTheme()
 
+        // 初始化通知渠道
+        initNotificationChannel()
+
         // 初始化 DoraemonKit
-        DoraemonKit.install(this)
+        initDoraemon()
+    }
+
+    /** 初始化通知渠道 */
+    private fun initNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            // 应用通知
+            val appChannel = NotificationChannel(
+                NOTIFICATION_CHANNEL_APP,
+                R.string.channel_app_name.string,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = R.string.channel_app_description.string
+            }
+            // 更新通知
+            val updateChannel = NotificationChannel(
+                NOTIFICATION_CHANNEL_UPDATE,
+                R.string.channel_update_name.string,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = R.string.channel_update_description.string
+            }
+            nm.createNotificationChannels(mutableListOf(appChannel, updateChannel))
+        }
+    }
+
+    /** 初始化 DoraemonKit */
+    private fun initDoraemon() {
+
+        fun createKit(name: Int, onClick: (Context) -> Unit): IKit {
+            return object : IKit {
+                override fun getCategory() = 4
+
+                override fun getName() = name
+
+                override fun getIcon() = R.drawable.ic_launcher
+
+                override fun onClick(context: Context) {
+                    onClick.invoke(context)
+                }
+
+                override fun onAppInit(context: Context?) {
+                }
+            }
+        }
+
+        var job: Job? = null
+        DoraemonKit.install(
+            this, arrayListOf(
+                createKit(R.string.show_notification) {
+                    UpdateManager.showNotification()
+                },
+                createKit(R.string.update_notification_progress) {
+                    job = GlobalScope.launch {
+                        for (i in 1..100) {
+                            UpdateManager.updateProgress(i)
+                            delay(250L)
+                        }
+                    }
+                },
+                createKit(R.string.hide_notification) {
+                    job?.cancel()
+                    UpdateManager.hideNotification()
+                },
+            )
+        )
     }
 }

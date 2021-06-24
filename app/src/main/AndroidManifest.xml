@@ -55,6 +55,14 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <receiver
+            android:name=".receiver.EventReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.EventReceiver" />
+            </intent-filter>
+        </receiver>
+
         <!-- 闪屏界面 -->
         <activity
             android:name=".ui.main.activity.SplashActivity"
@@ -72,6 +80,7 @@
         <activity
             android:name=".ui.main.activity.MainActivity"
             android:configChanges="screenSize"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
         <!-- 关于我们界面 -->

@@ -136,4 +136,14 @@
     <string name="tag_name_must_not_be_blank">标签名不能为空</string>
     <string name="same_tag_exist">已存在相同名称的标签</string>
     <string name="edit_tag">编辑标签</string>
+    <string name="show_notification">显示通知</string>
+    <string name="channel_update_description">该渠道用于通知更新下载进度</string>
+    <string name="channel_update_name">应用升级</string>
+    <string name="update_progress_title">下载进度</string>
+    <string name="update_notification_progress">更新通知进度</string>
+    <string name="hide_notification">取消通知</string>
+    <string name="channel_app_name">应用通知</string>
+    <string name="channel_app_description">该渠道用于通知应用信息</string>
+    <string name="update_error_title">下载失败</string>
+    <string name="retry">重试</string>
 </resources>

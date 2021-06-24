@@ -40,3 +40,15 @@ const val BOTTOM_SHEET_STATE_EXPANDED = BottomSheetBehavior.STATE_EXPANDED
 const val BOTTOM_SHEET_STATE_HALF_EXPANDED = BottomSheetBehavior.STATE_HALF_EXPANDED
 const val BOTTOM_SHEET_STATE_HIDDEN = BottomSheetBehavior.STATE_HIDDEN
 const val BOTTOM_SHEET_STATE_SETTLING = BottomSheetBehavior.STATE_SETTLING
+
+/** 通知渠道 - 应用 */
+const val NOTIFICATION_CHANNEL_APP = "channel_app"
+/** 通知渠道 - 更新 */
+const val NOTIFICATION_CHANNEL_UPDATE = "channel_update"
+
+/** 通知 id - 应用 */
+const val NOTIFICATION_ID_APP = 2020
+/** 通知 id - 更新 */
+const val NOTIFICATION_ID_UPDATE = 2021
+/** 通知 id - 更新异常 */
+const val NOTIFICATION_ID_UPDATE_ERROR = 2022
