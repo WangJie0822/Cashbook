@@ -58,10 +58,6 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
-            // 应用包名后缀
-            applicationIdSuffix = ".debug"
-            // 版本名后缀
-            versionNameSuffix = "_debug"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -71,10 +67,6 @@ android {
         getByName("release") {
             isMinifyEnabled = false
             isShrinkResources = false
-            // 应用包名后缀
-            applicationIdSuffix = ""
-            // 版本名后缀
-            versionNameSuffix = "_release"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -83,10 +75,38 @@ android {
         }
     }
 
+    // 维度
+    flavorDimensions("version")
+
+    productFlavors {
+        // 正式线上版本
+        create("online") {
+            dimension("version")
+            // 版本名后缀
+            versionNameSuffix = "_online"
+        }
+
+        // 开发版本
+        create("dev") {
+            dimension("version")
+            // 应用包名后缀
+            applicationIdSuffix = ".dev"
+            // 版本名后缀
+            versionNameSuffix = "_dev"
+        }
+    }
+
     // 源文件路径设置
     sourceSets {
         named("main") {
             java.srcDirs("src/main/java", "src/main/kotlin")
+            res.srcDirs("src/main/res")
+        }
+        named("online") {
+            res.srcDirs("src/main/res-online")
+        }
+        named("dev") {
+            res.srcDirs("src/main/res-dev")
         }
     }
 

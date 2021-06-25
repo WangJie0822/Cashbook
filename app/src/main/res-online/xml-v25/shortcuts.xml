@@ -1,0 +1,26 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/vector_shortcuts_add_24"
+        android:shortcutId="record"
+        android:shortcutShortLabel="@string/keep_a_record">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="cn.wj.android.cashbook.ui.record.activity.EditRecordActivity"
+            android:targetPackage="cn.wj.android.cashbook" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/vector_shortcuts_asset_24"
+        android:shortcutId="asset"
+        android:shortcutShortLabel="@string/asset_info">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="cn.wj.android.cashbook.ui.asset.activity.MyAssetActivity"
+            android:targetPackage="cn.wj.android.cashbook" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

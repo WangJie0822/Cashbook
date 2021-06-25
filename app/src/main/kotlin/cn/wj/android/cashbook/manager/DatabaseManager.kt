@@ -11,6 +11,8 @@ import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.store.LocalDataStore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * 数据库管理类
@@ -21,34 +23,38 @@ object DatabaseManager {
 
     /** 初始化数据库数据 */
     suspend fun initDatabase(local: LocalDataStore) {
-        // 初始化账本数据
-        initBooksData(local)
-        // 初始化类型数据
-        initTypeData(local)
+        withContext(Dispatchers.IO) {
+            // 初始化账本数据
+            initBooksData(local)
+            // 初始化类型数据
+            initTypeData(local)
+        }
     }
 
     /** 初始化账本信息 */
     private suspend fun initBooksData(local: LocalDataStore) {
         // 获取默认账本
         val books = local.getDefaultBooks()
-        CurrentBooksLiveData.value = if (null != books) {
-            books
-        } else {
-            // 没有默认账本新增
-            val currentTime = System.currentTimeMillis().dateFormat()
-            val default = BooksEntity(
-                -1,
-                R.string.default_books.string,
-                "",
-                "日常账本",
-                null,
-                true,
-                currentTime,
-                currentTime
-            )
-            val insertId = local.insertBooks(default)
-            default.copy(id = insertId)
-        }
+        CurrentBooksLiveData.postValue(
+            if (null != books) {
+                books
+            } else {
+                // 没有默认账本新增
+                val currentTime = System.currentTimeMillis().dateFormat()
+                val default = BooksEntity(
+                    -1,
+                    R.string.default_books.string,
+                    "",
+                    "日常账本",
+                    null,
+                    true,
+                    currentTime,
+                    currentTime
+                )
+                val insertId = local.insertBooks(default)
+                default.copy(id = insertId)
+            }
+        )
     }
 
     /** 初始化消费类型信息 */

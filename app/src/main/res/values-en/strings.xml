@@ -148,4 +148,6 @@
     <string name="retry">重试</string>
     <string name="sort">排序</string>
     <string name="sort_hint">长按可拖拽移动</string>
+    <string name="keep_a_record">记一笔</string>
+    <string name="asset_info">资产信息</string>
 </resources>

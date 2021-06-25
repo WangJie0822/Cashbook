@@ -33,6 +33,7 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
+import cn.wj.android.cashbook.manager.DatabaseManager
 import cn.wj.android.cashbook.widget.calculator.SYMBOL_ZERO
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
@@ -43,6 +44,13 @@ import kotlinx.coroutines.launch
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
 class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
+
+    init {
+        // 该界面用于快捷启动，需要单独初始化
+        viewModelScope.launch {
+            DatabaseManager.initDatabase(local)
+        }
+    }
 
     /** 编辑数据 */
     var record: RecordEntity? = null
