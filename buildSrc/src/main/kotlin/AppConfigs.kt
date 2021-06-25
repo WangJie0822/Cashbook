@@ -28,7 +28,7 @@ object AppConfigs {
     val versionCode = getVersionCode()
 
     /** 应用版本名 */
-    val versionName = "v0.1.2_$versionCode"
+    val versionName = "v0.1.3_$versionCode"
 }
 
 /** 根据日期时间获取对应版本号 */
