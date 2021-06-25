@@ -8,7 +8,6 @@ import android.content.Context
 import android.os.Bundle
 import java.lang.ref.WeakReference
 import java.util.Stack
-import kotlin.system.exitProcess
 
 /**
  * 应用程序 [Activity] 管理类
@@ -309,19 +308,5 @@ object AppManager {
             it.get()?.finish()
         }
         activityStack.clear()
-    }
-
-    /** 退出应用程序 */
-    @JvmStatic
-    fun appExit() {
-        try {
-            val activityMgr =
-                getContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityMgr.killBackgroundProcesses(getContext().packageName)
-            finishAllActivity()
-            exitProcess(0)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }

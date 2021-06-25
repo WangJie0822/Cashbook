@@ -6,6 +6,7 @@ package cn.wj.android.cashbook.base.tools
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.ifCondition
 import cn.wj.android.cashbook.manager.AppManager
@@ -24,6 +25,7 @@ fun jumpSendEmail(email: String, subject: String = "", text: String = "", contex
         return Uri.parse(email.ifCondition(!email.startsWith(emailStart)) { "$emailStart$email" })
     }
     context.startActivity(Intent(Intent.ACTION_SENDTO).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         data = fixedEmailData(email)
         putExtra(Intent.EXTRA_SUBJECT, subject)
         putExtra(Intent.EXTRA_TEXT, text)
@@ -33,7 +35,17 @@ fun jumpSendEmail(email: String, subject: String = "", text: String = "", contex
 /** 通过 [context] 唤起浏览器应用，打开指定路径 [url] */
 fun jumpBrowser(url: String, context: Context = AppManager.getContext()) {
     context.startActivity(Intent.createChooser(Intent().apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         action = Intent.ACTION_VIEW
         data = Uri.parse(url)
     }, getStringById(R.string.please_select_browser, context)))
+}
+
+/** 通过 [context] 跳转应用详情界面 */
+fun jumpAppDetails(context: Context = AppManager.getContext()) {
+    context.startActivity(Intent().apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        data = Uri.fromParts("package", context.packageName, null)
+    })
 }

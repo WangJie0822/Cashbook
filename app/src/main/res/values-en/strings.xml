@@ -150,4 +150,5 @@
     <string name="sort_hint">长按可拖拽移动</string>
     <string name="keep_a_record">记一笔</string>
     <string name="asset_info">资产信息</string>
+    <string name="application_details">应用详情</string>
 </resources>

@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.multidex.MultiDex
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.jumpAppDetails
 import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_APP
 import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_UPDATE
 import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
@@ -18,17 +19,12 @@ import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.netModule
 import cn.wj.android.cashbook.di.viewModelModule
 import cn.wj.android.cashbook.manager.AppManager
-import cn.wj.android.cashbook.manager.UpdateManager
 import cn.wj.android.cashbook.third.logger.MyFormatStrategy
 import com.alibaba.android.arouter.launcher.ARouter
 import com.didichuxing.doraemonkit.DoraemonKit
 import com.didichuxing.doraemonkit.kit.IKit
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -134,24 +130,11 @@ class MyApplication : Application() {
             }
         }
 
-        var job: Job? = null
         DoraemonKit.install(
             this, arrayListOf(
-                createKit(R.string.show_notification) {
-                    UpdateManager.showNotification()
-                },
-                createKit(R.string.update_notification_progress) {
-                    job = GlobalScope.launch {
-                        for (i in 1..100) {
-                            UpdateManager.updateProgress(i)
-                            delay(250L)
-                        }
-                    }
-                },
-                createKit(R.string.hide_notification) {
-                    job?.cancel()
-                    UpdateManager.hideNotification()
-                },
+                createKit(R.string.application_details) {
+                    jumpAppDetails()
+                }
             )
         )
     }
