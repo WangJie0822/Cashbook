@@ -42,11 +42,12 @@ object Dependencies {
 
     /**
      * Kotlin 相关
+     * - [指南](https://kotlinlang.org/)
      */
     object Kotlin {
 
         /** Kotlin 版本 */
-        const val version = "1.5.10"
+        const val version = "1.5.20"
 
         /** 标准库 */
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
@@ -85,26 +86,45 @@ object Dependencies {
      */
     object Androidx {
 
-        /** legacy */
+        /**
+         * legacy
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.legacy%3Alegacy-support-v4)
+         */
         const val legacy = "androidx.legacy:legacy-support-v4:1.0.0"
 
-        /** appcompat */
+        /**
+         * appcompat
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.appcompat%3Aappcompat)
+         */
         const val appcompat = "androidx.appcompat:appcompat:1.2.0"
 
-        /** recyclerview */
+        /**
+         * recyclerview
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.recyclerview%3Arecyclerview)
+         */
         const val recyclerview = "androidx.recyclerview:recyclerview:1.2.0"
 
-        /** viewpager2 */
+        /**
+         * viewpager2
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.viewpager2%3Aviewpager2)
+         */
         const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
 
-        /** 约束性布局 */
+        /**
+         * 约束性布局
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.constraintlayout2%3Aconstraintlayout)
+         */
         const val constraint = "androidx.constraintlayout:constraintlayout:2.0.4"
 
-        /** multidex 分包 */
+        /**
+         * multidex 分包
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.multidex2%3Amultidex)
+         */
         const val multidex = "androidx.multidex:multidex:2.0.1"
 
         /**
          * 测试相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.test)
          */
         object Test {
 
@@ -120,6 +140,7 @@ object Dependencies {
 
             /**
              * Espresso
+             * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.test.espresso)
              */
             object Espresso {
 
@@ -136,6 +157,7 @@ object Dependencies {
 
                 /**
                  * idling
+                 * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.test.espresso.idling)
                  */
                 object Idling {
 
@@ -149,6 +171,7 @@ object Dependencies {
 
             /**
              * Ext 相关
+             * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.test.ext)
              */
             object Ext {
 
@@ -166,6 +189,7 @@ object Dependencies {
 
         /**
          * Core 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.core)
          */
         object Core {
 
@@ -181,6 +205,7 @@ object Dependencies {
 
         /**
          * Compose 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.compose)
          */
         object Compose {
 
@@ -211,6 +236,7 @@ object Dependencies {
 
         /**
          * Activity 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.activity)
          */
         object Activity {
 
@@ -226,6 +252,7 @@ object Dependencies {
 
         /**
          * Fragment 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.fragment)
          */
         object Fragment {
 
@@ -244,6 +271,7 @@ object Dependencies {
 
         /**
          * 生命周期相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.lifecycle)
          */
         object Lifecycle {
 
@@ -274,6 +302,7 @@ object Dependencies {
 
         /**
          * Room 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.room)
          */
         object Room {
 
@@ -296,6 +325,7 @@ object Dependencies {
 
         /**
          * Paging 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.paging)
          */
         object Paging {
 
@@ -316,6 +346,7 @@ object Dependencies {
 
         /**
          * Navigation 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.navigation)
          */
         object Navigation {
 
@@ -339,7 +370,10 @@ object Dependencies {
             const val compose = "androidx.navigation:navigation-compose:1.0.0-alpha08"
         }
 
-        /** WorkManager 相关 */
+        /**
+         * WorkManager 相关
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.work)
+         */
         object Work {
 
             /** 版本号 */
