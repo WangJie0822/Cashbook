@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.orTrue
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
@@ -43,7 +43,7 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
     val jumpBrowserEvent: LifecycleEvent<String> = LifecycleEvent()
 
     /** 是否使用 Gitee */
-    val useGitee: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(getSharedBoolean(SHARED_KEY_USE_GITEE).orElse(true)) {
+    val useGitee: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(getSharedBoolean(SHARED_KEY_USE_GITEE).orTrue()) {
 
         override fun setValue(value: Boolean?) {
             super.setValue(value)
@@ -86,9 +86,9 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
         loadChangelog()
     }
 
-    /** TODO 用户协议和隐私协议点击 */
+    /** 用户协议和隐私协议点击 */
     val onUserAgreementAndPrivacyPolicyClick: () -> Unit = {
-        snackbarEvent.value = "用户协议和隐私协议".toSnackbarModel()
+        loadPrivacyPolicy()
     }
 
     /** 检查更新 */
@@ -127,6 +127,27 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
                 }
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadChangelog")
+            }
+        }
+    }
+
+    /** 加载用户协议和隐私政策数据 */
+    private fun loadPrivacyPolicy() {
+        viewModelScope.launch {
+            try {
+                val privacyPolicy = web.getPrivacyPolicy(useGitee.value.condition)
+                logger().d("loadPrivacyPolicy: $privacyPolicy")
+                // 跳转 Markdown 界面打开
+                uiNavigationEvent.value = UiNavigationModel.builder {
+                    jump(
+                        ROUTE_PATH_MARKDOWN, bundleOf(
+                            ACTION_TITLE to R.string.user_agreement_and_privacy_policy.string,
+                            ACTION_CONTENT to privacyPolicy
+                        )
+                    )
+                }
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "loadPrivacyPolicy")
             }
         }
     }

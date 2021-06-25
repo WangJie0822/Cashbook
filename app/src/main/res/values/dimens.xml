@@ -2,7 +2,7 @@
 
     <dimen name="zero">0dp</dimen>
 
-    <dimen name="dialog_title_horizontal_margin">48dp</dimen>
+    <dimen name="dialog_title_horizontal_margin">24dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="spacing_small">4dp</dimen>

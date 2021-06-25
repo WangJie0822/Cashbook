@@ -30,9 +30,18 @@ class WebDataStore(private val service: WebService) {
     suspend fun getChangelog(useGitee: Boolean): String = withContext(Dispatchers.IO) {
         @Suppress("BlockingMethodInNonBlockingContext")
         if (useGitee) {
-            service.giteeChangelog(GITEE_OWNER, REPO_NAME)
+            service.giteeRaw(GITEE_OWNER, REPO_NAME, "CHANGELOG.md")
         } else {
-            service.githubChangelog(GITHUB_OWNER, REPO_NAME)
+            service.githubRaw(GITHUB_OWNER, REPO_NAME, "CHANGELOG.md")
+        }.string()
+    }
+
+    suspend fun getPrivacyPolicy(useGitee: Boolean): String = withContext(Dispatchers.IO) {
+        @Suppress("BlockingMethodInNonBlockingContext")
+        if (useGitee) {
+            service.giteeRaw(GITEE_OWNER, REPO_NAME, "PRIVACY_POLICY.md")
+        } else {
+            service.githubRaw(GITHUB_OWNER, REPO_NAME, "PRIVACY_POLICY.md")
         }.string()
     }
 }

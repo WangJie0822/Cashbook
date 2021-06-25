@@ -87,11 +87,11 @@ fun TextView.setText(@StringRes resId: Int?) {
 
 /** 将 [TextView] 文本设置为 [cs] 并执行 [textSpan] 方法块设置富文本 */
 @BindingAdapter("android:bind_tv_text", "android:bind_tv_text_span", requireAll = false)
-fun TextView.setText(cs: CharSequence?, textSpan: (SpannableString.() -> Unit)?) {
+fun TextView.setText(cs: CharSequence?, textSpan: ((SpannableString) -> Unit)?) {
     if (null != cs && null != textSpan) {
         this.movementMethod = LinkMovementMethod.getInstance()
         val ss = SpannableString(cs)
-        ss.textSpan()
+        textSpan.invoke(ss)
         this.text = ss
     } else {
         this.text = cs

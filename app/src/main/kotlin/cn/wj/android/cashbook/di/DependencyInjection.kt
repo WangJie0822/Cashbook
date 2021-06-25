@@ -35,9 +35,9 @@ import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.EditTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.EditTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
@@ -117,7 +117,7 @@ val dataStoreModule = module {
 val viewModelModule = module {
     // Activity
     viewModel {
-        SplashViewModel(get())
+        SplashViewModel(get(), get())
     }
     viewModel {
         MainViewModel(get())

@@ -2,6 +2,7 @@
 
 package cn.wj.android.cashbook.ui.general.dialog
 
+import android.text.SpannableString
 import android.view.Gravity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
@@ -36,6 +37,18 @@ class GeneralDialog
     /** 积极按钮点击  */
     private var onPositiveAction: OnDialogActionListener? = null
 
+    /** 标题富文本处理 */
+    private var titleSpan: ((SpannableString) -> Unit)? = null
+
+    /** 副标题富文本处理 */
+    private var subtitleSpan: ((SpannableString) -> Unit)? = null
+
+    /** 内容富文本处理 */
+    private var contentSpan: ((SpannableString) -> Unit)? = null
+
+    /** 选择器富文本处理 */
+    private var selectSpan: ((SpannableString) -> Unit)? = null
+
     /** Builder 对象  */
     var builder: Builder? = null
 
@@ -60,6 +73,10 @@ class GeneralDialog
         viewModel.negativeButtonStr.set(arguments.getString(ACTION_NEGATIVE_BUTTON_STR, ""))
         viewModel.showPositiveButton.set(arguments.getBoolean(ACTION_SHOW_POSITIVE_BUTTON, true))
         viewModel.positiveButtonStr.set(arguments.getString(ACTION_POSITIVE_BUTTON_STR))
+        viewModel.titleSpan.value = titleSpan
+        viewModel.subtitleSpan.value = subtitleSpan
+        viewModel.contentSpan.value = contentSpan
+        viewModel.selectSpan.value = selectSpan
     }
 
     override fun observe() {
@@ -178,6 +195,18 @@ class GeneralDialog
         /** 选择器文本 - 默认：不再提示  */
         private var selectStr: CharSequence = R.string.no_longer_prompt.string
 
+        /** 标题富文本处理 */
+        private var titleSpan: ((SpannableString) -> Unit)? = null
+
+        /** 副标题富文本处理 */
+        private var subtitleSpan: ((SpannableString) -> Unit)? = null
+
+        /** 内容富文本处理 */
+        private var contentSpan: ((SpannableString) -> Unit)? = null
+
+        /** 选择器富文本处理 */
+        private var selectSpan: ((SpannableString) -> Unit)? = null
+
         /** 标记 - 是否显示消极按钮  */
         private var showNegativeButton = true
 
@@ -217,6 +246,10 @@ class GeneralDialog
                 showSelect = builder.showSelect
                 selected = builder.selected
                 selectStr = builder.selectStr
+                titleSpan = builder.titleSpan
+                subtitleSpan = builder.subtitleSpan
+                contentSpan = builder.contentSpan
+                selectSpan = builder.selectSpan
                 showNegativeButton = builder.showNegativeButton
                 negativeButtonStr = builder.negativeButtonStr
                 showPositiveButton = builder.showPositiveButton
@@ -242,14 +275,16 @@ class GeneralDialog
         }
 
         /** 设置 [GeneralDialog] 标题文本 [titleStr] 并返回 [Builder] 对象 */
-        fun titleStr(titleStr: CharSequence): Builder {
+        fun titleStr(titleStr: CharSequence, span: ((SpannableString) -> Unit)? = null): Builder {
             this.titleStr = titleStr
+            this.titleSpan = span
             return this
         }
 
         /** 设置 [GeneralDialog] 副标题文本 [subtitleStr] 并返回 [Builder] 对象 */
-        fun subtitleStr(subtitleStr: CharSequence): Builder {
+        fun subtitleStr(subtitleStr: CharSequence, span: ((SpannableString) -> Unit)? = null): Builder {
             this.subtitleStr = subtitleStr
+            this.subtitleSpan = span
             return this
         }
 
@@ -260,8 +295,9 @@ class GeneralDialog
         }
 
         /** 设置 [GeneralDialog] 内容文本 并返回 [Builder] 对象 */
-        fun contentStr(contentStr: CharSequence): Builder {
+        fun contentStr(contentStr: CharSequence, span: ((SpannableString) -> Unit)? = null): Builder {
             this.contentStr = contentStr
+            this.contentSpan = span
             return this
         }
 
@@ -287,8 +323,9 @@ class GeneralDialog
         }
 
         /** 设置 [GeneralDialog] 选择器提示文本 [selectStr] 并返回 [Builder] 对象 */
-        fun selectTipsStr(selectStr: CharSequence): Builder {
+        fun selectTipsStr(selectStr: CharSequence, span: ((SpannableString) -> Unit)? = null): Builder {
             this.selectStr = selectStr
+            this.selectSpan = span
             return this
         }
 
@@ -420,11 +457,15 @@ class GeneralDialog
                     ACTION_SHOW_POSITIVE_BUTTON to showPositiveButton,
                     ACTION_POSITIVE_BUTTON_STR to positiveButtonStr
                 )
-                setOnNegativeClick(this@Builder.onNegativeClick)
-                setOnNegativeAction(this@Builder.onNegativeAction)
-                setOnPositiveClick(this@Builder.onPositiveClick)
-                setOnPositiveAction(this@Builder.onPositiveAction)
-                setOnDialogDismissListener(this@Builder.onDialogDismissListener)
+                this.onNegativeClick = this@Builder.onNegativeClick
+                this.onNegativeAction = this@Builder.onNegativeAction
+                this.onPositiveClick = this@Builder.onPositiveClick
+                this.onPositiveAction = this@Builder.onPositiveAction
+                this.titleSpan = this@Builder.titleSpan
+                this.subtitleSpan = this@Builder.subtitleSpan
+                this.contentSpan = this@Builder.contentSpan
+                this.selectSpan = this@Builder.selectSpan
+                this.setOnDialogDismissListener(this@Builder.onDialogDismissListener)
                 builder = this@Builder
             }
         }

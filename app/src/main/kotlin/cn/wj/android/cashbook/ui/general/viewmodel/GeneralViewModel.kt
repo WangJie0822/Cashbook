@@ -1,9 +1,11 @@
 package cn.wj.android.cashbook.ui.general.viewmodel
 
+import android.text.SpannableString
 import android.view.Gravity
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
+import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -28,6 +30,9 @@ class GeneralViewModel : BaseViewModel() {
     /** 标题文本  */
     val titleStr: ObservableField<CharSequence> = ObservableField("")
 
+    /** 标题富文本处理 */
+    val titleSpan: MutableLiveData<((SpannableString) -> Unit)?> = MutableLiveData(null)
+
     /** 标记 - 是否显示标题  */
     val showTitle: ObservableBoolean = object : ObservableBoolean(titleStr) {
         override fun get(): Boolean {
@@ -38,6 +43,9 @@ class GeneralViewModel : BaseViewModel() {
     /** 副标题文本 */
     val subtitleStr: ObservableField<CharSequence> = ObservableField("")
 
+    /** 副标题富文本处理 */
+    val subtitleSpan: MutableLiveData<((SpannableString) -> Unit)?> = MutableLiveData(null)
+
     /** 标记 - 是否显示副标题  */
     val showSubtitle: ObservableBoolean = object : ObservableBoolean(subtitleStr) {
         override fun get(): Boolean {
@@ -47,6 +55,9 @@ class GeneralViewModel : BaseViewModel() {
 
     /** 内容文本  */
     val contentStr: ObservableField<CharSequence> = ObservableField("")
+
+    /** 内容富文本处理 */
+    val contentSpan: MutableLiveData<((SpannableString) -> Unit)?> = MutableLiveData(null)
 
     /** 内容文本重心  */
     val contentGravity: ObservableInt = ObservableInt(Gravity.START or Gravity.CENTER_VERTICAL)
@@ -59,6 +70,9 @@ class GeneralViewModel : BaseViewModel() {
 
     /** 选择器文本 - 默认：不再提示  */
     val selectStr: ObservableField<CharSequence> = ObservableField(R.string.no_longer_prompt.string)
+
+    /** 选择器富文本处理 */
+    val selectSpan: MutableLiveData<((SpannableString) -> Unit)?> = MutableLiveData(null)
 
     /** 标记 - 是否显示消极按钮  */
     val showNegativeButton: ObservableBoolean = ObservableBoolean(true)
