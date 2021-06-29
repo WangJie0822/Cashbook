@@ -42,6 +42,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         EditRecordVpAdapter(this)
     }
 
+    /** 选择关联记录启动器 */
     lateinit var selectAssociatedRecordResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {

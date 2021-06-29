@@ -254,9 +254,10 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 查询并返回记录类型为 [type] 的类型数据列表 */
     suspend fun getTypeListByType(type: RecordTypeEnum): List<TypeEntity> = withContext(Dispatchers.IO) {
         typeDao.queryByPosition(TypeEnum.FIRST.name, type.position).map { first ->
-            first.toTypeEntity().copy(
+            val firstEntity = first.toTypeEntity(null)
+            firstEntity.copy(
                 childList = typeDao.queryByParentId(TypeEnum.SECOND.name, first.id.orElse(-1L)).map { second ->
-                    second.toTypeEntity()
+                    second.toTypeEntity(firstEntity)
                 }.sortedBy {
                     it.sort
                 }
@@ -408,11 +409,12 @@ class LocalDataStore(private val database: CashbookDatabase) {
             val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
             val intoAssetTable = assetDao.queryById(record.intoAssetId)
             val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            val firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(null)
             RecordEntity(
                 id = record.id.orElse(-1L),
                 type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
-                firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(),
-                secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(),
+                firstType = firstType,
+                secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(firstType),
                 asset = asset,
                 intoAsset = intoAsset,
                 booksId = record.booksId,
@@ -441,11 +443,12 @@ class LocalDataStore(private val database: CashbookDatabase) {
         val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
         val intoAssetTable = assetDao.queryById(record.intoAssetId)
         val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+        val firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(null)
         RecordEntity(
             id = record.id.orElse(-1L),
             type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
-            firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(),
-            secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(),
+            firstType = firstType,
+            secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(firstType),
             asset = asset,
             intoAsset = intoAsset,
             booksId = record.booksId,

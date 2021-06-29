@@ -3,12 +3,14 @@ package cn.wj.android.cashbook.ui.asset.dialog
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.ConcatAdapter
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.tag
 import cn.wj.android.cashbook.base.ui.BaseDialog
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.databinding.DialogSelectAssetBinding
 import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetViewModel
+import cn.wj.android.cashbook.ui.general.adapter.OneItemAdapter
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.gyf.immersionbar.ktx.immersionBar
@@ -34,7 +36,7 @@ class SelectAssetDialog : BaseDialog<SelectAssetViewModel, DialogSelectAssetBind
     override val dialogHeight: Int = WindowManager.LayoutParams.MATCH_PARENT
 
     /** 选中回调 */
-    private var onSelectedListener: ((AssetEntity) -> Unit)? = null
+    private var onSelectedListener: ((AssetEntity?) -> Unit)? = null
 
     /** 资产列表适配器 */
     private val assetAdapter: SimpleRvListAdapter<AssetEntity> by lazy {
@@ -53,7 +55,12 @@ class SelectAssetDialog : BaseDialog<SelectAssetViewModel, DialogSelectAssetBind
         // 配置 RecyclerView
         binding.rvAsset.run {
             layoutManager = WrapContentLinearLayoutManager()
-            adapter = assetAdapter
+            adapter = ConcatAdapter(
+                OneItemAdapter(R.layout.recycler_header_asset_no_select) {
+                    viewModel.selectedAssetEvent.value = null
+                },
+                assetAdapter
+            )
         }
     }
 
@@ -68,14 +75,14 @@ class SelectAssetDialog : BaseDialog<SelectAssetViewModel, DialogSelectAssetBind
             assetAdapter.submitList(list)
         })
         // 选中资产
-        viewModel.selectedAssetData.observe(this, { selected ->
+        viewModel.selectedAssetEvent.observe(this, { selected ->
             onSelectedListener?.invoke(selected)
             dismiss()
         })
     }
 
     companion object {
-        fun actionShow(manager: FragmentManager, onSelected: (AssetEntity) -> Unit) {
+        fun actionShow(manager: FragmentManager, onSelected: (AssetEntity?) -> Unit) {
             SelectAssetDialog().run {
                 onSelectedListener = onSelected
                 show(manager)

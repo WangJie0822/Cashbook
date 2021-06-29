@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.type.activity.EditTypeListActivity">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.type.viewmodel.EditTypListViewModel" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/ll_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
+            android:bind_toolbar_onClick="@{viewModel.onAddFirstTypeClick}"
+            app:menu="@menu/edit_type_toolbar"
+            app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
+            app:navigationIconTint="@color/color_on_primary"
+            app:popupTheme="@style/Theme.Cashbook.PopupOverlay">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/colorPrimary"
+                android:bind_tl_currentItem="@={viewModel.currentItem}"
+                android:bind_tl_viewpager2="@{@id/vp_type}"
+                app:tabIndicatorColor="@color/color_on_primary"
+                app:tabIndicatorHeight="2dp"
+                app:tabSelectedTextColor="@color/color_on_primary"
+                app:tabTextAppearance="?attr/textAppearanceSubtitle1"
+                app:tabTextColor="@color/text_color_light" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:text="@string/edit_type_list_hint" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vp_type"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+</layout>

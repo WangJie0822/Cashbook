@@ -41,3 +41,6 @@ const val ROUTE_PATH_INVISIBLE_ASSET = "/path/asset/invisible"
 
 /** 路由路径 - 资产信息 */
 const val ROUTE_PATH_ASSET_INFO = "/path/asset/info"
+
+/** 路由路径 - 编辑分类列表 */
+const val ROUTE_PATH_TYPE_LIST_EDIT = "/path/type/list/edit"

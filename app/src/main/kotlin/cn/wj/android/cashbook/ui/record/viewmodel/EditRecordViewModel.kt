@@ -25,7 +25,6 @@ import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
-import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
@@ -139,16 +138,12 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 账户文本 */
     val accountStr: LiveData<String> = accountData.map {
-        if (null == it || it.classification == AssetClassificationEnum.NOT_SELECT) {
-            R.string.account.string
-        } else {
-            it.showStr
-        }
+        it?.showStr ?: R.string.account.string
     }
 
     /** 账户选中状态 */
     val accountChecked: LiveData<Boolean> = accountData.map {
-        null != it && it.classification !== AssetClassificationEnum.NOT_SELECT
+        null != it
     }
 
     /** 是否显示转入账户 */
@@ -158,7 +153,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 转账转入账户文本 */
     val transferAccountStr: LiveData<String> = transferAccountData.map {
-        if (null == it || it.classification == AssetClassificationEnum.NOT_SELECT) {
+        if (null == it) {
             R.string.into_account.string
         } else {
             R.string.into_with_colon.string + it.showStr
@@ -167,7 +162,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 转账转入账户选中状态 */
     val transferAccountChecked: LiveData<Boolean> = transferAccountData.map {
-        null != it && it.classification !== AssetClassificationEnum.NOT_SELECT
+        null != it
     }
 
     /** 标签文本 */

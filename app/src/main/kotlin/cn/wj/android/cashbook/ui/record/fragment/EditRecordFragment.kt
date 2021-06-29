@@ -15,7 +15,7 @@ import cn.wj.android.cashbook.databinding.FragmentEditRecordBinding
 import cn.wj.android.cashbook.ui.record.adapter.TypeSecondRvAdapter
 import cn.wj.android.cashbook.ui.record.adapter.TypeSettingRvAdapter
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -40,6 +40,11 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
     /** 二级类型适配器 */
     private val secondAdapter: TypeSecondRvAdapter by lazy {
         TypeSecondRvAdapter(typeViewModel)
+    }
+
+    override fun beforeOnCreate() {
+        // 绑定基本事件
+        observeBaseModel(typeViewModel)
     }
 
     override fun initView() {
@@ -177,7 +182,7 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
         fun newInstance(position: Int): EditRecordFragment {
             return EditRecordFragment().apply {
                 arguments = bundleOf(
-                    ACTION_TYPE to RecordTypeEnum.fromPosition(position).orElse(RecordTypeEnum.INCOME)
+                    ACTION_TYPE to RecordTypeEnum.fromPosition(position).orElse(RecordTypeEnum.EXPENDITURE)
                 )
             }
         }

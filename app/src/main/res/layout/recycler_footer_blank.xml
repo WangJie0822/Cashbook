@@ -3,6 +3,8 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/blank_bottom_size" />
+        android:layout_height="@dimen/blank_bottom_size"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
 
 </layout>

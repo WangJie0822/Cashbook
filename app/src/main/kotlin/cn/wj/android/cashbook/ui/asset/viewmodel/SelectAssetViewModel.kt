@@ -22,7 +22,7 @@ class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(),
     val showSelectAssetTypeEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 选中的资产数据 */
-    val selectedAssetData: MutableLiveData<AssetEntity> = MutableLiveData()
+    val selectedAssetEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 资产列表数据 */
     val assetListData: MutableLiveData<List<AssetEntity>> = object : MutableLiveData<List<AssetEntity>>() {
@@ -45,7 +45,7 @@ class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(),
 
     /** 资产 item 点击 */
     override val onAssetItemClick: (AssetEntity) -> Unit = { item ->
-        selectedAssetData.value = item
+        selectedAssetEvent.value = item
     }
 
     /** 资产 item 长点击 */
@@ -55,10 +55,7 @@ class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(),
     private fun loadVisibleAssetData() {
         viewModelScope.launch {
             try {
-                val ls = ArrayList(local.getVisibleAssetListSortByRecord())
-                // 添加未选择资产
-                ls.add(0, AssetEntity.notSelectAsset())
-                assetListData.value = ls
+                assetListData.value = local.getVisibleAssetListSortByRecord()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadVisibleAssetData")
             }

@@ -182,4 +182,6 @@
     <string name="disagree">不同意</string>
     <string name="agree">同意</string>
     <string name="user_agreement_and_privacy_policy_with_chevron">《用户协议和隐私政策》</string>
+    <string name="edit_type_list_hint">长按可拖动排序</string>
+    <string name="add_second_type">添加子类</string>
 </resources>

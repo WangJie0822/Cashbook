@@ -1,16 +1,20 @@
-package cn.wj.android.cashbook.ui.record.viewmodel
+package cn.wj.android.cashbook.ui.type.viewmodel
 
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
+import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
-import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import kotlinx.coroutines.launch
 
 /**
@@ -40,7 +44,7 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
         if (item.type == TypeEnum.SECOND) {
             // 二级类型，更新选中状态
             typeListData.value?.firstOrNull {
-                it.id == item.parentId
+                it.id == item.parent?.id
             }?.childList?.forEach { it ->
                 it.selected.set(it.id == item.id)
             }
@@ -63,9 +67,16 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
         selectTypeData.value = item
     }
 
-    /** TODO 类型设置点击 */
+    /** 类型设置点击 */
     val onTypeSettingClick: () -> Unit = {
-        snackbarEvent.value = "类型设置".toSnackbarModel()
+        // 跳转类型设置
+        uiNavigationEvent.value = UiNavigationModel.builder {
+            jump(
+                ROUTE_PATH_TYPE_LIST_EDIT, bundleOf(
+                    ACTION_SELECTED to typeData.value?.position.orElse(RecordTypeEnum.EXPENDITURE.position)
+                )
+            )
+        }
     }
 
     /** 根据记录类型 [recordType] 加载记录分类 */

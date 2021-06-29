@@ -98,10 +98,10 @@ internal fun AssetEntity.toAssetTable(): AssetTable {
 }
 
 /** 将数据库数据转换为对应数据实体类 */
-internal fun TypeTable.toTypeEntity(): TypeEntity {
+internal fun TypeTable.toTypeEntity(parent: TypeEntity?): TypeEntity {
     return TypeEntity(
         id = id.orElse(-1L),
-        parentId = parentId,
+        parent = parent,
         name = name,
         iconResName = iconResName,
         type = TypeEnum.fromName(type).orElse(TypeEnum.FIRST),
@@ -119,7 +119,7 @@ internal fun TypeTable.toTypeEntity(): TypeEntity {
 internal fun TypeEntity.toTypeTable(): TypeTable {
     return TypeTable(
         id = if (-1L == id) null else id,
-        parentId = parentId,
+        parentId = parent?.id.orElse(-1L),
         name = name,
         iconResName = iconResName,
         type = type.name,

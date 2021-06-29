@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.record.viewmodel.ConsumptionTypeViewModel" />
+            type="cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

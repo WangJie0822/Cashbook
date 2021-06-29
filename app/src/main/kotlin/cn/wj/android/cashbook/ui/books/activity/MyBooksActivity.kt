@@ -17,7 +17,7 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMyBooksBinding
 import cn.wj.android.cashbook.databinding.RecyclerItemBooksBinding
 import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
-import cn.wj.android.cashbook.ui.general.adapter.BlankFooterAdapter
+import cn.wj.android.cashbook.ui.general.adapter.OneItemAdapter
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.widget.recyclerview.adapter.ADAPTER_ANIM_ALL
 import cn.wj.android.cashbook.widget.recyclerview.adapter.ADAPTER_ANIM_CHANGED
@@ -52,7 +52,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
 
         // 注册 launcher
         editBooksResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK ) {
+            if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.getParcelableExtra<BooksEntity>(ACTION_BOOKS)?.let { newBooks ->
                     if (newBooks.id == -1L) {
                         // 新增
@@ -70,7 +70,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
             layoutManager = WrapContentLinearLayoutManager()
             adapter = ConcatAdapter(booksListRvAdapter.apply {
                 this.viewModel = this@MyBooksActivity.viewModel
-            }, BlankFooterAdapter())
+            }, OneItemAdapter(R.layout.recycler_footer_blank))
         }
 
         // 加载数据

@@ -11,10 +11,14 @@ import java.util.Collections
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/24
  */
-class DragItemTouchCallback<T>(private val adapter: SimpleRvListAdapter<T>) :
-    ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
+class DragItemTouchCallback<T>(private val adapter: SimpleRvListAdapter<T>, private val onMoved: (() -> Unit)? = null) :
+    ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    ) {
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        onMoved?.invoke()
         val fromPosition = viewHolder.bindingAdapterPosition
         val toPosition = target.bindingAdapterPosition
         val ls = adapter.mDiffer.currentList.toNewList()

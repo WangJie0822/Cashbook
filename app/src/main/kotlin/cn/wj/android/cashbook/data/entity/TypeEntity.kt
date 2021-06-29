@@ -28,7 +28,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class TypeEntity(
     val id: Long,
-    val parentId: Long,
+    val parent: TypeEntity?,
     val name: String,
     val iconResName: String,
     val type: TypeEnum,
@@ -63,7 +63,7 @@ data class TypeEntity(
         fun empty(): TypeEntity {
             return TypeEntity(
                 id = -1L,
-                parentId = -1L,
+                parent = null,
                 name = "",
                 iconResName = "",
                 type = TypeEnum.FIRST,
@@ -80,7 +80,7 @@ data class TypeEntity(
         fun newFirstExpenditure(name: String, iconResName: String, sort: Int, childEnable: Boolean = true): TypeEntity {
             return TypeEntity(
                 id = -1L,
-                parentId = -1L,
+                parent = null,
                 name = name,
                 iconResName = iconResName,
                 type = TypeEnum.FIRST,
@@ -94,10 +94,10 @@ data class TypeEntity(
             )
         }
 
-        fun newSecondExpenditure(parentId: Long, name: String, iconResName: String, sort: Int): TypeEntity {
+        fun newSecondExpenditure(parent: TypeEntity, name: String, iconResName: String, sort: Int): TypeEntity {
             return TypeEntity(
                 id = -1L,
-                parentId = parentId,
+                parent = parent,
                 name = name,
                 iconResName = iconResName,
                 type = TypeEnum.SECOND,
@@ -114,7 +114,7 @@ data class TypeEntity(
         fun newFirstIncome(name: String, iconResName: String, sort: Int, childEnable: Boolean = true, refund: Boolean = false, reimburse: Boolean = false): TypeEntity {
             return TypeEntity(
                 id = -1L,
-                parentId = -1L,
+                parent = null,
                 name = name,
                 iconResName = iconResName,
                 type = TypeEnum.FIRST,
@@ -128,10 +128,10 @@ data class TypeEntity(
             )
         }
 
-        fun newSecondIncome(parentId: Long, name: String, iconResName: String, sort: Int): TypeEntity {
+        fun newSecondIncome(parent: TypeEntity, name: String, iconResName: String, sort: Int): TypeEntity {
             return TypeEntity(
                 id = -1L,
-                parentId = parentId,
+                parent = parent,
                 name = name,
                 iconResName = iconResName,
                 type = TypeEnum.SECOND,
@@ -148,7 +148,7 @@ data class TypeEntity(
         fun newFirstTransfer(name: String, iconResName: String, sort: Int, childEnable: Boolean = true): TypeEntity {
             return TypeEntity(
                 id = -1L,
-                parentId = -1L,
+                parent = null,
                 name = name,
                 iconResName = iconResName,
                 type = TypeEnum.FIRST,
@@ -162,10 +162,10 @@ data class TypeEntity(
             )
         }
 
-        fun newSecondTransfer(parentId: Long, name: String, iconResName: String, sort: Int): TypeEntity {
+        fun newSecondTransfer(parent: TypeEntity, name: String, iconResName: String, sort: Int): TypeEntity {
             return TypeEntity(
                 id = -1L,
-                parentId = parentId,
+                parent = parent,
                 name = name,
                 iconResName = iconResName,
                 type = TypeEnum.SECOND,
