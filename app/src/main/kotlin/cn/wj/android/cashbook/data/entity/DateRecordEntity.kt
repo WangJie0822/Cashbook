@@ -50,10 +50,10 @@ data class DateRecordEntity(
                 if (totalIncome.toFloat() > 0) {
                     append(R.string.income_with_colon.string + symbol + totalIncome.formatToNumber())
                 }
-                if (isNotBlank()) {
-                    append(R.string.symbol_comma.string)
-                }
                 if (totalExpend.toFloat() > 0) {
+                    if (isNotBlank()) {
+                        append(R.string.symbol_comma.string)
+                    }
                     append(R.string.expenditure_with_colon.string + symbol + totalExpend.formatToNumber())
                 }
                 toString()
