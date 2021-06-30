@@ -42,6 +42,7 @@ import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewMode
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypListViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeMenuViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.MediaType.Companion.toMediaType
@@ -205,5 +206,8 @@ val viewModelModule = module {
     }
     viewModel {
         EditTagViewModel(get())
+    }
+    viewModel {
+        EditTypeMenuViewModel()
     }
 }

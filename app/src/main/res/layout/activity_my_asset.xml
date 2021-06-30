@@ -542,7 +542,7 @@
 
                         </com.google.android.material.card.MaterialCardView>
 
-                        <Space
+                        <androidx.legacy.widget.Space
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/blank_bottom_size" />
 

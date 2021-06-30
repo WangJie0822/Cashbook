@@ -67,11 +67,11 @@ abstract class BaseRvListAdapter<VH : BaseRvViewHolder<E>, E>
      */
     open fun onCurrentListChanged(previousList: List<E>, currentList: List<E>) {}
 
-    fun submitList(list: List<E>?) {
+    open fun submitList(list: List<E>?) {
         mDiffer.submitList(list)
     }
 
-    fun submitList(list: List<E>?, commitCallback: Runnable?) {
+    open fun submitList(list: List<E>?, commitCallback: Runnable?) {
         mDiffer.submitList(list, commitCallback)
     }
 }

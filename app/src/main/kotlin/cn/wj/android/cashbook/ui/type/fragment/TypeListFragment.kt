@@ -2,15 +2,19 @@ package cn.wj.android.cashbook.ui.type.fragment
 
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.ItemTouchHelper
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ui.BaseFragment
 import cn.wj.android.cashbook.data.constants.ACTION_TYPE
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.FragmentTypeListBinding
 import cn.wj.android.cashbook.ui.general.adapter.OneItemAdapter
 import cn.wj.android.cashbook.ui.type.adapter.EditTypeRvAdapter
+import cn.wj.android.cashbook.ui.type.dialog.EditTypeMenuDialog
 import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
+import cn.wj.android.cashbook.widget.recyclerview.callback.DragItemTouchCallback
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -45,6 +49,8 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
                 this@TypeListFragment.adapter,
                 OneItemAdapter(R.layout.recycler_footer_blank)
             )
+            val helper = ItemTouchHelper(DragItemTouchCallback(this@TypeListFragment.adapter) { viewModel.edit.value = true })
+            helper.attachToRecyclerView(this)
         }
     }
 
@@ -52,6 +58,26 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
         // 数据列表
         viewModel.listData.observe(this, { list ->
             adapter.submitList(list)
+        })
+        // 编辑保存点击
+        viewModel.saveEvent.observe(this, {
+            viewModel.updateType(adapter.getChangeList())
+        })
+        // 显示编辑弹窗
+        viewModel.showEditTypeMenuEvent.observe(this, { type ->
+            EditTypeMenuDialog.actionShow(childFragmentManager,
+                onEditClick = {
+                    // TODO 编辑点击
+                    viewModel.snackbarEvent.value = "跳转编辑-${type.name}".toSnackbarModel()
+                },
+                onDeleteClick = {
+                    // 删除点击
+                    viewModel.deleteType(type)
+                },
+                onStatisticsClick = {
+                    // TODO 统计数据点击
+                    viewModel.snackbarEvent.value = "跳转统计数据-${type.name}".toSnackbarModel()
+                })
         })
     }
 

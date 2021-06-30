@@ -94,7 +94,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
         booksDao.delete(books.toAssetTable())
     }
 
-    /** 从数据库中删除 [books] */
+    /** 更新账单数据 [books] */
     suspend fun updateBooks(vararg books: BooksEntity) = withContext(Dispatchers.IO) {
         val ls = arrayListOf<BooksTable>()
         books.forEach {
@@ -667,5 +667,19 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 删除 [tag] 数据*/
     suspend fun deleteTag(tag: TagEntity) = withContext(Dispatchers.IO) {
         tagDao.delete(tag.toTagTable())
+    }
+
+    /** 从数据库中删除 [type] */
+    suspend fun deleteType(type: TypeEntity) = withContext(Dispatchers.IO) {
+        typeDao.delete(type.toTypeTable())
+    }
+
+    /** 更新分类数据 [types] */
+    suspend fun updateTypes(types: List<TypeEntity>) = withContext(Dispatchers.IO) {
+        val ls = arrayListOf<TypeTable>()
+        types.forEach {
+            ls.add(it.toTypeTable())
+        }
+        typeDao.update(*ls.toTypedArray())
     }
 }

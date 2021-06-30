@@ -34,6 +34,7 @@
                 android:layout_marginStart="@dimen/spacing_normal"
                 android:bind_selected="@{item.expand}"
                 android:bind_visibility="@{item.showMore}"
+                android:bind_visibility_gone="@{false}"
                 android:contentDescription="@null"
                 android:src="@drawable/selector_type_arrow"
                 app:layout_constraintBottom_toTopOf="@id/space_horizontal"

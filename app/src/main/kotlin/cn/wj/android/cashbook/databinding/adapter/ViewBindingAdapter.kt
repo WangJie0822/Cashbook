@@ -186,9 +186,6 @@ fun View.setViewVisibility(visibility: Int?) {
     if (null == visibility) {
         return
     }
-    if (this.visibility == visibility) {
-        return
-    }
     this.visibility = visibility
 }
 
@@ -197,9 +194,6 @@ fun View.setViewVisibility(visibility: Int?) {
 fun View.setViewVisibility(show: Boolean?, gone: Boolean? = true) {
     val visibility =
         if (show.condition) View.VISIBLE else if (gone != false) View.GONE else View.INVISIBLE
-    if (this.visibility == visibility) {
-        return
-    }
     this.visibility = visibility
 }
 

@@ -1,8 +1,10 @@
 package cn.wj.android.cashbook.data.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import cn.wj.android.cashbook.data.database.table.TypeTable
 
 /**
@@ -21,9 +23,17 @@ interface TypeDao {
     @Insert
     suspend fun insert(vararg types: TypeTable)
 
+    /** 从数据库中删除 [type] */
+    @Delete
+    suspend fun delete(type: TypeTable)
+
     /** 清空数据表数据 */
     @Query("DELETE FROM db_type")
     suspend fun deleteAll()
+
+    /** 更新类型数据 [types] */
+    @Update
+    suspend fun update(vararg types: TypeTable)
 
     /** 获取数据库中的数据数量 */
     @Query("SELECT COUNT(*) FROM db_type")
