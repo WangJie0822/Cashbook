@@ -33,3 +33,6 @@ val Int.colorStateList: ColorStateList?
 /** 图片资源 */
 val Int.drawable: Drawable?
     get() = getDrawableById(this)
+
+val Int.drawableString: String
+    get() = "@drawable/${this.string}"

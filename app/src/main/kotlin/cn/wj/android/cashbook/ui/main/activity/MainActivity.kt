@@ -6,14 +6,15 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
+import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
 import cn.wj.android.cashbook.data.constants.MAIN_BACK_PRESS_INTERVAL_MS
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
 import cn.wj.android.cashbook.databinding.LayoutNoDataRecordBinding
-import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
+import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
@@ -108,6 +109,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         })
         // 记录变化监听
         LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+            viewModel.refreshing.value = true
+        })
+        // 分类数据变化
+        LiveEventBus.get(EVENT_TYPE_CHANGE).observe(this, {
             viewModel.refreshing.value = true
         })
     }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.main.activity.MainActivity">
 
     <data>
 
@@ -112,6 +113,21 @@
                 android:textAppearance="?attr/textAppearanceListItem"
                 android:textColor="@color/color_on_secondary"
                 app:drawableStartCompat="@drawable/vector_baseline_web_asset_24" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/item_height"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMyTypeClick}"
+                android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
+                android:drawablePadding="@dimen/spacing_small"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/spacing_big"
+                android:paddingEnd="@dimen/spacing_big"
+                android:text="@string/my_type"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@color/color_on_secondary"
+                app:drawableStartCompat="@drawable/vector_baseline_category_24" />
 
             <View
                 android:layout_width="match_parent"

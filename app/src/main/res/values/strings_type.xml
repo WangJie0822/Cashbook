@@ -57,7 +57,7 @@
     <string name="type_icon_name_car" translatable="false">vector_type_car_24</string>
     <string name="type_icon_name_parking" translatable="false">vector_type_parking_24</string>
     <string name="type_icon_name_refuel" translatable="false">vector_type_refuel_24</string>
-    <string name="type_icon_name_charge" translatable="false">vector_type_car_charge_24</string>
+    <string name="type_icon_name_car_charge" translatable="false">vector_type_car_charge_24</string>
     <string name="type_icon_name_car_maintenance" translatable="false">vector_type_car_maintenance_24</string>
     <string name="type_icon_name_car_wash" translatable="false">vector_type_car_wash_24</string>
     <string name="type_icon_name_repair" translatable="false">vector_type_repair_24</string>
@@ -114,6 +114,63 @@
     <string name="type_icon_name_proceeds" translatable="false">vector_type_type_proceeds_24</string>
 
     <string name="type_icon_name_balance_adjustment" translatable="false">vector_type_balance_adjustment_24</string>
+
+    <string name="type_icon_name_royalty" translatable="false">vector_type_royalty_24</string>
+    <string name="type_icon_name_provident_fund" translatable="false">vector_type_provident_fund_24</string>
+    <string name="type_icon_name_medicare" translatable="false">vector_type_medicare_24</string>
+    <string name="type_icon_name_alimony" translatable="false">vector_type_alimony_24</string>
+    <string name="type_icon_name_pocket_money" translatable="false">vector_type_pocket_money_24</string>
+    <string name="type_icon_name_lucky_money" translatable="false">vector_type_lucky_money_24</string>
+    <string name="type_icon_name_convert_payment" translatable="false">vector_type_convert_payment_24</string>
+    <string name="type_icon_name_rent" translatable="false">vector_type_rent_24</string>
+    <string name="type_icon_name_tax_rebate" translatable="false">vector_type_tax_rebate_24</string>
+    <string name="type_icon_name_dividend" translatable="false">vector_type_dividend_24</string>
+    <string name="type_icon_name_scholarship" translatable="false">vector_type_scholarship_24</string>
+    <string name="type_icon_name_stock" translatable="false">vector_type_investment_24</string>
+    <string name="type_icon_name_fund" translatable="false">vector_type_fund_24</string>
+    <string name="type_icon_name_money_management" translatable="false">vector_type_money_management_24</string>
+    <string name="type_icon_name_gold" translatable="false">vector_type_gold_24</string>
+    <string name="type_icon_name_bond" translatable="false">vector_type_bond_24</string>
+    <string name="type_icon_name_forex" translatable="false">vector_type_forex_24</string>
+    <string name="type_icon_name_charge" translatable="false">vector_type_charge_24</string>
+    <string name="type_icon_name_breakfast" translatable="false">vector_type_breakfast_24</string>
+    <string name="type_icon_name_lunch" translatable="false">vector_type_lunch_24</string>
+    <string name="type_icon_name_dinner" translatable="false">vector_type_dinner_24</string>
+    <string name="type_icon_name_takeaway" translatable="false">vector_type_takeaway_24</string>
+    <string name="type_icon_name_coffee" translatable="false">vector_type_coffee_24</string>
+    <string name="type_icon_name_clean" translatable="false">vector_type_clean_24</string>
+    <string name="type_icon_name_haircut" translatable="false">vector_type_haircut_24</string>
+    <string name="type_icon_name_bath" translatable="false">vector_type_bath_24</string>
+    <string name="type_icon_name_express" translatable="false">vector_type_express_24</string>
+    <string name="type_icon_name_furniture" translatable="false">vector_type_furniture_24</string>
+    <string name="type_icon_name_hat" translatable="false">vector_type_hat_24</string>
+    <string name="type_icon_name_coat" translatable="false">vector_type_coat_24</string>
+    <string name="type_icon_name_pants" translatable="false">vector_type_pants_24</string>
+    <string name="type_icon_name_underwear" translatable="false">vector_type_underwear_24</string>
+    <string name="type_icon_name_bag" translatable="false">vector_type_bag_24</string>
+    <string name="type_icon_name_shoes" translatable="false">vector_type_shoes_24</string>
+    <string name="type_icon_name_socks" translatable="false">vector_type_socks_24</string>
+    <string name="type_icon_name_daily" translatable="false">vector_type_daily_24</string>
+    <string name="type_icon_name_mobile_phone" translatable="false">vector_type_mobile_phone_24</string>
+    <string name="type_icon_name_mobile_phone_accessories" translatable="false">vector_type_mobile_phone_accessories_24</string>
+    <string name="type_icon_name_member" translatable="false">vector_type_member_24</string>
+    <string name="type_icon_name_camera" translatable="false">vector_type_camera_24</string>
+    <string name="type_icon_name_family" translatable="false">vector_type_family_24</string>
+    <string name="type_icon_name_parent" translatable="false">vector_type_parent_24</string>
+    <string name="type_icon_name_love" translatable="false">vector_type_love_24</string>
+    <string name="type_icon_name_child" translatable="false">vector_type_child_24</string>
+    <string name="type_icon_name_feeder" translatable="false">vector_type_feeder_24</string>
+    <string name="type_icon_name_diapers" translatable="false">vector_type_diapers_24</string>
+    <string name="type_icon_name_early_education" translatable="false">vector_type_early_education_24</string>
+    <string name="type_icon_name_family_trip" translatable="false">vector_type_family_trip_24</string>
+    <string name="type_icon_name_vaccination" translatable="false">vector_type_vaccination_24</string>
+    <string name="type_icon_name_toll" translatable="false">vector_type_toll_24</string>
+    <string name="type_icon_name_auto_parts" translatable="false">vector_type_auto_parts_24</string>
+    <string name="type_icon_name_ship" translatable="false">vector_type_ship_24</string>
+    <string name="type_icon_name_bicycle" translatable="false">vector_type_bicycle_24</string>
+    <string name="type_icon_name_medkit" translatable="false">vector_type_medkit_24</string>
+    <string name="type_icon_name_sport" translatable="false">vector_type_sport_24</string>
+    <string name="type_icon_name_benefit" translatable="false">vector_type_benefit_24</string>
 
     <string name="type_dining">餐饮</string>
     <string name="type_three_meals">三餐</string>
@@ -173,7 +230,7 @@
     <string name="type_car">汽车</string>
     <string name="type_parking">停车</string>
     <string name="type_refuel">加油</string>
-    <string name="type_charge">充电</string>
+    <string name="type_car_charge">充电</string>
     <string name="type_car_maintenance">保养</string>
     <string name="type_car_wash">洗车</string>
     <string name="type_repair">维修</string>
@@ -228,4 +285,62 @@
     <string name="type_lend">借出</string>
     <string name="type_repayment">还款</string>
     <string name="type_proceeds">收款</string>
+
+    <string name="type_royalty">提成</string>
+    <string name="type_provident_fund">公积金</string>
+    <string name="type_medicare">医保</string>
+    <string name="type_alimony">生活费</string>
+    <string name="type_pocket_money">零花钱</string>
+    <string name="type_lucky_money">压岁钱</string>
+    <string name="type_convert_payment">红包</string>
+    <string name="type_rent">租金</string>
+    <string name="type_tax_rebate">退税</string>
+    <string name="type_dividend">分红</string>
+    <string name="type_scholarship">奖学金</string>
+    <string name="type_stock">股票</string>
+    <string name="type_fund">基金</string>
+    <string name="type_money_management">理财</string>
+    <string name="type_gold">黄金</string>
+    <string name="type_bond">债券</string>
+    <string name="type_forex">外汇</string>
+    <string name="type_charge">手续费</string>
+    <string name="type_breakfast">早餐</string>
+    <string name="type_lunch">午餐</string>
+    <string name="type_dinner">晚餐</string>
+    <string name="type_takeaway">外卖</string>
+    <string name="type_coffee">咖啡</string>
+    <string name="type_clean">清洁</string>
+    <string name="type_haircut">理发</string>
+    <string name="type_bath">洗澡</string>
+    <string name="type_express">快递</string>
+    <string name="type_furniture">家具</string>
+    <string name="type_hat">帽子</string>
+    <string name="type_coat">外套</string>
+    <string name="type_pants">裤子</string>
+    <string name="type_underwear">内衣</string>
+    <string name="type_bag">包包</string>
+    <string name="type_shoes">鞋子</string>
+    <string name="type_socks">袜子</string>
+    <string name="type_daily">日常</string>
+    <string name="type_mobile_phone">手机</string>
+    <string name="type_mobile_phone_accessories">手机配件</string>
+    <string name="type_member">付费会员</string>
+    <string name="type_camera">相机</string>
+    <string name="type_family">家人</string>
+    <string name="type_parent">父母</string>
+    <string name="type_love">恋爱</string>
+    <string name="type_child">孩子</string>
+    <string name="type_feeder">奶瓶</string>
+    <string name="type_diapers">纸尿裤</string>
+    <string name="type_early_education">早教</string>
+    <string name="type_family_trip">亲子游</string>
+    <string name="type_vaccination">疫苗接种</string>
+    <string name="type_toll">通行费</string>
+    <string name="type_auto_parts">汽车配件</string>
+    <string name="type_ship">轮船</string>
+    <string name="type_bicycle">自行车</string>
+    <string name="type_medkit">医疗包</string>
+    <string name="type_sport">运动</string>
+    <string name="type_benefit">津贴</string>
+
 </resources>

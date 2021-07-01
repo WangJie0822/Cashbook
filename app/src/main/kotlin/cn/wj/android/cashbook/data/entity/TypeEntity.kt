@@ -68,7 +68,7 @@ data class TypeEntity(
                 iconResName = "",
                 type = TypeEnum.FIRST,
                 recordType = RecordTypeEnum.EXPENDITURE,
-                childEnable = false,
+                childEnable = true,
                 refund = false,
                 reimburse = false,
                 system = false,

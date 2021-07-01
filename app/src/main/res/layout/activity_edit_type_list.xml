@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.type.viewmodel.EditTypListViewModel" />
+            type="cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel" />
     </data>
 
     <LinearLayout
@@ -24,7 +24,7 @@
             android:background="?attr/colorPrimary"
             android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
             android:bind_toolbar_onClick="@{viewModel.onAddFirstTypeClick}"
-            app:menu="@menu/edit_type_toolbar"
+            app:menu="@menu/edit_type_list_toolbar"
             app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
             app:navigationIconTint="@color/color_on_primary"
             app:popupTheme="@style/Theme.Cashbook.PopupOverlay">

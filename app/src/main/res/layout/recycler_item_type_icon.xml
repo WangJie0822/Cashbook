@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
+            name="item"
+            type="cn.wj.android.cashbook.data.entity.TypeIconEntity" />
+
+        <variable
             name="viewModel"
-            type="cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel" />
+            type="cn.wj.android.cashbook.ui.type.viewmodel.EditTypeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:bind_onClick="@{viewModel.onTypeSettingClick}"
+        android:bind_onClick="@{viewModel.onIconItemClick}"
+        android:bind_onClick_item="@{item}"
         android:paddingTop="@dimen/spacing_normal"
         android:paddingBottom="@dimen/spacing_normal">
 
@@ -21,27 +27,29 @@
             android:id="@+id/iv_icon"
             android:layout_width="@dimen/icon_size_larger"
             android:layout_height="@dimen/icon_size_larger"
-            android:background="@drawable/shape_type_icon_background"
-            android:backgroundTint="@color/color_primary"
-            android:bind_selected="@{true}"
+            android:background="@drawable/selector_type_icon_background"
+            android:bind_iv_srcResIdStr="@{item.iconResIdStr}"
             android:contentDescription="@null"
             android:padding="@dimen/icon_padding"
-            android:src="@drawable/vector_baseline_settings_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/color_on_primary" />
+            app:tint="@color/selector_type_icon_tint"
+            tools:src="@drawable/vector_type_dining_24" />
+
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/setting"
+            android:text="@{item.name}"
             android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="@color/color_primary"
+            android:textColor="@color/selector_type_text_tint"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_icon" />
+            app:layout_constraintTop_toBottomOf="@id/iv_icon"
+            tools:text="餐饮" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

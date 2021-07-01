@@ -41,8 +41,9 @@ import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.EditTypListViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeMenuViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.MediaType.Companion.toMediaType
@@ -159,10 +160,13 @@ val viewModelModule = module {
         SettingViewModel()
     }
     viewModel {
-        EditTypListViewModel()
+        EditTypeListViewModel()
     }
     viewModel {
         TypListViewModel(get())
+    }
+    viewModel {
+        EditTypeViewModel(get())
     }
 
     // Fragment

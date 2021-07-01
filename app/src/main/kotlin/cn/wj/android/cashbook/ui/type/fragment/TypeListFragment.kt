@@ -1,21 +1,24 @@
 package cn.wj.android.cashbook.ui.type.fragment
 
 import androidx.core.os.bundleOf
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ui.BaseFragment
+import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
 import cn.wj.android.cashbook.data.constants.ACTION_TYPE
+import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.FragmentTypeListBinding
-import cn.wj.android.cashbook.ui.general.adapter.OneItemAdapter
 import cn.wj.android.cashbook.ui.type.adapter.EditTypeRvAdapter
 import cn.wj.android.cashbook.ui.type.dialog.EditTypeMenuDialog
 import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
 import cn.wj.android.cashbook.widget.recyclerview.callback.DragItemTouchCallback
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
+import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -45,10 +48,7 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
         // 配置 RecyclerView
         binding.rvType.run {
             layoutManager = WrapContentLinearLayoutManager()
-            adapter = ConcatAdapter(
-                this@TypeListFragment.adapter,
-                OneItemAdapter(R.layout.recycler_footer_blank)
-            )
+            adapter = this@TypeListFragment.adapter
             val helper = ItemTouchHelper(DragItemTouchCallback(this@TypeListFragment.adapter) { viewModel.edit.value = true })
             helper.attachToRecyclerView(this)
         }
@@ -67,8 +67,14 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
         viewModel.showEditTypeMenuEvent.observe(this, { type ->
             EditTypeMenuDialog.actionShow(childFragmentManager,
                 onEditClick = {
-                    // TODO 编辑点击
-                    viewModel.snackbarEvent.value = "跳转编辑-${type.name}".toSnackbarModel()
+                    // 编辑点击
+                    viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
+                        jump(
+                            ROUTE_PATH_TYPE_EDIT, bundleOf(
+                                ACTION_SELECTED to type
+                            )
+                        )
+                    }
                 },
                 onDeleteClick = {
                     // 删除点击
@@ -78,6 +84,10 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
                     // TODO 统计数据点击
                     viewModel.snackbarEvent.value = "跳转统计数据-${type.name}".toSnackbarModel()
                 })
+        })
+        // 分类数据变化
+        LiveEventBus.get(EVENT_TYPE_CHANGE).observe(this, {
+            viewModel.loadTypeList()
         })
     }
 

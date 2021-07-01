@@ -44,3 +44,6 @@ const val ROUTE_PATH_ASSET_INFO = "/path/asset/info"
 
 /** 路由路径 - 编辑分类列表 */
 const val ROUTE_PATH_TYPE_LIST_EDIT = "/path/type/list/edit"
+
+/** 路由路径 - 编辑分类 */
+const val ROUTE_PATH_TYPE_EDIT = "/path/type/edit"

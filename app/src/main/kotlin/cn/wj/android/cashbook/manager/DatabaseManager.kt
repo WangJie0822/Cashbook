@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.manager
 
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
+import cn.wj.android.cashbook.base.ext.base.drawableString
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
@@ -213,7 +214,7 @@ object DatabaseManager {
             // 加油
             TypeEntity.newSecondExpenditure(parent = carParent, name = R.string.type_refuel.string, R.string.type_icon_name_refuel.drawableString, 1),
             // 充电
-            TypeEntity.newSecondExpenditure(parent = carParent, name = R.string.type_charge.string, R.string.type_icon_name_charge.drawableString, 2),
+            TypeEntity.newSecondExpenditure(parent = carParent, name = R.string.type_car_charge.string, R.string.type_icon_name_car_charge.drawableString, 2),
             // 保养
             TypeEntity.newSecondExpenditure(parent = carParent, name = R.string.type_car_maintenance.string, R.string.type_icon_name_car_maintenance.drawableString, 3),
             // 洗车
@@ -340,7 +341,4 @@ object DatabaseManager {
         // 其它
         local.insertType(TypeEntity.newFirstTransfer(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 8, false))
     }
-
-    private val Int.drawableString: String
-        get() = "@drawable/${this.string}"
 }

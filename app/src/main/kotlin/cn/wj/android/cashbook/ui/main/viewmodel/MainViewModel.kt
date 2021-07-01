@@ -19,6 +19,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
@@ -163,6 +164,14 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
         // 跳转我的资产
         uiNavigationEvent.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_MY_ASSET)
+        }
+    }
+
+    /** 我的分类点击 */
+    val onMyTypeClick: () -> Unit = {
+        // 跳转我的分类
+        uiNavigationEvent.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_TYPE_LIST_EDIT)
         }
     }
 

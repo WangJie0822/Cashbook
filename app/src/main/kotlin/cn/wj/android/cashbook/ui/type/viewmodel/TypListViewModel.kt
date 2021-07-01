@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.ui.type.viewmodel
 
+import androidx.core.os.bundleOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
@@ -8,10 +9,13 @@ import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
+import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import kotlinx.coroutines.launch
@@ -74,10 +78,18 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 添加二级分类点击 */
     val onAddSecondTypeClick: (TypeEntity) -> Unit = { first ->
-        snackbarEvent.value = "添加子类${first.name}".toSnackbarModel()
+        uiNavigationEvent.value = UiNavigationModel.builder {
+            jump(
+                ROUTE_PATH_TYPE_EDIT, bundleOf(
+                    ACTION_SELECTED to TypeEntity.empty()
+                        .copy(parent = first, type = TypeEnum.SECOND, recordType = typeData.value.orElse(RecordTypeEnum.EXPENDITURE))
+                )
+            )
+        }
     }
 
-    private fun loadTypeList() {
+    /** 加载分类列表数据 */
+    fun loadTypeList() {
         viewModelScope.launch {
             try {
                 listData.value = local.getTypeListByType(typeData.value.orElse(RecordTypeEnum.EXPENDITURE))
@@ -123,6 +135,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
         viewModelScope.launch {
             try {
+                // TODO 检查是否存在记录
                 local.deleteType(type)
                 // 删除成功，刷新列表
                 val ls = listData.value.toNewList()

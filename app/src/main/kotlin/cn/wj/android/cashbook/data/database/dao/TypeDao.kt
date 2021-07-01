@@ -35,6 +35,14 @@ interface TypeDao {
     @Update
     suspend fun update(vararg types: TypeTable)
 
+    /** 更新类型数据 [type] */
+    @Update
+    suspend fun update(type: TypeTable)
+
+    /** 获取 name 是 [name] 的数据数量 */
+    @Query("SELECT COUNT(*) FROM db_type WHERE name=:name")
+    suspend fun getCountByName(name: String): Long
+
     /** 获取数据库中的数据数量 */
     @Query("SELECT COUNT(*) FROM db_type")
     suspend fun getCount(): Long

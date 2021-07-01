@@ -8,15 +8,17 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ui.BaseFragment
 import cn.wj.android.cashbook.data.constants.ACTION_TYPE
+import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.databinding.FragmentEditRecordBinding
+import cn.wj.android.cashbook.ui.general.adapter.OneItemAdapter
 import cn.wj.android.cashbook.ui.record.adapter.TypeSecondRvAdapter
-import cn.wj.android.cashbook.ui.record.adapter.TypeSettingRvAdapter
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
+import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -72,7 +74,9 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
                     adapter.addAdapter(createTypeAdapter(ls))
                 }
             }
-            adapter.addAdapter(TypeSettingRvAdapter(typeViewModel))
+            adapter.addAdapter(OneItemAdapter(R.layout.recycler_footer_type_setting) {
+                typeViewModel.onTypeSettingClick.invoke()
+            })
             // 默认选中第一条
             val firstItem = list.firstOrNull()
             firstItem?.let { first ->
@@ -132,6 +136,10 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
                 // 二级分类点击
                 notifySecondType(selected)
             }
+        })
+        // 分类数据变化
+        LiveEventBus.get(EVENT_TYPE_CHANGE).observe(this, {
+            typeViewModel.loadType()
         })
     }
 

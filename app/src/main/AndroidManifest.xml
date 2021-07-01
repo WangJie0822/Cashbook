@@ -150,6 +150,12 @@
             android:name=".ui.type.activity.EditTypeListActivity"
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
+
+        <!-- 编辑分类 -->
+        <activity
+            android:name=".ui.type.activity.EditTypeActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

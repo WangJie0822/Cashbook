@@ -32,6 +32,8 @@ import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
+import cn.wj.android.cashbook.data.entity.TypeIconGroupEntity
+import cn.wj.android.cashbook.data.entity.getTypeIconGroupList
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
@@ -230,6 +232,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 返回数据库是否存在类型数据 */
     suspend fun hasType(): Boolean = withContext(Dispatchers.IO) {
         typeDao.getCount() > 0
+    }
+
+    /** 获取数据库中分类数据数量 */
+    suspend fun getTypeCount(): Long = withContext(Dispatchers.IO) {
+        typeDao.getCount()
     }
 
     /** 将 [type] 插入数据库并返回 id */
@@ -681,5 +688,20 @@ class LocalDataStore(private val database: CashbookDatabase) {
             ls.add(it.toTypeTable())
         }
         typeDao.update(*ls.toTypedArray())
+    }
+
+    /** 更新分类数据 [type] */
+    suspend fun updateType(type: TypeEntity) = withContext(Dispatchers.IO) {
+        typeDao.update(type.toTypeTable())
+    }
+
+    /** 获取分类图标数据 */
+    suspend fun getTypeIconData(): List<TypeIconGroupEntity> = withContext(Dispatchers.IO) {
+        getTypeIconGroupList()
+    }
+
+    /** 获取名称为 [name] 的分类数量 */
+    suspend fun getTypeCountByName(name: String): Long = withContext(Dispatchers.IO) {
+        typeDao.getCountByName(name)
     }
 }

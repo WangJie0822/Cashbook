@@ -1,9 +1,7 @@
 package cn.wj.android.cashbook.ui.type.viewmodel
 
 import androidx.core.os.bundleOf
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
@@ -31,12 +29,17 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
     val selectTypeData: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 记录类型数据 */
-    val typeData: MutableLiveData<RecordTypeEnum> = MutableLiveData()
+    val typeData: MutableLiveData<RecordTypeEnum> = object : MutableLiveData<RecordTypeEnum>() {
+        override fun setValue(value: RecordTypeEnum?) {
+            super.setValue(value)
+            if (null != value) {
+                loadType()
+            }
+        }
+    }
 
     /** 类型列表数据 */
-    val typeListData: LiveData<List<TypeEntity>> = typeData.switchMap {
-        loadType(it)
-    }
+    val typeListData: MutableLiveData<List<TypeEntity>> = MutableLiveData()
 
     /** 类型 item 点击 */
     val onTypeItemClick: (TypeEntity) -> Unit = { item ->
@@ -79,16 +82,15 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
         }
     }
 
-    /** 根据记录类型 [recordType] 加载记录分类 */
-    private fun loadType(recordType: RecordTypeEnum): LiveData<List<TypeEntity>> {
-        val result = MutableLiveData<List<TypeEntity>>()
+    /** 加载记录分类数据 */
+    fun loadType() {
+        val recordType = typeData.value ?: return
         viewModelScope.launch {
             try {
-                result.value = local.getTypeListByType(recordType)
+                typeListData.value = local.getTypeListByType(recordType)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadType")
             }
         }
-        return result
     }
 }

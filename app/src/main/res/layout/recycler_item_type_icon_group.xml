@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="cn.wj.android.cashbook.data.entity.TypeIconGroupEntity" />
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.type.viewmodel.EditTypeViewModel" />
+    </data>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="@drawable/selector_type_icon_group_background"
+        android:bind_onClick="@{viewModel.onGroupItemClick}"
+        android:bind_onClick_item="@{item}"
+        android:bind_selected="@{item.selected}"
+        android:gravity="center"
+        android:text="@{item.name}"
+        android:textAppearance="?textAppearanceListItem"
+        android:textColor="@color/selector_type_icon_group_text"
+        tools:text="收入" />
+
+</layout>

@@ -9,7 +9,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.databinding.ActivityEditTypeListBinding
 import cn.wj.android.cashbook.ui.type.adapter.EditTypeListVpAdapter
-import cn.wj.android.cashbook.ui.type.viewmodel.EditTypListViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -19,9 +19,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/29
  */
 @Route(path = ROUTE_PATH_TYPE_LIST_EDIT)
-class EditTypeListActivity : BaseActivity<EditTypListViewModel, ActivityEditTypeListBinding>() {
+class EditTypeListActivity : BaseActivity<EditTypeListViewModel, ActivityEditTypeListBinding>() {
 
-    override val viewModel: EditTypListViewModel by viewModel()
+    override val viewModel: EditTypeListViewModel by viewModel()
 
     /** 适配器 */
     private val adapter: EditTypeListVpAdapter by lazy {
