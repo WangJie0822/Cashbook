@@ -26,8 +26,117 @@
             app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
             app:navigationIconTint="@color/color_on_primary"
             app:popupTheme="@style/Theme.Cashbook.PopupOverlay"
-            app:titleTextColor="@color/color_on_primary"
-            app:title="@string/delete_type" />
+            app:title="@string/delete_type"
+            app:titleTextColor="@color/color_on_primary" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/rv_type"
+            tools:listitem="@layout/recycler_item_edit_type_first"
+            android:layout_weight="1" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_bottom_sheet_dialog_background">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_hint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginTop="@dimen/spacing_big"
+                android:layout_marginEnd="@dimen/spacing_big"
+                android:text="@{viewModel.hintStr}"
+                android:textAppearance="?attr/textAppearanceCaption"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/replace_type_hint_format" />
+
+            <ImageView
+                android:id="@+id/iv_icon_old"
+                android:layout_width="@dimen/icon_size_larger"
+                android:layout_height="@dimen/icon_size_larger"
+                android:background="@drawable/selector_type_icon_background"
+                android:bind_iv_srcResIdStr="@{viewModel.oldTypeIconResStr}"
+                android:contentDescription="@null"
+                android:padding="@dimen/icon_padding"
+                app:layout_constraintBottom_toTopOf="@id/tv_type_old"
+                app:layout_constraintEnd_toStartOf="@id/tv_arrow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_arrow"
+                app:tint="@color/selector_type_icon_tint"
+                tools:src="@drawable/vector_type_dining_24" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_type_old"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.oldTypeName}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="@color/selector_type_text_tint"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_arrow"
+                app:layout_constraintEnd_toEndOf="@id/iv_icon_old"
+                app:layout_constraintStart_toStartOf="@id/iv_icon_old"
+                app:layout_constraintTop_toBottomOf="@id/iv_icon_old"
+                tools:text="餐饮" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_big"
+                android:text="@string/symbol_arrow_right"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_hint" />
+
+            <ImageView
+                android:id="@+id/iv_icon_new"
+                android:layout_width="@dimen/icon_size_larger"
+                android:layout_height="@dimen/icon_size_larger"
+                android:background="@drawable/selector_type_icon_background"
+                android:bind_iv_srcResIdStr="@{viewModel.newTypeIconResStr}"
+                android:contentDescription="@null"
+                android:padding="@dimen/icon_padding"
+                app:layout_constraintBottom_toTopOf="@id/tv_type_new"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_arrow"
+                app:layout_constraintTop_toTopOf="@id/tv_arrow"
+                app:tint="@color/selector_type_icon_tint"
+                tools:src="@drawable/vector_type_dining_24" />
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_type_new"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.newTypeName}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="@color/selector_type_text_tint"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_arrow"
+                app:layout_constraintEnd_toEndOf="@id/iv_icon_new"
+                app:layout_constraintStart_toStartOf="@id/iv_icon_new"
+                app:layout_constraintTop_toBottomOf="@id/iv_icon_new"
+                tools:text="餐饮" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginTop="@dimen/spacing_big"
+                android:layout_marginEnd="@dimen/spacing_big"
+                android:bind_onClick="@{viewModel.onSaveClick}"
+                android:text="@string/save"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_arrow" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

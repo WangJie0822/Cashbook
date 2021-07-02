@@ -25,6 +25,7 @@
     <string name="symbol_calculator_nine" translatable="false">9</string>
     <string name="github" translatable="false">Github</string>
     <string name="gitee" translatable="false">Gitee</string>
+    <string name="symbol_arrow_right" translatable="false"><![CDATA[>>>]]></string>
 
     <string name="default_currency_format">%1$s（默认）</string>
 
@@ -215,4 +216,7 @@
     <string name="my_type">我的分类</string>
     <string name="delete_type">删除分类</string>
     <string name="delete_success">删除成功</string>
+    <string name="replace_type_hint_format">此分类下已有%1$s条记录，如果删除，请给这些记录选择一个新的分类。</string>
+    <string name="please_select_new_type">请选择新的类型</string>
+    <string name="modify_success">修改成功</string>
 </resources>

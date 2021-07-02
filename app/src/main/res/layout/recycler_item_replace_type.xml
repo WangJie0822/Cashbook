@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.type.viewmodel.ReplaceTypeViewModel" />
+
+        <variable
+            name="item"
+            type="cn.wj.android.cashbook.data.entity.TypeEntity" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="@drawable/selector_default_ripple"
+        android:bind_onClick="@{viewModel.onTypeItemClick}"
+        android:bind_onClick_item="@{item}">
+
+        <androidx.legacy.widget.Space
+            android:id="@+id/space"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:bind_visibility="@{!item.first}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="@dimen/icon_size_larger"
+            android:layout_height="@dimen/icon_size_larger"
+            android:bind_iv_srcResIdStr="@{item.iconResName}"
+            android:contentDescription="@null"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/space"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginStart="@dimen/spacing_normal"
+            app:tint="@color/selector_type_icon_tint"
+            tools:src="@drawable/vector_type_dining_24" />
+
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:background="@drawable/selector_type_icon_background"
+            android:bind_visibility="@{item.showMore}"
+            android:contentDescription="@null"
+            android:src="@drawable/vector_baseline_more_horiz_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/iv_icon"
+            app:layout_constraintEnd_toEndOf="@id/iv_icon"
+            app:tint="@color/selector_type_icon_tint"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:text="@{item.name}"
+            android:textAppearance="?attr/textAppearanceListItem"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="餐饮" />
+
+        <ImageView
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:background="?selectableItemBackground"
+            android:bind_visibility="@{item.selected}"
+            android:contentDescription="@null"
+            android:src="@drawable/vector_baseline_check_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorPrimary"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

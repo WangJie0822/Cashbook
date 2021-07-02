@@ -44,6 +44,11 @@ data class TypeEntity(
     val showMore: Boolean
         get() = type == TypeEnum.FIRST && childEnable && childList.isNotEmpty()
 
+    /** 是否是一级分类 */
+    @IgnoredOnParcel
+    val first: Boolean
+        get() = type == TypeEnum.FIRST
+
     /** 标记 - 是否选中 */
     @IgnoredOnParcel
     val selected: ObservableBoolean by lazy {

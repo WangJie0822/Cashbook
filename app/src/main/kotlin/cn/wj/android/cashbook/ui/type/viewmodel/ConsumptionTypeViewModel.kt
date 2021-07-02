@@ -81,7 +81,7 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
                 }
             }
             // 更新二级列表
-            secondTypeData.value = item
+            secondTypeData.value = typeListData.value?.firstOrNull { it.id == item.id }
         }
         selectTypeData.value = item
     }

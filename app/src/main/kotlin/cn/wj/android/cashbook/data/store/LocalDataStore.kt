@@ -274,6 +274,33 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
     }
 
+
+    /** 查询并返回记录类型为 [type] 的类型数据列表 */
+    suspend fun getReplaceTypeListByType(type: TypeEntity): List<TypeEntity> = withContext(Dispatchers.IO) {
+        val ls = arrayListOf<TypeEntity>()
+        typeDao.queryByPosition(TypeEnum.FIRST.name, type.recordType.position)
+            .sortedBy {
+                it.sort
+            }
+            .map { first ->
+                val firstEntity = first.toTypeEntity(null)
+                val secondLs = typeDao.queryByParentId(TypeEnum.SECOND.name, first.id.orElse(-1L)).map { second ->
+                    second.toTypeEntity(firstEntity)
+                }.sortedBy {
+                    it.sort
+                }
+                ls.add(firstEntity.copy(childList = secondLs))
+                secondLs.forEach {
+                    ls.add(it)
+                }
+            }
+        val index = ls.indexOfFirst { it.id == type.id }
+        if (index >= 0) {
+            ls.removeAt(index)
+        }
+        ls
+    }
+
     /** 获取 id 为 [assetId] 的资产余额 */
     private suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
         if (null == assetId) {
@@ -347,6 +374,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
     /** 更新 [record] 记录 */
     suspend fun updateRecord(record: RecordEntity) = withContext(Dispatchers.IO) {
         recordDao.update(record.toRecordTable())
+    }
+
+    /** 将记录中分类为 [old] 的记录分类修改为 [new] */
+    suspend fun updateRecordTypes(old: TypeEntity, new: TypeEntity) = withContext(Dispatchers.IO) {
+        recordDao.updateTypeId(old.id, new.id)
     }
 
     /** 获取首页数据 */
@@ -709,10 +741,6 @@ class LocalDataStore(private val database: CashbookDatabase) {
             ls.add(it.toTypeTable())
         }
         typeDao.update(*ls.toTypedArray())
-    }
-
-    suspend fun updateTypeToNotSystem()= withContext(Dispatchers.IO){
-
     }
 
     /** 更新分类数据 [type] */

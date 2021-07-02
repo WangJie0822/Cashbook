@@ -76,17 +76,17 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
             adapter.addAdapter(OneItemAdapter(R.layout.recycler_footer_type_setting) {
                 typeViewModel.onTypeSettingClick.invoke()
             })
-            // 默认选中第一条
-            val firstItem = list.firstOrNull()
-            firstItem?.let { first ->
-                typeViewModel.onTypeItemClick.invoke(first)
-            }
-            viewModel.record?.let { record ->
-                if (record.typeEnum != typeViewModel.typeData.value) {
-                    return@let
+            val record = viewModel.record
+            if (null == record || record.typeEnum != typeViewModel.typeData.value) {
+                // 默认选中第一条
+                val firstItem = list.firstOrNull()
+                firstItem?.let { first ->
+                    typeViewModel.onTypeItemClick.invoke(first)
                 }
-                val type = record.type ?: return@let
-                typeViewModel.onTypeItemClick.invoke(type)
+            } else {
+                record.type?.let {
+                    typeViewModel.onTypeItemClick.invoke(it)
+                }
             }
         })
         // 二级类型状态

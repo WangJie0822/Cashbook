@@ -33,6 +33,10 @@ interface RecordDao {
     @Update
     suspend fun update(record: RecordTable)
 
+    /** 将类型为 [oldId] 的记录类型修改为 [newId] */
+    @Query("UPDATE db_record SET type_id=:newId WHERE type_id=:oldId")
+    suspend fun updateTypeId(oldId: Long, newId: Long)
+
     /** 根据 id 获取对应记录数据 */
     @Query("SELECT * FROM db_record WHERE id=:recordId")
     suspend fun queryById(recordId: Long): RecordTable?
