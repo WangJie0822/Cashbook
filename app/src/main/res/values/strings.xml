@@ -213,4 +213,6 @@
     <string name="please_select_type_icon">请选择分类图标</string>
     <string name="same_name_type_exist_already">已存在相同名称的分类</string>
     <string name="my_type">我的分类</string>
+    <string name="delete_type">删除分类</string>
+    <string name="delete_success">删除成功</string>
 </resources>

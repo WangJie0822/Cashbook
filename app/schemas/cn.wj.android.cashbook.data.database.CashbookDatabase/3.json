@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "0680c495edf8524d852d2da17cf58c2a",
+    "identityHash": "bbaa729f094e2139011f2c9e7ba503c0",
     "entities": [
       {
         "tableName": "db_books",
@@ -154,7 +154,7 @@
       },
       {
         "tableName": "db_type",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `icon_res_name` TEXT NOT NULL, `type` TEXT NOT NULL, `record_type` INTEGER NOT NULL, `child_enable` INTEGER NOT NULL, `refund` INTEGER NOT NULL, `reimburse` INTEGER NOT NULL, `system` INTEGER NOT NULL, `sort` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `icon_res_name` TEXT NOT NULL, `type` TEXT NOT NULL, `record_type` INTEGER NOT NULL, `child_enable` INTEGER NOT NULL, `refund` INTEGER NOT NULL, `reimburse` INTEGER NOT NULL, `sort` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -207,12 +207,6 @@
           {
             "fieldPath": "reimburse",
             "columnName": "reimburse",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "system",
-            "columnName": "system",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -372,7 +366,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0680c495edf8524d852d2da17cf58c2a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bbaa729f094e2139011f2c9e7ba503c0')"
     ]
   }
 }

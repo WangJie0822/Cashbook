@@ -11,6 +11,7 @@ import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_REPLACE
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
@@ -123,7 +124,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 删除类型 [type] */
     fun deleteType(type: TypeEntity) {
-        if (type.system) {
+        if (type.refund || type.reimburse) {
             // 系统类型不支持删除
             snackbarEvent.value = R.string.system_type_does_not_support_deletion.string.toSnackbarModel()
             return
@@ -135,7 +136,18 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
         viewModelScope.launch {
             try {
-                // TODO 检查是否存在记录
+                // 检查是否存在记录
+                if (local.getRecordCountByType(type) > 0) {
+                    // 跳转替换分类
+                    uiNavigationEvent.value = UiNavigationModel.builder {
+                        jump(
+                            ROUTE_PATH_TYPE_REPLACE, bundleOf(
+                                ACTION_SELECTED to type
+                            )
+                        )
+                    }
+                    return@launch
+                }
                 local.deleteType(type)
                 // 删除成功，刷新列表
                 val ls = listData.value.toNewList()
@@ -159,6 +171,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     }
                 }
                 listData.value = ls
+                snackbarEvent.value = R.string.delete_success.string.toSnackbarModel()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "deleteType")
             }

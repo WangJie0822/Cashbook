@@ -697,6 +697,11 @@ class LocalDataStore(private val database: CashbookDatabase) {
         typeDao.delete(type.toTypeTable())
     }
 
+    /** 获取分类为 [type] 的记录数量 */
+    suspend fun getRecordCountByType(type: TypeEntity): Int = withContext(Dispatchers.IO) {
+        recordDao.queryRecordCountByTypeId(type.id)
+    }
+
     /** 更新分类数据 [types] */
     suspend fun updateTypes(types: List<TypeEntity>) = withContext(Dispatchers.IO) {
         val ls = arrayListOf<TypeTable>()
@@ -704,6 +709,10 @@ class LocalDataStore(private val database: CashbookDatabase) {
             ls.add(it.toTypeTable())
         }
         typeDao.update(*ls.toTypedArray())
+    }
+
+    suspend fun updateTypeToNotSystem()= withContext(Dispatchers.IO){
+
     }
 
     /** 更新分类数据 [type] */

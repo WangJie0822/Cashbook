@@ -65,6 +65,10 @@ interface RecordDao {
     @Query("SELECT COUNT(*) FROM db_record WHERE asset_id=:assetId")
     suspend fun queryRecordCountByAssetId(assetId: Long): Int
 
+    /** 获取分类 id 为 [typeId] 的记录数量 */
+    @Query("SELECT COUNT(*) FROM db_record WHERE type_id=:typeId")
+    suspend fun queryRecordCountByTypeId(typeId: Long): Int
+
     /** 查询金额小于等于 [amount] 记录时间在 [recordTime] 之后的支出记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type_enum=:type AND books_id=:booksId AND amount>=:amount ORDER BY record_time DESC")
     suspend fun queryExpenditureRecordAfterDateLargerThanAmount(booksId: Long, amount: Float, recordTime: Long, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>

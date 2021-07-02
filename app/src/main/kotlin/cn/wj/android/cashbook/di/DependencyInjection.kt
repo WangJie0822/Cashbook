@@ -44,6 +44,7 @@ import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeMenuViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.ReplaceTypeViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.MediaType.Companion.toMediaType
@@ -98,14 +99,25 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 /** 数据库升级 2 -> 3 */
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
+        // 更新记录表数据
         // 将旧表重命名
         database.execSQL("ALTER TABLE `db_record` RENAME TO `db_record_temp`")
         // 新建新表
         database.execSQL("CREATE TABLE IF NOT EXISTS `db_record` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `type_enum` TEXT NOT NULL, `type_id` INTEGER NOT NULL, `asset_id` INTEGER NOT NULL, `into_asset_id` INTEGER NOT NULL, `books_id` INTEGER NOT NULL, `record_id` INTEGER NOT NULL, `amount` REAL NOT NULL, `charge` REAL NOT NULL, `remark` TEXT NOT NULL, `tag_ids` TEXT NOT NULL, `reimbursable` INTEGER NOT NULL, `system` INTEGER NOT NULL, `record_time` INTEGER NOT NULL, `create_time` INTEGER NOT NULL, `modify_time` INTEGER NOT NULL)")
-        // 从就表中查询数据插入新表
+        // 从旧表中查询数据插入新表
         database.execSQL("INSERT INTO `db_record` SELECT `id`, `type`, `first_type_id`, `asset_id`, `into_asset_id`, `books_id`, `record_id`, `amount`, `charge`, `remark`, `tag_ids`, `reimbursable`, `system`, `record_time`, `create_time`, `modify_time` FROM `db_record_temp`")
         // 删除旧表
         database.execSQL("DROP TABLE `db_record_temp`")
+
+        // 更新分类表数据
+        // 将旧表重命名
+        database.execSQL("ALTER TABLE `db_type` RENAME TO `db_type_temp`")
+        // 新建新表
+        database.execSQL("CREATE TABLE IF NOT EXISTS `db_type` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `icon_res_name` TEXT NOT NULL, `type` TEXT NOT NULL, `record_type` INTEGER NOT NULL, `child_enable` INTEGER NOT NULL, `refund` INTEGER NOT NULL, `reimburse` INTEGER NOT NULL, `sort` INTEGER NOT NULL)")
+        // 从旧表中查询数据插入新表
+        database.execSQL("INSERT INTO `db_type` SELECT `id`, `parent_id`, `name`, `icon_res_name`, `type`, `record_type`, `child_enable`, `refund`, `reimburse`, `sort` FROM `db_type_temp`")
+        // 删除旧表
+        database.execSQL("DROP TABLE `db_type_temp`")
     }
 }
 
@@ -182,6 +194,9 @@ val viewModelModule = module {
     }
     viewModel {
         EditTypeViewModel(get())
+    }
+    viewModel {
+        ReplaceTypeViewModel(get())
     }
 
     // Fragment
