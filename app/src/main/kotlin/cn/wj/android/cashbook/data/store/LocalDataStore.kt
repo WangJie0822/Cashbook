@@ -289,7 +289,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
         var result = lastModify.amount.toBigDecimalOrZero()
         val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
         recordList.forEach {
-            when (it.type) {
+            when (it.typeEnum) {
                 RecordTypeEnum.INCOME.name -> {
                     // 收入
                     if (creditCard) {
@@ -324,7 +324,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
         // 查询转账转入数据
         val transferRecordList = recordDao.queryByIntoAssetIdAfterRecordTime(assetId, lastModify.recordTime)
         transferRecordList.forEach {
-            when (it.type) {
+            when (it.typeEnum) {
                 RecordTypeEnum.TRANSFER.name -> {
                     // 转账转入
                     if (creditCard) {
@@ -416,12 +416,20 @@ class LocalDataStore(private val database: CashbookDatabase) {
             val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
             val intoAssetTable = assetDao.queryById(record.intoAssetId)
             val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
-            val firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(null)
+            val typeTable = if (record.typeId < 0) null else typeDao.queryById(record.typeId)
+            val type = if (null == typeTable) {
+                null
+            } else {
+                if (typeTable.parentId < 0) {
+                    typeTable.toTypeEntity(null)
+                } else {
+                    typeTable.toTypeEntity(typeDao.queryById(typeTable.parentId)?.toTypeEntity(null))
+                }
+            }
             RecordEntity(
                 id = record.id.orElse(-1L),
-                type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
-                firstType = firstType,
-                secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(firstType),
+                typeEnum = RecordTypeEnum.fromName(record.typeEnum).orElse(RecordTypeEnum.EXPENDITURE),
+                type = type,
                 asset = asset,
                 intoAsset = intoAsset,
                 booksId = record.booksId,
@@ -450,12 +458,20 @@ class LocalDataStore(private val database: CashbookDatabase) {
         val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
         val intoAssetTable = assetDao.queryById(record.intoAssetId)
         val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
-        val firstType = if (record.firstTypeId < 0) null else typeDao.queryById(record.firstTypeId)?.toTypeEntity(null)
+        val typeTable = if (record.typeId < 0) null else typeDao.queryById(record.typeId)
+        val type = if (null == typeTable) {
+            null
+        } else {
+            if (typeTable.parentId < 0) {
+                typeTable.toTypeEntity(null)
+            } else {
+                typeTable.toTypeEntity(typeDao.queryById(typeTable.parentId)?.toTypeEntity(null))
+            }
+        }
         RecordEntity(
             id = record.id.orElse(-1L),
-            type = RecordTypeEnum.fromName(record.type).orElse(RecordTypeEnum.EXPENDITURE),
-            firstType = firstType,
-            secondType = if (record.secondTypeId < 0) null else typeDao.queryById(record.secondTypeId)?.toTypeEntity(firstType),
+            typeEnum = RecordTypeEnum.fromName(record.typeEnum).orElse(RecordTypeEnum.EXPENDITURE),
+            type = type,
             asset = asset,
             intoAsset = intoAsset,
             booksId = record.booksId,

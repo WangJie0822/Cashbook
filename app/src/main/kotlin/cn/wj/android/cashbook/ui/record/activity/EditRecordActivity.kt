@@ -67,7 +67,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
                 viewModel.showCalculatorEvent.value = 0
             } else {
                 // 切换到对应页面
-                viewModel.currentItem.value = viewModel.record!!.type.position
+                viewModel.currentItem.value = viewModel.record!!.typeEnum.position
             }
         }
     }

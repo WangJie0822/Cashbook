@@ -26,7 +26,7 @@ interface RecordDao {
     suspend fun delete(record: RecordTable)
 
     /** 删除与资产 id 为 [assetId] 相关联的所有转账、修改余额记录  */
-    @Query("DELETE FROM db_record WHERE (asset_id=:assetId OR into_asset_id=:assetId) AND (type=:modify OR type=:transfer)")
+    @Query("DELETE FROM db_record WHERE (asset_id=:assetId OR into_asset_id=:assetId) AND (type_enum=:modify OR type_enum=:transfer)")
     suspend fun deleteModifyAndTransferByAssetId(assetId: Long, modify: String = RecordTypeEnum.MODIFY_BALANCE.name, transfer: String = RecordTypeEnum.TRANSFER.name)
 
     /** 更新 [record] 数据 */
@@ -42,7 +42,7 @@ interface RecordDao {
     suspend fun queryAssociatedById(recordId: Long): RecordTable?
 
     /** 查询最后一条修改记录 */
-    @Query("SELECT * FROM db_record WHERE asset_id=:assetId AND type=:type ORDER BY record_time DESC LIMIT 1")
+    @Query("SELECT * FROM db_record WHERE asset_id=:assetId AND type_enum=:type ORDER BY record_time DESC LIMIT 1")
     suspend fun queryLastModifyRecord(assetId: Long, type: String = RecordTypeEnum.MODIFY_BALANCE.name): List<RecordTable>
 
     /** 查询记录时间在 [recordTime] 之后的所有记录 */
@@ -50,7 +50,7 @@ interface RecordDao {
     suspend fun queryAfterRecordTime(assetId: Long, recordTime: Long): List<RecordTable>
 
     /** 查询记录时间在 [recordTime] 之后的所有 转入资产id 为 [assetId] 的转账记录 */
-    @Query("SELECT * FROM db_record WHERE into_asset_id=:assetId AND type=:type AND record_time>=:recordTime")
+    @Query("SELECT * FROM db_record WHERE into_asset_id=:assetId AND type_enum=:type AND record_time>=:recordTime")
     suspend fun queryByIntoAssetIdAfterRecordTime(assetId: Long, recordTime: Long, type: String = RecordTypeEnum.TRANSFER.name): List<RecordTable>
 
     /** 查询记录时间在 [recordTime] 之后且属于 id 为 [booksId] 的账本的记录 */
@@ -66,26 +66,26 @@ interface RecordDao {
     suspend fun queryRecordCountByAssetId(assetId: Long): Int
 
     /** 查询金额小于等于 [amount] 记录时间在 [recordTime] 之后的支出记录 */
-    @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type=:type AND books_id=:booksId AND amount>=:amount ORDER BY record_time DESC")
+    @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type_enum=:type AND books_id=:booksId AND amount>=:amount ORDER BY record_time DESC")
     suspend fun queryExpenditureRecordAfterDateLargerThanAmount(booksId: Long, amount: Float, recordTime: Long, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 
     /** 查询标记为可报销记录时间在 [recordTime] 之后的支出记录 */
-    @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type=:type AND books_id=:booksId AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC")
+    @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type_enum=:type AND books_id=:booksId AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC")
     suspend fun queryReimburseExpenditureRecordAfterDate(booksId: Long, recordTime: Long, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 
     /** 查询备注满足 [remark] 条件的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND remark LIKE :remark ORDER BY record_time DESC LIMIT 30")
+    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND remark LIKE :remark ORDER BY record_time DESC LIMIT 30")
     suspend fun queryExpenditureRecordByRemark(booksId: Long, remark: String, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 
     /** 查询金额等于 [amount] 的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND amount=:amount ORDER BY record_time DESC LIMIT 30")
+    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND amount=:amount ORDER BY record_time DESC LIMIT 30")
     suspend fun queryExpenditureRecordByAmount(booksId: Long, amount: Float, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 
     /** 查询备注满足 [remark] 条件的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND remark LIKE :remark AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
+    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND remark LIKE :remark AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
     suspend fun queryReimburseExpenditureRecordByRemark(booksId: Long, remark: String, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 
     /** 查询金额等于 [amount] 的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type=:type AND books_id=:booksId AND amount=:amount AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
+    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND amount=:amount AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
     suspend fun queryReimburseExpenditureRecordByAmount(booksId: Long, amount: Float, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 }

@@ -152,9 +152,8 @@ internal fun TagEntity.toTagTable(): TagTable {
 internal fun RecordEntity.toRecordTable(): RecordTable {
     return RecordTable(
         id = if (-1L == id) null else id,
-        type = type.name,
-        firstTypeId = firstType?.id.orElse(-1L),
-        secondTypeId = secondType?.id.orElse(-1L),
+        typeEnum = typeEnum.name,
+        typeId = type?.id.orElse(-1L),
         assetId = asset?.id.orElse(-1L),
         intoAssetId = intoAsset?.id.orElse(-1L),
         booksId = booksId,

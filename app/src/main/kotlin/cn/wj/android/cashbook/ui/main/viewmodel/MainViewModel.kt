@@ -59,11 +59,11 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     val expenditure: LiveData<String> = currentMonthRecord.map {
         var totalExpenditure = "0".toBigDecimal()
         it.forEach { record ->
-            if (record.type == RecordTypeEnum.EXPENDITURE) {
+            if (record.typeEnum == RecordTypeEnum.EXPENDITURE) {
                 // 支出
                 totalExpenditure += record.amount.toBigDecimalOrZero()
             }
-            if (record.type == RecordTypeEnum.TRANSFER) {
+            if (record.typeEnum == RecordTypeEnum.TRANSFER) {
                 // 转账
                 val chargeF = record.charge.toFloatOrNull().orElse(0f)
                 if (chargeF > 0f) {
@@ -81,7 +81,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     val income: LiveData<String> = currentMonthRecord.map {
         var totalIncome = "0".toBigDecimal()
         it.forEach { record ->
-            if (record.type == RecordTypeEnum.INCOME) {
+            if (record.typeEnum == RecordTypeEnum.INCOME) {
                 // 收入
                 totalIncome += record.amount.toBigDecimalOrZero()
             }

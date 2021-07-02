@@ -26,7 +26,7 @@ data class DateRecordEntity(
             var totalExpend = "0".toBigDecimal()
             var totalIncome = "0".toBigDecimal()
             list.forEach {
-                when (it.type) {
+                when (it.typeEnum) {
                     RecordTypeEnum.EXPENDITURE -> {
                         // 支出
                         totalExpend += it.amount.toBigDecimalOrZero()

@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -90,19 +91,19 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     val currentItem: MutableLiveData<Int> = MutableLiveData(RecordTypeEnum.EXPENDITURE.position)
 
     /** 支出类型 */
-    val firstExpenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
+    val expenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 支出类型 */
     val secondExpenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 收入类型 */
-    val firstIncomeType: MutableLiveData<TypeEntity> = MutableLiveData()
+    val incomeType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 收入类型 */
     val secondIncomeType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 转账类型 */
-    val firstTransferType: MutableLiveData<TypeEntity> = MutableLiveData()
+    val transferType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 转账类型 */
     val secondTransferType: MutableLiveData<TypeEntity> = MutableLiveData()
@@ -210,8 +211,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     }
 
     /** 是否显示关联记录 */
-    val showAssociatedRecord: LiveData<Boolean> = maps(currentItem, firstIncomeType) {
-        currentItem.value == RecordTypeEnum.INCOME.position && (firstIncomeType.value?.refund.condition || firstIncomeType.value?.reimburse.condition)
+    val showAssociatedRecord: LiveData<Boolean> = maps(currentItem, incomeType) {
+        currentItem.value == RecordTypeEnum.INCOME.position && (incomeType.value?.refund.condition || incomeType.value?.reimburse.condition)
     }
 
     /** 关联记录数据 */
@@ -289,7 +290,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
 
     /** 关联记录点击 */
     val onAssociatedRecordClick: () -> Unit = {
-        jumpSelectAssociatedRecordEvent.value = firstIncomeType.value?.refund.condition
+        jumpSelectAssociatedRecordEvent.value = incomeType.value?.refund.condition
     }
 
     /** 金额点击 */
@@ -310,39 +311,32 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
             return
         }
         val amount = calculatorStr.get().moneyFormat()
-        val firstType = when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
+        val typeValue = when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
             RecordTypeEnum.EXPENDITURE.position -> {
                 // 支出
-                firstExpenditureType
+                expenditureType
             }
             RecordTypeEnum.INCOME.position -> {
                 // 收入
-                firstIncomeType
+                incomeType
             }
             else -> {
                 // 转账
-                firstTransferType
+                transferType
             }
         }.value
-        if (null == firstType) {
+        if (null == typeValue) {
             // 未选择类型
             snackbarEvent.value = R.string.please_select_type.string.toSnackbarModel()
             return
         }
-        val secondType = when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
-            RecordTypeEnum.EXPENDITURE.position -> {
-                // 支出
-                secondExpenditureType
-            }
-            RecordTypeEnum.INCOME.position -> {
-                // 收入
-                secondIncomeType
-            }
-            else -> {
-                // 转账
-                secondTransferType
-            }
-        }.value
+        val childType = typeValue.childList.firstOrNull { it.selected.get() }
+        val type = if (typeValue.type == TypeEnum.FIRST && typeValue.expand.get() && null != childType) {
+            // 一级菜单，展开且子类型选中
+            childType
+        } else {
+            typeValue
+        }
         val asset = accountData.value
         val intoAsset = if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
             transferAccountData.value
@@ -374,9 +368,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     local.insertRecord(
                         RecordEntity(
                             id = -1,
-                            type = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
-                            firstType = firstType,
-                            secondType = secondType,
+                            typeEnum = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
+                            type = type,
                             asset = asset,
                             intoAsset = intoAsset,
                             booksId = CurrentBooksLiveData.booksId,
@@ -398,9 +391,8 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     // 修改
                     local.updateRecord(
                         record!!.copy(
-                            type = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
-                            firstType = firstType,
-                            secondType = secondType,
+                            typeEnum = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
+                            type = type,
                             asset = accountData.value,
                             intoAsset = intoAsset,
                             record = associatedRecord.value,

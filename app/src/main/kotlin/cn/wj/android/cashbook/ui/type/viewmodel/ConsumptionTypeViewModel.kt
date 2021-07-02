@@ -48,8 +48,24 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
             // 二级类型，更新选中状态
             typeListData.value?.firstOrNull {
                 it.id == item.parent?.id
-            }?.childList?.forEach { it ->
-                it.selected.set(it.id == item.id)
+            }?.let { parent ->
+                if (parent.selected.get() && parent.expand.get()) {
+                    // 已选中且已展开，更新选中状态
+                    parent.childList.forEach {
+                        it.selected.set(it.id == item.id)
+                    }
+                } else {
+                    // 更新选中状态及折叠状态
+                    typeListData.value?.forEach {
+                        val selected = it.id == parent.id
+                        it.selected.set(selected)
+                        it.expand.set(selected)
+                    }
+                    parent.childList.forEach { child ->
+                        child.selected.set(child.id == item.id)
+                    }
+                    secondTypeData.value = parent
+                }
             }
         } else {
             // 一级类型

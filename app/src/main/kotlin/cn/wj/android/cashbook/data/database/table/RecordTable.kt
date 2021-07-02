@@ -13,9 +13,8 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
  * 记录数据库表
  *
  * @param id 主键自增长
- * @param type 记录类型
- * @param firstTypeId 记录一级分类id
- * @param secondTypeId 记录二级分类id
+ * @param typeEnum 记录类型
+ * @param typeId 分类id
  * @param assetId 关联资产 id
  * @param intoAssetId 转账转入资产 id
  * @param booksId 关联账本 id
@@ -35,9 +34,8 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 @Entity(tableName = "db_record")
 data class RecordTable(
     @PrimaryKey(autoGenerate = true) val id: Long?,
-    val type: String,
-    @ColumnInfo(name = "first_type_id") val firstTypeId: Long,
-    @ColumnInfo(name = "second_type_id") val secondTypeId: Long,
+    @ColumnInfo(name = "type_enum") val typeEnum: String,
+    @ColumnInfo(name = "type_id") val typeId: Long,
     @ColumnInfo(name = "asset_id") val assetId: Long,
     @ColumnInfo(name = "into_asset_id") val intoAssetId: Long,
     @ColumnInfo(name = "books_id") val booksId: Long,
@@ -58,9 +56,8 @@ data class RecordTable(
             val ms = System.currentTimeMillis()
             return RecordTable(
                 id = null,
-                type = RecordTypeEnum.MODIFY_BALANCE.name,
-                firstTypeId = -1L,
-                secondTypeId = -1L,
+                typeEnum = RecordTypeEnum.MODIFY_BALANCE.name,
+                typeId = -1L,
                 assetId = assetId,
                 intoAssetId = -1L,
                 booksId = CurrentBooksLiveData.booksId,
