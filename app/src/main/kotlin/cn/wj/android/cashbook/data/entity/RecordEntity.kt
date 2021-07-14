@@ -34,6 +34,7 @@ import kotlinx.parcelize.Parcelize
  * @param recordTime 记录时间
  * @param createTime 创建时间
  * @param modifyTime 修改时间
+ * @param showDate 备注文本是否显示时间
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */

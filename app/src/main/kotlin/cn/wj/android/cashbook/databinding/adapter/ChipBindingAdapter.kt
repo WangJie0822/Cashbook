@@ -34,3 +34,11 @@ fun Chip.freezeCheckedState(checked: Boolean?) {
     }
     isChecked = checked
 }
+
+/** 关闭按钮点击 */
+@BindingAdapter("android:bind_chip_onCloseClick")
+fun Chip.setOnCloseClickListener(onCloseClick: (() -> Unit)?) {
+    this.setOnCloseIconClickListener {
+        onCloseClick?.invoke()
+    }
+}

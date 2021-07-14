@@ -207,10 +207,11 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_associated_record"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    style="@style/Widget.MaterialComponents.Chip.Entry"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:bind_chip_freezeChecked="@{viewModel.associatedRecordChecked}"
+                    android:bind_chip_onCloseClick="@{viewModel.onAssociateRecordCloseClick}"
                     android:bind_onClick="@{viewModel.onAssociatedRecordClick}"
                     android:bind_visibility="@{viewModel.showAssociatedRecord}"
                     android:text="@{viewModel.associatedRecordStr}"

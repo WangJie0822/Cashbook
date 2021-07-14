@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedLong
@@ -228,7 +229,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
         if (null == it) {
             R.string.associated_expenditure_record.string
         } else {
-            R.string.associated_with_colon.string + it.typeStr + it.amountStr
+            "${R.string.associated_with_colon.string}${it.recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)} ${it.typeStr} ${it.amountStr}"
         }
     }
 
@@ -291,6 +292,12 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
     /** 关联记录点击 */
     val onAssociatedRecordClick: () -> Unit = {
         jumpSelectAssociatedRecordEvent.value = incomeType.value?.refund.condition
+    }
+
+    /** 关联记录清除点击 */
+    val onAssociateRecordCloseClick: () -> Unit = {
+        // 清除关联记录
+        associatedRecord.value = null
     }
 
     /** 金额点击 */
