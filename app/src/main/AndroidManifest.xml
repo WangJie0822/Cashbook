@@ -113,7 +113,8 @@
         <activity
             android:name=".ui.record.activity.EditRecordActivity"
             android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- 选择关联记录记录 -->
         <activity
