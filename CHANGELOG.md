@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Changed
+- 修改选择资产弹窗默认高度，优化体验；
 ### Fixed
 - 修复切换账本后新增记录时显示其它账本资产问题；
 
