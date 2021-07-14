@@ -186,7 +186,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
 
     /** 获取资产数据并返回 */
     suspend fun getCurrentAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
-        assetDao.queryByBooksId(CurrentBooksLiveData.booksId).map {
+        assetDao.queryByBooksId().map {
             // 获取余额
             val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
@@ -204,12 +204,12 @@ class LocalDataStore(private val database: CashbookDatabase) {
 
     /** 获取资产数据最大排序数字并返回 */
     suspend fun queryMaxSort(): Int? = withContext(Dispatchers.IO) {
-        assetDao.queryMaxSortByBooksId(CurrentBooksLiveData.booksId)
+        assetDao.queryMaxSortByBooksId()
     }
 
     /** 获取隐藏资产数据并返回 */
     suspend fun getInvisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
-        assetDao.queryInvisibleByBooksId(CurrentBooksLiveData.booksId).map {
+        assetDao.queryInvisibleByBooksId().map {
             //  获取余额
             val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             it.toAssetEntity(balance)
@@ -218,7 +218,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
 
     /** 获取未隐藏资产数据通过记录数量排序 */
     suspend fun getVisibleAssetListSortByRecord(): List<AssetEntity> = withContext(Dispatchers.IO) {
-        assetDao.queryVisibleByBooksId(CurrentBooksLiveData.booksId).map {
+        assetDao.queryVisibleByBooksId().map {
             //  获取余额
             val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
             // 获取记录数
@@ -649,7 +649,7 @@ class LocalDataStore(private val database: CashbookDatabase) {
     ).liveData
 
     /** 获取关联资产 id 为 [assetId] 的记录数量 */
-    suspend fun getRecordCountByAssetId(assetId: Long?): Int = withContext(Dispatchers.IO) {
+    private suspend fun getRecordCountByAssetId(assetId: Long?): Int = withContext(Dispatchers.IO) {
         if (assetId == null) {
             0
         } else {

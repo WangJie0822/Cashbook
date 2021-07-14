@@ -8,6 +8,7 @@ import androidx.room.Update
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.table.AssetTable
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
 /**
  * 资产相关数据库操作接口
@@ -35,21 +36,21 @@ interface AssetDao {
 
     /** 根据 [booksId] 从数据库中查询所有资产数据并返回 */
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId")
-    suspend fun queryByBooksId(booksId: Long): List<AssetTable>
+    suspend fun queryByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
 
     /** 根据 [booksId] 从数据库中查询隐藏资产数据并返回 */
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId AND invisible=${SWITCH_INT_ON}")
-    suspend fun queryInvisibleByBooksId(booksId: Long): List<AssetTable>
+    suspend fun queryInvisibleByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
 
     /** 根据 [booksId] 从数据库中查询未隐藏资产数据并返回 */
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId AND invisible=${SWITCH_INT_OFF}")
-    suspend fun queryVisibleByBooksId(booksId: Long): List<AssetTable>
+    suspend fun queryVisibleByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
 
     /** 从数据库中查询账本id为 [booksId] 的资产中最大的排序 */
     @Query("SELECT MAX(sort) FROM db_asset WHERE books_id=:booksId")
-    suspend fun queryMaxSortByBooksId(booksId: Long): Int?
+    suspend fun queryMaxSortByBooksId(booksId: Long = CurrentBooksLiveData.booksId): Int?
 
     /** 获取 id 为 [id] 的资产 */
-    @Query("SELECT * FROM db_asset WHERE id=:id")
-    suspend fun queryById(id: Long): AssetTable?
+    @Query("SELECT * FROM db_asset WHERE id=:id AND books_id=:booksId")
+    suspend fun queryById(id: Long, booksId: Long = CurrentBooksLiveData.booksId): AssetTable?
 }
