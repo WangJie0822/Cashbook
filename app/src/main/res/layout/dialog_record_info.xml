@@ -55,7 +55,7 @@
                 android:layout_marginEnd="@dimen/spacing_normal"
                 android:background="?selectableItemBackground"
                 android:bind_onClick="@{viewModel.onDeleteClick}"
-                android:bind_visibility="@{item.canModify}"
+                android:bind_visibility="@{item.canDelete}"
                 android:padding="@dimen/spacing_normal"
                 android:text="@string/delete"
                 android:textAppearance="?attr/textAppearanceButton"

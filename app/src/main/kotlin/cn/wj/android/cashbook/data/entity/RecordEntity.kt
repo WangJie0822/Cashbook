@@ -213,6 +213,11 @@ data class RecordEntity(
     val canModify: Boolean
         get() = typeEnum != RecordTypeEnum.MODIFY_BALANCE
 
+    /** 能否删除，系统插入数据无法删除 */
+    @IgnoredOnParcel
+    val canDelete: Boolean
+        get() = !system
+
     /** 是否显示关联信息 */
     @IgnoredOnParcel
     val showAssociated: Boolean
