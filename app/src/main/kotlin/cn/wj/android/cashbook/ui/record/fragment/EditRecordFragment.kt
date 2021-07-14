@@ -62,6 +62,9 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
     override fun observe() {
         // 类型列表
         typeViewModel.typeListData.observe(this, { list ->
+            adapter.adapters.forEach {
+                adapter.removeAdapter(it)
+            }
             var ls: ArrayList<TypeEntity> = arrayListOf()
             list.forEachIndexed { index, entity ->
                 val mod = index % 5
@@ -76,17 +79,28 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
             adapter.addAdapter(OneItemAdapter(R.layout.recycler_footer_type_setting) {
                 typeViewModel.onTypeSettingClick.invoke()
             })
-            val record = viewModel.record
-            if (null == record || record.typeEnum != typeViewModel.typeData.value) {
+            val typeValue = when (typeViewModel.typeData.value.orElse(RecordTypeEnum.EXPENDITURE)) {
+                RecordTypeEnum.EXPENDITURE -> {
+                    // 支出
+                    viewModel.expenditureType
+                }
+                RecordTypeEnum.INCOME -> {
+                    // 收入
+                    viewModel.incomeType
+                }
+                else -> {
+                    // 转账
+                    viewModel.transferType
+                }
+            }.value
+            if (null == typeValue) {
                 // 默认选中第一条
                 val firstItem = list.firstOrNull()
                 firstItem?.let { first ->
                     typeViewModel.onTypeItemClick.invoke(first)
                 }
             } else {
-                record.type?.let {
-                    typeViewModel.onTypeItemClick.invoke(it)
-                }
+                typeViewModel.onTypeItemClick.invoke(typeValue)
             }
         })
         // 二级类型状态

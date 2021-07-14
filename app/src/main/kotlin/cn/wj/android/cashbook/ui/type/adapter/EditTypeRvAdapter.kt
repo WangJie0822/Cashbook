@@ -24,15 +24,17 @@ class EditTypeRvAdapter : BaseRvListDBAdapter<
         EditTypeRvAdapter.ViewHolder,
         RecyclerItemEditTypeFirstBinding,
         TypListViewModel,
-        TypeEntity>(diffCallback = object : DiffUtil.ItemCallback<TypeEntity>() {
-    override fun areItemsTheSame(oldItem: TypeEntity, newItem: TypeEntity): Boolean {
-        return oldItem.id == newItem.id
-    }
+        TypeEntity>(
+    diffCallback = object : DiffUtil.ItemCallback<TypeEntity>() {
+        override fun areItemsTheSame(oldItem: TypeEntity, newItem: TypeEntity): Boolean {
+            return oldItem === newItem && oldItem.id == newItem.id
+        }
 
-    override fun areContentsTheSame(oldItem: TypeEntity, newItem: TypeEntity): Boolean {
-        return oldItem.toString() == newItem.toString()
+        override fun areContentsTheSame(oldItem: TypeEntity, newItem: TypeEntity): Boolean {
+            return oldItem.toString() == newItem.toString()
+        }
     }
-}) {
+) {
 
     override val layoutResId: Int = R.layout.recycler_item_edit_type_first
 

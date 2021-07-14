@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
+import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_REPLACE
 import cn.wj.android.cashbook.data.entity.TypeEntity
@@ -19,6 +20,7 @@ import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 
 /**
@@ -27,6 +29,9 @@ import kotlinx.coroutines.launch
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/29
  */
 class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
+
+    /** 记录展开类型的 id */
+    private var expandTypeId = -1L
 
     /** 显示编辑类型菜单弹窗事件 */
     val showEditTypeMenuEvent: LifecycleEvent<TypeEntity> = LifecycleEvent()
@@ -69,6 +74,9 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
             } else {
                 it.expand.set(false)
             }
+            if (it.expand.get()) {
+                expandTypeId = it.id
+            }
         }
     }
 
@@ -93,7 +101,12 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
     fun loadTypeList() {
         viewModelScope.launch {
             try {
-                listData.value = local.getTypeListByType(typeData.value.orElse(RecordTypeEnum.EXPENDITURE))
+                val typeList = local.getTypeListByType(typeData.value.orElse(RecordTypeEnum.EXPENDITURE))
+                // 修正已展开的数据
+                typeList.firstOrNull {
+                    it.id == expandTypeId
+                }?.expand?.set(true)
+                listData.value = typeList
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getTypeListByType")
             }
@@ -150,27 +163,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 }
                 local.deleteType(type)
                 // 删除成功，刷新列表
-                val ls = listData.value.toNewList()
-                if (type.type == TypeEnum.FIRST) {
-                    // 一级分类，直接移除
-                    val index = ls.indexOfFirst { it.id == type.id }
-                    if (index >= 0) {
-                        ls.removeAt(index)
-                    }
-                } else {
-                    // 二级分类
-                    val index = ls.indexOfFirst { it.id == type.parent?.id }
-                    if (index >= 0) {
-                        val parent = ls[index]
-                        val childLs = parent.childList.toNewList()
-                        val i = childLs.indexOfFirst { it.id == type.id }
-                        if (i >= 0) {
-                            childLs.removeAt(i)
-                        }
-                        ls[index] = parent.copy(childList = childLs)
-                    }
-                }
-                listData.value = ls
+                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
                 snackbarEvent.value = R.string.delete_success.string.toSnackbarModel()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "deleteType")

@@ -67,6 +67,20 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 this@EditRecordViewModel.chargeStr.value = charge
                 this@EditRecordViewModel.remarkStr.value = remark
                 reimbursableChecked.value = reimbursable
+                when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
+                    RecordTypeEnum.EXPENDITURE.position -> {
+                        // 支出
+                        expenditureType
+                    }
+                    RecordTypeEnum.INCOME.position -> {
+                        // 收入
+                        incomeType
+                    }
+                    else -> {
+                        // 转账
+                        transferType
+                    }
+                }.value = type
             }
         }
 
