@@ -219,4 +219,19 @@
     <string name="replace_type_hint_format">此分类下已有%1$s条记录，如果删除，请给这些记录选择一个新的分类。</string>
     <string name="please_select_new_type">请选择新的类型</string>
     <string name="modify_success">修改成功</string>
+    <string name="calendar">日历</string>
+    <string name="no_data_record">还没有记录哦！</string>
+    <string name="january">一月</string>
+    <string name="february">二月</string>
+    <string name="march">三月</string>
+    <string name="april">四月</string>
+    <string name="may">五月</string>
+    <string name="june">六月</string>
+    <string name="july">七月</string>
+    <string name="august">八月</string>
+    <string name="september">九月</string>
+    <string name="october">十月</string>
+    <string name="november">十一月</string>
+    <string name="december">十二月</string>
+    <string name="year">年</string>
 </resources>

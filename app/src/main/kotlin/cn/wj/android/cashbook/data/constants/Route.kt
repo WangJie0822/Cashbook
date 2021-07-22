@@ -30,6 +30,9 @@ const val ROUTE_PATH_EDIT_RECORD = "/path/record/edit"
 /** 路由路径 - 编辑记录 */
 const val ROUTE_PATH_SELECT_ASSOCIATED_RECORD = "/path/record/selectAssociated"
 
+/** 路由路径 - 日历记录 */
+const val ROUTE_PATH_CALENDAR_RECORD = "/path/record/calendar"
+
 /** 路由路径 - 编辑资产 */
 const val ROUTE_PATH_EDIT_ASSET = "/path/asset/edit"
 

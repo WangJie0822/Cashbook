@@ -81,3 +81,12 @@ fun TabLayout.addOnSelectedListener(
         }
     })
 }
+
+/** 设置标签列表 */
+@BindingAdapter("android:bind_tl_tabs")
+fun TabLayout.setTabList(list: List<Any>) {
+    removeAllTabs()
+    list.forEach {
+        addTab(newTab().setText(it.toString()))
+    }
+}

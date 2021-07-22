@@ -5,17 +5,17 @@
     tools:showIn="toolbar">
 
     <item
-        android:id="@+id/search"
-        android:icon="@drawable/vector_baseline_search_24"
+        android:id="@+id/calendar"
+        android:icon="@drawable/vector_calendar_24"
         android:iconTint="@color/color_on_primary"
-        android:title="@string/search"
+        android:title="@string/calendar"
         app:iconTint="@color/color_on_primary"
         app:showAsAction="ifRoom"
         tools:targetApi="o" />
 
     <item
         android:id="@+id/my_asset"
-        android:icon="@drawable/vector_baseline_web_asset_24"
+        android:icon="@drawable/vector_asset_24"
         android:iconTint="@color/color_on_primary"
         android:title="@string/my_asset"
         app:iconTint="@color/color_on_primary"

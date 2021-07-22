@@ -34,12 +34,14 @@ import cn.wj.android.cashbook.ui.main.viewmodel.MarkdownViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.CalendarViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.SelectYearMonthViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeMenuViewModel
@@ -198,6 +200,9 @@ val viewModelModule = module {
     viewModel {
         ReplaceTypeViewModel(get())
     }
+    viewModel {
+        CalendarViewModel(get())
+    }
 
     // Fragment
     viewModel {
@@ -243,5 +248,8 @@ val viewModelModule = module {
     }
     viewModel {
         EditTypeMenuViewModel()
+    }
+    viewModel {
+        SelectYearMonthViewModel()
     }
 }

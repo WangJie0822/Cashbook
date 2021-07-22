@@ -757,4 +757,125 @@ class LocalDataStore(private val database: CashbookDatabase) {
     suspend fun getTypeCountByName(name: String): Long = withContext(Dispatchers.IO) {
         typeDao.getCountByName(name)
     }
+
+
+    /** 获取指定日期的记录数据 */
+    suspend fun getRecordListByDate(calendar: com.haibin.calendarview.Calendar): List<DateRecordEntity> = withContext(Dispatchers.IO) {
+        // 首页显示一周内数据
+        val result = arrayListOf<DateRecordEntity>()
+        val year = calendar.year
+        val month = calendar.month
+        val day = calendar.day
+        val monthStr = if (month < 10) "0$month" else "$month"
+        val dayStr = if (day < 10) "0$day" else "$day"
+        val startTime = "$year-$monthStr-$dayStr 00:00:00".toLongTime() ?: return@withContext result
+        val endTime = "$year-$monthStr-$dayStr 23:59:59".toLongTime() ?: return@withContext result
+        val list = recordDao.queryRecordBetweenTimeByBooksId(CurrentBooksLiveData.booksId, startTime, endTime).filter {
+            it.system != SWITCH_INT_ON
+        }
+        val map = hashMapOf<String, MutableList<RecordEntity>>()
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
+        val today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        for (item in list) {
+            val dateKey = item.recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)
+            val yearInt = item.recordTime.dateFormat().split("-").firstOrNull()?.toIntOrNull().orElse(-1)
+            val monthInt = dateKey.split(".").firstOrNull()?.toIntOrNull().orElse(-1)
+            val dayInt = dateKey.split(".").lastOrNull()?.toIntOrNull().orElse(-1)
+            val key = dateKey + if (yearInt == currentYear && monthInt == currentMonth) {
+                when (dayInt) {
+                    today -> {
+                        // 今天
+                        " ${R.string.today.string}"
+                    }
+                    today - 1 -> {
+                        // 昨天
+                        " ${R.string.yesterday.string}"
+                    }
+                    today - 2 -> {
+                        // 前天
+                        " ${R.string.the_day_before_yesterday.string}"
+                    }
+                    else -> {
+                        ""
+                    }
+                }
+            } else {
+                ""
+            }
+            val value = loadRecordEntityFromTable(item, false) ?: continue
+            if (key.isNotBlank()) {
+                if (map.containsKey(key)) {
+                    map[key]!!.add(value)
+                } else {
+                    map[key] = arrayListOf(value)
+                }
+            }
+        }
+        map.keys.forEach { key ->
+            result.add(
+                DateRecordEntity(
+                    date = key,
+                    list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+                )
+            )
+        }
+        result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
+    }
+
+    /** 根据日期获取当月每天数据结余 */
+    suspend fun getCalendarSchemesByDate(calendar: com.haibin.calendarview.Calendar): Map<String, com.haibin.calendarview.Calendar> = withContext(Dispatchers.IO) {
+        val result = hashMapOf<String, com.haibin.calendarview.Calendar>()
+        val year = calendar.year
+        val month = calendar.month
+        val monthStr = if (month < 10) "0$month" else "$month"
+        val cal = Calendar.getInstance()
+        cal.set(year, month - 1, 1)
+        cal.add(Calendar.MONTH, 1)
+        cal.add(Calendar.DAY_OF_YEAR, -1)
+        val endDay = cal.get(Calendar.DAY_OF_MONTH)
+        val endDayStr = if (endDay < 10) "0$endDay" else "$endDay"
+        val startTime = "$year-$monthStr-01 00:00:00".toLongTime() ?: return@withContext result
+        val endTime = "$year-$monthStr-$endDayStr 23:59:59".toLongTime() ?: return@withContext result
+        val map = recordDao.queryRecordBetweenTimeByBooksId(CurrentBooksLiveData.booksId, startTime, endTime).filter {
+            it.system != SWITCH_INT_ON
+        }.mapNotNull {
+            loadRecordEntityFromTable(it, false)
+        }.groupBy {
+            it.recordTime.dateFormat(DATE_FORMAT_DATE)
+        }
+        for ((date, list) in map) {
+            var amount = "0".toBigDecimal()
+            list.forEach {
+                when (it.typeEnum) {
+                    RecordTypeEnum.EXPENDITURE -> {
+                        // 支出
+                        amount -= it.amount.toBigDecimal()
+                    }
+                    RecordTypeEnum.INCOME -> {
+                        // 收入
+                        amount += it.amount.toBigDecimal()
+                    }
+                    RecordTypeEnum.TRANSFER -> {
+                        // 转账
+                        if (it.charge.toFloatOrNull().orElse(0f) > 0f) {
+                            // 有手续费
+                            amount -= it.charge.toBigDecimal()
+                        }
+                    }
+                    else -> {
+                    }
+                }
+            }
+            val amountStr = amount.formatToNumber()
+            val value = com.haibin.calendarview.Calendar().apply {
+                this.year = year
+                this.month = month
+                this.day = date.split("-").last().toInt()
+                this.scheme = amountStr
+            }
+            result[value.toString()] = value
+        }
+        result
+    }
 }

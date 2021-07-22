@@ -174,7 +174,7 @@
 
                         <include
                             android:id="@+id/include_no_data"
-                            layout="@layout/layout_no_data_record"
+                            layout="@layout/layout_no_data"
                             tools:visibility="gone" />
 
                         <com.google.android.material.card.MaterialCardView

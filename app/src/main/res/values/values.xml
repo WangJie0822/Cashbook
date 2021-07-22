@@ -11,4 +11,8 @@
     <!-- SwipeRefresh 进度条颜色 -->
     <string name="swipe_refresh_scheme_colors" translatable="false">\@color/color_primary,\@color/color_secondary_variant,\@color/color_secondary,\@color/color_primary_variant</string>
 
+    <!-- 日历视图类路径 -->
+    <string name="calendar_month_view_path" translatable="false">cn.wj.android.cashbook.widget.calendar.MonthView</string>
+    <string name="calendar_week_view_path" translatable="false">cn.wj.android.cashbook.widget.calendar.WeekView</string>
+
 </resources>

@@ -251,6 +251,9 @@ dependencies {
     // Markdown 解析
     implementation(Dependencies.Markwon.markwon)
 
+    // 日历控件
+    implementation(Dependencies.calendar_view)
+
     // 测试
     testImplementation(Dependencies.testJunit)
     androidTestImplementation(Dependencies.Androidx.Test.rules)

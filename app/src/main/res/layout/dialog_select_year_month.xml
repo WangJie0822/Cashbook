@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="cn.wj.android.cashbook.ui.record.viewmodel.SelectYearMonthViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:background="@color/color_surface">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:bind_tl_currentItem="@={viewModel.yearCurrentItem}"
+            android:bind_tl_tabs="@{viewModel.tabs}"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="?attr/colorPrimary"
+            app:tabTextColor="?attr/colorOnSurface" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{1}"
+                android:bind_selected="@{viewModel.selectedMonth == 1}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/january"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{2}"
+                android:bind_selected="@{viewModel.selectedMonth == 2}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/february"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{3}"
+                android:bind_selected="@{viewModel.selectedMonth == 3}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/march"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{4}"
+                android:bind_selected="@{viewModel.selectedMonth == 4}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/april"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{5}"
+                android:bind_selected="@{viewModel.selectedMonth == 5}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/may"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{6}"
+                android:bind_selected="@{viewModel.selectedMonth == 6}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/june"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{7}"
+                android:bind_selected="@{viewModel.selectedMonth == 7}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/july"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{8}"
+                android:bind_selected="@{viewModel.selectedMonth == 8}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/august"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{9}"
+                android:bind_selected="@{viewModel.selectedMonth == 9}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/september"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{10}"
+                android:bind_selected="@{viewModel.selectedMonth == 10}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/october"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{11}"
+                android:bind_selected="@{viewModel.selectedMonth == 11}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/november"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMonthClick}"
+                android:bind_onClick_item="@{12}"
+                android:bind_selected="@{viewModel.selectedMonth == 12}"
+                android:gravity="center"
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/december"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textColor="@color/selector_month_text" />
+
+        </GridLayout>
+
+    </LinearLayout>
+
+</layout>

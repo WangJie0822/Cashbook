@@ -24,8 +24,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/spacing_normal"
-        android:paddingEnd="@dimen/spacing_normal"
-        tools:background="@color/white">
+        android:paddingEnd="@dimen/spacing_normal">
 
         <ImageView
             android:layout_width="@dimen/icon_size_larger"

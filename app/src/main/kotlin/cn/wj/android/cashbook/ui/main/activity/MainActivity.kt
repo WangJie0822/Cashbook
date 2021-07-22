@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
-import cn.wj.android.cashbook.databinding.LayoutNoDataRecordBinding
+import cn.wj.android.cashbook.databinding.LayoutNoDataBinding
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
@@ -56,7 +56,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         binding.includeContent.rv.run {
             layoutManager = WrapContentLinearLayoutManager()
             adapter = this@MainActivity.adapter.apply {
-                setEmptyView(LayoutNoDataRecordBinding.inflate(LayoutInflater.from(context)).apply {
+                setEmptyView(LayoutNoDataBinding.inflate(LayoutInflater.from(context)).apply {
                     viewModel = NoDataModel(R.string.no_bill_hint)
                 }.root)
             }

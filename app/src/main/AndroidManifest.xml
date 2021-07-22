@@ -116,9 +116,15 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
-        <!-- 选择关联记录记录 -->
+        <!-- 选择关联记录 -->
         <activity
             android:name=".ui.record.activity.SelectAssociatedRecordActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
+        <!-- 日历记录 -->
+        <activity
+            android:name=".ui.record.activity.CalendarActivity"
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
 

@@ -15,6 +15,7 @@ import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_CALENDAR_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
@@ -139,8 +140,11 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     /** 标题栏菜单点击 */
     val onToolbarMenuClick: (Int) -> Unit = { menuId ->
         when (menuId) {
-            R.id.search -> {
-                // TODO 跳转搜索
+            R.id.calendar -> {
+                // 跳转日历
+                uiNavigationEvent.value = UiNavigationModel.builder {
+                    jump(ROUTE_PATH_CALENDAR_RECORD)
+                }
             }
             R.id.my_asset -> {
                 // 跳转我的资产

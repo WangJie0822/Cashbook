@@ -663,4 +663,10 @@ object Dependencies {
 
         const val markwon = "io.noties.markwon:core:$version"
     }
+
+    /**
+     * 日历控件
+     * - [Github](https://github.com/huanghaibin-dev/CalendarView)
+     */
+    const val calendar_view = "com.haibin:calendarview:3.7.1"
 }
