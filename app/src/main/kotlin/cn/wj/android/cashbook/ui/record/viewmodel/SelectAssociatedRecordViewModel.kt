@@ -56,7 +56,7 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
 
     /** 搜索结果数据 */
     private val searchListData: LiveData<List<RecordEntity>> = searchText.switchMap {
-        searchDataListByRemarkOrAmount(it)
+        searchDataListByKeyword(it)
     }
 
     /** 显示列表数据 */
@@ -122,7 +122,7 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
     }
 
     /** 根据关键字 [keywords] 搜索备注或金额 */
-    private fun searchDataListByRemarkOrAmount(keywords: String): LiveData<List<RecordEntity>> {
+    private fun searchDataListByKeyword(keywords: String): LiveData<List<RecordEntity>> {
         val result = MutableLiveData<List<RecordEntity>>()
         viewModelScope.launch {
             try {
@@ -132,15 +132,15 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
                     }
                     refund.value.condition -> {
                         // 退款
-                        local.getExpenditureRecordByRemarkOrAmount(keywords)
+                        local.getExpenditureRecordByKeyword(keywords)
                     }
                     else -> {
                         // 报销
-                        local.getReimburseExpenditureRecordByRemarkOrAmount(keywords)
+                        local.getReimburseExpenditureRecordByKeyword(keywords)
                     }
                 }
             } catch (throwable: Throwable) {
-                logger().e(throwable, "searchDataListByRemarkOrAmount")
+                logger().e(throwable, "searchDataListByKeyword")
             }
         }
         return result

@@ -5,9 +5,11 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.table.RecordTable
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
 /**
  * 记录相关数据库操作接口
@@ -85,19 +87,11 @@ interface RecordDao {
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND type_enum=:type AND books_id=:booksId AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC")
     suspend fun queryReimburseExpenditureRecordAfterDate(booksId: Long, recordTime: Long, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 
-    /** 查询备注满足 [remark] 条件的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND remark LIKE :remark ORDER BY record_time DESC LIMIT 30")
-    suspend fun queryExpenditureRecordByRemark(booksId: Long, remark: String, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
+    /** 查询金额或备注满足 [keyword] 条件的前 30 条支出记录 */
+    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND reimbursable=$SWITCH_INT_OFF AND (remark LIKE :keyword OR amount LIKE :keyword) ORDER BY record_time DESC LIMIT 30")
+    suspend fun queryExpenditureRecordByKeyword(keyword: String, booksId: Long = CurrentBooksLiveData.booksId, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 
-    /** 查询金额等于 [amount] 的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND amount=:amount ORDER BY record_time DESC LIMIT 30")
-    suspend fun queryExpenditureRecordByAmount(booksId: Long, amount: Float, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
-
-    /** 查询备注满足 [remark] 条件的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND remark LIKE :remark AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
-    suspend fun queryReimburseExpenditureRecordByRemark(booksId: Long, remark: String, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
-
-    /** 查询金额等于 [amount] 的前 30 条支出记录 */
-    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND amount=:amount AND reimbursable=$SWITCH_INT_ON ORDER BY record_time DESC LIMIT 30")
-    suspend fun queryReimburseExpenditureRecordByAmount(booksId: Long, amount: Float, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
+    /** 查询金额或备注满足 [keyword] 条件的前 30 条支出记录 */
+    @Query("SELECT * FROM db_record WHERE type_enum=:type AND books_id=:booksId AND reimbursable=$SWITCH_INT_ON AND (remark LIKE :keyword OR amount LIKE :keyword) ORDER BY record_time DESC LIMIT 30")
+    suspend fun queryReimburseExpenditureRecordByKeyword(keyword: String, booksId: Long = CurrentBooksLiveData.booksId, type: String = RecordTypeEnum.EXPENDITURE.name): List<RecordTable>
 }

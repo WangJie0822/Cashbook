@@ -73,7 +73,7 @@
                 android:bind_search_text="@={viewModel.searchText}"
                 android:iconifiedByDefault="false"
                 android:queryBackground="@color/white"
-                android:queryHint="搜索全部账单备注/金额" />
+                android:queryHint="@string/record_search_hint" />
 
             <View
                 android:layout_width="match_parent"
