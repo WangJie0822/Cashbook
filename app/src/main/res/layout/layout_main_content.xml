@@ -83,6 +83,7 @@
             android:bind_onClick="@{viewModel.onAddClick}"
             android:contentDescription="@null"
             android:tint="@color/color_on_secondary"
+            app:layout_behavior="@string/floating_action_button_hidden_behavior"
             app:srcCompat="@drawable/vector_baseline_add_24" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

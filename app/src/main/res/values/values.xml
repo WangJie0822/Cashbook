@@ -15,4 +15,7 @@
     <string name="calendar_month_view_path" translatable="false">cn.wj.android.cashbook.widget.calendar.MonthView</string>
     <string name="calendar_week_view_path" translatable="false">cn.wj.android.cashbook.widget.calendar.WeekView</string>
 
+    <!-- 浮动按钮上滑隐藏下滑显示 -->
+    <string name="floating_action_button_hidden_behavior" translatable="false">cn.wj.android.cashbook.widget.behavior.FloatingActionHiddenBehavior</string>
+
 </resources>
