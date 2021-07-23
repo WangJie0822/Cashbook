@@ -49,7 +49,7 @@
                     android:bind_fits_status_bar="@{true}"
                     android:bind_toolbar_menuItemClickId="@{viewModel.onToolbarMenuClick}"
                     app:layout_collapseMode="pin"
-                    app:menu="@menu/main_toolbar"
+                    app:menu="@menu/toolbar_main"
                     app:navigationIcon="@drawable/vector_baseline_menu_24"
                     app:navigationIconTint="@color/color_on_primary"
                     app:popupTheme="@style/Theme.Cashbook.PopupOverlay" />

@@ -25,7 +25,7 @@
             android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
             android:bind_toolbar_menuItemClickId="@{viewModel.onToolbarMenuClick}"
             android:bind_toolbar_title="@{viewModel.titleStr}"
-            app:menu="@menu/asset_info_toolbar"
+            app:menu="@menu/toolbar_asset_info"
             app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
             app:navigationIconTint="@color/color_on_primary"
             app:popupTheme="@style/Theme.Cashbook.PopupOverlay"

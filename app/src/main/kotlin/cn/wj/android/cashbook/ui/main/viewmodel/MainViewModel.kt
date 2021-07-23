@@ -15,10 +15,11 @@ import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_CALENDAR_RECORD
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_ASSET
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_MY
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_MY
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_CALENDAR
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
@@ -140,16 +141,22 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     /** 标题栏菜单点击 */
     val onToolbarMenuClick: (Int) -> Unit = { menuId ->
         when (menuId) {
+            R.id.search -> {
+                // 跳转搜索
+                uiNavigationEvent.value = UiNavigationModel.builder {
+                    jump(ROUTE_PATH_RECORD_SEARCH)
+                }
+            }
             R.id.calendar -> {
                 // 跳转日历
                 uiNavigationEvent.value = UiNavigationModel.builder {
-                    jump(ROUTE_PATH_CALENDAR_RECORD)
+                    jump(ROUTE_PATH_RECORD_CALENDAR)
                 }
             }
             R.id.my_asset -> {
                 // 跳转我的资产
                 uiNavigationEvent.value = UiNavigationModel.builder {
-                    jump(ROUTE_PATH_MY_ASSET)
+                    jump(ROUTE_PATH_ASSET_MY)
                 }
             }
         }
@@ -159,7 +166,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     val onMyBooksClick: () -> Unit = {
         // 跳转我的账本界面
         uiNavigationEvent.value = UiNavigationModel.builder {
-            jump(ROUTE_PATH_MY_BOOKS)
+            jump(ROUTE_PATH_BOOKS_MY)
         }
     }
 
@@ -167,7 +174,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     val onMyAssetClick: () -> Unit = {
         // 跳转我的资产
         uiNavigationEvent.value = UiNavigationModel.builder {
-            jump(ROUTE_PATH_MY_ASSET)
+            jump(ROUTE_PATH_ASSET_MY)
         }
     }
 
@@ -199,7 +206,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     val onAddClick: () -> Unit = {
         // 跳转编辑记录界面
         uiNavigationEvent.value = UiNavigationModel.builder {
-            jump(ROUTE_PATH_EDIT_RECORD)
+            jump(ROUTE_PATH_RECORD_EDIT)
         }
     }
 

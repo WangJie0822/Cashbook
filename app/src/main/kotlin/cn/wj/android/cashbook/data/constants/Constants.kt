@@ -52,3 +52,6 @@ const val NOTIFICATION_ID_APP = 2020
 const val NOTIFICATION_ID_UPDATE = 2021
 /** 通知 id - 更新异常 */
 const val NOTIFICATION_ID_UPDATE_ERROR = 2022
+
+/** 默认 - 每页数据 */
+const val DEFAULT_PAGE_SIZE = 20

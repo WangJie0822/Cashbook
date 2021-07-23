@@ -11,7 +11,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MY_BOOKS
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_MY
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMyBooksBinding
@@ -31,7 +31,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于2021/5/25
  */
-@Route(path = ROUTE_PATH_MY_BOOKS)
+@Route(path = ROUTE_PATH_BOOKS_MY)
 class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>() {
 
     override val viewModel: MyBooksViewModel by viewModel()
@@ -90,7 +90,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
             if (null != viewHolder && viewHolder is SimpleRvListAdapter.ViewHolder<*>) {
                 (viewHolder.mBinding as? RecyclerItemBooksBinding)?.ivMore?.let { anchor ->
                     PopupMenu(context, anchor).run {
-                        inflate(R.menu.my_books_more)
+                        inflate(R.menu.menu_my_books_more)
                         setOnMenuItemClickListener { menuItem ->
                             when (menuItem.itemId) {
                                 R.id.modify -> {

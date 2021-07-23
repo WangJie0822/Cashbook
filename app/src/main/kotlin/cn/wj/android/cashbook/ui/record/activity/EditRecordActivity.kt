@@ -13,7 +13,7 @@ import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.EVENT_TAG_CHANGE
 import cn.wj.android.cashbook.data.constants.EVENT_TAG_DELETE
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_EDIT_RECORD
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
@@ -32,7 +32,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
-@Route(path = ROUTE_PATH_EDIT_RECORD)
+@Route(path = ROUTE_PATH_RECORD_EDIT)
 class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordBinding>() {
 
     override val viewModel: EditRecordViewModel by viewModel()

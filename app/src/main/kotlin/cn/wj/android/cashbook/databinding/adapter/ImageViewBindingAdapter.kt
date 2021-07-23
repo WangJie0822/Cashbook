@@ -9,7 +9,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.databinding.BindingAdapter
 import cn.wj.android.cashbook.databinding.constants.RESOURCE_MARK
-import cn.wj.android.databinding.adapter.getIdentifier
+import cn.wj.android.cashbook.databinding.utils.getIdentifier
 import coil.load
 import java.io.File
 

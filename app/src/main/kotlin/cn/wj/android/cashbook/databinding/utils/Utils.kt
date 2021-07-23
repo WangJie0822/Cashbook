@@ -1,4 +1,4 @@
-package cn.wj.android.databinding.adapter
+package cn.wj.android.cashbook.databinding.utils
 
 import android.content.Context
 import cn.wj.android.cashbook.databinding.constants.RESOURCE_MARK

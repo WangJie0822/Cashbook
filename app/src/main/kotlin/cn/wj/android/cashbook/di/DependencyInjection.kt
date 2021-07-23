@@ -39,6 +39,7 @@ import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.EditTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.SearchRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectYearMonthViewModel
@@ -202,6 +203,9 @@ val viewModelModule = module {
     }
     viewModel {
         CalendarViewModel(get())
+    }
+    viewModel {
+        SearchRecordViewModel(get())
     }
 
     // Fragment

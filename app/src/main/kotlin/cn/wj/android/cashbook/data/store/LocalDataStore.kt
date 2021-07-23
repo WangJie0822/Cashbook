@@ -15,6 +15,7 @@ import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
+import cn.wj.android.cashbook.data.constants.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.dao.AssetDao
@@ -39,7 +40,8 @@ import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
-import cn.wj.android.cashbook.data.source.RecordPagingSource
+import cn.wj.android.cashbook.data.source.AssetRecordPagingSource
+import cn.wj.android.cashbook.data.source.SearchRecordPagingSource
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toAssetTable
 import cn.wj.android.cashbook.data.transform.toBooksEntity
@@ -594,9 +596,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
     }
 
     /** 根据关键字 [keywords] 搜索没有标记为可报销的支出记录 */
-    suspend fun getExpenditureRecordByKeyword(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
+    suspend fun getExpenditureRecordByKeywords(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
         val result = arrayListOf<RecordEntity>()
-        recordDao.queryExpenditureRecordByKeyword("%$keywords%")
+        recordDao.queryExpenditureRecordByKeywords("%$keywords%")
             .forEach { item ->
                 val record = loadRecordEntityFromTable(item, true)
                 if (null != record) {
@@ -610,9 +612,9 @@ class LocalDataStore(private val database: CashbookDatabase) {
     }
 
     /** 根据关键字 [keywords] 搜索可报销的支出记录 */
-    suspend fun getReimburseExpenditureRecordByKeyword(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
+    suspend fun getReimburseExpenditureRecordByKeywords(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
         val result = arrayListOf<RecordEntity>()
-        recordDao.queryReimburseExpenditureRecordByKeyword("%$keywords%")
+        recordDao.queryReimburseExpenditureRecordByKeywords("%$keywords%")
             .forEach { item ->
                 val record = loadRecordEntityFromTable(item, true)
                 if (null != record) {
@@ -632,8 +634,8 @@ class LocalDataStore(private val database: CashbookDatabase) {
 
     /** 根据资产id [assetId] 获取记录 Pager 数据 */
     fun getRecordListByAssetIdPagerData(assetId: Long) = Pager(
-        config = PagingConfig(20),
-        pagingSourceFactory = { RecordPagingSource(assetId, this) }
+        config = PagingConfig(DEFAULT_PAGE_SIZE),
+        pagingSourceFactory = { AssetRecordPagingSource(assetId, this) }
     ).liveData
 
     /** 获取关联资产 id 为 [assetId] 的记录数量 */
@@ -866,4 +868,25 @@ class LocalDataStore(private val database: CashbookDatabase) {
         }
         result
     }
+
+
+    /** 根据关键字 [keywords] 搜索账单记录 */
+    suspend fun getRecordByKeywords(keywords: String, pageNum: Int, pageSize: Int = DEFAULT_PAGE_SIZE): List<RecordEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<RecordEntity>()
+        recordDao.queryRecordByKeywords("%$keywords%", pageNum, pageSize)
+            .forEach { item ->
+                val record = loadRecordEntityFromTable(item, true)
+                if (null != record) {
+                    result.add(record)
+                }
+            }
+        result
+    }
+
+
+    /** 根据资产id [keywords] 获取记录 Pager 数据 */
+    fun getRecordListByKeywordsPagerData(keywords: String) = Pager(
+        config = PagingConfig(DEFAULT_PAGE_SIZE),
+        pagingSourceFactory = { SearchRecordPagingSource(keywords, this) }
+    ).liveData
 }

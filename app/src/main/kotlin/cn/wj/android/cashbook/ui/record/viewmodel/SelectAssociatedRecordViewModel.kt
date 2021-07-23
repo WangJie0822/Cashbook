@@ -132,11 +132,11 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
                     }
                     refund.value.condition -> {
                         // 退款
-                        local.getExpenditureRecordByKeyword(keywords)
+                        local.getExpenditureRecordByKeywords(keywords)
                     }
                     else -> {
                         // 报销
-                        local.getReimburseExpenditureRecordByKeyword(keywords)
+                        local.getReimburseExpenditureRecordByKeywords(keywords)
                     }
                 }
             } catch (throwable: Throwable) {

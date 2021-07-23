@@ -5,7 +5,12 @@ import androidx.paging.PagingState
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.store.LocalDataStore
 
-class RecordPagingSource(private val assetId: Long, private val local: LocalDataStore) : PagingSource<Int, DateRecordEntity>() {
+/**
+ * 资产相关记录数据源
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/15
+ */
+class AssetRecordPagingSource(private val assetId: Long, private val local: LocalDataStore) : PagingSource<Int, DateRecordEntity>() {
 
     override fun getRefreshKey(state: PagingState<Int, DateRecordEntity>): Int? {
         return null

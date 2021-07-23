@@ -19,28 +19,31 @@ const val ROUTE_PATH_MARKDOWN = "/path/main/markdown"
 const val ROUTE_PATH_SETTING = "/path/main/setting"
 
 /** 路由路径 - 我的账本 */
-const val ROUTE_PATH_MY_BOOKS = "/path/books/my"
+const val ROUTE_PATH_BOOKS_MY = "/path/books/my"
 
 /** 路由路径 - 编辑账本 */
-const val ROUTE_PATH_EDIT_BOOKS = "/path/books/edit"
+const val ROUTE_PATH_BOOKS_EDIT = "/path/books/edit"
 
 /** 路由路径 - 编辑记录 */
-const val ROUTE_PATH_EDIT_RECORD = "/path/record/edit"
+const val ROUTE_PATH_RECORD_EDIT = "/path/record/edit"
 
 /** 路由路径 - 编辑记录 */
-const val ROUTE_PATH_SELECT_ASSOCIATED_RECORD = "/path/record/selectAssociated"
+const val ROUTE_PATH_RECORD_SELECT_ASSOCIATED = "/path/record/selectAssociated"
 
 /** 路由路径 - 日历记录 */
-const val ROUTE_PATH_CALENDAR_RECORD = "/path/record/calendar"
+const val ROUTE_PATH_RECORD_CALENDAR = "/path/record/calendar"
+
+/** 路由路径 - 搜索记录 */
+const val ROUTE_PATH_RECORD_SEARCH = "/path/record/search"
 
 /** 路由路径 - 编辑资产 */
-const val ROUTE_PATH_EDIT_ASSET = "/path/asset/edit"
+const val ROUTE_PATH_ASSET_EDIT = "/path/asset/edit"
 
 /** 路由路径 - 我的资产 */
-const val ROUTE_PATH_MY_ASSET = "/path/asset/my"
+const val ROUTE_PATH_ASSET_MY = "/path/asset/my"
 
 /** 路由路径 - 隐藏资产 */
-const val ROUTE_PATH_INVISIBLE_ASSET = "/path/asset/invisible"
+const val ROUTE_PATH_ASSET_INVISIBLE = "/path/asset/invisible"
 
 /** 路由路径 - 资产信息 */
 const val ROUTE_PATH_ASSET_INFO = "/path/asset/info"

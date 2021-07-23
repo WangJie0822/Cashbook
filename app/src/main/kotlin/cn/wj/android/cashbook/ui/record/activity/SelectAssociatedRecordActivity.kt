@@ -9,7 +9,7 @@ import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_CURRENT_AMOUNT
 import cn.wj.android.cashbook.data.constants.ACTION_DATE
 import cn.wj.android.cashbook.data.constants.ACTION_REFUND
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SELECT_ASSOCIATED_RECORD
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SELECT_ASSOCIATED
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.databinding.ActivitySelectAccosiatedRecordBinding
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
@@ -23,7 +23,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/16
  */
-@Route(path = ROUTE_PATH_SELECT_ASSOCIATED_RECORD)
+@Route(path = ROUTE_PATH_RECORD_SELECT_ASSOCIATED)
 class SelectAssociatedRecordActivity : BaseActivity<SelectAssociatedRecordViewModel, ActivitySelectAccosiatedRecordBinding>() {
 
     override val viewModel: SelectAssociatedRecordViewModel by viewModel()

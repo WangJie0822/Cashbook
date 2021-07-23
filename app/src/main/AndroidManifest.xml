@@ -128,6 +128,12 @@
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
 
+        <!-- 搜索记录 -->
+        <activity
+            android:name=".ui.record.activity.SearchRecordActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
         <!-- 编辑资产 -->
         <activity
             android:name=".ui.asset.activity.EditAssetActivity"

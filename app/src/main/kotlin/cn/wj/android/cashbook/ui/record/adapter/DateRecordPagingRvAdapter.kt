@@ -15,7 +15,7 @@ import cn.wj.android.cashbook.widget.recyclerview.holder.BaseRvDBViewHolder
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 
 /**
- * 首页数据列表适配器
+ * 资产记录列表适配器
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/11
  */

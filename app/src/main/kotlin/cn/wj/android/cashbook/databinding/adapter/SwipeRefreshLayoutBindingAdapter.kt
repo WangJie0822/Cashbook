@@ -11,7 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.wj.android.cashbook.base.ext.base.color
 import cn.wj.android.cashbook.databinding.constants.COLOR_MARK
 import cn.wj.android.cashbook.databinding.constants.RESOURCE_MARK
-import cn.wj.android.databinding.adapter.getIdentifier
+import cn.wj.android.cashbook.databinding.utils.getIdentifier
 
 /*
  * SwipeRefreshLayout DataBinding 适配器

@@ -88,7 +88,7 @@ class SelectTagDialog : BaseDialog<SelectTagViewModel, DialogSelectTagBinding>()
             if (null != viewHolder && viewHolder is SimpleRvListAdapter.ViewHolder<*>) {
                 (viewHolder.mBinding as? RecyclerItemTagBinding)?.root?.let { anchor ->
                     PopupMenu(requireContext(), anchor).run {
-                        inflate(R.menu.select_tag_more)
+                        inflate(R.menu.menu_select_tag_more)
                         setOnMenuItemClickListener { menuItem ->
                             when (menuItem.itemId) {
                                 R.id.modify -> {

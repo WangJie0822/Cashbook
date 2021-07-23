@@ -6,7 +6,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.databinding.adapter.getIdentifier
 
 /**
  * DrawerLayout 相关适配器

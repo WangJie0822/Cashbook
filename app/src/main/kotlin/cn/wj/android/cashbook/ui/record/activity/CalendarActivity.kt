@@ -6,7 +6,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_CALENDAR_RECORD
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_CALENDAR
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.databinding.ActivityCalendarBinding
 import cn.wj.android.cashbook.databinding.LayoutNoDataBinding
@@ -24,7 +24,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/15
  */
-@Route(path = ROUTE_PATH_CALENDAR_RECORD)
+@Route(path = ROUTE_PATH_RECORD_CALENDAR)
 class CalendarActivity : BaseActivity<CalendarViewModel, ActivityCalendarBinding>() {
 
     override val viewModel: CalendarViewModel by viewModel()

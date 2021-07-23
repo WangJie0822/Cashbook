@@ -7,6 +7,7 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
@@ -101,6 +102,13 @@ class CalendarViewModel(private val local: LocalDataStore) : BaseViewModel(), Re
     val onBackClick: () -> Unit = {
         uiNavigationEvent.value = UiNavigationModel.builder {
             close()
+        }
+    }
+
+    /** 搜索点击 */
+    val onSearchClick: () -> Unit = {
+        uiNavigationEvent.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_RECORD_SEARCH)
         }
     }
 

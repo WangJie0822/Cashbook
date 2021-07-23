@@ -5,7 +5,10 @@ package cn.wj.android.cashbook.base.ext
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.IdRes
+import androidx.core.view.children
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.tools.getStatusBarHeight
 
@@ -74,5 +77,27 @@ fun View.fitsStatusBar() {
             height = measuredHeight + getStatusBarHeight()
         }
         setPadding(paddingLeft, paddingTop + getStatusBarHeight(), paddingRight, paddingBottom)
+    }
+}
+
+/** 从 [View] 中获取 id 为 [id] 的子 [View] */
+fun View.findChildById(@IdRes id: Int): View? {
+    return when {
+        this.id == id -> {
+            this
+        }
+        this is ViewGroup -> {
+            var result: View? = null
+            this.children.iterator().forEach {
+                val v = it.findChildById(id)
+                if (null != v) {
+                    result = v
+                }
+            }
+            result
+        }
+        else -> {
+            null
+        }
     }
 }

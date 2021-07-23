@@ -24,7 +24,7 @@
             android:background="?attr/colorPrimary"
             android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
             android:bind_toolbar_onClick="@{viewModel.onAddClick}"
-            app:menu="@menu/my_books_toolbar"
+            app:menu="@menu/toolbar_my_books"
             app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
             app:navigationIconTint="@color/color_on_primary"
             app:popupTheme="@style/Theme.Cashbook.PopupOverlay"

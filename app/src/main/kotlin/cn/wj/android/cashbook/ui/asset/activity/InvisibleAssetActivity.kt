@@ -5,7 +5,7 @@ import android.view.View
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_INVISIBLE_ASSET
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INVISIBLE
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.databinding.ActivityInvisibleAssetBinding
@@ -21,7 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/7
  */
-@Route(path = ROUTE_PATH_INVISIBLE_ASSET)
+@Route(path = ROUTE_PATH_ASSET_INVISIBLE)
 class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInvisibleAssetBinding>() {
 
     override val viewModel: InvisibleAssetViewModel by viewModel()
