@@ -3,7 +3,6 @@ package cn.wj.android.cashbook.ui.main.activity
 import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.md2Spanned
-import cn.wj.android.cashbook.base.ext.base.orFalse
 import cn.wj.android.cashbook.base.ext.base.runIfNotNullAndBlank
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
@@ -56,7 +55,7 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
                 .contentStr(info.versionInfo.md2Spanned())
                 .setPositiveAction(R.string.update.string) {
                     // 下载升级
-                    if (isWifiAvailable() || getSharedBoolean(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE).orFalse()) {
+                    if (isWifiAvailable() || getSharedBoolean(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE)) {
                         // WIFI 可用或允许使用流量下载，直接开始下载
                         UpdateManager.startDownload(info)
                         viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()

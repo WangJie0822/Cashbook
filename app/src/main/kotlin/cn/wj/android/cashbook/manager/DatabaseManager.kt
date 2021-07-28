@@ -1,7 +1,6 @@
 package cn.wj.android.cashbook.manager
 
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.drawableString
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
@@ -60,8 +59,7 @@ object DatabaseManager {
 
     /** 初始化消费类型信息 */
     private suspend fun initTypeData(local: LocalDataStore) {
-        val initialized = getSharedBoolean(SHARED_KEY_TYPE_INITIALIZED).condition
-        if (initialized) {
+        if (getSharedBoolean(SHARED_KEY_TYPE_INITIALIZED)) {
             // 已初始化
             return
         }

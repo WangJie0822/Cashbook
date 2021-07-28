@@ -26,7 +26,7 @@ enum class ThemeEnum(val typeStrResId: Int, val mode: Int) {
 
     companion object {
         fun currentTheme(): ThemeEnum {
-            val mode = getSharedInt(SHARED_KEY_THEME_MODE).orElse(-1)
+            val mode = getSharedInt(SHARED_KEY_THEME_MODE)
             return values().firstOrNull { it.mode == mode }.orElse(FOLLOW_SYSTEM)
         }
 

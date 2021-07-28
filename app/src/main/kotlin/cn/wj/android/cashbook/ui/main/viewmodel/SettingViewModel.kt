@@ -3,7 +3,6 @@ package cn.wj.android.cashbook.ui.main.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
-import cn.wj.android.cashbook.base.ext.base.orFalse
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -23,7 +22,14 @@ class SettingViewModel : BaseViewModel() {
     val showSelectThemeDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 是否允许流量下载 */
-    val enableDownloadWithMobileNetwork: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(getSharedBoolean(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE).orFalse()) {
+    val enableDownloadWithMobileNetwork: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>() {
+
+        override fun onActive() {
+            if (null == value) {
+                value = getSharedBoolean(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE)
+            }
+        }
+
         override fun setValue(value: Boolean?) {
             super.setValue(value)
             if (null != value) {

@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.orFalse
-import cn.wj.android.cashbook.base.ext.base.orTrue
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
@@ -58,7 +56,7 @@ class SplashViewModel(private val local: LocalDataStore, private val web: WebDat
             } catch (throwable: Throwable) {
                 logger().e(throwable, "init")
             } finally {
-                if (getSharedBoolean(SHARED_KEY_AGREE_USER_AGREEMENT).orFalse()) {
+                if (getSharedBoolean(SHARED_KEY_AGREE_USER_AGREEMENT)) {
                     // 已同意隐私政策
                     // 消耗的时间
                     val spendMs = (System.currentTimeMillis() - startMs).absoluteValue
@@ -84,7 +82,7 @@ class SplashViewModel(private val local: LocalDataStore, private val web: WebDat
     fun loadPrivacyPolicy() {
         viewModelScope.launch {
             try {
-                val privacyPolicy = web.getPrivacyPolicy(getSharedBoolean(SHARED_KEY_USE_GITEE).orTrue())
+                val privacyPolicy = web.getPrivacyPolicy(getSharedBoolean(SHARED_KEY_USE_GITEE, true))
                 logger().d("loadPrivacyPolicy: $privacyPolicy")
                 // 跳转 Markdown 界面打开
                 uiNavigationEvent.value = UiNavigationModel.builder {

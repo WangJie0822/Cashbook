@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.orTrue
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
@@ -17,6 +16,7 @@ import cn.wj.android.cashbook.data.constants.EMAIL_ADDRESS
 import cn.wj.android.cashbook.data.constants.GITEE_HOMEPAGE
 import cn.wj.android.cashbook.data.constants.GITHUB_HOMEPAGE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MARKDOWN
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
@@ -43,12 +43,35 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
     val jumpBrowserEvent: LifecycleEvent<String> = LifecycleEvent()
 
     /** 是否使用 Gitee */
-    val useGitee: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(getSharedBoolean(SHARED_KEY_USE_GITEE).orTrue()) {
+    val useGitee: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>() {
+
+        override fun onActive() {
+            if (null == value) {
+                value = getSharedBoolean(SHARED_KEY_USE_GITEE, true)
+            }
+        }
 
         override fun setValue(value: Boolean?) {
             super.setValue(value)
             if (null != value) {
                 setSharedBoolean(SHARED_KEY_USE_GITEE, value)
+            }
+        }
+    }
+
+    /** 标记 - 是否自动检查更新 */
+    val autoCheckUpdate: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>() {
+
+        override fun onActive() {
+            if (null == value) {
+                value = getSharedBoolean(SHARED_KEY_AUTO_CHECK_UPDATE, true)
+            }
+        }
+
+        override fun setValue(value: Boolean?) {
+            super.setValue(value)
+            if (null != value) {
+                setSharedBoolean(SHARED_KEY_AUTO_CHECK_UPDATE, value)
             }
         }
     }

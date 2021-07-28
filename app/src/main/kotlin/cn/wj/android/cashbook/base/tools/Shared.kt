@@ -22,8 +22,8 @@ val mmkv: MMKV? by lazy {
 
 /** 根据 [key] 获取对应 [String] 值，没有返回默认 [defaultValue] */
 @JvmOverloads
-fun getSharedString(key: String, defaultValue: String? = null): String? {
-    return mmkv?.decodeString(key, defaultValue)
+fun getSharedString(key: String, defaultValue: String = ""): String {
+    return mmkv?.decodeString(key, defaultValue) ?: defaultValue
 }
 
 /** 使用 [key] 保存对应值 [value] */
@@ -33,8 +33,8 @@ fun setSharedString(key: String, value: String?) {
 
 /** 根据 [key] 获取对应 [Boolean] 值，没有返回默认 [defaultValue] */
 @JvmOverloads
-fun getSharedBoolean(key: String, defaultValue: Boolean = false): Boolean? {
-    return mmkv?.decodeBool(key, defaultValue)
+fun getSharedBoolean(key: String, defaultValue: Boolean = false): Boolean {
+    return mmkv?.decodeBool(key, defaultValue) ?: defaultValue
 }
 
 /** 使用 [key] 保存对应值 [value] */
@@ -54,8 +54,8 @@ fun <T : Parcelable> setSharedParcelable(key: String, value: T?) {
 
 /** 根据 [key] 获取对应 [Long] 值，没有返回默认 [defaultValue] */
 @JvmOverloads
-fun getSharedLong(key: String, defaultValue: Long? = null): Long? {
-    return mmkv?.decodeLong(key, defaultValue.orElse(-1L))
+fun getSharedLong(key: String, defaultValue: Long = -1L): Long {
+    return mmkv?.decodeLong(key, defaultValue) ?: defaultValue
 }
 
 /** 使用 [key] 保存对应值 [value] */
@@ -65,8 +65,8 @@ fun setSharedLong(key: String, value: Long?) {
 
 /** 根据 [key] 获取对应 [Int] 值，没有返回默认 [defaultValue] */
 @JvmOverloads
-fun getSharedInt(key: String, defaultValue: Int? = null): Int? {
-    return mmkv?.decodeInt(key, defaultValue.orElse(-1))
+fun getSharedInt(key: String, defaultValue: Int = -1): Int {
+    return mmkv?.decodeInt(key, defaultValue) ?: -1
 }
 
 /** 使用 [key] 保存对应值 [value] */

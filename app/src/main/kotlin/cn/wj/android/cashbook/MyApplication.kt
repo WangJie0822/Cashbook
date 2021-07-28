@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
 import cn.wj.android.cashbook.di.dataStoreModule
 import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.netModule
+import cn.wj.android.cashbook.di.repositoryModule
 import cn.wj.android.cashbook.di.viewModelModule
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.third.logger.MyFormatStrategy
@@ -65,7 +66,7 @@ class MyApplication : Application() {
         startKoin {
             androidLogger(Level.NONE)
             androidContext(this@MyApplication)
-            modules(listOf(netModule, dbModule, dataStoreModule, viewModelModule))
+            modules(listOf(netModule, dbModule, repositoryModule, dataStoreModule, viewModelModule))
         }
 
         // 初始化 ARouter

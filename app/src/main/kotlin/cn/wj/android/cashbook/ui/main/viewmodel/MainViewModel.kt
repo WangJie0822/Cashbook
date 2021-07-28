@@ -11,7 +11,9 @@ import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
+import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
@@ -22,14 +24,19 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.main.MainRepository
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
+import cn.wj.android.cashbook.manager.UpdateManager
 import kotlinx.coroutines.launch
 
 /**
@@ -37,7 +44,10 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
-class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
+class MainViewModel(private val repository: MainRepository) : BaseViewModel(), RecordListClickListener {
+
+    /** 显示升级提示事件 */
+    val showUpdateDialogEvent: LifecycleEvent<UpdateInfoEntity> = LifecycleEvent()
 
     /** 显示记录详情弹窗事件 */
     val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
@@ -215,11 +225,34 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
         showRecordDetailsDialogEvent.value = item
     }
 
+    /** 检查更新 */
+    fun checkUpdate() {
+        if (!getSharedBoolean(SHARED_KEY_AUTO_CHECK_UPDATE, true)) {
+            // 关闭自动更新
+            return
+        }
+        viewModelScope.launch {
+            try {
+                // 获取 Release 信息
+                val info = repository.queryLatestRelease(getSharedBoolean(SHARED_KEY_USE_GITEE, true))
+                UpdateManager.checkFromInfo(info, {
+                    // 显示升级提示弹窗
+                    showUpdateDialogEvent.value = info
+                }, {
+                    // 不需要升级
+                    snackbarEvent.value = R.string.it_is_the_latest_version.string.toSnackbarModel()
+                })
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "checkUpdate")
+            }
+        }
+    }
+
     /** 获取最近一周数据 */
     private fun loadHomepageList() {
         viewModelScope.launch {
             try {
-                listData.value = local.getHomepageList()
+                listData.value = repository.getHomepageList()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadHomepageList")
             } finally {
@@ -232,7 +265,7 @@ class MainViewModel(private val local: LocalDataStore) : BaseViewModel(), Record
     private fun getCurrentMonthRecord() {
         viewModelScope.launch {
             try {
-                currentMonthRecord.value = local.getCurrentMonthRecord()
+                currentMonthRecord.value = repository.getCurrentMonthRecord()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getCurrentMonthRecord")
             }

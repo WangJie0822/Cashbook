@@ -236,4 +236,5 @@
     <string name="year">年</string>
     <string name="record_search_hint">搜索全部账单备注/金额</string>
     <string name="no_data_search">还没有数据哦，输入关键字搜索</string>
+    <string name="auto_check_update">自动检查更新</string>
 </resources>

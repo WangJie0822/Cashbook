@@ -196,8 +196,8 @@ class LocalDataStore(private val database: CashbookDatabase) {
     }
 
     /** 根据资产 id [assetId] 获取资产数据 */
-    suspend fun findAssetById(assetId: Long?): AssetEntity? = withContext(Dispatchers.IO) {
-        if (null == assetId || assetId < 0) {
+    suspend fun findAssetById(assetId: Long): AssetEntity? = withContext(Dispatchers.IO) {
+        if (assetId < 0) {
             return@withContext null
         }
         val queryById = assetDao.queryById(assetId)
@@ -303,71 +303,6 @@ class LocalDataStore(private val database: CashbookDatabase) {
         ls
     }
 
-    /** 获取 id 为 [assetId] 的资产余额 */
-    private suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
-        if (null == assetId) {
-            return@withContext "0"
-        }
-        val modifyList = recordDao.queryLastModifyRecord(assetId)
-        if (modifyList.isEmpty()) {
-            return@withContext "0"
-        }
-        // 获取最后一条修改数据
-        val lastModify = modifyList.first()
-        // 获取在此之后的所有记录
-        var result = lastModify.amount.toBigDecimalOrZero()
-        val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
-        recordList.forEach {
-            when (it.typeEnum) {
-                RecordTypeEnum.INCOME.name -> {
-                    // 收入
-                    if (creditCard) {
-                        // 信用卡，降低欠款
-                        result -= it.amount.toBigDecimalOrZero()
-                    } else {
-                        result += it.amount.toBigDecimalOrZero()
-                    }
-                }
-                RecordTypeEnum.EXPENDITURE.name -> {
-                    // 支出
-                    if (creditCard) {
-                        // 信用卡，增加欠款
-                        result += it.amount.toBigDecimalOrZero()
-                    } else {
-                        result -= it.amount.toBigDecimalOrZero()
-                    }
-                }
-                RecordTypeEnum.TRANSFER.name -> {
-                    // 转账转出
-                    if (creditCard) {
-                        // 信用卡，增加欠款
-                        result += it.amount.toBigDecimalOrZero()
-                        result += it.charge.toBigDecimalOrZero()
-                    } else {
-                        result -= it.amount.toBigDecimalOrZero()
-                        result -= it.charge.toBigDecimalOrZero()
-                    }
-                }
-            }
-        }
-        // 查询转账转入数据
-        val transferRecordList = recordDao.queryByIntoAssetIdAfterRecordTime(assetId, lastModify.recordTime)
-        transferRecordList.forEach {
-            when (it.typeEnum) {
-                RecordTypeEnum.TRANSFER.name -> {
-                    // 转账转入
-                    if (creditCard) {
-                        // 信用卡，减少欠款
-                        result -= it.amount.toBigDecimalOrZero()
-                    } else {
-                        result += it.amount.toBigDecimalOrZero()
-                    }
-                }
-            }
-        }
-        result.formatToNumber()
-    }
-
     /** 将记录 [record] 插入到数据库并返回生成的主键 id */
     suspend fun insertRecord(record: RecordEntity): Long = withContext(Dispatchers.IO) {
         recordDao.insert(record.toRecordTable())
@@ -439,6 +374,71 @@ class LocalDataStore(private val database: CashbookDatabase) {
             )
         }
         result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
+    }
+
+    /** 获取 id 为 [assetId] 的资产余额 */
+    private suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
+        if (null == assetId) {
+            return@withContext "0"
+        }
+        val modifyList = recordDao.queryLastModifyRecord(assetId)
+        if (modifyList.isEmpty()) {
+            return@withContext "0"
+        }
+        // 获取最后一条修改数据
+        val lastModify = modifyList.first()
+        // 获取在此之后的所有记录
+        var result = lastModify.amount.toBigDecimalOrZero()
+        val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
+        recordList.forEach {
+            when (it.typeEnum) {
+                RecordTypeEnum.INCOME.name -> {
+                    // 收入
+                    if (creditCard) {
+                        // 信用卡，降低欠款
+                        result -= it.amount.toBigDecimalOrZero()
+                    } else {
+                        result += it.amount.toBigDecimalOrZero()
+                    }
+                }
+                RecordTypeEnum.EXPENDITURE.name -> {
+                    // 支出
+                    if (creditCard) {
+                        // 信用卡，增加欠款
+                        result += it.amount.toBigDecimalOrZero()
+                    } else {
+                        result -= it.amount.toBigDecimalOrZero()
+                    }
+                }
+                RecordTypeEnum.TRANSFER.name -> {
+                    // 转账转出
+                    if (creditCard) {
+                        // 信用卡，增加欠款
+                        result += it.amount.toBigDecimalOrZero()
+                        result += it.charge.toBigDecimalOrZero()
+                    } else {
+                        result -= it.amount.toBigDecimalOrZero()
+                        result -= it.charge.toBigDecimalOrZero()
+                    }
+                }
+            }
+        }
+        // 查询转账转入数据
+        val transferRecordList = recordDao.queryByIntoAssetIdAfterRecordTime(assetId, lastModify.recordTime)
+        transferRecordList.forEach {
+            when (it.typeEnum) {
+                RecordTypeEnum.TRANSFER.name -> {
+                    // 转账转入
+                    if (creditCard) {
+                        // 信用卡，减少欠款
+                        result -= it.amount.toBigDecimalOrZero()
+                    } else {
+                        result += it.amount.toBigDecimalOrZero()
+                    }
+                }
+            }
+        }
+        result.formatToNumber()
     }
 
     /** 根据 [record] 数据获取 [RecordEntity] 数据并返回 */

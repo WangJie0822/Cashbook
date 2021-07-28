@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.net.UrlDefinition
 import cn.wj.android.cashbook.data.net.WebService
+import cn.wj.android.cashbook.data.repository.main.MainRepository
 import cn.wj.android.cashbook.data.store.LocalDataStore
 import cn.wj.android.cashbook.data.store.WebDataStore
 import cn.wj.android.cashbook.manager.AppManager
@@ -144,6 +145,13 @@ val dataStoreModule = module {
     }
     factory {
         WebDataStore(get())
+    }
+}
+
+/** 输出仓库相关依赖注入 */
+val repositoryModule = module {
+    factory {
+        MainRepository(get(), get())
     }
 }
 
