@@ -1,7 +1,6 @@
 package cn.wj.android.cashbook.ui.asset.activity
 
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
@@ -54,10 +53,8 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
     override fun observe() {
         // 数据列表
         viewModel.recordListData.observe(this, { list ->
-            lifecycleScope.launchWhenCreated {
-                pagingAdapter.submitData(list)
-                viewModel.refreshing.value = false
-            }
+            pagingAdapter.submitData(this.lifecycle, list)
+            viewModel.refreshing.value = false
         })
         // 刷新数据
         viewModel.refreshing.observe(this, {

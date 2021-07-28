@@ -1,7 +1,7 @@
 package cn.wj.android.cashbook.ui.record.activity
 
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
@@ -37,27 +37,29 @@ class SearchRecordActivity : BaseActivity<SearchRecordViewModel, ActivitySearchR
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_record)
 
-        // 配置 SearchView
-        binding.sv.run {
-            onActionViewExpanded()
-            setOnCloseListener {
-                true
-            }
-        }
         // 配置 RecyclerView
         binding.rv.run {
             layoutManager = WrapContentLinearLayoutManager()
-            adapter = this@SearchRecordActivity.adapter
+            adapter = this@SearchRecordActivity.adapter.apply {
+                registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+
+                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                        this@SearchRecordActivity.viewModel.showNoData.value = this@apply.itemCount <= 0
+                    }
+
+                    override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                        this@SearchRecordActivity.viewModel.showNoData.value = this@apply.itemCount <= 0
+                    }
+                })
+            }
         }
     }
 
     override fun observe() {
         // 列表数据
         viewModel.listData.observe(this, { list ->
-            lifecycleScope.launchWhenCreated {
-                adapter.submitData(list)
-                viewModel.refreshing.value = false
-            }
+            adapter.submitData(this.lifecycle, list)
+            viewModel.refreshing.value = false
         })
         // 刷新数据
         viewModel.refreshing.observe(this, {
