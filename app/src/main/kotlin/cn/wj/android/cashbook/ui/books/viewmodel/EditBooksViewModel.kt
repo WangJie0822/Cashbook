@@ -13,7 +13,7 @@ import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.books.BooksRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import kotlinx.coroutines.launch
 
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/27
  */
-class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class EditBooksViewModel(private val repository: BooksRepository) : BaseViewModel() {
 
     /** 旧数据 */
     var oldBooks: BooksEntity? = null
@@ -93,7 +93,7 @@ class EditBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 }
                 if (null == oldBooks) {
                     // 新增数据，判断名称是否已存在
-                    if (local.getBooksCountByName(name) > 0) {
+                    if (repository.hasBooksCountByName(name)) {
                         booksNameError.set(R.string.books_name_already_exists.string)
                         return@launch
                     }

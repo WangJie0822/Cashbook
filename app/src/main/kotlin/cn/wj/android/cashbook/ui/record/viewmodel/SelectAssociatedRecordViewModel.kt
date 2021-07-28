@@ -17,7 +17,7 @@ import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/16
  */
-class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
+class SelectAssociatedRecordViewModel(private val repository: RecordRepository) : BaseViewModel(), RecordListClickListener {
 
     /** 标记 - 是否是退款 */
     val refund: MutableLiveData<Boolean> = MutableLiveData()
@@ -109,10 +109,10 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
             try {
                 result.value = if (refund) {
                     // 退款
-                    local.getLastThreeMonthExpenditureRecordLargerThanAmount(amount.value.orEmpty())
+                    repository.getLastThreeMonthExpenditureRecordLargerThanAmount(amount.value.orEmpty())
                 } else {
                     // 报销
-                    local.getLastThreeMonthReimburseExpenditureRecord()
+                    repository.getLastThreeMonthReimburseExpenditureRecord()
                 }
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getDefaultDataList")
@@ -132,11 +132,11 @@ class SelectAssociatedRecordViewModel(private val local: LocalDataStore) : BaseV
                     }
                     refund.value.condition -> {
                         // 退款
-                        local.getExpenditureRecordByKeywords(keywords)
+                        repository.getExpenditureRecordByKeywords(keywords)
                     }
                     else -> {
                         // 报销
-                        local.getReimburseExpenditureRecordByKeywords(keywords)
+                        repository.getReimburseExpenditureRecordByKeywords(keywords)
                     }
                 }
             } catch (throwable: Throwable) {

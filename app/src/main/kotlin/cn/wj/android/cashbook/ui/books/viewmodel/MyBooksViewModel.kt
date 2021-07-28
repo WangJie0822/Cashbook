@@ -13,7 +13,7 @@ import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.books.BooksRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import kotlinx.coroutines.launch
 
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于2021/5/25
  */
-class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class MyBooksViewModel(private val repository: BooksRepository) : BaseViewModel() {
 
     /** 显示弹窗事件 */
     val showPopupMenuEvent: LifecycleEvent<BooksEntity> = LifecycleEvent()
@@ -74,7 +74,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 val ls = arrayListOf<BooksEntity>()
-                ls.addAll(local.getBooksList())
+                ls.addAll(repository.getBooksList())
                 booksListData.value = ls
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadBooksList")
@@ -87,7 +87,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 // 插入数据
-                val id = local.insertBooks(books)
+                val id = repository.insertBooks(books)
                 // 插入完成，更新列表
                 booksListData.add(books.copy(id = id))
             } catch (throwable: Throwable) {
@@ -106,7 +106,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 // 删除数据
-                local.deleteBooks(books)
+                repository.deleteBooks(books)
                 // 删除成功，更新列表
                 booksListData.remove(books)
             } catch (throwable: Throwable) {
@@ -119,7 +119,7 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
     fun updateBooks(books: BooksEntity) {
         viewModelScope.launch {
             // 更新数据
-            local.updateBooks(books)
+            repository.updateBooks(books)
             // 更新成功，刷新列表
             val ls = booksListData.value.toNewList()
             val index = ls.indexOfFirst {
@@ -143,9 +143,9 @@ class MyBooksViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 val selectedItem = selected.second
                 val unSelectedItem = unSelected.second
                 if (null == unSelectedItem) {
-                    local.updateBooks(selectedItem)
+                    repository.updateBooks(selectedItem)
                 } else {
-                    local.updateBooks(selectedItem, unSelectedItem)
+                    repository.updateBooks(selectedItem, unSelectedItem)
                 }
                 // 更新完成，刷新列表
                 val ls = booksListData.value.toNewList()

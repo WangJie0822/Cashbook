@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.data.entity.AssetClassificationListEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.AssetClassificationListClickListener
 import kotlinx.coroutines.launch
 
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/1
  */
-class SelectAssetClassificationViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetClassificationListClickListener {
+class SelectAssetClassificationViewModel(private val repository: AssetRepository) : BaseViewModel(), AssetClassificationListClickListener {
 
     /** 资产类型大类 */
     var classificationType = ClassificationTypeEnum.CAPITAL_ACCOUNT
@@ -101,7 +101,7 @@ class SelectAssetClassificationViewModel(private val local: LocalDataStore) : Ba
     private fun getClassificationData(): LiveData<ArrayList<AssetClassificationListEntity>> {
         val result = MutableLiveData<ArrayList<AssetClassificationListEntity>>()
         viewModelScope.launch {
-            result.value = local.getAssetClassificationList()
+            result.value = repository.getAssetClassificationList()
         }
         return result
     }
@@ -110,7 +110,7 @@ class SelectAssetClassificationViewModel(private val local: LocalDataStore) : Ba
     private fun getBankData(): LiveData<ArrayList<AssetClassificationEnum>> {
         val result = MutableLiveData<ArrayList<AssetClassificationEnum>>()
         viewModelScope.launch {
-            result.value = local.getBankList()
+            result.value = repository.getBankList()
         }
         return result
     }

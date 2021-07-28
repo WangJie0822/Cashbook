@@ -15,7 +15,7 @@ import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
 import kotlinx.coroutines.launch
 
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/7
  */
-class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetListClickListener {
+class InvisibleAssetViewModel(private val repository: AssetRepository) : BaseViewModel(), AssetListClickListener {
 
     /** 显示资产菜单事件 */
     val showLongClickMenuEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
@@ -186,7 +186,7 @@ class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel
     private fun loadInvisibleAssetData() {
         viewModelScope.launch {
             try {
-                assetListData.value = local.getInvisibleAssetList()
+                assetListData.value = repository.getInvisibleAssetList()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadInvisibleAssetData")
             } finally {
@@ -199,7 +199,7 @@ class InvisibleAssetViewModel(private val local: LocalDataStore) : BaseViewModel
     fun cancelHidden(asset: AssetEntity) {
         viewModelScope.launch {
             try {
-                local.updateAsset(asset.copy(invisible = false))
+                repository.updateAsset(asset.copy(invisible = false))
                 // 取消隐藏资产成功，更新列表
                 loadInvisibleAssetData()
             } catch (throwable: Throwable) {

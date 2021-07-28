@@ -20,7 +20,7 @@ import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/2
  */
-class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class EditAssetViewModel(private val repository: AssetRepository) : BaseViewModel() {
 
     /** 资产 id，新建为 -1L */
     var id = -1L
@@ -183,7 +183,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 saveEnable.set(false)
                 if (id >= 0) {
                     // 编辑
-                    local.updateAsset(
+                    repository.updateAsset(
                         AssetEntity(
                             id = id,
                             booksId = CurrentBooksLiveData.booksId,
@@ -202,7 +202,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     )
                 } else {
                     // 新建
-                    local.insertAsset(
+                    repository.insertAsset(
                         AssetEntity(
                             id = -1,
                             booksId = CurrentBooksLiveData.booksId,
@@ -213,7 +213,7 @@ class EditAssetViewModel(private val local: LocalDataStore) : BaseViewModel() {
                             type = type,
                             classification = classification,
                             invisible = invisible,
-                            sort = local.queryMaxSort().orElse(-1) + 1,
+                            sort = repository.queryMaxSort().orElse(-1) + 1,
                             createTime = currentTime,
                             modifyTime = currentTime,
                             balance = balance

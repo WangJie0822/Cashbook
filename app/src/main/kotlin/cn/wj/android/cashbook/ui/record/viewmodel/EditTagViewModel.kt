@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.data.constants.EVENT_TAG_CHANGE
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/23
  */
-class EditTagViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class EditTagViewModel(private val repository: RecordRepository) : BaseViewModel() {
 
     /** 成功事件 */
     val successEvent: LifecycleEvent<TagEntity> = LifecycleEvent()
@@ -75,7 +75,7 @@ class EditTagViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
         viewModelScope.launch {
             try {
-                if (local.queryTagByName(name).isNotEmpty()) {
+                if (repository.queryTagByName(name).isNotEmpty()) {
                     // 已有标签
                     nameError.value = R.string.same_tag_exist.string
                     return@launch
@@ -84,12 +84,12 @@ class EditTagViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 val result = if (null == edit) {
                     // 新建，保存标签
                     val changed = TagEntity(-1L, name)
-                    val id = local.insertTag(changed)
+                    val id = repository.insertTag(changed)
                     changed.copy(id = id)
                 } else {
                     // 编辑
                     val changed = edit.copy(name = name)
-                    local.updateTag(changed)
+                    repository.updateTag(changed)
                     changed
                 }
                 LiveEventBus.get(EVENT_TAG_CHANGE).post(result)

@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import com.haibin.calendarview.Calendar
 import kotlinx.coroutines.launch
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/15
  */
-class CalendarViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
+class CalendarViewModel(private val repository: RecordRepository) : BaseViewModel(), RecordListClickListener {
 
     /** 旧的缓存数据，用于判断处理日期变换时标记数据 */
     private var oldCalendar: Calendar = Calendar()
@@ -68,7 +68,7 @@ class CalendarViewModel(private val local: LocalDataStore) : BaseViewModel(), Re
         val result = MutableLiveData<List<DateRecordEntity>>()
         viewModelScope.launch {
             try {
-                result.value = local.getRecordListByDate(it)
+                result.value = repository.getRecordListByDate(it)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getRecordListByDate")
             }
@@ -88,7 +88,7 @@ class CalendarViewModel(private val local: LocalDataStore) : BaseViewModel(), Re
                     // 月份已改变或者是刷新，获取数据
                     refresh = false
                     oldCalendar = it
-                    oldMap = local.getCalendarSchemesByDate(it)
+                    oldMap = repository.getCalendarSchemesByDate(it)
                     oldMap
                 }
             } catch (throwable: Throwable) {

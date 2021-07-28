@@ -10,7 +10,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/11
  */
-class RecordInfoViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class RecordInfoViewModel(private val repository: RecordRepository) : BaseViewModel() {
 
     /** 当前记录数据 */
     lateinit var record: RecordEntity
@@ -58,7 +58,7 @@ class RecordInfoViewModel(private val local: LocalDataStore) : BaseViewModel() {
     fun deleteRecord() {
         viewModelScope.launch {
             try {
-                local.deleteRecord(record)
+                repository.deleteRecord(record)
                 // 通知记录变化
                 LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 // 删除成功，关闭当前弹窗

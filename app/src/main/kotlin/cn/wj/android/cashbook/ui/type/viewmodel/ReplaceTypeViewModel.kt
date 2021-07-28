@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.type.TypeRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/2
  */
-class ReplaceTypeViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class ReplaceTypeViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 分类数据 */
     val typeData: MutableLiveData<TypeEntity> = MutableLiveData()
@@ -33,7 +33,7 @@ class ReplaceTypeViewModel(private val local: LocalDataStore) : BaseViewModel() 
         val result = MutableLiveData<List<TypeEntity>>()
         viewModelScope.launch {
             try {
-                result.value = local.getReplaceTypeListByType(it)
+                result.value = repository.getReplaceTypeListByType(it)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getRecordCountByType")
             }
@@ -46,7 +46,7 @@ class ReplaceTypeViewModel(private val local: LocalDataStore) : BaseViewModel() 
         val result = MutableLiveData<String>()
         viewModelScope.launch {
             try {
-                result.value = R.string.replace_type_hint_format.string.format(local.getRecordCountByType(it))
+                result.value = R.string.replace_type_hint_format.string.format(repository.getRecordCountByType(it))
             } catch (throwable: Throwable) {
                 logger().e(throwable, "getRecordCountByType")
             }
@@ -108,9 +108,9 @@ class ReplaceTypeViewModel(private val local: LocalDataStore) : BaseViewModel() 
         viewModelScope.launch {
             try {
                 // 更新记录数据
-                local.updateRecordTypes(old, new)
+                repository.updateRecordTypes(old, new)
                 // 删除分类
-                local.deleteType(old)
+                repository.deleteType(old)
                 // 修改成功
                 LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
                 snackbarEvent.value = R.string.modify_success.string.toSnackbarModel(onCallback = object : Snackbar.Callback() {

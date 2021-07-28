@@ -32,7 +32,7 @@ import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.manager.DatabaseManager
 import cn.wj.android.cashbook.widget.calculator.SYMBOL_ZERO
@@ -44,12 +44,12 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
-class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class EditRecordViewModel(private val repository: RecordRepository) : BaseViewModel() {
 
     init {
         // 该界面用于快捷启动，需要单独初始化
         viewModelScope.launch {
-            DatabaseManager.initDatabase(local)
+            DatabaseManager.initDatabase(repository.database)
         }
     }
 
@@ -130,7 +130,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
             if (firstLoad) {
                 if (null == record) {
                     viewModelScope.launch {
-                        value = local.findAssetById(getSharedLong(SHARED_KEY_LAST_ASSET_ID))
+                        value = repository.findAssetById(getSharedLong(SHARED_KEY_LAST_ASSET_ID))
                     }
                 }
                 firstLoad = false
@@ -386,7 +386,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                 buttonEnable.value = false
                 if (null == record) {
                     // 新建
-                    local.insertRecord(
+                    repository.insertRecord(
                         RecordEntity(
                             id = -1,
                             typeEnum = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
@@ -410,7 +410,7 @@ class EditRecordViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     )
                 } else {
                     // 修改
-                    local.updateRecord(
+                    repository.updateRecord(
                         record!!.copy(
                             typeEnum = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
                             type = type,

@@ -10,7 +10,7 @@ import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 
 /**
@@ -18,7 +18,7 @@ import cn.wj.android.cashbook.interfaces.RecordListClickListener
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/23
  */
-class SearchRecordViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
+class SearchRecordViewModel(private val repository: RecordRepository) : BaseViewModel(), RecordListClickListener {
 
     /** 显示记录详情弹窗事件 */
     val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
@@ -35,7 +35,7 @@ class SearchRecordViewModel(private val local: LocalDataStore) : BaseViewModel()
 
     /** 当前资产记录列表 */
     val listData: LiveData<PagingData<RecordEntity>> = searchText.switchMap {
-        local.getRecordListByKeywordsPagerData(it)
+        repository.getRecordListByKeywordsPagerData(it)
     }
 
     /** 返回点击 */

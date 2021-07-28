@@ -19,8 +19,7 @@ import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.constants.SPLASH_WAIT_MS
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
-import cn.wj.android.cashbook.data.store.WebDataStore
+import cn.wj.android.cashbook.data.repository.main.MainRepository
 import cn.wj.android.cashbook.manager.DatabaseManager
 import java.util.Date
 import kotlin.math.absoluteValue
@@ -30,11 +29,11 @@ import kotlinx.coroutines.launch
 /**
  * 闪屏界面 ViewModel
  *
- * @param local 本地数据存储对象
+ * @param repository 本地数据存储对象
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/16
  */
-class SplashViewModel(private val local: LocalDataStore, private val web: WebDataStore) : BaseViewModel() {
+class SplashViewModel(private val repository: MainRepository) : BaseViewModel() {
 
     /** 信息字符串 */
     val infoStr: ObservableField<String> = ObservableField(
@@ -52,7 +51,7 @@ class SplashViewModel(private val local: LocalDataStore, private val web: WebDat
             val startMs = System.currentTimeMillis()
             try {
                 // 初始化数据数据
-                DatabaseManager.initDatabase(local)
+                DatabaseManager.initDatabase(repository.database)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "init")
             } finally {
@@ -82,7 +81,7 @@ class SplashViewModel(private val local: LocalDataStore, private val web: WebDat
     fun loadPrivacyPolicy() {
         viewModelScope.launch {
             try {
-                val privacyPolicy = web.getPrivacyPolicy(getSharedBoolean(SHARED_KEY_USE_GITEE, true))
+                val privacyPolicy = repository.getPrivacyPolicy(getSharedBoolean(SHARED_KEY_USE_GITEE, true))
                 logger().d("loadPrivacyPolicy: $privacyPolicy")
                 // 跳转 Markdown 界面打开
                 uiNavigationEvent.value = UiNavigationModel.builder {

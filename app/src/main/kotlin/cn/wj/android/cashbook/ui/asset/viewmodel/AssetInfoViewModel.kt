@@ -17,7 +17,7 @@ import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/7
  */
-class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), RecordListClickListener {
+class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewModel(), RecordListClickListener {
 
     /** 显示记录详情弹窗事件 */
     val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
@@ -102,7 +102,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
 
     /** 当前资产记录列表 */
     val recordListData: LiveData<PagingData<DateRecordEntity>> by lazy {
-        local.getRecordListByAssetIdPagerData(assetData.value?.id.orElse(-1L))
+        repository.getRecordListByAssetIdPagerData(assetData.value?.id.orElse(-1L))
     }
 
     /** 标记 - 是否正在刷新 */
@@ -144,7 +144,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
             try {
                 val invisible = asset.invisible
                 val changed = asset.copy(invisible = !invisible)
-                local.updateAsset(changed)
+                repository.updateAsset(changed)
                 // 更新成功，更新状态
                 assetData.value = changed
             } catch (throwable: Throwable) {
@@ -159,7 +159,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         viewModelScope.launch {
             try {
                 // 更新资产信息
-                assetData.value = local.findAssetById(asset.id)
+                assetData.value = repository.findAssetById(asset.id)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "refreshAsset")
             }
@@ -171,7 +171,7 @@ class AssetInfoViewModel(private val local: LocalDataStore) : BaseViewModel(), R
         val asset = assetData.value ?: return
         viewModelScope.launch {
             try {
-                local.deleteAsset(asset)
+                repository.deleteAsset(asset)
                 // 删除成功，退出当前界面
                 uiNavigationEvent.value = UiNavigationModel.builder {
                     close()

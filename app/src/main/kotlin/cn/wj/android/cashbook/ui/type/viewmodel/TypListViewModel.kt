@@ -18,7 +18,7 @@ import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.type.TypeRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/29
  */
-class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class TypListViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 记录展开类型的 id */
     private var expandTypeId = -1L
@@ -101,7 +101,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
     fun loadTypeList() {
         viewModelScope.launch {
             try {
-                val typeList = local.getTypeListByType(typeData.value.orElse(RecordTypeEnum.EXPENDITURE))
+                val typeList = repository.getTypeListByType(typeData.value.orElse(RecordTypeEnum.EXPENDITURE))
                 // 修正已展开的数据
                 typeList.firstOrNull {
                     it.id == expandTypeId
@@ -124,7 +124,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
                         ls.add(second.copy(sort = i))
                     }
                 }
-                local.updateTypes(ls)
+                repository.updateTypes(ls)
                 // 更新成功，刷新
                 loadTypeList()
                 // 退出编辑
@@ -150,7 +150,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 // 检查是否存在记录
-                if (local.getRecordCountByType(type) > 0) {
+                if (repository.getRecordCountByType(type) > 0) {
                     // 跳转替换分类
                     uiNavigationEvent.value = UiNavigationModel.builder {
                         jump(
@@ -161,7 +161,7 @@ class TypListViewModel(private val local: LocalDataStore) : BaseViewModel() {
                     }
                     return@launch
                 }
-                local.deleteType(type)
+                repository.deleteType(type)
                 // 删除成功，刷新列表
                 LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
                 snackbarEvent.value = R.string.delete_success.string.toSnackbarModel()

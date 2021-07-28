@@ -14,7 +14,7 @@ import cn.wj.android.cashbook.data.entity.TypeIconEntity
 import cn.wj.android.cashbook.data.entity.TypeIconGroupEntity
 import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.type.TypeRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/30
  */
-class EditTypeViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 当前分类信息 */
     val typeData: MutableLiveData<TypeEntity> = object : MutableLiveData<TypeEntity>(null) {
@@ -119,7 +119,7 @@ class EditTypeViewModel(private val local: LocalDataStore) : BaseViewModel() {
     private fun loadTypeIconData() {
         viewModelScope.launch {
             try {
-                val list = local.getTypeIconData()
+                val list = repository.getTypeIconData()
                 groupListData.value = list
                 // 默认选中第一条
                 onGroupItemClick.invoke(list.first())
@@ -144,17 +144,17 @@ class EditTypeViewModel(private val local: LocalDataStore) : BaseViewModel() {
         }
         viewModelScope.launch {
             try {
-                if (local.getTypeCountByName(name) > 0L) {
+                if (repository.getTypeCountByName(name) > 0L) {
                     // 已有相同名称
                     snackbarEvent.value = R.string.same_name_type_exist_already.string.toSnackbarModel()
                     return@launch
                 }
                 if (typeEntity.id == -1L) {
                     // 新建分类
-                    local.insertType(typeEntity.copy(name = name, iconResName = iconResIdStr, sort = local.getTypeCount().toInt()))
+                    repository.insertType(typeEntity.copy(name = name, iconResName = iconResIdStr, sort = repository.getTypeCount().toInt()))
                 } else {
                     // 更新分类
-                    local.updateType(typeEntity.copy(name = name, iconResName = iconResIdStr))
+                    repository.updateType(typeEntity.copy(name = name, iconResName = iconResIdStr))
                 }
                 LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
                 uiNavigationEvent.value = UiNavigationModel.builder {

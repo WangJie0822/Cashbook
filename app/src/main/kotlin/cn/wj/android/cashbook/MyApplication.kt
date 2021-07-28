@@ -14,7 +14,6 @@ import cn.wj.android.cashbook.base.tools.jumpAppDetails
 import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_APP
 import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_UPDATE
 import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
-import cn.wj.android.cashbook.di.dataStoreModule
 import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.netModule
 import cn.wj.android.cashbook.di.repositoryModule
@@ -66,7 +65,7 @@ class MyApplication : Application() {
         startKoin {
             androidLogger(Level.NONE)
             androidContext(this@MyApplication)
-            modules(listOf(netModule, dbModule, repositoryModule, dataStoreModule, viewModelModule))
+            modules(listOf(netModule, dbModule, repositoryModule, viewModelModule))
         }
 
         // 初始化 ARouter

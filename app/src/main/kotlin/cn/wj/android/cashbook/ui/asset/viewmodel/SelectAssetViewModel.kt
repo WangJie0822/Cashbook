@@ -7,7 +7,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
 import kotlinx.coroutines.launch
 
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/1
  */
-class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetListClickListener {
+class SelectAssetViewModel(private val repository: AssetRepository) : BaseViewModel(), AssetListClickListener {
 
     /** 显示选择资产类别弹窗事件 */
     val showSelectAssetTypeEvent: LifecycleEvent<Int> = LifecycleEvent()
@@ -55,7 +55,7 @@ class SelectAssetViewModel(private val local: LocalDataStore) : BaseViewModel(),
     private fun loadVisibleAssetData() {
         viewModelScope.launch {
             try {
-                assetListData.value = local.getVisibleAssetListSortByRecord()
+                assetListData.value = repository.getVisibleAssetListSortByRecord()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadVisibleAssetData")
             }

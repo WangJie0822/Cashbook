@@ -24,7 +24,7 @@ import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
 import cn.wj.android.cashbook.manager.DatabaseManager
 import kotlinx.coroutines.launch
@@ -34,12 +34,12 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/3
  */
-class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), AssetListClickListener {
+class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(), AssetListClickListener {
 
     init {
         // 该界面用于快捷启动，需要单独初始化
         viewModelScope.launch {
-            DatabaseManager.initDatabase(local)
+            DatabaseManager.initDatabase(repository.database)
             // 加载数据
             loadAssetData()
         }
@@ -400,7 +400,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     private fun loadAssetData() {
         viewModelScope.launch {
             try {
-                assetListData.value = local.getCurrentAssetList()
+                assetListData.value = repository.getCurrentAssetList()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadAssetData")
             } finally {
@@ -413,7 +413,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     fun hideAsset(asset: AssetEntity) {
         viewModelScope.launch {
             try {
-                local.updateAsset(asset.copy(invisible = true))
+                repository.updateAsset(asset.copy(invisible = true))
                 // 隐藏资产成功，更新列表
                 loadAssetData()
             } catch (throwable: Throwable) {
@@ -426,7 +426,7 @@ class MyAssetViewModel(private val local: LocalDataStore) : BaseViewModel(), Ass
     fun updateAsset(ls: List<AssetEntity>) {
         viewModelScope.launch {
             try {
-                local.updateAsset(ls)
+                repository.updateAssets(ls)
                 // 更新资产成功，更新列表
                 loadAssetData()
             } catch (throwable: Throwable) {

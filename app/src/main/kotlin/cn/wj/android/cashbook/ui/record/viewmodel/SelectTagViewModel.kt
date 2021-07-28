@@ -10,7 +10,7 @@ import cn.wj.android.cashbook.data.constants.EVENT_TAG_DELETE
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/23
  */
-class SelectTagViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class SelectTagViewModel(private val repository: RecordRepository) : BaseViewModel() {
 
     /** 显示菜单事件 */
     val showMenuEvent: LifecycleEvent<TagEntity> = LifecycleEvent()
@@ -75,7 +75,7 @@ class SelectTagViewModel(private val local: LocalDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 // 获取标签列表
-                val list = local.getTagList()
+                val list = repository.getTagList()
                 val selectedTagIds = selectedTags.value?.map {
                     it.id
                 }.orEmpty()
@@ -95,7 +95,7 @@ class SelectTagViewModel(private val local: LocalDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 // 删除标签
-                local.deleteTag(tag)
+                repository.deleteTag(tag)
                 // 移除已删除标签
                 val list = tagListData.value.toNewList()
                 list.remove(tag)

@@ -21,7 +21,7 @@ import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.WebDataStore
+import cn.wj.android.cashbook.data.repository.main.MainRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.manager.UpdateManager
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/17
  */
-class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
+class AboutUsViewModel(private val repository: MainRepository) : BaseViewModel() {
 
     /** 显示升级提示事件 */
     val showUpdateDialogEvent: LifecycleEvent<UpdateInfoEntity> = LifecycleEvent()
@@ -119,7 +119,7 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
         viewModelScope.launch {
             try {
                 // 获取 Release 信息
-                val info = web.queryLatestRelease(useGitee.value.condition)
+                val info = repository.queryLatestRelease(useGitee.value.condition)
                 UpdateManager.checkFromInfo(info, {
                     // 显示升级提示弹窗
                     showUpdateDialogEvent.value = info
@@ -137,7 +137,7 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
     private fun loadChangelog() {
         viewModelScope.launch {
             try {
-                val changelog = web.getChangelog(useGitee.value.condition)
+                val changelog = repository.getChangelog(useGitee.value.condition)
                 logger().d("loadChangelog: $changelog")
                 // 跳转 Markdown 界面打开
                 uiNavigationEvent.value = UiNavigationModel.builder {
@@ -158,7 +158,7 @@ class AboutUsViewModel(private val web: WebDataStore) : BaseViewModel() {
     private fun loadPrivacyPolicy() {
         viewModelScope.launch {
             try {
-                val privacyPolicy = web.getPrivacyPolicy(useGitee.value.condition)
+                val privacyPolicy = repository.getPrivacyPolicy(useGitee.value.condition)
                 logger().d("loadPrivacyPolicy: $privacyPolicy")
                 // 跳转 Markdown 界面打开
                 uiNavigationEvent.value = UiNavigationModel.builder {

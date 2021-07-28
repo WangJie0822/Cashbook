@@ -7,10 +7,14 @@ import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_TYPE_INITIALIZED
+import cn.wj.android.cashbook.data.database.CashbookDatabase
+import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.transform.toAssetTable
+import cn.wj.android.cashbook.data.transform.toBooksEntity
+import cn.wj.android.cashbook.data.transform.toTypeTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,19 +26,19 @@ import kotlinx.coroutines.withContext
 object DatabaseManager {
 
     /** 初始化数据库数据 */
-    suspend fun initDatabase(local: LocalDataStore) {
+    suspend fun initDatabase(database: CashbookDatabase) {
         withContext(Dispatchers.IO) {
             // 初始化账本数据
-            initBooksData(local)
+            initBooksData(database)
             // 初始化类型数据
-            initTypeData(local)
+            initTypeData(database)
         }
     }
 
     /** 初始化账本信息 */
-    private suspend fun initBooksData(local: LocalDataStore) {
+    private suspend fun initBooksData(database: CashbookDatabase) {
         // 获取默认账本
-        val books = local.getDefaultBooks()
+        val books = database.booksDao().queryDefault().firstOrNull()?.toBooksEntity()
         CurrentBooksLiveData.postValue(
             if (null != books) {
                 books
@@ -51,36 +55,51 @@ object DatabaseManager {
                     currentTime,
                     currentTime
                 )
-                val insertId = local.insertBooks(default)
+                val insertId = database.booksDao().insert(default.toAssetTable())
                 default.copy(id = insertId)
             }
         )
     }
 
     /** 初始化消费类型信息 */
-    private suspend fun initTypeData(local: LocalDataStore) {
+    private suspend fun initTypeData(database: CashbookDatabase) {
         if (getSharedBoolean(SHARED_KEY_TYPE_INITIALIZED)) {
             // 已初始化
             return
         }
         // 未初始化
-        if (local.hasType()) {
+        if (database.typeDao().getCount() > 0) {
             // 已有数据
             return
         }
-        initExpenditureTypeData(local)
-        initIncomeTypeData(local)
-        initTransferTypeData(local)
+        initExpenditureTypeData(database)
+        initIncomeTypeData(database)
+        initTransferTypeData(database)
         setSharedBoolean(SHARED_KEY_TYPE_INITIALIZED, true)
     }
 
+
+    /** 将 [type] 插入数据库并返回 id */
+    private suspend fun CashbookDatabase.insertType(type: TypeEntity): Long = withContext(Dispatchers.IO) {
+        typeDao().insert(type.toTypeTable())
+    }
+
+    /** 将 [types] 插入数据库 */
+    private suspend fun CashbookDatabase.insertTypes(vararg types: TypeEntity) = withContext(Dispatchers.IO) {
+        val ls = arrayListOf<TypeTable>()
+        types.forEach {
+            ls.add(it.toTypeTable())
+        }
+        typeDao().insert(*ls.toTypedArray())
+    }
+
     /** 初始化支出类型 */
-    private suspend fun initExpenditureTypeData(local: LocalDataStore) {
+    private suspend fun initExpenditureTypeData(database: CashbookDatabase) {
         // 餐饮数据
         val diningFirst = TypeEntity.newFirstExpenditure(R.string.type_dining.string, R.string.type_icon_name_dining.drawableString, 0)
-        val diningId = local.insertType(diningFirst)
+        val diningId = database.insertType(diningFirst)
         val diningParent = diningFirst.copy(id = diningId)
-        local.insertTypes(
+        database.insertTypes(
             // 三餐
             TypeEntity.newSecondExpenditure(parent = diningParent, name = R.string.type_three_meals.string, R.string.type_icon_name_three_meals.drawableString, 0),
             // 夜宵
@@ -92,9 +111,9 @@ object DatabaseManager {
         )
         // 烟酒零食
         val atsFirst = TypeEntity.newFirstExpenditure(R.string.type_ats.string, R.string.type_icon_name_ats.drawableString, 1)
-        val atsId = local.insertType(atsFirst)
+        val atsId = database.insertType(atsFirst)
         val atsParent = atsFirst.copy(id = atsId)
-        local.insertTypes(
+        database.insertTypes(
             // 水果
             TypeEntity.newSecondExpenditure(parent = atsParent, name = R.string.type_fruit.string, R.string.type_icon_name_fruit.drawableString, 0),
             // 甜点
@@ -108,9 +127,9 @@ object DatabaseManager {
         )
         // 购物
         val shoppingFirst = TypeEntity.newFirstExpenditure(R.string.type_shopping.string, R.string.type_icon_name_shopping.drawableString, 2)
-        val shoppingId = local.insertType(shoppingFirst)
+        val shoppingId = database.insertType(shoppingFirst)
         val shoppingParent = shoppingFirst.copy(id = shoppingId)
-        local.insertTypes(
+        database.insertTypes(
             // 数码
             TypeEntity.newSecondExpenditure(parent = shoppingParent, name = R.string.type_digital_products.string, R.string.type_icon_name_digital_products.drawableString, 0),
             // 日用
@@ -126,9 +145,9 @@ object DatabaseManager {
         )
         // 住房
         val housingFirst = TypeEntity.newFirstExpenditure(R.string.type_housing.string, R.string.type_icon_name_housing.drawableString, 3)
-        val housingId = local.insertType(housingFirst)
+        val housingId = database.insertType(housingFirst)
         val housingParent = housingFirst.copy(id = housingId)
-        local.insertTypes(
+        database.insertTypes(
             // 房租
             TypeEntity.newSecondExpenditure(parent = housingParent, name = R.string.type_house_rent.string, R.string.type_icon_name_house_rent.drawableString, 0),
             // 房贷
@@ -136,9 +155,9 @@ object DatabaseManager {
         )
         // 交通
         val trafficFirst = TypeEntity.newFirstExpenditure(R.string.type_traffic.string, R.string.type_icon_name_traffic.drawableString, 4)
-        val trafficId = local.insertType(trafficFirst)
+        val trafficId = database.insertType(trafficFirst)
         val trafficParent = trafficFirst.copy(id = trafficId)
-        local.insertTypes(
+        database.insertTypes(
             // 公交
             TypeEntity.newSecondExpenditure(parent = trafficParent, name = R.string.type_bus.string, R.string.type_icon_name_bus.drawableString, 0),
             // 地铁
@@ -152,9 +171,9 @@ object DatabaseManager {
         )
         // 娱乐
         val amusementFirst = TypeEntity.newFirstExpenditure(R.string.type_amusement.string, R.string.type_icon_name_amusement.drawableString, 5)
-        val amusementId = local.insertType(amusementFirst)
+        val amusementId = database.insertType(amusementFirst)
         val amusementParent = amusementFirst.copy(id = amusementId)
-        local.insertTypes(
+        database.insertTypes(
             // 游戏
             TypeEntity.newSecondExpenditure(parent = amusementParent, name = R.string.type_game.string, R.string.type_icon_name_game.drawableString, 0),
             // 聚会
@@ -170,9 +189,9 @@ object DatabaseManager {
         )
         // 生活
         val lifeFirst = TypeEntity.newFirstExpenditure(R.string.type_life.string, R.string.type_icon_name_life.drawableString, 6)
-        val lifeId = local.insertType(lifeFirst)
+        val lifeId = database.insertType(lifeFirst)
         val lifeParent = lifeFirst.copy(id = lifeId)
-        local.insertTypes(
+        database.insertTypes(
             // 水费
             TypeEntity.newSecondExpenditure(parent = lifeParent, name = R.string.type_water_rate.string, R.string.type_icon_name_water_rate.drawableString, 0),
             // 电费
@@ -188,9 +207,9 @@ object DatabaseManager {
         )
         // 文教
         val booksEducationFirst = TypeEntity.newFirstExpenditure(R.string.type_book_education.string, R.string.type_icon_name_book_education.drawableString, 7)
-        val booksEducationId = local.insertType(booksEducationFirst)
+        val booksEducationId = database.insertType(booksEducationFirst)
         val booksEducationParent = booksEducationFirst.copy(id = booksEducationId)
-        local.insertTypes(
+        database.insertTypes(
             // 学费
             TypeEntity.newSecondExpenditure(parent = booksEducationParent, name = R.string.type_tuition.string, R.string.type_icon_name_tuition.drawableString, 0),
             // 文具
@@ -204,9 +223,9 @@ object DatabaseManager {
         )
         // 汽车
         val carFirst = TypeEntity.newFirstExpenditure(R.string.type_car.string, R.string.type_icon_name_car.drawableString, 8)
-        val carId = local.insertType(carFirst)
+        val carId = database.insertType(carFirst)
         val carParent = carFirst.copy(id = carId)
-        local.insertTypes(
+        database.insertTypes(
             // 停车
             TypeEntity.newSecondExpenditure(parent = carParent, name = R.string.type_parking.string, R.string.type_icon_name_parking.drawableString, 0),
             // 加油
@@ -230,9 +249,9 @@ object DatabaseManager {
         )
         // 通讯
         val communicationFirst = TypeEntity.newFirstExpenditure(R.string.type_communication.string, R.string.type_icon_name_communication.drawableString, 9)
-        val communicationId = local.insertType(communicationFirst)
+        val communicationId = database.insertType(communicationFirst)
         val communicationParent = communicationFirst.copy(id = communicationId)
-        local.insertTypes(
+        database.insertTypes(
             // 话费
             TypeEntity.newSecondExpenditure(parent = communicationParent, name = R.string.type_call_charge.string, R.string.type_icon_name_call_charge.drawableString, 0),
             // 网费
@@ -240,9 +259,9 @@ object DatabaseManager {
         )
         // 育儿
         val parentingFirst = TypeEntity.newFirstExpenditure(R.string.type_parenting.string, R.string.type_icon_name_parenting.drawableString, 2)
-        val parentingId = local.insertType(parentingFirst)
+        val parentingId = database.insertType(parentingFirst)
         val parentingParent = parentingFirst.copy(id = parentingId)
-        local.insertTypes(
+        database.insertTypes(
             // 奶粉
             TypeEntity.newSecondExpenditure(parent = parentingParent, name = R.string.type_milk_powder.string, R.string.type_icon_name_milk_powder.drawableString, 3),
             // 辅食
@@ -256,9 +275,9 @@ object DatabaseManager {
         )
         // 人际交往
         val interpersonalFirst = TypeEntity.newFirstExpenditure(R.string.type_interpersonal.string, R.string.type_icon_name_interpersonal.drawableString, 10)
-        val interpersonalId = local.insertType(interpersonalFirst)
+        val interpersonalId = database.insertType(interpersonalFirst)
         val interpersonalParent = interpersonalFirst.copy(id = interpersonalId)
-        local.insertTypes(
+        database.insertTypes(
             // 礼金
             TypeEntity.newSecondExpenditure(parent = interpersonalParent, name = R.string.type_cash_gift.string, R.string.type_icon_name_cash_gift.drawableString, 0),
             // 礼品
@@ -268,9 +287,9 @@ object DatabaseManager {
         )
         // 医疗
         val medicalFirst = TypeEntity.newFirstExpenditure(R.string.type_medical.string, R.string.type_icon_name_medical.drawableString, 11)
-        val medicalId = local.insertType(medicalFirst)
+        val medicalId = database.insertType(medicalFirst)
         val medicalParent = medicalFirst.copy(id = medicalId)
-        local.insertTypes(
+        database.insertTypes(
             // 挂号
             TypeEntity.newSecondExpenditure(parent = medicalParent, name = R.string.type_registration.string, R.string.type_icon_name_registration.drawableString, 0),
             // 看诊
@@ -284,9 +303,9 @@ object DatabaseManager {
         )
         // 旅行
         val travelFirst = TypeEntity.newFirstExpenditure(R.string.type_travel.string, R.string.type_icon_name_travel.drawableString, 12)
-        val travelId = local.insertType(travelFirst)
+        val travelId = database.insertType(travelFirst)
         val travelParent = travelFirst.copy(id = travelId)
-        local.insertTypes(
+        database.insertTypes(
             // 团费
             TypeEntity.newSecondExpenditure(parent = travelParent, name = R.string.type_excursion_fare.string, R.string.type_icon_name_excursion_fare.drawableString, 0),
             // 门票
@@ -297,46 +316,46 @@ object DatabaseManager {
             TypeEntity.newSecondExpenditure(parent = travelParent, name = R.string.type_hotel.string, R.string.type_icon_name_hotel.drawableString, 3)
         )
         // 其它
-        local.insertType(TypeEntity.newFirstExpenditure(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 13, false))
+        database.insertType(TypeEntity.newFirstExpenditure(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 13, false))
     }
 
     /** 初始化收入类型 */
-    private suspend fun initIncomeTypeData(local: LocalDataStore) {
+    private suspend fun initIncomeTypeData(database: CashbookDatabase) {
         // 薪资
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_salary.string, R.string.type_icon_name_salary.drawableString, 0, false))
+        database.insertType(TypeEntity.newFirstIncome(R.string.type_salary.string, R.string.type_icon_name_salary.drawableString, 0, false))
         // 奖金
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_bonus.string, R.string.type_icon_name_bonus.drawableString, 1, false))
+        database.insertType(TypeEntity.newFirstIncome(R.string.type_bonus.string, R.string.type_icon_name_bonus.drawableString, 1, false))
         // 退款
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_refund.string, R.string.type_icon_name_refund.drawableString, 2, childEnable = false, refund = true))
+        database.insertType(TypeEntity.newFirstIncome(R.string.type_refund.string, R.string.type_icon_name_refund.drawableString, 2, childEnable = false, refund = true))
         // 报销
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_reimburse.string, R.string.type_icon_name_reimburse.drawableString, 3, childEnable = false, reimburse = true))
+        database.insertType(TypeEntity.newFirstIncome(R.string.type_reimburse.string, R.string.type_icon_name_reimburse.drawableString, 3, childEnable = false, reimburse = true))
         // 投资
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_investment.string, R.string.type_icon_name_investment.drawableString, 4, false))
+        database.insertType(TypeEntity.newFirstIncome(R.string.type_investment.string, R.string.type_icon_name_investment.drawableString, 4, false))
         // 外快
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_windfall.string, R.string.type_icon_name_windfall.drawableString, 5, false))
+        database.insertType(TypeEntity.newFirstIncome(R.string.type_windfall.string, R.string.type_icon_name_windfall.drawableString, 5, false))
         // 其它
-        local.insertType(TypeEntity.newFirstIncome(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 6, false))
+        database.insertType(TypeEntity.newFirstIncome(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 6, false))
     }
 
     /** 初始化转账类型 */
-    private suspend fun initTransferTypeData(local: LocalDataStore) {
+    private suspend fun initTransferTypeData(database: CashbookDatabase) {
         // 账户互转
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_account_transfer.string, R.string.type_icon_name_account_transfer.drawableString, 0, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_account_transfer.string, R.string.type_icon_name_account_transfer.drawableString, 0, false))
         // 还信用卡
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_credit_card_payment.string, R.string.type_icon_name_credit_card_payment.drawableString, 1, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_credit_card_payment.string, R.string.type_icon_name_credit_card_payment.drawableString, 1, false))
         // 取款
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_withdrawals.string, R.string.type_icon_name_withdrawals.drawableString, 2, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_withdrawals.string, R.string.type_icon_name_withdrawals.drawableString, 2, false))
         // 存款
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_deposit.string, R.string.type_icon_name_deposit.drawableString, 3, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_deposit.string, R.string.type_icon_name_deposit.drawableString, 3, false))
         // 借入
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_borrow.string, R.string.type_icon_name_borrow.drawableString, 4, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_borrow.string, R.string.type_icon_name_borrow.drawableString, 4, false))
         // 借出
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_lend.string, R.string.type_icon_name_lend.drawableString, 5, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_lend.string, R.string.type_icon_name_lend.drawableString, 5, false))
         // 还款
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_repayment.string, R.string.type_icon_name_repayment.drawableString, 6, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_repayment.string, R.string.type_icon_name_repayment.drawableString, 6, false))
         // 收款
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_proceeds.string, R.string.type_icon_name_proceeds.drawableString, 7, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_proceeds.string, R.string.type_icon_name_proceeds.drawableString, 7, false))
         // 其它
-        local.insertType(TypeEntity.newFirstTransfer(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 8, false))
+        database.insertType(TypeEntity.newFirstTransfer(R.string.type_other.string, R.string.type_icon_name_other.drawableString, 8, false))
     }
 }

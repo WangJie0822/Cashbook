@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/28
  */
-abstract class Repository(protected val database: CashbookDatabase) {
+abstract class Repository(val database: CashbookDatabase) {
 
     /** 账本数据库操作对象 */
     protected val booksDao: BooksDao by lazy {
@@ -219,5 +219,14 @@ abstract class Repository(protected val database: CashbookDatabase) {
             }
         }
         return@withContext result
+    }
+
+    /** 获取关联资产 id 为 [assetId] 的记录数量 */
+    protected suspend fun getRecordCountByAssetId(assetId: Long?): Int = withContext(Dispatchers.IO) {
+        if (assetId == null) {
+            0
+        } else {
+            recordDao.queryRecordCountByAssetId(assetId)
+        }
     }
 }

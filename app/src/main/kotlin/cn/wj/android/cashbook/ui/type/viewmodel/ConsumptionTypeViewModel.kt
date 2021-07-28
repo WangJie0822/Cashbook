@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
-import cn.wj.android.cashbook.data.store.LocalDataStore
+import cn.wj.android.cashbook.data.repository.type.TypeRepository
 import kotlinx.coroutines.launch
 
 /**
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
-class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewModel() {
+class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 更新二级类型列表数据 */
     val secondTypeData: MutableLiveData<TypeEntity> = MutableLiveData()
@@ -103,7 +103,7 @@ class ConsumptionTypeViewModel(private val local: LocalDataStore) : BaseViewMode
         val recordType = typeData.value ?: return
         viewModelScope.launch {
             try {
-                typeListData.value = local.getTypeListByType(recordType)
+                typeListData.value = repository.getTypeListByType(recordType)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadType")
             }
