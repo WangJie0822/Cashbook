@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.ui.main.activity
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.core.view.GravityCompat
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.md2Spanned
 import cn.wj.android.cashbook.base.ext.base.string
@@ -9,11 +10,7 @@ import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.isWifiAvailable
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
-import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
-import cn.wj.android.cashbook.data.constants.MAIN_BACK_PRESS_INTERVAL_MS
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE
+import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
@@ -27,8 +24,8 @@ import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinea
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlin.math.absoluteValue
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.math.absoluteValue
 
 /**
  * 主界面
@@ -76,16 +73,16 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun onStop() {
         super.onStop()
 
-        if (binding.dlRoot.isOpen) {
+        if (binding.dlRoot.isDrawerOpen(GravityCompat.START)) {
             // 抽屉开启时关闭
-            binding.dlRoot.close()
+            binding.dlRoot.closeDrawer(GravityCompat.START)
         }
     }
 
     override fun onBackPressed() {
-        if (binding.dlRoot.isOpen) {
+        if (binding.dlRoot.isDrawerOpen(GravityCompat.START)) {
             // 抽屉开启时关闭
-            binding.dlRoot.close()
+            binding.dlRoot.closeDrawer(GravityCompat.START)
             return
         }
         // 当前时间

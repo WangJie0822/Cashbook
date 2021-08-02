@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.databinding.adapter
 
+import android.view.Gravity
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.Toolbar
@@ -14,8 +15,8 @@ import cn.wj.android.cashbook.base.ext.base.logger
  */
 
 /** 将 [DrawerLayout] 开启关联到对应 [toolbarId] 的 [Toolbar] */
-@BindingAdapter("android:bind_dl_toolbar")
-fun DrawerLayout.bindToToolbar(@IdRes toolbarId: Int?) {
+@BindingAdapter("android:bind_dl_toolbar", "android:bind_dl_openGravity", "android:bind_dl_openAnimated", requireAll = false)
+fun DrawerLayout.bindToToolbar(@IdRes toolbarId: Int?, gravity: String?, animate: Boolean?) {
     if (null == toolbarId) {
         return
     }
@@ -28,7 +29,14 @@ fun DrawerLayout.bindToToolbar(@IdRes toolbarId: Int?) {
         logger().w("View with R.id.$toolbarId is not the Toolbar!")
         return
     }
+    val gravityInt = when (gravity.orEmpty()) {
+        "end" -> Gravity.END
+        "top" -> Gravity.TOP
+        "bottom" -> Gravity.BOTTOM
+        else -> Gravity.START
+    }
+    val animateBool = animate ?: true
     v.setNavigationOnClickListener {
-        open()
+        openDrawer(gravityInt, animateBool)
     }
 }

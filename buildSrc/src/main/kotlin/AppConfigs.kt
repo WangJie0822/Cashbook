@@ -12,16 +12,16 @@ import java.util.Locale
 object AppConfigs {
 
     /** 编译 SDK 版本 */
-    const val compileSdkVersion = 30
-
-    /** 编译工具版本 */
-    const val buildToolsVersion = "30.0.3"
+    const val compileSdk = 30
 
     /** 最小支持版本 */
-    const val minSdkVersion = 21
+    const val minSdk = 21
 
     /** 目标支持版本 */
-    const val targetSdkVersion = 30
+    const val targetSdk = 30
+
+    /** 应用 id */
+    const val applicationId = "cn.wj.android.cashbook"
 
     /** 应用版本号 */
     val versionCode = getVersionCode()
