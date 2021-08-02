@@ -47,7 +47,7 @@ object Dependencies {
     object Kotlin {
 
         /** Kotlin 版本 */
-        const val version = "1.5.20"
+        const val version = "1.5.21"
 
         /** 标准库 */
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
@@ -210,7 +210,7 @@ object Dependencies {
         object Compose {
 
             /** Compose 版本号 */
-            const val version = "1.0.0-beta01"
+            const val version = "1.0.0"
 
             /** 基础 */
             const val foundation = "androidx.compose.foundation:foundation:$version"
@@ -218,7 +218,8 @@ object Dependencies {
             /** UI 相关 */
             const val ui = "androidx.compose.ui:ui:$version"
             const val uiTooling = "androidx.compose.ui:ui-tooling:$version"
-            const val uiTest = "androidx.compose.ui:ui-test-junit4:$version"
+            const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview:$version"
+            const val uiTestJunit = "androidx.compose.ui:ui-test-junit4:$version"
 
             /** 运行时 */
             const val runtime = "androidx.compose.runtime:runtime:$version"
@@ -248,6 +249,9 @@ object Dependencies {
 
             /** kotlin 拓展 */
             const val ktx = "androidx.activity:activity-ktx:$version"
+
+            /** Compose 相关 */
+            const val compose = "androidx.activity:activity-compose:1.3.0"
         }
 
         /**

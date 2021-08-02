@@ -14,18 +14,16 @@ plugins {
 android {
 
     // 编译 SDK 版本
-    compileSdkVersion(AppConfigs.compileSdkVersion)
-    // 编译工具版本
-    buildToolsVersion(AppConfigs.buildToolsVersion)
+    compileSdk = AppConfigs.compileSdk
 
     defaultConfig {
         // 应用 id
-        applicationId = "cn.wj.android.cashbook"
+        applicationId = AppConfigs.applicationId
 
         // 最低支持版本
-        minSdkVersion(AppConfigs.minSdkVersion)
+        minSdk = AppConfigs.minSdk
         // 目标 SDK 版本
-        targetSdkVersion(AppConfigs.targetSdkVersion)
+        targetSdk = AppConfigs.targetSdk
 
         // 应用版本号
         versionCode = AppConfigs.versionCode
@@ -36,6 +34,10 @@ android {
 
         // 开启 Dex 分包
         multiDexEnabled = true
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     signingConfigs {
@@ -76,19 +78,19 @@ android {
     }
 
     // 维度
-    flavorDimensions("version")
+    flavorDimensions.add("version")
 
     productFlavors {
         // 正式线上版本
         create("online") {
-            dimension("version")
+            dimension = "version"
             // 版本名后缀
             versionNameSuffix = "_online"
         }
 
         // 开发版本
         create("dev") {
-            dimension("version")
+            dimension = "version"
             // 应用包名后缀
             applicationIdSuffix = ".dev"
             // 版本名后缀
@@ -115,7 +117,13 @@ android {
         dataBinding = true
     }
 
-    lintOptions {
+    packagingOptions {
+        resources {
+            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+        }
+    }
+
+    lint {
         // 出现错误不终止编译
         isAbortOnError = false
     }
@@ -199,10 +207,6 @@ dependencies {
     implementation(Dependencies.Androidx.Room.common)
     implementation(Dependencies.Androidx.Room.ktx)
     kapt(Dependencies.Androidx.Room.compiler)
-
-    // Navigation
-    implementation(Dependencies.Androidx.Navigation.uiKtx)
-    implementation(Dependencies.Androidx.Navigation.fragmentKtx)
 
     // Paging
     implementation(Dependencies.Androidx.Paging.runtimeKtx)
