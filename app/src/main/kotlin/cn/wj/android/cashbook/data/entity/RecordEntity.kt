@@ -2,11 +2,7 @@ package cn.wj.android.cashbook.data.entity
 
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.color
-import cn.wj.android.cashbook.base.ext.base.condition
-import cn.wj.android.cashbook.base.ext.base.drawableString
-import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.*
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
@@ -14,6 +10,7 @@ import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlin.text.orEmpty
 
 /**
  * 记录数据实体类
@@ -116,7 +113,7 @@ data class RecordEntity(
                 }
                 RecordTypeEnum.TRANSFER -> {
                     "$symbol$amount${
-                        if (charge.toFloatOrNull().orElse(0f) > 0f) {
+                        if (charge.toFloatOrZero() > 0f) {
                             "(-$symbol$charge)"
                         } else {
                             ""
@@ -153,7 +150,7 @@ data class RecordEntity(
     /** 是否显示手续费 */
     @IgnoredOnParcel
     val showCharge: Boolean
-        get() = typeEnum == RecordTypeEnum.TRANSFER && charge.toFloatOrNull().orElse(0f) > 0f
+        get() = typeEnum == RecordTypeEnum.TRANSFER && charge.toFloatOrZero() > 0f
 
     /** 手续费文本 */
     @IgnoredOnParcel

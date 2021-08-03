@@ -2,15 +2,17 @@ package cn.wj.android.cashbook.data.entity
 
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.formatToNumber
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
-import kotlin.math.roundToInt
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlin.math.roundToInt
 
 /**
  * 资产信息数据库表
@@ -59,7 +61,7 @@ data class AssetEntity(
         get() = if (!creditCardAccount || totalAmount.toFloat() <= 0f) {
             0
         } else {
-            (balance.toFloat() / totalAmount.toFloat() * 100).roundToInt()
+            (balance.toBigDecimalOrZero() / totalAmount.toBigDecimalOrNull().orElse("1".toBigDecimal()) * "100".toBigDecimal()).toFloat().roundToInt()
         }
 
     /** 余额显示文本 */
@@ -82,7 +84,7 @@ data class AssetEntity(
             name, "${CurrentBooksLiveData.currency.symbol}${
                 if (creditCardAccount) {
                     // 信用卡，显示总额度减去已使用
-                    (totalAmount.toFloatOrNull().orElse(0f) - balance.toFloatOrNull().orElse(0f)).toString()
+                    (totalAmount.toBigDecimalOrZero() - balance.toBigDecimalOrZero()).formatToNumber()
                 } else {
                     // 其他，显示余额
                     balance

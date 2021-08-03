@@ -2,9 +2,9 @@ package cn.wj.android.cashbook.data.entity
 
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.formatToNumber
-import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
+import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
@@ -37,7 +37,7 @@ data class DateRecordEntity(
                     }
                     RecordTypeEnum.TRANSFER -> {
                         // 转账
-                        if (it.charge.toFloatOrNull().orElse(0f) > 0) {
+                        if (it.charge.toFloatOrZero() > 0) {
                             totalExpend += it.amount.toBigDecimalOrZero()
                         }
                     }

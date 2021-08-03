@@ -36,8 +36,12 @@ fun String?.moneyFormat(): String {
     return this.toBigDecimalOrZero().formatToNumber()
 }
 
-fun String?.toMoneyFloat(): Float {
-    return this?.toFloatOrNull().orElse(0f)
+fun String?.toFloatOrElse(value: Float): Float {
+    return this?.toFloatOrNull() ?: value
+}
+
+fun String?.toFloatOrZero(): Float {
+    return this?.toFloatOrNull() ?: 0f
 }
 
 fun String.md2Spanned(context: Context = AppManager.getContext()): Spanned {

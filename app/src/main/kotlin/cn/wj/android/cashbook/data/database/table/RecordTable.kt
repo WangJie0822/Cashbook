@@ -3,7 +3,7 @@ package cn.wj.android.cashbook.data.database.table
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import cn.wj.android.cashbook.base.ext.base.toMoneyFloat
+import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
@@ -62,7 +62,7 @@ data class RecordTable(
                 intoAssetId = -1L,
                 booksId = CurrentBooksLiveData.booksId,
                 recordId = -1L,
-                amount = balance.toMoneyFloat(),
+                amount = balance.toFloatOrZero(),
                 charge = 0f,
                 remark = remark,
                 tagIds = "",

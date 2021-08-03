@@ -4,10 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.liveData
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.formatToNumber
-import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.ext.base.toMoneyFloat
+import cn.wj.android.cashbook.base.ext.base.*
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.dateFormat
@@ -28,9 +25,9 @@ import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toRecordTable
 import cn.wj.android.cashbook.data.transform.toTagEntity
 import cn.wj.android.cashbook.data.transform.toTagTable
-import java.util.Calendar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.*
 
 /**
  * 记录相关数据仓库
@@ -238,7 +235,7 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, -90)
         val startDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime() ?: return@withContext result
-        recordDao.queryExpenditureRecordAfterDateLargerThanAmount(CurrentBooksLiveData.booksId, amount.toMoneyFloat(), startDate).forEach { item ->
+        recordDao.queryExpenditureRecordAfterDateLargerThanAmount(CurrentBooksLiveData.booksId, amount.toFloatOrZero(), startDate).forEach { item ->
             val record = loadRecordEntityFromTable(item, true)
             if (null != record) {
                 result.add(record)

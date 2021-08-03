@@ -4,26 +4,14 @@
 package cn.wj.android.cashbook.data.transform
 
 import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.ext.base.toMoneyFloat
+import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
-import cn.wj.android.cashbook.data.database.table.AssetTable
-import cn.wj.android.cashbook.data.database.table.BooksTable
-import cn.wj.android.cashbook.data.database.table.RecordTable
-import cn.wj.android.cashbook.data.database.table.TagTable
-import cn.wj.android.cashbook.data.database.table.TypeTable
-import cn.wj.android.cashbook.data.entity.AssetEntity
-import cn.wj.android.cashbook.data.entity.BooksEntity
-import cn.wj.android.cashbook.data.entity.RecordEntity
-import cn.wj.android.cashbook.data.entity.TagEntity
-import cn.wj.android.cashbook.data.entity.TypeEntity
-import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
-import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.data.enums.CurrencyEnum
-import cn.wj.android.cashbook.data.enums.RecordTypeEnum
-import cn.wj.android.cashbook.data.enums.TypeEnum
+import cn.wj.android.cashbook.data.database.table.*
+import cn.wj.android.cashbook.data.entity.*
+import cn.wj.android.cashbook.data.enums.*
 
 /**
  * 数据库数据转换相关
@@ -85,7 +73,7 @@ internal fun AssetEntity.toAssetTable(): AssetTable {
         id = if (-1L == id) null else id,
         booksId = booksId,
         name = name,
-        totalAmount = totalAmount.toMoneyFloat(),
+        totalAmount = totalAmount.toFloatOrZero(),
         billingDate = billingDate,
         repaymentDate = repaymentDate,
         type = type.name,
@@ -156,8 +144,8 @@ internal fun RecordEntity.toRecordTable(): RecordTable {
         intoAssetId = intoAsset?.id.orElse(-1L),
         booksId = booksId,
         recordId = record?.id.orElse(-1L),
-        amount = amount.toMoneyFloat(),
-        charge = charge.toMoneyFloat(),
+        amount = amount.toFloatOrZero(),
+        charge = charge.toFloatOrZero(),
         remark = remark,
         tagIds = with(StringBuilder()) {
             tags.forEach {
