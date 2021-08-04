@@ -237,4 +237,10 @@
     <string name="record_search_hint">搜索全部账单备注/金额</string>
     <string name="no_data_search">还没有数据哦，输入关键字搜索</string>
     <string name="auto_check_update">自动检查更新</string>
+    <string name="change_to_second_type">改为二级分类</string>
+    <string name="change_to_first_type">改为一级分类</string>
+    <string name="move_to_other_first_type">移动到其它一级分类</string>
+    <string name="update_success">更新成功</string>
+    <string name="please_select_first_type">请选择一级分类</string>
+    <string name="first_type_has_child">当前分类有二级分类，无法修改</string>
 </resources>

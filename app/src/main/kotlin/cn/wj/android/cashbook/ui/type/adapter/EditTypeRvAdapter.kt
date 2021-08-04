@@ -8,7 +8,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.databinding.RecyclerItemEditTypeFirstBinding
 import cn.wj.android.cashbook.ui.general.adapter.OneItemAdapter
-import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.TypeListViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.base.BaseRvListDBAdapter
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.callback.DragItemTouchCallback
@@ -23,7 +23,7 @@ import cn.wj.android.cashbook.widget.recyclerview.holder.BaseRvViewHolder
 class EditTypeRvAdapter : BaseRvListDBAdapter<
         EditTypeRvAdapter.ViewHolder,
         RecyclerItemEditTypeFirstBinding,
-        TypListViewModel,
+        TypeListViewModel,
         TypeEntity>(
     diffCallback = object : DiffUtil.ItemCallback<TypeEntity>() {
         override fun areItemsTheSame(oldItem: TypeEntity, newItem: TypeEntity): Boolean {

@@ -18,40 +18,13 @@ import cn.wj.android.cashbook.data.repository.type.TypeRepository
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.third.okhttp.InterceptorLogger
 import cn.wj.android.cashbook.third.okhttp.LoggerInterceptor
-import cn.wj.android.cashbook.ui.asset.viewmodel.AssetInfoViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.AssetLongClickMenuViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.AssetMoreMenuViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.EditAssetViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.InvisibleAssetLongClickMenuViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.InvisibleAssetViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.MyAssetViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetClassificationViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.SelectAssetViewModel
-import cn.wj.android.cashbook.ui.asset.viewmodel.SelectDayViewModel
+import cn.wj.android.cashbook.ui.asset.viewmodel.*
 import cn.wj.android.cashbook.ui.books.viewmodel.EditBooksViewModel
 import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.general.viewmodel.GeneralViewModel
-import cn.wj.android.cashbook.ui.main.viewmodel.AboutUsViewModel
-import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
-import cn.wj.android.cashbook.ui.main.viewmodel.MarkdownViewModel
-import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
-import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.CalculatorViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.CalendarViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.DateTimePickerViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.EditTagViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.RecordInfoViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.SearchRecordViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
-import cn.wj.android.cashbook.ui.record.viewmodel.SelectYearMonthViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeMenuViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.ReplaceTypeViewModel
-import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
+import cn.wj.android.cashbook.ui.main.viewmodel.*
+import cn.wj.android.cashbook.ui.record.viewmodel.*
+import cn.wj.android.cashbook.ui.type.viewmodel.*
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -205,7 +178,7 @@ val viewModelModule = module {
         EditTypeListViewModel()
     }
     viewModel {
-        TypListViewModel(get())
+        TypeListViewModel(get())
     }
     viewModel {
         EditTypeViewModel(get())
@@ -218,6 +191,9 @@ val viewModelModule = module {
     }
     viewModel {
         SearchRecordViewModel(get())
+    }
+    viewModel {
+        SelectFirstTypeViewModel(get())
     }
 
     // Fragment

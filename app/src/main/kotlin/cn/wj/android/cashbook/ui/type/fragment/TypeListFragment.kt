@@ -1,21 +1,24 @@
 package cn.wj.android.cashbook.ui.type.fragment
 
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ItemTouchHelper
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseFragment
-import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
-import cn.wj.android.cashbook.data.constants.ACTION_TYPE
-import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
+import cn.wj.android.cashbook.data.constants.*
+import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.FragmentTypeListBinding
+import cn.wj.android.cashbook.ui.type.activity.SelectFirstTypeActivity
 import cn.wj.android.cashbook.ui.type.adapter.EditTypeRvAdapter
 import cn.wj.android.cashbook.ui.type.dialog.EditTypeMenuDialog
-import cn.wj.android.cashbook.ui.type.viewmodel.TypListViewModel
+import cn.wj.android.cashbook.ui.type.viewmodel.TypeListViewModel
 import cn.wj.android.cashbook.widget.recyclerview.callback.DragItemTouchCallback
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -26,11 +29,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/29
  */
-class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>() {
+class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding>() {
 
     override val layoutResId: Int = R.layout.fragment_type_list
 
-    override val viewModel: TypListViewModel by viewModel()
+    override val viewModel: TypeListViewModel by viewModel()
 
     /** 适配器对象 */
     private val adapter: EditTypeRvAdapter by lazy {
@@ -39,12 +42,26 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
         }
     }
 
+    /** 操作的分类对象 */
+    private var targetTypeEntity: TypeEntity? = null
+
+    /** 选择一级分类启动器 */
+    private lateinit var selectFirstTypeLauncher: ActivityResultLauncher<Intent>
+
     override fun beforeOnCreate() {
         // 获取分类大类
         viewModel.typeData.value = requireArguments().getParcelable<RecordTypeEnum>(ACTION_TYPE).orElse(RecordTypeEnum.EXPENDITURE)
     }
 
     override fun initView() {
+        // 注册 launcher
+        selectFirstTypeLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode != ACTIVITY_RESULT_OK) {
+                return@registerForActivityResult
+            }
+            // 选择一级分类返回
+            viewModel.disposeForResult(targetTypeEntity ?: return@registerForActivityResult, it.data?.getParcelableExtra(ACTION_SELECTED) ?: return@registerForActivityResult)
+        }
         // 配置 RecyclerView
         binding.rvType.run {
             layoutManager = WrapContentLinearLayoutManager()
@@ -66,6 +83,7 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
         // 显示编辑弹窗
         viewModel.showEditTypeMenuEvent.observe(this, { type ->
             EditTypeMenuDialog.actionShow(childFragmentManager,
+                type.first,
                 onEditClick = {
                     // 编辑点击
                     viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
@@ -79,6 +97,25 @@ class TypeListFragment : BaseFragment<TypListViewModel, FragmentTypeListBinding>
                 onDeleteClick = {
                     // 删除点击
                     viewModel.deleteType(type)
+                },
+                onChangeToSecondTypeClick = {
+                    // 修改为二级分类
+                    if (type.childList.isNotEmpty()) {
+                        // 有二级分类，无法修改
+                        viewModel.snackbarEvent.value = R.string.first_type_has_child.string.toSnackbarModel()
+                    } else {
+                        targetTypeEntity = type
+                        selectFirstTypeLauncher.launch(SelectFirstTypeActivity.createIntent(requireActivity(), type))
+                    }
+                },
+                onChangeToFirstTypeClick = {
+                    // 修改为一级分类
+                    viewModel.changeToFirstType(type)
+                },
+                onMoveToOtherFirstTypeClick = {
+                    // 移动到其它一级分类
+                    targetTypeEntity = type
+                    selectFirstTypeLauncher.launch(SelectFirstTypeActivity.createIntent(requireActivity(), type))
                 },
                 onStatisticsClick = {
                     // TODO 统计数据点击

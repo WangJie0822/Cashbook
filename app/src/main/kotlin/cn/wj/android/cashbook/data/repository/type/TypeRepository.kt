@@ -37,6 +37,17 @@ class TypeRepository(database: CashbookDatabase) : Repository(database) {
         }
     }
 
+    /** 获取 [type] 同类别且不包含 [type] 的一级分类列表 */
+    suspend fun getFirstTypeListWithOutType(type: TypeEntity): List<TypeEntity> = withContext(Dispatchers.IO) {
+        typeDao.queryByPosition(TypeEnum.FIRST.name, type.recordType.position).dropWhile {
+            it.id == type.id
+        }.map {
+            it.toTypeEntity(null)
+        }.sortedBy {
+            it.sort
+        }
+    }
+
     /** 获取分类图标数据 */
     suspend fun getTypeIconData(): List<TypeIconGroupEntity> = withContext(Dispatchers.IO) {
         getTypeIconGroupList()

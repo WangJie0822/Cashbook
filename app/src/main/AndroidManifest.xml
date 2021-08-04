@@ -175,6 +175,12 @@
             android:name=".ui.type.activity.ReplaceTypeActivity"
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
+
+        <!-- 选择一级分类 -->
+        <activity
+            android:name=".ui.type.activity.SelectFirstTypeActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

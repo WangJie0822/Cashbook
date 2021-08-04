@@ -18,51 +18,11 @@ import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.fitsStatusBar
 import cn.wj.android.cashbook.base.ext.setOnThrottleClickListener
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 
 /*
  * View DataBinding 适配器
  */
-
-/** 给 [View] 设置点击事件 [click]，传递数据 [item]，并设置重复点击拦截间隔时间 [throttle]，[throttle] 默认 [DEFAULT_CLICK_THROTTLE_MS] */
-@BindingAdapter(
-    "android:bind_onClick",
-    "android:bind_onClick_item",
-    "android:bind_onClick_throttle",
-    requireAll = false
-)
-fun <T> View.setViewOnClick(click: ViewItemClickListener<T>?, item: T, throttle: Long?) {
-    if (null == click) {
-        this.setOnClickListener(null)
-        return
-    }
-    val interval = throttle ?: DEFAULT_CLICK_THROTTLE_MS
-    this.setOnThrottleClickListener({ click.onItemClick(item) }, interval)
-}
-
-/** 给 [View] 设置点击事件 [listener] 并设置重复点击拦截间隔时间 [throttle]，[throttle] 默认 [DEFAULT_CLICK_THROTTLE_MS] */
-@BindingAdapter("android:bind_onClick", "android:bind_onClick_throttle", requireAll = false)
-fun View.setViewOnClick(listener: ViewClickListener?, throttle: Long?) {
-    if (null == listener) {
-        this.setOnClickListener(null)
-        return
-    }
-    val interval = throttle ?: DEFAULT_CLICK_THROTTLE_MS
-    this.setOnThrottleClickListener({ listener.onClick() }, interval)
-}
-
-/** View 点击事件 */
-interface ViewClickListener {
-
-    /** 点击回调 */
-    fun onClick()
-}
-
-/** View 点击事件，传递参数 [T] */
-interface ViewItemClickListener<T> {
-
-    /** 点击回调，传递参数 [item] */
-    fun onItemClick(item: T)
-}
 
 /** 给 [View] 设置点击事件 [click] 并设置重复点击拦截间隔时间 [throttle]，[throttle] 默认 [DEFAULT_CLICK_THROTTLE_MS] */
 @BindingAdapter("android:bind_onClick", "android:bind_onClick_throttle", requireAll = false)

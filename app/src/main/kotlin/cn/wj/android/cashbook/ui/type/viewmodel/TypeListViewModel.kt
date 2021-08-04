@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/29
  */
-class TypListViewModel(private val repository: TypeRepository) : BaseViewModel() {
+class TypeListViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 记录展开类型的 id */
     private var expandTypeId = -1L
@@ -167,6 +167,42 @@ class TypListViewModel(private val repository: TypeRepository) : BaseViewModel()
                 snackbarEvent.value = R.string.delete_success.string.toSnackbarModel()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "deleteType")
+            }
+        }
+    }
+
+    /** 将  [type] 修改为一级分类 */
+    fun changeToFirstType(type: TypeEntity) {
+        viewModelScope.launch {
+            try {
+                val changed = type.copy(parent = null, type = TypeEnum.FIRST, sort = repository.getTypeCount().toInt())
+                repository.updateType(changed)
+                // 修改成功，刷新列表
+                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
+                snackbarEvent.value = R.string.update_success.string.toSnackbarModel()
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "changeToFirstType")
+            }
+        }
+    }
+
+    /** 处理选择一级分类返回 */
+    fun disposeForResult(target: TypeEntity, first: TypeEntity) {
+        viewModelScope.launch {
+            try {
+                val changed = if (target.first) {
+                    // 一级分类，修改为二级分类
+                    target.copy(parent = first, type = TypeEnum.SECOND, sort = repository.getTypeCount().toInt())
+                } else {
+                    // 二级分类，移动到其它一级分类
+                    target.copy(parent = first, sort = repository.getTypeCount().toInt())
+                }
+                repository.updateType(changed)
+                // 修改成功，刷新列表
+                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
+                snackbarEvent.value = R.string.update_success.string.toSnackbarModel()
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "changeToFirstType")
             }
         }
     }

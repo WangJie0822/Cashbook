@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.ui.type.dialog
 
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.tag
@@ -32,6 +33,9 @@ class EditTypeMenuDialog : BaseDialog<EditTypeMenuViewModel, DialogEditTypeMenuB
 
     private var onEditClickListener: (() -> Unit)? = null
     private var onDeleteClickListener: (() -> Unit)? = null
+    private var onChangeToSecondTypeClickListener: (() -> Unit)? = null
+    private var onChangeToFirstTypeClickListener: (() -> Unit)? = null
+    private var onMoveToOtherFirstTypeClickListener: (() -> Unit)? = null
     private var onStatisticsClickListener: (() -> Unit)? = null
 
     override fun initView() {
@@ -40,6 +44,9 @@ class EditTypeMenuDialog : BaseDialog<EditTypeMenuViewModel, DialogEditTypeMenuB
             getTag(requireActivity().tag)
             fitsSystemWindows(true)
         }
+
+        // 获取分类类别
+        viewModel.firstType.value = requireArguments().getBoolean(ACTION_FIRST, true)
     }
 
     override fun observe() {
@@ -52,6 +59,18 @@ class EditTypeMenuDialog : BaseDialog<EditTypeMenuViewModel, DialogEditTypeMenuB
             onDeleteClickListener?.invoke()
             dismiss()
         })
+        viewModel.changeToSecondTypeEvent.observe(this, {
+            onChangeToSecondTypeClickListener?.invoke()
+            dismiss()
+        })
+        viewModel.changeToFirstTypeEvent.observe(this, {
+            onChangeToFirstTypeClickListener?.invoke()
+            dismiss()
+        })
+        viewModel.moveToOtherFirstTypeEvent.observe(this, {
+            onMoveToOtherFirstTypeClickListener?.invoke()
+            dismiss()
+        })
         viewModel.statisticsClickEvent.observe(this, {
             onStatisticsClickListener?.invoke()
             dismiss()
@@ -59,10 +78,29 @@ class EditTypeMenuDialog : BaseDialog<EditTypeMenuViewModel, DialogEditTypeMenuB
     }
 
     companion object {
-        fun actionShow(manager: FragmentManager, onEditClick: () -> Unit, onDeleteClick: () -> Unit, onStatisticsClick: () -> Unit) {
+
+        /** 标记 - 是否是一级分类 */
+        private const val ACTION_FIRST = "action_first"
+
+        fun actionShow(
+            manager: FragmentManager,
+            first: Boolean,
+            onEditClick: () -> Unit,
+            onDeleteClick: () -> Unit,
+            onChangeToSecondTypeClick: () -> Unit,
+            onChangeToFirstTypeClick: () -> Unit,
+            onMoveToOtherFirstTypeClick: () -> Unit,
+            onStatisticsClick: () -> Unit
+        ) {
             EditTypeMenuDialog().run {
+                arguments = bundleOf(
+                    ACTION_FIRST to first
+                )
                 onEditClickListener = onEditClick
                 onDeleteClickListener = onDeleteClick
+                onChangeToSecondTypeClickListener = onChangeToSecondTypeClick
+                onChangeToFirstTypeClickListener = onChangeToFirstTypeClick
+                onMoveToOtherFirstTypeClickListener = onMoveToOtherFirstTypeClick
                 onStatisticsClickListener = onStatisticsClick
                 show(manager)
             }

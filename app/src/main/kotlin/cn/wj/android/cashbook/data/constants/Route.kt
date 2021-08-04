@@ -56,3 +56,6 @@ const val ROUTE_PATH_TYPE_EDIT = "/path/type/edit"
 
 /** 路由路径 - 编辑分类 */
 const val ROUTE_PATH_TYPE_REPLACE = "/path/type/replace"
+
+/** 路由路径 - 选择一级分类 */
+const val ROUTE_PATH_TYPE_SELECT_FIRST = "/path/type/selectFirst"
