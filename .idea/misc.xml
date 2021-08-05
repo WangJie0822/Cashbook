@@ -3,9 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_edit_asset.xml" value="0.31197916666666664" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_edit_record.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_main.xml" value="0.2759259259259259" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_select_first_type.xml" value="0.3104166666666667" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_setting.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/dialog_edit_type_menu.xml" value="0.3104166666666667" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/fragment_edit_record.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/fragment_type_list.xml" value="0.3104166666666667" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/layout_main_content.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/recycler_item_edit_type_first.xml" value="0.3104166666666667" />

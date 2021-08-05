@@ -121,7 +121,7 @@
                     style="@style/textInputEditTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
+                    android:inputType="numberSigned|numberDecimal"
                     android:text="@={viewModel.chargeStr}" />
 
             </com.google.android.material.textfield.TextInputLayout>
