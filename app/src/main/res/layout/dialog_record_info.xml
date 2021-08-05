@@ -81,8 +81,10 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/spacing_normal"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onBeAssociateRecordClick}"
                 android:bind_visibility="@{item.showAssociatedInInfoDialog}"
+                android:padding="@dimen/spacing_normal"
                 android:text="@{item.associatedStrInInfoDialog}"
                 android:textAppearance="?attr/textAppearanceCaption"
                 android:visibility="gone"

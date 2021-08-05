@@ -50,7 +50,25 @@ class RecordInfoViewModel(private val repository: RecordRepository) : BaseViewMo
     /** 关联的记录点击 */
     val onAssociatedRecordClick: () -> Unit = {
         record.record?.let {
-            showAssociatedRecordInfoEvent.value = it
+            showOtherInfo(it.id)
+        }
+    }
+
+    /** 被关联记录点击 */
+    val onBeAssociateRecordClick: () -> Unit = {
+        record.beAssociated?.let {
+            showOtherInfo(it.id)
+        }
+    }
+
+    /** 显示指定 [id] 的其它记录信息 */
+    private fun showOtherInfo(id: Long) {
+        viewModelScope.launch {
+            try {
+                showAssociatedRecordInfoEvent.value = repository.getRecordById(id)
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "showOtherInfo")
+            }
         }
     }
 
