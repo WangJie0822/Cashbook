@@ -1,9 +1,7 @@
 package cn.wj.android.cashbook.ui.books.activity
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.ConcatAdapter
@@ -16,6 +14,7 @@ import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMyBooksBinding
 import cn.wj.android.cashbook.databinding.RecyclerItemBooksBinding
+import cn.wj.android.cashbook.third.result.createForActivityResultLauncher
 import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.general.adapter.OneItemAdapter
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
@@ -44,26 +43,11 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
     )
 
     /** 编辑账本 launcher */
-    private lateinit var editBooksResultLauncher: ActivityResultLauncher<Intent>
+    private val editBooksResultLauncher = createForActivityResultLauncher(ActivityResultContracts.StartActivityForResult())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_books)
-
-        // 注册 launcher
-        editBooksResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.getParcelableExtra<BooksEntity>(ACTION_BOOKS)?.let { newBooks ->
-                    if (newBooks.id == -1L) {
-                        // 新增
-                        viewModel.insertBooks(newBooks)
-                    } else {
-                        // 编辑
-                        viewModel.updateBooks(newBooks)
-                    }
-                }
-            }
-        }
 
         // 配置 RecyclerView
         binding.rv.run {
@@ -121,7 +105,19 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
         })
         // 跳转新增
         viewModel.jumpToAddBooksEvent.observe(this, {
-            editBooksResultLauncher.launch(EditBooksActivity.parseIntent(context))
+            editBooksResultLauncher.launch(EditBooksActivity.parseIntent(context)) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.getParcelableExtra<BooksEntity>(ACTION_BOOKS)?.let { newBooks ->
+                        if (newBooks.id == -1L) {
+                            // 新增
+                            viewModel.insertBooks(newBooks)
+                        } else {
+                            // 编辑
+                            viewModel.updateBooks(newBooks)
+                        }
+                    }
+                }
+            }
         })
     }
 }

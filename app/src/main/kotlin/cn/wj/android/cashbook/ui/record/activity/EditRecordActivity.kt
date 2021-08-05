@@ -1,9 +1,7 @@
 package cn.wj.android.cashbook.ui.record.activity
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import cn.wj.android.cashbook.R
@@ -17,6 +15,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
+import cn.wj.android.cashbook.third.result.createForActivityResultLauncher
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetDialog
 import cn.wj.android.cashbook.ui.record.adapter.EditRecordVpAdapter
 import cn.wj.android.cashbook.ui.record.dialog.CalculatorDialog
@@ -43,20 +42,11 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
     }
 
     /** 选择关联记录启动器 */
-    lateinit var selectAssociatedRecordResultLauncher: ActivityResultLauncher<Intent>
+    private val selectAssociatedRecordResultLauncher = createForActivityResultLauncher(ActivityResultContracts.StartActivityForResult())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_record)
-
-        // 注册 launcher
-        selectAssociatedRecordResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.getParcelableExtra<RecordEntity>(ACTION_RECORD)?.let { selected ->
-                    viewModel.associatedRecord.value = selected
-                }
-            }
-        }
 
         // 配置 ViewPager2
         binding.vpType.adapter = typesVpAdapter
@@ -104,7 +94,13 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         })
         // 跳转选择关联记录
         viewModel.jumpSelectAssociatedRecordEvent.observe(this, {
-            selectAssociatedRecordResultLauncher.launch(SelectAssociatedRecordActivity.parseIntent(context, viewModel.dateStr.value.orEmpty(), viewModel.calculatorStr.get().orEmpty(), it))
+            selectAssociatedRecordResultLauncher.launch(SelectAssociatedRecordActivity.parseIntent(context, viewModel.dateStr.value.orEmpty(), viewModel.calculatorStr.get().orEmpty(), it)) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.getParcelableExtra<RecordEntity>(ACTION_RECORD)?.let { selected ->
+                        viewModel.associatedRecord.value = selected
+                    }
+                }
+            }
         })
         // 显示选择标签弹窗
         viewModel.showSelectTagDialogEvent.observe(this, { selected ->
@@ -115,13 +111,13 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
 
         // 标签变化
         LiveEventBus.get(EVENT_TAG_CHANGE).observe(this, { value ->
-            (value as? TagEntity)?.let { tag->
+            (value as? TagEntity)?.let { tag ->
                 viewModel.notifyTagChanged(tag)
             }
         })
         // 标签删除
         LiveEventBus.get(EVENT_TAG_DELETE).observe(this, { value ->
-            (value as? TagEntity)?.let { tag->
+            (value as? TagEntity)?.let { tag ->
                 viewModel.notifyTagDelete(tag)
             }
         })

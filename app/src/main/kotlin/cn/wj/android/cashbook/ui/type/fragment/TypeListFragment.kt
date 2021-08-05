@@ -1,7 +1,5 @@
 package cn.wj.android.cashbook.ui.type.fragment
 
-import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -10,11 +8,11 @@ import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseFragment
 import cn.wj.android.cashbook.data.constants.*
-import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.FragmentTypeListBinding
+import cn.wj.android.cashbook.third.result.createForActivityResultLauncher
 import cn.wj.android.cashbook.ui.type.activity.SelectFirstTypeActivity
 import cn.wj.android.cashbook.ui.type.adapter.EditTypeRvAdapter
 import cn.wj.android.cashbook.ui.type.dialog.EditTypeMenuDialog
@@ -42,11 +40,8 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
         }
     }
 
-    /** 操作的分类对象 */
-    private var targetTypeEntity: TypeEntity? = null
-
     /** 选择一级分类启动器 */
-    private lateinit var selectFirstTypeLauncher: ActivityResultLauncher<Intent>
+    private val selectFirstTypeLauncher = createForActivityResultLauncher(ActivityResultContracts.StartActivityForResult())
 
     override fun beforeOnCreate() {
         // 获取分类大类
@@ -54,14 +49,6 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
     }
 
     override fun initView() {
-        // 注册 launcher
-        selectFirstTypeLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode != ACTIVITY_RESULT_OK) {
-                return@registerForActivityResult
-            }
-            // 选择一级分类返回
-            viewModel.disposeForResult(targetTypeEntity ?: return@registerForActivityResult, it.data?.getParcelableExtra(ACTION_SELECTED) ?: return@registerForActivityResult)
-        }
         // 配置 RecyclerView
         binding.rvType.run {
             layoutManager = WrapContentLinearLayoutManager()
@@ -104,8 +91,13 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
                         // 有二级分类，无法修改
                         viewModel.snackbarEvent.value = R.string.first_type_has_child.string.toSnackbarModel()
                     } else {
-                        targetTypeEntity = type
-                        selectFirstTypeLauncher.launch(SelectFirstTypeActivity.createIntent(requireActivity(), type))
+                        selectFirstTypeLauncher.launch(SelectFirstTypeActivity.createIntent(requireActivity(), type)) {
+                            if (it.resultCode != ACTIVITY_RESULT_OK) {
+                                return@launch
+                            }
+                            // 选择一级分类返回
+                            viewModel.disposeForResult(type, it.data?.getParcelableExtra(ACTION_SELECTED) ?: return@launch)
+                        }
                     }
                 },
                 onChangeToFirstTypeClick = {
@@ -114,8 +106,13 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
                 },
                 onMoveToOtherFirstTypeClick = {
                     // 移动到其它一级分类
-                    targetTypeEntity = type
-                    selectFirstTypeLauncher.launch(SelectFirstTypeActivity.createIntent(requireActivity(), type))
+                    selectFirstTypeLauncher.launch(SelectFirstTypeActivity.createIntent(requireActivity(), type)) {
+                        if (it.resultCode != ACTIVITY_RESULT_OK) {
+                            return@launch
+                        }
+                        // 选择一级分类返回
+                        viewModel.disposeForResult(type, it.data?.getParcelableExtra(ACTION_SELECTED) ?: return@launch)
+                    }
                 },
                 onStatisticsClick = {
                     // TODO 统计数据点击
