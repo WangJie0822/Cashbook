@@ -63,4 +63,6 @@ class SearchRecordViewModel(private val repository: RecordRepository) : BaseView
         showRecordDetailsDialogEvent.value = item
     }
 
+    override val onRecordItemLongClick: (RecordEntity) -> Unit = { }
+
 }

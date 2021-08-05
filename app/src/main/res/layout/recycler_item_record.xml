@@ -21,6 +21,8 @@
         android:background="?selectableItemBackground"
         android:bind_onClick="@{viewModel.onRecordItemClick}"
         android:bind_onClick_item="@{item}"
+        android:bind_onLongClick="@{viewModel.onRecordItemLongClick}"
+        android:bind_onLongClick_item="@{item}"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/spacing_normal"

@@ -119,8 +119,8 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
                     viewModel.snackbarEvent.value = "跳转统计数据-${type.name}".toSnackbarModel()
                 })
         })
-        // 分类数据变化
-        LiveEventBus.get(EVENT_TYPE_CHANGE).observe(this, {
+        // 记录数据变化
+        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
             viewModel.loadTypeList()
         })
     }

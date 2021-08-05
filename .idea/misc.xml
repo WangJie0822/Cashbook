@@ -12,7 +12,9 @@
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/fragment_edit_record.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/fragment_type_list.xml" value="0.3104166666666667" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/layout_main_content.xml" value="0.31197916666666664" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/recycler_item_asset_list.xml" value="0.15520833333333334" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/recycler_item_edit_type_first.xml" value="0.3104166666666667" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/recycler_item_record.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/recycler_item_type_first.xml" value="0.3104166666666667" />
       </map>
     </option>

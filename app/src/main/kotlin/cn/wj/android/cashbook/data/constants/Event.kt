@@ -8,6 +8,3 @@ const val EVENT_TAG_CHANGE = "event_tag_change"
 
 /** 事件 - 标签删除 */
 const val EVENT_TAG_DELETE = "event_tag_delete"
-
-/** 事件 - 分类变化 */
-const val EVENT_TYPE_CHANGE = "event_type_change"

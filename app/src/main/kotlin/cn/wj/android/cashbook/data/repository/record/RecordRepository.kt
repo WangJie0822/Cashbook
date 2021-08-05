@@ -55,6 +55,11 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
         result
     }
 
+    /** 根据 [id] 获取记录数据 */
+    suspend fun getRecordById(id: Long): RecordEntity? = withContext(Dispatchers.IO) {
+        loadRecordEntityFromTable(recordDao.queryById(id), false)
+    }
+
     /** 获取指定日期的记录数据 */
     suspend fun getRecordListByDate(calendar: com.haibin.calendarview.Calendar): List<DateRecordEntity> = withContext(Dispatchers.IO) {
         // 首页显示一周内数据

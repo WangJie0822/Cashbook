@@ -1,15 +1,11 @@
 package cn.wj.android.cashbook.ui.type.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
+import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.type.TypeRepository
@@ -112,7 +108,7 @@ class ReplaceTypeViewModel(private val repository: TypeRepository) : BaseViewMod
                 // 删除分类
                 repository.deleteType(old)
                 // 修改成功
-                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
+                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 snackbarEvent.value = R.string.modify_success.string.toSnackbarModel(onCallback = object : Snackbar.Callback() {
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                         uiNavigationEvent.value = UiNavigationModel.builder {

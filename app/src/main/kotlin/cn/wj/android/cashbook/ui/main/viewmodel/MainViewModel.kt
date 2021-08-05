@@ -16,16 +16,7 @@ import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_MY
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_MY
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_CALENDAR
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
+import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
@@ -38,6 +29,10 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import cn.wj.android.cashbook.manager.UpdateManager
 import kotlinx.coroutines.launch
+import kotlin.text.orEmpty
+import kotlin.text.replace
+import kotlin.text.toBigDecimal
+import kotlin.text.toFloatOrNull
 
 /**
  * 主界面 ViewModel
@@ -224,6 +219,8 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
     override val onRecordItemClick: (RecordEntity) -> Unit = { item ->
         showRecordDetailsDialogEvent.value = item
     }
+
+    override val onRecordItemLongClick: (RecordEntity) -> Unit = { }
 
     /** 检查更新 */
     fun checkUpdate() {

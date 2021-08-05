@@ -9,10 +9,7 @@ import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
-import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_REPLACE
+import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.enums.TypeEnum
@@ -163,7 +160,7 @@ class TypeListViewModel(private val repository: TypeRepository) : BaseViewModel(
                 }
                 repository.deleteType(type)
                 // 删除成功，刷新列表
-                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
+                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 snackbarEvent.value = R.string.delete_success.string.toSnackbarModel()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "deleteType")
@@ -178,7 +175,7 @@ class TypeListViewModel(private val repository: TypeRepository) : BaseViewModel(
                 val changed = type.copy(parent = null, type = TypeEnum.FIRST, sort = repository.getTypeCount().toInt())
                 repository.updateType(changed)
                 // 修改成功，刷新列表
-                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
+                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 snackbarEvent.value = R.string.update_success.string.toSnackbarModel()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "changeToFirstType")
@@ -199,7 +196,7 @@ class TypeListViewModel(private val repository: TypeRepository) : BaseViewModel(
                 }
                 repository.updateType(changed)
                 // 修改成功，刷新列表
-                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
+                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 snackbarEvent.value = R.string.update_success.string.toSnackbarModel()
             } catch (throwable: Throwable) {
                 logger().e(throwable, "changeToFirstType")

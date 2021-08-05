@@ -137,6 +137,8 @@ class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewMode
         showRecordDetailsDialogEvent.value = item
     }
 
+    override val onRecordItemLongClick: (RecordEntity) -> Unit = { }
+
     /** 切换隐藏状态 */
     private fun toggleInvisibleStatus() {
         val asset = assetData.value ?: return

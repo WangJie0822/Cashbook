@@ -8,7 +8,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
-import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
+import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.entity.TypeIconEntity
 import cn.wj.android.cashbook.data.entity.TypeIconGroupEntity
@@ -156,7 +156,7 @@ class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel(
                     // 更新分类
                     repository.updateType(typeEntity.copy(name = name, iconResName = iconResIdStr))
                 }
-                LiveEventBus.get(EVENT_TYPE_CHANGE).post(0)
+                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 uiNavigationEvent.value = UiNavigationModel.builder {
                     close()
                 }

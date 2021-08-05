@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
-import cn.wj.android.cashbook.data.constants.EVENT_TYPE_CHANGE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_CALENDAR
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.databinding.ActivityCalendarBinding
@@ -65,10 +64,6 @@ class CalendarActivity : BaseActivity<CalendarViewModel, ActivityCalendarBinding
         })
         // 记录变化监听
         LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
-            viewModel.refresh()
-        })
-        // 分类数据变化
-        LiveEventBus.get(EVENT_TYPE_CHANGE).observe(this, {
             viewModel.refresh()
         })
     }

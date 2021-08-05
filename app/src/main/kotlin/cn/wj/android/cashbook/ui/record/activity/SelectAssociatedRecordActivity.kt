@@ -6,16 +6,15 @@ import android.content.Intent
 import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.ACTION_CURRENT_AMOUNT
-import cn.wj.android.cashbook.data.constants.ACTION_DATE
-import cn.wj.android.cashbook.data.constants.ACTION_REFUND
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SELECT_ASSOCIATED
+import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.databinding.ActivitySelectAccosiatedRecordBinding
+import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -54,6 +53,14 @@ class SelectAssociatedRecordActivity : BaseActivity<SelectAssociatedRecordViewMo
         // 列表数据
         viewModel.listData.observe(this, { list ->
             recordAdapter.submitList(list)
+        })
+        // 显示记录详情弹窗
+        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
+            RecordInfoDialog.actionShow(supportFragmentManager, record)
+        })
+        // 记录变化监听
+        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+            viewModel.searchText.value = viewModel.searchText.value
         })
     }
 

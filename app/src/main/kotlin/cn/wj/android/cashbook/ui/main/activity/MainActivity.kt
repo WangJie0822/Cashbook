@@ -145,9 +145,5 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
             viewModel.refreshing.value = true
         })
-        // 分类数据变化
-        LiveEventBus.get(EVENT_TYPE_CHANGE).observe(this, {
-            viewModel.refreshing.value = true
-        })
     }
 }

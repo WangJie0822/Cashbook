@@ -1,10 +1,6 @@
 package cn.wj.android.cashbook.ui.record.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
@@ -130,6 +126,8 @@ class CalendarViewModel(private val repository: RecordRepository) : BaseViewMode
     override val onRecordItemClick: (RecordEntity) -> Unit = { item ->
         showRecordDetailsDialogEvent.value = item
     }
+
+    override val onRecordItemLongClick: (RecordEntity) -> Unit = { }
 
     /** 刷新数据 */
     fun refresh() {

@@ -55,6 +55,7 @@
             android:layout_marginEnd="@dimen/spacing_big"
             android:layout_marginBottom="@dimen/spacing_normal"
             android:bind_backgroundTint="@{viewModel.primaryTint}"
+            android:bind_enable="@{viewModel.buttonEnable}"
             android:bind_onClick="@{viewModel.onSaveClick}"
             android:text="@string/save" />
 

@@ -13,12 +13,7 @@ import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
-import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
-import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
-import cn.wj.android.cashbook.base.tools.dateFormat
-import cn.wj.android.cashbook.base.tools.getSharedLong
-import cn.wj.android.cashbook.base.tools.maps
-import cn.wj.android.cashbook.base.tools.setSharedLong
+import cn.wj.android.cashbook.base.tools.*
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET_ID
@@ -38,6 +33,7 @@ import cn.wj.android.cashbook.manager.DatabaseManager
 import cn.wj.android.cashbook.widget.calculator.SYMBOL_ZERO
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
+import kotlin.text.orEmpty
 
 /**
  * 编辑记录 ViewModel
@@ -84,6 +80,9 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
             }
         }
 
+    /** 显示记录详情弹窗事件 */
+    val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
+
     /** 显示选择标签弹窗事件 */
     val showSelectTagDialogEvent: LifecycleEvent<List<TagEntity>> = LifecycleEvent()
 
@@ -108,20 +107,11 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
     /** 支出类型 */
     val expenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
 
-    /** 支出类型 */
-    val secondExpenditureType: MutableLiveData<TypeEntity> = MutableLiveData()
-
     /** 收入类型 */
     val incomeType: MutableLiveData<TypeEntity> = MutableLiveData()
 
-    /** 收入类型 */
-    val secondIncomeType: MutableLiveData<TypeEntity> = MutableLiveData()
-
     /** 转账类型 */
     val transferType: MutableLiveData<TypeEntity> = MutableLiveData()
-
-    /** 转账类型 */
-    val secondTransferType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 账户信息 */
     val accountData: MutableLiveData<AssetEntity> = object : MutableLiveData<AssetEntity>() {
@@ -308,6 +298,12 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
         jumpSelectAssociatedRecordEvent.value = incomeType.value?.refund.condition
     }
 
+    /** 关联记录长点击 */
+    val onAssociatedRecordLongClick: () -> Boolean = {
+        showRecordDetailsDialogEvent.value = associatedRecord.value
+        true
+    }
+
     /** 关联记录清除点击 */
     val onAssociateRecordCloseClick: () -> Unit = {
         // 清除关联记录
@@ -461,5 +457,17 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
             list.removeAt(index)
         }
         tagsData.value = list
+    }
+
+    /** 刷新绑定的记录数据 */
+    fun refreshAssociatedRecord() {
+        val associated = associatedRecord.value ?: return
+        viewModelScope.launch {
+            try {
+                associatedRecord.value = repository.getRecordById(associated.id)
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "refreshAssociatedRecord")
+            }
+        }
     }
 }

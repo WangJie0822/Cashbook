@@ -1,11 +1,7 @@
 package cn.wj.android.cashbook.ui.record.viewmodel
 
 import androidx.core.os.bundleOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
@@ -15,6 +11,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
 import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.record.RecordRepository
@@ -27,6 +24,9 @@ import kotlinx.coroutines.launch
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/16
  */
 class SelectAssociatedRecordViewModel(private val repository: RecordRepository) : BaseViewModel(), RecordListClickListener {
+
+    /** 显示记录详情弹窗事件 */
+    val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
 
     /** 标记 - 是否是退款 */
     val refund: MutableLiveData<Boolean> = MutableLiveData()
@@ -100,6 +100,11 @@ class SelectAssociatedRecordViewModel(private val repository: RecordRepository) 
                 )
             )
         }
+    }
+
+    /** 记录 item 长点击 */
+    override val onRecordItemLongClick: (RecordEntity) -> Unit = { item ->
+        showRecordDetailsDialogEvent.value = item
     }
 
     /** 根据是否是退款 [refund] 获取默认列表数据 */

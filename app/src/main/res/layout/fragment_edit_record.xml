@@ -213,6 +213,7 @@
                     android:bind_chip_freezeChecked="@{viewModel.associatedRecordChecked}"
                     android:bind_chip_onCloseClick="@{viewModel.onAssociateRecordCloseClick}"
                     android:bind_onClick="@{viewModel.onAssociatedRecordClick}"
+                    android:bind_onLongClick="@{viewModel.onAssociatedRecordLongClick}"
                     android:bind_visibility="@{viewModel.showAssociatedRecord}"
                     android:text="@{viewModel.associatedRecordStr}"
                     android:textColor="@color/selector_record_options"

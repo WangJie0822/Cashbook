@@ -11,4 +11,7 @@ interface RecordListClickListener {
 
     /** 点击回调 */
     val onRecordItemClick: (RecordEntity) -> Unit
+
+    /** 长点击回调 */
+    val onRecordItemLongClick: (RecordEntity) -> Unit
 }
