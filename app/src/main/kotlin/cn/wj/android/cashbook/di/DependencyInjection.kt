@@ -195,6 +195,9 @@ val viewModelModule = module {
     viewModel {
         SelectFirstTypeViewModel(get())
     }
+    viewModel {
+        BackupViewModel(get())
+    }
 
     // Fragment
     viewModel {

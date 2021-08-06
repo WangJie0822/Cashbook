@@ -7,38 +7,44 @@ import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
+import cn.wj.android.cashbook.base.tools.createFileIfNotExists
 import cn.wj.android.cashbook.base.tools.dateFormat
+import cn.wj.android.cashbook.base.tools.deleteFiles
+import cn.wj.android.cashbook.base.tools.toJsonString
 import cn.wj.android.cashbook.base.tools.toLongTime
+import cn.wj.android.cashbook.base.tools.zipToFile
+import cn.wj.android.cashbook.data.config.AppConfigs
+import cn.wj.android.cashbook.data.constants.BACKUP_ASSET_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_BOOKS_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_CACHE_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_RECORD_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_TAG_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_TYPE_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_ZIPPED_FILE_NAME
 import cn.wj.android.cashbook.data.constants.GITEE_OWNER
 import cn.wj.android.cashbook.data.constants.GITHUB_OWNER
 import cn.wj.android.cashbook.data.constants.REPO_NAME
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.CashbookDatabase
-import cn.wj.android.cashbook.data.database.dao.AssetDao
-import cn.wj.android.cashbook.data.database.dao.RecordDao
-import cn.wj.android.cashbook.data.database.table.TypeTable
-import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
-import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.net.WebService
 import cn.wj.android.cashbook.data.repository.Repository
-import cn.wj.android.cashbook.data.transform.toAssetTable
-import cn.wj.android.cashbook.data.transform.toBooksEntity
-import cn.wj.android.cashbook.data.transform.toTypeTable
 import cn.wj.android.cashbook.data.transform.toUpdateInfoEntity
-import java.util.Calendar
+import cn.wj.android.cashbook.manager.AppManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.*
 
 /**
  * 主逻辑相关数据仓库
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/28
  */
-class MainRepository(database: CashbookDatabase,private val service: WebService) : Repository(database) {
+class MainRepository(database: CashbookDatabase, private val service: WebService) : Repository(database) {
 
     /** 获取首页数据 */
     suspend fun getHomepageList(): List<DateRecordEntity> = withContext(Dispatchers.IO) {
@@ -113,35 +119,6 @@ class MainRepository(database: CashbookDatabase,private val service: WebService)
         result
     }
 
-    /** 获取并返回默认选中的账本，没有返回 `null` */
-    suspend fun getDefaultBooks(): BooksEntity? = withContext(Dispatchers.IO) {
-        booksDao.queryDefault().firstOrNull()?.toBooksEntity()
-    }
-
-    /** 将账本数据 [books] 插入到数据库中 */
-    suspend fun insertBooks(books: BooksEntity) = withContext(Dispatchers.IO) {
-        booksDao.insert(books.toAssetTable())
-    }
-
-    /** 返回数据库是否存在类型数据 */
-    suspend fun hasType(): Boolean = withContext(Dispatchers.IO) {
-        typeDao.getCount() > 0
-    }
-
-    /** 将 [type] 插入数据库并返回 id */
-    suspend fun insertType(type: TypeEntity): Long = withContext(Dispatchers.IO) {
-        typeDao.insert(type.toTypeTable())
-    }
-
-    /** 将 [types] 插入数据库 */
-    suspend fun insertTypes(vararg types: TypeEntity) = withContext(Dispatchers.IO) {
-        val ls = arrayListOf<TypeTable>()
-        types.forEach {
-            ls.add(it.toTypeTable())
-        }
-        typeDao.insert(*ls.toTypedArray())
-    }
-
     /** 获取最新 Release 信息 */
     suspend fun queryLatestRelease(useGitee: Boolean): UpdateInfoEntity = withContext(Dispatchers.IO) {
         if (useGitee) {
@@ -169,5 +146,41 @@ class MainRepository(database: CashbookDatabase,private val service: WebService)
         } else {
             service.githubRaw(GITHUB_OWNER, REPO_NAME, "PRIVACY_POLICY.md")
         }.string()
+    }
+
+    /** 备份到指定路径 [path] */
+    suspend fun backup(path: String) = withContext(Dispatchers.IO) {
+        // 保存备份时间
+        AppConfigs.lastBackupMs = System.currentTimeMillis()
+        // 获取缓存路径
+        val cachePath = File(AppManager.getContext().filesDir, BACKUP_CACHE_FILE_NAME).absolutePath
+        // 清空缓存路径下文件
+        cachePath.deleteFiles()
+        val cacheFiles = arrayListOf<String>()
+        // 备份数据库数据到文件
+        cachePath.createFileIfNotExists(BACKUP_ASSET_FILE_NAME).run {
+            cacheFiles.add(this.path)
+            writeText(assetDao.queryAll().toJsonString())
+        }
+        cachePath.createFileIfNotExists(BACKUP_BOOKS_FILE_NAME).run {
+            cacheFiles.add(this.path)
+            writeText(booksDao.queryAll().toJsonString())
+        }
+        cachePath.createFileIfNotExists(BACKUP_RECORD_FILE_NAME).run {
+            cacheFiles.add(this.path)
+            writeText(recordDao.queryAll().toJsonString())
+        }
+        cachePath.createFileIfNotExists(BACKUP_TAG_FILE_NAME).run {
+            cacheFiles.add(this.path)
+            writeText(tagDao.queryAll().toJsonString())
+        }
+        cachePath.createFileIfNotExists(BACKUP_TYPE_FILE_NAME).run {
+            cacheFiles.add(this.path)
+            writeText(typeDao.queryAll().toJsonString())
+        }
+        // 压缩包路径
+        val zippedPath = cachePath + File.separator + BACKUP_ZIPPED_FILE_NAME
+        // 将缓存压缩
+        cacheFiles.zipToFile(zippedPath)
     }
 }

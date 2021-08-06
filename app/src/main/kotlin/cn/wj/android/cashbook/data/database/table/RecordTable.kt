@@ -8,6 +8,7 @@ import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
+import kotlinx.serialization.Serializable
 
 /**
  * 记录数据库表
@@ -31,6 +32,7 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
+@Serializable
 @Entity(tableName = "db_record")
 data class RecordTable(
     @PrimaryKey(autoGenerate = true) val id: Long?,

@@ -17,13 +17,7 @@ import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.data.constants.ACTION_APK_NAME
-import cn.wj.android.cashbook.data.constants.ACTION_DOWNLOAD_URL
-import cn.wj.android.cashbook.data.constants.INTENT_KEY_CANCEL_DOWNLOAD
-import cn.wj.android.cashbook.data.constants.INTENT_KEY_RETRY_DOWNLOAD
-import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_UPDATE
-import cn.wj.android.cashbook.data.constants.NOTIFICATION_ID_UPDATE
-import cn.wj.android.cashbook.data.constants.NOTIFICATION_ID_UPDATE_ERROR
+import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.receiver.EventReceiver
 import cn.wj.android.cashbook.work.ApkDownloadWorker
@@ -147,7 +141,7 @@ object UpdateManager {
             .setProgress(100, 0, false)
             .addAction(0, R.string.cancel.string, PendingIntent.getBroadcast(context, 0, Intent(EventReceiver.ACTION).apply {
                 putExtra(INTENT_KEY_CANCEL_DOWNLOAD, "")
-            }, PendingIntent.FLAG_CANCEL_CURRENT))
+            }, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_CANCEL_CURRENT))
             .setSmallIcon(R.mipmap.ic_launcher)
             .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
     }
@@ -199,7 +193,7 @@ object UpdateManager {
             .setCategory(Notification.CATEGORY_RECOMMENDATION)
             .addAction(0, R.string.retry.string, PendingIntent.getBroadcast(context, 0, Intent(EventReceiver.ACTION).apply {
                 putExtra(INTENT_KEY_RETRY_DOWNLOAD, "")
-            }, PendingIntent.FLAG_CANCEL_CURRENT))
+            }, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_CANCEL_CURRENT))
             .setSmallIcon(R.mipmap.ic_launcher)
             .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
             .build()

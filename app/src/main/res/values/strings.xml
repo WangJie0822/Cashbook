@@ -243,4 +243,14 @@
     <string name="update_success">更新成功</string>
     <string name="please_select_first_type">请选择一级分类</string>
     <string name="first_type_has_child">当前分类有二级分类，无法修改</string>
+    <string name="backup_and_recovery">备份与恢复</string>
+    <string name="backup_path">备份路径</string>
+    <string name="backup">备份</string>
+    <string name="backup_hint">单击开始备份</string>
+    <string name="recovery">恢复</string>
+    <string name="recovery_hint">单击开始恢复</string>
+    <string name="backup_path_hint">点击选择备份路径</string>
+    <string name="backup_path_exception">备份路径异常，备份失败</string>
+    <string name="backup_need_storage_permissions">备份需要存储权限</string>
+    <string name="backup_success">备份成功</string>
 </resources>
