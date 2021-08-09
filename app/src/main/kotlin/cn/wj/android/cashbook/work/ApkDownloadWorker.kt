@@ -54,6 +54,7 @@ class ApkDownloadWorker(context: Context, workerParameters: WorkerParameters) : 
                         if (it.available().toLong() == total) {
                             // 且大小相同，已下载
                             logger().d("doWork downloaded")
+                            UpdateManager.hideNotification()
                             UpdateManager.install(saveFile)
                             return@withContext Result.success()
                         }
