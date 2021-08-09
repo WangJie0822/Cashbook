@@ -86,6 +86,8 @@ android {
             dimension = "version"
             // 版本名后缀
             versionNameSuffix = "_online"
+            // 备份版本号
+            buildConfigField("int", "BACKUP_VERSION", "${AppConfigs.backupVersion}")
         }
 
         // 开发版本
@@ -95,6 +97,8 @@ android {
             applicationIdSuffix = ".dev"
             // 版本名后缀
             versionNameSuffix = "_dev"
+            // 备份版本号
+            buildConfigField("int", "BACKUP_VERSION", "${AppConfigs.backupVersion}")
         }
     }
 

@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
@@ -22,6 +23,10 @@ interface RecordDao {
     /** 插入记录数据 [record] 并返回生成的主键 id */
     @Insert
     suspend fun insert(record: RecordTable): Long
+
+    /** 插入或替换记录 */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(vararg records: RecordTable)
 
     /** 删除记录数据 [record] */
     @Delete

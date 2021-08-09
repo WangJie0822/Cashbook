@@ -26,6 +26,9 @@ class BackupViewModel(private val repository: MainRepository) : BaseViewModel() 
     /** 检查备份路径 */
     val checkBackupPathEvent: LifecycleEvent<String> = LifecycleEvent()
 
+    /** 选择恢复文件路径 */
+    val selectRecoveryPathEvent: LifecycleEvent<Int> = LifecycleEvent()
+
     /** 备份路径 */
     val backupPathData: MutableLiveData<String> = object : MutableLiveData<String>() {
 
@@ -65,17 +68,32 @@ class BackupViewModel(private val repository: MainRepository) : BaseViewModel() 
 
     /** 恢复点击 */
     val onRecoveryClick: () -> Unit = {
-
+        selectRecoveryPathEvent.value = 0
     }
 
-    /** 尝试使用路径 [path] 开始备份 */
-    fun tryBackup(path: String) {
+    /** 尝试备份到备份路径 */
+    fun tryBackup() {
         viewModelScope.launch {
             try {
-                repository.backup(path)
+                repository.backup()
                 snackbarEvent.value = R.string.backup_success.string.toSnackbarModel()
             } catch (throwable: Throwable) {
-                logger().e(throwable, "backup")
+                logger().e(throwable, "tryBackup")
+            }
+        }
+    }
+
+    /** 尝试从 [path] 开始恢复 */
+    fun tryRecovery(path: String) {
+        viewModelScope.launch {
+            try {
+                if (repository.recovery(path)) {
+                    snackbarEvent.value = R.string.recovery_success.string.toSnackbarModel()
+                } else {
+                    snackbarEvent.value = R.string.recovery_failed.string.toSnackbarModel()
+                }
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "tryRecovery")
             }
         }
     }

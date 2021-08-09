@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.isContentScheme
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.data.constants.MIME_TYPE_ZIP
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BACKUP
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityBackupBinding
@@ -28,8 +29,8 @@ class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
 
     override val viewModel: BackupViewModel by viewModel()
 
-    /** 文件选择 launcher */
-    private val selectFileLauncher = createForActivityResultLauncher(ActivityResultContracts.OpenDocumentTree())
+    /** 目录选择 launcher */
+    private val selectDirLauncher = createForActivityResultLauncher(ActivityResultContracts.OpenDocumentTree())
 
     /** 权限申请 launcher */
     private val requestPermissionsLauncher = createForActivityResultLauncher(ActivityResultContracts.RequestMultiplePermissions())
@@ -42,7 +43,7 @@ class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
     override fun observe() {
         // 选择备份路径
         viewModel.selectBackupPathEvent.observe(this) { backup ->
-            selectFileLauncher.launch(null) {
+            selectDirLauncher.launch(null) {
                 if (null == it) {
                     return@launch
                 }
@@ -71,10 +72,10 @@ class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
             if (path.isContentScheme()) {
                 if (DocumentFile.fromTreeUri(this, Uri.parse(path))?.canRead() == true) {
                     // 有权限，开始备份
-                    viewModel.tryBackup(path)
+                    viewModel.tryBackup()
                 } else {
-                    // 重新选择备份路径
-                    viewModel.selectBackupPathEvent.value = true
+                    // 没有权限，提示
+                    viewModel.snackbarEvent.value = R.string.path_no_permission.string.toSnackbarModel()
                 }
             } else {
                 // 申请权限
@@ -85,9 +86,50 @@ class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
                         return@launch
                     }
                     // 开始备份
-                    viewModel.tryBackup(path)
+                    viewModel.tryBackup()
                 }
             }
         })
+        // 选择恢复文件路径
+        viewModel.selectRecoveryPathEvent.observe(this) {
+            selectDirLauncher.launch(null, fun(it) {
+                if (null == it) {
+                    return@launch
+                }
+                val path = if (it.isContentScheme()) {
+                    contentResolver.takePersistableUriPermission(
+                        it,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                    it.toString()
+                } else {
+                    it.path
+                }.orEmpty()
+                if (path.isBlank()) {
+                    viewModel.snackbarEvent.value = R.string.recovery_path_exception.string.toSnackbarModel()
+                    return
+                }
+                if (path.isContentScheme()) {
+                    if (DocumentFile.fromTreeUri(this, Uri.parse(path))?.canRead() == true) {
+                        // 有权限，开始恢复
+                        viewModel.tryRecovery(path)
+                    } else {
+                        // 没有权限，提示
+                        viewModel.snackbarEvent.value = R.string.path_no_permission.string.toSnackbarModel()
+                    }
+                } else {
+                    // 申请权限
+                    requestPermissionsLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)) { map ->
+                        if (map.values.contains(false)) {
+                            // 有未同意权限
+                            viewModel.snackbarEvent.value = R.string.backup_need_storage_permissions.string.toSnackbarModel()
+                        } else {
+                            // 开始恢复
+                            viewModel.tryRecovery(path)
+                        }
+                    }
+                }
+            })
+        }
     }
 }

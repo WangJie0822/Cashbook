@@ -16,6 +16,9 @@ import java.util.Locale
 /** 默认时间格式化 */
 const val DATE_FORMAT_DEFAULT = "yyyy-MM-dd HH:mm:ss"
 
+/** 备份名称时间格式化 */
+const val DATE_FORMAT_BACKUP = "yyyyMMddHHmmss"
+
 /** 日期时间格式化 */
 const val DATE_FORMAT_DATE = "yyyy-MM-dd"
 

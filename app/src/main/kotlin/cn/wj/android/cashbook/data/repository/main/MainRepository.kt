@@ -1,31 +1,51 @@
 package cn.wj.android.cashbook.data.repository.main
 
+import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
+import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.isContentScheme
+import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_BACKUP
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
+import cn.wj.android.cashbook.base.tools.copyToPath
 import cn.wj.android.cashbook.base.tools.createFileIfNotExists
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.deleteFiles
+import cn.wj.android.cashbook.base.tools.readBytes
 import cn.wj.android.cashbook.base.tools.toJsonString
 import cn.wj.android.cashbook.base.tools.toLongTime
+import cn.wj.android.cashbook.base.tools.toTypeEntity
+import cn.wj.android.cashbook.base.tools.unzipToDir
 import cn.wj.android.cashbook.base.tools.zipToFile
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.BACKUP_ASSET_FILE_NAME
 import cn.wj.android.cashbook.data.constants.BACKUP_BOOKS_FILE_NAME
 import cn.wj.android.cashbook.data.constants.BACKUP_CACHE_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_DIR_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_FILE_EXT
+import cn.wj.android.cashbook.data.constants.BACKUP_FILE_NAME
+import cn.wj.android.cashbook.data.constants.BACKUP_INFO_NAME
 import cn.wj.android.cashbook.data.constants.BACKUP_RECORD_FILE_NAME
 import cn.wj.android.cashbook.data.constants.BACKUP_TAG_FILE_NAME
 import cn.wj.android.cashbook.data.constants.BACKUP_TYPE_FILE_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_ZIPPED_FILE_NAME
 import cn.wj.android.cashbook.data.constants.GITEE_OWNER
 import cn.wj.android.cashbook.data.constants.GITHUB_OWNER
+import cn.wj.android.cashbook.data.constants.MIME_TYPE_ZIP
 import cn.wj.android.cashbook.data.constants.REPO_NAME
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.CashbookDatabase
+import cn.wj.android.cashbook.data.database.table.AssetTable
+import cn.wj.android.cashbook.data.database.table.BooksTable
+import cn.wj.android.cashbook.data.database.table.RecordTable
+import cn.wj.android.cashbook.data.database.table.TagTable
+import cn.wj.android.cashbook.data.database.table.TypeTable
+import cn.wj.android.cashbook.data.entity.BackupVersionEntity
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
@@ -148,14 +168,18 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         }.string()
     }
 
-    /** 备份到指定路径 [path] */
-    suspend fun backup(path: String) = withContext(Dispatchers.IO) {
+    /** 备份到指定路径 */
+    suspend fun backup() = withContext(Dispatchers.IO) {
+        val currentMs = System.currentTimeMillis()
+        val dateFormat = currentMs.dateFormat(DATE_FORMAT_BACKUP)
         // 保存备份时间
-        AppConfigs.lastBackupMs = System.currentTimeMillis()
+        AppConfigs.lastBackupMs = currentMs
+
         // 获取缓存路径
-        val cachePath = File(AppManager.getContext().filesDir, BACKUP_CACHE_FILE_NAME).absolutePath
+        val cachePath = File(AppManager.getContext().cacheDir, BACKUP_CACHE_FILE_NAME).absolutePath
         // 清空缓存路径下文件
         cachePath.deleteFiles()
+
         val cacheFiles = arrayListOf<String>()
         // 备份数据库数据到文件
         cachePath.createFileIfNotExists(BACKUP_ASSET_FILE_NAME).run {
@@ -178,9 +202,102 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
             cacheFiles.add(this.path)
             writeText(typeDao.queryAll().toJsonString())
         }
+        // 添加备份信息
+        cachePath.createFileIfNotExists(BACKUP_INFO_NAME).run {
+            cacheFiles.add(this.path)
+            writeText(BackupVersionEntity(BuildConfig.BACKUP_VERSION, dateFormat).toJsonString())
+        }
+
         // 压缩包路径
-        val zippedPath = cachePath + File.separator + BACKUP_ZIPPED_FILE_NAME
+        val zippedPath = cachePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT
         // 将缓存压缩
         cacheFiles.zipToFile(zippedPath)
+
+        // 复制缓存中备份文件到备份目录
+        zippedPath.copyToPath(AppConfigs.backupPath, MIME_TYPE_ZIP, BACKUP_DIR_NAME)
+    }
+
+    /** 从指定路径 [path] 恢复备份 */
+    suspend fun recovery(path: String): Boolean {
+        // 获取缓存路径
+        val cachePath = File(AppManager.getContext().cacheDir, BACKUP_CACHE_FILE_NAME).absolutePath
+        // 清空缓存路径下文件
+        cachePath.deleteFiles()
+
+        // 创建缓存文件
+        val zippedFile = cachePath.createFileIfNotExists(BACKUP_FILE_NAME + "Cache" + BACKUP_FILE_EXT)
+
+        if (path.isContentScheme()) {
+            DocumentFile.fromTreeUri(AppManager.getContext(), Uri.parse(path))?.let { df ->
+                val backupFile = if (df.name == BACKUP_DIR_NAME) {
+                    df
+                } else {
+                    df.findFile(BACKUP_DIR_NAME)
+                }?.listFiles()?.sortedBy {
+                    it.name
+                }?.reversed()?.firstOrNull {
+                    it.name?.startsWith(BACKUP_FILE_NAME) == true && it.name?.endsWith(BACKUP_FILE_EXT) == true
+                } ?: return false
+                logger().d("backupFile: ${backupFile.name}")
+                // 复制数据到缓存文件
+                val bytes = backupFile.readBytes() ?: return false
+                zippedFile.writeBytes(bytes)
+            }
+        } else {
+            val file = File(path)
+            if (!file.exists()) {
+                return false
+            }
+            val backupFile = if (file.name == BACKUP_DIR_NAME) {
+                file.listFiles()
+            } else {
+                file.listFiles()?.firstOrNull {
+                    it.name == BACKUP_DIR_NAME
+                }?.listFiles()
+            }?.sortedBy {
+                it.name
+            }?.reversed()?.firstOrNull {
+                it.name.startsWith(BACKUP_FILE_NAME) && it.name.endsWith(BACKUP_FILE_EXT)
+            } ?: return false
+            logger().d("backupFile: ${backupFile.name}")
+            // 复制数据到缓存文件
+            backupFile.copyTo(zippedFile)
+        }
+
+        // 将 zip 文件解压到缓存路径
+        val files = zippedFile.absolutePath.unzipToDir(cachePath)
+        files.firstOrNull {
+            it.name == BACKUP_INFO_NAME
+        }?.readText().toTypeEntity<BackupVersionEntity>() ?: return false
+        files.forEach {
+            when (it.name) {
+                BACKUP_ASSET_FILE_NAME -> {
+                    it.readText().toTypeEntity<List<AssetTable>>()?.let { list ->
+                        assetDao.insertOrReplace(*list.toTypedArray())
+                    }
+                }
+                BACKUP_BOOKS_FILE_NAME -> {
+                    it.readText().toTypeEntity<List<BooksTable>>()?.let { list ->
+                        booksDao.insertOrReplace(*list.toTypedArray())
+                    }
+                }
+                BACKUP_RECORD_FILE_NAME -> {
+                    it.readText().toTypeEntity<List<RecordTable>>()?.let { list ->
+                        recordDao.insertOrReplace(*list.toTypedArray())
+                    }
+                }
+                BACKUP_TAG_FILE_NAME -> {
+                    it.readText().toTypeEntity<List<TagTable>>()?.let { list ->
+                        tagDao.insertOrReplace(*list.toTypedArray())
+                    }
+                }
+                BACKUP_TYPE_FILE_NAME -> {
+                    it.readText().toTypeEntity<List<TypeTable>>()?.let { list ->
+                        typeDao.insertOrReplace(*list.toTypedArray())
+                    }
+                }
+            }
+        }
+        return true
     }
 }

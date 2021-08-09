@@ -28,6 +28,9 @@ object AppConfigs {
 
     /** 应用版本名 */
     val versionName = "v0.3.0_$versionCode"
+
+    /** 备份版本号 - 用于兼容性控制 */
+    val backupVersion = 1
 }
 
 /** 根据日期时间获取对应版本号 */

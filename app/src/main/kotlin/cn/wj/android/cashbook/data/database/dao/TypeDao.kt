@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.data.database.table.TypeTable
@@ -22,6 +23,10 @@ interface TypeDao {
     /** 将 [types] 插入数据库 */
     @Insert
     suspend fun insert(vararg types: TypeTable)
+
+    /** 插入或替换类型 */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(vararg types: TypeTable)
 
     /** 从数据库中删除 [type] */
     @Delete

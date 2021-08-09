@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
@@ -21,6 +22,10 @@ interface AssetDao {
     /** 插入新的资产 [asset] 到数据库并返回主键id */
     @Insert
     suspend fun insert(asset: AssetTable): Long
+
+    /** 插入或替换资产 */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(vararg assets: AssetTable)
 
     /** 删除资产 [asset] */
     @Delete

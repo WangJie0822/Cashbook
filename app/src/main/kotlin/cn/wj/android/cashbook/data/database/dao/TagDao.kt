@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.data.database.table.TagTable
@@ -18,6 +19,10 @@ interface TagDao {
     /** 将 [tag] 数据插入数据库并返回主键 id */
     @Insert
     suspend fun insert(tag: TagTable): Long
+
+    /** 插入或替换标签 */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(vararg tags: TagTable)
 
     /** 删除 [tag] 数据 */
     @Delete

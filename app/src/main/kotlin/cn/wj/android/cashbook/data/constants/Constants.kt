@@ -56,10 +56,14 @@ const val NOTIFICATION_ID_UPDATE_ERROR = 2022
 /** 默认 - 每页数据 */
 const val DEFAULT_PAGE_SIZE = 20
 
+/** 备份文件夹 */
+const val BACKUP_DIR_NAME = "Cashbook_Backup"
 /** 备份缓存文件夹 */
-const val BACKUP_CACHE_FILE_NAME = "Wj_Cashbook_Backup_Cache"
+const val BACKUP_CACHE_FILE_NAME = "Cashbook_Backup_Cache"
 /** 备份文件名 */
-const val BACKUP_ZIPPED_FILE_NAME = "Wj_Cashbook_Backup.zip"
+const val BACKUP_FILE_NAME = "Cashbook_Backup_File_"
+/** 备份文件后缀 */
+const val BACKUP_FILE_EXT = ".zip"
 /** 备份 - 资产数据文件名 */
 const val BACKUP_ASSET_FILE_NAME = "Backup_Asset.json"
 /** 备份 - 账本数据文件名 */
@@ -70,3 +74,8 @@ const val BACKUP_RECORD_FILE_NAME = "Backup_Record.json"
 const val BACKUP_TAG_FILE_NAME = "Backup_Tag.json"
 /** 备份 - 记录分类文件名 */
 const val BACKUP_TYPE_FILE_NAME = "Backup_Type.json"
+/** 备份 - 版本备份信息文件名 */
+const val BACKUP_INFO_NAME = "Backup_Info.json"
+
+/** MIME 类型 - 压缩文件 */
+const val MIME_TYPE_ZIP = "application/zip"

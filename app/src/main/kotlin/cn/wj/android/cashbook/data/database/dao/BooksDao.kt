@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.data.database.table.BooksTable
@@ -18,6 +19,10 @@ interface BooksDao {
     /** 新增账本数据 [books] 到数据库 */
     @Insert
     suspend fun insert(books: BooksTable): Long
+
+    /** 插入或替换账本 */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(vararg books: BooksTable)
 
     /** 从数据库中删除账本数据 [books]*/
     @Delete
