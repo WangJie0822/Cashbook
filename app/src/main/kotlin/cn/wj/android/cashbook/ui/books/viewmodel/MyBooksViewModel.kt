@@ -74,7 +74,9 @@ class MyBooksViewModel(private val repository: BooksRepository) : BaseViewModel(
         viewModelScope.launch {
             try {
                 val ls = arrayListOf<BooksEntity>()
-                ls.addAll(repository.getBooksList())
+                repository.getBooksList().forEach {
+                    ls.add(it.copy(selected = it.id == CurrentBooksLiveData.booksId))
+                }
                 booksListData.value = ls
             } catch (throwable: Throwable) {
                 logger().e(throwable, "loadBooksList")
