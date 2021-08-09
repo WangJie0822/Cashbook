@@ -6,6 +6,7 @@ import androidx.lifecycle.map
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BACKUP
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
@@ -53,5 +54,12 @@ class SettingViewModel : BaseViewModel() {
     /** 主题点击 */
     val onThemeClick: () -> Unit = {
         showSelectThemeDialogEvent.value = 0
+    }
+
+    /** 备份与恢复点击 */
+    val onBackupAndRecoveryClick: () -> Unit = {
+        uiNavigationEvent.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_BACKUP)
+        }
     }
 }

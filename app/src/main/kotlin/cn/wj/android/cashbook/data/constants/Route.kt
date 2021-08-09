@@ -18,6 +18,9 @@ const val ROUTE_PATH_MARKDOWN = "/path/main/markdown"
 /** 路由路径 - 设置 */
 const val ROUTE_PATH_SETTING = "/path/main/setting"
 
+/** 路由路径 - 备份 */
+const val ROUTE_PATH_BACKUP = "/path/main/backup"
+
 /** 路由路径 - 我的账本 */
 const val ROUTE_PATH_BOOKS_MY = "/path/books/my"
 

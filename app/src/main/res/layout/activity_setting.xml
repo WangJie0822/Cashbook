@@ -100,6 +100,19 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_height"
+                    android:layout_marginTop="@dimen/spacing_big"
+                    android:background="?selectableItemBackground"
+                    android:bind_onClick="@{viewModel.onBackupAndRecoveryClick}"
+                    android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="@dimen/spacing_big"
+                    android:paddingEnd="@dimen/spacing_big"
+                    android:text="@string/backup_and_recovery"
+                    android:textAppearance="?attr/textAppearanceListItem" />
+
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>

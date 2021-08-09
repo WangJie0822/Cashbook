@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.data.database.table
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 /**
  * 类型数据表
@@ -20,6 +21,7 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
  */
+@Serializable
 @Entity(tableName = "db_type")
 data class TypeTable(
     @PrimaryKey(autoGenerate = true) val id: Long?,

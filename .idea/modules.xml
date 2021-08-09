@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Cashbook.iml" filepath="$PROJECT_DIR$/.idea/Cashbook.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Cashbook.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Cashbook.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Cashbook.buildSrc.iml" filepath="$PROJECT_DIR$/.idea/modules/Cashbook.buildSrc.iml" />
+    </modules>
+  </component>
+</project>

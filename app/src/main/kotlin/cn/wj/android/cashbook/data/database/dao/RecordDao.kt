@@ -39,6 +39,10 @@ interface RecordDao {
     @Query("UPDATE db_record SET type_id=:newId WHERE type_id=:oldId")
     suspend fun updateTypeId(oldId: Long, newId: Long)
 
+    /** 查询所有数据 */
+    @Query("SELECT * FROM db_record")
+    suspend fun queryAll(): List<RecordTable>
+
     /** 根据 id 获取对应记录数据 */
     @Query("SELECT * FROM db_record WHERE id=:recordId")
     suspend fun queryById(recordId: Long): RecordTable?

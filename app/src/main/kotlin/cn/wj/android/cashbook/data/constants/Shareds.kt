@@ -18,5 +18,11 @@ const val SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE = "shared_key_mobile_network
 /** 主题 mode */
 const val SHARED_KEY_THEME_MODE = "shared_key_theme_mode"
 
-/** 是否同样用户协议 */
+/** 是否同意用户协议 */
 const val SHARED_KEY_AGREE_USER_AGREEMENT = "shared_key_agree_user_agreement"
+
+/** 备份路径 */
+const val SHARED_KEY_BACKUP_PATH = "shared_key_backup_path"
+
+/** 上次备份时间 */
+const val SHARED_KEY_LAST_BACKUP_MS = "shared_key_last_backup_ms"

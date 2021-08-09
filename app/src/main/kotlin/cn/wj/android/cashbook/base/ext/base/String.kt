@@ -47,3 +47,5 @@ fun String?.toFloatOrZero(): Float {
 fun String.md2Spanned(context: Context = AppManager.getContext()): Spanned {
     return Markwon.create(context).toMarkdown(this)
 }
+
+fun String?.isContentScheme(): Boolean = this?.startsWith("content://") == true
