@@ -257,4 +257,5 @@
     <string name="path_no_permission">选中路径无操作权限，请重新选择</string>
     <string name="recovery_success">恢复成功</string>
     <string name="recovery_failed">恢复失败</string>
+    <string name="update_downloading_hint">更新下载中，请耐心等待</string>
 </resources>

@@ -39,6 +39,7 @@ class ApkDownloadWorker(context: Context, workerParameters: WorkerParameters) : 
 
         try {
             UpdateManager.showNotification()
+            UpdateManager.downloading = true
             okhttpClient.newCall(request).execute().use { response ->
                 val downloads = AppManager.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
                 val saveFile = File(downloads, apkName)
@@ -93,6 +94,7 @@ class ApkDownloadWorker(context: Context, workerParameters: WorkerParameters) : 
             return@withContext Result.success()
         } catch (throwable: Throwable) {
             logger().e(throwable, "doWork")
+            UpdateManager.downloading = false
             UpdateManager.showDownloadError()
             return@withContext Result.failure()
         }

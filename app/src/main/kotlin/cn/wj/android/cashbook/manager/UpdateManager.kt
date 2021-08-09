@@ -40,6 +40,9 @@ object UpdateManager {
 
     private var download: UpdateInfoEntity? = null
 
+    /** 标记 - 是否正在下载 */
+    var downloading = false
+
     fun checkFromInfo(info: UpdateInfoEntity, need: () -> Unit, noNeed: () -> Unit) {
         logger().d("checkFromInfo info: $info")
         if (BuildConfig.DEBUG) {
@@ -83,6 +86,7 @@ object UpdateManager {
 
     fun startDownload(info: UpdateInfoEntity) {
         download = info
+        downloading = true
         manager.enqueue(
             OneTimeWorkRequestBuilder<ApkDownloadWorker>()
                 .setInputData(
@@ -104,6 +108,7 @@ object UpdateManager {
 
     fun install(file: File) {
         logger().d("install file: ${file.path}")
+        downloading = false
         try {
             val context = AppManager.getContext()
             context.startActivity(Intent(Intent.ACTION_VIEW).apply {
@@ -147,6 +152,7 @@ object UpdateManager {
     }
 
     fun cancelDownload() {
+        downloading = false
         manager.cancelAllWorkByTag(downloadWorkerTag)
         hideNotification()
     }

@@ -231,6 +231,10 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
             // 关闭自动更新
             return
         }
+        if (UpdateManager.downloading) {
+            // 下载中
+            return
+        }
         viewModelScope.launch {
             try {
                 // 获取 Release 信息

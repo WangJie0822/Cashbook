@@ -116,6 +116,11 @@ class AboutUsViewModel(private val repository: MainRepository) : BaseViewModel()
 
     /** 检查更新 */
     private fun checkUpdate() {
+        if (UpdateManager.downloading) {
+            // 下载中
+            snackbarEvent.value = R.string.update_downloading_hint.string.toSnackbarModel()
+            return
+        }
         viewModelScope.launch {
             try {
                 // 获取 Release 信息
