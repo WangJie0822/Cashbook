@@ -96,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{item.amountStr}"
                 android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="@{item.colorTint}"
+                android:textColor="@{item.amountTextTint}"
                 tools:text="+￥200.00"
                 tools:textColor="@color/color_income" />
 
@@ -125,8 +125,9 @@
                 android:layout_height="wrap_content"
                 android:text="@{item.chargeStr}"
                 android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="@color/color_expenditure"
-                tools:text="-￥200.00" />
+                android:textColor="@{item.chargeTextTint}"
+                tools:text="-￥200.00"
+                tools:textColor="@color/color_expenditure" />
 
         </LinearLayout>
 
@@ -299,7 +300,7 @@
                 android:text="@string/remark"
                 android:textAppearance="?attr/textAppearanceBody1" />
 
-            <Space
+            <androidx.legacy.widget.Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
@@ -334,7 +335,7 @@
                 android:text="@string/tags"
                 android:textAppearance="?attr/textAppearanceBody1" />
 
-            <Space
+            <androidx.legacy.widget.Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />

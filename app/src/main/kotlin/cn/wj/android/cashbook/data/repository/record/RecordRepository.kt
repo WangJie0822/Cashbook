@@ -168,7 +168,7 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
                     }
                 }
             }
-            val amountStr = amount.formatToNumber()
+            val amountStr = amount.decimalFormat()
             val value = com.haibin.calendarview.Calendar().apply {
                 this.year = year
                 this.month = month

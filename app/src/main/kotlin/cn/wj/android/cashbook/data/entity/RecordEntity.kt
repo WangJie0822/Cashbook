@@ -2,15 +2,19 @@ package cn.wj.android.cashbook.data.entity
 
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.*
+import cn.wj.android.cashbook.base.ext.base.color
+import cn.wj.android.cashbook.base.ext.base.condition
+import cn.wj.android.cashbook.base.ext.base.drawableString
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
+import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-import kotlin.text.orEmpty
 
 /**
  * 记录数据实体类
@@ -99,50 +103,20 @@ data class RecordEntity(
             remark
         }
 
-    /** 金额文本 */
-    @IgnoredOnParcel
-    val amountStrWithCharge: String
-        get() {
-            val symbol = CurrentBooksLiveData.currency.symbol
-            return when (typeEnum) {
-                RecordTypeEnum.EXPENDITURE -> {
-                    "-$symbol$amount"
-                }
-                RecordTypeEnum.INCOME -> {
-                    "+$symbol$amount"
-                }
-                RecordTypeEnum.TRANSFER -> {
-                    "$symbol$amount${
-                        if (charge.toFloatOrZero() > 0f) {
-                            "(-$symbol$charge)"
-                        } else {
-                            ""
-                        }
-                    }"
-                }
-                else -> {
-                    "$symbol$amount"
-                }
-            }
-        }
-
     /** 资金文本 */
     @IgnoredOnParcel
     val amountStr: String
         get() {
-            val symbol = CurrentBooksLiveData.currency.symbol
+            val amountValue = amount.moneyFormat()
             return when (typeEnum) {
                 RecordTypeEnum.EXPENDITURE -> {
-                    "-$symbol$amount"
+                    "-$amountValue"
                 }
                 RecordTypeEnum.INCOME -> {
-                    "+$symbol$amount"
-                }
-                RecordTypeEnum.TRANSFER -> {
-                    "$symbol$amount"
+                    "+$amountValue"
                 }
                 else -> {
-                    "$symbol$amount"
+                    amountValue
                 }
             }
         }
@@ -150,7 +124,7 @@ data class RecordEntity(
     /** 是否显示手续费 */
     @IgnoredOnParcel
     val showCharge: Boolean
-        get() = typeEnum == RecordTypeEnum.TRANSFER && charge.toFloatOrZero() > 0f
+        get() = typeEnum == RecordTypeEnum.TRANSFER && charge.toFloatOrZero() != 0f
 
     /** 手续费文本 */
     @IgnoredOnParcel
@@ -158,7 +132,7 @@ data class RecordEntity(
         get() = if (charge.isBlank()) {
             ""
         } else {
-            "-${CurrentBooksLiveData.currency.symbol}$charge"
+            charge.moneyFormat()
         }
 
     /** 是否显示资产信息 */
@@ -198,6 +172,10 @@ data class RecordEntity(
             "${asset?.name}->${intoAsset?.name}"
         } else {
             asset?.name.orEmpty()
+        } + if (!showCharge) {
+            ""
+        } else {
+            "($chargeStr)"
         }
 
     /** 记录时间 */
@@ -282,9 +260,9 @@ data class RecordEntity(
             }
         }
 
-    /** 不同类型着色 */
+    /** 金额文本颜色 */
     @IgnoredOnParcel
-    val colorTint: Int
+    val amountTextTint: Int
         get() = when (typeEnum) {
             RecordTypeEnum.MODIFY_BALANCE -> {
                 R.color.color_on_secondary
@@ -298,5 +276,14 @@ data class RecordEntity(
             RecordTypeEnum.TRANSFER -> {
                 R.color.color_primary
             }
+        }.color
+
+    /** 手续费文本颜色 */
+    @IgnoredOnParcel
+    val chargeTextTint: Int
+        get() = if (charge.toFloatOrZero() > 0f) {
+            R.color.color_expenditure
+        } else {
+            R.color.color_income
         }.color
 }

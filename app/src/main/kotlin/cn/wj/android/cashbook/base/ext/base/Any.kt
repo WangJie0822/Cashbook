@@ -5,6 +5,7 @@ package cn.wj.android.cashbook.base.ext.base
 
 import cn.wj.android.cashbook.base.tools.funLogger
 import com.orhanobut.logger.Printer
+import java.text.DecimalFormat
 
 /**
  * 任意对象拓展
@@ -33,4 +34,9 @@ fun <T> T.ifCondition(condition: Boolean, defaultValue: () -> T): T {
     } else {
         this
     }
+}
+
+/** 对任意格式数字数据进行格式化并返回 [String] */
+fun <T> T?.decimalFormat(pattern: String = "#.##"): String {
+    return DecimalFormat(pattern).format(this?.toString()?.toBigDecimalOrNull() ?: return "")
 }

@@ -1,10 +1,16 @@
 package cn.wj.android.cashbook.ui.record.viewmodel
 
 import androidx.core.os.bundleOf
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
+import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -12,7 +18,6 @@ import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
@@ -48,7 +53,7 @@ class SelectAssociatedRecordViewModel(private val repository: RecordRepository) 
             R.string.refund_with_colon
         } else {
             R.string.reimburse_with_colon
-        }.string + CurrentBooksLiveData.currency.symbol + amount.value
+        }.string + amount.value.orElse("0").moneyFormat()
     }
 
     /** 搜索框文本 */

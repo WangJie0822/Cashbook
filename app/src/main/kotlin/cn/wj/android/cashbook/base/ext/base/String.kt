@@ -5,6 +5,7 @@ package cn.wj.android.cashbook.base.ext.base
 
 import android.content.Context
 import android.text.Spanned
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.manager.AppManager
 import io.noties.markwon.Markwon
 
@@ -31,21 +32,34 @@ fun String?.ifNullOrBlank(block: () -> String): String {
     }
 }
 
-/** 对金额字符串进行格式化 */
-fun String?.moneyFormat(): String {
-    return this.toBigDecimalOrZero().formatToNumber()
-}
-
+/** 将 [String] 转换为 [Float]，失败时返回 [value] */
 fun String?.toFloatOrElse(value: Float): Float {
     return this?.toFloatOrNull() ?: value
 }
 
+/** 将 [String] 转换为 [Float]，失败时返回 `0f` */
 fun String?.toFloatOrZero(): Float {
     return this?.toFloatOrNull() ?: 0f
 }
 
+/** 将 [String] 类型的 `Markdown` 数据转换为 [Spanned] */
 fun String.md2Spanned(context: Context = AppManager.getContext()): Spanned {
     return Markwon.create(context).toMarkdown(this)
 }
 
+/** 判断 [String] 类型 `Uri` 数据是否是 `contentScheme` */
 fun String?.isContentScheme(): Boolean = this?.startsWith("content://") == true
+
+/** 对金额字符串插入货币符号 [symbol] 进行格式化 */
+fun String.moneyFormat(symbol: String = CurrentBooksLiveData.currency.symbol): String {
+    val negative = this.startsWith("-")
+    val value = this.replace("-", "")
+    return "${if (negative) "-" else ""}$symbol$value"
+}
+
+/** 对 [String] 取负 */
+fun String.negative(): String {
+    val negative = this.startsWith("-")
+    val value = this.replace("-", "")
+    return "${if (negative) "" else "-"}$value"
+}

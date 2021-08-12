@@ -8,10 +8,11 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
-import cn.wj.android.cashbook.base.ext.base.formatToNumber
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
+import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -75,13 +76,13 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
             }
             if (record.typeEnum == RecordTypeEnum.TRANSFER) {
                 // 转账
-                val chargeF = record.charge.toFloatOrNull().orElse(0f)
+                val chargeF = record.charge.toFloatOrZero()
                 if (chargeF > 0f) {
                     totalExpenditure += chargeF.toBigDecimalOrZero()
                 }
             }
         }
-        CurrentBooksLiveData.currency.symbol + totalExpenditure.formatToNumber()
+        totalExpenditure.decimalFormat().moneyFormat()
     }
 
     /** 本月支出透明度 */
@@ -95,8 +96,15 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
                 // 收入
                 totalIncome += record.amount.toBigDecimalOrZero()
             }
+            if (record.typeEnum == RecordTypeEnum.TRANSFER) {
+                // 转账
+                val chargeF = record.charge.toFloatOrZero()
+                if (chargeF < 0f) {
+                    totalIncome -= chargeF.toBigDecimalOrZero()
+                }
+            }
         }
-        CurrentBooksLiveData.currency.symbol + totalIncome.formatToNumber()
+        totalIncome.decimalFormat().moneyFormat()
     }
 
     /** 本月结余 */
@@ -104,17 +112,11 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
         val symbol = CurrentBooksLiveData.currency.symbol
         val income = income.value.orEmpty().replace(symbol, "").toBigDecimalOrZero()
         val expenditure = expenditure.value.orEmpty().replace(symbol, "").toBigDecimalOrZero()
-        val balance = income - expenditure
-        if (balance.toFloat() >= 0f) {
-            symbol + balance.formatToNumber()
-        } else {
-            "-" + symbol + (-balance).formatToNumber()
-        }
+        (income - expenditure).decimalFormat().moneyFormat()
     }
 
     /** 本月收入、结余透明度 */
     val incomeAndBalanceAlpha = ObservableFloat(1f)
-
 
     /** 刷新状态 */
     val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {

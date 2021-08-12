@@ -88,8 +88,8 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:bind_tv_textColor="@{item.colorTint}"
-                    android:text="@{item.amountStrWithCharge}"
+                    android:bind_tv_textColor="@{item.amountTextTint}"
+                    android:text="@{item.amountStr}"
                     android:textAppearance="?attr/textAppearanceBody1"
                     tools:text="-￥2444.00"
                     tools:textColor="@color/color_expenditure" />
@@ -103,7 +103,7 @@
                 android:text="@{item.assetInfoStr}"
                 android:textAppearance="?attr/textAppearanceCaption"
                 android:visibility="gone"
-                tools:text="张三->李四"
+                tools:text="张三->李四(-￥20.0)"
                 tools:visibility="visible" />
 
         </LinearLayout>

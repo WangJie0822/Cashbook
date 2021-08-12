@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.data.repository
 
-import cn.wj.android.cashbook.base.ext.base.formatToNumber
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.dateFormat
@@ -117,7 +117,7 @@ abstract class Repository(val database: CashbookDatabase) {
                 }
             }
         }
-        result.formatToNumber()
+        result.decimalFormat()
     }
 
     /** 根据 [record] 数据获取 [RecordEntity] 数据并返回 */

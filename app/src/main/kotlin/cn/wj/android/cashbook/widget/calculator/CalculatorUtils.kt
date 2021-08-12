@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.widget.calculator
 
-import cn.wj.android.cashbook.base.ext.base.formatToNumber
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.logger
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -22,7 +22,7 @@ object CalculatorUtils {
         }
     }
 
-    fun calculatorCompatBracket(text: String): String {
+    private fun calculatorCompatBracket(text: String): String {
         logger().d(text)
         if (hasBracket(text)) {
             // 有括号
@@ -39,7 +39,7 @@ object CalculatorUtils {
             return calculatorCompatBracket(text.replace(bracket, bracketResult))
         } else {
             // 没有括号，直接计算
-            return calculator(text).formatToNumber()
+            return calculator(text).decimalFormat()
         }
     }
 
@@ -116,7 +116,7 @@ object CalculatorUtils {
     private const val REGEX_BRACKET = ".*[()].*"
 
 
-    fun hasBracket(text: String): Boolean {
+    private fun hasBracket(text: String): Boolean {
         return Pattern.matches(REGEX_BRACKET, text)
     }
 

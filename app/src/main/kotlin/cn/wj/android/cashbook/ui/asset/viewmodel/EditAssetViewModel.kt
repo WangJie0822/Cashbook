@@ -8,8 +8,8 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
@@ -164,7 +164,7 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
             nameError.set(R.string.asset_name_cannot_be_empty.string)
             return
         }
-        val totalAmount = totalAmount.value.moneyFormat()
+        val totalAmount = totalAmount.value.decimalFormat()
         if (type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
             // 信用卡，判断总额度
             if (totalAmount.toFloatOrNull().orElse(0f) <= 0f) {
@@ -173,7 +173,7 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
                 return
             }
         }
-        val balance = balance.value.moneyFormat()
+        val balance = balance.value.decimalFormat()
         val billingDate = billingDate.value.orEmpty()
         val repaymentDate = repaymentDate.value.orEmpty()
         val invisible = invisibleAsset.value.condition

@@ -2,7 +2,8 @@ package cn.wj.android.cashbook.data.entity
 
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.formatToNumber
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
@@ -67,36 +68,32 @@ data class AssetEntity(
     /** 余额显示文本 */
     @IgnoredOnParcel
     val balanceStr: String
-        get() = "${CurrentBooksLiveData.currency.symbol}${
-            if (creditCardAccount) {
-                // 信用卡类型，显示总额度
-                totalAmount
-            } else {
-                // 其他类型，显示余额
-                balance
-            }
-        }"
+        get() = if (creditCardAccount) {
+            // 信用卡类型，显示总额度
+            totalAmount
+        } else {
+            // 其他类型，显示余额
+            balance
+        }.moneyFormat()
 
     /** 显示文本：支付宝（￥200）*/
     @IgnoredOnParcel
     val showStr: String
         get() = R.string.account_show_format.string.format(
-            name, "${CurrentBooksLiveData.currency.symbol}${
-                if (creditCardAccount) {
-                    // 信用卡，显示总额度减去已使用
-                    (totalAmount.toBigDecimalOrZero() - balance.toBigDecimalOrZero()).formatToNumber()
-                } else {
-                    // 其他，显示余额
-                    balance
-                }
-            }"
+            name, if (creditCardAccount) {
+                // 信用卡，显示总额度减去已使用
+                (totalAmount.toBigDecimalOrZero() - balance.toBigDecimalOrZero()).decimalFormat()
+            } else {
+                // 其他，显示余额
+                balance
+            }.moneyFormat()
         )
 
     /** 信用卡已用文本 */
     @IgnoredOnParcel
     val creditCardUsed: String
         get() = if (creditCardAccount) {
-            R.string.used_with_colon_format.string.format("${CurrentBooksLiveData.currency.orElse(CurrencyEnum.CNY).symbol}$balance")
+            R.string.used_with_colon_format.string.format(balance.moneyFormat())
         } else {
             ""
         }

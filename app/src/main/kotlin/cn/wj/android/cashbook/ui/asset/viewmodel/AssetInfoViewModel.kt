@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -15,7 +16,6 @@ import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
@@ -66,9 +66,9 @@ class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewMode
     /** 金额文本 */
     val amountStr: LiveData<String> = assetData.map {
         if (it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
-            "-${CurrentBooksLiveData.currency.symbol}${it.balance}"
+            "-${it.balance.moneyFormat()}"
         } else {
-            "${CurrentBooksLiveData.currency.symbol}${it.balance}"
+            it.balance.moneyFormat()
         }
     }
 
@@ -79,7 +79,7 @@ class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewMode
 
     /** 总额度 */
     val totalAmount: LiveData<String> = assetData.map {
-        "${CurrentBooksLiveData.currency.symbol}${it.totalAmount}"
+        it.totalAmount.moneyFormat()
     }
 
     /** 账单日 */

@@ -1,12 +1,12 @@
 package cn.wj.android.cashbook.data.entity
 
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.formatToNumber
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
 /**
  * 日期相关记录数据实体类
@@ -37,24 +37,25 @@ data class DateRecordEntity(
                     }
                     RecordTypeEnum.TRANSFER -> {
                         // 转账
-                        if (it.charge.toFloatOrZero() > 0) {
-                            totalExpend += it.amount.toBigDecimalOrZero()
+                        if (it.charge.toFloatOrZero() > 0f) {
+                            totalExpend += it.charge.toBigDecimalOrZero()
+                        } else if (it.charge.toFloatOrZero() < 0f) {
+                            totalIncome -= it.charge.toBigDecimalOrZero()
                         }
                     }
                     else -> {
                     }
                 }
             }
-            val symbol = CurrentBooksLiveData.currency.symbol
             return with(StringBuilder()) {
                 if (totalIncome.toFloat() > 0) {
-                    append(R.string.income_with_colon.string + symbol + totalIncome.formatToNumber())
+                    append(R.string.income_with_colon.string + totalIncome.decimalFormat().moneyFormat())
                 }
                 if (totalExpend.toFloat() > 0) {
                     if (isNotBlank()) {
                         append(R.string.symbol_comma.string)
                     }
-                    append(R.string.expenditure_with_colon.string + symbol + totalExpend.formatToNumber())
+                    append(R.string.expenditure_with_colon.string + totalExpend.decimalFormat().moneyFormat())
                 }
                 toString()
             }

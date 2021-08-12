@@ -9,8 +9,10 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
-import cn.wj.android.cashbook.base.ext.base.formatToNumber
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.ext.base.moneyFormat
+import cn.wj.android.cashbook.base.ext.base.negative
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
@@ -22,7 +24,6 @@ import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
@@ -102,7 +103,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             it.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+            total.decimalFormat().moneyFormat()
         }
     }
 
@@ -131,11 +132,10 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             var total = "0".toBigDecimal()
             it.filter { asset ->
                 asset.balance.toFloatOrNull().orElse(0f) > 0f
+            }.forEach { asset ->
+                total += asset.balance.toBigDecimalOrZero()
             }
-                .forEach { asset ->
-                    total += asset.balance.toBigDecimalOrZero()
-                }
-            "-${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+            total.decimalFormat().moneyFormat().negative()
         }
     }
 
@@ -165,7 +165,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             it.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+            total.decimalFormat().moneyFormat()
         }
     }
 
@@ -195,7 +195,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             it.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+            total.decimalFormat().moneyFormat()
         }
     }
 
@@ -232,7 +232,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
                     totalLend += asset.balance.toBigDecimalOrZero()
                 }
             }
-            R.string.debt_total_format.string.format("${CurrentBooksLiveData.currency.symbol}${totalBorrow.formatToNumber()}", "${CurrentBooksLiveData.currency.symbol}${totalLend.formatToNumber()}")
+            R.string.debt_total_format.string.format(totalBorrow.decimalFormat().moneyFormat(), totalLend.decimalFormat().moneyFormat())
         }
     }
 
@@ -272,7 +272,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
                     totalCreditCard += asset.balance.toBigDecimalOrZero()
                 }
             }
-            "${CurrentBooksLiveData.currency.symbol}${(total - totalBorrow - totalCreditCard).formatToNumber()}"
+            (total - totalBorrow - totalCreditCard).decimalFormat().moneyFormat()
         }
     }
 
@@ -288,7 +288,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             }.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            "${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+            total.decimalFormat().moneyFormat()
         }
     }
 
@@ -304,7 +304,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             }.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            "-${CurrentBooksLiveData.currency.symbol}${total.formatToNumber()}"
+            total.decimalFormat().moneyFormat().negative()
         }
     }
 

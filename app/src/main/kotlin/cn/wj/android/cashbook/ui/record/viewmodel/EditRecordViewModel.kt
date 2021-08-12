@@ -8,10 +8,11 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.color
 import cn.wj.android.cashbook.base.ext.base.condition
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.tools.*
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -33,7 +34,6 @@ import cn.wj.android.cashbook.manager.DatabaseManager
 import cn.wj.android.cashbook.widget.calculator.SYMBOL_ZERO
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
-import kotlin.text.orEmpty
 
 /**
  * 编辑记录 ViewModel
@@ -61,6 +61,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                 dateData.value = recordTime
                 associatedRecord.value = record
                 this@EditRecordViewModel.chargeStr.value = charge
+                chargeChecked.value = charge.toFloatOrZero() != 0f
                 this@EditRecordViewModel.remarkStr.value = remark
                 reimbursableChecked.value = reimbursable
                 when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
@@ -327,7 +328,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
             snackbarEvent.value = R.string.amount_can_not_be_zero.string.toSnackbarModel()
             return
         }
-        val amount = calculatorStr.get().moneyFormat()
+        val amount = calculatorStr.get().decimalFormat()
         val typeValue = when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
             RecordTypeEnum.EXPENDITURE.position -> {
                 // 支出
@@ -372,7 +373,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
             }
         }
         val charge = if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
-            chargeStr.value.moneyFormat()
+            chargeStr.value.decimalFormat()
         } else {
             ""
         }
