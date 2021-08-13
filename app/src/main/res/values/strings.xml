@@ -95,7 +95,7 @@
     <string name="hidden_hint">隐藏后将不在此列表展示，且记账时不能选择</string>
     <string name="add_asset">添加资产</string>
     <string name="cancel_hidden">取消隐藏</string>
-    <string name="no_bill_hint">还没有账单哦，赶紧来记上一笔吧！</string>
+    <string name="homepage_no_record_hint">当前页仅显示当前月份记录！</string>
     <string name="no_asset_hint">你还没有资产哦，快来添加吧！</string>
     <string name="no_invisible_asset_hint">隐藏的资产将不会显示在资产列表，并且记账时也无法选择</string>
     <string name="do_not_select_account">不选择账户</string>
@@ -258,4 +258,5 @@
     <string name="recovery_success">恢复成功</string>
     <string name="recovery_failed">恢复失败</string>
     <string name="update_downloading_hint">更新下载中，请耐心等待</string>
+    <string name="click_to_see_other_month">点击查看其它月份</string>
 </resources>

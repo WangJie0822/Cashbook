@@ -12,9 +12,11 @@ import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.model.NoDataModel
+import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
 import cn.wj.android.cashbook.databinding.LayoutNoDataBinding
+import cn.wj.android.cashbook.databinding.RecyclerFooterHomepageBinding
 import cn.wj.android.cashbook.manager.UpdateManager
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
@@ -61,8 +63,21 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             layoutManager = WrapContentLinearLayoutManager()
             adapter = this@MainActivity.adapter.apply {
                 setEmptyView(LayoutNoDataBinding.inflate(LayoutInflater.from(context)).apply {
-                    viewModel = NoDataModel(R.string.no_bill_hint)
+                    viewModel = NoDataModel(R.string.homepage_no_record_hint, showButton = true, buttonTextResId = R.string.click_to_see_other_month) {
+                        // 跳转日历
+                        this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
+                            jump(ROUTE_PATH_RECORD_CALENDAR)
+                        }
+                    }
                 }.root)
+                addFooterView(RecyclerFooterHomepageBinding.inflate(LayoutInflater.from(context)).root.apply {
+                    setOnClickListener {
+                        // 跳转日历
+                        this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
+                            jump(ROUTE_PATH_RECORD_CALENDAR)
+                        }
+                    }
+                })
             }
         }
 

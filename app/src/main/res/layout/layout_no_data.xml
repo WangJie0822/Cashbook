@@ -37,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_no_data"
-            tools:text="@string/no_bill_hint" />
+            tools:text="@string/homepage_no_record_hint" />
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
