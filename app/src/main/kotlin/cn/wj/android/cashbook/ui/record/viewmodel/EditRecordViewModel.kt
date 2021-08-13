@@ -371,6 +371,10 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                 snackbarEvent.value = R.string.please_select_into_asset.string.toSnackbarModel()
                 return
             }
+            if (asset.id == intoAsset.id) {
+                snackbarEvent.value = R.string.transfer_asset_should_not_be_same.string.toSnackbarModel()
+                return
+            }
         }
         val charge = if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
             chargeStr.value.decimalFormat()

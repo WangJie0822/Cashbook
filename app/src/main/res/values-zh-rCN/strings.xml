@@ -234,4 +234,5 @@
     <string name="ignore_update_hint">忽略该版本更新</string>
     <string name="new_versions_found">发现新版本</string>
     <string name="view">查看</string>
+    <string name="transfer_asset_should_not_be_same">转入转出资产不应该相同</string>
 </resources>
