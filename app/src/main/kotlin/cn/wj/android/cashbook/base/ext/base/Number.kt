@@ -35,3 +35,11 @@ fun String?.toBigDecimalOrZero(): BigDecimal {
 fun Number?.toBigDecimalOrZero(): BigDecimal {
     return this?.toString().toBigDecimalOrZero()
 }
+
+fun Int.completeZero(): String {
+    return if (this >= 10) {
+        this.toString()
+    } else {
+        "0$this"
+    }
+}

@@ -7,15 +7,18 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.*
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.data.constants.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.CashbookDatabase
+import cn.wj.android.cashbook.data.database.table.RecordTable
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
+import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
@@ -71,7 +74,7 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
         val dayStr = if (day < 10) "0$day" else "$day"
         val startTime = "$year-$monthStr-$dayStr 00:00:00".toLongTime() ?: return@withContext result
         val endTime = "$year-$monthStr-$dayStr 23:59:59".toLongTime() ?: return@withContext result
-        val list = recordDao.queryRecordBetweenTimeByBooksId(CurrentBooksLiveData.booksId, startTime, endTime).filter {
+        val list = recordDao.queryRecordBetweenTime(startTime, endTime).filter {
             it.system != SWITCH_INT_ON
         }
         val map = hashMapOf<String, MutableList<RecordEntity>>()
@@ -138,7 +141,7 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
         val endDayStr = if (endDay < 10) "0$endDay" else "$endDay"
         val startTime = "$year-$monthStr-01 00:00:00".toLongTime() ?: return@withContext result
         val endTime = "$year-$monthStr-$endDayStr 23:59:59".toLongTime() ?: return@withContext result
-        val map = recordDao.queryRecordBetweenTimeByBooksId(CurrentBooksLiveData.booksId, startTime, endTime).filter {
+        val map = recordDao.queryRecordBetweenTime(startTime, endTime).filter {
             it.system != SWITCH_INT_ON
         }.mapNotNull {
             loadRecordEntityFromTable(it, false)
@@ -301,5 +304,70 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
             // 排除已关联的
             null == it.beAssociated
         }
+    }
+
+    /** 根据类型 [type] 及时间 [date] 获取数据 */
+    suspend fun getTypeRecordList(type: TypeEntity, date: String): List<DateRecordEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<DateRecordEntity>()
+        val justYear = !date.contains("-")
+        val startTime = if (justYear) {
+            "$date-01-01 00:00:00"
+        } else {
+            "$date-01 00:00:00"
+        }.toLongTime() ?: return@withContext result
+        val endTime = if (justYear) {
+            "$date-12-30 23:59:59"
+        } else {
+            val calendar = Calendar.getInstance()
+            val splits = date.split("-")
+            calendar.set(Calendar.YEAR, splits.first().toInt())
+            calendar.set(Calendar.MONTH, splits.last().toInt() - 1)
+            val dayMax = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+            "$date-${dayMax.completeZero()} 23:59:59"
+        }.toLongTime() ?: return@withContext result
+        val recordList = if (type.first) {
+            // 一级分类
+            val ls = arrayListOf<RecordTable>()
+            ls.addAll(recordDao.queryRecordBetweenTimeByTypeId(type.id, startTime, endTime))
+            // 添加所有子类型数据
+            typeDao.queryByParentId(type.id)
+                .forEach {
+                    ls.addAll(recordDao.queryRecordBetweenTimeByTypeId(it.id.orElse(-1L), startTime, endTime))
+                }
+            ls
+        } else {
+            // 二级分类
+            recordDao.queryRecordBetweenTimeByTypeId(type.id, startTime, endTime)
+        }.filter {
+            it.system != SWITCH_INT_ON
+        }
+        val dateFormat = if (justYear) {
+            // 全年，显示月份
+            DATE_FORMAT_YEAR_MONTH
+        } else {
+            // 月份，显示日期
+            DATE_FORMAT_MONTH_DAY
+        }
+        val map = hashMapOf<String, MutableList<RecordEntity>>()
+        for (item in recordList) {
+            val key = item.recordTime.dateFormat(dateFormat)
+            val value = loadRecordEntityFromTable(item, justYear) ?: continue
+            if (key.isNotBlank()) {
+                if (map.containsKey(key)) {
+                    map[key]!!.add(value)
+                } else {
+                    map[key] = arrayListOf(value)
+                }
+            }
+        }
+        map.keys.forEach { key ->
+            result.add(
+                DateRecordEntity(
+                    date = key,
+                    list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+                )
+            )
+        }
+        result.sortedBy { it.date.toLongTime(dateFormat) }.reversed()
     }
 }

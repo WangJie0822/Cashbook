@@ -45,6 +45,22 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private val adapter: DateRecordRvAdapter by lazy {
         DateRecordRvAdapter().apply {
             this.viewModel = this@MainActivity.viewModel
+            setEmptyView(LayoutNoDataBinding.inflate(LayoutInflater.from(context)).apply {
+                viewModel = NoDataModel(R.string.homepage_no_record_hint, showButton = true, buttonTextResId = R.string.click_to_see_other_month) {
+                    // 跳转日历
+                    this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
+                        jump(ROUTE_PATH_RECORD_CALENDAR)
+                    }
+                }
+            }.root)
+            addFooterView(RecyclerFooterHomepageBinding.inflate(LayoutInflater.from(context)).root.apply {
+                setOnClickListener {
+                    // 跳转日历
+                    this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
+                        jump(ROUTE_PATH_RECORD_CALENDAR)
+                    }
+                }
+            })
         }
     }
 
@@ -60,24 +76,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 配置 RecyclerView
         binding.includeContent.rv.run {
             layoutManager = WrapContentLinearLayoutManager()
-            adapter = this@MainActivity.adapter.apply {
-                setEmptyView(LayoutNoDataBinding.inflate(LayoutInflater.from(context)).apply {
-                    viewModel = NoDataModel(R.string.homepage_no_record_hint, showButton = true, buttonTextResId = R.string.click_to_see_other_month) {
-                        // 跳转日历
-                        this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
-                            jump(ROUTE_PATH_RECORD_CALENDAR)
-                        }
-                    }
-                }.root)
-                addFooterView(RecyclerFooterHomepageBinding.inflate(LayoutInflater.from(context)).root.apply {
-                    setOnClickListener {
-                        // 跳转日历
-                        this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
-                            jump(ROUTE_PATH_RECORD_CALENDAR)
-                        }
-                    }
-                })
-            }
+            adapter = this@MainActivity.adapter
         }
 
         // 检查更新

@@ -26,7 +26,7 @@ class TypeRepository(database: CashbookDatabase) : Repository(database) {
         typeDao.queryByPosition(TypeEnum.FIRST.name, type.position).map { first ->
             val firstEntity = first.toTypeEntity(null)
             firstEntity.copy(
-                childList = typeDao.queryByParentId(TypeEnum.SECOND.name, first.id.orElse(-1L)).map { second ->
+                childList = typeDao.queryByParentId(first.id.orElse(-1L)).map { second ->
                     second.toTypeEntity(firstEntity)
                 }.sortedBy {
                     it.sort
@@ -87,7 +87,7 @@ class TypeRepository(database: CashbookDatabase) : Repository(database) {
             }
             .map { first ->
                 val firstEntity = first.toTypeEntity(null)
-                val secondLs = typeDao.queryByParentId(TypeEnum.SECOND.name, first.id.orElse(-1L)).map { second ->
+                val secondLs = typeDao.queryByParentId(first.id.orElse(-1L)).map { second ->
                     second.toTypeEntity(firstEntity)
                 }.sortedBy {
                     it.sort

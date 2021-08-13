@@ -72,9 +72,13 @@ interface RecordDao {
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND books_id=:booksId ORDER BY record_time DESC")
     suspend fun queryAfterRecordTimeByBooksId(booksId: Long, recordTime: Long): List<RecordTable>
 
-    /** 查询记录时间在 [startTime] 与 [endTime] 之间且属于 id 为 [booksId] 的账本的记录 */
+    /** 查询记录时间在 [startTime] 与 [endTime] 之间的记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:startTime AND record_time<=:endTime AND books_id=:booksId ORDER BY record_time DESC")
-    suspend fun queryRecordBetweenTimeByBooksId(booksId: Long, startTime: Long, endTime: Long): List<RecordTable>
+    suspend fun queryRecordBetweenTime(startTime: Long, endTime: Long, booksId: Long = CurrentBooksLiveData.booksId): List<RecordTable>
+
+    /** 查询记录时间在 [startTime] 与 [endTime] 之间且类型 id 为 [typeId] 的记录 */
+    @Query("SELECT * FROM db_record WHERE record_time>=:startTime AND record_time<=:endTime AND books_id=:booksId AND type_id=:typeId ORDER BY record_time DESC")
+    suspend fun queryRecordBetweenTimeByTypeId(typeId: Long, startTime: Long, endTime: Long, booksId: Long = CurrentBooksLiveData.booksId): List<RecordTable>
 
     /** 获取与资产有关联的所有记录 */
     @Query("SELECT * FROM db_record WHERE (asset_id=:assetId OR into_asset_id=:assetId) ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")

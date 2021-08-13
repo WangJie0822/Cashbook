@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.FragmentTypeListBinding
 import cn.wj.android.cashbook.third.result.createForActivityResultLauncher
+import cn.wj.android.cashbook.ui.record.activity.TypeRecordActivity
 import cn.wj.android.cashbook.ui.type.activity.SelectFirstTypeActivity
 import cn.wj.android.cashbook.ui.type.adapter.EditTypeRvAdapter
 import cn.wj.android.cashbook.ui.type.dialog.EditTypeMenuDialog
@@ -115,8 +116,8 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
                     }
                 },
                 onStatisticsClick = {
-                    // TODO 统计数据点击
-                    viewModel.snackbarEvent.value = "跳转统计数据-${type.name}".toSnackbarModel()
+                    // 跳转数据统计
+                    TypeRecordActivity.actionStart(requireActivity(), type)
                 })
         })
         // 记录数据变化

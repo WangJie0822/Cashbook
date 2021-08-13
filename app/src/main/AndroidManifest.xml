@@ -59,6 +59,7 @@
         <activity
             android:name=".ui.main.activity.SplashActivity"
             android:configChanges="screenSize"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Cashbook.Splash">
             <intent-filter>
@@ -137,6 +138,12 @@
         <!-- 搜索记录 -->
         <activity
             android:name=".ui.record.activity.SearchRecordActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
+        <!-- 分类记录数据 -->
+        <activity
+            android:name=".ui.record.activity.TypeRecordActivity"
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
 

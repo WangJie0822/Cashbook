@@ -39,6 +39,9 @@ const val ROUTE_PATH_RECORD_CALENDAR = "/path/record/calendar"
 /** 路由路径 - 搜索记录 */
 const val ROUTE_PATH_RECORD_SEARCH = "/path/record/search"
 
+/** 路由路径 - 分类下记录 */
+const val ROUTE_PATH_RECORD_TYPE = "/path/record/type"
+
 /** 路由路径 - 编辑资产 */
 const val ROUTE_PATH_ASSET_EDIT = "/path/asset/edit"
 
