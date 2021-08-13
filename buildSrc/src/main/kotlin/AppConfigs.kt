@@ -23,14 +23,14 @@ object AppConfigs {
     /** 应用 id */
     const val applicationId = "cn.wj.android.cashbook"
 
+    /** 备份版本号 - 用于兼容性控制 */
+    const val backupVersion = 1
+
     /** 应用版本号 */
     val versionCode = getVersionCode()
 
     /** 应用版本名 */
-    val versionName = "v0.3.0_$versionCode"
-
-    /** 备份版本号 - 用于兼容性控制 */
-    val backupVersion = 1
+    val versionName = "v0.4.0_$versionCode"
 }
 
 /** 根据日期时间获取对应版本号 */
