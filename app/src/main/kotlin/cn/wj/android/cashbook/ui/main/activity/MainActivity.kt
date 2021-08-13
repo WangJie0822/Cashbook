@@ -6,6 +6,7 @@ import androidx.core.view.GravityCompat
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.md2Spanned
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.scrollToTop
 import cn.wj.android.cashbook.base.tools.isWifiAvailable
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.config.AppConfigs
@@ -122,6 +123,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 首页列表
         viewModel.listData.observe(this, { list ->
             adapter.submitList(list)
+            binding.includeContent.rv.scrollToTop()
         })
         // 显示记录详情弹窗
         viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
