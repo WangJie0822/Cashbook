@@ -64,12 +64,12 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                 chargeChecked.value = charge.toFloatOrZero() != 0f
                 this@EditRecordViewModel.remarkStr.value = remark
                 reimbursableChecked.value = reimbursable
-                when (currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)) {
-                    RecordTypeEnum.EXPENDITURE.position -> {
+                when (typeEnum) {
+                    RecordTypeEnum.EXPENDITURE -> {
                         // 支出
                         expenditureType
                     }
-                    RecordTypeEnum.INCOME.position -> {
+                    RecordTypeEnum.INCOME -> {
                         // 收入
                         incomeType
                     }
