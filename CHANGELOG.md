@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Added
 - 新增本地备份恢复功能；
+- 首页新增脚布局、跳转其它月份；
 ### Changed
 - JDK 版本升级到 11；
 ### Fixed
