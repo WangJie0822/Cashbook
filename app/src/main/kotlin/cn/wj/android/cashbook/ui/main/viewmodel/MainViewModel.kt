@@ -14,7 +14,6 @@ import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
-import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
@@ -26,8 +25,6 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
@@ -233,7 +230,7 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
 
     /** 检查更新 */
     fun checkUpdate() {
-        if (!getSharedBoolean(SHARED_KEY_AUTO_CHECK_UPDATE, true)) {
+        if (!AppConfigs.autoUpdate) {
             // 关闭自动更新
             return
         }
@@ -244,7 +241,7 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
         viewModelScope.launch {
             try {
                 // 获取 Release 信息
-                val info = repository.queryLatestRelease(getSharedBoolean(SHARED_KEY_USE_GITEE, true))
+                val info = repository.queryLatestRelease(AppConfigs.useGitee)
                 if (AppConfigs.ignoreVersion == info.versionName) {
                     // 已忽略版本
                     return@launch

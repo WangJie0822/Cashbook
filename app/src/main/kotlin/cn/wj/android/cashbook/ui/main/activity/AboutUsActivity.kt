@@ -5,14 +5,12 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.md2Spanned
 import cn.wj.android.cashbook.base.ext.base.runIfNotNullAndBlank
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.isWifiAvailable
 import cn.wj.android.cashbook.base.tools.jumpBrowser
 import cn.wj.android.cashbook.base.tools.jumpSendEmail
-import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityAboutUsBinding
 import cn.wj.android.cashbook.manager.UpdateManager
@@ -55,7 +53,7 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
                 .contentStr(info.versionInfo.md2Spanned())
                 .setPositiveAction(R.string.update.string) {
                     // 下载升级
-                    if (isWifiAvailable() || getSharedBoolean(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE)) {
+                    if (isWifiAvailable() || AppConfigs.mobileNetworkDownloadEnable) {
                         // WIFI 可用或允许使用流量下载，直接开始下载
                         UpdateManager.startDownload(info)
                         viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()
@@ -66,7 +64,7 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
                             .showSelect(true)
                             .setOnPositiveAction {
                                 // 保存用户选择
-                                setSharedBoolean(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE, it)
+                                AppConfigs.mobileNetworkDownloadEnable = it
                                 // 开始下载
                                 UpdateManager.startDownload(info)
                                 viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()

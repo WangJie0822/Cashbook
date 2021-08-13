@@ -5,8 +5,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.ifCondition
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.tools.getSharedInt
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_THEME_MODE
+import cn.wj.android.cashbook.data.config.AppConfigs
 
 /**
  * 主题枚举
@@ -26,7 +25,7 @@ enum class ThemeEnum(val typeStrResId: Int, val mode: Int) {
 
     companion object {
         fun currentTheme(): ThemeEnum {
-            val mode = getSharedInt(SHARED_KEY_THEME_MODE)
+            val mode = AppConfigs.themeMode
             return values().firstOrNull { it.mode == mode }.orElse(FOLLOW_SYSTEM)
         }
 

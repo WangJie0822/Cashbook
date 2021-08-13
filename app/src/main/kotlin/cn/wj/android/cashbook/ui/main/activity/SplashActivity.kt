@@ -6,11 +6,10 @@ import android.text.style.ClickableSpan
 import android.view.View
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_AGREE_USER_AGREEMENT
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.databinding.ActivitySplashBinding
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
@@ -77,7 +76,7 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
                 }
                 .setPositiveAction(R.string.agree.string) {
                     // 同意，保存状态
-                    setSharedBoolean(SHARED_KEY_AGREE_USER_AGREEMENT, true)
+                    AppConfigs.agreeUserAgreement = true
                     // 跳转首页并关闭当前界面
                     viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
                         jump(ROUTE_PATH_MAIN)

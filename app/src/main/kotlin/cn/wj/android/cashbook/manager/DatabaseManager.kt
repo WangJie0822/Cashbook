@@ -4,9 +4,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.drawableString
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.dateFormat
-import cn.wj.android.cashbook.base.tools.getSharedBoolean
-import cn.wj.android.cashbook.base.tools.setSharedBoolean
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_TYPE_INITIALIZED
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.database.table.TypeTable
 import cn.wj.android.cashbook.data.entity.BooksEntity
@@ -63,7 +61,7 @@ object DatabaseManager {
 
     /** 初始化消费类型信息 */
     private suspend fun initTypeData(database: CashbookDatabase) {
-        if (getSharedBoolean(SHARED_KEY_TYPE_INITIALIZED)) {
+        if (AppConfigs.typeInitialized) {
             // 已初始化
             return
         }
@@ -75,7 +73,7 @@ object DatabaseManager {
         initExpenditureTypeData(database)
         initIncomeTypeData(database)
         initTransferTypeData(database)
-        setSharedBoolean(SHARED_KEY_TYPE_INITIALIZED, true)
+        AppConfigs.typeInitialized = true
     }
 
 

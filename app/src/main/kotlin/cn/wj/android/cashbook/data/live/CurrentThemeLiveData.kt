@@ -3,8 +3,7 @@ package cn.wj.android.cashbook.data.live
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.tools.setSharedInt
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_THEME_MODE
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.enums.ThemeEnum
 
 /**
@@ -28,7 +27,7 @@ object CurrentThemeLiveData : MutableLiveData<ThemeEnum>(ThemeEnum.currentTheme(
 
         if (null != value) {
             AppCompatDelegate.setDefaultNightMode(value.mode)
-            setSharedInt(SHARED_KEY_THEME_MODE, value.mode)
+            AppConfigs.themeMode = value.mode
         }
     }
 }

@@ -7,17 +7,14 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.tools.getSharedBoolean
-import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ACTION_CONTENT
 import cn.wj.android.cashbook.data.constants.ACTION_TITLE
 import cn.wj.android.cashbook.data.constants.EMAIL_ADDRESS
 import cn.wj.android.cashbook.data.constants.GITEE_HOMEPAGE
 import cn.wj.android.cashbook.data.constants.GITHUB_HOMEPAGE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MARKDOWN
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -47,14 +44,14 @@ class AboutUsViewModel(private val repository: MainRepository) : BaseViewModel()
 
         override fun onActive() {
             if (null == value) {
-                value = getSharedBoolean(SHARED_KEY_USE_GITEE, true)
+                value = AppConfigs.useGitee
             }
         }
 
         override fun setValue(value: Boolean?) {
             super.setValue(value)
             if (null != value) {
-                setSharedBoolean(SHARED_KEY_USE_GITEE, value)
+                AppConfigs.useGitee = value
             }
         }
     }
@@ -64,14 +61,14 @@ class AboutUsViewModel(private val repository: MainRepository) : BaseViewModel()
 
         override fun onActive() {
             if (null == value) {
-                value = getSharedBoolean(SHARED_KEY_AUTO_CHECK_UPDATE, true)
+                value = AppConfigs.autoUpdate
             }
         }
 
         override fun setValue(value: Boolean?) {
             super.setValue(value)
             if (null != value) {
-                setSharedBoolean(SHARED_KEY_AUTO_CHECK_UPDATE, value)
+                AppConfigs.autoUpdate = value
             }
         }
     }

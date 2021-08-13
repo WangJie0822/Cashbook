@@ -16,8 +16,8 @@ import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.tools.*
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET_ID
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
@@ -121,7 +121,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
             if (firstLoad) {
                 if (null == record) {
                     viewModelScope.launch {
-                        value = repository.findAssetById(getSharedLong(SHARED_KEY_LAST_ASSET_ID))
+                        value = repository.findAssetById(AppConfigs.lastAssetId)
                     }
                 }
                 firstLoad = false
@@ -427,7 +427,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                 // 通知记录变化
                 LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
                 // 插入成功，保存本次资产
-                setSharedLong(SHARED_KEY_LAST_ASSET_ID, accountData.value?.id)
+                AppConfigs.lastAssetId = accountData.value?.id.orElse(0L)
                 // 关闭当前界面
                 uiNavigationEvent.value = UiNavigationModel.builder {
                     close()
