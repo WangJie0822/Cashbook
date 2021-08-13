@@ -26,3 +26,6 @@ const val SHARED_KEY_BACKUP_PATH = "shared_key_backup_path"
 
 /** 上次备份时间 */
 const val SHARED_KEY_LAST_BACKUP_MS = "shared_key_last_backup_ms"
+
+/** 忽略升级版本 */
+const val SHARED_KEY_IGNORE_VERSION = "shared_key_ignore_version"

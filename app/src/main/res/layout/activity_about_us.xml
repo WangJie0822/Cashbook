@@ -183,8 +183,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/item_height"
-                    android:layout_marginTop="@dimen/spacing_normal">
+                    android:layout_height="@dimen/item_height">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"

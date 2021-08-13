@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.base.tools.setSharedLong
 import cn.wj.android.cashbook.base.tools.setSharedParcelable
 import cn.wj.android.cashbook.base.tools.setSharedString
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_BACKUP_PATH
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_IGNORE_VERSION
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_BACKUP_MS
 import kotlin.reflect.KProperty
 
@@ -80,6 +81,9 @@ object AppConfigs {
 
     /** 上次备份时间 */
     var lastBackupMs: Long by NoNullProperties(SHARED_KEY_LAST_BACKUP_MS, 0L)
+
+    /** 忽略版本号 */
+    var ignoreVersion: String by NoNullProperties(SHARED_KEY_IGNORE_VERSION, "")
 }
 
 

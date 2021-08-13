@@ -72,4 +72,16 @@ data class SnackbarModel(
         onAction,
         onCallback
     )
+
+    companion object {
+
+        /** 同 [Snackbar.LENGTH_INDEFINITE] */
+        const val LENGTH_INDEFINITE = Snackbar.LENGTH_INDEFINITE
+
+        /** 同 [Snackbar.LENGTH_SHORT] */
+        const val LENGTH_SHORT = Snackbar.LENGTH_SHORT
+
+        /** 同 [Snackbar.LENGTH_LONG] */
+        const val LENGTH_LONG = Snackbar.LENGTH_LONG
+    }
 }

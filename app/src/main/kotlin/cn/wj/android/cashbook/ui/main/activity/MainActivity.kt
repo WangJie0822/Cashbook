@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.isWifiAvailable
 import cn.wj.android.cashbook.base.tools.setSharedBoolean
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -133,6 +134,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         viewModel.showUpdateDialogEvent.observe(this, { info ->
             GeneralDialog.newBuilder()
                 .contentStr(info.versionInfo.md2Spanned())
+                .showSelect(true)
+                .selectTipsStr(R.string.ignore_update_hint.string)
                 .setPositiveAction(R.string.update.string) {
                     // 下载升级
                     if (isWifiAvailable() || getSharedBoolean(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE)) {
@@ -152,6 +155,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                                 viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()
                             }
                             .show(supportFragmentManager)
+                    }
+                }
+                .setOnNegativeAction {
+                    if (it) {
+                        // 忽略该版本
+                        AppConfigs.ignoreVersion = info.versionName
                     }
                 }
                 .show(supportFragmentManager)

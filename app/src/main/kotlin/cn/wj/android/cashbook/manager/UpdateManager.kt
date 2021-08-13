@@ -17,7 +17,13 @@ import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.data.constants.*
+import cn.wj.android.cashbook.data.constants.ACTION_APK_NAME
+import cn.wj.android.cashbook.data.constants.ACTION_DOWNLOAD_URL
+import cn.wj.android.cashbook.data.constants.INTENT_KEY_CANCEL_DOWNLOAD
+import cn.wj.android.cashbook.data.constants.INTENT_KEY_RETRY_DOWNLOAD
+import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_UPDATE
+import cn.wj.android.cashbook.data.constants.NOTIFICATION_ID_UPDATE
+import cn.wj.android.cashbook.data.constants.NOTIFICATION_ID_UPDATE_ERROR
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.receiver.EventReceiver
 import cn.wj.android.cashbook.work.ApkDownloadWorker

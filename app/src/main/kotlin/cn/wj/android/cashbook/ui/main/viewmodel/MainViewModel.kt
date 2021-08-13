@@ -11,11 +11,13 @@ import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.moneyFormat
+import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_MY
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_MY
@@ -32,8 +34,10 @@ import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
+import cn.wj.android.cashbook.data.model.SnackbarModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.main.MainRepository
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import cn.wj.android.cashbook.manager.UpdateManager
 import kotlinx.coroutines.launch
@@ -241,9 +245,19 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
             try {
                 // 获取 Release 信息
                 val info = repository.queryLatestRelease(getSharedBoolean(SHARED_KEY_USE_GITEE, true))
+                if (AppConfigs.ignoreVersion == info.versionName) {
+                    // 已忽略版本
+                    return@launch
+                }
                 UpdateManager.checkFromInfo(info, {
-                    // 显示升级提示弹窗
-                    showUpdateDialogEvent.value = info
+                    // 有可用版本
+                    snackbarEvent.value = R.string.new_versions_found.string.toSnackbarModel(
+                        duration = SnackbarModel.LENGTH_INDEFINITE,
+                        actionText = R.string.view.string,
+                        onAction = {
+                            // 显示升级提示弹窗
+                            showUpdateDialogEvent.value = info
+                        })
                 }, {
                     // 不需要升级
                 })
