@@ -100,7 +100,7 @@ class SelectTagViewModel(private val repository: RecordRepository) : BaseViewMod
                 val list = tagListData.value.toNewList()
                 list.remove(tag)
                 tagListData.value = list
-                LiveEventBus.get(EVENT_TAG_DELETE).post(tag)
+                LiveEventBus.get<TagEntity>(EVENT_TAG_DELETE).post(tag)
             } catch (throwable: Throwable) {
                 logger().e(throwable, "deleteTag")
             }

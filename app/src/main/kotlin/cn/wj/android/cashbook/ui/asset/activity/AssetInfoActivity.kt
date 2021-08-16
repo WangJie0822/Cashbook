@@ -80,7 +80,7 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
 
         })
         // 记录变化监听
-        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
             pagingAdapter.refresh()
             viewModel.refreshAsset()
         })

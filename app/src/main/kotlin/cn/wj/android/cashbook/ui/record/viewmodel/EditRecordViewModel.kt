@@ -429,7 +429,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                     )
                 }
                 // 通知记录变化
-                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
+                LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).post(0)
                 // 插入成功，保存本次资产
                 AppConfigs.lastAssetId = accountData.value?.id.orElse(0L)
                 // 关闭当前界面

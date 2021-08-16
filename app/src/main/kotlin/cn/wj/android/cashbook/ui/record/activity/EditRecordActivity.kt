@@ -110,14 +110,14 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         })
 
         // 标签变化
-        LiveEventBus.get(EVENT_TAG_CHANGE).observe(this, { value ->
-            (value as? TagEntity)?.let { tag ->
+        LiveEventBus.get<TagEntity>(EVENT_TAG_CHANGE).observe(this, { value ->
+            value?.let { tag ->
                 viewModel.notifyTagChanged(tag)
             }
         })
         // 标签删除
-        LiveEventBus.get(EVENT_TAG_DELETE).observe(this, { value ->
-            (value as? TagEntity)?.let { tag ->
+        LiveEventBus.get<TagEntity>(EVENT_TAG_DELETE).observe(this, { value ->
+            value?.let { tag ->
                 viewModel.notifyTagDelete(tag)
             }
         })

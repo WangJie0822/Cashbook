@@ -149,7 +149,7 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
             RecordInfoDialog.actionShow(childFragmentManager, record)
         })
         // 记录数据变化
-        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
             typeViewModel.loadType()
             viewModel.refreshAssociatedRecord()
         })

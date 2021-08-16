@@ -63,7 +63,7 @@ class CalendarActivity : BaseActivity<CalendarViewModel, ActivityCalendarBinding
             SelectYearMonthDialog.actionShow(supportFragmentManager, viewModel.titleStr.value.orEmpty(), callback)
         })
         // 记录变化监听
-        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
             viewModel.refresh()
         })
     }

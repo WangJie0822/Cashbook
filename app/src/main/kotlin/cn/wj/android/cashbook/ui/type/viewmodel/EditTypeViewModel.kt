@@ -156,7 +156,7 @@ class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel(
                     // 更新分类
                     repository.updateType(typeEntity.copy(name = name, iconResName = iconResIdStr))
                 }
-                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
+                LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).post(0)
                 uiNavigationEvent.value = UiNavigationModel.builder {
                     close()
                 }

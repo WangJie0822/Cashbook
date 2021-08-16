@@ -32,7 +32,7 @@ object Dependencies {
      * LiveEventBus
      * - [Github](https://github.com/JeremyLiao/LiveEventBus)
      */
-    const val liveEventBus = "com.jeremyliao:live-event-bus-x:1.7.3"
+    const val liveEventBus = "io.github.jeremyliao:live-event-bus:1.8.0"
 
     /**
      * TabLayout
@@ -72,13 +72,13 @@ object Dependencies {
          * - [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
          * - [Github](https://github.com/Kotlin/kotlinx.coroutines)
          */
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3"
+        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1"
 
         /**
          * kotlin Json 序列化
          * - [Github](https://github.com/Kotlin/kotlinx.serialization)
          */
-        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0"
+        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2"
     }
 
     /**
@@ -96,13 +96,13 @@ object Dependencies {
          * appcompat
          * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.appcompat%3Aappcompat)
          */
-        const val appcompat = "androidx.appcompat:appcompat:1.2.0"
+        const val appcompat = "androidx.appcompat:appcompat:1.3.1"
 
         /**
          * recyclerview
          * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.recyclerview%3Arecyclerview)
          */
-        const val recyclerview = "androidx.recyclerview:recyclerview:1.2.0"
+        const val recyclerview = "androidx.recyclerview:recyclerview:1.2.1"
 
         /**
          * viewpager2
@@ -112,13 +112,13 @@ object Dependencies {
 
         /**
          * 约束性布局
-         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.constraintlayout2%3Aconstraintlayout)
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.constraintlayout%3Aconstraintlayout)
          */
-        const val constraint = "androidx.constraintlayout:constraintlayout:2.0.4"
+        const val constraint = "androidx.constraintlayout:constraintlayout:2.1.0"
 
         /**
          * multidex 分包
-         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.multidex2%3Amultidex)
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.multidex%3Amultidex)
          */
         const val multidex = "androidx.multidex:multidex:2.0.1"
 
@@ -194,7 +194,7 @@ object Dependencies {
         object Core {
 
             /** core 版本 */
-            private const val version = "1.3.2"
+            private const val version = "1.6.0"
 
             /** 核心功能 */
             const val core = "androidx.core:core:$version"
@@ -242,7 +242,7 @@ object Dependencies {
         object Activity {
 
             /** activity 版本 */
-            private const val version = "1.2.3"
+            private const val version = "1.3.1"
 
             /** Activity 相关 */
             const val activity = "androidx.activity:activity:$version"
@@ -251,7 +251,7 @@ object Dependencies {
             const val ktx = "androidx.activity:activity-ktx:$version"
 
             /** Compose 相关 */
-            const val compose = "androidx.activity:activity-compose:1.3.0"
+            const val compose = "androidx.activity:activity-compose:1.3.1"
         }
 
         /**
@@ -261,7 +261,7 @@ object Dependencies {
         object Fragment {
 
             /** fragment 版本 */
-            private const val version = "1.3.3"
+            private const val version = "1.3.6"
 
             /** Fragment 相关 */
             const val fragment = "androidx.fragment:fragment:$version"
@@ -334,7 +334,7 @@ object Dependencies {
         object Paging {
 
             /** paging 版本 */
-            private const val version = "3.0.0"
+            private const val version = "3.0.1"
 
             const val runtime = "androidx.paging:paging-runtime:$version"
             const val runtimeKtx = "androidx.paging:paging-runtime-ktx:$version"
@@ -396,8 +396,11 @@ object Dependencies {
      */
     object Google {
 
-        /** androidx material */
-        const val material = "com.google.android.material:material:1.3.0"
+        /**
+         * androidx material
+         * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=com.google.android.material)
+         */
+        const val material = "com.google.android.material:material:1.4.0"
 
         /**
          * Zxing
@@ -487,10 +490,11 @@ object Dependencies {
     object Koin3 {
 
         /** koin 版本 */
-        private const val version = "3.0.1"
+        private const val version = "3.1.2"
 
         const val android = "io.insert-koin:koin-android:$version"
-        const val androidExt = "io.insert-koin:koin-android-ext:$version"
+//        const val androidExt = "io.insert-koin:koin-android-ext:$version"
+        const val androidExt = "io.insert-koin:koin-android-ext:3.0.2"
         const val workManager = "io.insert-koin:koin-androidx-workmanager:$version"
         const val compose = "io.insert-koin:koin-androidx-compose:$version"
     }
@@ -584,7 +588,7 @@ object Dependencies {
     object Coil {
 
         /** coil 版本 */
-        private const val version = "1.2.1"
+        private const val version = "1.3.2"
 
         const val coil = "io.coil-kt:coil:$version"
         const val base = "io.coil-kt:coil-base:$version"
@@ -621,7 +625,7 @@ object Dependencies {
         object ARouter {
 
             /** ARouter 版本 */
-            private const val version = "1.5.1"
+            private const val version = "1.5.2"
 
             const val api = "com.alibaba:arouter-api:$version"
             const val compiler = "com.alibaba:arouter-compiler:$version"
@@ -637,7 +641,7 @@ object Dependencies {
          * MMKV
          * - [Github](https://github.com/tencent/mmkv)
          */
-        const val mmkv = "com.tencent:mmkv:1.2.7"
+        const val mmkv = "com.tencent:mmkv:1.2.10"
     }
 
     /** 滴滴 */

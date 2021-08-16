@@ -92,7 +92,7 @@ class EditTagViewModel(private val repository: RecordRepository) : BaseViewModel
                     repository.updateTag(changed)
                     changed
                 }
-                LiveEventBus.get(EVENT_TAG_CHANGE).post(result)
+                LiveEventBus.get<TagEntity>(EVENT_TAG_CHANGE).post(result)
                 successEvent.value = result
                 // 保存成功，关闭弹窗
                 uiNavigationEvent.value = UiNavigationModel.builder {

@@ -71,7 +71,7 @@ class SearchRecordActivity : BaseActivity<SearchRecordViewModel, ActivitySearchR
             RecordInfoDialog.actionShow(supportFragmentManager, record)
         })
         // 记录变化监听
-        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
             adapter.refresh()
         })
     }

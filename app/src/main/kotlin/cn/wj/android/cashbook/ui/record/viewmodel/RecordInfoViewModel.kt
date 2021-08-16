@@ -78,7 +78,7 @@ class RecordInfoViewModel(private val repository: RecordRepository) : BaseViewMo
             try {
                 repository.deleteRecord(record)
                 // 通知记录变化
-                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
+                LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).post(0)
                 // 删除成功，关闭当前弹窗
                 uiNavigationEvent.value = UiNavigationModel.builder {
                     close()

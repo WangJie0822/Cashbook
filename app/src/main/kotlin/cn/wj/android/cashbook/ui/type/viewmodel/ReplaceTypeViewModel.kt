@@ -108,7 +108,7 @@ class ReplaceTypeViewModel(private val repository: TypeRepository) : BaseViewMod
                 // 删除分类
                 repository.deleteType(old)
                 // 修改成功
-                LiveEventBus.get(EVENT_RECORD_CHANGE).post(0)
+                LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).post(0)
                 snackbarEvent.value = R.string.modify_success.string.toSnackbarModel(onCallback = object : Snackbar.Callback() {
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                         uiNavigationEvent.value = UiNavigationModel.builder {

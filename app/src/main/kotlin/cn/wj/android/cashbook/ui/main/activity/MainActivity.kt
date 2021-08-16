@@ -165,7 +165,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 .show(supportFragmentManager)
         })
         // 记录变化监听
-        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
             viewModel.refreshing.value = true
         })
     }

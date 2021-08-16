@@ -121,7 +121,7 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
                 })
         })
         // 记录数据变化
-        LiveEventBus.get(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
             viewModel.loadTypeList()
         })
     }
