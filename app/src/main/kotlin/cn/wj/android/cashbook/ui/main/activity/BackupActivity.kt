@@ -10,13 +10,14 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.isContentScheme
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.MIME_TYPE_ZIP
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BACKUP
+import cn.wj.android.cashbook.data.enums.AutoBackupEnum
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityBackupBinding
 import cn.wj.android.cashbook.third.result.createForActivityResultLauncher
 import cn.wj.android.cashbook.ui.main.viewmodel.BackupViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -111,8 +112,8 @@ class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
                 }
                 if (path.isContentScheme()) {
                     if (DocumentFile.fromTreeUri(this, Uri.parse(path))?.canRead() == true) {
-                        // 有权限，开始恢复
-                        viewModel.tryRecovery(path)
+                        // 有权限，查询备份列表
+                        viewModel.queryLocalBackupList(path)
                     } else {
                         // 没有权限，提示
                         viewModel.snackbarEvent.value = R.string.path_no_permission.string.toSnackbarModel()
@@ -124,12 +125,30 @@ class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
                             // 有未同意权限
                             viewModel.snackbarEvent.value = R.string.backup_need_storage_permissions.string.toSnackbarModel()
                         } else {
-                            // 开始恢复
-                            viewModel.tryRecovery(path)
+                            // 查询备份列表
+                            viewModel.queryLocalBackupList(path)
                         }
                     }
                 }
             })
+        }
+        // 选择备份列表弹窗
+        viewModel.showSelectBackupListDialogEvent.observe(this) { ls ->
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.please_select_backup)
+                .setItems(ls.map { it.name }.toTypedArray()) { _, index ->
+                    viewModel.recovery(ls[index])
+                }
+                .show()
+        }
+        // 选择自动备份配置
+        viewModel.selectAutoBackup.observe(this) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.please_select_auto_backup)
+                .setItems(AutoBackupEnum.values().map { it.textResId.string }.toTypedArray()) { _, index ->
+                    viewModel.autoBackup.value = AutoBackupEnum.values()[index]
+                }
+                .show()
         }
     }
 }

@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Added
+- 新增 WebDAV 备份恢复支持；
 ### Changed
 - 三方依赖升级；
 

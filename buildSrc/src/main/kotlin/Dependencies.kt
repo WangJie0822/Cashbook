@@ -41,6 +41,12 @@ object Dependencies {
     const val tabLayout = "com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar"
 
     /**
+     * jsoup HTML 解析
+     * - [Github](https://github.com/jhy/jsoup)
+     */
+    const val jsoup = "org.jsoup:jsoup:1.14.2"
+
+    /**
      * Kotlin 相关
      * - [指南](https://kotlinlang.org/)
      */
@@ -493,7 +499,8 @@ object Dependencies {
         private const val version = "3.1.2"
 
         const val android = "io.insert-koin:koin-android:$version"
-//        const val androidExt = "io.insert-koin:koin-android-ext:$version"
+
+        //        const val androidExt = "io.insert-koin:koin-android-ext:$version"
         const val androidExt = "io.insert-koin:koin-android-ext:3.0.2"
         const val workManager = "io.insert-koin:koin-androidx-workmanager:$version"
         const val compose = "io.insert-koin:koin-androidx-compose:$version"

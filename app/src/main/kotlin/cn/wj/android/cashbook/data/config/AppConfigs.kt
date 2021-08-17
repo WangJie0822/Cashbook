@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.base.tools.setSharedLong
 import cn.wj.android.cashbook.base.tools.setSharedParcelable
 import cn.wj.android.cashbook.base.tools.setSharedString
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_AGREE_USER_AGREEMENT
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_BACKUP
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_BACKUP_PATH
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_IGNORE_VERSION
@@ -21,6 +22,10 @@ import cn.wj.android.cashbook.data.constants.SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_THEME_MODE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_TYPE_INITIALIZED
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_WEBDAV_ACCOUNT
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_WEBDAV_PASSWORD
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_WEBDAV_WEB_URL
+import cn.wj.android.cashbook.data.enums.AutoBackupEnum
 import kotlin.reflect.KProperty
 
 /**
@@ -104,11 +109,23 @@ object AppConfigs {
     /** 是否同意用户协议 */
     var agreeUserAgreement: Boolean by NoNullProperties(SHARED_KEY_AGREE_USER_AGREEMENT, false)
 
+    /** WebDAV 服务路径 */
+    var webDAVWebUrl: String by NoNullProperties(SHARED_KEY_WEBDAV_WEB_URL, "https://dav.jianguoyun.com/dav/")
+
+    /** WebDAV 账户 */
+    var webDAVAccount: String by NoNullProperties(SHARED_KEY_WEBDAV_ACCOUNT, "")
+
+    /** WebDAV 密码 */
+    var webDAVPassword: String by NoNullProperties(SHARED_KEY_WEBDAV_PASSWORD, "")
+
     /** 备份路径 */
     var backupPath: String by NoNullProperties(SHARED_KEY_BACKUP_PATH, "")
 
     /** 上次备份时间 */
     var lastBackupMs: Long by NoNullProperties(SHARED_KEY_LAST_BACKUP_MS, 0L)
+
+    /** 自动备份配置 */
+    var autoBackup: Int by NoNullProperties(SHARED_KEY_AUTO_BACKUP, AutoBackupEnum.CLOSED.value)
 
     /** 忽略版本号 */
     var ignoreVersion: String by NoNullProperties(SHARED_KEY_IGNORE_VERSION, "")

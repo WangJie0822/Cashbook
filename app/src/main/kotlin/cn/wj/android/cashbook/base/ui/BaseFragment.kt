@@ -15,6 +15,7 @@ import cn.wj.android.cashbook.BR
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.firstVisibleFragmentOrNull
 import cn.wj.android.cashbook.data.model.SnackbarModel
+import cn.wj.android.cashbook.manager.ProgressDialogManager
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
 
@@ -152,6 +153,14 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
 
     /** 订阅基本数据 */
     protected fun observeBaseModel(viewModel: BaseViewModel) {
+        // 进度弹窗
+        viewModel.progressEvent.observe(this, Observer {
+            if (null == it) {
+                ProgressDialogManager.dismiss()
+                return@Observer
+            }
+            ProgressDialogManager.show(requireActivity(), it.cancelable, it.hint)
+        })
         // snackbar 提示
         viewModel.snackbarEvent.observe(this, Observer {
             if (it.content.isNullOrBlank()) {

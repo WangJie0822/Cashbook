@@ -3,10 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/drawable/shape_window_background_transparent.xml" value="0.328125" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_about_us.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_asset_info.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_backup.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_edit_asset.xml" value="0.31197916666666664" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_edit_books.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_edit_record.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_main.xml" value="0.2759259259259259" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_my_asset.xml" value="0.31197916666666664" />
@@ -16,6 +18,8 @@
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/activity_type_record.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/dialog_edit_type_menu.xml" value="0.3104166666666667" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/dialog_general.xml" value="0.31197916666666664" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/dialog_progress.xml" value="0.31197916666666664" />
+        <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/dialog_progressing.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/dialog_record_info.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/dialog_select_year_month.xml" value="0.31197916666666664" />
         <entry key="..\:/Development/WorkSpace/android/Cashbook/app/src/main/res/layout/fragment_edit_record.xml" value="0.31197916666666664" />

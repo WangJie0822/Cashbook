@@ -3,6 +3,7 @@
 package cn.wj.android.cashbook.data.constants
 
 import android.app.Activity
+import cn.wj.android.cashbook.BuildConfig
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 /**
@@ -57,7 +58,7 @@ const val NOTIFICATION_ID_UPDATE_ERROR = 2022
 const val DEFAULT_PAGE_SIZE = 20
 
 /** 备份文件夹 */
-const val BACKUP_DIR_NAME = "Cashbook_Backup"
+const val BACKUP_DIR_NAME = "Cashbook_Backup_${BuildConfig.FLAVOR}"
 /** 备份缓存文件夹 */
 const val BACKUP_CACHE_FILE_NAME = "Cashbook_Backup_Cache"
 /** 备份文件名 */

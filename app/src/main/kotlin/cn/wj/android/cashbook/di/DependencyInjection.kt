@@ -31,6 +31,7 @@ import cn.wj.android.cashbook.ui.asset.viewmodel.SelectDayViewModel
 import cn.wj.android.cashbook.ui.books.viewmodel.EditBooksViewModel
 import cn.wj.android.cashbook.ui.books.viewmodel.MyBooksViewModel
 import cn.wj.android.cashbook.ui.general.viewmodel.GeneralViewModel
+import cn.wj.android.cashbook.ui.general.viewmodel.ProgressViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.AboutUsViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.BackupViewModel
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
@@ -279,5 +280,8 @@ val viewModelModule = module {
     }
     viewModel {
         SelectYearMonthViewModel()
+    }
+    viewModel {
+        ProgressViewModel()
     }
 }

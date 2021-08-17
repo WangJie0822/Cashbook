@@ -259,6 +259,9 @@ dependencies {
     // Markdown 解析
     implementation(Dependencies.Markwon.markwon)
 
+    // HTML 解析
+    implementation(Dependencies.jsoup)
+
     // 日历控件
     implementation(Dependencies.calendar_view)
 

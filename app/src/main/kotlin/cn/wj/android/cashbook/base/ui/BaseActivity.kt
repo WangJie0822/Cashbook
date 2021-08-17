@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.base.ext.hideSoftKeyboard
 import cn.wj.android.cashbook.base.tools.shouldHideInput
 import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
 import cn.wj.android.cashbook.data.model.SnackbarModel
+import cn.wj.android.cashbook.manager.ProgressDialogManager
 import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.platform.MaterialSharedAxis
@@ -178,6 +179,14 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
 
     /** 订阅基本数据 */
     private fun observeBaseModel() {
+        // 进度弹窗
+        viewModel.progressEvent.observe(this, Observer {
+            if (null == it) {
+                ProgressDialogManager.dismiss()
+                return@Observer
+            }
+            ProgressDialogManager.show(this, it.cancelable, it.hint)
+        })
         // Snackbar 提示
         viewModel.snackbarEvent.observe(this, Observer {
             if (it.content.isNullOrBlank()) {

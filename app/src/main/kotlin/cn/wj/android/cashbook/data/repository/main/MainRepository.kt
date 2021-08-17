@@ -44,8 +44,15 @@ import cn.wj.android.cashbook.data.database.table.BooksTable
 import cn.wj.android.cashbook.data.database.table.RecordTable
 import cn.wj.android.cashbook.data.database.table.TagTable
 import cn.wj.android.cashbook.data.database.table.TypeTable
+import cn.wj.android.cashbook.data.entity.BackupEntity
 import cn.wj.android.cashbook.data.entity.BackupVersionEntity
+import cn.wj.android.cashbook.data.entity.DataResult
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
+import cn.wj.android.cashbook.data.entity.RESULT_CODE_RECOVERY_CHANNEL_ERROR
+import cn.wj.android.cashbook.data.entity.RESULT_CODE_RECOVERY_PATH_ERROR
+import cn.wj.android.cashbook.data.entity.RESULT_CODE_RECOVERY_UNKNOWN_FILE
+import cn.wj.android.cashbook.data.entity.RESULT_CODE_SUCCESS
+import cn.wj.android.cashbook.data.entity.RESULT_CODE_WEBDAV_FAILED
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
@@ -53,6 +60,7 @@ import cn.wj.android.cashbook.data.net.WebService
 import cn.wj.android.cashbook.data.repository.Repository
 import cn.wj.android.cashbook.data.transform.toUpdateInfoEntity
 import cn.wj.android.cashbook.manager.AppManager
+import cn.wj.android.cashbook.manager.WebDAVManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -161,7 +169,7 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
     }
 
     /** 备份到指定路径 */
-    suspend fun backup() = withContext(Dispatchers.IO) {
+    suspend fun backup(): DataResult<Any> = withContext(Dispatchers.IO) {
         val currentMs = System.currentTimeMillis()
         val dateFormat = currentMs.dateFormat(DATE_FORMAT_BACKUP)
         // 保存备份时间
@@ -197,7 +205,7 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         // 添加备份信息
         cachePath.createFileIfNotExists(BACKUP_INFO_NAME).run {
             cacheFiles.add(this.path)
-            writeText(BackupVersionEntity(BuildConfig.BACKUP_VERSION, dateFormat).toJsonString())
+            writeText(BackupVersionEntity(BuildConfig.BACKUP_VERSION, BuildConfig.FLAVOR, dateFormat).toJsonString())
         }
 
         // 压缩包路径
@@ -205,12 +213,79 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         // 将缓存压缩
         cacheFiles.zipToFile(zippedPath)
 
+        // 备份到 WebDAV
+        val result = WebDAVManager.backup(zippedPath)
+
         // 复制缓存中备份文件到备份目录
         zippedPath.copyToPath(AppConfigs.backupPath, MIME_TYPE_ZIP, BACKUP_DIR_NAME)
+        DataResult(
+            code = if (result) {
+                RESULT_CODE_SUCCESS
+            } else {
+                RESULT_CODE_WEBDAV_FAILED
+            }
+        )
+    }
+
+    /** 获取云端备份列表 */
+    suspend fun getWebBackupList(): List<BackupEntity> = withContext(Dispatchers.IO) {
+        WebDAVManager.getBackupFileList().sortedBy { it.name }.reversed()
+    }
+
+    /** 获取 [path] 路径下备份列表 */
+    suspend fun getLocalBackupList(path: String): List<BackupEntity> = withContext(Dispatchers.IO) {
+        val result = arrayListOf<BackupEntity>()
+        if (path.isContentScheme()) {
+            DocumentFile.fromTreeUri(AppManager.getContext(), Uri.parse(path))?.let { df ->
+                if (df.name == BACKUP_DIR_NAME) {
+                    df
+                } else {
+                    df.findFile(BACKUP_DIR_NAME)
+                }?.listFiles()?.filter {
+                    it.name?.startsWith(BACKUP_FILE_NAME) == true && it.name?.endsWith(BACKUP_FILE_EXT) == true
+                }?.forEach {
+                    result.add(BackupEntity(it.name.orEmpty(), it.uri.toString(), false))
+                }
+            }
+        } else {
+            val file = File(path)
+            if (!file.exists()) {
+                return@withContext result
+            }
+            if (file.name == BACKUP_DIR_NAME) {
+                file.listFiles()
+            } else {
+                file.listFiles()?.firstOrNull {
+                    it.name == BACKUP_DIR_NAME
+                }?.listFiles()
+            }?.filter {
+                it.name.startsWith(BACKUP_FILE_NAME) && it.name.endsWith(BACKUP_FILE_EXT)
+            }?.forEach {
+                result.add(BackupEntity(it.name, it.path, false))
+            }
+        }
+        result.sortedBy { it.name }.reversed()
+    }
+
+    /** 下载 [url] 备份文件并恢复备份 */
+    suspend fun recoveryWeb(url: String): DataResult<Any> = withContext(Dispatchers.IO) {
+        // 获取缓存路径
+        val cachePath = File(AppManager.getContext().cacheDir, BACKUP_CACHE_FILE_NAME).absolutePath
+        // 清空缓存路径下文件
+        cachePath.deleteFiles()
+
+        // 创建缓存文件
+        val zippedFile = cachePath.createFileIfNotExists(BACKUP_FILE_NAME + "Cache" + BACKUP_FILE_EXT)
+
+        // 下载文件
+        WebDAVManager.downloadTo(url, zippedFile)
+
+        // 解压压缩文件并恢复备份
+        recoveryFromZipped(zippedFile.absolutePath.unzipToDir(cachePath))
     }
 
     /** 从指定路径 [path] 恢复备份 */
-    suspend fun recovery(path: String): Boolean {
+    suspend fun recoveryLocal(path: String): DataResult<Any> = withContext(Dispatchers.IO) {
         // 获取缓存路径
         val cachePath = File(AppManager.getContext().cacheDir, BACKUP_CACHE_FILE_NAME).absolutePath
         // 清空缓存路径下文件
@@ -229,16 +304,16 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
                     it.name
                 }?.reversed()?.firstOrNull {
                     it.name?.startsWith(BACKUP_FILE_NAME) == true && it.name?.endsWith(BACKUP_FILE_EXT) == true
-                } ?: return false
+                } ?: return@withContext DataResult.failed(RESULT_CODE_RECOVERY_PATH_ERROR)
                 logger().d("backupFile: ${backupFile.name}")
                 // 复制数据到缓存文件
-                val bytes = backupFile.readBytes() ?: return false
+                val bytes = backupFile.readBytes() ?: return@withContext DataResult.failed(RESULT_CODE_RECOVERY_PATH_ERROR)
                 zippedFile.writeBytes(bytes)
             }
         } else {
             val file = File(path)
             if (!file.exists()) {
-                return false
+                return@withContext DataResult.failed(RESULT_CODE_RECOVERY_PATH_ERROR)
             }
             val backupFile = if (file.name == BACKUP_DIR_NAME) {
                 file.listFiles()
@@ -250,17 +325,25 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
                 it.name
             }?.reversed()?.firstOrNull {
                 it.name.startsWith(BACKUP_FILE_NAME) && it.name.endsWith(BACKUP_FILE_EXT)
-            } ?: return false
+            } ?: return@withContext DataResult.failed(RESULT_CODE_RECOVERY_PATH_ERROR)
             logger().d("backupFile: ${backupFile.name}")
             // 复制数据到缓存文件
             backupFile.copyTo(zippedFile)
         }
 
-        // 将 zip 文件解压到缓存路径
-        val files = zippedFile.absolutePath.unzipToDir(cachePath)
-        files.firstOrNull {
+        // 解压压缩文件并恢复备份
+        recoveryFromZipped(zippedFile.absolutePath.unzipToDir(cachePath))
+    }
+
+    /** 从解压的文件 [files] 中恢复备份 */
+    private suspend fun recoveryFromZipped(files: List<File>): DataResult<Any> = withContext(Dispatchers.IO) {
+        // 获取配置信息
+        val info = files.firstOrNull {
             it.name == BACKUP_INFO_NAME
-        }?.readText().toTypeEntity<BackupVersionEntity>() ?: return false
+        }?.readText().toTypeEntity<BackupVersionEntity>() ?: return@withContext DataResult.failed<Any>(RESULT_CODE_RECOVERY_UNKNOWN_FILE)
+        if (info.channel != BuildConfig.FLAVOR) {
+            return@withContext DataResult.failed(RESULT_CODE_RECOVERY_CHANNEL_ERROR)
+        }
         files.forEach {
             when (it.name) {
                 BACKUP_ASSET_FILE_NAME -> {
@@ -290,6 +373,6 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
                 }
             }
         }
-        return true
+        DataResult.success()
     }
 }
