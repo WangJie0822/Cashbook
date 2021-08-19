@@ -1,17 +1,16 @@
+@file:kotlin.Suppress("UnstableApiUsage")
 pluginManagement {
     repositories {
-        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin/") }
+        maven { setUrl(Dependencies.MavenRepository.AliYun.gradlePlugin) }
         gradlePluginPortal()
     }
 }
 
 dependencyResolutionManagement {
-    @Suppress("UnstableApiUsage")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    @Suppress("UnstableApiUsage")
     repositories {
-        maven { setUrl("https://maven.aliyun.com/repository/public/") }
-        maven { setUrl("https://maven.aliyun.com/repository/google/") }
+        maven { setUrl(Dependencies.MavenRepository.AliYun.public) }
+        maven { setUrl(Dependencies.MavenRepository.AliYun.google) }
         mavenCentral()
     }
 }
