@@ -1,11 +1,38 @@
 @file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 /**
- * 依赖数据
+ * 三方依赖配置
  *
  * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/5/10
  */
 object Dependencies {
+
+    /** Maven 仓库地址 */
+    object MavenRepository {
+
+        /**
+         * Jitpack 仓库
+         * - [首页](https://www.jitpack.io/)
+         */
+        const val jitpack = "https://jitpack.io"
+
+        /**
+         * 阿里云仓库
+         * - [指南](https://developer.aliyun.com/mvn/guide)
+         */
+        object AliYun {
+            /** [central] 和 [jcenter] 的聚合 */
+            const val public = "https://maven.aliyun.com/nexus/content/groups/public"
+            const val central = "https://maven.aliyun.com/repository/central"
+            const val jcenter = "https://maven.aliyun.com/repository/public"
+            const val google = "https://maven.aliyun.com/repository/google"
+            const val gradlePlugin = "https://maven.aliyun.com/repository/gradle-plugin"
+            const val spring = "https://maven.aliyun.com/repository/spring"
+            const val springPlugin = "https://maven.aliyun.com/repository/spring-plugin"
+            const val grailsCore = "https://maven.aliyun.com/repository/grails-core"
+            const val apacheSnapshots = "https://maven.aliyun.com/repository/apache-snapshots"
+        }
+    }
 
     /** 测试 */
     const val testJunit = "junit:junit:4.13"
