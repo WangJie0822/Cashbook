@@ -80,3 +80,8 @@ const val BACKUP_INFO_NAME = "Backup_Info.json"
 
 /** MIME 类型 - 压缩文件 */
 const val MIME_TYPE_ZIP = "application/zip"
+
+/** 一天对应毫秒数 */
+const val MS_DAY = 1000L * 60L * 60L * 24L
+/** 一周对应毫秒数 */
+const val MS_WEEK = MS_DAY * 7L

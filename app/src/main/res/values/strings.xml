@@ -282,4 +282,5 @@
     <string name="recovery_failed_channel_error">渠道异常，请选择正确的备份文件</string>
     <string name="recovery_failed_path_error">路径异常，请选择正确的备份文件</string>
     <string name="please_select_auto_backup">请选择自动备份设置</string>
+    <string name="auto_backup_exception">自动备份失败，请检查备份设置</string>
 </resources>

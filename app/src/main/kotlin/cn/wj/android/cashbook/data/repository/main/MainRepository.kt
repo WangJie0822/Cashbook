@@ -172,8 +172,6 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
     suspend fun backup(): DataResult<Any> = withContext(Dispatchers.IO) {
         val currentMs = System.currentTimeMillis()
         val dateFormat = currentMs.dateFormat(DATE_FORMAT_BACKUP)
-        // 保存备份时间
-        AppConfigs.lastBackupMs = currentMs
 
         // 获取缓存路径
         val cachePath = File(AppManager.getContext().cacheDir, BACKUP_CACHE_FILE_NAME).absolutePath
@@ -218,6 +216,8 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
 
         // 复制缓存中备份文件到备份目录
         zippedPath.copyToPath(AppConfigs.backupPath, MIME_TYPE_ZIP, BACKUP_DIR_NAME)
+        // 保存备份时间
+        AppConfigs.lastBackupMs = currentMs
         DataResult(
             code = if (result) {
                 RESULT_CODE_SUCCESS

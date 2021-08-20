@@ -1,9 +1,14 @@
 package cn.wj.android.cashbook.ui.main.activity
 
+import android.Manifest
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GravityCompat
+import androidx.documentfile.provider.DocumentFile
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.isContentScheme
 import cn.wj.android.cashbook.base.ext.base.md2Spanned
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.scrollToTop
@@ -12,12 +17,14 @@ import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.model.NoDataModel
+import cn.wj.android.cashbook.data.model.SnackbarModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMainBinding
 import cn.wj.android.cashbook.databinding.LayoutNoDataBinding
 import cn.wj.android.cashbook.databinding.RecyclerFooterHomepageBinding
 import cn.wj.android.cashbook.manager.UpdateManager
+import cn.wj.android.cashbook.third.result.createForActivityResultLauncher
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
@@ -41,6 +48,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     /** 上次返回点击时间 */
     private var lastBackPressMs = 0L
+
+    /** 权限申请 launcher */
+    private val requestPermissionsLauncher = createForActivityResultLauncher(ActivityResultContracts.RequestMultiplePermissions())
 
     /** 列表适配器对象 */
     private val adapter: DateRecordRvAdapter by lazy {
@@ -82,6 +92,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
         // 检查更新
         viewModel.checkUpdate()
+        // 自动备份
+        viewModel.autoBackup()
     }
 
     override fun onStop() {
@@ -164,9 +176,46 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 }
                 .show(supportFragmentManager)
         })
+        // 检查备份路径
+        viewModel.checkBackupPathEvent.observe(this, fun(path) {
+            if (path.isNullOrBlank()) {
+                showPathErrorHint()
+                return
+            }
+            if (path.isContentScheme()) {
+                if (DocumentFile.fromTreeUri(this, Uri.parse(path))?.canRead() == true) {
+                    // 有权限，开始备份
+                    viewModel.tryBackup()
+                } else {
+                    // 没有权限，提示
+                    showPathErrorHint()
+                }
+            } else {
+                // 申请权限
+                requestPermissionsLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)) { map ->
+                    if (map.values.contains(false)) {
+                        // 有未同意权限
+                        showPathErrorHint()
+                        return@launch
+                    }
+                    // 开始备份
+                    viewModel.tryBackup()
+                }
+            }
+        })
         // 记录变化监听
         LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
             viewModel.refreshing.value = true
+        })
+    }
+
+    /** 显示备份路径异常提示 */
+    private fun showPathErrorHint() {
+        viewModel.snackbarEvent.value = R.string.auto_backup_exception.string.toSnackbarModel(duration = SnackbarModel.LENGTH_INDEFINITE, actionText = R.string.view.string, onAction = {
+            // 点击跳转备份界面
+            viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
+                jump(ROUTE_PATH_BACKUP)
+            }
         })
     }
 }

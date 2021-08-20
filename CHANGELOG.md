@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Added
 - 新增 WebDAV 备份恢复支持；
+- 新增自动备份功能；
 ### Changed
 - 三方依赖升级；
 

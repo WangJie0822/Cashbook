@@ -17,6 +17,8 @@ import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
+import cn.wj.android.cashbook.data.constants.MS_DAY
+import cn.wj.android.cashbook.data.constants.MS_WEEK
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_MY
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_MY
@@ -28,6 +30,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.data.enums.AutoBackupEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
@@ -38,6 +41,7 @@ import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import cn.wj.android.cashbook.manager.UpdateManager
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 /**
  * 主界面 ViewModel
@@ -51,6 +55,9 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
 
     /** 显示记录详情弹窗事件 */
     val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
+
+    /** 检查备份路径 */
+    val checkBackupPathEvent: LifecycleEvent<String> = LifecycleEvent()
 
     /** 当前月记录列表 */
     private val currentMonthRecord: MutableLiveData<List<RecordEntity>> = MutableLiveData()
@@ -260,6 +267,35 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
                 })
             } catch (throwable: Throwable) {
                 logger().e(throwable, "checkUpdate")
+            }
+        }
+    }
+
+    /** 自动备份 */
+    fun autoBackup() {
+        // 获取备份策略
+        val autoBackup = AutoBackupEnum.fromValue(AppConfigs.autoBackup)
+        logger().i(autoBackup.toString())
+        if (autoBackup == AutoBackupEnum.CLOSED) {
+            // 关闭，不备份
+            return
+        }
+        // 获取距离上次备份时间
+        val duration = (System.currentTimeMillis() - AppConfigs.lastBackupMs).absoluteValue
+        if ((autoBackup == AutoBackupEnum.WHEN_OPEN) || (autoBackup == AutoBackupEnum.EVERY_DAY && duration >= MS_DAY) || (autoBackup == AutoBackupEnum.EVERY_WEEK && duration >= MS_WEEK)) {
+            // 满足备份条件，检查备份路径
+            checkBackupPathEvent.value = AppConfigs.backupPath
+        }
+    }
+
+    /** 备份 */
+    fun tryBackup() {
+        viewModelScope.launch {
+            try {
+                val result = repository.backup()
+                logger().i(result.toString())
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "tryBackup")
             }
         }
     }

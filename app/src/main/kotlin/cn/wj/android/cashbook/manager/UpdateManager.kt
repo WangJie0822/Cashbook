@@ -120,15 +120,14 @@ object UpdateManager {
             context.startActivity(Intent(Intent.ACTION_VIEW).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     //如果SDK版本>=24，即：Build.VERSION.SDK_INT >= 24
                     val authority = "${BuildConfig.APPLICATION_ID}.FileProvider"
-                    val uri = FileProvider.getUriForFile(context, authority, file)
-                    setDataAndType(uri, "application/vnd.android.package-archive")
+                    FileProvider.getUriForFile(context, authority, file)
                 } else {
-                    val uri = Uri.fromFile(file)
-                    setDataAndType(uri, "application/vnd.android.package-archive")
+                    Uri.fromFile(file)
                 }
+                setDataAndType(uri, "application/vnd.android.package-archive")
             })
         } catch (throwable: Throwable) {
             logger().e(throwable, "install")
@@ -146,7 +145,7 @@ object UpdateManager {
             .setContentTitle(R.string.update_progress_title.string)
             .setContentText(R.string.update_progress_format.string.format(0))
             .setWhen(System.currentTimeMillis())
-            .setNotificationSilent()
+            .setSilent(true)
             .setCategory(Notification.CATEGORY_PROGRESS)
             .setOngoing(true)
             .setProgress(100, 0, false)
