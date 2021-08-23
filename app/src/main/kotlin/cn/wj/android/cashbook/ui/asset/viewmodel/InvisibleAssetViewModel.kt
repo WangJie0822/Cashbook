@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.tools.maps
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
@@ -30,14 +31,12 @@ class InvisibleAssetViewModel(private val repository: AssetRepository) : BaseVie
     val showLongClickMenuEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 刷新状态 */
-    val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
-        override fun onActive() {
-            // 进入自动加载数据
+    val refreshing: MutableLiveData<Boolean> = mutableLiveDataOf(
+        default = true,
+        onActive = {
             loadInvisibleAssetData()
-        }
-
-        override fun setValue(value: Boolean?) {
-            super.setValue(value)
+        },
+        onSet = {
             if (value.condition) {
                 // 刷新
                 hideCapitalAccountList.value = false
@@ -47,8 +46,7 @@ class InvisibleAssetViewModel(private val repository: AssetRepository) : BaseVie
                 hideDebtAccountList.value = false
                 loadInvisibleAssetData()
             }
-        }
-    }
+        })
 
     /** 资产数据 */
     private val assetListData: MutableLiveData<List<AssetEntity>> = MutableLiveData()

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_TAG_CHANGE
 import cn.wj.android.cashbook.data.entity.TagEntity
@@ -27,11 +28,8 @@ class EditTagViewModel(private val repository: RecordRepository) : BaseViewModel
     val successEvent: LifecycleEvent<TagEntity> = LifecycleEvent()
 
     /** 编辑对象 */
-    val editTag: MutableLiveData<TagEntity> = object : MutableLiveData<TagEntity>(null) {
-        override fun setValue(value: TagEntity?) {
-            super.setValue(value)
-            name.value = value?.name.orEmpty()
-        }
+    val editTag: MutableLiveData<TagEntity> = mutableLiveDataOf(default = null) {
+        name.value = value?.name.orEmpty()
     }
 
     /** 标题文本 */
@@ -47,11 +45,8 @@ class EditTagViewModel(private val repository: RecordRepository) : BaseViewModel
     val nameError: MutableLiveData<String> = MutableLiveData()
 
     /** 标签名称 */
-    val name: MutableLiveData<String> = object : MutableLiveData<String>() {
-        override fun setValue(value: String?) {
-            super.setValue(value)
-            nameError.value = ""
-        }
+    val name: MutableLiveData<String> = mutableLiveDataOf {
+        nameError.value = ""
     }
 
     /** 取消点击 */

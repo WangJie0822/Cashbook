@@ -8,6 +8,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.entity.BackupEntity
@@ -48,40 +49,35 @@ class BackupViewModel(private val repository: MainRepository) : BaseViewModel() 
     val showSelectBackupListDialogEvent: LifecycleEvent<List<BackupEntity>> = LifecycleEvent()
 
     /** WebDAV 服务器地址 */
-    val webDAVWebUrl: MutableLiveData<String> = object : MutableLiveData<String>(AppConfigs.webDAVWebUrl) {
-
-        override fun setValue(value: String?) {
-            super.setValue(value)
+    val webDAVWebUrl: MutableLiveData<String> = mutableLiveDataOf(
+        default = AppConfigs.webDAVWebUrl,
+        onSet = {
             AppConfigs.webDAVWebUrl = value.orEmpty()
         }
-    }
+    )
 
     /** WebDAV 账户 */
-    val webDAVAccount: MutableLiveData<String> = object : MutableLiveData<String>(AppConfigs.webDAVAccount) {
-
-        override fun setValue(value: String?) {
-            super.setValue(value)
+    val webDAVAccount: MutableLiveData<String> = mutableLiveDataOf(
+        default = AppConfigs.webDAVAccount,
+        onSet = {
             AppConfigs.webDAVAccount = value.orEmpty()
         }
-    }
+    )
 
     /** WebDAV 密码 */
-    val webDAVPassword: MutableLiveData<String> = object : MutableLiveData<String>(AppConfigs.webDAVPassword) {
-
-        override fun setValue(value: String?) {
-            super.setValue(value)
+    val webDAVPassword: MutableLiveData<String> = mutableLiveDataOf(
+        default = AppConfigs.webDAVPassword,
+        onSet = {
             AppConfigs.webDAVPassword = value.orEmpty()
         }
-    }
+    )
 
     /** 自动备份配置 */
-    val autoBackup: MutableLiveData<AutoBackupEnum> = object : MutableLiveData<AutoBackupEnum>(AutoBackupEnum.fromValue(AppConfigs.autoBackup)) {
-
-        override fun setValue(value: AutoBackupEnum?) {
-            super.setValue(value)
+    val autoBackup: MutableLiveData<AutoBackupEnum> = mutableLiveDataOf(
+        default = AutoBackupEnum.fromValue(AppConfigs.autoBackup),
+        onSet = {
             AppConfigs.autoBackup = value.orElse(AutoBackupEnum.CLOSED).value
-        }
-    }
+        })
 
     /** 自动备份文本 */
     val autoBackupTextResId: LiveData<Int> = autoBackup.map {
@@ -89,17 +85,13 @@ class BackupViewModel(private val repository: MainRepository) : BaseViewModel() 
     }
 
     /** 备份路径 */
-    val backupPathData: MutableLiveData<String> = object : MutableLiveData<String>() {
-
-        override fun onActive() {
+    val backupPathData: MutableLiveData<String> = mutableLiveDataOf(
+        onActive = {
             value = AppConfigs.backupPath
-        }
-
-        override fun setValue(value: String?) {
-            super.setValue(value)
+        }, onSet = {
             AppConfigs.backupPath = value.orEmpty()
         }
-    }
+    )
 
     /** 返回点击 */
     val onBackClick: () -> Unit = {

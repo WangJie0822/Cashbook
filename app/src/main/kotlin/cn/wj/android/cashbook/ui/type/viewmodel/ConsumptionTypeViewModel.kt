@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
@@ -29,12 +30,9 @@ class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseVie
     val selectTypeData: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 记录类型数据 */
-    val typeData: MutableLiveData<RecordTypeEnum> = object : MutableLiveData<RecordTypeEnum>() {
-        override fun setValue(value: RecordTypeEnum?) {
-            super.setValue(value)
-            if (null != value) {
-                loadType()
-            }
+    val typeData: MutableLiveData<RecordTypeEnum> = mutableLiveDataOf {
+        if (null != value) {
+            loadType()
         }
     }
 

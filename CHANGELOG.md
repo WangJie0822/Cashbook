@@ -2,6 +2,10 @@
 
 # 记账本 Changelog
 
+## [Unreleased]
+### Changed
+- LiveData 优化；
+
 ## [0.5.0_21082014]
 ### Added
 - 新增 WebDAV 备份恢复支持；

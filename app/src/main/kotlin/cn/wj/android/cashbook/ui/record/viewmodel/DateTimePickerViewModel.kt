@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_TIME
 import cn.wj.android.cashbook.base.tools.dateFormat
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 
@@ -24,22 +25,22 @@ class DateTimePickerViewModel : BaseViewModel() {
     val confirmDateData: MutableLiveData<String> = MutableLiveData()
 
     /** 当前日期 */
-    val date: MutableLiveData<String> = object : MutableLiveData<String>(currentMs.dateFormat(DATE_FORMAT_DATE)) {
-        override fun setValue(value: String?) {
-            super.setValue(value)
+    val date: MutableLiveData<String> = mutableLiveDataOf(
+        default = currentMs.dateFormat(DATE_FORMAT_DATE),
+        onSet = {
             // 更新数据同步更新按钮显示文本
             showDate.value = showDate.value
         }
-    }
+    )
 
     /** 当前时间 */
-    var time: MutableLiveData<String> = object : MutableLiveData<String>(currentMs.dateFormat(DATE_FORMAT_TIME)) {
-        override fun setValue(value: String?) {
-            super.setValue(value)
+    var time: MutableLiveData<String> = mutableLiveDataOf(
+        default = currentMs.dateFormat(DATE_FORMAT_TIME),
+        onSet = {
             // 更新数据同步更新按钮显示文本
             showDate.value = showDate.value
         }
-    }
+    )
 
     /** 是否显示选择日期 */
     val showDate: MutableLiveData<Boolean> = MutableLiveData(true)

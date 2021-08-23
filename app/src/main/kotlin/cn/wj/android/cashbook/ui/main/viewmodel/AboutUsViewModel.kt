@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ACTION_CONTENT
@@ -40,38 +41,30 @@ class AboutUsViewModel(private val repository: MainRepository) : BaseViewModel()
     val jumpBrowserEvent: LifecycleEvent<String> = LifecycleEvent()
 
     /** 是否使用 Gitee */
-    val useGitee: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>() {
-
-        override fun onActive() {
+    val useGitee: MutableLiveData<Boolean> = mutableLiveDataOf(
+        onActive = {
             if (null == value) {
                 value = AppConfigs.useGitee
             }
-        }
-
-        override fun setValue(value: Boolean?) {
-            super.setValue(value)
-            if (null != value) {
+        },
+        onSet = {
+            value?.let { value ->
                 AppConfigs.useGitee = value
             }
         }
-    }
+    )
 
     /** 标记 - 是否自动检查更新 */
-    val autoCheckUpdate: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>() {
-
-        override fun onActive() {
+    val autoCheckUpdate: MutableLiveData<Boolean> = mutableLiveDataOf(
+        onActive = {
             if (null == value) {
                 value = AppConfigs.autoUpdate
             }
-        }
-
-        override fun setValue(value: Boolean?) {
-            super.setValue(value)
-            if (null != value) {
+        }, onSet = {
+            value?.let { value ->
                 AppConfigs.autoUpdate = value
             }
-        }
-    }
+        })
 
     /** 返回按钮点击 */
     val onBackClick: () -> Unit = {

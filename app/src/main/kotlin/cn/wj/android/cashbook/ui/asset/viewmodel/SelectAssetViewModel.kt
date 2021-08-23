@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.ui.asset.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
@@ -25,11 +26,9 @@ class SelectAssetViewModel(private val repository: AssetRepository) : BaseViewMo
     val selectedAssetEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 资产列表数据 */
-    val assetListData: MutableLiveData<List<AssetEntity>> = object : MutableLiveData<List<AssetEntity>>() {
-        override fun onActive() {
-            loadVisibleAssetData()
-        }
-    }
+    val assetListData: MutableLiveData<List<AssetEntity>> = mutableLiveDataOf(onActive = {
+        loadVisibleAssetData()
+    })
 
     /** 底部隐藏 */
     val onBottomSheetHidden: () -> Unit = {

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orFalse
 import cn.wj.android.cashbook.base.ext.base.toNewList
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_TAG_DELETE
 import cn.wj.android.cashbook.data.entity.TagEntity
@@ -34,12 +35,10 @@ class SelectTagViewModel(private val repository: RecordRepository) : BaseViewMod
     val selectedTags: MutableLiveData<List<TagEntity>> = MutableLiveData()
 
     /** 标签数据列表 */
-    val tagListData: MutableLiveData<List<TagEntity>> = object : MutableLiveData<List<TagEntity>>() {
-        override fun onActive() {
-            // 自动获取数据
-            refreshTagList()
-        }
-    }
+    val tagListData: MutableLiveData<List<TagEntity>> = mutableLiveDataOf(onActive = {
+        // 自动获取数据
+        refreshTagList()
+    })
 
     /** 底部隐藏 */
     val onBottomSheetHidden: () -> Unit = {

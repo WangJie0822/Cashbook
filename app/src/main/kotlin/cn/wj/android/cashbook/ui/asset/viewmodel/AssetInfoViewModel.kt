@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.moneyFormat
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
@@ -38,11 +39,9 @@ class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewMode
     val jumpEditAssetEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 资产信息 */
-    val assetData: MutableLiveData<AssetEntity> = object : MutableLiveData<AssetEntity>() {
-        override fun onActive() {
-            refreshAsset()
-        }
-    }
+    val assetData: MutableLiveData<AssetEntity> = mutableLiveDataOf(onActive = {
+        refreshAsset()
+    })
 
     /** 标题文本 */
     val titleStr: LiveData<String> = assetData.map {

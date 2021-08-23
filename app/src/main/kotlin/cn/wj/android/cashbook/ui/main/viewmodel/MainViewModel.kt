@@ -15,6 +15,7 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.tools.maps
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.MS_DAY
@@ -127,16 +128,15 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
     val incomeAndBalanceAlpha = ObservableFloat(1f)
 
     /** 刷新状态 */
-    val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
-        override fun onActive() {
+    val refreshing: MutableLiveData<Boolean> = mutableLiveDataOf(
+        default = true,
+        onActive = {
             // 进入自动加载数据
             loadHomepageList()
             // 获取当前月所有记录
             getCurrentMonthRecord()
-        }
-
-        override fun setValue(value: Boolean?) {
-            super.setValue(value)
+        },
+        onSet = {
             if (value.condition) {
                 // 刷新
                 loadHomepageList()
@@ -144,7 +144,7 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
                 getCurrentMonthRecord()
             }
         }
-    }
+    )
 
     /** 状态栏折叠进度监听 */
     val onCollapsingChanged: (Float) -> Unit = { percent ->

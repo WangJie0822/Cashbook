@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.maps
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
@@ -62,14 +63,13 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
     val edit: MutableLiveData<Boolean> = MutableLiveData(false)
 
     /** 刷新状态 */
-    val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
-        override fun onActive() {
+    val refreshing: MutableLiveData<Boolean> = mutableLiveDataOf(
+        default = true,
+        onActive = {
             // 进入自动加载数据
             loadAssetData()
-        }
-
-        override fun setValue(value: Boolean?) {
-            super.setValue(value)
+        },
+        onSet = {
             if (value.condition) {
                 // 刷新
                 hideCapitalAccountList.value = false
@@ -80,7 +80,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
                 loadAssetData()
             }
         }
-    }
+    )
 
     /** 资产数据 */
     private val assetListData: MutableLiveData<List<AssetEntity>> = MutableLiveData()

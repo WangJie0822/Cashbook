@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.ui.main.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BACKUP
@@ -21,21 +22,17 @@ class SettingViewModel : BaseViewModel() {
     val showSelectThemeDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 是否允许流量下载 */
-    val enableDownloadWithMobileNetwork: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>() {
-
-        override fun onActive() {
+    val enableDownloadWithMobileNetwork: MutableLiveData<Boolean> = mutableLiveDataOf(
+        onActive = {
             if (null == value) {
                 value = AppConfigs.mobileNetworkDownloadEnable
             }
-        }
-
-        override fun setValue(value: Boolean?) {
-            super.setValue(value)
-            if (null != value) {
+        }, onSet = {
+            value?.let { value ->
                 AppConfigs.mobileNetworkDownloadEnable = value
             }
         }
-    }
+    )
 
     /** 当前主题显示文本 */
     val currentThemeStrResId: LiveData<Int> = CurrentThemeLiveData.map {

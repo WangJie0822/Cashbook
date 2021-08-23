@@ -8,6 +8,7 @@ import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.entity.TypeEntity
@@ -40,11 +41,8 @@ class TypeListViewModel(private val repository: TypeRepository) : BaseViewModel(
     val edit: MutableLiveData<Boolean> = MutableLiveData(false)
 
     /** 分类大类 */
-    val typeData: MutableLiveData<RecordTypeEnum> = object : MutableLiveData<RecordTypeEnum>() {
-        override fun setValue(value: RecordTypeEnum?) {
-            super.setValue(value)
-            loadTypeList()
-        }
+    val typeData: MutableLiveData<RecordTypeEnum> = mutableLiveDataOf {
+        loadTypeList()
     }
 
     /** 类型数据 */

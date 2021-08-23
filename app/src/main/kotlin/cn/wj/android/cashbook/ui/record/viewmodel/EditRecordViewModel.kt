@@ -115,19 +115,17 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
     val transferType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 账户信息 */
-    val accountData: MutableLiveData<AssetEntity> = object : MutableLiveData<AssetEntity>() {
-        private var firstLoad = true
-        override fun onActive() {
-            if (firstLoad) {
-                if (null == record) {
-                    viewModelScope.launch {
-                        value = repository.findAssetById(AppConfigs.lastAssetId)
-                    }
+    val accountData: MutableLiveData<AssetEntity> = mutableLiveDataOf(onActive = {
+        if (null == record && null == value) {
+            viewModelScope.launch {
+                try {
+                    value = repository.findAssetById(AppConfigs.lastAssetId)
+                } catch (throwable: Throwable) {
+                    logger().e(throwable, "getAccountData")
                 }
-                firstLoad = false
             }
         }
-    }
+    })
 
     /** 转账转入账户信息 */
     val transferAccountData: MutableLiveData<AssetEntity> = MutableLiveData(null)

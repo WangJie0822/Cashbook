@@ -1,7 +1,12 @@
 package cn.wj.android.cashbook.ui.record.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.base.ext.base.logger
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
@@ -34,25 +39,23 @@ class CalendarViewModel(private val repository: RecordRepository) : BaseViewMode
     val showSelectYearMonthDialogEvent: LifecycleEvent<(String) -> Unit> = LifecycleEvent()
 
     /** 选中日期 */
-    val selectedDate: MutableLiveData<Calendar> = object : MutableLiveData<Calendar>() {
-        override fun onActive() {
-            val temp = value
-            value = Calendar().apply {
-                if (null == temp) {
-                    // 绑定数据时如果为空，默认加载当天
-                    val cal = java.util.Calendar.getInstance()
-                    year = cal.get(java.util.Calendar.YEAR)
-                    month = cal.get(java.util.Calendar.MONTH) + 1
-                    day = cal.get(java.util.Calendar.DAY_OF_MONTH)
-                } else {
-                    // 已选择日期，刷新
-                    year = temp.year
-                    month = temp.month
-                    day = temp.day
-                }
+    val selectedDate: MutableLiveData<Calendar> = mutableLiveDataOf(onActive = {
+        val temp = value
+        value = Calendar().apply {
+            if (null == temp) {
+                // 绑定数据时如果为空，默认加载当天
+                val cal = java.util.Calendar.getInstance()
+                year = cal.get(java.util.Calendar.YEAR)
+                month = cal.get(java.util.Calendar.MONTH) + 1
+                day = cal.get(java.util.Calendar.DAY_OF_MONTH)
+            } else {
+                // 已选择日期，刷新
+                year = temp.year
+                month = temp.month
+                day = temp.day
             }
         }
-    }
+    })
 
     /** 标题文本 */
     val titleStr: LiveData<String> = selectedDate.map {

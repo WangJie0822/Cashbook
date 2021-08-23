@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.tools.maps
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
@@ -81,16 +82,15 @@ class TypeRecordViewModel(private val repository: RecordRepository) : BaseViewMo
     }
 
     /** 刷新状态 */
-    val refreshing: MutableLiveData<Boolean> = object : MutableLiveData<Boolean>(true) {
-
-        override fun setValue(value: Boolean?) {
-            super.setValue(value)
+    val refreshing: MutableLiveData<Boolean> = mutableLiveDataOf(
+        default = true,
+        onSet = {
             if (value.condition) {
                 // 刷新
                 currentItem.value = currentItem.value
             }
         }
-    }
+    )
 
     /** 返回点击 */
     val onBackClick: () -> Unit = {

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.entity.TypeEntity
@@ -27,12 +28,9 @@ import kotlinx.coroutines.launch
 class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 当前分类信息 */
-    val typeData: MutableLiveData<TypeEntity> = object : MutableLiveData<TypeEntity>(null) {
-        override fun setValue(value: TypeEntity?) {
-            super.setValue(value)
-            typeName.value = value?.name
-            iconResStr.value = value?.iconResName
-        }
+    val typeData: MutableLiveData<TypeEntity> = mutableLiveDataOf(default = null){
+        typeName.value = value?.name
+        iconResStr.value = value?.iconResName
     }
 
     /** 标题文本 */
@@ -73,12 +71,9 @@ class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel(
     val iconResStr: MutableLiveData<String> = MutableLiveData()
 
     /** 分组列表数据 */
-    val groupListData: MutableLiveData<List<TypeIconGroupEntity>> = object : MutableLiveData<List<TypeIconGroupEntity>>() {
-        override fun onActive() {
-            // 获取数据
-            loadTypeIconData()
-        }
-    }
+    val groupListData: MutableLiveData<List<TypeIconGroupEntity>> = mutableLiveDataOf(onActive = {
+        loadTypeIconData()
+    })
 
     /** 分组图标数据 */
     val iconListData: MutableLiveData<List<TypeIconEntity>> = MutableLiveData()
