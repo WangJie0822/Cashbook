@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.constants.EVENT_TAG_CHANGE
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.event.LifecycleEvent
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -78,7 +79,7 @@ class EditTagViewModel(private val repository: RecordRepository) : BaseViewModel
                 val edit = editTag.value
                 val result = if (null == edit) {
                     // 新建，保存标签
-                    val changed = TagEntity(-1L, name)
+                    val changed = TagEntity(-1L, name, CurrentBooksLiveData.booksId, false)
                     val id = repository.insertTag(changed)
                     changed.copy(id = id)
                 } else {

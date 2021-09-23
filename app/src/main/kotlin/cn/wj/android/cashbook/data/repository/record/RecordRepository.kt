@@ -209,7 +209,7 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
 
     /** 获取所有标签数据并返回 */
     suspend fun getTagList(): List<TagEntity> = withContext(Dispatchers.IO) {
-        tagDao.queryAll().map {
+        tagDao.getTagListByBooksId().map {
             it.toTagEntity()
         }
     }

@@ -9,9 +9,21 @@ import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
-import cn.wj.android.cashbook.data.database.table.*
-import cn.wj.android.cashbook.data.entity.*
-import cn.wj.android.cashbook.data.enums.*
+import cn.wj.android.cashbook.data.database.table.AssetTable
+import cn.wj.android.cashbook.data.database.table.BooksTable
+import cn.wj.android.cashbook.data.database.table.RecordTable
+import cn.wj.android.cashbook.data.database.table.TagTable
+import cn.wj.android.cashbook.data.database.table.TypeTable
+import cn.wj.android.cashbook.data.entity.AssetEntity
+import cn.wj.android.cashbook.data.entity.BooksEntity
+import cn.wj.android.cashbook.data.entity.RecordEntity
+import cn.wj.android.cashbook.data.entity.TagEntity
+import cn.wj.android.cashbook.data.entity.TypeEntity
+import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
+import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.data.enums.CurrencyEnum
+import cn.wj.android.cashbook.data.enums.RecordTypeEnum
+import cn.wj.android.cashbook.data.enums.TypeEnum
 
 /**
  * 数据库数据转换相关
@@ -122,7 +134,9 @@ internal fun TypeEntity.toTypeTable(): TypeTable {
 internal fun TagTable.toTagEntity(): TagEntity {
     return TagEntity(
         id = id.orElse(-1L),
-        name = name
+        name = name,
+        booksId = booksId,
+        shared = shared == SWITCH_INT_ON
     )
 }
 
@@ -130,7 +144,9 @@ internal fun TagTable.toTagEntity(): TagEntity {
 internal fun TagEntity.toTagTable(): TagTable {
     return TagTable(
         id = if (-1L == id) null else id,
-        name = name
+        name = name,
+        booksId = booksId,
+        shared = if (shared) SWITCH_INT_ON else SWITCH_INT_OFF
     )
 }
 

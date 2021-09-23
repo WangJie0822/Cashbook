@@ -5,6 +5,8 @@
 ## [Unreleased]
 ### Changed
 - LiveData 优化；
+### Fixed
+- 修复不同账本使用同一份标签数据问题;
 
 ## [0.5.0_21082014]
 ### Added

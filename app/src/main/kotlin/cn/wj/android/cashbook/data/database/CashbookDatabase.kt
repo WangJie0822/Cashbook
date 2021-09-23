@@ -18,7 +18,7 @@ import cn.wj.android.cashbook.data.database.table.TypeTable
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/15
  */
-@Database(entities = [BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class], version = 3)
+@Database(entities = [BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class], version = 4)
 abstract class CashbookDatabase : RoomDatabase() {
 
     /** 获取账本相关数据库操作接口 */

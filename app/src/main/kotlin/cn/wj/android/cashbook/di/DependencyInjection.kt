@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.base.tools.funLogger
 import cn.wj.android.cashbook.base.tools.jsonDefault
 import cn.wj.android.cashbook.data.constants.DB_FILE_NAME
+import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.database.CashbookDatabase
 import cn.wj.android.cashbook.data.net.UrlDefinition
 import cn.wj.android.cashbook.data.net.WebService
@@ -131,6 +132,15 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+/** 数据库升级 3 -> 4 */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // 标签表新增所属账本主键
+        database.execSQL("ALTER TABLE `db_tag` ADD `books_id` INTEGER DEFAULT -1 NOT NULL")
+        database.execSQL("ALTER TABLE `db_tag` ADD `shared` INTEGER DEFAULT $SWITCH_INT_ON NOT NULL")
+    }
+}
+
 /** 数据库相关依赖注入 */
 val dbModule = module {
     single {
@@ -139,7 +149,7 @@ val dbModule = module {
             CashbookDatabase::class.java,
             DB_FILE_NAME
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
     }
 }

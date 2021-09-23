@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.data.database.table.TagTable
+import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 
 /**
  * 标签数据库访问接口
@@ -35,6 +36,10 @@ interface TagDao {
     /** 从数据库中获取所有标签数据并返回 */
     @Query("SELECT * FROM db_tag")
     suspend fun queryAll(): List<TagTable>
+
+    /** 从数据库中获取账本 id 为 [booksId] 的标签数据并返回 */
+    @Query("SELECT * FROM db_tag WHERE books_id=:booksId AND books_id=-1")
+    suspend fun getTagListByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<TagTable>
 
     /** 根据 [id] 查询并返回标签数据 */
     @Query("SELECT * FROM db_tag WHERE id=:id")
