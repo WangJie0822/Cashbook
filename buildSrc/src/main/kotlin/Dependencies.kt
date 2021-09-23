@@ -74,6 +74,12 @@ object Dependencies {
     const val jsoup = "org.jsoup:jsoup:1.14.2"
 
     /**
+     * 图表控件
+     * - [Github](https://github.com/PhilJay/MPAndroidChart)
+     */
+    const val mpChart = "com.github.PhilJay:MPAndroidChart:v3.1.0"
+
+    /**
      * Kotlin 相关
      * - [指南](https://kotlinlang.org/)
      */

@@ -265,6 +265,9 @@ dependencies {
     // 日历控件
     implementation(Dependencies.calendar_view)
 
+    // 图表控件
+    implementation(Dependencies.mpChart)
+
     // 测试
     testImplementation(Dependencies.testJunit)
     androidTestImplementation(Dependencies.Androidx.Test.rules)

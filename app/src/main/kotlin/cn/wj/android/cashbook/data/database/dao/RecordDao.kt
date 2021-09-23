@@ -70,7 +70,7 @@ interface RecordDao {
 
     /** 查询记录时间在 [recordTime] 之后且属于 id 为 [booksId] 的账本的记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:recordTime AND books_id=:booksId ORDER BY record_time DESC")
-    suspend fun queryAfterRecordTimeByBooksId(booksId: Long, recordTime: Long): List<RecordTable>
+    suspend fun queryAfterRecordTimeByBooksId(recordTime: Long,booksId: Long=CurrentBooksLiveData.booksId): List<RecordTable>
 
     /** 查询记录时间在 [startTime] 与 [endTime] 之间的记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:startTime AND record_time<=:endTime AND books_id=:booksId ORDER BY record_time DESC")

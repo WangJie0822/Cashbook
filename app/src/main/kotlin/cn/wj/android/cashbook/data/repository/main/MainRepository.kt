@@ -55,7 +55,6 @@ import cn.wj.android.cashbook.data.entity.RESULT_CODE_SUCCESS
 import cn.wj.android.cashbook.data.entity.RESULT_CODE_WEBDAV_FAILED
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
-import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.net.WebService
 import cn.wj.android.cashbook.data.repository.Repository
 import cn.wj.android.cashbook.data.transform.toUpdateInfoEntity
@@ -80,7 +79,7 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         val calendar = Calendar.getInstance()
         val today = calendar.get(Calendar.DAY_OF_MONTH)
         val recordTime = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00".toLongTime(DATE_FORMAT_NO_SECONDS) ?: return@withContext result
-        val list = recordDao.queryAfterRecordTimeByBooksId(CurrentBooksLiveData.booksId, recordTime).filter {
+        val list = recordDao.queryAfterRecordTimeByBooksId(recordTime).filter {
             it.system != SWITCH_INT_ON
         }
         val map = hashMapOf<String, MutableList<RecordEntity>>()
@@ -130,7 +129,7 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         // 获取当前月开始时间
         val calendar = Calendar.getInstance()
         val monthStartDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00".toLongTime() ?: return@withContext result
-        recordDao.queryAfterRecordTimeByBooksId(CurrentBooksLiveData.booksId, monthStartDate).forEach { item ->
+        recordDao.queryAfterRecordTimeByBooksId(monthStartDate).forEach { item ->
             val record = loadRecordEntityFromTable(item, false)
             if (null != record) {
                 result.add(record)
