@@ -347,6 +347,17 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
+                                <com.google.android.material.checkbox.MaterialCheckBox
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="@={viewModel.topUpEntryIntoTotal}"
+                                    android:text="@string/entry_into_total_assets"
+                                    android:textAppearance="?attr/textAppearanceCaption"
+                                    app:layout_constraintBottom_toBottomOf="@id/tv_top_up_label"
+                                    app:layout_constraintStart_toEndOf="@id/tv_top_up_label"
+                                    app:layout_constraintTop_toTopOf="@id/tv_top_up_label"
+                                    tools:checked="true" />
+
                                 <ImageButton
                                     android:id="@+id/ib_top_up_arrow"
                                     android:layout_width="wrap_content"

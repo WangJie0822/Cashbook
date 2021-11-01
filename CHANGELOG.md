@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Added
+- 新增充值账户是否计入总资产功能；
 ### Changed
 - LiveData 优化；
 ### Fixed

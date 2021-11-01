@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET_ID
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_BACKUP_MS
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_THEME_MODE
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_TOP_UP_ENTRY_INTO_TOTAL
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_TYPE_INITIALIZED
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_WEBDAV_ACCOUNT
@@ -129,6 +130,9 @@ object AppConfigs {
 
     /** 忽略版本号 */
     var ignoreVersion: String by NoNullProperties(SHARED_KEY_IGNORE_VERSION, "")
+
+    /** 充值账户是否计入总资产 */
+    var topUpEntryIntoTotal: Boolean by NoNullProperties(SHARED_KEY_TOP_UP_ENTRY_INTO_TOTAL, true)
 }
 
 

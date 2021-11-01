@@ -41,3 +41,6 @@ const val SHARED_KEY_AUTO_BACKUP = "shared_key_auto_backup"
 
 /** 忽略升级版本 */
 const val SHARED_KEY_IGNORE_VERSION = "shared_key_ignore_version"
+
+/** 充值账户是否计入总资产 */
+const val SHARED_KEY_TOP_UP_ENTRY_INTO_TOTAL = "shared_key_top_up_entry_into_total"

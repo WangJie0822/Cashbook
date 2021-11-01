@@ -19,6 +19,7 @@ import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
 import cn.wj.android.cashbook.data.entity.AssetEntity
@@ -30,6 +31,7 @@ import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
 import cn.wj.android.cashbook.manager.DatabaseManager
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 /**
  * 我的资产 ViewModel
@@ -147,6 +149,14 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
     /** 是否隐藏信用卡账户列表 */
     val hideCreditCardAccountList: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    /** 标记 - 充值账户是否计入总资产 */
+    val topUpEntryIntoTotal: MutableLiveData<Boolean> = mutableLiveDataOf(
+        default = AppConfigs.topUpEntryIntoTotal,
+        onSet = {
+            AppConfigs.topUpEntryIntoTotal = value.condition
+        }
+    )
+
     /** 充值账户数据列表 */
     val topUpListData: LiveData<List<AssetEntity>> = assetListData.map {
         it.filter { asset ->
@@ -250,18 +260,21 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
     }
 
     /** 净资产 */
-    val netAssets: LiveData<String> = assetListData.map {
-        // 净资产为总资产-总借入-总信用卡欠款
-        if (it.isEmpty()) {
+    val netAssets: LiveData<String> = maps(assetListData, topUpEntryIntoTotal) {
+        val ls = assetListData.value
+        if (ls.isNullOrEmpty()) {
             R.string.nothing.string
         } else {
             var total = "0".toBigDecimal()
             var totalBorrow = "0".toBigDecimal()
             var totalCreditCard = "0".toBigDecimal()
-            it.forEach { asset ->
+            ls.forEach { asset ->
                 if (asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.classification != AssetClassificationEnum.BORROW) {
                     // 总资产
-                    total += asset.balance.toBigDecimalOrZero()
+                    if (asset.type != ClassificationTypeEnum.TOP_UP_ACCOUNT || topUpEntryIntoTotal.value.condition) {
+                        // 充值账户单独判断
+                        total += asset.balance.toBigDecimalOrZero()
+                    }
                 }
                 if (asset.classification == AssetClassificationEnum.BORROW) {
                     // 借入
@@ -272,23 +285,36 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
                     totalCreditCard += asset.balance.toBigDecimalOrZero()
                 }
             }
-            (total - totalBorrow - totalCreditCard).decimalFormat().moneyFormat()
+            val result = total - totalBorrow - totalCreditCard
+            if (result == BigDecimal.ZERO) {
+                R.string.nothing.string
+            } else {
+                result.decimalFormat().moneyFormat()
+            }
         }
     }
 
     /** 总资产 */
-    val totalAssets: LiveData<String> = assetListData.map {
-        if (it.isEmpty()) {
+    val totalAssets: LiveData<String> = maps(assetListData, topUpEntryIntoTotal) {
+        val ls = assetListData.value
+        if (ls.isNullOrEmpty()) {
             R.string.nothing.string
         } else {
             // 总资产为除去信用卡、借入，所有资产总额
             var total = "0".toBigDecimal()
-            it.filter { asset ->
+            ls.filter { asset ->
                 asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.classification != AssetClassificationEnum.BORROW
             }.forEach { asset ->
-                total += asset.balance.toBigDecimalOrZero()
+                if (asset.type != ClassificationTypeEnum.TOP_UP_ACCOUNT || topUpEntryIntoTotal.value.condition) {
+                    // 充值账户单独判断
+                    total += asset.balance.toBigDecimalOrZero()
+                }
             }
-            total.decimalFormat().moneyFormat()
+            if (total == BigDecimal.ZERO) {
+                R.string.nothing.string
+            } else {
+                total.decimalFormat().moneyFormat()
+            }
         }
     }
 
@@ -304,7 +330,11 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             }.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            total.decimalFormat().moneyFormat().negative()
+            if (total == BigDecimal.ZERO) {
+                R.string.nothing.string
+            } else {
+                total.decimalFormat().moneyFormat().negative()
+            }
         }
     }
 
