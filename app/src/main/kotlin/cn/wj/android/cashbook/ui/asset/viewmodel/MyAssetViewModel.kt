@@ -259,51 +259,16 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
         !(hasCapitalAccount.value.condition || hasCreditCardAccount.value.condition || hasTopUpAccount.value.condition || hasInvestmentFinancialAccount.value.condition || hasDebtAccount.value.condition)
     }
 
-    /** 净资产 */
-    val netAssets: LiveData<String> = maps(assetListData, topUpEntryIntoTotal) {
-        val ls = assetListData.value
-        if (ls.isNullOrEmpty()) {
-            R.string.nothing.string
-        } else {
-            var total = "0".toBigDecimal()
-            var totalBorrow = "0".toBigDecimal()
-            var totalCreditCard = "0".toBigDecimal()
-            ls.forEach { asset ->
-                if (asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.classification != AssetClassificationEnum.BORROW) {
-                    // 总资产
-                    if (asset.type != ClassificationTypeEnum.TOP_UP_ACCOUNT || topUpEntryIntoTotal.value.condition) {
-                        // 充值账户单独判断
-                        total += asset.balance.toBigDecimalOrZero()
-                    }
-                }
-                if (asset.classification == AssetClassificationEnum.BORROW) {
-                    // 借入
-                    totalBorrow += asset.balance.toBigDecimalOrZero()
-                }
-                if (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull().orElse(0f) > 0) {
-                    // 信用卡且有欠款
-                    totalCreditCard += asset.balance.toBigDecimalOrZero()
-                }
-            }
-            val result = total - totalBorrow - totalCreditCard
-            if (result == BigDecimal.ZERO) {
-                R.string.nothing.string
-            } else {
-                result.decimalFormat().moneyFormat()
-            }
-        }
-    }
-
     /** 总资产 */
     val totalAssets: LiveData<String> = maps(assetListData, topUpEntryIntoTotal) {
         val ls = assetListData.value
         if (ls.isNullOrEmpty()) {
             R.string.nothing.string
         } else {
-            // 总资产为除去信用卡、借入，所有资产总额
+            // 总资产为除去信用卡，所有资产总额
             var total = "0".toBigDecimal()
             ls.filter { asset ->
-                asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.classification != AssetClassificationEnum.BORROW
+                asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
             }.forEach { asset ->
                 if (asset.type != ClassificationTypeEnum.TOP_UP_ACCOUNT || topUpEntryIntoTotal.value.condition) {
                     // 充值账户单独判断
@@ -334,6 +299,41 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
                 R.string.nothing.string
             } else {
                 total.decimalFormat().moneyFormat().negative()
+            }
+        }
+    }
+
+    /** 净资产 */
+    val netAssets: LiveData<String> = maps(assetListData, topUpEntryIntoTotal) {
+        val ls = assetListData.value
+        if (ls.isNullOrEmpty()) {
+            R.string.nothing.string
+        } else {
+            var total = "0".toBigDecimal()
+            var totalBorrow = "0".toBigDecimal()
+            var totalCreditCard = "0".toBigDecimal()
+            ls.forEach { asset ->
+                if (asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                    // 总资产
+                    if (asset.type != ClassificationTypeEnum.TOP_UP_ACCOUNT || topUpEntryIntoTotal.value.condition) {
+                        // 充值账户单独判断
+                        total += asset.balance.toBigDecimalOrZero()
+                    }
+                }
+                if (asset.classification == AssetClassificationEnum.BORROW) {
+                    // 借入
+                    totalBorrow += asset.balance.toBigDecimalOrZero()
+                }
+                if (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull().orElse(0f) > 0) {
+                    // 信用卡且有欠款
+                    totalCreditCard += asset.balance.toBigDecimalOrZero()
+                }
+            }
+            val result = total - totalBorrow - totalCreditCard
+            if (result == BigDecimal.ZERO) {
+                R.string.nothing.string
+            } else {
+                result.decimalFormat().moneyFormat()
             }
         }
     }
