@@ -2,7 +2,7 @@
 
 # 记账本 Changelog
 
-## [Unreleased]
+## [0.5.1_21110121]
 ### Added
 - 新增充值账户是否计入总资产功能；
 ### Changed
