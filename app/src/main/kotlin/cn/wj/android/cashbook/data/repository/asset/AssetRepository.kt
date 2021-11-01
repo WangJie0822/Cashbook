@@ -96,7 +96,7 @@ class AssetRepository(database: CashbookDatabase) : Repository(database) {
             return@withContext null
         }
         val queryById = assetDao.queryById(assetId)
-        queryById?.toAssetEntity(getAssetBalanceById(assetId, queryById.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+        queryById?.toAssetEntity(getAssetBalanceById(assetId, queryById.needNegative))
     }
 
     /** 从数据库中删除资产 [asset] 以及关联数据 */
@@ -119,7 +119,7 @@ class AssetRepository(database: CashbookDatabase) : Repository(database) {
     suspend fun getInvisibleAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryInvisibleByBooksId().map {
             //  获取余额
-            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
+            val balance = getAssetBalanceById(it.id, it.needNegative)
             it.toAssetEntity(balance)
         }
     }
@@ -128,7 +128,7 @@ class AssetRepository(database: CashbookDatabase) : Repository(database) {
     suspend fun getVisibleAssetListSortByRecord(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryVisibleByBooksId().map {
             //  获取余额
-            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
+            val balance = getAssetBalanceById(it.id, it.needNegative)
             // 获取记录数
             val count = getRecordCountByAssetId(it.id)
             it.toAssetEntity(balance, count)
@@ -141,7 +141,7 @@ class AssetRepository(database: CashbookDatabase) : Repository(database) {
     suspend fun getCurrentAssetList(): List<AssetEntity> = withContext(Dispatchers.IO) {
         assetDao.queryByBooksId().map {
             // 获取余额
-            val balance = getAssetBalanceById(it.id, it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name)
+            val balance = getAssetBalanceById(it.id, it.needNegative)
             it.toAssetEntity(balance)
         }
     }

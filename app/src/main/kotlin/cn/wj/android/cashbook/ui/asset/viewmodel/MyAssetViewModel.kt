@@ -105,7 +105,11 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             it.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            total.decimalFormat().moneyFormat()
+            if (total == BigDecimal.ZERO) {
+                ""
+            } else {
+                total.decimalFormat().moneyFormat()
+            }
         }
     }
 
@@ -137,7 +141,11 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             }.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            total.decimalFormat().moneyFormat().negative()
+            if (total == BigDecimal.ZERO) {
+                ""
+            } else {
+                total.decimalFormat().negative().moneyFormat()
+            }
         }
     }
 
@@ -175,7 +183,11 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             it.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            total.decimalFormat().moneyFormat()
+            if (total == BigDecimal.ZERO) {
+                ""
+            } else {
+                total.decimalFormat().moneyFormat()
+            }
         }
     }
 
@@ -205,7 +217,11 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             it.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
-            total.decimalFormat().moneyFormat()
+            if (total == BigDecimal.ZERO) {
+                ""
+            } else {
+                total.decimalFormat().moneyFormat()
+            }
         }
     }
 
@@ -236,13 +252,13 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             it.forEach { asset ->
                 if (asset.classification == AssetClassificationEnum.BORROW) {
                     // 借入
-                    totalBorrow += asset.balance.toBigDecimalOrZero()
+                    totalBorrow -= asset.balance.toBigDecimalOrZero()
                 } else {
                     // 借出
                     totalLend += asset.balance.toBigDecimalOrZero()
                 }
             }
-            R.string.debt_total_format.string.format(totalBorrow.decimalFormat().moneyFormat(), totalLend.decimalFormat().moneyFormat())
+            R.string.debt_total_format.string.format(totalBorrow.decimalFormat().negative().moneyFormat(), totalLend.decimalFormat().moneyFormat())
         }
     }
 
@@ -265,10 +281,10 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
         if (ls.isNullOrEmpty()) {
             R.string.nothing.string
         } else {
-            // 总资产为除去信用卡，所有资产总额
+            // 总资产为除去信用卡，所有资产总额，借入、借出不参与统计
             var total = "0".toBigDecimal()
             ls.filter { asset ->
-                asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
+                asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.type != ClassificationTypeEnum.DEBT_ACCOUNT
             }.forEach { asset ->
                 if (asset.type != ClassificationTypeEnum.TOP_UP_ACCOUNT || topUpEntryIntoTotal.value.condition) {
                     // 充值账户单独判断
@@ -298,7 +314,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             if (total == BigDecimal.ZERO) {
                 R.string.nothing.string
             } else {
-                total.decimalFormat().moneyFormat().negative()
+                total.decimalFormat().negative().moneyFormat()
             }
         }
     }

@@ -19,7 +19,6 @@ import cn.wj.android.cashbook.data.entity.DateRecordEntity
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.entity.TypeEntity
-import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.repository.Repository
@@ -189,7 +188,7 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
             return@withContext null
         }
         val queryById = assetDao.queryById(assetId)
-        queryById?.toAssetEntity(getAssetBalanceById(assetId, queryById.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+        queryById?.toAssetEntity(getAssetBalanceById(assetId, queryById.needNegative))
     }
 
     /** 将记录 [record] 插入到数据库并返回生成的主键 id */

@@ -14,7 +14,6 @@ import cn.wj.android.cashbook.data.database.dao.TypeDao
 import cn.wj.android.cashbook.data.database.table.RecordTable
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
-import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toTagEntity
@@ -55,8 +54,8 @@ abstract class Repository(val database: CashbookDatabase) {
     }
 
 
-    /** 获取 id 为 [assetId] 的资产余额 */
-    protected suspend fun getAssetBalanceById(assetId: Long?, creditCard: Boolean): String = withContext(Dispatchers.IO) {
+    /** 获取 id 为 [assetId] 的资产余额，[needNegative] 是否需要取负 */
+    protected suspend fun getAssetBalanceById(assetId: Long?, needNegative: Boolean): String = withContext(Dispatchers.IO) {
         if (null == assetId) {
             return@withContext "0"
         }
@@ -73,7 +72,7 @@ abstract class Repository(val database: CashbookDatabase) {
             when (it.typeEnum) {
                 RecordTypeEnum.INCOME.name -> {
                     // 收入
-                    if (creditCard) {
+                    if (needNegative) {
                         // 信用卡，降低欠款
                         result -= it.amount.toBigDecimalOrZero()
                     } else {
@@ -82,7 +81,7 @@ abstract class Repository(val database: CashbookDatabase) {
                 }
                 RecordTypeEnum.EXPENDITURE.name -> {
                     // 支出
-                    if (creditCard) {
+                    if (needNegative) {
                         // 信用卡，增加欠款
                         result += it.amount.toBigDecimalOrZero()
                     } else {
@@ -91,7 +90,7 @@ abstract class Repository(val database: CashbookDatabase) {
                 }
                 RecordTypeEnum.TRANSFER.name -> {
                     // 转账转出
-                    if (creditCard) {
+                    if (needNegative) {
                         // 信用卡，增加欠款
                         result += it.amount.toBigDecimalOrZero()
                         result += it.charge.toBigDecimalOrZero()
@@ -108,7 +107,7 @@ abstract class Repository(val database: CashbookDatabase) {
             when (it.typeEnum) {
                 RecordTypeEnum.TRANSFER.name -> {
                     // 转账转入
-                    if (creditCard) {
+                    if (needNegative) {
                         // 信用卡，减少欠款
                         result -= it.amount.toBigDecimalOrZero()
                     } else {
@@ -126,9 +125,9 @@ abstract class Repository(val database: CashbookDatabase) {
             null
         } else {
             val assetTable = assetDao.queryById(record.assetId)
-            val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.needNegative))
             val intoAssetTable = assetDao.queryById(record.intoAssetId)
-            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.needNegative))
             val typeTable = if (record.typeId < 0) null else typeDao.queryById(record.typeId)
             val type = if (null == typeTable) {
                 null
@@ -168,9 +167,9 @@ abstract class Repository(val database: CashbookDatabase) {
         }
         val record = recordDao.queryAssociatedById(id) ?: return@withContext null
         val assetTable = assetDao.queryById(record.assetId)
-        val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+        val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.needNegative))
         val intoAssetTable = assetDao.queryById(record.intoAssetId)
-        val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name))
+        val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.needNegative))
         val typeTable = if (record.typeId < 0) null else typeDao.queryById(record.typeId)
         val type = if (null == typeTable) {
             null

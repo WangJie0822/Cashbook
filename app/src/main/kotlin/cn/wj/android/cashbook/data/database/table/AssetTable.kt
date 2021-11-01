@@ -3,6 +3,9 @@ package cn.wj.android.cashbook.data.database.table
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
+import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.serialization.Serializable
 
 /**
@@ -38,4 +41,10 @@ data class AssetTable(
     val sort: Int,
     @ColumnInfo(name = "create_time") val createTime: Long,
     @ColumnInfo(name = "modify_time") val modifyTime: Long
-)
+) {
+
+    /** 信用卡、借入类型计算余额时需要取反 */
+    @IgnoredOnParcel
+    val needNegative: Boolean
+        get() = type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name || classification == AssetClassificationEnum.BORROW.name
+}

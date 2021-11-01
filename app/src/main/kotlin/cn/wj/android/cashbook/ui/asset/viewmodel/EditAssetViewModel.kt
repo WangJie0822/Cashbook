@@ -65,6 +65,11 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
         it == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
     }
 
+    /** 标记 - 是否是债务类型 */
+    val debtType: LiveData<Boolean> = classificationType.map {
+        it == ClassificationTypeEnum.DEBT_ACCOUNT
+    }
+
     /** 余额提示文本 */
     val balanceHint: LiveData<String> = creditCardType.map {
         if (it) {

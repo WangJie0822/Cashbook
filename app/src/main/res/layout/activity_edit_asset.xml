@@ -161,6 +161,7 @@
                         android:id="@+id/til_balance"
                         android_bind_til_hint="@{viewModel.balanceHint}"
                         android:layout_width="match_parent"
+                        android:bind_visibility="@{!viewModel.debtType}"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_normal"
                         android:hint="@string/asset_balance"
