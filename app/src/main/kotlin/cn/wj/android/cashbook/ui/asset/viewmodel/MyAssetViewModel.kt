@@ -329,7 +329,7 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             var totalBorrow = "0".toBigDecimal()
             var totalCreditCard = "0".toBigDecimal()
             ls.forEach { asset ->
-                if (asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                if (asset.type != ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.classification != AssetClassificationEnum.BORROW) {
                     // 总资产
                     if (asset.type != ClassificationTypeEnum.TOP_UP_ACCOUNT || topUpEntryIntoTotal.value.condition) {
                         // 充值账户单独判断
