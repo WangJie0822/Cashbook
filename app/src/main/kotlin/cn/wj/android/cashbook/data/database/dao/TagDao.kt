@@ -38,7 +38,7 @@ interface TagDao {
     suspend fun queryAll(): List<TagTable>
 
     /** 从数据库中获取账本 id 为 [booksId] 的标签数据并返回 */
-    @Query("SELECT * FROM db_tag WHERE books_id=:booksId AND books_id=-1")
+    @Query("SELECT * FROM db_tag WHERE books_id=:booksId OR shared=1")
     suspend fun getTagListByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<TagTable>
 
     /** 根据 [id] 查询并返回标签数据 */
