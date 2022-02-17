@@ -71,7 +71,7 @@ object Dependencies {
      * jsoup HTML 解析
      * - [Github](https://github.com/jhy/jsoup)
      */
-    const val jsoup = "org.jsoup:jsoup:1.14.2"
+    const val jsoup = "org.jsoup:jsoup:1.14.3"
 
     /**
      * 图表控件
@@ -86,7 +86,7 @@ object Dependencies {
     object Kotlin {
 
         /** Kotlin 版本 */
-        const val version = "1.5.31"
+        const val version = "1.6.10"
 
         /** 标准库 */
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
@@ -111,13 +111,13 @@ object Dependencies {
          * - [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
          * - [Github](https://github.com/Kotlin/kotlinx.coroutines)
          */
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1"
+        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
 
         /**
          * kotlin Json 序列化
          * - [Github](https://github.com/Kotlin/kotlinx.serialization)
          */
-        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2"
+        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
     }
 
     /**
@@ -135,7 +135,7 @@ object Dependencies {
          * appcompat
          * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.appcompat%3Aappcompat)
          */
-        const val appcompat = "androidx.appcompat:appcompat:1.3.1"
+        const val appcompat = "androidx.appcompat:appcompat:1.4.1"
 
         /**
          * recyclerview
@@ -153,7 +153,7 @@ object Dependencies {
          * 约束性布局
          * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=androidx.constraintlayout%3Aconstraintlayout)
          */
-        const val constraint = "androidx.constraintlayout:constraintlayout:2.1.0"
+        const val constraint = "androidx.constraintlayout:constraintlayout:2.1.3"
 
         /**
          * multidex 分包
@@ -233,7 +233,7 @@ object Dependencies {
         object Core {
 
             /** core 版本 */
-            private const val version = "1.6.0"
+            private const val version = "1.7.0"
 
             /** 核心功能 */
             const val core = "androidx.core:core:$version"
@@ -281,7 +281,7 @@ object Dependencies {
         object Activity {
 
             /** activity 版本 */
-            private const val version = "1.3.1"
+            private const val version = "1.4.0"
 
             /** Activity 相关 */
             const val activity = "androidx.activity:activity:$version"
@@ -300,7 +300,7 @@ object Dependencies {
         object Fragment {
 
             /** fragment 版本 */
-            private const val version = "1.3.6"
+            private const val version = "1.4.1"
 
             /** Fragment 相关 */
             const val fragment = "androidx.fragment:fragment:$version"
@@ -319,7 +319,7 @@ object Dependencies {
         object Lifecycle {
 
             /** lifecycle 版本 */
-            private const val version = "2.3.1"
+            private const val version = "2.4.1"
 
             const val reactivestreams = "androidx.lifecycle:lifecycle-reactivestreams:$version"
             const val reactivestreamsKtx = "androidx.lifecycle:lifecycle-reactivestreams-ktx:$version"
@@ -350,7 +350,7 @@ object Dependencies {
         object Room {
 
             /** room 版本 */
-            private const val version = "2.3.0"
+            private const val version = "2.4.1"
 
             const val runtime = "androidx.room:room-runtime:$version"
             const val compiler = "androidx.room:room-compiler:$version"
@@ -373,7 +373,7 @@ object Dependencies {
         object Paging {
 
             /** paging 版本 */
-            private const val version = "3.0.1"
+            private const val version = "3.1.0"
 
             const val runtime = "androidx.paging:paging-runtime:$version"
             const val runtimeKtx = "androidx.paging:paging-runtime-ktx:$version"
@@ -420,7 +420,7 @@ object Dependencies {
         object Work {
 
             /** 版本号 */
-            const val version = "2.5.0"
+            const val version = "2.7.1"
 
             const val runtime = "androidx.work:work-runtime:$version"
             const val runtimeKtx = "androidx.work:work-runtime-ktx:$version"
@@ -439,7 +439,7 @@ object Dependencies {
          * androidx material
          * - [版本查询](https://www.wanandroid.com/maven_pom/index?k=com.google.android.material)
          */
-        const val material = "com.google.android.material:material:1.4.0"
+        const val material = "com.google.android.material:material:1.5.0"
 
         /**
          * Zxing
@@ -525,11 +525,12 @@ object Dependencies {
     /**
      * Koin3
      * - [Github](https://github.com/InsertKoinIO/koin)
+     * - [指南](https://insert-koin.io/)
      */
     object Koin3 {
 
         /** koin 版本 */
-        private const val version = "3.1.2"
+        private const val version = "3.1.5"
 
         const val android = "io.insert-koin:koin-android:$version"
 
@@ -566,11 +567,12 @@ object Dependencies {
         /**
          * okhttp
          * - [Github](https://github.com/square/okhttp)
+         * - [指南](https://square.github.io/okhttp)
          */
         object OkHttp {
 
             /** okhttp 版本 */
-            private const val version = "4.9.1"
+            private const val version = "4.9.3"
 
             const val okhttp = "com.squareup.okhttp3:okhttp:$version"
             const val urlConnection = "com.squareup.okhttp3:okhttp-urlconnection:$version"
@@ -580,6 +582,7 @@ object Dependencies {
         /**
          * Retrofit
          * - [Github](https://github.com/square/retrofit)
+         * - [指南](https://square.github.io/retrofit/)
          */
         object Retrofit {
 
@@ -615,20 +618,21 @@ object Dependencies {
     object ImmersionBar {
 
         /** immersion bar 版本 */
-        private const val version = "3.0.0"
+        private const val version = "3.2.1"
 
-        const val immersionBar = "com.gyf.immersionbar:immersionbar:$version"
-        const val ktx = "com.gyf.immersionbar:immersionbar-ktx:$version"
+        const val immersionBar = "com.geyifeng.immersionbar:immersionbar:$version"
+        const val ktx = "com.geyifeng.immersionbar:immersionbar-ktx:$version"
     }
 
     /**
      * Coil 图片加载
      * - [Github](https://github.com/coil-kt/coil)
+     * - [指南](https://coil-kt.github.io/coil)
      */
     object Coil {
 
         /** coil 版本 */
-        private const val version = "1.3.2"
+        private const val version = "1.4.0"
 
         const val coil = "io.coil-kt:coil:$version"
         const val base = "io.coil-kt:coil-base:$version"
@@ -681,7 +685,7 @@ object Dependencies {
          * MMKV
          * - [Github](https://github.com/tencent/mmkv)
          */
-        const val mmkv = "com.tencent:mmkv:1.2.10"
+        const val mmkv = "com.tencent:mmkv:1.2.12"
     }
 
     /** 滴滴 */
@@ -702,8 +706,8 @@ object Dependencies {
 
     /**
      * Markdown 解析
-     * - [文档](https://noties.io/Markwon/)
      * - [Github](https://github.com/noties/Markwon)
+     * - [指南](https://noties.io/Markwon/)
      */
     object Markwon {
 

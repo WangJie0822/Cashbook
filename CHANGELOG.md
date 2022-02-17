@@ -2,6 +2,10 @@
 
 # 记账本 Changelog
 
+## [Unreleased]
+### Changed
+- Gradle 等相关依赖升级；
+
 ## [0.5.2_21111515]
 ### Fixed
 - 修复总资产计算问题；

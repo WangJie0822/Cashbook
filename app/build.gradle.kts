@@ -129,13 +129,13 @@ android {
 
     lint {
         // 出现错误不终止编译
-        isAbortOnError = false
+        abortOnError = false
     }
 
     // 配置 APK 输出路径
     applicationVariants.all {
         if (buildType.name == "release") {
-            packageApplicationProvider?.get()?.outputDirectory?.set(
+            packageApplicationProvider.get().outputDirectory.set(
                 File(
                     project.rootDir,
                     "/outputs/apk"
