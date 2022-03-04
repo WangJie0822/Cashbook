@@ -14,13 +14,13 @@
     </data>
 
     <com.google.android.material.checkbox.MaterialCheckBox
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_normal"
-        android:layout_marginEnd="@dimen/spacing_normal"
         android:bind_onLongClick="@{viewModel.onTagItemLongClick}"
         android:bind_onLongClick_item="@{item}"
         android:checked="@={item.selected}"
+        android:paddingStart="@dimen/spacing_normal"
+        android:paddingEnd="@dimen/spacing_normal"
         android:text="@{item.name}"
         tools:checked="true"
         tools:text="标签文本" />

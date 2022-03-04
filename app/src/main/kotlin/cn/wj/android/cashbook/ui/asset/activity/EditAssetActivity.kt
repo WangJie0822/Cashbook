@@ -60,7 +60,7 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
 
     override fun observe() {
         // 显示选择日期弹窗
-        viewModel.showSelectDayEvent.observe(this, { billingDate ->
+        viewModel.showSelectDayEvent.observe(this) { billingDate ->
             val selectedDay = if (billingDate) {
                 // 账单日
                 viewModel.billingDate.value.orEmpty()
@@ -77,16 +77,16 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
                     viewModel.repaymentDate.value = selected
                 }
             }
-        })
+        }
         // 显示选择资产分类弹窗
-        viewModel.showSelectAssetClassificationEvent.observe(this, {
+        viewModel.showSelectAssetClassificationEvent.observe(this) {
             SelectAssetClassificationDialog()
                 .setOnClassificationSelectListener { classificationTypeEnum, assetClassificationEnum ->
                     viewModel.classificationType.value = classificationTypeEnum
                     viewModel.assetClassification.value = assetClassificationEnum
                 }
                 .show(supportFragmentManager)
-        })
+        }
     }
 
     companion object {

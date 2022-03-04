@@ -133,16 +133,16 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override fun observe() {
         // 首页列表
-        viewModel.listData.observe(this, { list ->
+        viewModel.listData.observe(this) { list ->
             adapter.submitList(list)
             binding.includeContent.rv.scrollToTop()
-        })
+        }
         // 显示记录详情弹窗
-        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
+        viewModel.showRecordDetailsDialogEvent.observe(this) { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
-        })
+        }
         // 升级提示弹窗
-        viewModel.showUpdateDialogEvent.observe(this, { info ->
+        viewModel.showUpdateDialogEvent.observe(this) { info ->
             GeneralDialog.newBuilder()
                 .contentStr(info.versionInfo.md2Spanned())
                 .showSelect(true)
@@ -175,7 +175,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     }
                 }
                 .show(supportFragmentManager)
-        })
+        }
         // 检查备份路径
         viewModel.checkBackupPathEvent.observe(this, fun(path) {
             if (path.isNullOrBlank()) {
@@ -204,9 +204,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
         })
         // 记录变化监听
-        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this) {
             viewModel.refreshing.value = true
-        })
+        }
     }
 
     /** 显示备份路径异常提示 */

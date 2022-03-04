@@ -83,31 +83,31 @@ class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInv
 
     override fun observe() {
         // 无数据界面
-        viewModel.showNoData.observe(this, {
+        viewModel.showNoData.observe(this) {
             binding.includeNoData.root.visibility = if (it) {
                 View.VISIBLE
             } else {
                 View.GONE
             }
-        })
+        }
         // 绑定列表数据
-        viewModel.capitalListData.observe(this, { list ->
+        viewModel.capitalListData.observe(this) { list ->
             capitalAdapter.submitList(list)
-        })
-        viewModel.creditCardListData.observe(this, { list ->
+        }
+        viewModel.creditCardListData.observe(this) { list ->
             creditCardAdapter.submitList(list)
-        })
-        viewModel.topUpListData.observe(this, { list ->
+        }
+        viewModel.topUpListData.observe(this) { list ->
             topUpAdapter.submitList(list)
-        })
-        viewModel.investmentFinancialListData.observe(this, { list ->
+        }
+        viewModel.investmentFinancialListData.observe(this) { list ->
             investmentFinancialAdapter.submitList(list)
-        })
-        viewModel.debtListData.observe(this, { list ->
+        }
+        viewModel.debtListData.observe(this) { list ->
             debtAdapter.submitList(list)
-        })
+        }
         // 隐藏显示资产
-        viewModel.hideCapitalAccountList.observe(this, { hide ->
+        viewModel.hideCapitalAccountList.observe(this) { hide ->
             capitalAdapter.submitList(
                 if (hide.condition) {
                     arrayListOf()
@@ -115,8 +115,8 @@ class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInv
                     viewModel.capitalListData.value
                 }
             )
-        })
-        viewModel.hideCreditCardAccountList.observe(this, { hide ->
+        }
+        viewModel.hideCreditCardAccountList.observe(this) { hide ->
             creditCardAdapter.submitList(
                 if (hide.condition) {
                     arrayListOf()
@@ -124,8 +124,8 @@ class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInv
                     viewModel.creditCardListData.value
                 }
             )
-        })
-        viewModel.hideTopUpAccountList.observe(this, { hide ->
+        }
+        viewModel.hideTopUpAccountList.observe(this) { hide ->
             topUpAdapter.submitList(
                 if (hide.condition) {
                     arrayListOf()
@@ -133,8 +133,8 @@ class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInv
                     viewModel.topUpListData.value
                 }
             )
-        })
-        viewModel.hideInvestmentFinancialAccountList.observe(this, { hide ->
+        }
+        viewModel.hideInvestmentFinancialAccountList.observe(this) { hide ->
             investmentFinancialAdapter.submitList(
                 if (hide.condition) {
                     arrayListOf()
@@ -142,8 +142,8 @@ class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInv
                     viewModel.investmentFinancialListData.value
                 }
             )
-        })
-        viewModel.hideDebtAccountList.observe(this, { hide ->
+        }
+        viewModel.hideDebtAccountList.observe(this) { hide ->
             debtAdapter.submitList(
                 if (hide.condition) {
                     arrayListOf()
@@ -151,16 +151,16 @@ class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInv
                     viewModel.debtListData.value
                 }
             )
-        })
+        }
         // 显示资产长按菜单
-        viewModel.showLongClickMenuEvent.observe(this, { asset ->
+        viewModel.showLongClickMenuEvent.observe(this) { asset ->
             InvisibleAssetLongClickMenuDialog.actionShow(
                 manager = supportFragmentManager,
                 onCancelHiddenClick = {
                     // 取消隐藏资产
                     viewModel.cancelHidden(asset)
                 })
-        })
+        }
     }
 
     /** 创建资产列表适配器对象 */

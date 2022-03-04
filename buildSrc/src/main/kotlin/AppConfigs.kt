@@ -12,7 +12,7 @@ import java.util.Locale
 object AppConfigs {
 
     /** 编译 SDK 版本 */
-    const val compileSdk = 30
+    const val compileSdk = 31
 
     /** 最小支持版本 */
     const val minSdk = 21

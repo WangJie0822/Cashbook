@@ -37,6 +37,9 @@ class SelectFirstTypeActivity : BaseActivity<SelectFirstTypeViewModel, ActivityS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_first_type)
 
+        // 获取目标分类数据
+        viewModel.targetTypeData.value = intent.getParcelableExtra(ACTION_SELECTED)
+
         // 配置 RecyclerView
         binding.rv.run {
             layoutManager = WrapContentLinearLayoutManager()
@@ -44,16 +47,11 @@ class SelectFirstTypeActivity : BaseActivity<SelectFirstTypeViewModel, ActivityS
         }
     }
 
-    override fun beforeOnCreate() {
-        // 获取目标分类数据
-        viewModel.targetTypeData.value = intent.getParcelableExtra(ACTION_SELECTED) ?: return
-    }
-
     override fun observe() {
         // 列表数据
-        viewModel.listData.observe(this, { list ->
+        viewModel.listData.observe(this) { list ->
             adapter.submitList(list)
-        })
+        }
     }
 
     companion object {

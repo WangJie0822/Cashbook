@@ -59,11 +59,11 @@ class EditTypeActivity : BaseActivity<EditTypeViewModel, ActivityEditTypeBinding
 
     override fun observe() {
         // 列表数据
-        viewModel.groupListData.observe(this, { list ->
+        viewModel.groupListData.observe(this) { list ->
             groupAdapter.submitList(list)
-        })
-        viewModel.iconListData.observe(this, { list ->
+        }
+        viewModel.iconListData.observe(this) { list ->
             iconAdapter.submitList(list)
-        })
+        }
     }
 }

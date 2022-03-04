@@ -48,6 +48,9 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_record)
 
+        // 获取数据
+        viewModel.record = intent.getParcelableExtra(ACTION_RECORD)
+
         // 配置 ViewPager2
         binding.vpType.adapter = typesVpAdapter
 
@@ -62,14 +65,9 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         }
     }
 
-    override fun beforeOnCreate() {
-        // 获取数据
-        viewModel.record = intent.getParcelableExtra(ACTION_RECORD)
-    }
-
     override fun observe() {
         // 选择资产弹窗
-        viewModel.showSelectAssetEvent.observe(this, {
+        viewModel.showSelectAssetEvent.observe(this) {
             SelectAssetDialog.actionShow(supportFragmentManager) { selected ->
                 if (it) {
                     viewModel.accountData
@@ -77,9 +75,9 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
                     viewModel.transferAccountData
                 }.value = selected
             }
-        })
+        }
         // 选择日期弹窗
-        viewModel.showSelectDateEvent.observe(this, {
+        viewModel.showSelectDateEvent.observe(this) {
             DateTimePickerDialog.Builder()
                 .setDate(viewModel.dateStr.value.orEmpty())
                 .setOnDatePickerListener { date ->
@@ -87,13 +85,13 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
                     viewModel.dateData.value = "$date:$seconds".toLongTime()
                 }.show(supportFragmentManager)
 
-        })
+        }
         // 计算器弹窗
-        viewModel.showCalculatorEvent.observe(this, {
+        viewModel.showCalculatorEvent.observe(this) {
             CalculatorDialog.actionShow(supportFragmentManager)
-        })
+        }
         // 跳转选择关联记录
-        viewModel.jumpSelectAssociatedRecordEvent.observe(this, {
+        viewModel.jumpSelectAssociatedRecordEvent.observe(this) {
             selectAssociatedRecordResultLauncher.launch(SelectAssociatedRecordActivity.parseIntent(context, viewModel.dateStr.value.orEmpty(), viewModel.calculatorStr.get().orEmpty(), it)) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.getParcelableExtra<RecordEntity>(ACTION_RECORD)?.let { selected ->
@@ -101,25 +99,25 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
                     }
                 }
             }
-        })
+        }
         // 显示选择标签弹窗
-        viewModel.showSelectTagDialogEvent.observe(this, { selected ->
+        viewModel.showSelectTagDialogEvent.observe(this) { selected ->
             SelectTagDialog.actionShow(supportFragmentManager, selected) { selectedTags ->
                 viewModel.tagsData.value = selectedTags
             }
-        })
+        }
 
         // 标签变化
-        LiveEventBus.get<TagEntity>(EVENT_TAG_CHANGE).observe(this, { value ->
+        LiveEventBus.get<TagEntity>(EVENT_TAG_CHANGE).observe(this) { value ->
             value?.let { tag ->
                 viewModel.notifyTagChanged(tag)
             }
-        })
+        }
         // 标签删除
-        LiveEventBus.get<TagEntity>(EVENT_TAG_DELETE).observe(this, { value ->
+        LiveEventBus.get<TagEntity>(EVENT_TAG_DELETE).observe(this) { value ->
             value?.let { tag ->
                 viewModel.notifyTagDelete(tag)
             }
-        })
+        }
     }
 }

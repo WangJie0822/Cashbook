@@ -46,8 +46,8 @@ class ReplaceTypeActivity : BaseActivity<ReplaceTypeViewModel, ActivityReplaceTy
 
     override fun observe() {
         // 分类列表
-        viewModel.listData.observe(this, { list ->
+        viewModel.listData.observe(this) { list ->
             adapter.submitList(list)
-        })
+        }
     }
 }

@@ -88,6 +88,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_hint"
+                tools:layoutManager="cn.wj.android.cashbook.widget.recyclerview.layoutmanager.FlowLayoutManager"
                 tools:listitem="@layout/recycler_item_tag" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,7 +31,7 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
 
     override fun observe() {
         // 显示选择主题弹窗
-        viewModel.showSelectThemeDialogEvent.observe(this, {
+        viewModel.showSelectThemeDialogEvent.observe(this) {
             themeIndex = ThemeEnum.indexOf(CurrentThemeLiveData.currentTheme)
             MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.please_select_application_theme)
@@ -44,6 +44,6 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
-        })
+        }
     }
 }

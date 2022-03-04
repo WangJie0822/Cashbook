@@ -36,19 +36,19 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
 
     override fun observe() {
         // 跳转发送邮件
-        viewModel.jumpSendEmailEvent.observe(this, { email ->
+        viewModel.jumpSendEmailEvent.observe(this) { email ->
             email.runIfNotNullAndBlank {
                 jumpSendEmail(this)
             }
-        })
+        }
         // 跳转浏览器打开
-        viewModel.jumpBrowserEvent.observe(this, { url ->
+        viewModel.jumpBrowserEvent.observe(this) { url ->
             url.runIfNotNullAndBlank {
                 jumpBrowser(this)
             }
-        })
+        }
         // 升级提示弹窗
-        viewModel.showUpdateDialogEvent.observe(this, { info ->
+        viewModel.showUpdateDialogEvent.observe(this) { info ->
             GeneralDialog.newBuilder()
                 .contentStr(info.versionInfo.md2Spanned())
                 .setPositiveAction(R.string.update.string) {
@@ -73,6 +73,6 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
                     }
                 }
                 .show(supportFragmentManager)
-        })
+        }
     }
 }

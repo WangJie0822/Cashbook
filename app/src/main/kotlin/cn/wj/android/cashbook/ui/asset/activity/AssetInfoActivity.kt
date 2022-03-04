@@ -37,6 +37,9 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_asset_info)
 
+        // 获取资产信息
+        viewModel.assetData.value = intent.getParcelableExtra(ACTION_ASSET)
+
         // 配置 RecyclerView
         binding.rv.run {
             layoutManager = WrapContentLinearLayoutManager()
@@ -44,33 +47,28 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
         }
     }
 
-    override fun beforeOnCreate() {
-        // 获取资产信息
-        viewModel.assetData.value = intent.getParcelableExtra(ACTION_ASSET)
-    }
-
     override fun observe() {
         // 数据列表
-        viewModel.recordListData.observe(this, { list ->
+        viewModel.recordListData.observe(this) { list ->
             pagingAdapter.submitData(this.lifecycle, list)
             viewModel.refreshing.value = false
-        })
+        }
         // 刷新数据
-        viewModel.refreshing.observe(this, {
+        viewModel.refreshing.observe(this) {
             if (it) {
                 pagingAdapter.refresh()
             }
-        })
+        }
         // 跳转编辑
-        viewModel.jumpEditAssetEvent.observe(this, { asset ->
+        viewModel.jumpEditAssetEvent.observe(this) { asset ->
             EditAssetActivity.actionStart(context, asset)
-        })
+        }
         // 显示记录详情弹窗
-        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
+        viewModel.showRecordDetailsDialogEvent.observe(this) { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
-        })
+        }
         // 显示删除确认弹窗
-        viewModel.showDeleteConfirmDialogEvent.observe(this, {
+        viewModel.showDeleteConfirmDialogEvent.observe(this) {
             GeneralDialog.newBuilder()
                 .contentStr(R.string.delete_asset_hint.string)
                 .setOnPositiveAction {
@@ -78,11 +76,11 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
                     viewModel.deleteAsset()
                 }.show(supportFragmentManager)
 
-        })
+        }
         // 记录变化监听
-        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this) {
             pagingAdapter.refresh()
             viewModel.refreshAsset()
-        })
+        }
     }
 }

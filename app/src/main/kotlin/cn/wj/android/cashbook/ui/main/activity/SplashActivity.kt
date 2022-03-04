@@ -55,7 +55,7 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
 
     override fun observe() {
         // 显示隐私政策弹窗
-        viewModel.showPrivacyPolicyDialogEvent.observe(this, {
+        viewModel.showPrivacyPolicyDialogEvent.observe(this) {
             GeneralDialog.newBuilder()
                 .titleStr(R.string.user_agreement_and_privacy_policy.string)
                 .contentStr(R.string.user_agreement_and_privacy_policy_hint.string) { ss ->
@@ -84,6 +84,6 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
                     }
                 }
                 .show(supportFragmentManager)
-        })
+        }
     }
 }

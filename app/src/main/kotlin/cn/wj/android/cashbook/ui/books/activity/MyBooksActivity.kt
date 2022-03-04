@@ -63,11 +63,11 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
 
     override fun observe() {
         // 账本列表
-        viewModel.booksListData.observe(this, { list ->
+        viewModel.booksListData.observe(this) { list ->
             booksListRvAdapter.submitList(list)
-        })
+        }
         // PopupMenu 弹窗
-        viewModel.showPopupMenuEvent.observe(this, { item ->
+        viewModel.showPopupMenuEvent.observe(this) { item ->
             val viewHolder = binding.rv.findViewHolderForAdapterPosition(
                 booksListRvAdapter.mDiffer.currentList.indexOf(item)
             )
@@ -102,9 +102,9 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
                     }
                 }
             }
-        })
+        }
         // 跳转新增
-        viewModel.jumpToAddBooksEvent.observe(this, {
+        viewModel.jumpToAddBooksEvent.observe(this) {
             editBooksResultLauncher.launch(EditBooksActivity.parseIntent(context)) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.getParcelableExtra<BooksEntity>(ACTION_BOOKS)?.let { newBooks ->
@@ -118,6 +118,6 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
                     }
                 }
             }
-        })
+        }
     }
 }

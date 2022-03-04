@@ -618,10 +618,19 @@ object Dependencies {
     object ImmersionBar {
 
         /** immersion bar 版本 */
-        private const val version = "3.2.1"
+        private const val version = "3.0.0"
 
-        const val immersionBar = "com.geyifeng.immersionbar:immersionbar:$version"
-        const val ktx = "com.geyifeng.immersionbar:immersionbar-ktx:$version"
+        const val immersionBar = "com.gyf.immersionbar:immersionbar:$version"
+        const val ktx = "com.gyf.immersionbar:immersionbar-ktx:$version"
+
+        object MarvenCenter {
+            /** immersion bar 版本 */
+            private const val version = "3.2.1"
+
+            const val immersionBar = "com.geyifeng.immersionbar:immersionbar:$version"
+            const val ktx = "com.geyifeng.immersionbar:immersionbar-ktx:$version"
+
+        }
     }
 
     /**

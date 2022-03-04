@@ -51,20 +51,20 @@ class CalendarActivity : BaseActivity<CalendarViewModel, ActivityCalendarBinding
 
     override fun observe() {
         // 列表数据
-        viewModel.listData.observe(this, { list ->
+        viewModel.listData.observe(this) { list ->
             adapter.submitList(list)
-        })
+        }
         // 显示记录详情弹窗
-        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
+        viewModel.showRecordDetailsDialogEvent.observe(this) { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
-        })
+        }
         // 显示选择年月弹窗
-        viewModel.showSelectYearMonthDialogEvent.observe(this, { callback ->
+        viewModel.showSelectYearMonthDialogEvent.observe(this) { callback ->
             SelectYearMonthDialog.actionShow(supportFragmentManager, viewModel.titleStr.value.orEmpty(), callback)
-        })
+        }
         // 记录变化监听
-        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this) {
             viewModel.refresh()
-        })
+        }
     }
 }

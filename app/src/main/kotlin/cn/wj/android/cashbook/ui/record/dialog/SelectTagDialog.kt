@@ -14,7 +14,7 @@ import cn.wj.android.cashbook.databinding.DialogSelectTagBinding
 import cn.wj.android.cashbook.databinding.RecyclerItemTagBinding
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
-import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
+import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.FlowLayoutManager
 import com.gyf.immersionbar.ktx.immersionBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -59,29 +59,29 @@ class SelectTagDialog : BaseDialog<SelectTagViewModel, DialogSelectTagBinding>()
 
         // 配置 RecyclerView
         binding.rvTag.run {
-            layoutManager = WrapContentLinearLayoutManager()
+            layoutManager = FlowLayoutManager()
             adapter = tagAdapter
         }
     }
 
     override fun observe() {
         // 标签列表
-        viewModel.tagListData.observe(this, { list ->
+        viewModel.tagListData.observe(this) { list ->
             tagAdapter.submitList(list)
-        })
+        }
         // 确认回调
-        viewModel.confirmClickEvent.observe(this, { selected ->
+        viewModel.confirmClickEvent.observe(this) { selected ->
             onCallback?.invoke(selected)
             dismiss()
-        })
+        }
         // 显示新建标签弹窗
-        viewModel.showCreateTagDialogEvent.observe(this, {
+        viewModel.showCreateTagDialogEvent.observe(this) {
             EditTagDialog.actionShow(requireActivity().supportFragmentManager, callback = { tag ->
                 viewModel.insertTag(tag)
             })
-        })
+        }
         // 显示菜单
-        viewModel.showMenuEvent.observe(this, { tag ->
+        viewModel.showMenuEvent.observe(this) { tag ->
             val viewHolder = binding.rvTag.findViewHolderForAdapterPosition(
                 tagAdapter.mDiffer.currentList.indexOf(tag)
             )
@@ -109,7 +109,7 @@ class SelectTagDialog : BaseDialog<SelectTagViewModel, DialogSelectTagBinding>()
                     }
                 }
             }
-        })
+        }
     }
 
     companion object {

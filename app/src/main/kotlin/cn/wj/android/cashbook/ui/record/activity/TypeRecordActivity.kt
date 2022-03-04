@@ -44,6 +44,9 @@ class TypeRecordActivity : BaseActivity<TypeRecordViewModel, ActivityTypeRecordB
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_type_record)
 
+        // 获取分类数据
+        viewModel.typeData.value = intent.getParcelableExtra(ACTION_SELECTED)
+
         // 配置 RecyclerView
         binding.rv.run {
             layoutManager = WrapContentLinearLayoutManager()
@@ -51,20 +54,15 @@ class TypeRecordActivity : BaseActivity<TypeRecordViewModel, ActivityTypeRecordB
         }
     }
 
-    override fun beforeOnCreate() {
-        // 获取分类数据
-        viewModel.typeData.value = intent.getParcelableExtra(ACTION_SELECTED) ?: return
-    }
-
     override fun observe() {
         // 列表数据
-        viewModel.listData.observe(this, { list ->
+        viewModel.listData.observe(this) { list ->
             adapter.submitList(list)
-        })
+        }
         // 显示记录详情弹窗
-        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
+        viewModel.showRecordDetailsDialogEvent.observe(this) { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
-        })
+        }
     }
 
     companion object {
