@@ -38,10 +38,10 @@ class DateTimePickerDialog : BaseDialog<DateTimePickerViewModel, DialogDateTimeP
 
     override fun observe() {
         // 确认点击
-        viewModel.confirmDateData.observe(this, { date ->
+        viewModel.confirmDateData.observe(this) { date ->
             onConfirmClickListener?.invoke(date)
             dismiss()
-        })
+        }
     }
 
     class Builder {

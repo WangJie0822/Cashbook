@@ -52,15 +52,15 @@ class SelectDayDialog : BaseDialog<SelectDayViewModel, DialogAssetSelectDayBindi
 
     override fun observe() {
         // 日期数据
-        viewModel.dayData.observe(this, { list ->
+        viewModel.dayData.observe(this) { list ->
             binding.epv.setDataList(list)
             binding.epv.moveTo(list.indexOf(selectedDay + R.string.day.string))
-        })
+        }
         // 确认事件
-        viewModel.confirmClickEvent.observe(this, {
+        viewModel.confirmClickEvent.observe(this) {
             onDaySelectedListener?.invoke(binding.epv.getCurrentData().toString().replace(R.string.day.string, ""))
             dismiss()
-        })
+        }
     }
 
     companion object {

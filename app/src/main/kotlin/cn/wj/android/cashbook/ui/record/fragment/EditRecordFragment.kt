@@ -64,7 +64,7 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
     @SuppressLint("NotifyDataSetChanged")
     override fun observe() {
         // 类型列表
-        typeViewModel.typeListData.observe(this, { list ->
+        typeViewModel.typeListData.observe(this) { list ->
             adapter.adapters.forEach {
                 adapter.removeAdapter(it)
             }
@@ -105,9 +105,9 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
             } else {
                 typeViewModel.onTypeItemClick.invoke(typeValue)
             }
-        })
+        }
         // 二级类型状态
-        typeViewModel.secondTypeData.observe(this, { item ->
+        typeViewModel.secondTypeData.observe(this) { item ->
             adapter.removeAdapter(secondAdapter)
             if (item.expand.get() && item.childEnable && item.childList.isNotEmpty()) {
                 // 需要展开
@@ -126,9 +126,9 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
                     secondAdapter.visiblePosition = itemIndex % 5
                 }
             }
-        })
+        }
         // 选中类型
-        typeViewModel.selectTypeData.observe(this, { selected ->
+        typeViewModel.selectTypeData.observe(this) { selected ->
             when (typeViewModel.typeData.value) {
                 RecordTypeEnum.EXPENDITURE -> {
                     // 支出
@@ -143,16 +143,16 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
                     viewModel.transferType
                 }
             }.value = selected
-        })
+        }
         // 显示记录详情弹窗
-        viewModel.showRecordDetailsDialogEvent.observe(this, { record ->
+        viewModel.showRecordDetailsDialogEvent.observe(this) { record ->
             RecordInfoDialog.actionShow(childFragmentManager, record)
-        })
+        }
         // 记录数据变化
-        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this) {
             typeViewModel.loadType()
             viewModel.refreshAssociatedRecord()
-        })
+        }
     }
 
     private fun createTypeAdapter(ls: List<TypeEntity>): SimpleRvListAdapter<TypeEntity> {

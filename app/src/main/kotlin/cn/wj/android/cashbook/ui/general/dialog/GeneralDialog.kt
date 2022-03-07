@@ -81,11 +81,11 @@ class GeneralDialog
 
     override fun observe() {
         // 背景点击
-        viewModel.tryDismissEvent.observe(this, {
+        viewModel.tryDismissEvent.observe(this) {
             if (isCancelable) {
                 dismiss()
             }
-        })
+        }
         // 消极按钮点击
         viewModel.negativeClickEvent.observe(this, Observer {
             // 选中状态

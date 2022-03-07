@@ -40,11 +40,11 @@ class ProgressDialog : BaseDialog<ProgressViewModel, DialogProgressBinding>(), L
 
     override fun observe() {
         // 空白处点击
-        viewModel.blankClickEvent.observe(this, {
+        viewModel.blankClickEvent.observe(this) {
             if (isCancelable) {
                 dismiss()
             }
-        })
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

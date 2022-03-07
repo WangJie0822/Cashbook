@@ -38,10 +38,10 @@ class SelectYearMonthDialog : BaseDialog<SelectYearMonthViewModel, DialogSelectY
 
     override fun observe() {
         // 月份点击
-        viewModel.monthSelectedEvent.observe(this, { date ->
+        viewModel.monthSelectedEvent.observe(this) { date ->
             onDateClickCallback?.invoke(date)
             dismiss()
-        })
+        }
     }
 
     companion object {

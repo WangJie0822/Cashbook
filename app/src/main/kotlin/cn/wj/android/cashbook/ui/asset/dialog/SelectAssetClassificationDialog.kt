@@ -52,7 +52,7 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
 
     override fun observe() {
         // 分类列表数据
-        viewModel.assetClassificationListData.observe(this, { list ->
+        viewModel.assetClassificationListData.observe(this) { list ->
             binding.rvAssetClassification.adapter = ConcatAdapter().apply {
                 list.forEach {
                     addAdapter(AssetClassificationGroupRvAdapter(it.classificationType.titleResId))
@@ -62,16 +62,16 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
                     })
                 }
             }
-        })
+        }
         // 银行列表
-        viewModel.bankListData.observe(this, { list ->
+        viewModel.bankListData.observe(this) { list ->
             binding.rvBanks.adapter = SimpleRvListAdapter<AssetClassificationEnum>(R.layout.recycler_item_asset_classification).apply {
                 viewModel = this@SelectAssetClassificationDialog.viewModel
                 submitList(list)
             }
-        })
+        }
         // 选中的数据
-        viewModel.selectedAssetClassificationData.observe(this, { selected ->
+        viewModel.selectedAssetClassificationData.observe(this) { selected ->
             onClassificationSelectListener?.invoke(viewModel.classificationType, selected)
             if (!selected.needSelectBank) {
                 // 不需要选择银行
@@ -82,7 +82,7 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
                 // 隐藏弹窗
                 dismiss()
             }
-        })
+        }
     }
 
     /** 设置选中类型回调 [listener] */

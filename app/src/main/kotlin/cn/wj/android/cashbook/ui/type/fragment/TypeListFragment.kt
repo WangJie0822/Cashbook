@@ -7,7 +7,11 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseFragment
-import cn.wj.android.cashbook.data.constants.*
+import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
+import cn.wj.android.cashbook.data.constants.ACTION_TYPE
+import cn.wj.android.cashbook.data.constants.ACTIVITY_RESULT_OK
+import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
@@ -61,15 +65,15 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
 
     override fun observe() {
         // 数据列表
-        viewModel.listData.observe(this, { list ->
+        viewModel.listData.observe(this) { list ->
             adapter.submitList(list)
-        })
+        }
         // 编辑保存点击
-        viewModel.saveEvent.observe(this, {
+        viewModel.saveEvent.observe(this) {
             viewModel.updateType(adapter.getChangeList())
-        })
+        }
         // 显示编辑弹窗
-        viewModel.showEditTypeMenuEvent.observe(this, { type ->
+        viewModel.showEditTypeMenuEvent.observe(this) { type ->
             EditTypeMenuDialog.actionShow(childFragmentManager,
                 type.first,
                 onEditClick = {
@@ -119,11 +123,11 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
                     // 跳转数据统计
                     TypeRecordActivity.actionStart(requireActivity(), type)
                 })
-        })
+        }
         // 记录数据变化
-        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this, {
+        LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this) {
             viewModel.loadTypeList()
-        })
+        }
     }
 
     companion object {

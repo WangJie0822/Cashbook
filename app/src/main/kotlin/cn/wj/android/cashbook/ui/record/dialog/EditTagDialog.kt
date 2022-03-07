@@ -37,9 +37,9 @@ class EditTagDialog
 
     override fun observe() {
         // 成功事件
-        viewModel.successEvent.observe(this, { tag ->
+        viewModel.successEvent.observe(this) { tag ->
             onCallback?.invoke(tag)
-        })
+        }
     }
 
     companion object {

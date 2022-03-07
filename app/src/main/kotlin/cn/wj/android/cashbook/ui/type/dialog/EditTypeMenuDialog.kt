@@ -51,30 +51,30 @@ class EditTypeMenuDialog : BaseDialog<EditTypeMenuViewModel, DialogEditTypeMenuB
 
     override fun observe() {
         // 点击事件
-        viewModel.editClickEvent.observe(this, {
+        viewModel.editClickEvent.observe(this) {
             onEditClickListener?.invoke()
             dismiss()
-        })
-        viewModel.deleteClickEvent.observe(this, {
+        }
+        viewModel.deleteClickEvent.observe(this) {
             onDeleteClickListener?.invoke()
             dismiss()
-        })
-        viewModel.changeToSecondTypeEvent.observe(this, {
+        }
+        viewModel.changeToSecondTypeEvent.observe(this) {
             onChangeToSecondTypeClickListener?.invoke()
             dismiss()
-        })
-        viewModel.changeToFirstTypeEvent.observe(this, {
+        }
+        viewModel.changeToFirstTypeEvent.observe(this) {
             onChangeToFirstTypeClickListener?.invoke()
             dismiss()
-        })
-        viewModel.moveToOtherFirstTypeEvent.observe(this, {
+        }
+        viewModel.moveToOtherFirstTypeEvent.observe(this) {
             onMoveToOtherFirstTypeClickListener?.invoke()
             dismiss()
-        })
-        viewModel.statisticsClickEvent.observe(this, {
+        }
+        viewModel.statisticsClickEvent.observe(this) {
             onStatisticsClickListener?.invoke()
             dismiss()
-        })
+        }
     }
 
     companion object {
