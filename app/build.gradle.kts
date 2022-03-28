@@ -135,15 +135,21 @@ android {
     // 配置 APK 输出路径
     applicationVariants.all {
         if (buildType.name == "release") {
-            packageApplicationProvider.get().outputDirectory.set(
-                File(
-                    project.rootDir,
-                    "/outputs/apk"
-                )
-            )
-            outputs.all {
-                if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
-                    this.outputFileName = "Cashbook_${versionName}.apk"
+            assembleProvider.get().doLast {
+                copy {
+                    println("> Task :doLast copyApk")
+                    val separator = org.jetbrains.kotlin.konan.file.File.Companion.separator
+                    val fromDir =
+                        packageApplicationProvider.get().outputDirectory.asFile.get().toString()
+                    val intoDir = "${project.rootDir}${separator}outputs${separator}apk"
+                    println("> Task :doLast copyApk start copy from $fromDir into $intoDir")
+                    from(fromDir)
+                    into(intoDir)
+                    include("**/*.apk")
+                    rename {
+                        "Cashbook_${versionName}.apk"
+                    }
+                    println("> Task :doLast copyApk finish")
                 }
             }
         }
