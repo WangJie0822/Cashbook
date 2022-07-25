@@ -23,14 +23,17 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
 
     private val tag: String? = builder.tag
 
+    private val borderPriority: Int = builder.borderPriority
+    private val headerPriority: Int = builder.headerPriority
+
     override fun log(priority: Int, onceOnlyTag: String?, message: String) {
         val tag = formatTag(onceOnlyTag)
 
-        if (priority >= Log.INFO) {
+        if (priority >= borderPriority || (headerPriority <= borderPriority && priority >= headerPriority)) {
             logTopBorder(priority, tag)
         }
 
-        if (priority >= Log.WARN) {
+        if (priority >= headerPriority) {
             logHeaderContent(priority, tag, methodCount)
         }
 
@@ -40,17 +43,17 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
         val bytes = message.toByteArray()
         val length = bytes.size
         if (length <= CHUNK_SIZE) {
-            if (methodCount > 0 && priority >= Log.WARN) {
+            if (methodCount > 0 && priority >= headerPriority) {
                 logDivider(priority, tag)
             }
             logContent(priority, tag, message)
-            if (priority >= Log.INFO) {
+            if (priority >= borderPriority || (headerPriority <= borderPriority && priority >= headerPriority)) {
                 logBottomBorder(priority, tag)
             }
             return
         }
 
-        if (methodCount > 0 && priority >= Log.WARN) {
+        if (methodCount > 0 && priority >= headerPriority) {
             logDivider(priority, tag)
         }
 
@@ -65,20 +68,20 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
         logBottomBorder(priority, tag)
     }
 
-    private fun logTopBorder(logType: Int, tag: String?) {
-        logChunk(logType, tag, TOP_BORDER)
+    private fun logTopBorder(priority: Int, tag: String?) {
+        logChunk(priority, tag, TOP_BORDER)
     }
 
-    private fun logHeaderContent(logType: Int, tag: String?, methodCount: Int) {
+    private fun logHeaderContent(priority: Int, tag: String?, methodCount: Int) {
         var methodCountVar = methodCount
         val trace = Thread.currentThread().stackTrace
         if (showThreadInfo) {
             logChunk(
-                logType,
+                priority,
                 tag,
                 HORIZONTAL_LINE.toString() + " Thread: " + Thread.currentThread().name
             )
-            logDivider(logType, tag)
+            logDivider(priority, tag)
         }
         var level = ""
         val stackOffset = getStackOffset(trace) + methodOffset
@@ -106,27 +109,27 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
                 .append(trace[stackIndex].lineNumber)
                 .append(")")
             level += "   "
-            logChunk(logType, tag, builder.toString())
+            logChunk(priority, tag, builder.toString())
         }
     }
 
-    private fun logBottomBorder(logType: Int, tag: String?) {
-        logChunk(logType, tag, BOTTOM_BORDER)
+    private fun logBottomBorder(priority: Int, tag: String?) {
+        logChunk(priority, tag, BOTTOM_BORDER)
     }
 
-    private fun logDivider(logType: Int, tag: String?) {
-        logChunk(logType, tag, MIDDLE_BORDER)
+    private fun logDivider(priority: Int, tag: String?) {
+        logChunk(priority, tag, MIDDLE_BORDER)
     }
 
-    private fun logContent(logType: Int, tag: String?, chunk: String) {
+    private fun logContent(priority: Int, tag: String?, chunk: String) {
         val lines = chunk.split(System.getProperty("line.separator").orEmpty()).toTypedArray()
         for (line in lines) {
-            val printChunk = if (logType >= Log.INFO) {
+            val printChunk = if (priority >= borderPriority || (headerPriority <= borderPriority && priority >= headerPriority)) {
                 "$HORIZONTAL_LINE $line"
             } else {
                 line
             }
-            logChunk(logType, tag, printChunk)
+            logChunk(priority, tag, printChunk)
         }
     }
 
@@ -168,13 +171,16 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
     }
 
     class Builder internal constructor() {
-        var methodCount = 2
-        var methodOffset = 0
-        var showThreadInfo = true
+        internal var methodCount = 2
+        internal var methodOffset = 0
+        internal var showThreadInfo = true
 
-        var logStrategy: LogStrategy? = null
+        internal var logStrategy: LogStrategy? = null
 
-        var tag: String? = "PRETTY_LOGGER"
+        internal var tag: String? = "PRETTY_LOGGER"
+
+        internal var borderPriority = Log.DEBUG
+        internal var headerPriority = Log.DEBUG
 
         fun methodCount(`val`: Int): Builder {
             methodCount = `val`
@@ -193,6 +199,16 @@ class MyFormatStrategy private constructor(builder: Builder) : FormatStrategy {
 
         fun logStrategy(`val`: LogStrategy?): Builder {
             logStrategy = `val`
+            return this
+        }
+
+        fun headerPriority(`val`: Int): Builder {
+            headerPriority = `val`
+            return this
+        }
+
+        fun borderPriority(`val`: Int): Builder {
+            borderPriority = `val`
             return this
         }
 

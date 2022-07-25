@@ -7,6 +7,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.multidex.MultiDex
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
@@ -52,11 +53,13 @@ class MyApplication : Application() {
 
         // 初始化 Logger 日志打印
         val strategy = MyFormatStrategy.newBuilder()
+            .borderPriority(Log.WARN)
+            .headerPriority(Log.WARN)
             .tag("CASHBOOK")
             .build()
         Logger.addLogAdapter(object : AndroidLogAdapter(strategy) {
             override fun isLoggable(priority: Int, tag: String?): Boolean {
-                return true
+                return BuildConfig.DEBUG
             }
         })
         logger().d("MyApplication onCreate ${BuildConfig.VERSION_NAME}")
