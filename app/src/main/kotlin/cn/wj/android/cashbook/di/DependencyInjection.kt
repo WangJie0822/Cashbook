@@ -16,7 +16,6 @@ import cn.wj.android.cashbook.data.repository.books.BooksRepository
 import cn.wj.android.cashbook.data.repository.main.MainRepository
 import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import cn.wj.android.cashbook.data.repository.type.TypeRepository
-import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.third.okhttp.InterceptorLogger
 import cn.wj.android.cashbook.third.okhttp.LoggerInterceptor
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetInfoViewModel
@@ -60,6 +59,7 @@ import cn.wj.android.cashbook.ui.type.viewmodel.TypeListViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -81,7 +81,10 @@ val netModule = module {
         OkHttpClient.Builder()
             .retryOnConnectionFailure(true)
             .addNetworkInterceptor(
-                LoggerInterceptor(logger, if (BuildConfig.DEBUG) LoggerInterceptor.LEVEL_BODY else LoggerInterceptor.LEVEL_NONE)
+                LoggerInterceptor(
+                    logger,
+                    if (BuildConfig.DEBUG) LoggerInterceptor.LEVEL_BODY else LoggerInterceptor.LEVEL_NONE
+                )
             )
             .build()
     }
@@ -145,7 +148,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
 val dbModule = module {
     single {
         Room.databaseBuilder(
-            AppManager.getContext().applicationContext,
+            androidContext(),
             CashbookDatabase::class.java,
             DB_FILE_NAME
         )

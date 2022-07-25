@@ -34,7 +34,7 @@ object DatabaseManager {
     }
 
     /** 初始化账本信息 */
-    private suspend fun initBooksData(database: CashbookDatabase) {
+    private fun initBooksData(database: CashbookDatabase) {
         // 获取默认账本
         val books = database.booksDao().queryDefault().firstOrNull()?.toBooksEntity()
         CurrentBooksLiveData.postValue(

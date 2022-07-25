@@ -19,33 +19,33 @@ interface TagDao {
 
     /** 将 [tag] 数据插入数据库并返回主键 id */
     @Insert
-    suspend fun insert(tag: TagTable): Long
+    fun insert(tag: TagTable): Long
 
     /** 插入或替换标签 */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrReplace(vararg tags: TagTable)
+    fun insertOrReplace(vararg tags: TagTable)
 
     /** 删除 [tag] 数据 */
     @Delete
-    suspend fun delete(tag: TagTable)
+    fun delete(tag: TagTable)
 
     /** 更新 [tag] 数据 */
     @Update
-    suspend fun update(tag: TagTable)
+    fun update(tag: TagTable)
 
     /** 从数据库中获取所有标签数据并返回 */
     @Query("SELECT * FROM db_tag")
-    suspend fun queryAll(): List<TagTable>
+    fun queryAll(): List<TagTable>
 
     /** 从数据库中获取账本 id 为 [booksId] 的标签数据并返回 */
     @Query("SELECT * FROM db_tag WHERE books_id=:booksId OR shared=1")
-    suspend fun getTagListByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<TagTable>
+    fun getTagListByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<TagTable>
 
     /** 根据 [id] 查询并返回标签数据 */
     @Query("SELECT * FROM db_tag WHERE id=:id")
-    suspend fun queryById(id: Long): TagTable?
+    fun queryById(id: Long): TagTable?
 
     /** 根据 [name] 查询并返回标签数据 */
     @Query("SELECT * FROM db_tag WHERE name=:name")
-    suspend fun queryByName(name: String): List<TagTable>
+    fun queryByName(name: String): List<TagTable>
 }

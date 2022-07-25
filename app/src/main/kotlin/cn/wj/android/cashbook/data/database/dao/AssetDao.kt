@@ -21,45 +21,45 @@ interface AssetDao {
 
     /** 插入新的资产 [asset] 到数据库并返回主键id */
     @Insert
-    suspend fun insert(asset: AssetTable): Long
+    fun insert(asset: AssetTable): Long
 
     /** 插入或替换资产 */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrReplace(vararg assets: AssetTable)
+    fun insertOrReplace(vararg assets: AssetTable)
 
     /** 删除资产 [asset] */
     @Delete
-    suspend fun delete(asset: AssetTable)
+    fun delete(asset: AssetTable)
 
     /** 更新资产 [asset] 到数据库 */
     @Update
-    suspend fun update(asset: AssetTable)
+    fun update(asset: AssetTable)
 
     /** 更新资产 [assets] */
     @Update
-    suspend fun update(vararg assets: AssetTable)
+    fun update(vararg assets: AssetTable)
 
     /** 查询所有数据 */
     @Query("SELECT * FROM db_asset")
-    suspend fun queryAll(): List<AssetTable>
+    fun queryAll(): List<AssetTable>
 
     /** 根据 [booksId] 从数据库中查询所有资产数据并返回 */
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId")
-    suspend fun queryByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
+    fun queryByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
 
     /** 根据 [booksId] 从数据库中查询隐藏资产数据并返回 */
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId AND invisible=${SWITCH_INT_ON}")
-    suspend fun queryInvisibleByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
+    fun queryInvisibleByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
 
     /** 根据 [booksId] 从数据库中查询未隐藏资产数据并返回 */
     @Query("SELECT * FROM db_asset WHERE books_id=:booksId AND invisible=${SWITCH_INT_OFF}")
-    suspend fun queryVisibleByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
+    fun queryVisibleByBooksId(booksId: Long = CurrentBooksLiveData.booksId): List<AssetTable>
 
     /** 从数据库中查询账本id为 [booksId] 的资产中最大的排序 */
     @Query("SELECT MAX(sort) FROM db_asset WHERE books_id=:booksId")
-    suspend fun queryMaxSortByBooksId(booksId: Long = CurrentBooksLiveData.booksId): Int?
+    fun queryMaxSortByBooksId(booksId: Long = CurrentBooksLiveData.booksId): Int?
 
     /** 获取 id 为 [id] 的资产 */
     @Query("SELECT * FROM db_asset WHERE id=:id AND books_id=:booksId")
-    suspend fun queryById(id: Long, booksId: Long = CurrentBooksLiveData.booksId): AssetTable?
+    fun queryById(id: Long, booksId: Long = CurrentBooksLiveData.booksId): AssetTable?
 }
