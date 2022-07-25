@@ -1,8 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
-        maven { setUrl(Dependencies.MavenRepository.AliYun.public) }
-        maven { setUrl(Dependencies.MavenRepository.AliYun.google) }
+        maven { setUrl("https://maven.aliyun.com/repository/public/") }
+        maven { setUrl("https://maven.aliyun.com/repository/google/") }
         mavenCentral()
     }
     dependencies {

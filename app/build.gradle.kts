@@ -163,7 +163,7 @@ android {
 
     // kotlin Jvm 版本
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
         freeCompilerArgs =
             freeCompilerArgs + arrayOf("-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi")
     }
@@ -248,8 +248,8 @@ dependencies {
     implementation(Dependencies.Coil.coil)
 
     // 状态栏工具
-    implementation(Dependencies.ImmersionBar.immersionBar)
-    implementation(Dependencies.ImmersionBar.ktx)
+    implementation(Dependencies.ImmersionBar.MarvenCenter.immersionBar)
+    implementation(Dependencies.ImmersionBar.MarvenCenter.ktx)
 
     // MMKV 数据存储
     implementation(Dependencies.Tencent.mmkv)
