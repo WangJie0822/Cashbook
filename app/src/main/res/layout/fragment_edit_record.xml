@@ -189,8 +189,7 @@
                     android:text="@string/charge"
                     android:textColor="@color/selector_record_options"
                     app:checkedIconTint="@color/selector_record_options"
-                    app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
-                    tools:checked="true" />
+                    app:chipBackgroundColor="@color/selector_choice_chip_background" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_reimbursable"
@@ -202,7 +201,7 @@
                     android:text="@string/reimbursable"
                     android:textColor="@color/selector_record_options"
                     app:checkedIconTint="@color/selector_record_options"
-                    app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
+                    app:chipBackgroundColor="@color/selector_choice_chip_background"
                     tools:checked="true" />
 
                 <com.google.android.material.chip.Chip
@@ -218,7 +217,7 @@
                     android:text="@{viewModel.associatedRecordStr}"
                     android:textColor="@color/selector_record_options"
                     app:checkedIconTint="@color/selector_record_options"
-                    app:chipBackgroundColor="@color/mtrl_choice_chip_background_color"
+                    app:chipBackgroundColor="@color/selector_choice_chip_background"
                     tools:checked="true"
                     tools:text="@string/associated_expenditure_record" />
 
