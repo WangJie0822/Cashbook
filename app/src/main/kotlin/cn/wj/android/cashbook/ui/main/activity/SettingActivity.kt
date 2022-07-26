@@ -4,8 +4,8 @@ import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
-import cn.wj.android.cashbook.data.enums.ThemeEnum
-import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
+import cn.wj.android.cashbook.data.enums.DayNightEnum
+import cn.wj.android.cashbook.data.live.CurrentDayNightLiveData
 import cn.wj.android.cashbook.databinding.ActivitySettingBinding
 import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
@@ -27,20 +27,20 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
         setContentView(R.layout.activity_setting)
     }
 
-    private var themeIndex = ThemeEnum.indexOf(CurrentThemeLiveData.currentTheme)
+    private var dayNightIndex = DayNightEnum.indexOf(CurrentDayNightLiveData.currentDayNight)
 
     override fun observe() {
         // 显示选择主题弹窗
-        viewModel.showSelectThemeDialogEvent.observe(this) {
-            themeIndex = ThemeEnum.indexOf(CurrentThemeLiveData.currentTheme)
+        viewModel.showSelectDayNightDialogEvent.observe(this) {
+            dayNightIndex = DayNightEnum.indexOf(CurrentDayNightLiveData.currentDayNight)
             MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.please_select_application_theme)
-                .setSingleChoiceItems(ThemeEnum.getSelectItems(), themeIndex) { _, which ->
-                    themeIndex = which
+                .setTitle(R.string.please_select_application_day_night)
+                .setSingleChoiceItems(DayNightEnum.getSelectItems(), dayNightIndex) { _, which ->
+                    dayNightIndex = which
                 }
                 .setPositiveButton(R.string.confirm) { _, _ ->
-                    // 更新主题
-                    CurrentThemeLiveData.value = ThemeEnum.fromIndex(themeIndex)
+                    // 更新白天黑夜模式
+                    CurrentDayNightLiveData.value = DayNightEnum.fromIndex(dayNightIndex)
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()

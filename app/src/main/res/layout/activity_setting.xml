@@ -71,14 +71,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/item_height"
                     android:background="?selectableItemBackground"
-                    android:bind_onClick="@{viewModel.onThemeClick}">
+                    android:bind_onClick="@{viewModel.onDayNightClick}">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_big"
                         android:gravity="start|center_vertical"
-                        android:text="@string/application_theme"
+                        android:text="@string/application_day_night"
                         android:textAppearance="?attr/textAppearanceListItem"
                         android:textColor="@color/color_on_secondary"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -89,7 +89,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/spacing_big"
-                        android:bind_tv_textResId="@{viewModel.currentThemeStrResId}"
+                        android:bind_tv_textResId="@{viewModel.currentDayNightStrResId}"
                         android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
                         android:gravity="start|center_vertical"
                         android:textAppearance="?attr/textAppearanceCaption"

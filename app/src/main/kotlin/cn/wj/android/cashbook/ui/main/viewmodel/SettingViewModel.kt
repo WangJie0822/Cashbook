@@ -8,7 +8,7 @@ import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BACKUP
 import cn.wj.android.cashbook.data.event.LifecycleEvent
-import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
+import cn.wj.android.cashbook.data.live.CurrentDayNightLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 
 /**
@@ -18,8 +18,8 @@ import cn.wj.android.cashbook.data.model.UiNavigationModel
  */
 class SettingViewModel : BaseViewModel() {
 
-    /** 显示选择主题事件 */
-    val showSelectThemeDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
+    /** 显示选择白天黑夜模式事件 */
+    val showSelectDayNightDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 是否允许流量下载 */
     val enableDownloadWithMobileNetwork: MutableLiveData<Boolean> = mutableLiveDataOf(
@@ -34,8 +34,8 @@ class SettingViewModel : BaseViewModel() {
         }
     )
 
-    /** 当前主题显示文本 */
-    val currentThemeStrResId: LiveData<Int> = CurrentThemeLiveData.map {
+    /** 当前白天黑夜模式显示文本 */
+    val currentDayNightStrResId: LiveData<Int> = CurrentDayNightLiveData.map {
         it.typeStrResId
     }
 
@@ -46,9 +46,9 @@ class SettingViewModel : BaseViewModel() {
         }
     }
 
-    /** 主题点击 */
-    val onThemeClick: () -> Unit = {
-        showSelectThemeDialogEvent.value = 0
+    /** 白天黑夜模式点击 */
+    val onDayNightClick: () -> Unit = {
+        showSelectDayNightDialogEvent.value = 0
     }
 
     /** 备份与恢复点击 */

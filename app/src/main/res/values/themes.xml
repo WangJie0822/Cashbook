@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- 应用主题 -->
-    <style name="Theme.Cashbook" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Cashbook" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- 主要颜色 -->
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryVariant">@color/color_primary_variant</item>
@@ -18,7 +18,7 @@
         <item name="colorError">@color/color_error</item>
         <item name="colorOnError">@color/color_on_error</item>
         <!-- 状态栏颜色 -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
 
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
@@ -34,6 +34,7 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">true</item>
     </style>
 
     <!-- 闪屏界面主题 -->
@@ -46,14 +47,16 @@
     <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog" />
 
     <!-- 全半透明背景 -->
-    <style name="Theme.Cashbook.Dialog.Transparent" >
+    <style name="Theme.Cashbook.Dialog.Transparent">
         <item name="android:windowBackground">@drawable/shape_window_background_transparent</item>
     </style>
 
     <!-- 底部抽屉弹窗 -->
     <style name="Theme.Cashbook.Dialog.BottomSheet">
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowAnimationStyle">@style/Animation.MaterialComponents.BottomSheetDialog</item>
+        <item name="android:windowAnimationStyle">
+            @style/Animation.MaterialComponents.BottomSheetDialog
+        </item>
         <item name="bottomSheetStyle">@style/Widget.MaterialComponents.BottomSheet.Modal</item>
     </style>
 

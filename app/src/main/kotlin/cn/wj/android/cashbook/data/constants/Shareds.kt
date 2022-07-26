@@ -15,8 +15,8 @@ const val SHARED_KEY_AUTO_CHECK_UPDATE = "shared_key_auto_check_update"
 /** 是否可用使用移动网络下载 */
 const val SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE = "shared_key_mobile_network_download_enable"
 
-/** 主题 mode */
-const val SHARED_KEY_THEME_MODE = "shared_key_theme_mode"
+/** 白天黑夜 mode */
+const val SHARED_KEY_DAY_NIGHT_MODE = "shared_key_day_night_mode"
 
 /** 是否同意用户协议 */
 const val SHARED_KEY_AGREE_USER_AGREEMENT = "shared_key_agree_user_agreement"

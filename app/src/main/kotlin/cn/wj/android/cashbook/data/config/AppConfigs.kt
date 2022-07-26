@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.data.config
 
 import android.os.Parcelable
+import androidx.appcompat.app.AppCompatDelegate
 import cn.wj.android.cashbook.base.tools.getSharedBoolean
 import cn.wj.android.cashbook.base.tools.getSharedInt
 import cn.wj.android.cashbook.base.tools.getSharedLong
@@ -15,11 +16,11 @@ import cn.wj.android.cashbook.data.constants.SHARED_KEY_AGREE_USER_AGREEMENT
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_BACKUP
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_BACKUP_PATH
+import cn.wj.android.cashbook.data.constants.SHARED_KEY_DAY_NIGHT_MODE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_IGNORE_VERSION
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET_ID
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_BACKUP_MS
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_THEME_MODE
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_TOP_UP_ENTRY_INTO_TOTAL
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_TYPE_INITIALIZED
 import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
@@ -44,7 +45,10 @@ import kotlin.reflect.KProperty
 class NoNullProperties<T>(val key: String, val default: T)
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
-inline operator fun <reified T> NoNullProperties<T>.getValue(thisRef: Any?, property: KProperty<*>): T {
+inline operator fun <reified T> NoNullProperties<T>.getValue(
+    thisRef: Any?,
+    property: KProperty<*>
+): T {
     return (when (default) {
         is String -> {
             getSharedString(key, default)
@@ -67,7 +71,11 @@ inline operator fun <reified T> NoNullProperties<T>.getValue(thisRef: Any?, prop
     } as? T) ?: default
 }
 
-inline operator fun <reified T> NoNullProperties<T>.setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+inline operator fun <reified T> NoNullProperties<T>.setValue(
+    thisRef: Any?,
+    property: KProperty<*>,
+    value: T
+) {
     when (value) {
         is String -> {
             setSharedString(key, value)
@@ -102,16 +110,25 @@ object AppConfigs {
     var autoUpdate: Boolean by NoNullProperties(SHARED_KEY_AUTO_CHECK_UPDATE, true)
 
     /** 是否可用使用移动网络下载 */
-    var mobileNetworkDownloadEnable: Boolean by NoNullProperties(SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE, false)
+    var mobileNetworkDownloadEnable: Boolean by NoNullProperties(
+        SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE,
+        false
+    )
 
-    /** 主题 mode */
-    var themeMode: Int by NoNullProperties(SHARED_KEY_THEME_MODE, -1)
+    /** 白天黑夜 mode */
+    var datNightMode: Int by NoNullProperties(
+        SHARED_KEY_DAY_NIGHT_MODE,
+        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+    )
 
     /** 是否同意用户协议 */
     var agreeUserAgreement: Boolean by NoNullProperties(SHARED_KEY_AGREE_USER_AGREEMENT, false)
 
     /** WebDAV 服务路径 */
-    var webDAVWebUrl: String by NoNullProperties(SHARED_KEY_WEBDAV_WEB_URL, "https://dav.jianguoyun.com/dav/")
+    var webDAVWebUrl: String by NoNullProperties(
+        SHARED_KEY_WEBDAV_WEB_URL,
+        "https://dav.jianguoyun.com/dav/"
+    )
 
     /** WebDAV 账户 */
     var webDAVAccount: String by NoNullProperties(SHARED_KEY_WEBDAV_ACCOUNT, "")

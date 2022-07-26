@@ -14,7 +14,7 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.jumpAppDetails
 import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_APP
 import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_UPDATE
-import cn.wj.android.cashbook.data.live.CurrentThemeLiveData
+import cn.wj.android.cashbook.data.live.CurrentDayNightLiveData
 import cn.wj.android.cashbook.di.dbModule
 import cn.wj.android.cashbook.di.netModule
 import cn.wj.android.cashbook.di.repositoryModule
@@ -80,7 +80,7 @@ class MyApplication : Application() {
         ARouter.init(this)
 
         // 应用主题
-        CurrentThemeLiveData.applyTheme()
+        CurrentDayNightLiveData.applyTheme()
 
         // 初始化通知渠道
         initNotificationChannel()

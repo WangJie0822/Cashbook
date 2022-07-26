@@ -4,17 +4,17 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.MutableLiveData
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.data.config.AppConfigs
-import cn.wj.android.cashbook.data.enums.ThemeEnum
+import cn.wj.android.cashbook.data.enums.DayNightEnum
 
 /**
- * 当前主题数据
+ * 当前白天黑夜模式数据
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/22
  */
-object CurrentThemeLiveData : MutableLiveData<ThemeEnum>(ThemeEnum.currentTheme()) {
+object CurrentDayNightLiveData : MutableLiveData<DayNightEnum>(DayNightEnum.currentDayNight()) {
 
-    val currentTheme: ThemeEnum
-        get() = value.orElse(ThemeEnum.currentTheme())
+    val currentDayNight: DayNightEnum
+        get() = value.orElse(DayNightEnum.currentDayNight())
 
     fun applyTheme() {
         value?.run {
@@ -22,12 +22,12 @@ object CurrentThemeLiveData : MutableLiveData<ThemeEnum>(ThemeEnum.currentTheme(
         }
     }
 
-    override fun setValue(value: ThemeEnum?) {
+    override fun setValue(value: DayNightEnum?) {
         super.setValue(value)
 
         if (null != value) {
             AppCompatDelegate.setDefaultNightMode(value.mode)
-            AppConfigs.themeMode = value.mode
+            AppConfigs.datNightMode = value.mode
         }
     }
 }
