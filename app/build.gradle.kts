@@ -36,6 +36,7 @@ android {
         multiDexEnabled = true
 
         vectorDrawables {
+            // 运行时绘制向量图
             useSupportLibrary = true
         }
     }
@@ -165,7 +166,7 @@ android {
     kotlinOptions {
         jvmTarget = "11"
         freeCompilerArgs =
-            freeCompilerArgs + arrayOf("-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi")
+            freeCompilerArgs + arrayOf("-opt-in=kotlinx.serialization.ExperimentalSerializationApi")
     }
 }
 

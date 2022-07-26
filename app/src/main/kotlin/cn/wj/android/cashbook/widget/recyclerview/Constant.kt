@@ -2,6 +2,7 @@
 
 package cn.wj.android.cashbook.widget.recyclerview
 
+import android.annotation.SuppressLint
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 
@@ -17,18 +18,19 @@ const val VIEW_TYPE_FOOTER = 0x0101553
 /** 布局类型 - 空布局 */
 const val VIEW_TYPE_EMPTY = 0x0101554
 
-fun <E> defaultDiffCallback(): DiffUtil.ItemCallback<E> {
+fun <E : Any> defaultDiffCallback(): DiffUtil.ItemCallback<E> {
     return object : DiffUtil.ItemCallback<E>() {
         override fun areItemsTheSame(oldItem: E, newItem: E): Boolean {
             return oldItem === newItem
         }
 
+        @SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: E, newItem: E): Boolean {
             return oldItem.toString() == newItem.toString()
         }
     }
 }
 
-fun <E> defaultDiffConfig(): AsyncDifferConfig<E> {
+fun <E : Any> defaultDiffConfig(): AsyncDifferConfig<E> {
     return AsyncDifferConfig.Builder(defaultDiffCallback<E>()).build()
 }

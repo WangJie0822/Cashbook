@@ -11,7 +11,7 @@ import java.util.Collections
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/24
  */
-class DragItemTouchCallback<T>(private val adapter: BaseRvListAdapter<*, T>, private val onMoved: ((List<T>) -> Unit)? = null) :
+class DragItemTouchCallback<T : Any>(private val adapter: BaseRvListAdapter<*, T>, private val onMoved: ((List<T>) -> Unit)? = null) :
     ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
         0

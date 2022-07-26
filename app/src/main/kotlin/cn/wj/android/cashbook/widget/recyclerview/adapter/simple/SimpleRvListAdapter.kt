@@ -23,7 +23,7 @@ import java.lang.reflect.ParameterizedType
  *
  * @author 王杰
  */
-class SimpleRvListAdapter<E>(
+class SimpleRvListAdapter<E : Any>(
     override val layoutResId: Int,
     anim: Int = ADAPTER_ANIM_ALL,
     areItemsTheSame: AreTheSame<E> = { old, new -> old === new },

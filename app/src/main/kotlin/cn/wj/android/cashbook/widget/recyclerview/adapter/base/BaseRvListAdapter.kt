@@ -19,7 +19,7 @@ import cn.wj.android.cashbook.widget.recyclerview.holder.BaseRvViewHolder
  *
  * @author 王杰
  */
-abstract class BaseRvListAdapter<VH : BaseRvViewHolder<E>, E>
+abstract class BaseRvListAdapter<VH : BaseRvViewHolder<E>, E : Any>
     : AbstractAdapter<BaseRvViewHolder<E>, E> {
 
     /** 数据集合 */

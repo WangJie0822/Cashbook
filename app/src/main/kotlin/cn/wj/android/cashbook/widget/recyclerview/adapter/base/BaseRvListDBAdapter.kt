@@ -26,7 +26,7 @@ import cn.wj.android.cashbook.widget.recyclerview.holder.BaseRvViewHolder
  *
  * @author 王杰
  */
-abstract class BaseRvListDBAdapter<out VH : BaseRvDBViewHolder<DB, E>, DB : ViewDataBinding, VM, E>
+abstract class BaseRvListDBAdapter<out VH : BaseRvDBViewHolder<DB, E>, DB : ViewDataBinding, VM, E : Any>
     : BaseRvListAdapter<BaseRvViewHolder<E>, E> {
 
     /**
