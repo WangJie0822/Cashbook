@@ -3,7 +3,7 @@
 /**
  * 三方依赖配置
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/5/10
+ * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/5/10
  */
 object Dependencies {
 
@@ -576,7 +576,7 @@ object Dependencies {
 
             const val okhttp = "com.squareup.okhttp3:okhttp:$version"
             const val urlConnection = "com.squareup.okhttp3:okhttp-urlconnection:$version"
-            const val logging = "com.squareup.okhttp:logging-interceptor:$version"
+            const val logging = "com.squareup.okhttp3:logging-interceptor:$version"
         }
 
         /**

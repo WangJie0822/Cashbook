@@ -80,19 +80,6 @@ fun <T> View.setViewOnClick(click: ((T) -> Unit)?, item: T, throttle: Long?) {
 
 /** 给 [View] 设置长点击事件 [click] */
 @BindingAdapter("android:bind_onLongClick")
-fun View.setViewOnLongClickUnit(click: ((View) -> Unit)?) {
-    if (null == click) {
-        this.setOnLongClickListener(null)
-        return
-    }
-    this.setOnLongClickListener {
-        click.invoke(it)
-        true
-    }
-}
-
-/** 给 [View] 设置长点击事件 [click] */
-@BindingAdapter("android:bind_onLongClick")
 fun View.setViewOnLongClick(click: ((View) -> Boolean)?) {
     this.setOnLongClickListener(click)
 }
