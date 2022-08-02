@@ -18,7 +18,6 @@ import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.fitsStatusBar
 import cn.wj.android.cashbook.base.ext.setOnThrottleClickListener
-import cn.wj.android.cashbook.data.event.LifecycleEvent
 
 /*
  * View DataBinding 适配器
@@ -344,7 +343,7 @@ fun View.setViewDimensionRatio(ratio: String?) {
         return
     }
     val params = ratio.split(",")
-    if (params.isNullOrEmpty()) {
+    if (params.isEmpty()) {
         return
     }
     // 获取比例属性

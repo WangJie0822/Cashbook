@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Changed
+- 项目三方依赖管理优化；
 
 ## [0.5.4_22072713]
 ### Changed

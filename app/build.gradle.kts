@@ -6,7 +6,7 @@ plugins {
     // Kotlin 注解处理
     kotlin("kapt")
     // Kotlin json 转换
-    kotlin("plugin.serialization") version Dependencies.Kotlin.version
+    kotlin("plugin.serialization") version libs.versions.kotlin.get()
     // Kotlin Parcelize 序列化
     id("kotlin-parcelize")
 }
@@ -14,21 +14,21 @@ plugins {
 android {
 
     // 编译 SDK 版本
-    compileSdk = AppConfigs.compileSdk
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         // 应用 id
-        applicationId = AppConfigs.applicationId
+        applicationId = "cn.wj.android.cashbook"
 
         // 最低支持版本
-        minSdk = AppConfigs.minSdk
+        minSdk = libs.versions.minSdk.get().toInt()
         // 目标 SDK 版本
-        targetSdk = AppConfigs.targetSdk
+        targetSdk = libs.versions.targetSdk.get().toInt()
 
         // 应用版本号
-        versionCode = AppConfigs.versionCode
+        versionCode = libs.versions.versionCode.get().toInt()
         // 应用版本名
-        versionName = AppConfigs.versionName
+        versionName = libs.versions.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -42,18 +42,21 @@ android {
     }
 
     signingConfigs {
+        val signingProp = org.jetbrains.kotlin.konan.properties.Properties().apply {
+            load(rootProject.file("signing.properties").inputStream())
+        }
         // 签名配置
         getByName("debug") {
-            keyAlias = SigningConfigs.keyAlias
-            keyPassword = SigningConfigs.keyPassword
-            storeFile = file(SigningConfigs.storeFile)
-            storePassword = SigningConfigs.storePassword
+            keyAlias = signingProp["keyAlias"].toString()
+            keyPassword = signingProp["keyPassword"].toString()
+            storeFile = file(signingProp["storeFile"].toString())
+            storePassword = signingProp["storePassword"].toString()
         }
         create("release") {
-            keyAlias = SigningConfigs.keyAlias
-            keyPassword = SigningConfigs.keyPassword
-            storeFile = file(SigningConfigs.storeFile)
-            storePassword = SigningConfigs.storePassword
+            keyAlias = signingProp["keyAlias"].toString()
+            keyPassword = signingProp["keyPassword"].toString()
+            storeFile = file(signingProp["storeFile"].toString())
+            storePassword = signingProp["storePassword"].toString()
         }
     }
 
@@ -88,7 +91,7 @@ android {
             // 版本名后缀
             versionNameSuffix = "_online"
             // 备份版本号
-            buildConfigField("int", "BACKUP_VERSION", "${AppConfigs.backupVersion}")
+            buildConfigField("int", "BACKUP_VERSION", libs.versions.backupVersion.get())
         }
 
         // 开发版本
@@ -99,7 +102,7 @@ android {
             // 版本名后缀
             versionNameSuffix = "_dev"
             // 备份版本号
-            buildConfigField("int", "BACKUP_VERSION", "${AppConfigs.backupVersion}")
+            buildConfigField("int", "BACKUP_VERSION", libs.versions.backupVersion.get())
         }
     }
 
@@ -180,105 +183,104 @@ kapt {
 dependencies {
 
     // Kotlin
-    implementation(Dependencies.Kotlin.stdlib)
+    implementation(libs.kotlin.stdlib)
     // 协程
-    implementation(Dependencies.Kotlinx.coroutines)
+    implementation(libs.kotlinx.coroutines)
     // Json 序列化
-    implementation(Dependencies.Kotlinx.serialization)
+    implementation(libs.kotlinx.serialization)
 
     // Dex 分包
-    implementation(Dependencies.Androidx.multidex)
+    implementation(libs.androidx.multidex)
 
     // v4
-    implementation(Dependencies.Androidx.legacy)
+    implementation(libs.androidx.legacy)
     // v7
-    implementation(Dependencies.Androidx.appcompat)
+    implementation(libs.androidx.appcompat)
     // RecyclerView
-    implementation(Dependencies.Androidx.recyclerview)
+    implementation(libs.androidx.recyclerview)
     // 约束性布局
-    implementation(Dependencies.Androidx.constraint)
+    implementation(libs.androidx.constraintlayout)
 
     // activity
-    implementation(Dependencies.Androidx.Activity.ktx)
+    implementation(libs.androidx.activity.ktx)
     // fragment
-    implementation(Dependencies.Androidx.Fragment.ktx)
+    implementation(libs.androidx.fragment.ktx)
 
     // core-ktx
-    implementation(Dependencies.Androidx.Core.ktx)
+    implementation(libs.androidx.core.ktx)
 
     // LifeCycle 拓展
-    implementation(Dependencies.Androidx.Lifecycle.runtimeKtx)
-    implementation(Dependencies.Androidx.Lifecycle.extensions)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.extensions)
     // ViewModel 拓展
-    implementation(Dependencies.Androidx.Lifecycle.viewModelKtx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     // LiveData 拓展
-    implementation(Dependencies.Androidx.Lifecycle.liveDataKtx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 
     // Room
-    implementation(Dependencies.Androidx.Room.common)
-    implementation(Dependencies.Androidx.Room.ktx)
-    kapt(Dependencies.Androidx.Room.compiler)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 
     // Paging
-    implementation(Dependencies.Androidx.Paging.runtimeKtx)
+    implementation(libs.androidx.paging.runtime.ktx)
 
     // WorkManager
-    implementation(Dependencies.Androidx.Work.runtimeKtx)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Material
-    implementation(Dependencies.Google.material)
+    implementation(libs.google.material)
 
     // Logger
-    implementation(Dependencies.logger)
+    implementation(libs.logger)
 
     // LiveEventBus
-    implementation(Dependencies.liveEventBus)
+    implementation(libs.liveEventBus)
 
     // Koin
-    implementation(Dependencies.Koin3.android)
-    implementation(Dependencies.Koin3.androidExt)
+    implementation(libs.koin3.android)
 
     // OkHttp
-    implementation(Dependencies.Squareup.OkHttp.okhttp)
+    implementation(libs.squareup.okhttp3)
 
     // Retrofit
-    implementation(Dependencies.Squareup.Retrofit.retrofit)
-    implementation(Dependencies.Squareup.Retrofit.converterKt)
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.squareup.retrofit2.converter.kotlin)
 
     // Coil
-    implementation(Dependencies.Coil.coil)
+    implementation(libs.coil)
 
     // 状态栏工具
-    implementation(Dependencies.ImmersionBar.MarvenCenter.immersionBar)
-    implementation(Dependencies.ImmersionBar.MarvenCenter.ktx)
+    implementation(libs.immersionbar)
+    implementation(libs.immersionbar.ktx)
 
     // MMKV 数据存储
-    implementation(Dependencies.Tencent.mmkv)
+    implementation(libs.tencent.mmkv)
 
     // ARouter 路由
-    implementation(Dependencies.Alibaba.ARouter.api)
-    kapt(Dependencies.Alibaba.ARouter.compiler)
+    implementation(libs.alibaba.arouter.api)
+    kapt(libs.alibaba.arouter.compiler)
 
     // DoraemonKit
-    debugImplementation(Dependencies.Didi.DoraemonKit.debug)
-    releaseImplementation(Dependencies.Didi.DoraemonKit.release)
+    debugImplementation(libs.didi.doraemonkit.debug)
+    releaseImplementation(libs.didi.doraemonkit.release)
 
     // Markdown 解析
-    implementation(Dependencies.Markwon.markwon)
+    implementation(libs.noties.markwon)
 
     // HTML 解析
-    implementation(Dependencies.jsoup)
+    implementation(libs.jsoup)
 
     // 日历控件
-    implementation(Dependencies.calendar_view)
+    implementation(libs.haibin.calendarview)
 
     // 图表控件
-    implementation(Dependencies.mpChart)
+    implementation(libs.mpChart)
 
     // 测试
-    testImplementation(Dependencies.testJunit)
-    androidTestImplementation(Dependencies.Androidx.Test.rules)
-    androidTestImplementation(Dependencies.Androidx.Test.runner)
-    androidTestImplementation(Dependencies.Androidx.Test.Espresso.core)
-    androidTestImplementation(Dependencies.Androidx.Test.Ext.junit)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
 }

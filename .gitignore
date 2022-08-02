@@ -85,7 +85,7 @@ lint/tmp/
 *.jks
 
 # 签名配置文件
-/buildSrc/src/main/kotlin/SigningConfigs.kt
+/signing.properties
 
 # 输出路径
 /outputs

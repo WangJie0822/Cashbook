@@ -27,21 +27,15 @@
 ## 使用说明
 1. 你可以从项目的发行版本中下载最新的安装包：[Github](https://github.com/WangJie0822/Cashbook/releases) or [Gitee](https://gitee.com/wangjie0822/Cashbook/releases)；
 
-2. 你也可以将项目下载到本地运行，运行项目前请在 /buildSrc/src/main/kotlin/ 目录下按如下格式添加文件 SigningConfigs.kt
+2. 你也可以将项目下载到本地运行，运行项目前请在项目根路径下按如下格式添加文件 signing.properties
 
-```kotlin
-object SigningConfigs {
- 
-    /** 密钥别名 */
-    const val keyAlias = ""
- 
-    /** 别名密码 */
-    const val keyPassword = ""
- 
-    /** 密钥文件路径 */
-    const val storeFile = "xxx.jks"
- 
-    /** 密钥密码 */
-    const val storePassword = ""
-}
+```
+# 密钥别名
+keyAlias = 
+# 别名密码
+keyPassword = 
+# 密钥文件路径
+storeFile = 
+# 密钥密码
+storePassword = 
 ```
