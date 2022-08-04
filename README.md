@@ -27,15 +27,16 @@
 ## 使用说明
 1. 你可以从项目的发行版本中下载最新的安装包：[Github](https://github.com/WangJie0822/Cashbook/releases) or [Gitee](https://gitee.com/wangjie0822/Cashbook/releases)；
 
-2. 你也可以将项目下载到本地运行，运行项目前请在项目根路径下按如下格式添加文件 signing.properties
+2. 你也可以将项目下载到本地运行，运行项目前请在项目 /gradle 路径下按如下格式添加文件 signing.versions.toml
 
-```
+```toml
+[versions]
 # 密钥别名
-keyAlias = 
+keyAlias = ""
 # 别名密码
-keyPassword = 
+keyPassword = ""
 # 密钥文件路径
-storeFile = 
+storeFile = ""
 # 密钥密码
-storePassword = 
+storePassword = ""
 ```

@@ -1,7 +1,8 @@
-@file:kotlin.Suppress("UnstableApiUsage")
-
+// 开启 Version Catalogs 功能
 enableFeaturePreview("VERSION_CATALOGS")
+
 pluginManagement {
+    // 配置插件仓库
     repositories {
         maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin/") }
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
@@ -13,7 +14,9 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    // 配置只能在当前文件配置三方依赖仓库，否则编译异常退出
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    // 配置三方依赖仓库
     repositories {
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
         maven { setUrl("https://maven.aliyun.com/repository/google/") }
@@ -21,10 +24,14 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    // 配置 Version Catalogs
     versionCatalogs {
+        // mavenCentral 中的依赖仓库
         create("libs") {
             from("io.github.wangjie0822:catalog:1.1.3")
-
+        }
+        // 应用配置信息
+        create("configLibs") {
             // 应用配置信息
             // 编译版本
             version("compileSdk", "31")
@@ -40,6 +47,10 @@ dependencyResolutionManagement {
             // 备份版本号 - 用于兼容性控制
             version("backupVersion", "1")
         }
+        // 签名配置信息
+        create("signingLibs") {
+            from(files("./gradle/signing.versions.toml"))
+        }
     }
 }
 
@@ -52,5 +63,7 @@ fun getVersionCode(): Int {
     return versionCode
 }
 
+// 项目名称
 rootProject.name = "Cashbook"
+// 项目包含的 Module
 include(":app")

@@ -85,7 +85,7 @@ lint/tmp/
 *.jks
 
 # 签名配置文件
-/signing.properties
+/gradle/signing.versions.toml
 
 # 输出路径
 /outputs

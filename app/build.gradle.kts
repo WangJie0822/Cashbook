@@ -6,7 +6,7 @@ plugins {
     // Kotlin 注解处理
     kotlin("kapt")
     // Kotlin json 转换
-    kotlin("plugin.serialization") version libs.versions.kotlin.get()
+    kotlin("plugin.serialization")
     // Kotlin Parcelize 序列化
     id("kotlin-parcelize")
 }
@@ -14,21 +14,21 @@ plugins {
 android {
 
     // 编译 SDK 版本
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdk = configLibs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         // 应用 id
         applicationId = "cn.wj.android.cashbook"
 
         // 最低支持版本
-        minSdk = libs.versions.minSdk.get().toInt()
+        minSdk = configLibs.versions.minSdk.get().toInt()
         // 目标 SDK 版本
-        targetSdk = libs.versions.targetSdk.get().toInt()
+        targetSdk = configLibs.versions.targetSdk.get().toInt()
 
         // 应用版本号
-        versionCode = libs.versions.versionCode.get().toInt()
+        versionCode = configLibs.versions.versionCode.get().toInt()
         // 应用版本名
-        versionName = libs.versions.versionName.get()
+        versionName = configLibs.versions.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -42,21 +42,18 @@ android {
     }
 
     signingConfigs {
-        val signingProp = org.jetbrains.kotlin.konan.properties.Properties().apply {
-            load(rootProject.file("signing.properties").inputStream())
-        }
         // 签名配置
         getByName("debug") {
-            keyAlias = signingProp["keyAlias"].toString()
-            keyPassword = signingProp["keyPassword"].toString()
-            storeFile = file(signingProp["storeFile"].toString())
-            storePassword = signingProp["storePassword"].toString()
+            keyAlias = signingLibs.versions.keyAlias.get()
+            keyPassword = signingLibs.versions.keyPassword.get()
+            storeFile = file(signingLibs.versions.storeFile.get())
+            storePassword = signingLibs.versions.storePassword.get()
         }
         create("release") {
-            keyAlias = signingProp["keyAlias"].toString()
-            keyPassword = signingProp["keyPassword"].toString()
-            storeFile = file(signingProp["storeFile"].toString())
-            storePassword = signingProp["storePassword"].toString()
+            keyAlias = signingLibs.versions.keyAlias.get()
+            keyPassword = signingLibs.versions.keyPassword.get()
+            storeFile = file(signingLibs.versions.storeFile.get())
+            storePassword = signingLibs.versions.storePassword.get()
         }
     }
 
@@ -91,7 +88,7 @@ android {
             // 版本名后缀
             versionNameSuffix = "_online"
             // 备份版本号
-            buildConfigField("int", "BACKUP_VERSION", libs.versions.backupVersion.get())
+            buildConfigField("int", "BACKUP_VERSION", configLibs.versions.backupVersion.get())
         }
 
         // 开发版本
@@ -102,7 +99,7 @@ android {
             // 版本名后缀
             versionNameSuffix = "_dev"
             // 备份版本号
-            buildConfigField("int", "BACKUP_VERSION", libs.versions.backupVersion.get())
+            buildConfigField("int", "BACKUP_VERSION", configLibs.versions.backupVersion.get())
         }
     }
 
