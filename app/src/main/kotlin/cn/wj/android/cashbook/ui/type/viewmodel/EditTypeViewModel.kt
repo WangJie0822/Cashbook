@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 当前分类信息 */
-    val typeData: MutableLiveData<TypeEntity> = mutableLiveDataOf(default = null){
+    val typeData: MutableLiveData<TypeEntity> = mutableLiveDataOf(default = null) {
         typeName.value = value?.name
         iconResStr.value = value?.iconResName
     }
@@ -106,7 +106,10 @@ class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel(
 
     /** 图标 item 点击 */
     val onIconItemClick: (TypeIconEntity) -> Unit = { item ->
-        typeName.value = item.name
+        if (typeName.value.isNullOrBlank()) {
+            // 文本为空时才设置值
+            typeName.value = item.name
+        }
         iconResStr.value = item.iconResIdStr
     }
 
@@ -141,12 +144,19 @@ class EditTypeViewModel(private val repository: TypeRepository) : BaseViewModel(
             try {
                 if (repository.getTypeCountByName(name) > 0L) {
                     // 已有相同名称
-                    snackbarEvent.value = R.string.same_name_type_exist_already.string.toSnackbarModel()
+                    snackbarEvent.value =
+                        R.string.same_name_type_exist_already.string.toSnackbarModel()
                     return@launch
                 }
                 if (typeEntity.id == -1L) {
                     // 新建分类
-                    repository.insertType(typeEntity.copy(name = name, iconResName = iconResIdStr, sort = repository.getTypeCount().toInt()))
+                    repository.insertType(
+                        typeEntity.copy(
+                            name = name,
+                            iconResName = iconResIdStr,
+                            sort = repository.getTypeCount().toInt()
+                        )
+                    )
                 } else {
                     // 更新分类
                     repository.updateType(typeEntity.copy(name = name, iconResName = iconResIdStr))
