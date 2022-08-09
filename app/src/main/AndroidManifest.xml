@@ -147,6 +147,18 @@
             android:configChanges="screenSize"
             android:screenOrientation="portrait" />
 
+        <!-- 标签记录数据 -->
+        <activity
+            android:name=".ui.record.activity.TagRecordActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
+        <!-- 标签管理 -->
+        <activity
+            android:name=".ui.record.activity.TagManagerActivity"
+            android:configChanges="screenSize"
+            android:screenOrientation="portrait" />
+
         <!-- 编辑资产 -->
         <activity
             android:name=".ui.asset.activity.EditAssetActivity"

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="currency_summary_format" translatable="false">%1$s  %2$s (%3$s)</string>
     <string name="update_progress_format" translatable="false">%1$s%%</string>
 
@@ -214,6 +214,7 @@
     <string name="please_select_type_icon">请选择分类图标</string>
     <string name="same_name_type_exist_already">已存在相同名称的分类</string>
     <string name="my_type">我的分类</string>
+    <string name="my_tag">我的标签</string>
     <string name="delete_type">删除分类</string>
     <string name="delete_success">删除成功</string>
     <string name="replace_type_hint_format">此分类下已有%1$s条记录，如果删除，请给这些记录选择一个新的分类。</string>

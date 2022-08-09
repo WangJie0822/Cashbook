@@ -129,6 +129,21 @@
                 android:textColor="@color/color_on_secondary"
                 app:drawableStartCompat="@drawable/vector_baseline_category_24" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/item_height"
+                android:background="?selectableItemBackground"
+                android:bind_onClick="@{viewModel.onMyTagClick}"
+                android:drawableEnd="@drawable/vector_baseline_keyboard_arrow_right_24"
+                android:drawablePadding="@dimen/spacing_small"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/spacing_big"
+                android:paddingEnd="@dimen/spacing_big"
+                android:text="@string/my_tag"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@color/color_on_secondary"
+                app:drawableStartCompat="@drawable/vector_baseline_layers_24" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"

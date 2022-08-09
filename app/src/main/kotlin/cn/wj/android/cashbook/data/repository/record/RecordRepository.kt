@@ -4,7 +4,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.liveData
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.*
+import cn.wj.android.cashbook.base.ext.base.completeZero
+import cn.wj.android.cashbook.base.ext.base.decimalFormat
+import cn.wj.android.cashbook.base.ext.base.orElse
+import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
 import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
@@ -27,9 +31,9 @@ import cn.wj.android.cashbook.data.transform.toAssetEntity
 import cn.wj.android.cashbook.data.transform.toRecordTable
 import cn.wj.android.cashbook.data.transform.toTagEntity
 import cn.wj.android.cashbook.data.transform.toTagTable
+import java.util.Calendar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
 
 /**
  * 记录相关数据仓库
@@ -45,7 +49,11 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
     ).liveData
 
     /** 根据关键字 [keywords] 搜索账单记录 */
-    suspend fun getRecordByKeywords(keywords: String, pageNum: Int, pageSize: Int = DEFAULT_PAGE_SIZE): List<RecordEntity> = withContext(Dispatchers.IO) {
+    suspend fun getRecordByKeywords(
+        keywords: String,
+        pageNum: Int,
+        pageSize: Int = DEFAULT_PAGE_SIZE
+    ): List<RecordEntity> = withContext(Dispatchers.IO) {
         val result = arrayListOf<RecordEntity>()
         recordDao.queryRecordByKeywords("%$keywords%", pageNum, pageSize)
             .forEach { item ->
@@ -63,124 +71,130 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
     }
 
     /** 获取指定日期的记录数据 */
-    suspend fun getRecordListByDate(calendar: com.haibin.calendarview.Calendar): List<DateRecordEntity> = withContext(Dispatchers.IO) {
-        // 首页显示一周内数据
-        val result = arrayListOf<DateRecordEntity>()
-        val year = calendar.year
-        val month = calendar.month
-        val day = calendar.day
-        val monthStr = if (month < 10) "0$month" else "$month"
-        val dayStr = if (day < 10) "0$day" else "$day"
-        val startTime = "$year-$monthStr-$dayStr 00:00:00".toLongTime() ?: return@withContext result
-        val endTime = "$year-$monthStr-$dayStr 23:59:59".toLongTime() ?: return@withContext result
-        val list = recordDao.queryRecordBetweenTime(startTime, endTime).filter {
-            it.system != SWITCH_INT_ON
-        }
-        val map = hashMapOf<String, MutableList<RecordEntity>>()
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
-        val today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-        for (item in list) {
-            val dateKey = item.recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)
-            val yearInt = item.recordTime.dateFormat().split("-").firstOrNull()?.toIntOrNull().orElse(-1)
-            val monthInt = dateKey.split(".").firstOrNull()?.toIntOrNull().orElse(-1)
-            val dayInt = dateKey.split(".").lastOrNull()?.toIntOrNull().orElse(-1)
-            val key = dateKey + if (yearInt == currentYear && monthInt == currentMonth) {
-                when (dayInt) {
-                    today -> {
-                        // 今天
-                        " ${R.string.today.string}"
-                    }
-                    today - 1 -> {
-                        // 昨天
-                        " ${R.string.yesterday.string}"
-                    }
-                    today - 2 -> {
-                        // 前天
-                        " ${R.string.the_day_before_yesterday.string}"
-                    }
-                    else -> {
-                        ""
-                    }
-                }
-            } else {
-                ""
+    suspend fun getRecordListByDate(calendar: com.haibin.calendarview.Calendar): List<DateRecordEntity> =
+        withContext(Dispatchers.IO) {
+            // 首页显示一周内数据
+            val result = arrayListOf<DateRecordEntity>()
+            val year = calendar.year
+            val month = calendar.month
+            val day = calendar.day
+            val monthStr = if (month < 10) "0$month" else "$month"
+            val dayStr = if (day < 10) "0$day" else "$day"
+            val startTime =
+                "$year-$monthStr-$dayStr 00:00:00".toLongTime() ?: return@withContext result
+            val endTime =
+                "$year-$monthStr-$dayStr 23:59:59".toLongTime() ?: return@withContext result
+            val list = recordDao.queryRecordBetweenTime(startTime, endTime).filter {
+                it.system != SWITCH_INT_ON
             }
-            val value = loadRecordEntityFromTable(item, false) ?: continue
-            if (key.isNotBlank()) {
-                if (map.containsKey(key)) {
-                    map[key]!!.add(value)
-                } else {
-                    map[key] = arrayListOf(value)
-                }
-            }
-        }
-        map.keys.forEach { key ->
-            result.add(
-                DateRecordEntity(
-                    date = key,
-                    list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
-                )
-            )
-        }
-        result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
-    }
-
-    /** 根据日期获取当月每天数据结余 */
-    suspend fun getCalendarSchemesByDate(calendar: com.haibin.calendarview.Calendar): Map<String, com.haibin.calendarview.Calendar> = withContext(Dispatchers.IO) {
-        val result = hashMapOf<String, com.haibin.calendarview.Calendar>()
-        val year = calendar.year
-        val month = calendar.month
-        val monthStr = if (month < 10) "0$month" else "$month"
-        val cal = Calendar.getInstance()
-        cal.set(year, month - 1, 1)
-        cal.add(Calendar.MONTH, 1)
-        cal.add(Calendar.DAY_OF_YEAR, -1)
-        val endDay = cal.get(Calendar.DAY_OF_MONTH)
-        val endDayStr = if (endDay < 10) "0$endDay" else "$endDay"
-        val startTime = "$year-$monthStr-01 00:00:00".toLongTime() ?: return@withContext result
-        val endTime = "$year-$monthStr-$endDayStr 23:59:59".toLongTime() ?: return@withContext result
-        val map = recordDao.queryRecordBetweenTime(startTime, endTime).filter {
-            it.system != SWITCH_INT_ON
-        }.mapNotNull {
-            loadRecordEntityFromTable(it, false)
-        }.groupBy {
-            it.recordTime.dateFormat(DATE_FORMAT_DATE)
-        }
-        for ((date, list) in map) {
-            var amount = "0".toBigDecimal()
-            list.forEach {
-                when (it.typeEnum) {
-                    RecordTypeEnum.EXPENDITURE -> {
-                        // 支出
-                        amount -= it.amount.toBigDecimal()
-                    }
-                    RecordTypeEnum.INCOME -> {
-                        // 收入
-                        amount += it.amount.toBigDecimal()
-                    }
-                    RecordTypeEnum.TRANSFER -> {
-                        // 转账
-                        if (it.charge.toFloatOrNull().orElse(0f) > 0f) {
-                            // 有手续费
-                            amount -= it.charge.toBigDecimal()
+            val map = hashMapOf<String, MutableList<RecordEntity>>()
+            val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+            val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
+            val today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+            for (item in list) {
+                val dateKey = item.recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)
+                val yearInt =
+                    item.recordTime.dateFormat().split("-").firstOrNull()?.toIntOrNull().orElse(-1)
+                val monthInt = dateKey.split(".").firstOrNull()?.toIntOrNull().orElse(-1)
+                val dayInt = dateKey.split(".").lastOrNull()?.toIntOrNull().orElse(-1)
+                val key = dateKey + if (yearInt == currentYear && monthInt == currentMonth) {
+                    when (dayInt) {
+                        today -> {
+                            // 今天
+                            " ${R.string.today.string}"
+                        }
+                        today - 1 -> {
+                            // 昨天
+                            " ${R.string.yesterday.string}"
+                        }
+                        today - 2 -> {
+                            // 前天
+                            " ${R.string.the_day_before_yesterday.string}"
+                        }
+                        else -> {
+                            ""
                         }
                     }
-                    else -> {
+                } else {
+                    ""
+                }
+                val value = loadRecordEntityFromTable(item, false) ?: continue
+                if (key.isNotBlank()) {
+                    if (map.containsKey(key)) {
+                        map[key]!!.add(value)
+                    } else {
+                        map[key] = arrayListOf(value)
                     }
                 }
             }
-            val amountStr = amount.decimalFormat()
-            val value = com.haibin.calendarview.Calendar().apply {
-                this.year = year
-                this.month = month
-                this.day = date.split("-").last().toInt()
-                this.scheme = amountStr
+            map.keys.forEach { key ->
+                result.add(
+                    DateRecordEntity(
+                        date = key,
+                        list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+                    )
+                )
             }
-            result[value.toString()] = value
+            result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
         }
-        result
-    }
+
+    /** 根据日期获取当月每天数据结余 */
+    suspend fun getCalendarSchemesByDate(calendar: com.haibin.calendarview.Calendar): Map<String, com.haibin.calendarview.Calendar> =
+        withContext(Dispatchers.IO) {
+            val result = hashMapOf<String, com.haibin.calendarview.Calendar>()
+            val year = calendar.year
+            val month = calendar.month
+            val monthStr = if (month < 10) "0$month" else "$month"
+            val cal = Calendar.getInstance()
+            cal.set(year, month - 1, 1)
+            cal.add(Calendar.MONTH, 1)
+            cal.add(Calendar.DAY_OF_YEAR, -1)
+            val endDay = cal.get(Calendar.DAY_OF_MONTH)
+            val endDayStr = if (endDay < 10) "0$endDay" else "$endDay"
+            val startTime = "$year-$monthStr-01 00:00:00".toLongTime() ?: return@withContext result
+            val endTime =
+                "$year-$monthStr-$endDayStr 23:59:59".toLongTime() ?: return@withContext result
+            val map = recordDao.queryRecordBetweenTime(startTime, endTime).filter {
+                it.system != SWITCH_INT_ON
+            }.mapNotNull {
+                loadRecordEntityFromTable(it, false)
+            }.groupBy {
+                it.recordTime.dateFormat(DATE_FORMAT_DATE)
+            }
+            for ((date, list) in map) {
+                var amount = "0".toBigDecimal()
+                list.forEach {
+                    when (it.typeEnum) {
+                        RecordTypeEnum.EXPENDITURE -> {
+                            // 支出
+                            amount -= it.amount.toBigDecimal()
+                        }
+                        RecordTypeEnum.INCOME -> {
+                            // 收入
+                            amount += it.amount.toBigDecimal()
+                        }
+                        RecordTypeEnum.TRANSFER -> {
+                            // 转账
+                            if (it.charge.toFloatOrNull().orElse(0f) > 0f) {
+                                // 有手续费
+                                amount -= it.charge.toBigDecimal()
+                            }
+                        }
+                        else -> {
+                        }
+                    }
+                }
+                val amountStr = amount.decimalFormat()
+                val value = com.haibin.calendarview.Calendar().apply {
+                    this.year = year
+                    this.month = month
+                    this.day = date.split("-").last().toInt()
+                    this.scheme = amountStr
+                }
+                result[value.toString()] = value
+            }
+            result
+        }
 
     /** 根据资产 id [assetId] 获取资产数据 */
     suspend fun findAssetById(assetId: Long): AssetEntity? = withContext(Dispatchers.IO) {
@@ -236,137 +250,216 @@ class RecordRepository(database: CashbookDatabase) : Repository(database) {
     }
 
     /** 获取最近三个月金额小于等于 [amount] 的所有支出记录 */
-    suspend fun getLastThreeMonthExpenditureRecordLargerThanAmount(amount: String): List<RecordEntity> = withContext(Dispatchers.IO) {
-        val result = arrayListOf<RecordEntity>()
-        // 获取最近三个月开始时间
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_MONTH, -90)
-        val startDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime() ?: return@withContext result
-        recordDao.queryExpenditureRecordAfterDateLargerThanAmount(CurrentBooksLiveData.booksId, amount.toFloatOrZero(), startDate).forEach { item ->
-            val record = loadRecordEntityFromTable(item, true)
-            if (null != record) {
-                result.add(record)
+    suspend fun getLastThreeMonthExpenditureRecordLargerThanAmount(amount: String): List<RecordEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<RecordEntity>()
+            // 获取最近三个月开始时间
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.DAY_OF_MONTH, -90)
+            val startDate =
+                "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()
+                    ?: return@withContext result
+            recordDao.queryExpenditureRecordAfterDateLargerThanAmount(
+                CurrentBooksLiveData.booksId,
+                amount.toFloatOrZero(),
+                startDate
+            ).forEach { item ->
+                val record = loadRecordEntityFromTable(item, true)
+                if (null != record) {
+                    result.add(record)
+                }
+            }
+            result.filter {
+                // 排除已关联的以及标记为可报销的
+                null == it.beAssociated && !it.reimbursable
             }
         }
-        result.filter {
-            // 排除已关联的以及标记为可报销的
-            null == it.beAssociated && !it.reimbursable
-        }
-    }
 
     /** 获取最近三个月标记为可报销的支出记录 */
-    suspend fun getLastThreeMonthReimburseExpenditureRecord(): List<RecordEntity> = withContext(Dispatchers.IO) {
-        val result = arrayListOf<RecordEntity>()
-        // 获取最近三个月开始时间
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_MONTH, -90)
-        val startDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime() ?: return@withContext result
-        recordDao.queryReimburseExpenditureRecordAfterDate(CurrentBooksLiveData.booksId, startDate).forEach { item ->
-            val record = loadRecordEntityFromTable(item, true)
-            if (null != record) {
-                result.add(record)
+    suspend fun getLastThreeMonthReimburseExpenditureRecord(): List<RecordEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<RecordEntity>()
+            // 获取最近三个月开始时间
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.DAY_OF_MONTH, -90)
+            val startDate =
+                "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()
+                    ?: return@withContext result
+            recordDao.queryReimburseExpenditureRecordAfterDate(
+                CurrentBooksLiveData.booksId,
+                startDate
+            ).forEach { item ->
+                val record = loadRecordEntityFromTable(item, true)
+                if (null != record) {
+                    result.add(record)
+                }
+            }
+            result.filter {
+                // 排除已关联的
+                null == it.beAssociated
             }
         }
-        result.filter {
-            // 排除已关联的
-            null == it.beAssociated
-        }
-    }
 
     /** 根据关键字 [keywords] 搜索没有标记为可报销的支出记录 */
-    suspend fun getExpenditureRecordByKeywords(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
-        val result = arrayListOf<RecordEntity>()
-        recordDao.queryExpenditureRecordByKeywords("%$keywords%")
-            .forEach { item ->
-                val record = loadRecordEntityFromTable(item, true)
-                if (null != record) {
-                    result.add(record)
+    suspend fun getExpenditureRecordByKeywords(keywords: String): List<RecordEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<RecordEntity>()
+            recordDao.queryExpenditureRecordByKeywords("%$keywords%")
+                .forEach { item ->
+                    val record = loadRecordEntityFromTable(item, true)
+                    if (null != record) {
+                        result.add(record)
+                    }
                 }
+            result.filter {
+                // 排除已关联
+                null == it.beAssociated
             }
-        result.filter {
-            // 排除已关联
-            null == it.beAssociated
         }
-    }
 
     /** 根据关键字 [keywords] 搜索可报销的支出记录 */
-    suspend fun getReimburseExpenditureRecordByKeywords(keywords: String): List<RecordEntity> = withContext(Dispatchers.IO) {
-        val result = arrayListOf<RecordEntity>()
-        recordDao.queryReimburseExpenditureRecordByKeywords("%$keywords%")
-            .forEach { item ->
-                val record = loadRecordEntityFromTable(item, true)
-                if (null != record) {
-                    result.add(record)
+    suspend fun getReimburseExpenditureRecordByKeywords(keywords: String): List<RecordEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<RecordEntity>()
+            recordDao.queryReimburseExpenditureRecordByKeywords("%$keywords%")
+                .forEach { item ->
+                    val record = loadRecordEntityFromTable(item, true)
+                    if (null != record) {
+                        result.add(record)
+                    }
                 }
+            result.filter {
+                // 排除已关联的
+                null == it.beAssociated
             }
-        result.filter {
-            // 排除已关联的
-            null == it.beAssociated
         }
-    }
 
     /** 根据类型 [type] 及时间 [date] 获取数据 */
-    suspend fun getTypeRecordList(type: TypeEntity, date: String): List<DateRecordEntity> = withContext(Dispatchers.IO) {
-        val result = arrayListOf<DateRecordEntity>()
-        val justYear = !date.contains("-")
-        val startTime = if (justYear) {
-            "$date-01-01 00:00:00"
-        } else {
-            "$date-01 00:00:00"
-        }.toLongTime() ?: return@withContext result
-        val endTime = if (justYear) {
-            "$date-12-30 23:59:59"
-        } else {
-            val calendar = Calendar.getInstance()
-            val splits = date.split("-")
-            calendar.set(Calendar.YEAR, splits.first().toInt())
-            calendar.set(Calendar.MONTH, splits.last().toInt() - 1)
-            val dayMax = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-            "$date-${dayMax.completeZero()} 23:59:59"
-        }.toLongTime() ?: return@withContext result
-        val recordList = if (type.first) {
-            // 一级分类
-            val ls = arrayListOf<RecordTable>()
-            ls.addAll(recordDao.queryRecordBetweenTimeByTypeId(type.id, startTime, endTime))
-            // 添加所有子类型数据
-            typeDao.queryByParentId(type.id)
-                .forEach {
-                    ls.addAll(recordDao.queryRecordBetweenTimeByTypeId(it.id.orElse(-1L), startTime, endTime))
-                }
-            ls
-        } else {
-            // 二级分类
-            recordDao.queryRecordBetweenTimeByTypeId(type.id, startTime, endTime)
-        }.filter {
-            it.system != SWITCH_INT_ON
-        }
-        val dateFormat = if (justYear) {
-            // 全年，显示月份
-            DATE_FORMAT_YEAR_MONTH
-        } else {
-            // 月份，显示日期
-            DATE_FORMAT_MONTH_DAY
-        }
-        val map = hashMapOf<String, MutableList<RecordEntity>>()
-        for (item in recordList) {
-            val key = item.recordTime.dateFormat(dateFormat)
-            val value = loadRecordEntityFromTable(item, justYear) ?: continue
-            if (key.isNotBlank()) {
-                if (map.containsKey(key)) {
-                    map[key]!!.add(value)
-                } else {
-                    map[key] = arrayListOf(value)
+    suspend fun getTypeRecordList(type: TypeEntity, date: String): List<DateRecordEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<DateRecordEntity>()
+            val justYear = !date.contains("-")
+            val startTime = if (justYear) {
+                "$date-01-01 00:00:00"
+            } else {
+                "$date-01 00:00:00"
+            }.toLongTime() ?: return@withContext result
+            val endTime = if (justYear) {
+                "$date-12-30 23:59:59"
+            } else {
+                val calendar = Calendar.getInstance()
+                val splits = date.split("-")
+                calendar.set(Calendar.YEAR, splits.first().toInt())
+                calendar.set(Calendar.MONTH, splits.last().toInt() - 1)
+                val dayMax = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                "$date-${dayMax.completeZero()} 23:59:59"
+            }.toLongTime() ?: return@withContext result
+            val recordList = if (type.first) {
+                // 一级分类
+                val ls = arrayListOf<RecordTable>()
+                ls.addAll(recordDao.queryRecordBetweenTimeByTypeId(type.id, startTime, endTime))
+                // 添加所有子类型数据
+                typeDao.queryByParentId(type.id)
+                    .forEach {
+                        ls.addAll(
+                            recordDao.queryRecordBetweenTimeByTypeId(
+                                it.id.orElse(-1L),
+                                startTime,
+                                endTime
+                            )
+                        )
+                    }
+                ls
+            } else {
+                // 二级分类
+                recordDao.queryRecordBetweenTimeByTypeId(type.id, startTime, endTime)
+            }.filter {
+                it.system != SWITCH_INT_ON
+            }
+            val dateFormat = if (justYear) {
+                // 全年，显示月份
+                DATE_FORMAT_YEAR_MONTH
+            } else {
+                // 月份，显示日期
+                DATE_FORMAT_MONTH_DAY
+            }
+            val map = hashMapOf<String, MutableList<RecordEntity>>()
+            for (item in recordList) {
+                val key = item.recordTime.dateFormat(dateFormat)
+                val value = loadRecordEntityFromTable(item, justYear) ?: continue
+                if (key.isNotBlank()) {
+                    if (map.containsKey(key)) {
+                        map[key]!!.add(value)
+                    } else {
+                        map[key] = arrayListOf(value)
+                    }
                 }
             }
-        }
-        map.keys.forEach { key ->
-            result.add(
-                DateRecordEntity(
-                    date = key,
-                    list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+            map.keys.forEach { key ->
+                result.add(
+                    DateRecordEntity(
+                        date = key,
+                        list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+                    )
                 )
-            )
+            }
+            result.sortedBy { it.date.toLongTime(dateFormat) }.reversed()
         }
-        result.sortedBy { it.date.toLongTime(dateFormat) }.reversed()
-    }
+
+    /** 根据类型 [tag] 及时间 [date] 获取数据 */
+    suspend fun getTagRecordList(tag: TagEntity, date: String): List<DateRecordEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<DateRecordEntity>()
+            val justYear = !date.contains("-")
+            val startTime = if (justYear) {
+                "$date-01-01 00:00:00"
+            } else {
+                "$date-01 00:00:00"
+            }.toLongTime() ?: return@withContext result
+            val endTime = if (justYear) {
+                "$date-12-30 23:59:59"
+            } else {
+                val calendar = Calendar.getInstance()
+                val splits = date.split("-")
+                calendar.set(Calendar.YEAR, splits.first().toInt())
+                calendar.set(Calendar.MONTH, splits.last().toInt() - 1)
+                val dayMax = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                "$date-${dayMax.completeZero()} 23:59:59"
+            }.toLongTime() ?: return@withContext result
+
+            val recordList = recordDao.queryRecordBetweenTime(startTime, endTime)
+                .filter {
+                    it.system != SWITCH_INT_ON
+                }.filter {
+                    it.tagIds.contains(tag.id.toString())
+                }
+            val dateFormat = if (justYear) {
+                // 全年，显示月份
+                DATE_FORMAT_YEAR_MONTH
+            } else {
+                // 月份，显示日期
+                DATE_FORMAT_MONTH_DAY
+            }
+            val map = hashMapOf<String, MutableList<RecordEntity>>()
+            for (item in recordList) {
+                val key = item.recordTime.dateFormat(dateFormat)
+                val value = loadRecordEntityFromTable(item, justYear) ?: continue
+                if (key.isNotBlank()) {
+                    if (map.containsKey(key)) {
+                        map[key]!!.add(value)
+                    } else {
+                        map[key] = arrayListOf(value)
+                    }
+                }
+            }
+            map.keys.forEach { key ->
+                result.add(
+                    DateRecordEntity(
+                        date = key,
+                        list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+                    )
+                )
+            }
+            result.sortedBy { it.date.toLongTime(dateFormat) }.reversed()
+        }
 }

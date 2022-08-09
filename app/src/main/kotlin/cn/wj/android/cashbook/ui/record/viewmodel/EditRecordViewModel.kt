@@ -115,7 +115,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
     val transferType: MutableLiveData<TypeEntity> = MutableLiveData()
 
     /** 账户信息 */
-    val accountData: MutableLiveData<AssetEntity> = mutableLiveDataOf(onActive = {
+    val accountData: MutableLiveData<AssetEntity?> = mutableLiveDataOf(onActive = {
         if (null == record && null == value) {
             viewModelScope.launch {
                 try {
@@ -128,7 +128,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
     })
 
     /** 转账转入账户信息 */
-    val transferAccountData: MutableLiveData<AssetEntity> = MutableLiveData(null)
+    val transferAccountData: MutableLiveData<AssetEntity?> = MutableLiveData(null)
 
     /** 标签数据 */
     val tagsData: MutableLiveData<List<TagEntity>> = MutableLiveData(arrayListOf())
@@ -220,7 +220,7 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
     }
 
     /** 关联记录数据 */
-    val associatedRecord: MutableLiveData<RecordEntity> = MutableLiveData(null)
+    val associatedRecord: MutableLiveData<RecordEntity?> = MutableLiveData(null)
 
     /** 关联记录数据选中状态 */
     val associatedRecordChecked: LiveData<Boolean> = associatedRecord.map {

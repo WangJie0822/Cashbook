@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_MY
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_CALENDAR
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_TAG_MANAGER
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
 import cn.wj.android.cashbook.data.entity.DateRecordEntity
@@ -41,15 +42,16 @@ import cn.wj.android.cashbook.data.repository.main.MainRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import cn.wj.android.cashbook.manager.UpdateManager
-import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
+import kotlinx.coroutines.launch
 
 /**
  * 主界面 ViewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
-class MainViewModel(private val repository: MainRepository) : BaseViewModel(), RecordListClickListener {
+class MainViewModel(private val repository: MainRepository) : BaseViewModel(),
+    RecordListClickListener {
 
     /** 显示升级提示事件 */
     val showUpdateDialogEvent: LifecycleEvent<UpdateInfoEntity> = LifecycleEvent()
@@ -201,6 +203,14 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(), R
         // 跳转我的分类
         uiNavigationEvent.value = UiNavigationModel.builder {
             jump(ROUTE_PATH_TYPE_LIST_EDIT)
+        }
+    }
+
+    /** 我的标签点击 */
+    val onMyTagClick: () -> Unit = {
+        // 跳转我的标签
+        uiNavigationEvent.value = UiNavigationModel.builder {
+            jump(ROUTE_PATH_RECORD_TAG_MANAGER)
         }
     }
 

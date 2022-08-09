@@ -48,6 +48,8 @@ import cn.wj.android.cashbook.ui.record.viewmodel.SearchRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectTagViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectYearMonthViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.TagManagerViewModel
+import cn.wj.android.cashbook.ui.record.viewmodel.TagRecordViewModel
 import cn.wj.android.cashbook.ui.record.viewmodel.TypeRecordViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.ConsumptionTypeViewModel
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel
@@ -244,6 +246,12 @@ val viewModelModule = module {
     }
     viewModel {
         TypeRecordViewModel(get())
+    }
+    viewModel {
+        TagManagerViewModel(get())
+    }
+    viewModel {
+        TagRecordViewModel(get())
     }
 
     // Fragment

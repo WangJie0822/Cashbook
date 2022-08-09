@@ -30,7 +30,7 @@ const val ROUTE_PATH_BOOKS_EDIT = "/path/books/edit"
 /** 路由路径 - 编辑记录 */
 const val ROUTE_PATH_RECORD_EDIT = "/path/record/edit"
 
-/** 路由路径 - 编辑记录 */
+/** 路由路径 - 选择关联记录 */
 const val ROUTE_PATH_RECORD_SELECT_ASSOCIATED = "/path/record/selectAssociated"
 
 /** 路由路径 - 日历记录 */
@@ -41,6 +41,12 @@ const val ROUTE_PATH_RECORD_SEARCH = "/path/record/search"
 
 /** 路由路径 - 分类下记录 */
 const val ROUTE_PATH_RECORD_TYPE = "/path/record/type"
+
+/** 路由路径 - 标签管理 */
+const val ROUTE_PATH_RECORD_TAG_MANAGER = "/path/record/tagManager"
+
+/** 路由路径 - 标签下记录 */
+const val ROUTE_PATH_RECORD_TAG_RECORD = "/path/record/tagRecord"
 
 /** 路由路径 - 编辑资产 */
 const val ROUTE_PATH_ASSET_EDIT = "/path/asset/edit"

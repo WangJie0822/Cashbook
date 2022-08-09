@@ -3,6 +3,9 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 新增标签管理功能；
+- 新增标签记录统计功能；
 ### Changed
 - 项目三方依赖管理优化；
 ### Fixed
