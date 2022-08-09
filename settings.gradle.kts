@@ -43,7 +43,7 @@ dependencyResolutionManagement {
             val versionCode = getVersionCode().toString()
             version("versionCode", versionCode)
             // 版本名
-            version("versionName", "v0.5.4_$versionCode")
+            version("versionName", "v0.5.5_$versionCode")
             // 备份版本号 - 用于兼容性控制
             version("backupVersion", "1")
         }
