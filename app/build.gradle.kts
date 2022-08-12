@@ -229,13 +229,13 @@ dependencies {
     implementation(libs.google.material)
 
     // Logger
-    implementation(libs.logger)
+    implementation(libs.orhanobut.logger)
 
     // LiveEventBus
-    implementation(libs.liveEventBus)
+    implementation(libs.jeremyliao.liveEventBus)
 
     // Koin
-    implementation(libs.koin3.android)
+    implementation(libs.insert.koin.android)
 
     // OkHttp
     implementation(libs.squareup.okhttp3)
@@ -248,8 +248,8 @@ dependencies {
     implementation(libs.coil)
 
     // 状态栏工具
-    implementation(libs.immersionbar)
-    implementation(libs.immersionbar.ktx)
+    implementation(libs.geyifeng.immersionbar)
+    implementation(libs.geyifeng.immersionbar.ktx)
 
     // MMKV 数据存储
     implementation(libs.tencent.mmkv)
@@ -272,7 +272,7 @@ dependencies {
     implementation(libs.haibin.calendarview)
 
     // 图表控件
-    implementation(libs.mpChart)
+    implementation(libs.philJay.mpAndroidChart)
 
     // 测试
     testImplementation(libs.junit)

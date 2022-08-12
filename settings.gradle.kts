@@ -1,9 +1,7 @@
-// 开启 Version Catalogs 功能
-enableFeaturePreview("VERSION_CATALOGS")
-
 pluginManagement {
     // 配置插件仓库
     repositories {
+        maven { setUrl("https://s01.oss.sonatype.org/content/repositories/releases/") }
         maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin/") }
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
         maven { setUrl("https://maven.aliyun.com/repository/google/") }
@@ -18,6 +16,7 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     // 配置三方依赖仓库
     repositories {
+        maven { setUrl("https://s01.oss.sonatype.org/content/repositories/releases/") }
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
         maven { setUrl("https://maven.aliyun.com/repository/google/") }
         maven { setUrl("https://jitpack.io") }
@@ -28,7 +27,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         // mavenCentral 中的依赖仓库
         create("libs") {
-            from("io.github.wangjie0822:catalog:1.1.3")
+            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.0")
         }
         // 应用配置信息
         create("configLibs") {

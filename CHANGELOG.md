@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Changed
+- 三方依赖升级，依赖配置优化；
 
 ## [0.5.5_22080914]
 ### Add
