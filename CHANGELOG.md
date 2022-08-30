@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 新增 Room 数据库升级测试；
 ### Changed
 - 三方依赖升级，依赖配置优化；
 

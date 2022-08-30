@@ -105,15 +105,18 @@ android {
 
     // 源文件路径设置
     sourceSets {
-        named("main") {
+        getByName("main") {
             java.srcDirs("src/main/java", "src/main/kotlin")
             res.srcDirs("src/main/res")
         }
-        named("online") {
+        getByName("online") {
             res.srcDirs("src/main/res-online")
         }
-        named("dev") {
+        getByName("dev") {
             res.srcDirs("src/main/res-dev")
+        }
+        getByName("androidTest") {
+            assets.srcDirs("$projectDir/schemas")
         }
     }
 
@@ -179,10 +182,19 @@ kapt {
 
 dependencies {
 
+    // 测试
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+
     // Kotlin
     implementation(libs.kotlin.stdlib)
     // 协程
-    implementation(libs.kotlinx.coroutines)
+    implementation(libs.kotlinx.coroutines.android)
     // Json 序列化
     implementation(libs.kotlinx.serialization)
 
@@ -242,7 +254,7 @@ dependencies {
 
     // Retrofit
     implementation(libs.squareup.retrofit2)
-    implementation(libs.squareup.retrofit2.converter.kotlin)
+    implementation(libs.jakeWharton.retrofit2.converter.kotlin)
 
     // Coil
     implementation(libs.coil)
@@ -273,11 +285,4 @@ dependencies {
 
     // 图表控件
     implementation(libs.philJay.mpAndroidChart)
-
-    // 测试
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.rules)
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.androidx.test.ext.junit)
 }

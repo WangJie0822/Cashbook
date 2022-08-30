@@ -27,7 +27,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         // mavenCentral 中的依赖仓库
         create("libs") {
-            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.0")
+            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.2")
         }
         // 应用配置信息
         create("configLibs") {

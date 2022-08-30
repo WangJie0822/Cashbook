@@ -44,7 +44,6 @@ data class AssetTable(
 ) {
 
     /** 信用卡、借入类型计算余额时需要取反 */
-    @IgnoredOnParcel
     val needNegative: Boolean
         get() = type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name || classification == AssetClassificationEnum.BORROW.name
 }
