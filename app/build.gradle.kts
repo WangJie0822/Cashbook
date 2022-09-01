@@ -1,8 +1,8 @@
+import cn.wj.android.cashbook.buildlogic.configureOutputs
+
 plugins {
-    // Android 应用
-    id("com.android.application")
-    // Android Kotlin 支持
-    kotlin("android")
+    // Android Kotlin 应用
+    id("cashbook.android.application")
     // Kotlin 注解处理
     kotlin("kapt")
     // Kotlin json 转换
@@ -13,163 +13,41 @@ plugins {
 
 android {
 
-    // 编译 SDK 版本
-    compileSdk = configLibs.versions.compileSdk.get().toInt()
-
     defaultConfig {
         // 应用 id
         applicationId = "cn.wj.android.cashbook"
 
-        // 最低支持版本
-        minSdk = configLibs.versions.minSdk.get().toInt()
-        // 目标 SDK 版本
-        targetSdk = configLibs.versions.targetSdk.get().toInt()
-
-        // 应用版本号
-        versionCode = configLibs.versions.versionCode.get().toInt()
-        // 应用版本名
-        versionName = configLibs.versions.versionName.get()
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
         // 开启 Dex 分包
         multiDexEnabled = true
+    }
 
-        vectorDrawables {
-            // 运行时绘制向量图
-            useSupportLibrary = true
+    buildFeatures {
+        dataBinding {
+            isEnabled = true
         }
     }
 
-    signingConfigs {
-        // 签名配置
-        getByName("debug") {
-            keyAlias = signingLibs.versions.keyAlias.get()
-            keyPassword = signingLibs.versions.keyPassword.get()
-            storeFile = file(signingLibs.versions.storeFile.get())
-            storePassword = signingLibs.versions.storePassword.get()
-        }
-        create("release") {
-            keyAlias = signingLibs.versions.keyAlias.get()
-            keyPassword = signingLibs.versions.keyPassword.get()
-            storeFile = file(signingLibs.versions.storeFile.get())
-            storePassword = signingLibs.versions.storePassword.get()
-        }
-    }
-
-    buildTypes {
-        getByName("debug") {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.findByName("debug")
-        }
-        getByName("release") {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.findByName("release")
-        }
-    }
-
-    // 维度
-    flavorDimensions.add("version")
-
-    productFlavors {
-        // 正式线上版本
-        create("online") {
-            dimension = "version"
-            // 版本名后缀
-            versionNameSuffix = "_online"
-            // 备份版本号
-            buildConfigField("int", "BACKUP_VERSION", configLibs.versions.backupVersion.get())
-        }
-
-        // 开发版本
-        create("dev") {
-            dimension = "version"
-            // 应用包名后缀
-            applicationIdSuffix = ".dev"
-            // 版本名后缀
-            versionNameSuffix = "_dev"
-            // 备份版本号
-            buildConfigField("int", "BACKUP_VERSION", configLibs.versions.backupVersion.get())
-        }
-    }
-
-    // 源文件路径设置
     sourceSets {
-        getByName("main") {
-            java.srcDirs("src/main/java", "src/main/kotlin")
-            res.srcDirs("src/main/res")
-        }
-        getByName("online") {
-            res.srcDirs("src/main/res-online")
-        }
-        getByName("dev") {
-            res.srcDirs("src/main/res-dev")
-        }
         getByName("androidTest") {
+            // room 测试使用资源
             assets.srcDirs("$projectDir/schemas")
         }
     }
 
-    buildFeatures {
-        // DataBinding 开启
-        dataBinding = true
-    }
-
-    packagingOptions {
-        resources {
-            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-        }
-    }
+    // 配置 APK 输出路径
+    val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
+    configureOutputs(
+        "${project.rootDir}${sep}outputs${sep}apk",
+        { variant ->
+            variant.buildType.name == "release"
+        },
+        { variant, _ ->
+            "Cashbook_${variant.versionName}.apk"
+        })
 
     lint {
         // 出现错误不终止编译
         abortOnError = false
-    }
-
-    // 配置 APK 输出路径
-    applicationVariants.all {
-        if (buildType.name == "release") {
-            assembleProvider.get().doLast {
-                copy {
-                    println("> Task :doLast copyApk")
-                    val separator = org.jetbrains.kotlin.konan.file.File.Companion.separator
-                    val fromDir =
-                        packageApplicationProvider.get().outputDirectory.asFile.get().toString()
-                    val intoDir = "${project.rootDir}${separator}outputs${separator}apk"
-                    println("> Task :doLast copyApk start copy from $fromDir into $intoDir")
-                    from(fromDir)
-                    into(intoDir)
-                    include("**/*.apk")
-                    rename {
-                        "Cashbook_${versionName}.apk"
-                    }
-                    println("> Task :doLast copyApk finish")
-                }
-            }
-        }
-    }
-
-    // Java 版本配置
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    // kotlin Jvm 版本
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs =
-            freeCompilerArgs + arrayOf("-opt-in=kotlinx.serialization.ExperimentalSerializationApi")
     }
 }
 
@@ -188,7 +66,7 @@ dependencies {
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.espressoCore)
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     // Kotlin
@@ -211,20 +89,20 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     // activity
-    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.activityKtx)
     // fragment
-    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.fragmentKtx)
 
     // core-ktx
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.coreKtx)
 
     // LifeCycle 拓展
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtimeKtx)
     implementation(libs.androidx.lifecycle.extensions)
     // ViewModel 拓展
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodelKtx)
     // LiveData 拓展
-    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.livedataKtx)
 
     // Room
     implementation(libs.androidx.room.common)
@@ -232,10 +110,10 @@ dependencies {
     kapt(libs.androidx.room.compiler)
 
     // Paging
-    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.runtimeKtx)
 
     // WorkManager
-    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.work.runtimeKtx)
 
     // Material
     implementation(libs.google.material)
@@ -254,14 +132,14 @@ dependencies {
 
     // Retrofit
     implementation(libs.squareup.retrofit2)
-    implementation(libs.jakeWharton.retrofit2.converter.kotlin)
+    implementation(libs.jakeWharton.retrofit2ConverterKotlin)
 
     // Coil
     implementation(libs.coil)
 
     // 状态栏工具
     implementation(libs.geyifeng.immersionbar)
-    implementation(libs.geyifeng.immersionbar.ktx)
+    implementation(libs.geyifeng.immersionbarKtx)
 
     // MMKV 数据存储
     implementation(libs.tencent.mmkv)

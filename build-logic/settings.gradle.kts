@@ -1,5 +1,4 @@
 pluginManagement {
-    includeBuild("build-logic")
     // 配置插件仓库
     repositories {
         maven { setUrl("https://s01.oss.sonatype.org/content/repositories/releases/") }
@@ -24,20 +23,12 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
-    // 配置 Version Catalogs
     versionCatalogs {
-        // mavenCentral 中的依赖仓库
         create("libs") {
             from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.3")
-        }
-        // 签名配置信息
-        create("signingLibs") {
-            from(files("./gradle/signing.versions.toml"))
         }
     }
 }
 
-// 项目名称
-rootProject.name = "Cashbook"
 // 项目包含的 Module
-include(":app")
+include(":convention")

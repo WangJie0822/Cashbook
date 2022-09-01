@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     // Android Gradle 插件版本
-    val androidGradlePluginVersion = "7.2.2"
+    val androidGradlePluginVersion = libs.versions.android.gradlePlugin.get()
     // Kotlin 版本
     val kotlinVersion = libs.versions.kotlin.get()
 
