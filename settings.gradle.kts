@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     includeBuild("build-logic")
     // 配置插件仓库
@@ -28,7 +30,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         // mavenCentral 中的依赖仓库
         create("libs") {
-            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.3")
+            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.4")
         }
         // 签名配置信息
         create("signingLibs") {

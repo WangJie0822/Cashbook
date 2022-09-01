@@ -12,7 +12,7 @@ java {
 dependencies {
     implementation(libs.android.gradlePlugin)
     implementation(libs.kotlin.gradlePlugin)
-    implementation("com.squareup:javapoet:1.13.0")
+    implementation(libs.squareup.javapoet)
 }
 
 gradlePlugin {

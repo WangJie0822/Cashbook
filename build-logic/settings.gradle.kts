@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     // 配置插件仓库
     repositories {
@@ -25,7 +27,7 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.3")
+            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.4")
         }
     }
 }
