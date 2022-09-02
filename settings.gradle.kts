@@ -30,7 +30,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         // mavenCentral 中的依赖仓库
         create("libs") {
-            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.4")
+            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.5")
         }
         // 签名配置信息
         create("signingLibs") {

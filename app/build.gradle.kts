@@ -79,30 +79,14 @@ dependencies {
     // Dex 分包
     implementation(libs.androidx.multidex)
 
-    // v4
-    implementation(libs.androidx.legacy)
-    // v7
-    implementation(libs.androidx.appcompat)
-    // RecyclerView
-    implementation(libs.androidx.recyclerview)
-    // 约束性布局
-    implementation(libs.androidx.constraintlayout)
+    // Androidx 基本依赖，包含 v4 v7 core-ktx activity-ktx fragment-ktx
+    implementation(libs.bundles.androidx.baseKtx)
 
-    // activity
-    implementation(libs.androidx.activityKtx)
-    // fragment
-    implementation(libs.androidx.fragmentKtx)
+    // Android 基本控件，包含 recyclerview constraintlayout cardview material
+    implementation(libs.bundles.androidx.widget)
 
-    // core-ktx
-    implementation(libs.androidx.coreKtx)
-
-    // LifeCycle 拓展
-    implementation(libs.androidx.lifecycle.runtimeKtx)
-    implementation(libs.androidx.lifecycle.extensions)
-    // ViewModel 拓展
-    implementation(libs.androidx.lifecycle.viewmodelKtx)
-    // LiveData 拓展
-    implementation(libs.androidx.lifecycle.livedataKtx)
+    // Androidx LifeCycle 拓展组合，包含 runtime-ktx extensions viewmodel-ktx livedata-ktx
+    implementation(libs.bundles.androidx.lifecycleKtx)
 
     // Room
     implementation(libs.androidx.room.common)
@@ -114,9 +98,6 @@ dependencies {
 
     // WorkManager
     implementation(libs.androidx.work.runtimeKtx)
-
-    // Material
-    implementation(libs.google.material)
 
     // Logger
     implementation(libs.orhanobut.logger)
@@ -137,9 +118,8 @@ dependencies {
     // Coil
     implementation(libs.coil)
 
-    // 状态栏工具
-    implementation(libs.geyifeng.immersionbar)
-    implementation(libs.geyifeng.immersionbarKtx)
+    // 状态栏工具组合
+    implementation(libs.bundles.geyifeng.immersionbar)
 
     // MMKV 数据存储
     implementation(libs.tencent.mmkv)
