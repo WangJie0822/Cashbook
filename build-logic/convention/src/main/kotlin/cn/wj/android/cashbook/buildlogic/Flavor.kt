@@ -4,9 +4,9 @@ package cn.wj.android.cashbook.buildlogic
 
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import org.gradle.api.Project
+import org.jetbrains.kotlin.util.removeSuffixIfPresent
 import java.io.File
 import javax.lang.model.element.Modifier
 
@@ -78,62 +78,31 @@ fun Project.configureFlavors(
             }
         }
 
+        // 枚举类生成路径
+        val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
+        val enumPath = "${buildDir}${sep}generated${sep}source${sep}buildConfig"
+
         // 生成多渠道枚举类
         applicationVariants.all {
             javaCompileProvider.get().doLast {
-                val chars = buildType.name.toCharArray()
-                chars.first().toUpperCase()
-                val buildTypeName = chars.concatToString()
-                val path = "$buildDir/generated/source/kapt/$flavorName$buildTypeName"
-                println("> :generateFlavorSource path $path")
-                generateFlavor(path)
+                val flavor = Flavor.valueOf(flavorName)
+                val appId = applicationId.removeSuffixIfPresent(flavor.applicationIdSuffix.orEmpty())
+                val buildPkg = "${appId}.buildlogic"
+                val path = "${enumPath}${sep}${flavor.name}${sep}${buildType.name}"
+                println("> Task :build-logic:generateFlavorEnumSource package: $buildPkg path: $path")
+                generateFlavor(buildPkg, path)
             }
         }
     }
 }
 
 /** 将多渠道枚举类生成到指定路径 [path] 下 */
-fun generateFlavor(path: String) {
-    val pkg = "cn.wj.android.cashbook.buildlogic"
-
-    val flavorDimension = TypeSpec.enumBuilder(FlavorDimension::class.simpleName).apply {
+fun generateFlavor(pkg: String, path: String) {
+    val flavor = TypeSpec.enumBuilder(Flavor::class.java.simpleName).apply {
         addModifiers(Modifier.PUBLIC)
-        FlavorDimension.values().forEach {
+        Flavor.values().forEach {
             addEnumConstant(it.name)
         }
     }.build()
-
-    JavaFile.builder(pkg, flavorDimension).build().writeTo(File(path))
-
-    val flavor = TypeSpec.enumBuilder(Flavor::class.java.simpleName).apply {
-        addModifiers(Modifier.PUBLIC)
-
-        val parameters = Flavor::class.java.declaredConstructors.firstOrNull()?.parameters?.drop(2)
-
-        parameters?.forEach {
-            addField(it.type, it.name)
-        }
-
-        addMethod(MethodSpec.constructorBuilder().apply {
-            parameters?.forEach {
-                addParameter(it.type, it.name)
-                addStatement("this.\$N = \$N", it.name, it.name)
-            }
-        }.build())
-
-        Flavor.values().forEach {
-            addEnumConstant(
-                it.name,
-                TypeSpec.anonymousClassBuilder(
-                    "\$T.\$N, \$S, \$S",
-                    it.dimension.javaClass,
-                    it.dimension.name,
-                    it.applicationIdSuffix,
-                    it.versionNameSuffix
-                ).build()
-            )
-        }
-    }.build()
-
     JavaFile.builder(pkg, flavor).build().writeTo(File(path))
 }
