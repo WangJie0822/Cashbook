@@ -21,5 +21,9 @@ gradlePlugin {
             id = "cashbook.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+        register("androidLibrary") {
+            id = "cashbook.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
     }
 }

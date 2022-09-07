@@ -1,32 +1,32 @@
-import cn.wj.android.cashbook.buildlogic.*
+import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.configureBuildTypes
+import cn.wj.android.cashbook.buildlogic.configureFlavors
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
 /**
- * Kotlin Android Application 插件
+ * Android Kotlin Library 插件
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/1
+ * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/7
  */
 @Suppress("unused")
-class AndroidApplicationConventionPlugin : Plugin<Project> {
+class AndroidLibraryConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
+                apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_LIBRARY)
                 apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
             }
 
-            extensions.configure<BaseAppModuleExtension> {
+            extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                configureSigningConfigs(this)
                 configureFlavors(this)
                 configureBuildTypes(this)
             }
         }
     }
-
 }

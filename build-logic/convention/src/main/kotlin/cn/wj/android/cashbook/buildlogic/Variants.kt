@@ -1,35 +1,182 @@
-@file:Suppress("unused", "DEPRECATION")
+@file:Suppress("unused", "UnstableApiUsage")
 
 package cn.wj.android.cashbook.buildlogic
 
-import com.android.build.gradle.api.ApplicationVariant
+import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.squareup.javapoet.JavaFile
+import com.squareup.javapoet.TypeSpec
+import org.gradle.api.Project
+import java.io.File
+import javax.lang.model.element.Modifier
 
 /**
- * 配置 APK 输出
+ * 维度枚举
+ *
+ * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2022/9/2
  */
-fun BaseAppModuleExtension.configureOutputs(
-    outputPath: String,
-    conditions: (ApplicationVariant) -> Boolean,
-    rename: (ApplicationVariant, String) -> String
+enum class FlavorDimension {
+    ContentType
+}
+
+/**
+ * 渠道枚举
+ *
+ * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2022/9/2
+ */
+enum class Flavor(
+    val dimension: FlavorDimension,
+    val signing: Signing,
+    val applicationIdSuffix: String? = null,
+    val versionNameSuffix: String? = null
 ) {
-    applicationVariants.all {
-        if (conditions(this)) {
-            assembleProvider.get().doLast {
-                project.copy {
-                    println("> Task :build-logic:configureOutputs start copy apk")
-                    val fromDir =
-                        packageApplicationProvider.get().outputDirectory.asFile.get().toString()
-                    println("> Task :build-logic:configureOutputs start copy from $fromDir into $outputPath")
-                    from(fromDir)
-                    into(outputPath)
-                    include("**/*.apk")
-                    rename {
-                        rename(this@all, it)
+    /** 正式渠道 */
+    Online(FlavorDimension.ContentType, Signing.Android, null, "_online"),
+
+    /** 开发渠道 */
+    Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev")
+}
+
+/**
+ * 配置多渠道
+ *
+ * - Application 使用，配置多渠道并生成渠道枚举类
+ */
+fun Project.configureFlavors(
+    commonExtension: BaseAppModuleExtension
+) {
+    commonExtension.apply {
+        // 配置维度
+        flavorDimensions += FlavorDimension.values().map { it.name }
+
+        // 多渠道配置
+        productFlavors {
+            Flavor.values().forEach {
+                create(it.name) {
+                    dimension = it.dimension.name
+
+                    it.applicationIdSuffix?.let { suffix ->
+                        applicationIdSuffix = suffix
                     }
-                    println("> Task :build-logic:configureOutputs copyApk finish")
+
+                    it.versionNameSuffix?.let { suffix ->
+                        versionNameSuffix = suffix
+                    }
+
+                    signingConfig = signingConfigs.findByName(it.signing.name)
+
+                    buildConfigField("int", "BACKUP_VERSION", "1")
+                }
+            }
+        }
+
+        applicationVariants.all {
+            generateBuildConfigProvider.get().let {
+                it.doLast {
+                    println("> Task :${project.name}:afterGenerateBuildConfig")
+                    // 将枚举类生成到 BuildConfig 路径下
+                    val enumPath = it.sourceOutputDir.asFile.get().path
+                    val buildPkg = "${it.namespace.get()}.buildlogic"
+                    println("> Task :${project.name}:generateFlavorEnumSource package: $buildPkg enumPath: $enumPath")
+                    generateFlavor(buildPkg, enumPath)
                 }
             }
         }
     }
+}
+
+/**
+ * 配置多渠道
+ *
+ * - Library 使用，仅生成多渠道枚举类
+ */
+fun Project.configureFlavors(
+    commonExtension: LibraryExtension
+) {
+    commonExtension.apply {
+        libraryVariants.all {
+            generateBuildConfigProvider.get().let {
+                it.doLast {
+                    println("> Task :${project.name}:afterGenerateBuildConfig")
+                    // 将枚举类生成到 BuildConfig 路径下
+                    val enumPath = it.sourceOutputDir.asFile.get().path
+                    val buildPkg = "${it.namespace.get()}.buildlogic"
+                    println("> Task :${project.name}:generateFlavorEnumSource package: $buildPkg enumPath: $enumPath")
+                    generateFlavor(buildPkg, enumPath)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 配置编译类型
+ *
+ * - Application 使用，debug 指定使用 release 签名
+ */
+fun Project.configureBuildTypes(
+    commonExtension: BaseAppModuleExtension,
+) {
+    commonExtension.apply {
+        buildTypes {
+            getByName("debug") {
+                isMinifyEnabled = false
+                isShrinkResources = false
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+                signingConfig = getByName("release").signingConfig
+            }
+            getByName("release") {
+                isMinifyEnabled = false
+                isShrinkResources = false
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 配置编译类型
+ *
+ * - Library 使用
+ */
+fun Project.configureBuildTypes(
+    commonExtension: LibraryExtension,
+) {
+    commonExtension.apply {
+        buildTypes {
+            getByName("debug") {
+                isMinifyEnabled = false
+                isShrinkResources = false
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            }
+            getByName("release") {
+                isMinifyEnabled = false
+                isShrinkResources = false
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            }
+        }
+    }
+}
+
+/** 将多渠道枚举类生成到指定路径 [path] [pkg] 包下 */
+private fun generateFlavor(pkg: String, path: String) {
+    val flavor = TypeSpec.enumBuilder(Flavor::class.java.simpleName).apply {
+        addModifiers(Modifier.PUBLIC)
+        Flavor.values().forEach {
+            addEnumConstant(it.name)
+        }
+    }.build()
+    JavaFile.builder(pkg, flavor).build().writeTo(File(path))
 }
