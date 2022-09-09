@@ -28,6 +28,12 @@ android {
     }
 
     sourceSets {
+        getByName("Online") {
+            res.srcDirs("src/main/res-online")
+        }
+        getByName("Dev") {
+            res.srcDirs("src/main/res-dev")
+        }
         getByName("androidTest") {
             // room 测试使用资源
             assets.srcDirs("$projectDir/schemas")
