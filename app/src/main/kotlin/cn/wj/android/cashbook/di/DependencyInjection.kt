@@ -25,6 +25,7 @@ import cn.wj.android.cashbook.ui.main.viewmodel.*
 import cn.wj.android.cashbook.ui.record.viewmodel.*
 import cn.wj.android.cashbook.ui.type.viewmodel.*
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.ExperimentalSerializationApi
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -38,6 +39,7 @@ import retrofit2.Retrofit
  * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/5/11
  */
 
+@OptIn(ExperimentalSerializationApi::class)
 val netModule = module {
     single {
         // 日志打印

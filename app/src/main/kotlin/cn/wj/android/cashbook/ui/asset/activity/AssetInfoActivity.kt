@@ -33,12 +33,16 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_asset_info)
+    override fun beforeOnCreate() {
+        super.beforeOnCreate()
 
         // 获取资产信息
         viewModel.assetData.value = intent.getParcelableExtra(ACTION_ASSET)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_asset_info)
 
         // 配置 RecyclerView
         binding.rv.run {
