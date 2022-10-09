@@ -236,7 +236,7 @@ class BackupViewModel(private val repository: MainRepository) : BaseViewModel() 
                     }
                     RESULT_CODE_RECOVERY_UNKNOWN_FILE -> {
                         // 未知文件
-                        R.string.recovery_failed_unkonwn_file
+                        R.string.recovery_failed_unknown_file
                     }
                     RESULT_CODE_RECOVERY_CHANNEL_ERROR -> {
                         // 渠道异常

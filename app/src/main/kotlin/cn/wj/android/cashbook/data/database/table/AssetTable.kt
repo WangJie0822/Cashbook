@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.serialization.Serializable
 
 /**
@@ -20,6 +19,9 @@ import kotlinx.serialization.Serializable
  * @param type 资产大类
  * @param classification 资产分类
  * @param invisible 是否隐藏
+ * @param openBank 开户行
+ * @param cardNo 卡号
+ * @param remark 备注
  * @param sort 排序
  * @param createTime 创建时间
  * @param modifyTime 修改时间
@@ -38,6 +40,9 @@ data class AssetTable(
     val type: String,
     val classification: String,
     val invisible: Int,
+    @ColumnInfo(name = "open_bank") val openBank: String,
+    @ColumnInfo(name = "card_no") val cardNo: String,
+    val remark: String,
     val sort: Int,
     @ColumnInfo(name = "create_time") val createTime: Long,
     @ColumnInfo(name = "modify_time") val modifyTime: Long

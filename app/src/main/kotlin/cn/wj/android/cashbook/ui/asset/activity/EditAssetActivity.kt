@@ -52,6 +52,9 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
                 viewModel.invisibleAsset.value = value.invisible
                 // 刷新余额
                 viewModel.oldBalance = value.balance
+                viewModel.openBank.value = value.openBank
+                viewModel.cardNo.value = value.cardNo
+                viewModel.remark.value = value.remark
             } else {
                 viewModel.assetName.value = value.classification.nameResId.string
             }
@@ -102,7 +105,11 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
         }
 
         /** 使用 [context] 对象打开 [EditAssetActivity] 界面，新建使用 */
-        fun actionStart(context: Context, type: ClassificationTypeEnum, classification: AssetClassificationEnum) {
+        fun actionStart(
+            context: Context,
+            type: ClassificationTypeEnum,
+            classification: AssetClassificationEnum
+        ) {
             actionStart(
                 context, AssetEntity.newAsset(type, classification)
             )

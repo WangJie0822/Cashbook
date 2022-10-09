@@ -231,4 +231,7 @@ val viewModelModule = module {
     viewModel {
         ProgressViewModel()
     }
+    viewModel {
+        AssetMoreInfoViewModel()
+    }
 }

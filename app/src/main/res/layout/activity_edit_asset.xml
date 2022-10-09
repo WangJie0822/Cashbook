@@ -159,11 +159,11 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_balance"
-                        android_bind_til_hint="@{viewModel.balanceHint}"
                         android:layout_width="match_parent"
-                        android:bind_visibility="@{!viewModel.debtType}"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_normal"
+                        android:bind_til_hint="@{viewModel.balanceHint}"
+                        android:bind_visibility="@{!viewModel.debtType}"
                         android:hint="@string/asset_balance"
                         app:endIconMode="clear_text"
                         app:errorIconTint="?attr/colorError"
@@ -183,6 +183,87 @@
                             android:text="@={viewModel.balance}"
                             android:textColor="@color/color_secondary"
                             tools:text="2000" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_asset_open_bank"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_normal"
+                        android:hint="@string/open_bank"
+                        app:endIconMode="clear_text"
+                        app:errorIconTint="?attr/colorError"
+                        app:errorTextColor="?attr/colorError"
+                        app:hintTextAppearance="?attr/textAppearanceCaption">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tie_asset_open_bank"
+                            style="@style/textInputEditTextStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center_vertical"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@={viewModel.openBank}"
+                            android:textColor="@color/color_secondary"
+                            tools:text="中国银行北京支行" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_card_no"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_normal"
+                        android:hint="@string/card_no"
+                        app:endIconMode="clear_text"
+                        app:errorIconTint="?attr/colorError"
+                        app:errorTextColor="?attr/colorError"
+                        app:hintTextAppearance="?attr/textAppearanceCaption">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tie_card_no"
+                            style="@style/textInputEditTextStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center_vertical"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@={viewModel.cardNo}"
+                            android:textColor="@color/color_secondary"
+                            tools:text="62140020200201234" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_remark"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_normal"
+                        android:hint="@string/remark"
+                        app:endIconMode="clear_text"
+                        app:errorIconTint="?attr/colorError"
+                        app:errorTextColor="?attr/colorError"
+                        app:hintTextAppearance="?attr/textAppearanceCaption">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tie_remark"
+                            style="@style/textInputEditTextStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center_vertical"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@={viewModel.remark}"
+                            android:textColor="@color/color_secondary"
+                            tools:text="" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 

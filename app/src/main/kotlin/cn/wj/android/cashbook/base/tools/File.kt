@@ -10,13 +10,7 @@ import androidx.documentfile.provider.DocumentFile
 import cn.wj.android.cashbook.base.ext.base.isContentScheme
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.manager.AppManager
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.ArrayList
+import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -80,7 +74,12 @@ fun Collection<String>?.zipToFile(zippedFilePath: String?, comment: String? = nu
 }
 
 /** 将当前路径对应的文件复制到指定位置 */
-fun String.copyToPath(path: String, mimeType: String, subDir: String = "", context: Context = AppManager.getContext()) {
+fun String.copyToPath(
+    path: String,
+    mimeType: String,
+    subDir: String = "",
+    context: Context = AppManager.getContext()
+) {
     if (path.isContentScheme()) {
         DocumentFile.fromTreeUri(context, Uri.parse(path))?.let { treeDoc ->
             val file = File(this)

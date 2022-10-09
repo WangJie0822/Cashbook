@@ -7,7 +7,9 @@ import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
+import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.databinding.ActivityAssetInfoBinding
+import cn.wj.android.cashbook.ui.asset.dialog.AssetMoreInfoDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetInfoViewModel
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.record.adapter.DateRecordPagingRvAdapter
@@ -49,6 +51,11 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
             layoutManager = WrapContentLinearLayoutManager()
             adapter = pagingAdapter
         }
+
+        if (viewModel.assetData.value?.type == ClassificationTypeEnum.DEBT_ACCOUNT) {
+            // 债务账户，没有更多信息
+            binding.toolbar.menu.removeItem(R.id.more)
+        }
     }
 
     override fun observe() {
@@ -70,6 +77,12 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
         // 显示记录详情弹窗
         viewModel.showRecordDetailsDialogEvent.observe(this) { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
+        }
+        // 显示更多信息弹窗
+        viewModel.showMoreInfoDialogEvent.observe(this) { asset ->
+            if (null != asset) {
+                AssetMoreInfoDialog.actionShow(supportFragmentManager, asset)
+            }
         }
         // 显示删除确认弹窗
         viewModel.showDeleteConfirmDialogEvent.observe(this) {

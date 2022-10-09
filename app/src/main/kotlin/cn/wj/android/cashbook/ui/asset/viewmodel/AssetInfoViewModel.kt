@@ -27,10 +27,14 @@ import kotlinx.coroutines.launch
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/7
  */
-class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewModel(), RecordListClickListener {
+class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewModel(),
+    RecordListClickListener {
 
     /** 显示记录详情弹窗事件 */
     val showRecordDetailsDialogEvent: LifecycleEvent<RecordEntity> = LifecycleEvent()
+
+    /** 显示更多资产信息弹窗时间 */
+    val showMoreInfoDialogEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
 
     /** 显示删除确认事件 */
     val showDeleteConfirmDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
@@ -69,6 +73,16 @@ class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewMode
         } else {
             it.balance.moneyFormat()
         }
+    }
+
+    /** 备注文本 */
+    val remarkStr: LiveData<String> = assetData.map {
+        it.remark
+    }
+
+    /** 标记 - 是否显示备注 */
+    val showRemark: LiveData<Boolean> = remarkStr.map {
+        it.isNotBlank()
     }
 
     /** 标记 - 是否显示信用卡信息 */
@@ -116,12 +130,19 @@ class AssetInfoViewModel(private val repository: AssetRepository) : BaseViewMode
 
     /** 菜单点击 */
     val onToolbarMenuClick: (Int) -> Unit = { id ->
-        if (id == R.id.edit) {
-            // 编辑
-            jumpEditAssetEvent.value = assetData.value
-        } else {
-            // 显示删除确认弹窗
-            showDeleteConfirmDialogEvent.value = 0
+        when (id) {
+            R.id.edit -> {
+                // 编辑
+                jumpEditAssetEvent.value = assetData.value
+            }
+            R.id.delete -> {
+                // 删除，显示删除确认弹窗
+                showDeleteConfirmDialogEvent.value = 0
+            }
+            R.id.more -> {
+                // 更多信息
+                showMoreInfoDialogEvent.value = assetData.value
+            }
         }
     }
 

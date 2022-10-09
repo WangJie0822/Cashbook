@@ -22,8 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
             android:bind_toolbar_menuItemClickId="@{viewModel.onToolbarMenuClick}"
+            android:bind_toolbar_navigationClick="@{viewModel.onBackClick}"
             android:bind_toolbar_title="@{viewModel.titleStr}"
             app:menu="@menu/toolbar_asset_info"
             app:navigationIcon="@drawable/vector_baseline_arrow_back_24"
@@ -76,6 +76,24 @@
                 tools:text="￥10000.00" />
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_remark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_big"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginEnd="@dimen/spacing_big"
+                android:bind_visibility="@{viewModel.showRemark}"
+                android:text="@{viewModel.remarkStr}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:visibility="gone"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_amount"
+                tools:text="备注文本"
+                tools:visibility="visible" />
+
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_total_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -84,7 +102,7 @@
                 android:textAppearance="?attr/textAppearanceCaption"
                 app:layout_constraintEnd_toStartOf="@id/tv_billing_date_label"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_amount" />
+                app:layout_constraintTop_toBottomOf="@id/tv_remark" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_total"
@@ -107,7 +125,7 @@
                 android:textAppearance="?attr/textAppearanceCaption"
                 app:layout_constraintEnd_toStartOf="@id/tv_repayment_date_label"
                 app:layout_constraintStart_toEndOf="@id/tv_total_label"
-                app:layout_constraintTop_toBottomOf="@id/tv_amount" />
+                app:layout_constraintTop_toBottomOf="@id/tv_remark" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_billing_date"
@@ -130,7 +148,7 @@
                 android:textAppearance="?attr/textAppearanceCaption"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tv_billing_date_label"
-                app:layout_constraintTop_toBottomOf="@id/tv_amount" />
+                app:layout_constraintTop_toBottomOf="@id/tv_remark" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_repayment_date"

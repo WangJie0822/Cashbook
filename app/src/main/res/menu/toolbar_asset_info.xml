@@ -22,4 +22,13 @@
         app:showAsAction="ifRoom"
         tools:targetApi="o" />
 
+    <item
+        android:id="@+id/more"
+        android:icon="@drawable/vector_baseline_more_vert_24"
+        android:iconTint="@color/color_on_primary"
+        android:title="@string/more"
+        app:iconTint="@color/color_on_primary"
+        app:showAsAction="ifRoom"
+        tools:targetApi="o" />
+
 </menu>

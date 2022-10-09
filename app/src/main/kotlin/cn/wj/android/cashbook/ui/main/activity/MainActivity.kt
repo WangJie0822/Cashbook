@@ -50,26 +50,33 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var lastBackPressMs = 0L
 
     /** 权限申请 launcher */
-    private val requestPermissionsLauncher = createForActivityResultLauncher(ActivityResultContracts.RequestMultiplePermissions())
+    private val requestPermissionsLauncher =
+        createForActivityResultLauncher(ActivityResultContracts.RequestMultiplePermissions())
 
     /** 列表适配器对象 */
     private val adapter: DateRecordRvAdapter by lazy {
         DateRecordRvAdapter().apply {
             this.viewModel = this@MainActivity.viewModel
             setEmptyView(LayoutNoDataBinding.inflate(LayoutInflater.from(context)).apply {
-                viewModel = NoDataModel(R.string.homepage_no_record_hint, showButton = true, buttonTextResId = R.string.click_to_see_other_month) {
+                viewModel = NoDataModel(
+                    R.string.homepage_no_record_hint,
+                    showButton = true,
+                    buttonTextResId = R.string.click_to_see_other_month
+                ) {
                     // 跳转日历
-                    this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
-                        jump(ROUTE_PATH_RECORD_CALENDAR)
-                    }
+                    this@MainActivity.viewModel.uiNavigationEvent.value =
+                        UiNavigationModel.builder {
+                            jump(ROUTE_PATH_RECORD_CALENDAR)
+                        }
                 }
             }.root)
             addFooterView(RecyclerFooterHomepageBinding.inflate(LayoutInflater.from(context)).root.apply {
                 setOnClickListener {
                     // 跳转日历
-                    this@MainActivity.viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
-                        jump(ROUTE_PATH_RECORD_CALENDAR)
-                    }
+                    this@MainActivity.viewModel.uiNavigationEvent.value =
+                        UiNavigationModel.builder {
+                            jump(ROUTE_PATH_RECORD_CALENDAR)
+                        }
                 }
             })
         }
@@ -152,7 +159,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     if (isWifiAvailable() || AppConfigs.mobileNetworkDownloadEnable) {
                         // WIFI 可用或允许使用流量下载，直接开始下载
                         UpdateManager.startDownload(info)
-                        viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()
+                        viewModel.snackbarEvent.value =
+                            R.string.start_background_download.string.toSnackbarModel()
                     } else {
                         // 未连接 WIFI 且未允许流量下载，弹窗提示
                         GeneralDialog.newBuilder()
@@ -163,7 +171,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                                 AppConfigs.mobileNetworkDownloadEnable = it
                                 // 开始下载
                                 UpdateManager.startDownload(info)
-                                viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()
+                                viewModel.snackbarEvent.value =
+                                    R.string.start_background_download.string.toSnackbarModel()
                             }
                             .show(supportFragmentManager)
                     }
@@ -192,7 +201,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 }
             } else {
                 // 申请权限
-                requestPermissionsLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)) { map ->
+                requestPermissionsLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    )
+                ) { map ->
                     if (map.values.contains(false)) {
                         // 有未同意权限
                         showPathErrorHint()
@@ -211,11 +225,14 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     /** 显示备份路径异常提示 */
     private fun showPathErrorHint() {
-        viewModel.snackbarEvent.value = R.string.auto_backup_exception.string.toSnackbarModel(duration = SnackbarModel.LENGTH_INDEFINITE, actionText = R.string.view.string, onAction = {
-            // 点击跳转备份界面
-            viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
-                jump(ROUTE_PATH_BACKUP)
-            }
-        })
+        viewModel.snackbarEvent.value = R.string.auto_backup_exception.string.toSnackbarModel(
+            duration = SnackbarModel.LENGTH_INDEFINITE,
+            actionText = R.string.view.string,
+            onAction = {
+                // 点击跳转备份界面
+                viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
+                    jump(ROUTE_PATH_BACKUP)
+                }
+            })
     }
 }

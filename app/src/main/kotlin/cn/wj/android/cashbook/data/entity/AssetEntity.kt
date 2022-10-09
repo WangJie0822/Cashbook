@@ -2,14 +2,9 @@ package cn.wj.android.cashbook.data.entity
 
 import android.os.Parcelable
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.decimalFormat
-import cn.wj.android.cashbook.base.ext.base.moneyFormat
-import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
+import cn.wj.android.cashbook.base.ext.base.*
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.data.enums.CurrencyEnum
 import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -27,6 +22,9 @@ import kotlin.math.roundToInt
  * @param type 资产大类
  * @param classification 资产分类
  * @param invisible 是否隐藏
+ * @param openBank 开户行
+ * @param cardNo 卡号
+ * @param remark 备注
  * @param sort 排序
  * @param createTime 创建时间
  * @param modifyTime 修改时间
@@ -45,6 +43,9 @@ data class AssetEntity(
     val type: ClassificationTypeEnum,
     val classification: AssetClassificationEnum,
     val invisible: Boolean,
+    val openBank: String,
+    val cardNo: String,
+    val remark: String,
     val sort: Int,
     val createTime: String,
     val modifyTime: String,
@@ -62,7 +63,8 @@ data class AssetEntity(
         get() = if (!creditCardAccount || totalAmount.toFloat() <= 0f) {
             0
         } else {
-            (balance.toBigDecimalOrZero() / totalAmount.toBigDecimalOrNull().orElse("1".toBigDecimal()) * "100".toBigDecimal()).toFloat().roundToInt()
+            (balance.toBigDecimalOrZero() / totalAmount.toBigDecimalOrNull()
+                .orElse("1".toBigDecimal()) * "100".toBigDecimal()).toFloat().roundToInt()
         }
 
     /** 余额显示文本 */
@@ -100,7 +102,10 @@ data class AssetEntity(
 
     companion object {
         /** 创建新建资产数据 */
-        fun newAsset(type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT, classification: AssetClassificationEnum = AssetClassificationEnum.CASH): AssetEntity {
+        fun newAsset(
+            type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT,
+            classification: AssetClassificationEnum = AssetClassificationEnum.CASH
+        ): AssetEntity {
             return AssetEntity(
                 id = -1,
                 booksId = CurrentBooksLiveData.booksId,
@@ -111,6 +116,9 @@ data class AssetEntity(
                 type = type,
                 classification = classification,
                 false,
+                openBank = "",
+                cardNo = "",
+                remark = "",
                 -1,
                 "",
                 "",

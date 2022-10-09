@@ -33,7 +33,19 @@ fun TextInputLayout.setErrorHint(error: CharSequence?) {
 }
 
 /** 设置提示文本 */
-@BindingAdapter("android_bind_til_hint")
+@BindingAdapter("android:bind_til_hint")
 fun TextInputLayout.setHintCS(text: CharSequence?) {
     hint = text
+}
+
+/** 设置后方按钮点击事件 */
+@BindingAdapter("android:bind_til_onEndIconClick")
+fun TextInputLayout.setOnEndIconClick(click: (() -> Unit)?) {
+    if (null == click) {
+        setEndIconOnClickListener(null)
+    } else {
+        setEndIconOnClickListener {
+            click.invoke()
+        }
+    }
 }

@@ -3,9 +3,9 @@ package cn.wj.android.cashbook.ui.books.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.add
+import cn.wj.android.cashbook.base.ext.add
 import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.remove
+import cn.wj.android.cashbook.base.ext.remove
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toNewList
 import cn.wj.android.cashbook.base.ui.BaseViewModel

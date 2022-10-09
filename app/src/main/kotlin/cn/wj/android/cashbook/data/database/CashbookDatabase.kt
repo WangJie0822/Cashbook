@@ -15,7 +15,7 @@ import cn.wj.android.cashbook.data.database.table.*
  */
 @Database(
     entities = [BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class],
-    version = 4
+    version = 5
 )
 abstract class CashbookDatabase : RoomDatabase() {
 
@@ -88,7 +88,20 @@ abstract class CashbookDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * 数据库升级 4 -> 5
+         * - db_asset 表新增 open_bank、card_no、remark
+         */
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // 资产表新增字段
+                database.execSQL("ALTER TABLE `db_asset` ADD `open_bank` TEXT DEFAULT '' NOT NULL")
+                database.execSQL("ALTER TABLE `db_asset` ADD `card_no` TEXT DEFAULT '' NOT NULL")
+                database.execSQL("ALTER TABLE `db_asset` ADD `remark` TEXT DEFAULT '' NOT NULL")
+            }
+        }
+
         /** 数据库升级列表 */
-        val MIGRATION_LIST = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+        val MIGRATION_LIST = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
     }
 }

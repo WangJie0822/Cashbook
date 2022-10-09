@@ -40,6 +40,7 @@
     <string name="confirm">确认</string>
     <string name="modify">修改</string>
     <string name="delete">删除</string>
+    <string name="more">更多</string>
     <string name="cancel">取消</string>
     <string name="no_longer_prompt">不再提示</string>
     <string name="delete_books_confirm">删除账本将同步删除账本下所有记账记录，是否确认？</string>
@@ -71,6 +72,8 @@
     <string name="new_asset">新建资产</string>
     <string name="asset_classification">资产分类</string>
     <string name="asset_name">资产名称</string>
+    <string name="open_bank">开户行</string>
+    <string name="card_no">卡号</string>
     <string name="asset_balance">资产余额</string>
     <string name="total_amount">总额度</string>
     <string name="billing_date">账单日</string>
@@ -279,10 +282,13 @@
     <string name="get_webdav_backup_failed">获取 WebDAV 备份失败，使用本地备份</string>
     <string name="please_select_backup">请选择备份</string>
     <string name="no_backup_files">没有找到可恢复的备份文件，请先备份</string>
-    <string name="recovery_failed_unkonwn_file">未知文件，请选择正确的备份文件</string>
+    <string name="recovery_failed_unknown_file">未知文件，请选择正确的备份文件</string>
     <string name="recovery_failed_channel_error">渠道异常，请选择正确的备份文件</string>
     <string name="recovery_failed_path_error">路径异常，请选择正确的备份文件</string>
     <string name="please_select_auto_backup">请选择自动备份设置</string>
     <string name="auto_backup_exception">自动备份失败，请检查备份设置</string>
     <string name="entry_into_total_assets">计入总资产</string>
+    <string name="copy_all">全部复制</string>
+    <string name="copy_to_clipboard_success">已复制到剪切板</string>
+    <string name="copy_to_clipboard_format">开户行：%1$s\n卡号：%2$s</string>
 </resources>

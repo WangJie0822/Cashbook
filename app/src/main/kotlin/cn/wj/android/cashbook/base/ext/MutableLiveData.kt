@@ -1,9 +1,10 @@
 @file:Suppress("unused")
 @file:JvmName("MutableLiveDataExt")
 
-package cn.wj.android.cashbook.base.ext.base
+package cn.wj.android.cashbook.base.ext
 
 import androidx.lifecycle.MutableLiveData
+import cn.wj.android.cashbook.base.ext.base.toNewList
 
 /**
  * [MutableLiveData] 相关

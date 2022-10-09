@@ -228,6 +228,52 @@ class MigrationTest : TestBase() {
         assertEquals(true, hasShared)
     }
 
+    /**
+     * 测试数据库从 4 升级到 5
+     * - db_asset 表有新增字段
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate4_5() {
+        var hasOpenBank: Boolean
+        var hasCardNo: Boolean
+        var hasRemark: Boolean
+        helper.createDatabase(testDbName, 4).use { db ->
+            db.query(
+                "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                arrayOf("table", "db_asset")
+            ).use { cursor ->
+                cursor.moveToFirst()
+                val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                log("migrate4_5() sqlStr = [$sqlStr]")
+                hasOpenBank = sqlStr.contains("`open_bank`")
+                hasCardNo = sqlStr.contains("`card_no`")
+                hasRemark = sqlStr.contains("`remark`")
+            }
+        }
+        assertEquals(false, hasOpenBank)
+        assertEquals(false, hasCardNo)
+        assertEquals(false, hasRemark)
+
+        helper.runMigrationsAndValidate(testDbName, 5, true, CashbookDatabase.MIGRATION_4_5)
+            .use { db ->
+                db.query(
+                    "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                    arrayOf("table", "db_asset")
+                ).use { cursor ->
+                    cursor.moveToFirst()
+                    val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                    log("migrate4_5() sqlStr = [$sqlStr]")
+                    hasOpenBank = sqlStr.contains("`open_bank`")
+                    hasCardNo = sqlStr.contains("`card_no`")
+                    hasRemark = sqlStr.contains("`remark`")
+                }
+            }
+        assertEquals(true, hasOpenBank)
+        assertEquals(true, hasCardNo)
+        assertEquals(true, hasRemark)
+    }
+
     @Test
     @Throws(IOException::class)
     fun migrateAll() {

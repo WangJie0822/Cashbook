@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import kotlin.text.orEmpty
 
 /**
  * 编辑资产 ViewModel
@@ -55,10 +56,12 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
     val showSelectAssetClassificationEvent: LifecycleEvent<Int> = LifecycleEvent()
 
     /** 资产分类大类 */
-    val classificationType: MutableLiveData<ClassificationTypeEnum> = MutableLiveData(ClassificationTypeEnum.CAPITAL_ACCOUNT)
+    val classificationType: MutableLiveData<ClassificationTypeEnum> =
+        MutableLiveData(ClassificationTypeEnum.CAPITAL_ACCOUNT)
 
     /** 资产分类 */
-    val assetClassification: MutableLiveData<AssetClassificationEnum> = MutableLiveData(AssetClassificationEnum.CASH)
+    val assetClassification: MutableLiveData<AssetClassificationEnum> =
+        MutableLiveData(AssetClassificationEnum.CASH)
 
     /** 标记 - 是否是信用卡 */
     val creditCardType: LiveData<Boolean> = classificationType.map {
@@ -95,6 +98,15 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
 
     /** 余额、信用卡欠款 */
     val balance: MutableLiveData<String> = MutableLiveData()
+
+    /** 开户行 */
+    val openBank: MutableLiveData<String> = MutableLiveData()
+
+    /** 卡号 */
+    val cardNo: MutableLiveData<String> = MutableLiveData()
+
+    /** 备注 */
+    val remark: MutableLiveData<String> = MutableLiveData()
 
     /** 账单日 */
     val billingDate: MutableLiveData<String> = MutableLiveData()
@@ -179,6 +191,9 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
             }
         }
         val balance = balance.value.decimalFormat()
+        val openBank = openBank.value.orEmpty()
+        val cardNo = cardNo.value.orEmpty()
+        val remark = remark.value.orEmpty()
         val billingDate = billingDate.value.orEmpty()
         val repaymentDate = repaymentDate.value.orEmpty()
         val invisible = invisibleAsset.value.condition
@@ -199,6 +214,9 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
                             type = type,
                             classification = classification,
                             invisible = invisible,
+                            openBank = openBank,
+                            cardNo = cardNo,
+                            remark = remark,
                             sort = sort,
                             createTime = createTime,
                             modifyTime = currentTime,
@@ -218,6 +236,9 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
                             type = type,
                             classification = classification,
                             invisible = invisible,
+                            openBank = openBank,
+                            cardNo = cardNo,
+                            remark = remark,
                             sort = repository.queryMaxSort().orElse(-1) + 1,
                             createTime = currentTime,
                             modifyTime = currentTime,
@@ -236,12 +257,13 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
     /** 保存成功 */
     private fun callOnSaveSuccess() {
         // 保存成功，提示并关闭界面
-        snackbarEvent.value = R.string.save_success.string.toSnackbarModel(onCallback = object : Snackbar.Callback() {
-            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                uiNavigationEvent.value = UiNavigationModel.builder {
-                    close()
+        snackbarEvent.value =
+            R.string.save_success.string.toSnackbarModel(onCallback = object : Snackbar.Callback() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    uiNavigationEvent.value = UiNavigationModel.builder {
+                        close()
+                    }
                 }
-            }
-        })
+            })
     }
 }

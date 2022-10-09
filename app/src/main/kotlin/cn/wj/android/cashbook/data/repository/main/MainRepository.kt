@@ -8,53 +8,12 @@ import cn.wj.android.cashbook.base.ext.base.isContentScheme
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.tools.DATE_FORMAT_BACKUP
-import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
-import cn.wj.android.cashbook.base.tools.DATE_FORMAT_NO_SECONDS
-import cn.wj.android.cashbook.base.tools.DATE_FORMAT_YEAR_MONTH
-import cn.wj.android.cashbook.base.tools.copyToPath
-import cn.wj.android.cashbook.base.tools.createFileIfNotExists
-import cn.wj.android.cashbook.base.tools.dateFormat
-import cn.wj.android.cashbook.base.tools.deleteFiles
-import cn.wj.android.cashbook.base.tools.readBytes
-import cn.wj.android.cashbook.base.tools.toJsonString
-import cn.wj.android.cashbook.base.tools.toLongTime
-import cn.wj.android.cashbook.base.tools.toTypeEntity
-import cn.wj.android.cashbook.base.tools.unzipToDir
-import cn.wj.android.cashbook.base.tools.zipToFile
+import cn.wj.android.cashbook.base.tools.*
 import cn.wj.android.cashbook.data.config.AppConfigs
-import cn.wj.android.cashbook.data.constants.BACKUP_ASSET_FILE_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_BOOKS_FILE_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_CACHE_FILE_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_DIR_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_FILE_EXT
-import cn.wj.android.cashbook.data.constants.BACKUP_FILE_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_INFO_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_RECORD_FILE_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_TAG_FILE_NAME
-import cn.wj.android.cashbook.data.constants.BACKUP_TYPE_FILE_NAME
-import cn.wj.android.cashbook.data.constants.GITEE_OWNER
-import cn.wj.android.cashbook.data.constants.GITHUB_OWNER
-import cn.wj.android.cashbook.data.constants.MIME_TYPE_ZIP
-import cn.wj.android.cashbook.data.constants.REPO_NAME
-import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
+import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.database.CashbookDatabase
-import cn.wj.android.cashbook.data.database.table.AssetTable
-import cn.wj.android.cashbook.data.database.table.BooksTable
-import cn.wj.android.cashbook.data.database.table.RecordTable
-import cn.wj.android.cashbook.data.database.table.TagTable
-import cn.wj.android.cashbook.data.database.table.TypeTable
-import cn.wj.android.cashbook.data.entity.BackupEntity
-import cn.wj.android.cashbook.data.entity.BackupVersionEntity
-import cn.wj.android.cashbook.data.entity.DataResult
-import cn.wj.android.cashbook.data.entity.DateRecordEntity
-import cn.wj.android.cashbook.data.entity.RESULT_CODE_RECOVERY_CHANNEL_ERROR
-import cn.wj.android.cashbook.data.entity.RESULT_CODE_RECOVERY_PATH_ERROR
-import cn.wj.android.cashbook.data.entity.RESULT_CODE_RECOVERY_UNKNOWN_FILE
-import cn.wj.android.cashbook.data.entity.RESULT_CODE_SUCCESS
-import cn.wj.android.cashbook.data.entity.RESULT_CODE_WEBDAV_FAILED
-import cn.wj.android.cashbook.data.entity.RecordEntity
-import cn.wj.android.cashbook.data.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.data.database.table.*
+import cn.wj.android.cashbook.data.entity.*
 import cn.wj.android.cashbook.data.net.WebService
 import cn.wj.android.cashbook.data.repository.Repository
 import cn.wj.android.cashbook.data.transform.toUpdateInfoEntity
@@ -70,7 +29,8 @@ import java.util.*
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/28
  */
-class MainRepository(database: CashbookDatabase, private val service: WebService) : Repository(database) {
+class MainRepository(database: CashbookDatabase, private val service: WebService) :
+    Repository(database) {
 
     /** 获取首页数据 */
     suspend fun getHomepageList(): List<DateRecordEntity> = withContext(Dispatchers.IO) {
@@ -78,7 +38,10 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         val result = arrayListOf<DateRecordEntity>()
         val calendar = Calendar.getInstance()
         val today = calendar.get(Calendar.DAY_OF_MONTH)
-        val recordTime = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00".toLongTime(DATE_FORMAT_NO_SECONDS) ?: return@withContext result
+        val recordTime =
+            "${calendar.timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00".toLongTime(
+                DATE_FORMAT_NO_SECONDS
+            ) ?: return@withContext result
         val list = recordDao.queryAfterRecordTimeByBooksId(recordTime).filter {
             it.system != SWITCH_INT_ON
         }
@@ -128,7 +91,9 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         val result = arrayListOf<RecordEntity>()
         // 获取当前月开始时间
         val calendar = Calendar.getInstance()
-        val monthStartDate = "${calendar.timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00".toLongTime() ?: return@withContext result
+        val monthStartDate =
+            "${calendar.timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00".toLongTime()
+                ?: return@withContext result
         recordDao.queryAfterRecordTimeByBooksId(monthStartDate).forEach { item ->
             val record = loadRecordEntityFromTable(item, false)
             if (null != record) {
@@ -139,13 +104,14 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
     }
 
     /** 获取最新 Release 信息 */
-    suspend fun queryLatestRelease(useGitee: Boolean): UpdateInfoEntity = withContext(Dispatchers.IO) {
-        if (useGitee) {
-            service.giteeQueryRelease(GITEE_OWNER, REPO_NAME, "latest")
-        } else {
-            service.githubQueryRelease(GITHUB_OWNER, REPO_NAME, "latest")
-        }.toUpdateInfoEntity()
-    }
+    suspend fun queryLatestRelease(useGitee: Boolean): UpdateInfoEntity =
+        withContext(Dispatchers.IO) {
+            if (useGitee) {
+                service.giteeQueryRelease(GITEE_OWNER, REPO_NAME, "latest")
+            } else {
+                service.githubQueryRelease(GITHUB_OWNER, REPO_NAME, "latest")
+            }.toUpdateInfoEntity()
+        }
 
     /** 获取修改日志信息 */
     suspend fun getChangelog(useGitee: Boolean): String = withContext(Dispatchers.IO) {
@@ -206,7 +172,8 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         }
 
         // 压缩包路径
-        val zippedPath = cachePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT
+        val zippedPath =
+            cachePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT
         // 将缓存压缩
         cacheFiles.zipToFile(zippedPath)
 
@@ -241,7 +208,9 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
                 } else {
                     df.findFile(BACKUP_DIR_NAME)
                 }?.listFiles()?.filter {
-                    it.name?.startsWith(BACKUP_FILE_NAME) == true && it.name?.endsWith(BACKUP_FILE_EXT) == true
+                    it.name?.startsWith(BACKUP_FILE_NAME) == true && it.name?.endsWith(
+                        BACKUP_FILE_EXT
+                    ) == true
                 }?.forEach {
                     result.add(BackupEntity(it.name.orEmpty(), it.uri.toString(), false))
                 }
@@ -274,7 +243,8 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         cachePath.deleteFiles()
 
         // 创建缓存文件
-        val zippedFile = cachePath.createFileIfNotExists(BACKUP_FILE_NAME + "Cache" + BACKUP_FILE_EXT)
+        val zippedFile =
+            cachePath.createFileIfNotExists(BACKUP_FILE_NAME + "Cache" + BACKUP_FILE_EXT)
 
         // 下载文件
         WebDAVManager.downloadTo(url, zippedFile)
@@ -291,7 +261,8 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         cachePath.deleteFiles()
 
         // 创建缓存文件
-        val zippedFile = cachePath.createFileIfNotExists(BACKUP_FILE_NAME + "Cache" + BACKUP_FILE_EXT)
+        val zippedFile =
+            cachePath.createFileIfNotExists(BACKUP_FILE_NAME + "Cache" + BACKUP_FILE_EXT)
 
         if (path.isContentScheme()) {
             DocumentFile.fromTreeUri(AppManager.getContext(), Uri.parse(path))?.let { df ->
@@ -302,11 +273,15 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
                 }?.listFiles()?.sortedBy {
                     it.name
                 }?.reversed()?.firstOrNull {
-                    it.name?.startsWith(BACKUP_FILE_NAME) == true && it.name?.endsWith(BACKUP_FILE_EXT) == true
+                    it.name?.startsWith(BACKUP_FILE_NAME) == true && it.name?.endsWith(
+                        BACKUP_FILE_EXT
+                    ) == true
                 } ?: return@withContext DataResult.failed(RESULT_CODE_RECOVERY_PATH_ERROR)
                 logger().d("backupFile: ${backupFile.name}")
                 // 复制数据到缓存文件
-                val bytes = backupFile.readBytes() ?: return@withContext DataResult.failed(RESULT_CODE_RECOVERY_PATH_ERROR)
+                val bytes = backupFile.readBytes() ?: return@withContext DataResult.failed(
+                    RESULT_CODE_RECOVERY_PATH_ERROR
+                )
                 zippedFile.writeBytes(bytes)
             }
         } else {
@@ -335,45 +310,47 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
     }
 
     /** 从解压的文件 [files] 中恢复备份 */
-    private suspend fun recoveryFromZipped(files: List<File>): DataResult<Any> = withContext(Dispatchers.IO) {
-        // 获取配置信息
-        val info = files.firstOrNull {
-            it.name == BACKUP_INFO_NAME
-        }?.readText().toTypeEntity<BackupVersionEntity>() ?: return@withContext DataResult.failed<Any>(RESULT_CODE_RECOVERY_UNKNOWN_FILE)
-        logger().d("recoveryFromZipped() info = [$info]")
-        if (!BuildConfig.DEBUG && info.channel != BuildConfig.FLAVOR) {
-            // 非 debug 版本需要匹配渠道才能恢复
-            return@withContext DataResult.failed(RESULT_CODE_RECOVERY_CHANNEL_ERROR)
-        }
-        files.forEach {
-            when (it.name) {
-                BACKUP_ASSET_FILE_NAME -> {
-                    it.readText().toTypeEntity<List<AssetTable>>()?.let { list ->
-                        assetDao.insertOrReplace(*list.toTypedArray())
+    private suspend fun recoveryFromZipped(files: List<File>): DataResult<Any> =
+        withContext(Dispatchers.IO) {
+            // 获取配置信息
+            val info = files.firstOrNull {
+                it.name == BACKUP_INFO_NAME
+            }?.readText().toTypeEntity<BackupVersionEntity>()
+                ?: return@withContext DataResult.failed<Any>(RESULT_CODE_RECOVERY_UNKNOWN_FILE)
+            logger().d("recoveryFromZipped() info = [$info]")
+            if (!BuildConfig.DEBUG && info.channel != BuildConfig.FLAVOR) {
+                // 非 debug 版本需要匹配渠道才能恢复
+                return@withContext DataResult.failed(RESULT_CODE_RECOVERY_CHANNEL_ERROR)
+            }
+            files.forEach {
+                when (it.name) {
+                    BACKUP_ASSET_FILE_NAME -> {
+                        it.readText().toTypeEntity<List<AssetTable>>()?.let { list ->
+                            assetDao.insertOrReplace(*list.toTypedArray())
+                        }
                     }
-                }
-                BACKUP_BOOKS_FILE_NAME -> {
-                    it.readText().toTypeEntity<List<BooksTable>>()?.let { list ->
-                        booksDao.insertOrReplace(*list.toTypedArray())
+                    BACKUP_BOOKS_FILE_NAME -> {
+                        it.readText().toTypeEntity<List<BooksTable>>()?.let { list ->
+                            booksDao.insertOrReplace(*list.toTypedArray())
+                        }
                     }
-                }
-                BACKUP_RECORD_FILE_NAME -> {
-                    it.readText().toTypeEntity<List<RecordTable>>()?.let { list ->
-                        recordDao.insertOrReplace(*list.toTypedArray())
+                    BACKUP_RECORD_FILE_NAME -> {
+                        it.readText().toTypeEntity<List<RecordTable>>()?.let { list ->
+                            recordDao.insertOrReplace(*list.toTypedArray())
+                        }
                     }
-                }
-                BACKUP_TAG_FILE_NAME -> {
-                    it.readText().toTypeEntity<List<TagTable>>()?.let { list ->
-                        tagDao.insertOrReplace(*list.toTypedArray())
+                    BACKUP_TAG_FILE_NAME -> {
+                        it.readText().toTypeEntity<List<TagTable>>()?.let { list ->
+                            tagDao.insertOrReplace(*list.toTypedArray())
+                        }
                     }
-                }
-                BACKUP_TYPE_FILE_NAME -> {
-                    it.readText().toTypeEntity<List<TypeTable>>()?.let { list ->
-                        typeDao.insertOrReplace(*list.toTypedArray())
+                    BACKUP_TYPE_FILE_NAME -> {
+                        it.readText().toTypeEntity<List<TypeTable>>()?.let { list ->
+                            typeDao.insertOrReplace(*list.toTypedArray())
+                        }
                     }
                 }
             }
+            DataResult.success()
         }
-        DataResult.success()
-    }
 }
