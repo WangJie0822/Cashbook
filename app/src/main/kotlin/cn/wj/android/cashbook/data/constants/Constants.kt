@@ -58,7 +58,7 @@ const val NOTIFICATION_ID_UPDATE_ERROR = 2022
 const val DEFAULT_PAGE_SIZE = 20
 
 /** 备份文件夹 */
-const val BACKUP_DIR_NAME = "Cashbook_Backup_${BuildConfig.FLAVOR}"
+const val BACKUP_DIR_NAME = "Cashbook_Backup_${BuildConfig.BACKUP_DIR_SUFFIX}"
 /** 备份缓存文件夹 */
 const val BACKUP_CACHE_FILE_NAME = "Cashbook_Backup_Cache"
 /** 备份文件名 */

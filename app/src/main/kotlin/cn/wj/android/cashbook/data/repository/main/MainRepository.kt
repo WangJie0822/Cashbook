@@ -202,7 +202,7 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         // 添加备份信息
         cachePath.createFileIfNotExists(BACKUP_INFO_NAME).run {
             cacheFiles.add(this.path)
-            writeText(BackupVersionEntity(BuildConfig.BACKUP_VERSION, BuildConfig.FLAVOR, dateFormat).toJsonString())
+            writeText(BackupVersionEntity(BuildConfig.FLAVOR, dateFormat).toJsonString())
         }
 
         // 压缩包路径
@@ -340,7 +340,9 @@ class MainRepository(database: CashbookDatabase, private val service: WebService
         val info = files.firstOrNull {
             it.name == BACKUP_INFO_NAME
         }?.readText().toTypeEntity<BackupVersionEntity>() ?: return@withContext DataResult.failed<Any>(RESULT_CODE_RECOVERY_UNKNOWN_FILE)
-        if (info.channel != BuildConfig.FLAVOR) {
+        logger().d("recoveryFromZipped() info = [$info]")
+        if (!BuildConfig.DEBUG && info.channel != BuildConfig.FLAVOR) {
+            // 非 debug 版本需要匹配渠道才能恢复
             return@withContext DataResult.failed(RESULT_CODE_RECOVERY_CHANNEL_ERROR)
         }
         files.forEach {

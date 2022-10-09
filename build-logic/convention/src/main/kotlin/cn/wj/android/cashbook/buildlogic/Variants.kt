@@ -22,19 +22,26 @@ enum class FlavorDimension {
 /**
  * 渠道枚举
  *
+ * @param dimension 维度
+ * @param signing 签名
+ * @param applicationIdSuffix 应用 id 后缀
+ * @param versionNameSuffix 版本名后缀
+ * @param backupDirSuffix 备份文件夹后缀
+ *
  * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2022/9/2
  */
 enum class Flavor(
     val dimension: FlavorDimension,
     val signing: Signing,
-    val applicationIdSuffix: String? = null,
-    val versionNameSuffix: String? = null
+    val applicationIdSuffix: String?,
+    val versionNameSuffix: String?,
+    val backupDirSuffix: String
 ) {
     /** 正式渠道 */
-    Online(FlavorDimension.ContentType, Signing.Android, null, "_online"),
+    Online(FlavorDimension.ContentType, Signing.Android, null, "_online", "online"),
 
     /** 开发渠道 */
-    Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev")
+    Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev", "dev")
 }
 
 /**
@@ -65,7 +72,7 @@ fun Project.configureFlavors(
 
                     signingConfig = signingConfigs.findByName(it.signing.name)
 
-                    buildConfigField("int", "BACKUP_VERSION", "1")
+                    buildConfigField("String", "BACKUP_DIR_SUFFIX", "\"${it.backupDirSuffix}\"")
                 }
             }
         }
