@@ -42,6 +42,8 @@ class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseVie
     /** 类型 item 点击 */
     val onTypeItemClick: (TypeEntity) -> Unit = { item ->
         // 更新选中状态
+        // 标记 - 是否是取消二级分类
+        var selectParent: TypeEntity? = null
         if (item.type == TypeEnum.SECOND) {
             // 二级类型，更新选中状态
             typeListData.value?.firstOrNull {
@@ -50,7 +52,19 @@ class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseVie
                 if (parent.selected.get() && parent.expand.get()) {
                     // 已选中且已展开，更新选中状态
                     parent.childList.forEach {
-                        it.selected.set(it.id == item.id)
+                        if (it.id == item.id) {
+                            // 点击的分类
+                            if (it.selected.get()) {
+                                // 取消选中
+                                it.selected.set(false)
+                                selectParent = parent
+                            } else {
+                                it.selected.set(true)
+                            }
+                        } else {
+                            // 取消选中其他
+                            it.selected.set(false)
+                        }
                     }
                 } else {
                     // 更新选中状态及折叠状态
@@ -59,8 +73,20 @@ class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseVie
                         it.selected.set(selected)
                         it.expand.set(selected)
                     }
-                    parent.childList.forEach { child ->
-                        child.selected.set(child.id == item.id)
+                    parent.childList.forEach {
+                        if (it.id == item.id) {
+                            // 点击的分类
+                            if (it.selected.get()) {
+                                // 取消选中
+                                it.selected.set(false)
+                                selectParent = parent
+                            } else {
+                                it.selected.set(true)
+                            }
+                        } else {
+                            // 取消选中其他
+                            it.selected.set(false)
+                        }
                     }
                     secondTypeData.value = parent
                 }
@@ -81,7 +107,9 @@ class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseVie
             // 更新二级列表
             secondTypeData.value = typeListData.value?.firstOrNull { it.id == item.id }
         }
-        selectTypeData.value = item
+
+        // selectParent 不为空代表取消二级分类选择，使用父类型
+        selectTypeData.value = selectParent ?: item
     }
 
     /** 类型设置点击 */
