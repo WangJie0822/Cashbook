@@ -53,7 +53,7 @@ class RecordInfoDialog : BaseDialog<RecordInfoViewModel, DialogRecordInfoBinding
         binding.item = record
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 显示删除确认弹窗
         viewModel.showDeleteConfirmEvent.observe(this) {
             GeneralDialog.newBuilder()

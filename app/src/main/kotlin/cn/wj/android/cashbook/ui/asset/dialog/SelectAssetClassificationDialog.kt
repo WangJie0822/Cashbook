@@ -50,7 +50,7 @@ class SelectAssetClassificationDialog : BaseDialog<SelectAssetClassificationView
         binding.rvBanks.layoutManager = WrapContentLinearLayoutManager()
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 分类列表数据
         viewModel.assetClassificationListData.observe(this) { list ->
             binding.rvAssetClassification.adapter = ConcatAdapter().apply {

@@ -48,7 +48,7 @@ class CalculatorDialog : BaseDialog<CalculatorViewModel, DialogCalculatorBinding
         viewModel.calculatorStr.set(parentViewModel.calculatorStr.get())
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 确认点击
         viewModel.confirmClickEvent.observe(this) {
             // 更新金额

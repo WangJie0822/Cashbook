@@ -49,7 +49,7 @@ class SelectAssociatedRecordActivity : BaseActivity<SelectAssociatedRecordViewMo
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 列表数据
         viewModel.listData.observe(this) { list ->
             recordAdapter.submitList(list)

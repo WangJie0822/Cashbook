@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseViewModel() {
 
     /** 更新二级类型列表数据 */
-    val secondTypeData: MutableLiveData<TypeEntity> = MutableLiveData()
+    val secondTypeData: MutableLiveData<TypeEntity?> = MutableLiveData()
 
     /** 选中类型数据 */
     val selectTypeData: MutableLiveData<TypeEntity> = MutableLiveData()
@@ -37,7 +37,7 @@ class ConsumptionTypeViewModel(private val repository: TypeRepository) : BaseVie
     }
 
     /** 类型列表数据 */
-    val typeListData: MutableLiveData<List<TypeEntity>> = MutableLiveData()
+    val typeListData: MutableLiveData<List<TypeEntity>?> = MutableLiveData()
 
     /** 类型 item 点击 */
     val onTypeItemClick: (TypeEntity) -> Unit = { item ->

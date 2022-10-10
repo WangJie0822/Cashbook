@@ -80,11 +80,14 @@ fun Project.configureFlavors(
         applicationVariants.all {
             generateBuildConfigProvider.get().let {
                 it.doLast {
-                    println("> Task :${project.name}:afterGenerateBuildConfig")
+                    println("> Task :${project.name}:afterGenerateBuildConfig generateFlavorFile-$generateFlavorFile")
+                    if (!generateFlavorFile) {
+                        return@doLast
+                    }
                     // 将枚举类生成到 BuildConfig 路径下
                     val enumPath = it.sourceOutputDir.asFile.get().path
                     val buildPkg = "${it.namespace.get()}.buildlogic"
-                    println("> Task :${project.name}:generateFlavorEnumSource package: $buildPkg enumPath: $enumPath")
+                    println("> Task :${project.name}:beforeGenerateBuildConfig:generateFlavor package-$buildPkg enumPath-$enumPath")
                     generateFlavor(buildPkg, enumPath)
                 }
             }
@@ -104,11 +107,14 @@ fun Project.configureFlavors(
         libraryVariants.all {
             generateBuildConfigProvider.get().let {
                 it.doLast {
-                    println("> Task :${project.name}:afterGenerateBuildConfig")
+                    println("> Task :${project.name}:afterGenerateBuildConfig generateFlavorFile-$generateFlavorFile")
+                    if (!generateFlavorFile) {
+                        return@doLast
+                    }
                     // 将枚举类生成到 BuildConfig 路径下
                     val enumPath = it.sourceOutputDir.asFile.get().path
                     val buildPkg = "${it.namespace.get()}.buildlogic"
-                    println("> Task :${project.name}:generateFlavorEnumSource package: $buildPkg enumPath: $enumPath")
+                    println("> Task :${project.name}:beforeGenerateBuildConfig:generateFlavor package-$buildPkg enumPath-$enumPath")
                     generateFlavor(buildPkg, enumPath)
                 }
             }

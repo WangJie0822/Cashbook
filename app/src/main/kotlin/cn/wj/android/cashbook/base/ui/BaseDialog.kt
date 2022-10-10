@@ -78,7 +78,7 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
         }
 
         // 订阅数据
-        observe()
+        doObserve()
         logger().d("onCreate")
     }
 
@@ -163,7 +163,7 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
     }
 
     /** 订阅数据 */
-    protected open fun observe() {
+    protected open fun doObserve() {
     }
 
     /** 订阅基本数据 */

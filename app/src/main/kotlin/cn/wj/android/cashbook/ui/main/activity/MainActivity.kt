@@ -138,7 +138,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 首页列表
         viewModel.listData.observe(this) { list ->
             adapter.submitList(list)

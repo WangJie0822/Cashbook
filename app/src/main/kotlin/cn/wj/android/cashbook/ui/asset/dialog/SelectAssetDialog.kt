@@ -64,7 +64,7 @@ class SelectAssetDialog : BaseDialog<SelectAssetViewModel, DialogSelectAssetBind
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 显示选择资产类型弹窗
         viewModel.showSelectAssetTypeEvent.observe(this) {
             SelectAssetClassificationDialog().show(requireActivity().supportFragmentManager)

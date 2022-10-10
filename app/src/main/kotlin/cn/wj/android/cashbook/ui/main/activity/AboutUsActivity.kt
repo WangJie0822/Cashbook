@@ -34,7 +34,7 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
         setContentView(R.layout.activity_about_us)
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 跳转发送邮件
         viewModel.jumpSendEmailEvent.observe(this) { email ->
             email.runIfNotNullAndBlank {

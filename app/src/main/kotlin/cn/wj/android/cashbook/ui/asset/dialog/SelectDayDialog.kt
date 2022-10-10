@@ -50,7 +50,7 @@ class SelectDayDialog : BaseDialog<SelectDayViewModel, DialogAssetSelectDayBindi
         selectedDay = requireArguments().getString(ACTION_SELECTED) ?: return
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 日期数据
         viewModel.dayData.observe(this) { list ->
             binding.epv.setDataList(list)

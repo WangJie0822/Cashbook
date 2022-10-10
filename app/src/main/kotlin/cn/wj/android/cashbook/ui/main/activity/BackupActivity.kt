@@ -44,7 +44,7 @@ class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
         setContentView(R.layout.activity_backup)
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 选择备份路径
         viewModel.selectBackupPathEvent.observe(this) { backup ->
             selectDirLauncher.launch(null) {

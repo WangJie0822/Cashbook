@@ -79,7 +79,7 @@ class GeneralDialog
         viewModel.selectSpan.value = selectSpan
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 背景点击
         viewModel.tryDismissEvent.observe(this) {
             if (isCancelable) {

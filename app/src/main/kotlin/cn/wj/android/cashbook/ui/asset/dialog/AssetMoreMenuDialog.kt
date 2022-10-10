@@ -36,7 +36,7 @@ class AssetMoreMenuDialog : BaseDialog<AssetMoreMenuViewModel, DialogAssetMoreMe
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 显示选择资产类型弹窗
         viewModel.showSelectAssetClassificationData.observe(this) {
             SelectAssetClassificationDialog().show(requireActivity().supportFragmentManager)

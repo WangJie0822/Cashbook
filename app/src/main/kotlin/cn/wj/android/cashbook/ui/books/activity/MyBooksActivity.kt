@@ -61,7 +61,7 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
         viewModel.loadBooksList()
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 账本列表
         viewModel.booksListData.observe(this) { list ->
             booksListRvAdapter.submitList(list)

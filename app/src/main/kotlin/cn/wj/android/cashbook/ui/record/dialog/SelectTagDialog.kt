@@ -64,7 +64,7 @@ class SelectTagDialog : BaseDialog<SelectTagViewModel, DialogSelectTagBinding>()
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 标签列表
         viewModel.tagListData.observe(this) { list ->
             tagAdapter.submitList(list)

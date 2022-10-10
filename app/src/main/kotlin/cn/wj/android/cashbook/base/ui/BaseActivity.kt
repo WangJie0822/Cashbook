@@ -63,7 +63,7 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
         observeBaseModel()
 
         // 订阅数据
-        observe()
+        doObserve()
         logger().d("onCreate")
     }
 
@@ -160,7 +160,7 @@ abstract class BaseActivity<VM : BaseViewModel, DB : ViewDataBinding> :
     }
 
     /** 订阅数据 */
-    protected open fun observe() {
+    protected open fun doObserve() {
     }
 
     /** 初始化状态栏相关配置 */

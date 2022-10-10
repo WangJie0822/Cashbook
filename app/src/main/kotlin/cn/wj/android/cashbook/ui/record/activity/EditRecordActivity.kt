@@ -65,7 +65,7 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 选择资产弹窗
         viewModel.showSelectAssetEvent.observe(this) {
             SelectAssetDialog.actionShow(supportFragmentManager) { selected ->

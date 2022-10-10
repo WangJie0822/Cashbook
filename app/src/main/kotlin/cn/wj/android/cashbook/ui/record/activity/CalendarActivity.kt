@@ -49,7 +49,7 @@ class CalendarActivity : BaseActivity<CalendarViewModel, ActivityCalendarBinding
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 列表数据
         viewModel.listData.observe(this) { list ->
             adapter.submitList(list)

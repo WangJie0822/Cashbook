@@ -35,7 +35,7 @@ class EditTagDialog
     override fun initView() {
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 成功事件
         viewModel.successEvent.observe(this) { tag ->
             onCallback?.invoke(tag)

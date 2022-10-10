@@ -59,7 +59,7 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 数据列表
         viewModel.recordListData.observe(this) { list ->
             pagingAdapter.submitData(this.lifecycle, list)

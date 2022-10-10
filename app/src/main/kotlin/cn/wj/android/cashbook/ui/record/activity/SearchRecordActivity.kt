@@ -54,7 +54,7 @@ class SearchRecordActivity : BaseActivity<SearchRecordViewModel, ActivitySearchR
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 列表数据
         viewModel.listData.observe(this) { list ->
             adapter.submitData(this.lifecycle, list)

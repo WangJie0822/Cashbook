@@ -59,7 +59,7 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
         }
 
         // 订阅数据
-        observe()
+        doObserve()
         logger().d("onCreate")
     }
 
@@ -148,7 +148,7 @@ abstract class BaseFragment<VM : BaseViewModel, DB : ViewDataBinding> : Fragment
     }
 
     /** 订阅数据 */
-    protected open fun observe() {
+    protected open fun doObserve() {
     }
 
     /** 订阅基本数据 */

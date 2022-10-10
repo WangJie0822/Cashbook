@@ -113,7 +113,7 @@ class MyAssetActivity : BaseActivity<MyAssetViewModel, ActivityMyAssetBinding>()
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 无数据界面
         viewModel.showNoData.observe(this, {
             binding.includeNoData.root.visibility = if (it) {

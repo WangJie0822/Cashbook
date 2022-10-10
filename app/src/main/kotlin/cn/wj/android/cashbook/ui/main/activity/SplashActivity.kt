@@ -53,7 +53,7 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 显示隐私政策弹窗
         viewModel.showPrivacyPolicyDialogEvent.observe(this) {
             GeneralDialog.newBuilder()

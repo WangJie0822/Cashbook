@@ -55,7 +55,7 @@ class TagManagerActivity : BaseActivity<TagManagerViewModel, ActivityTagManagerB
         viewModel.refreshTagList()
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 标签列表
         viewModel.tagListData.observe(this) { list ->
             adapter.submitList(list)

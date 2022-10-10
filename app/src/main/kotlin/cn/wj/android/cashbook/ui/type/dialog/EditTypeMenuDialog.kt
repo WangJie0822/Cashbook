@@ -49,7 +49,7 @@ class EditTypeMenuDialog : BaseDialog<EditTypeMenuViewModel, DialogEditTypeMenuB
         viewModel.firstType.value = requireArguments().getBoolean(ACTION_FIRST, true)
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 点击事件
         viewModel.editClickEvent.observe(this) {
             onEditClickListener?.invoke()

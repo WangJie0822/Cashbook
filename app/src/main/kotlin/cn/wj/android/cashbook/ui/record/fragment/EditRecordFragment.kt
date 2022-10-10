@@ -62,9 +62,12 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun observe() {
+    override fun doObserve() {
         // 类型列表
         typeViewModel.typeListData.observe(this) { list ->
+            if (null == list) {
+                return@observe
+            }
             adapter.adapters.forEach {
                 adapter.removeAdapter(it)
             }
@@ -108,6 +111,9 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
         }
         // 二级类型状态
         typeViewModel.secondTypeData.observe(this) { item ->
+            if (null == item) {
+                return@observe
+            }
             adapter.removeAdapter(secondAdapter)
             if (item.expand.get() && item.childEnable && item.childList.isNotEmpty()) {
                 // 需要展开
@@ -168,7 +174,8 @@ class EditRecordFragment : BaseFragment<EditRecordViewModel, FragmentEditRecordB
         fun newInstance(position: Int): EditRecordFragment {
             return EditRecordFragment().apply {
                 arguments = bundleOf(
-                    ACTION_TYPE to RecordTypeEnum.fromPosition(position).orElse(RecordTypeEnum.EXPENDITURE)
+                    ACTION_TYPE to RecordTypeEnum.fromPosition(position)
+                        .orElse(RecordTypeEnum.EXPENDITURE)
                 )
             }
         }

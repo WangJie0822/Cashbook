@@ -62,7 +62,7 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 显示选择日期弹窗
         viewModel.showSelectDayEvent.observe(this) { billingDate ->
             val selectedDay = if (billingDate) {

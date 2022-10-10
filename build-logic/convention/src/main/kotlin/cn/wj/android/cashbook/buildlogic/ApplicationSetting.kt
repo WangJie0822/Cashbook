@@ -1,5 +1,7 @@
 package cn.wj.android.cashbook.buildlogic
 
+import org.gradle.api.Project
+
 /**
  * 应用配置数据
  *
@@ -12,7 +14,7 @@ object ApplicationSetting {
         const val minSdk = 21
         const val targetSdk = 30
         val versionCode = generateVersionCode()
-        val versionName = "v0.5.5_$versionCode"
+        val versionName = "v0.5.6_$versionCode"
 
         /** 根据日期时间获取对应版本号 */
         private fun generateVersionCode(): Int {
@@ -30,3 +32,15 @@ object ApplicationSetting {
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
     }
 }
+
+/** 拓展变量数据存储集合 */
+private val kvMap: HashMap<String, Any> = HashMap()
+
+/** 标记 - 是否生成枚举类文件 */
+var Project.generateFlavorFile: Boolean
+    get() {
+        return (kvMap["${this.name}-generateFlavorFileKey"] as? Boolean) ?: false
+    }
+    set(value) {
+        kvMap["${this.name}-generateFlavorFileKey"] = value
+    }

@@ -63,7 +63,7 @@ class TypeListFragment : BaseFragment<TypeListViewModel, FragmentTypeListBinding
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 数据列表
         viewModel.listData.observe(this) { list ->
             adapter.submitList(list)

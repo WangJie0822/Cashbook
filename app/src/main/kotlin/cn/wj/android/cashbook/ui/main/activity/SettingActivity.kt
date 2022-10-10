@@ -29,7 +29,7 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
 
     private var dayNightIndex = DayNightEnum.indexOf(CurrentDayNightLiveData.currentDayNight)
 
-    override fun observe() {
+    override fun doObserve() {
         // 显示选择主题弹窗
         viewModel.showSelectDayNightDialogEvent.observe(this) {
             dayNightIndex = DayNightEnum.indexOf(CurrentDayNightLiveData.currentDayNight)

@@ -35,7 +35,7 @@ fun bytesToHexString(bytes: ByteArray?): String {
     }
     for (element in bytes) {
         val v = element.toInt() and 0xFF
-        val hv = Integer.toHexString(v).toUpperCase(Locale.getDefault())
+        val hv = Integer.toHexString(v).uppercase(Locale.getDefault())
         if (hv.length < 2) {
             stringBuilder.append(0)
         }
@@ -49,7 +49,7 @@ fun hexStringToBytes(str: String?): ByteArray? {
     if (str == null || str == "") {
         return null
     }
-    val result = str.toUpperCase(Locale.getDefault())
+    val result = str.uppercase(Locale.getDefault())
     val length = result.length / 2
     val hexChars = result.toCharArray()
     val d = ByteArray(length)

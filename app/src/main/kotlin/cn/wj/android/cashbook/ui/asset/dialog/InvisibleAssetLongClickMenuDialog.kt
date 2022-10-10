@@ -40,7 +40,7 @@ class InvisibleAssetLongClickMenuDialog : BaseDialog<InvisibleAssetLongClickMenu
         }
     }
 
-    override fun observe() {
+    override fun doObserve() {
         // 点击事件
         viewModel.cancelHiddenClickEvent.observe(this) {
             onCancelHiddenClickListener?.invoke()
