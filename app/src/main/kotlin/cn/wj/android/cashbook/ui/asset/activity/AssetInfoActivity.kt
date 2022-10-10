@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.ui.asset.activity
 
 import android.os.Bundle
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
@@ -52,7 +53,7 @@ class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBind
             adapter = pagingAdapter
         }
 
-        if (viewModel.assetData.value?.type == ClassificationTypeEnum.DEBT_ACCOUNT) {
+        if (!viewModel.assetData.value?.needMoreInfo.condition || !viewModel.assetData.value?.hasMoreInfo.condition) {
             // 债务账户，没有更多信息
             binding.toolbar.menu.removeItem(R.id.more)
         }

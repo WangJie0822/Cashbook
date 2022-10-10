@@ -55,6 +55,7 @@ class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBind
                 viewModel.openBank.value = value.openBank
                 viewModel.cardNo.value = value.cardNo
                 viewModel.remark.value = value.remark
+                viewModel.needMoreInfo.value = value.needMoreInfo
             } else {
                 viewModel.assetName.value = value.classification.nameResId.string
             }

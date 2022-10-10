@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.copyToClipboard
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -25,9 +26,19 @@ class AssetMoreInfoViewModel : BaseViewModel() {
         it.openBank
     }
 
+    /** 标记 - 是否有开户行信息 */
+    val hasOpenBank: LiveData<Boolean> = openBankStr.map {
+        it.isNotBlank()
+    }
+
     /** 卡号 */
     val cardNoStr: LiveData<String> = assetData.map {
         it.cardNo
+    }
+
+    /** 标记 - 是否有卡号信息 */
+    val hasCardNo: LiveData<Boolean> = cardNoStr.map {
+        it.isNotBlank()
     }
 
     /** 开户行复制点击 */
@@ -44,8 +55,17 @@ class AssetMoreInfoViewModel : BaseViewModel() {
 
     /** 全部复制点击 */
     val onCopyAllClick: () -> Unit = {
-        R.string.copy_to_clipboard_format.string.format(openBankStr.value, cardNoStr.value)
-            .copyToClipboard()
+        val hasOpenBank = hasOpenBank.value.condition
+        val hasCardNo = hasCardNo.value.condition
+        if (hasOpenBank && hasCardNo) {
+            R.string.open_bank_copy_to_clipboard_format.string.format(openBankStr.value) +
+                    "\n" +
+                    R.string.card_no_copy_to_clipboard_format.string.format(cardNoStr.value)
+        } else if (hasOpenBank) {
+            R.string.open_bank_copy_to_clipboard_format.string.format(openBankStr.value)
+        } else {
+            R.string.card_no_copy_to_clipboard_format.string.format(cardNoStr.value)
+        }.copyToClipboard()
         snackbarEvent.value = SnackbarModel(R.string.copy_to_clipboard_success)
     }
 }

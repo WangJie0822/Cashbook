@@ -105,6 +105,9 @@ class EditAssetViewModel(private val repository: AssetRepository) : BaseViewMode
     /** 卡号 */
     val cardNo: MutableLiveData<String> = MutableLiveData()
 
+    /** 是否需要更多信息 */
+    val needMoreInfo: MutableLiveData<Boolean> = MutableLiveData()
+
     /** 备注 */
     val remark: MutableLiveData<String> = MutableLiveData()
 
