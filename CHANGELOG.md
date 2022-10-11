@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 新增密码相关功能；
 
 ## [0.5.6_22101015]
 ### Add

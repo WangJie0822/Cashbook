@@ -7,6 +7,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import cn.wj.android.cashbook.manager.AppManager
+import okhttp3.internal.toHexString
+import java.security.MessageDigest
 import java.util.*
 
 /* ----------------------------------------------------------------------------------------- */
@@ -25,6 +27,21 @@ fun String.copyToClipboard(
 ) {
     val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     manager.setPrimaryClip(ClipData.newPlainText(label, this))
+}
+
+fun String.shaEncode(): String {
+    val sha = MessageDigest.getInstance("SHA")
+    val byteArray = this.toByteArray()
+    val md5Bytes = sha.digest(byteArray)
+    val sb = StringBuilder()
+    md5Bytes.forEachIndexed { index, byte ->
+        val value = byte.toInt() and 0xff
+        if (value < 16) {
+            sb.append("0")
+        }
+        sb.append(value.toHexString())
+    }
+    return sb.toString()
 }
 
 /** 将 [bytes] 转换为 16 进制 [String] */

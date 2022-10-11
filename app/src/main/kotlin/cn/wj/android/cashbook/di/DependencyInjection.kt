@@ -234,4 +234,10 @@ val viewModelModule = module {
     viewModel {
         AssetMoreInfoViewModel()
     }
+    viewModel {
+        EditPasswordViewModel()
+    }
+    viewModel {
+        ClearPasswordViewModel()
+    }
 }

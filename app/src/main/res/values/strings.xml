@@ -292,4 +292,19 @@
     <string name="copy_to_clipboard_success">已复制到剪切板</string>
     <string name="open_bank_copy_to_clipboard_format">开户行：%1$s</string>
     <string name="card_no_copy_to_clipboard_format">卡号：%2$s</string>
+    <string name="verify_fingerprint">验证指纹</string>
+    <string name="need_verify_when_app_open">开启应用时需要安全验证</string>
+    <string name="modify_password">修改密码</string>
+    <string name="create_password">创建密码</string>
+    <string name="clear_password">清除密码</string>
+    <string name="please_enter_old_password">请输入旧密码</string>
+    <string name="please_enter_password">请输入密码</string>
+    <string name="please_enter_new_password">请输入新密码</string>
+    <string name="please_enter_password_again">请再次输入密码</string>
+    <string name="please_enter_same_password">请输入相同的密码</string>
+    <string name="password_length_too_short">密码长度不能低于6位</string>
+    <string name="please_enter_right_old_password">请输入正确的旧密码</string>
+    <string name="please_enter_password_to_confirm">请输入密码确认</string>
+    <string name="clear_password_hint">为确保信息安全，清除密码需要您输入正确的密码以确认</string>
+    <string name="please_enter_right_password">请输入正确的密码</string>
 </resources>

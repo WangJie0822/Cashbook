@@ -18,6 +18,12 @@ const val SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE = "shared_key_mobile_network
 /** 白天黑夜 mode */
 const val SHARED_KEY_DAY_NIGHT_MODE = "shared_key_day_night_mode"
 
+/** 是否需要开启安全验证 */
+const val SHARED_KEY_NEED_VERIFY_WHEN_OPEN = "shared_key_need_verify_when_open"
+
+/** 用户密码 */
+const val SHARED_KEY_PASSWORD = "shared_key_password"
+
 /** 是否同意用户协议 */
 const val SHARED_KEY_AGREE_USER_AGREEMENT = "shared_key_agree_user_agreement"
 

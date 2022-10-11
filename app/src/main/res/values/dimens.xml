@@ -9,9 +9,9 @@
     <dimen name="spacing_normal">8dp</dimen>
     <dimen name="spacing_big">16dp</dimen>
 
+    <dimen name="icon_size_small">12dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="icon_size_larger">32dp</dimen>
-    <dimen name="icon_size_small">12dp</dimen>
     <dimen name="icon_padding">8dp</dimen>
     <dimen name="icon_padding_small">4dp</dimen>
     <dimen name="icon_size_launcher">96dp</dimen>

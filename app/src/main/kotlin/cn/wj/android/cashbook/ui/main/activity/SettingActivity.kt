@@ -7,6 +7,8 @@ import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.enums.DayNightEnum
 import cn.wj.android.cashbook.data.live.CurrentDayNightLiveData
 import cn.wj.android.cashbook.databinding.ActivitySettingBinding
+import cn.wj.android.cashbook.ui.main.dialog.ClearPasswordDialog
+import cn.wj.android.cashbook.ui.main.dialog.EditPasswordDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -44,6 +46,14 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
+        }
+        // 显示编辑密码弹窗
+        viewModel.showEditPasswordDialogEvent.observe(this) {
+            EditPasswordDialog.actionShow(supportFragmentManager)
+        }
+        // 显示清除密码弹窗
+        viewModel.showClearPasswordDialogEvent.observe(this) {
+            ClearPasswordDialog.actionShow(supportFragmentManager)
         }
     }
 }

@@ -2,31 +2,8 @@ package cn.wj.android.cashbook.data.config
 
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatDelegate
-import cn.wj.android.cashbook.base.tools.getSharedBoolean
-import cn.wj.android.cashbook.base.tools.getSharedInt
-import cn.wj.android.cashbook.base.tools.getSharedLong
-import cn.wj.android.cashbook.base.tools.getSharedParcelable
-import cn.wj.android.cashbook.base.tools.getSharedString
-import cn.wj.android.cashbook.base.tools.setSharedBoolean
-import cn.wj.android.cashbook.base.tools.setSharedInt
-import cn.wj.android.cashbook.base.tools.setSharedLong
-import cn.wj.android.cashbook.base.tools.setSharedParcelable
-import cn.wj.android.cashbook.base.tools.setSharedString
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_AGREE_USER_AGREEMENT
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_BACKUP
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_AUTO_CHECK_UPDATE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_BACKUP_PATH
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_DAY_NIGHT_MODE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_IGNORE_VERSION
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_ASSET_ID
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_LAST_BACKUP_MS
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_TOP_UP_ENTRY_INTO_TOTAL
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_TYPE_INITIALIZED
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_USE_GITEE
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_WEBDAV_ACCOUNT
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_WEBDAV_PASSWORD
-import cn.wj.android.cashbook.data.constants.SHARED_KEY_WEBDAV_WEB_URL
+import cn.wj.android.cashbook.base.tools.*
+import cn.wj.android.cashbook.data.constants.*
 import cn.wj.android.cashbook.data.enums.AutoBackupEnum
 import kotlin.reflect.KProperty
 
@@ -113,6 +90,18 @@ object AppConfigs {
     var mobileNetworkDownloadEnable: Boolean by NoNullProperties(
         SHARED_KEY_MOBILE_NETWORK_DOWNLOAD_ENABLE,
         false
+    )
+
+    /** 是否需要开启安全验证 */
+    var needVerifyWhenOpen: Boolean by NoNullProperties(
+        SHARED_KEY_NEED_VERIFY_WHEN_OPEN,
+        false
+    )
+
+    /** 用户密码 */
+    var password: String by NoNullProperties(
+        SHARED_KEY_PASSWORD,
+        ""
     )
 
     /** 白天黑夜 mode */

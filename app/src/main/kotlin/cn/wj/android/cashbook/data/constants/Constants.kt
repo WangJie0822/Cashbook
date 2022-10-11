@@ -85,3 +85,6 @@ const val MIME_TYPE_ZIP = "application/zip"
 const val MS_DAY = 1000L * 60L * 60L * 24L
 /** 一周对应毫秒数 */
 const val MS_WEEK = MS_DAY * 7L
+
+/** 最低密码长度 */
+const val PASSWORD_MIN_LENGTH = 6
