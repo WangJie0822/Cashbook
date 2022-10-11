@@ -6,11 +6,10 @@ import android.text.style.ClickableSpan
 import android.view.View
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.showSoftKeyboard
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_MAIN
-import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.databinding.ActivitySplashBinding
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
@@ -32,7 +31,7 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
         setContentView(R.layout.activity_splash)
 
         // 初始化数据
-        viewModel.init()
+        viewModel.init(intent.action)
     }
 
     override fun beforeOnCreate() {
@@ -78,12 +77,13 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
                     // 同意，保存状态
                     AppConfigs.agreeUserAgreement = true
                     // 跳转首页并关闭当前界面
-                    viewModel.uiNavigationEvent.value = UiNavigationModel.builder {
-                        jump(ROUTE_PATH_MAIN)
-                        close()
-                    }
+                    viewModel.jumpToMainAndFinish()
                 }
                 .show(supportFragmentManager)
+        }
+        // 显示软键盘
+        viewModel.showSoftKeyboardEvent.observe(this){
+            binding.tietPassword.showSoftKeyboard()
         }
     }
 }

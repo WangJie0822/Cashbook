@@ -6,11 +6,12 @@
         android:shortcutShortLabel="@string/keep_a_record">
 
         <intent
-            android:action="android.intent.action.VIEW"
-            android:targetClass="cn.wj.android.cashbook.ui.record.activity.EditRecordActivity"
+            android:action="cn.wj.android.cashbook.record"
+            android:targetClass="cn.wj.android.cashbook.ui.main.activity.SplashActivity"
             android:targetPackage="cn.wj.android.cashbook.dev" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
+
     <shortcut
         android:enabled="true"
         android:icon="@drawable/vector_shortcuts_asset_24"
@@ -18,8 +19,8 @@
         android:shortcutShortLabel="@string/asset_info">
 
         <intent
-            android:action="android.intent.action.VIEW"
-            android:targetClass="cn.wj.android.cashbook.ui.asset.activity.MyAssetActivity"
+            android:action="cn.wj.android.cashbook.asset"
+            android:targetClass="cn.wj.android.cashbook.ui.main.activity.SplashActivity"
             android:targetPackage="cn.wj.android.cashbook.dev" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>

@@ -51,9 +51,16 @@ data class UiNavigationModel(
          *
          * @param path 界面路径
          * @param data 跳转数据，默认 `null`
+         * @param onArrival 跳转成功回调
+         * @param onIntercept 跳转拦截回调
          */
-        fun jump(path: String, data: Bundle? = null): Builder {
-            this.jump = UiJumpModel(path, data)
+        fun jump(
+            path: String,
+            data: Bundle? = null,
+            onArrival: (() -> Unit)? = null,
+            onIntercept: (() -> Unit)? = null
+        ): Builder {
+            this.jump = UiJumpModel(path, data, onArrival, onIntercept)
             return this
         }
 
@@ -81,8 +88,12 @@ data class UiCloseModel(
  *
  * @param path 界面路径
  * @param data 跳转数据，默认 `null`
+ * @param onArrival 跳转成功回调
+ * @param onIntercept 跳转拦截回调
  */
 data class UiJumpModel(
     val path: String,
-    val data: Bundle? = null
+    val data: Bundle? = null,
+    val onArrival: (() -> Unit)? = null,
+    val onIntercept: (() -> Unit)? = null
 )

@@ -8,14 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.condition
-import cn.wj.android.cashbook.base.ext.base.decimalFormat
-import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.moneyFormat
-import cn.wj.android.cashbook.base.ext.base.negative
-import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
+import cn.wj.android.cashbook.base.ext.base.*
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
 import cn.wj.android.cashbook.base.ui.BaseViewModel
@@ -29,7 +22,6 @@ import cn.wj.android.cashbook.data.event.LifecycleEvent
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.asset.AssetRepository
 import cn.wj.android.cashbook.interfaces.AssetListClickListener
-import cn.wj.android.cashbook.manager.DatabaseManager
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -38,16 +30,8 @@ import java.math.BigDecimal
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/3
  */
-class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(), AssetListClickListener {
-
-    init {
-        // 该界面用于快捷启动，需要单独初始化
-        viewModelScope.launch {
-            DatabaseManager.initDatabase(repository.database)
-            // 加载数据
-            loadAssetData()
-        }
-    }
+class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(),
+    AssetListClickListener {
 
     /** 显示资产菜单事件 */
     val showLongClickMenuEvent: LifecycleEvent<AssetEntity> = LifecycleEvent()
@@ -258,7 +242,10 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
                     totalLend += asset.balance.toBigDecimalOrZero()
                 }
             }
-            R.string.debt_total_format.string.format(totalBorrow.decimalFormat().negative().moneyFormat(), totalLend.decimalFormat().moneyFormat())
+            R.string.debt_total_format.string.format(
+                totalBorrow.decimalFormat().negative().moneyFormat(),
+                totalLend.decimalFormat().moneyFormat()
+            )
         }
     }
 
@@ -271,7 +258,13 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
     val hideDebtAccountList: MutableLiveData<Boolean> = MutableLiveData(false)
 
     /** 标记 - 是否显示无数据 */
-    val showNoData: LiveData<Boolean> = maps(hasCapitalAccount, hasCreditCardAccount, hasTopUpAccount, hasInvestmentFinancialAccount, hasDebtAccount) {
+    val showNoData: LiveData<Boolean> = maps(
+        hasCapitalAccount,
+        hasCreditCardAccount,
+        hasTopUpAccount,
+        hasInvestmentFinancialAccount,
+        hasDebtAccount
+    ) {
         !(hasCapitalAccount.value.condition || hasCreditCardAccount.value.condition || hasTopUpAccount.value.condition || hasInvestmentFinancialAccount.value.condition || hasDebtAccount.value.condition)
     }
 
@@ -307,7 +300,8 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
             // 总负债为所有信用卡欠款、借入总额
             var total = "0".toBigDecimal()
             it.filter { asset ->
-                (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull().orElse(0f) > 0) || asset.classification == AssetClassificationEnum.BORROW
+                (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull()
+                    .orElse(0f) > 0) || asset.classification == AssetClassificationEnum.BORROW
             }.forEach { asset ->
                 total += asset.balance.toBigDecimalOrZero()
             }
@@ -340,7 +334,9 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
                     // 借入
                     totalBorrow += asset.balance.toBigDecimalOrZero()
                 }
-                if (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull().orElse(0f) > 0) {
+                if (asset.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT && asset.balance.toFloatOrNull()
+                        .orElse(0f) > 0
+                ) {
                     // 信用卡且有欠款
                     totalCreditCard += asset.balance.toBigDecimalOrZero()
                 }
@@ -395,7 +391,8 @@ class MyAssetViewModel(private val repository: AssetRepository) : BaseViewModel(
 
     /** 理财账户箭头点击 */
     val onInvestmentFinancialArrowClick: () -> Unit = {
-        hideInvestmentFinancialAccountList.value = !hideInvestmentFinancialAccountList.value.condition
+        hideInvestmentFinancialAccountList.value =
+            !hideInvestmentFinancialAccountList.value.condition
     }
 
     /** 债务账户箭头点击 */

@@ -30,10 +30,13 @@ import cn.wj.android.cashbook.data.live.CurrentBooksLiveData
 import cn.wj.android.cashbook.data.model.UiNavigationModel
 import cn.wj.android.cashbook.data.repository.record.RecordRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
-import cn.wj.android.cashbook.manager.DatabaseManager
 import cn.wj.android.cashbook.widget.calculator.SYMBOL_ZERO
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
+import kotlin.text.StringBuilder
+import kotlin.text.isNotBlank
+import kotlin.text.orEmpty
+import kotlin.text.toFloatOrNull
 
 /**
  * 编辑记录 ViewModel
@@ -41,13 +44,6 @@ import kotlinx.coroutines.launch
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
 class EditRecordViewModel(private val repository: RecordRepository) : BaseViewModel() {
-
-    init {
-        // 该界面用于快捷启动，需要单独初始化
-        viewModelScope.launch {
-            DatabaseManager.initDatabase(repository.database)
-        }
-    }
 
     /** 编辑数据 */
     var record: RecordEntity? = null
@@ -232,7 +228,11 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
         if (null == it) {
             R.string.associated_expenditure_record.string
         } else {
-            "${R.string.associated_with_colon.string}${it.recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)} ${it.typeStr} ${it.amountStr}"
+            "${R.string.associated_with_colon.string}${
+                it.recordTime.dateFormat(
+                    DATE_FORMAT_MONTH_DAY
+                )
+            } ${it.typeStr} ${it.amountStr}"
         }
     }
 
@@ -347,12 +347,13 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
             return
         }
         val childType = typeValue.childList.firstOrNull { it.selected.get() }
-        val type = if (typeValue.type == TypeEnum.FIRST && typeValue.expand.get() && null != childType) {
-            // 一级菜单，展开且子类型选中
-            childType
-        } else {
-            typeValue
-        }
+        val type =
+            if (typeValue.type == TypeEnum.FIRST && typeValue.expand.get() && null != childType) {
+                // 一级菜单，展开且子类型选中
+                childType
+            } else {
+                typeValue
+            }
         val asset = accountData.value
         val intoAsset = if (currentItem.value == RecordTypeEnum.TRANSFER.position) {
             transferAccountData.value
@@ -370,7 +371,8 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                 return
             }
             if (asset.id == intoAsset.id) {
-                snackbarEvent.value = R.string.transfer_asset_should_not_be_same.string.toSnackbarModel()
+                snackbarEvent.value =
+                    R.string.transfer_asset_should_not_be_same.string.toSnackbarModel()
                 return
             }
         }
@@ -388,7 +390,11 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                     repository.insertRecord(
                         RecordEntity(
                             id = -1,
-                            typeEnum = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
+                            typeEnum = RecordTypeEnum.fromPosition(
+                                currentItem.value.orElse(
+                                    RecordTypeEnum.EXPENDITURE.position
+                                )
+                            ).orElse(RecordTypeEnum.EXPENDITURE),
                             type = type,
                             asset = asset,
                             intoAsset = intoAsset,
@@ -411,7 +417,11 @@ class EditRecordViewModel(private val repository: RecordRepository) : BaseViewMo
                     // 修改
                     repository.updateRecord(
                         record!!.copy(
-                            typeEnum = RecordTypeEnum.fromPosition(currentItem.value.orElse(RecordTypeEnum.EXPENDITURE.position)).orElse(RecordTypeEnum.EXPENDITURE),
+                            typeEnum = RecordTypeEnum.fromPosition(
+                                currentItem.value.orElse(
+                                    RecordTypeEnum.EXPENDITURE.position
+                                )
+                            ).orElse(RecordTypeEnum.EXPENDITURE),
                             type = type,
                             asset = accountData.value,
                             intoAsset = intoAsset,

@@ -101,6 +101,19 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         viewModel.checkUpdate()
         // 自动备份
         viewModel.autoBackup()
+
+        intent.getStringExtra(ACTION_CONTENT)?.let { action->
+            when (action) {
+                SHORTCUTS_RECORD -> {
+                    // 记一笔
+                    viewModel.onAddClick.invoke()
+                }
+                SHORTCUTS_ASSET -> {
+                    // 资产
+                    viewModel.onMyAssetClick.invoke()
+                }
+            }
+        }
     }
 
     override fun onStop() {

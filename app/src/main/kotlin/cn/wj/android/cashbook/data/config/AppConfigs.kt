@@ -74,6 +74,9 @@ inline operator fun <reified T> NoNullProperties<T>.setValue(
 
 object AppConfigs {
 
+    /** 是否已认证 */
+    var verified = false
+
     /** 分类是否初始化 */
     var typeInitialized: Boolean by NoNullProperties(SHARED_KEY_TYPE_INITIALIZED, false)
 

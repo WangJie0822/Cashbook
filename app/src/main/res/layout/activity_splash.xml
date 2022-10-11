@@ -29,6 +29,71 @@
             app:layout_constraintVertical_bias="0.96"
             tools:text="记账本\nv1.0_20210520_debug\n©2021 - 2021 By WangJie0822" />
 
+        <View
+            android:id="@+id/v_bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/colorSurface"
+            android:bind_visibility="@{viewModel.needVerify}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/til_password" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_password"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_big"
+            android:layout_marginEnd="@dimen/spacing_big"
+            android:layout_marginBottom="@dimen/spacing_big"
+            android:bind_visibility="@{viewModel.needVerify}"
+            android:hint="@string/please_enter_password_to_confirm"
+            app:endIconMode="password_toggle"
+            app:hintTextAppearance="?attr/textAppearanceCaption"
+            app:layout_constraintBottom_toTopOf="@id/iv_fingerprint"
+            app:layout_constraintEnd_toStartOf="@id/btn_confirm"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_password"
+                style="@style/textInputEditTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:inputType="textPassword"
+                android:text="@={viewModel.password}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spacing_big"
+            android:bind_onClick="@{viewModel.onConfirmClick}"
+            android:bind_visibility="@{viewModel.needVerify}"
+            android:text="@string/confirm"
+            app:layout_constraintBottom_toBottomOf="@id/til_password"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/til_password" />
+
+        <ImageView
+            android:id="@+id/iv_fingerprint"
+            android:layout_width="@dimen/icon_size_larger"
+            android:layout_height="@dimen/icon_size_larger"
+            android:layout_marginBottom="@dimen/spacing_big"
+            android:bind_onClick="@{viewModel.onFingerprintClick}"
+            android:bind_visibility="@{viewModel.needVerify &amp;&amp; viewModel.supportFingerprint}"
+            android:contentDescription="@null"
+            android:src="@drawable/vector_fingerprint"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

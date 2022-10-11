@@ -6,8 +6,11 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import cn.wj.android.cashbook.base.ext.base.logger
 import java.lang.ref.WeakReference
-import java.util.Stack
+import java.util.*
+
+typealias ForegroundCallback = (Boolean) -> Unit
 
 /**
  * 应用程序 [Activity] 管理类
@@ -34,7 +37,7 @@ object AppManager {
     private var foregroundCount = 0
 
     /** App 前后台切换回调 */
-    private var mAppForegroundStatusChangeCallback: ((Boolean) -> Unit)? = null
+    private val mAppForegroundStatusChangeCallbacks = arrayListOf<ForegroundCallback>()
 
     /** Activity 生命周期回调接口*/
     private val mActivityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
@@ -49,7 +52,9 @@ object AppManager {
         override fun onActivityStarted(activity: Activity) {
             if (foregroundCount == 0) {
                 // App 回到前台
-                mAppForegroundStatusChangeCallback?.invoke(true)
+                mAppForegroundStatusChangeCallbacks.forEach {
+                    it.invoke(true)
+                }
             }
             foregroundCount++
         }
@@ -64,7 +69,9 @@ object AppManager {
             foregroundCount--
             if (foregroundCount == 0) {
                 // App 退到后台
-                mAppForegroundStatusChangeCallback?.invoke(false)
+                mAppForegroundStatusChangeCallbacks.forEach {
+                    it.invoke(false)
+                }
             }
         }
 
@@ -107,12 +114,21 @@ object AppManager {
     }
 
     /**
-     * 设置 App 前后台状态切换监听[onChange]
+     * 添加 App 前后台状态切换监听[onChange]
      * > [onChange] 入参[Boolean] `true`回到前台 & `false`进入后台
      */
     @JvmStatic
-    fun setOnAppForegroundStatusChangeListener(onChange: (Boolean) -> Unit) {
-        mAppForegroundStatusChangeCallback = onChange
+    fun addOnAppForegroundStatusChangeListener(onChange: ForegroundCallback) {
+        mAppForegroundStatusChangeCallbacks.add(onChange)
+    }
+
+    /**
+     * 移除 App 前后台状态切换监听[onChange]
+     * > [onChange] 入参[Boolean] `true`回到前台 & `false`进入后台
+     */
+    @JvmStatic
+    fun removeOnAppForegroundStatusChangeListener(onChange: ForegroundCallback) {
+        mAppForegroundStatusChangeCallbacks.remove(onChange)
     }
 
     /**
@@ -155,6 +171,7 @@ object AppManager {
                 ?: throw NullPointerException("u should init first")
             return app as Application
         } catch (e: Exception) {
+            logger().e(e, "getApplicationByReflect")
         }
         throw NullPointerException("u should init first")
     }
