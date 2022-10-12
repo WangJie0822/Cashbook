@@ -2,13 +2,21 @@ package cn.wj.android.cashbook.ui.main.activity
 
 import android.os.Bundle
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.toHexString
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.biometric.biometric
+import cn.wj.android.cashbook.biometric.supportBiometric
+import cn.wj.android.cashbook.biometric.tryAuthenticate
+import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.enums.DayNightEnum
 import cn.wj.android.cashbook.data.live.CurrentDayNightLiveData
+import cn.wj.android.cashbook.data.live.PasswordLiveData
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivitySettingBinding
-import cn.wj.android.cashbook.ui.main.dialog.ClearPasswordDialog
 import cn.wj.android.cashbook.ui.main.dialog.EditPasswordDialog
+import cn.wj.android.cashbook.ui.main.dialog.VerifyPasswordDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -27,6 +35,9 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
+
+        // 是否支持指纹
+        viewModel.supportFingerprint.value = supportBiometric()
     }
 
     private var dayNightIndex = DayNightEnum.indexOf(CurrentDayNightLiveData.currentDayNight)
@@ -53,7 +64,52 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
         }
         // 显示清除密码弹窗
         viewModel.showClearPasswordDialogEvent.observe(this) {
-            ClearPasswordDialog.actionShow(supportFragmentManager)
+            VerifyPasswordDialog.actionShow(
+                supportFragmentManager,
+                R.string.clear_password_hint.string,
+                {
+                    // 验证成功，清除密码
+                    PasswordLiveData.value = ""
+                    viewModel.enableVerifyWhenOpen.value = false
+                    viewModel.verifyByFingerprint.value = false
+                }
+            )
+        }
+        // 显示验证密码弹窗
+        viewModel.showVerifyPasswordDialogEvent.observe(this) {
+            VerifyPasswordDialog.actionShow(
+                supportFragmentManager,
+                R.string.verify_password_for_fingerprint_hint.string,
+                {
+                    // 验证成功，开始指纹验证
+                    biometric.run {
+                        encrypt = true
+                        subTitle = R.string.verify_fingerprint_to_open.string
+                        tryAuthenticate({ cipher ->
+                            // 验证成功，加密用户密码
+                            val result =
+                                cipher.doFinal(PasswordLiveData.value?.toByteArray()).toHexString()
+                            // 保存加密信息
+                            AppConfigs.encryptedInformation = result
+                            AppConfigs.encryptedVector = cipher.iv.toHexString()
+                            viewModel.verifyByFingerprint.value = true
+                            viewModel.snackbarEvent.value =
+                                R.string.open_fingerprint_verify_success.string.toSnackbarModel()
+                        }, { _, msg ->
+                            // 验证失败
+                            viewModel.verifyByFingerprint.value = false
+                            viewModel.snackbarEvent.value = msg.toSnackbarModel()
+                        })
+                    }
+                }, {
+                    viewModel.verifyByFingerprint.value = false
+                }
+            )
+        }
+
+        PasswordLiveData.observe(this) {
+            // 密码变化，清除指纹验证信息
+            viewModel.verifyByFingerprint.value = false
         }
     }
 }

@@ -44,13 +44,13 @@ fun String.shaEncode(): String {
     return sb.toString()
 }
 
-/** 将 [bytes] 转换为 16 进制 [String] */
-fun bytesToHexString(bytes: ByteArray?): String {
+/** 将 [ByteArray] 转换为 16 进制 [String] */
+fun ByteArray?.toHexString(): String {
     val stringBuilder = StringBuilder("")
-    if (bytes == null || bytes.isEmpty()) {
+    if (this == null || this.isEmpty()) {
         return ""
     }
-    for (element in bytes) {
+    for (element in this) {
         val v = element.toInt() and 0xFF
         val hv = Integer.toHexString(v).uppercase(Locale.getDefault())
         if (hv.length < 2) {
@@ -61,12 +61,12 @@ fun bytesToHexString(bytes: ByteArray?): String {
     return stringBuilder.toString()
 }
 
-/** 将 16 进制 [str] 转换为 [ByteArray] */
-fun hexStringToBytes(str: String?): ByteArray? {
-    if (str == null || str == "") {
+/** 将 16 进制 [String] 转换为 [ByteArray] */
+fun String?.hexToBytes(): ByteArray? {
+    if (this == null || this == "") {
         return null
     }
-    val result = str.uppercase(Locale.getDefault())
+    val result = this.uppercase(Locale.getDefault())
     val length = result.length / 2
     val hexChars = result.toCharArray()
     val d = ByteArray(length)

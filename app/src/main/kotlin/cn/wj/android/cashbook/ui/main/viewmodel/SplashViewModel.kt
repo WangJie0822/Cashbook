@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.shaEncode
@@ -45,6 +46,9 @@ class SplashViewModel(private val repository: MainRepository) : BaseViewModel() 
     /** 显示软键盘事件 */
     val showSoftKeyboardEvent: LifecycleEvent<Int> = LifecycleEvent()
 
+    /** 指纹认证事件 */
+    val fingerprintVerifyEvent: LifecycleEvent<Int> = LifecycleEvent()
+
     /** 界面启动 action */
     private var action: String? = null
 
@@ -52,7 +56,8 @@ class SplashViewModel(private val repository: MainRepository) : BaseViewModel() 
     val needVerify: MutableLiveData<Boolean> = MutableLiveData()
 
     /** 是否支持指纹登录 */
-    val supportFingerprint: MutableLiveData<Boolean> = MutableLiveData(false)
+    val supportFingerprint: MutableLiveData<Boolean> =
+        MutableLiveData(AppConfigs.verifyByFingerprint)
 
     /** 密码 */
     val password: MutableLiveData<String> = MutableLiveData()
@@ -72,7 +77,7 @@ class SplashViewModel(private val repository: MainRepository) : BaseViewModel() 
 
     /** 指纹点击 */
     val onFingerprintClick: () -> Unit = {
-
+        fingerprintVerifyEvent.value = 0
     }
 
     /** 初始化相关数据 */
@@ -132,14 +137,19 @@ class SplashViewModel(private val repository: MainRepository) : BaseViewModel() 
         if (AppConfigs.needVerifyWhenOpen && AppConfigs.password.isNotBlank() && !AppConfigs.verified) {
             // 需要认证、密码不为空且未认证
             needVerify.value = true
-            // 显示软键盘
-            showSoftKeyboardEvent.value = 0
+            if (supportFingerprint.value.condition) {
+                // 支持指纹验证
+                fingerprintVerifyEvent.value = 0
+            } else {
+                // 显示软键盘
+                showSoftKeyboardEvent.value = 0
+            }
         } else {
             doJumpToMain()
         }
     }
 
-    private fun doJumpToMain() {
+    fun doJumpToMain() {
         uiNavigationEvent.value = UiNavigationModel.builder {
             jump(
                 ROUTE_PATH_MAIN,

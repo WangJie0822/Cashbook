@@ -31,6 +31,9 @@ class SettingViewModel : BaseViewModel() {
     /** 显示清除密码弹窗事件 */
     val showClearPasswordDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
 
+    /** 显示验证密码弹窗 */
+    val showVerifyPasswordDialogEvent: LifecycleEvent<Int> = LifecycleEvent()
+
     /** 是否允许流量下载 */
     val enableDownloadWithMobileNetwork: MutableLiveData<Boolean> = mutableLiveDataOf(
         onActive = {
@@ -54,6 +57,9 @@ class SettingViewModel : BaseViewModel() {
         it.isNotBlank()
     }
 
+    /** 是否支持指纹 */
+    val supportFingerprint: MutableLiveData<Boolean> = MutableLiveData(false)
+
     /** 密码选项文本 */
     val passwordItemStr: LiveData<String> = hasPassword.map {
         if (it) {
@@ -71,6 +77,17 @@ class SettingViewModel : BaseViewModel() {
             }
         }, onSet = {
             AppConfigs.needVerifyWhenOpen = value.condition
+        }
+    )
+
+    /** 是否通过指纹验证 */
+    val verifyByFingerprint: MutableLiveData<Boolean> = mutableLiveDataOf(
+        onActive = {
+            if (null == value) {
+                value = AppConfigs.verifyByFingerprint
+            }
+        }, onSet = {
+            AppConfigs.verifyByFingerprint = value.condition
         }
     )
 
@@ -102,6 +119,14 @@ class SettingViewModel : BaseViewModel() {
         } else {
             // 同步状态
             enableVerifyWhenOpen.value = it
+        }
+    }
+
+    /** 指纹验证开关 */
+    val onVerifyByFingerprintChange: (Boolean) -> Unit = {
+        if (it && !AppConfigs.verifyByFingerprint) {
+            // 开启验证，验证密码
+            showVerifyPasswordDialogEvent.value = 0
         }
     }
 

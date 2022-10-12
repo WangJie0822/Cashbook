@@ -6,10 +6,14 @@ import android.text.style.ClickableSpan
 import android.view.View
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
+import cn.wj.android.cashbook.base.ext.hexToBytes
 import cn.wj.android.cashbook.base.ext.showSoftKeyboard
 import cn.wj.android.cashbook.base.ui.BaseActivity
+import cn.wj.android.cashbook.biometric.biometric
+import cn.wj.android.cashbook.biometric.tryAuthenticate
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.ACTIVITY_ANIM_DURATION
+import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivitySplashBinding
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.SplashViewModel
@@ -81,8 +85,37 @@ class SplashActivity : BaseActivity<SplashViewModel, ActivitySplashBinding>() {
                 }
                 .show(supportFragmentManager)
         }
+        // 拉起指纹认证
+        viewModel.fingerprintVerifyEvent.observe(this) {
+            biometric.run {
+                // 已加密的数据
+                val encodedData = AppConfigs.encryptedInformation.hexToBytes()
+                ivBytes = AppConfigs.encryptedVector.hexToBytes()
+                encrypt = false
+                subTitle = R.string.verify_fingerprint_to_open.string
+                tryAuthenticate({ cipher ->
+                    // 验证成功，解密用户信息
+                    val result = cipher.doFinal(encodedData)
+                    val pwd = result.decodeToString()
+                    if (pwd != AppConfigs.password) {
+                        // 密码错误
+                        viewModel.snackbarEvent.value =
+                            R.string.verify_failed.string.toSnackbarModel()
+                        // 清除指纹相关信息
+                        AppConfigs.verifyByFingerprint = false
+                    } else {
+                        // 密码正确，保存验证状态，跳转
+                        AppConfigs.verified = true
+                        viewModel.doJumpToMain()
+                    }
+                }, { _, msg ->
+                    // 验证失败
+                    viewModel.snackbarEvent.value = msg.toSnackbarModel()
+                })
+            }
+        }
         // 显示软键盘
-        viewModel.showSoftKeyboardEvent.observe(this){
+        viewModel.showSoftKeyboardEvent.observe(this) {
             binding.tietPassword.showSoftKeyboard()
         }
     }

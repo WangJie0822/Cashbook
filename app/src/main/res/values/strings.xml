@@ -307,4 +307,10 @@
     <string name="please_enter_password_to_confirm">请输入密码确认</string>
     <string name="clear_password_hint">为确保信息安全，清除密码需要您输入正确的密码以确认</string>
     <string name="please_enter_right_password">请输入正确的密码</string>
+    <string name="verify_by_fingerprint">通过指纹验证</string>
+    <string name="verify_password">验证密码</string>
+    <string name="verify_password_for_fingerprint_hint">为确保信息安全，开启指纹验证前需要您验证密码</string>
+    <string name="verify_fingerprint_to_open">验证指纹以开启</string>
+    <string name="open_fingerprint_verify_success">指纹验证开启成功</string>
+    <string name="verify_failed">验证失败，请尝试密码登陆</string>
 </resources>

@@ -238,6 +238,6 @@ val viewModelModule = module {
         EditPasswordViewModel()
     }
     viewModel {
-        ClearPasswordViewModel()
+        VerifyPasswordViewModel()
     }
 }

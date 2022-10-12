@@ -101,9 +101,27 @@ object AppConfigs {
         false
     )
 
+    /** 是否使用指纹验证 */
+    var verifyByFingerprint: Boolean by NoNullProperties(
+        SHARED_KEY_VERIFY_BY_FINGERPRINT,
+        false
+    )
+
     /** 用户密码 */
     var password: String by NoNullProperties(
         SHARED_KEY_PASSWORD,
+        ""
+    )
+
+    /** 加密信息 */
+    var encryptedInformation: String by NoNullProperties(
+        SHARED_KEY_ENCRYPTED_INFORMATION,
+        ""
+    )
+
+    /** 加密向量 */
+    var encryptedVector: String by NoNullProperties(
+        SHARED_KEY_ENCRYPTED_VECTOR,
         ""
     )
 

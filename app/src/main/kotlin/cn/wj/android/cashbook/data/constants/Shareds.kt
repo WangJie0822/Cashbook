@@ -21,8 +21,17 @@ const val SHARED_KEY_DAY_NIGHT_MODE = "shared_key_day_night_mode"
 /** 是否需要开启安全验证 */
 const val SHARED_KEY_NEED_VERIFY_WHEN_OPEN = "shared_key_need_verify_when_open"
 
+/** 是否使用指纹验证 */
+const val SHARED_KEY_VERIFY_BY_FINGERPRINT = "shared_key_verify_by_fingerprint"
+
 /** 用户密码 */
 const val SHARED_KEY_PASSWORD = "shared_key_password"
+
+/** 加密信息 */
+const val SHARED_KEY_ENCRYPTED_INFORMATION = "shared_key_encrypted_information"
+
+/** 加密向量 */
+const val SHARED_KEY_ENCRYPTED_VECTOR = "shared_key_encrypted_vector"
 
 /** 是否同意用户协议 */
 const val SHARED_KEY_AGREE_USER_AGREEMENT = "shared_key_agree_user_agreement"
