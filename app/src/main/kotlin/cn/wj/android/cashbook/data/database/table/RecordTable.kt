@@ -3,7 +3,7 @@ package cn.wj.android.cashbook.data.database.table
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
+import cn.wj.android.cashbook.base.ext.base.toDoubleOrZero
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
@@ -20,8 +20,8 @@ import kotlinx.serialization.Serializable
  * @param intoAssetId 转账转入资产 id
  * @param booksId 关联账本 id
  * @param recordId 关联记录 id - 退款使用
- * @param amount 记录金额
- * @param charge 转账手续费
+ * @param recordAmount 记录金额
+ * @param recordCharge 记录手续费
  * @param remark 备注
  * @param tagIds 标签 id
  * @param reimbursable 能否报销
@@ -42,8 +42,8 @@ data class RecordTable(
     @ColumnInfo(name = "into_asset_id") val intoAssetId: Long,
     @ColumnInfo(name = "books_id") val booksId: Long,
     @ColumnInfo(name = "record_id") val recordId: Long,
-    val amount: Float,
-    val charge: Float,
+    @ColumnInfo(name = "amount") val recordAmount: Double,
+    @ColumnInfo(name = "charge") val recordCharge: Double,
     val remark: String,
     @ColumnInfo(name = "tag_ids") val tagIds: String,
     val reimbursable: Int,
@@ -54,7 +54,12 @@ data class RecordTable(
 ) {
 
     companion object {
-        fun newModifyBalance(assetId: Long, balance: String, remark: String = "", system: Boolean = false): RecordTable {
+        fun newModifyBalance(
+            assetId: Long,
+            balance: String,
+            remark: String = "",
+            system: Boolean = false
+        ): RecordTable {
             val ms = System.currentTimeMillis()
             return RecordTable(
                 id = null,
@@ -64,8 +69,8 @@ data class RecordTable(
                 intoAssetId = -1L,
                 booksId = CurrentBooksLiveData.booksId,
                 recordId = -1L,
-                amount = balance.toFloatOrZero(),
-                charge = 0f,
+                recordAmount = balance.toDoubleOrZero(),
+                recordCharge = 0.0,
                 remark = remark,
                 tagIds = "",
                 reimbursable = SWITCH_INT_OFF,

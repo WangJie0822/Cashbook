@@ -4,9 +4,18 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import cn.wj.android.cashbook.base.ext.base.toDoubleOrZero
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_ON
-import cn.wj.android.cashbook.data.database.dao.*
-import cn.wj.android.cashbook.data.database.table.*
+import cn.wj.android.cashbook.data.database.dao.AssetDao
+import cn.wj.android.cashbook.data.database.dao.BooksDao
+import cn.wj.android.cashbook.data.database.dao.RecordDao
+import cn.wj.android.cashbook.data.database.dao.TagDao
+import cn.wj.android.cashbook.data.database.dao.TypeDao
+import cn.wj.android.cashbook.data.database.table.AssetTable
+import cn.wj.android.cashbook.data.database.table.BooksTable
+import cn.wj.android.cashbook.data.database.table.RecordTable
+import cn.wj.android.cashbook.data.database.table.TagTable
+import cn.wj.android.cashbook.data.database.table.TypeTable
 
 /**
  * 记账本数据库
@@ -15,7 +24,7 @@ import cn.wj.android.cashbook.data.database.table.*
  */
 @Database(
     entities = [BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class],
-    version = 5
+    version = 6
 )
 abstract class CashbookDatabase : RoomDatabase() {
 
@@ -101,7 +110,38 @@ abstract class CashbookDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * 数据库升级 5 -> 6
+         * - db_asset、db_record 表金额类型由 float 修改为 double
+         */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // 将数据从 Float 更新为 Double
+                database.query("SELECT `id`, `total_amount` FROM `db_asset`").use {
+                    while (it.moveToNext()) {
+                        val id = it.getLong(it.getColumnIndexOrThrow("id"))
+                        val totalAmount =
+                            it.getFloat(it.getColumnIndexOrThrow("total_amount"))
+                        val newAmount = totalAmount.toString().toDoubleOrZero()
+                        database.execSQL("UPDATE db_asset SET `total_amount`=$newAmount WHERE `id`=$id")
+                    }
+                }
+                database.query("SELECT `id`, `amount`, `charge` FROM `db_record`").use {
+                    while (it.moveToNext()) {
+                        val id = it.getLong(it.getColumnIndexOrThrow("id"))
+                        val amount =
+                            it.getFloat(it.getColumnIndexOrThrow("amount"))
+                        val charge = it.getFloat(it.getColumnIndexOrThrow("charge"))
+                        val newAmount = amount.toString().toDoubleOrZero()
+                        val newCharge = charge.toString().toDoubleOrZero()
+                        database.execSQL("UPDATE db_record SET `amount`=$newAmount, `charge`=$newCharge WHERE `id`=$id")
+                    }
+                }
+            }
+        }
+
         /** 数据库升级列表 */
-        val MIGRATION_LIST = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+        val MIGRATION_LIST =
+            arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
     }
 }

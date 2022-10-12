@@ -34,7 +34,7 @@ data class AssetTable(
     @PrimaryKey(autoGenerate = true) val id: Long?,
     @ColumnInfo(name = "books_id") val booksId: Long,
     val name: String,
-    @ColumnInfo(name = "total_amount") val totalAmount: Float,
+    @ColumnInfo(name = "total_amount") val totalAmount: Double,
     @ColumnInfo(name = "billing_date") val billingDate: String,
     @ColumnInfo(name = "repayment_date") val repaymentDate: String,
     val type: String,

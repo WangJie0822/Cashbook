@@ -8,12 +8,13 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import cn.wj.android.cashbook.TestBase
+import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.data.database.CashbookDatabase
+import java.io.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.IOException
 
 /**
  * 数据库迁移测试
@@ -272,6 +273,50 @@ class MigrationTest : TestBase() {
         assertEquals(true, hasOpenBank)
         assertEquals(true, hasCardNo)
         assertEquals(true, hasRemark)
+    }
+
+    /**
+     * 测试数据库从 5 升级到 6
+     * -
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate5_6() {
+        var floatStr: String
+        helper.createDatabase(testDbName, 5).use { db ->
+            db.insert("db_asset", SQLiteDatabase.CONFLICT_FAIL, ContentValues().apply {
+                put("id", 1L)
+                put("books_id", 1L)
+                put("name", "name")
+                put("total_amount", 1.09f)
+                put("billing_date", "2022-10-10")
+                put("repayment_date", "2022-10-10")
+                put("type", "type")
+                put("classification", "classification")
+                put("invisible", 1)
+                put("open_bank", "")
+                put("card_no", "")
+                put("remark", "")
+                put("sort", 1)
+                put("create_time", System.currentTimeMillis())
+                put("modify_time", System.currentTimeMillis())
+            })
+            db.query("SELECT * FROM `db_asset`").use { cursor ->
+                cursor.moveToFirst()
+                floatStr = cursor.getString(cursor.getColumnIndexOrThrow("total_amount"))
+            }
+        }
+
+        var doubleStr: String
+        helper.runMigrationsAndValidate(testDbName, 6, true, CashbookDatabase.MIGRATION_5_6)
+            .use { db ->
+                db.query("SELECT * FROM `db_asset`").use { cursor ->
+                    cursor.moveToFirst()
+                    doubleStr = cursor.getString(cursor.getColumnIndexOrThrow("total_amount"))
+                }
+            }
+        logger().d("$floatStr - $doubleStr")
+        assertEquals(floatStr, doubleStr)
     }
 
     @Test

@@ -55,79 +55,94 @@ abstract class Repository(val database: CashbookDatabase) {
 
 
     /** 获取 id 为 [assetId] 的资产余额，[needNegative] 是否需要取负 */
-    protected suspend fun getAssetBalanceById(assetId: Long?, needNegative: Boolean): String = withContext(Dispatchers.IO) {
-        if (null == assetId) {
-            return@withContext "0"
-        }
-        val modifyList = recordDao.queryLastModifyRecord(assetId)
-        if (modifyList.isEmpty()) {
-            return@withContext "0"
-        }
-        // 获取最后一条修改数据
-        val lastModify = modifyList.first()
-        // 获取在此之后的所有记录
-        var result = lastModify.amount.toBigDecimalOrZero()
-        val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
-        recordList.forEach {
-            when (it.typeEnum) {
-                RecordTypeEnum.INCOME.name -> {
-                    // 收入
-                    if (needNegative) {
-                        // 信用卡，降低欠款
-                        result -= it.amount.toBigDecimalOrZero()
-                    } else {
-                        result += it.amount.toBigDecimalOrZero()
+    protected suspend fun getAssetBalanceById(assetId: Long?, needNegative: Boolean): String =
+        withContext(Dispatchers.IO) {
+            if (null == assetId) {
+                return@withContext "0"
+            }
+            val modifyList = recordDao.queryLastModifyRecord(assetId)
+            if (modifyList.isEmpty()) {
+                return@withContext "0"
+            }
+            // 获取最后一条修改数据
+            val lastModify = modifyList.first()
+            // 获取在此之后的所有记录
+            var result = lastModify.recordAmount.toBigDecimalOrZero()
+            val recordList = recordDao.queryAfterRecordTime(assetId, lastModify.recordTime)
+            recordList.forEach {
+                when (it.typeEnum) {
+                    RecordTypeEnum.INCOME.name -> {
+                        // 收入
+                        if (needNegative) {
+                            // 信用卡，降低欠款
+                            result -= it.recordAmount.toBigDecimalOrZero()
+                        } else {
+                            result += it.recordAmount.toBigDecimalOrZero()
+                        }
                     }
-                }
-                RecordTypeEnum.EXPENDITURE.name -> {
-                    // 支出
-                    if (needNegative) {
-                        // 信用卡，增加欠款
-                        result += it.amount.toBigDecimalOrZero()
-                    } else {
-                        result -= it.amount.toBigDecimalOrZero()
+                    RecordTypeEnum.EXPENDITURE.name -> {
+                        // 支出
+                        if (needNegative) {
+                            // 信用卡，增加欠款
+                            result += it.recordAmount.toBigDecimalOrZero()
+                        } else {
+                            result -= it.recordAmount.toBigDecimalOrZero()
+                        }
                     }
-                }
-                RecordTypeEnum.TRANSFER.name -> {
-                    // 转账转出
-                    if (needNegative) {
-                        // 信用卡，增加欠款
-                        result += it.amount.toBigDecimalOrZero()
-                        result += it.charge.toBigDecimalOrZero()
-                    } else {
-                        result -= it.amount.toBigDecimalOrZero()
-                        result -= it.charge.toBigDecimalOrZero()
+                    RecordTypeEnum.TRANSFER.name -> {
+                        // 转账转出
+                        if (needNegative) {
+                            // 信用卡，增加欠款
+                            result += it.recordAmount.toBigDecimalOrZero()
+                            result += it.recordCharge.toBigDecimalOrZero()
+                        } else {
+                            result -= it.recordAmount.toBigDecimalOrZero()
+                            result -= it.recordCharge.toBigDecimalOrZero()
+                        }
                     }
                 }
             }
-        }
-        // 查询转账转入数据
-        val transferRecordList = recordDao.queryByIntoAssetIdAfterRecordTime(assetId, lastModify.recordTime)
-        transferRecordList.forEach {
-            when (it.typeEnum) {
-                RecordTypeEnum.TRANSFER.name -> {
-                    // 转账转入
-                    if (needNegative) {
-                        // 信用卡，减少欠款
-                        result -= it.amount.toBigDecimalOrZero()
-                    } else {
-                        result += it.amount.toBigDecimalOrZero()
+            // 查询转账转入数据
+            val transferRecordList =
+                recordDao.queryByIntoAssetIdAfterRecordTime(assetId, lastModify.recordTime)
+            transferRecordList.forEach {
+                when (it.typeEnum) {
+                    RecordTypeEnum.TRANSFER.name -> {
+                        // 转账转入
+                        if (needNegative) {
+                            // 信用卡，减少欠款
+                            result -= it.recordAmount.toBigDecimalOrZero()
+                        } else {
+                            result += it.recordAmount.toBigDecimalOrZero()
+                        }
                     }
                 }
             }
+            result.decimalFormat()
         }
-        result.decimalFormat()
-    }
 
     /** 根据 [record] 数据获取 [RecordEntity] 数据并返回 */
-    protected suspend fun loadRecordEntityFromTable(record: RecordTable?, showDate: Boolean): RecordEntity? = withContext(Dispatchers.IO) {
+    protected suspend fun loadRecordEntityFromTable(
+        record: RecordTable?,
+        showDate: Boolean
+    ): RecordEntity? = withContext(Dispatchers.IO) {
         if (null == record) {
             null
         } else {
             val assetTable = assetDao.queryById(record.assetId)
-            val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.needNegative))
+            val asset = assetTable?.toAssetEntity(
+                getAssetBalanceById(
+                    record.assetId,
+                    assetTable.needNegative
+                )
+            )
             val intoAssetTable = assetDao.queryById(record.intoAssetId)
-            val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.needNegative))
+            val intoAsset = intoAssetTable?.toAssetEntity(
+                getAssetBalanceById(
+                    record.intoAssetId,
+                    intoAssetTable.needNegative
+                )
+            )
             val typeTable = if (record.typeId < 0) null else typeDao.queryById(record.typeId)
             val type = if (null == typeTable) {
                 null
@@ -135,20 +150,23 @@ abstract class Repository(val database: CashbookDatabase) {
                 if (typeTable.parentId < 0) {
                     typeTable.toTypeEntity(null)
                 } else {
-                    typeTable.toTypeEntity(typeDao.queryById(typeTable.parentId)?.toTypeEntity(null))
+                    typeTable.toTypeEntity(
+                        typeDao.queryById(typeTable.parentId)?.toTypeEntity(null)
+                    )
                 }
             }
             RecordEntity(
                 id = record.id.orElse(-1L),
-                typeEnum = RecordTypeEnum.fromName(record.typeEnum).orElse(RecordTypeEnum.EXPENDITURE),
+                typeEnum = RecordTypeEnum.fromName(record.typeEnum)
+                    .orElse(RecordTypeEnum.EXPENDITURE),
                 type = type,
                 asset = asset,
                 intoAsset = intoAsset,
                 booksId = record.booksId,
                 record = loadRecordEntityFromTable(recordDao.queryById(record.recordId), false),
                 beAssociated = loadBeAssociatedRecord(record.id.orElse(-1L)),
-                amount = record.amount.toString(),
-                charge = record.charge.toString(),
+                amount = record.recordAmount.toString(),
+                charge = record.recordCharge.toString(),
                 remark = record.remark,
                 tags = loadTagListFromIds(record.tagIds),
                 reimbursable = record.reimbursable == SWITCH_INT_ON,
@@ -161,71 +179,87 @@ abstract class Repository(val database: CashbookDatabase) {
         }
     }
 
-    protected suspend fun loadBeAssociatedRecord(id: Long): RecordEntity? = withContext(Dispatchers.IO) {
-        if (id < 0) {
-            return@withContext null
-        }
-        val record = recordDao.queryAssociatedById(id) ?: return@withContext null
-        val assetTable = assetDao.queryById(record.assetId)
-        val asset = assetTable?.toAssetEntity(getAssetBalanceById(record.assetId, assetTable.needNegative))
-        val intoAssetTable = assetDao.queryById(record.intoAssetId)
-        val intoAsset = intoAssetTable?.toAssetEntity(getAssetBalanceById(record.intoAssetId, intoAssetTable.needNegative))
-        val typeTable = if (record.typeId < 0) null else typeDao.queryById(record.typeId)
-        val type = if (null == typeTable) {
-            null
-        } else {
-            if (typeTable.parentId < 0) {
-                typeTable.toTypeEntity(null)
-            } else {
-                typeTable.toTypeEntity(typeDao.queryById(typeTable.parentId)?.toTypeEntity(null))
+    protected suspend fun loadBeAssociatedRecord(id: Long): RecordEntity? =
+        withContext(Dispatchers.IO) {
+            if (id < 0) {
+                return@withContext null
             }
+            val record = recordDao.queryAssociatedById(id) ?: return@withContext null
+            val assetTable = assetDao.queryById(record.assetId)
+            val asset = assetTable?.toAssetEntity(
+                getAssetBalanceById(
+                    record.assetId,
+                    assetTable.needNegative
+                )
+            )
+            val intoAssetTable = assetDao.queryById(record.intoAssetId)
+            val intoAsset = intoAssetTable?.toAssetEntity(
+                getAssetBalanceById(
+                    record.intoAssetId,
+                    intoAssetTable.needNegative
+                )
+            )
+            val typeTable = if (record.typeId < 0) null else typeDao.queryById(record.typeId)
+            val type = if (null == typeTable) {
+                null
+            } else {
+                if (typeTable.parentId < 0) {
+                    typeTable.toTypeEntity(null)
+                } else {
+                    typeTable.toTypeEntity(
+                        typeDao.queryById(typeTable.parentId)?.toTypeEntity(null)
+                    )
+                }
+            }
+            RecordEntity(
+                id = record.id.orElse(-1L),
+                typeEnum = RecordTypeEnum.fromName(record.typeEnum)
+                    .orElse(RecordTypeEnum.EXPENDITURE),
+                type = type,
+                asset = asset,
+                intoAsset = intoAsset,
+                booksId = record.booksId,
+                record = null,
+                beAssociated = null,
+                amount = record.recordAmount.toString(),
+                charge = record.recordCharge.toString(),
+                remark = record.remark,
+                tags = loadTagListFromIds(record.tagIds),
+                reimbursable = record.reimbursable == SWITCH_INT_ON,
+                system = record.system == SWITCH_INT_ON,
+                recordTime = record.recordTime,
+                createTime = record.createTime.dateFormat(),
+                modifyTime = record.modifyTime.dateFormat(),
+                showDate = true
+            )
         }
-        RecordEntity(
-            id = record.id.orElse(-1L),
-            typeEnum = RecordTypeEnum.fromName(record.typeEnum).orElse(RecordTypeEnum.EXPENDITURE),
-            type = type,
-            asset = asset,
-            intoAsset = intoAsset,
-            booksId = record.booksId,
-            record = null,
-            beAssociated = null,
-            amount = record.amount.toString(),
-            charge = record.charge.toString(),
-            remark = record.remark,
-            tags = loadTagListFromIds(record.tagIds),
-            reimbursable = record.reimbursable == SWITCH_INT_ON,
-            system = record.system == SWITCH_INT_ON,
-            recordTime = record.recordTime,
-            createTime = record.createTime.dateFormat(),
-            modifyTime = record.modifyTime.dateFormat(),
-            showDate = true
-        )
-    }
 
     /** 从 id 列表获取 Tag 列表 */
-    protected suspend fun loadTagListFromIds(ids: String): List<TagEntity> = withContext(Dispatchers.IO) {
-        val result = arrayListOf<TagEntity>()
-        if (ids.isBlank()) {
-            return@withContext result
-        }
-        val splits = ids.split(",")
-        if (splits.isEmpty()) {
-            return@withContext result
-        }
-        splits.forEach { id ->
-            tagDao.queryById(id.toLongOrNull().orElse(-1L))?.let { table ->
-                result.add(table.toTagEntity())
+    protected suspend fun loadTagListFromIds(ids: String): List<TagEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<TagEntity>()
+            if (ids.isBlank()) {
+                return@withContext result
             }
+            val splits = ids.split(",")
+            if (splits.isEmpty()) {
+                return@withContext result
+            }
+            splits.forEach { id ->
+                tagDao.queryById(id.toLongOrNull().orElse(-1L))?.let { table ->
+                    result.add(table.toTagEntity())
+                }
+            }
+            return@withContext result
         }
-        return@withContext result
-    }
 
     /** 获取关联资产 id 为 [assetId] 的记录数量 */
-    protected suspend fun getRecordCountByAssetId(assetId: Long?): Int = withContext(Dispatchers.IO) {
-        if (assetId == null) {
-            0
-        } else {
-            recordDao.queryRecordCountByAssetId(assetId)
+    protected suspend fun getRecordCountByAssetId(assetId: Long?): Int =
+        withContext(Dispatchers.IO) {
+            if (assetId == null) {
+                0
+            } else {
+                recordDao.queryRecordCountByAssetId(assetId)
+            }
         }
-    }
 }

@@ -4,7 +4,7 @@
 package cn.wj.android.cashbook.data.transform
 
 import cn.wj.android.cashbook.base.ext.base.orElse
-import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
+import cn.wj.android.cashbook.base.ext.base.toDoubleOrZero
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.data.constants.SWITCH_INT_OFF
@@ -78,7 +78,7 @@ internal fun AssetEntity.toAssetTable(): AssetTable {
         id = if (-1L == id) null else id,
         booksId = booksId,
         name = name,
-        totalAmount = totalAmount.toFloatOrZero(),
+        totalAmount = totalAmount.toDoubleOrZero(),
         billingDate = billingDate,
         repaymentDate = repaymentDate,
         type = type.name,
@@ -156,8 +156,8 @@ internal fun RecordEntity.toRecordTable(): RecordTable {
         intoAssetId = intoAsset?.id.orElse(-1L),
         booksId = booksId,
         recordId = record?.id.orElse(-1L),
-        amount = amount.toFloatOrZero(),
-        charge = charge.toFloatOrZero(),
+        recordAmount = amount.toDoubleOrZero(),
+        recordCharge = charge.toDoubleOrZero(),
         remark = remark,
         tagIds = with(StringBuilder()) {
             tags.forEach {

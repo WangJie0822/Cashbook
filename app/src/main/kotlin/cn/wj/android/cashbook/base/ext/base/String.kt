@@ -42,6 +42,11 @@ fun String?.toFloatOrZero(): Float {
     return this?.toFloatOrNull() ?: 0f
 }
 
+/** 将 [String] 转换为 [Double]，失败时返回 `0.0` */
+fun String?.toDoubleOrZero(): Double {
+    return this?.toDoubleOrNull() ?: 0.0
+}
+
 /** 将 [String] 类型的 `Markdown` 数据转换为 [Spanned] */
 fun String.md2Spanned(context: Context = AppManager.getContext()): Spanned {
     return Markwon.create(context).toMarkdown(this)
