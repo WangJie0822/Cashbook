@@ -4,6 +4,7 @@
     <string name="asset_classifications_cash">现金</string>
     <string name="asset_classifications_wechat">微信</string>
     <string name="asset_classifications_alipay">支付宝</string>
+    <string name="asset_classifications_douyin">抖音</string>
     <string name="asset_classifications_bank_card">银行卡</string>
     <string name="asset_classifications_other_capital">其它资金</string>
 
@@ -11,6 +12,7 @@
     <string name="asset_classifications_credit_card">信用卡</string>
     <string name="asset_classifications_ant_credit_pay">花呗</string>
     <string name="asset_classifications_jd_ious">京东白条</string>
+    <string name="asset_classifications_douyin_month">抖音月付</string>
     <string name="asset_classifications_other_credit_card">其它信用卡</string>
 
     <string name="asset_classifications_top_up_account">充值账户</string>

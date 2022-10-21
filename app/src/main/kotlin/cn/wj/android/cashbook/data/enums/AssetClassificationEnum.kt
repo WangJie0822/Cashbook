@@ -20,6 +20,7 @@ enum class AssetClassificationEnum(
     CASH(R.drawable.vector_cash_circle_24, R.string.asset_classifications_cash),
     WECHAT(R.drawable.vector_wechat_circle_24, R.string.asset_classifications_wechat),
     ALIPAY(R.drawable.vector_alipay_circle_24, R.string.asset_classifications_alipay),
+    DOUYIN(R.drawable.vector_douyin_circle_24, R.string.asset_classifications_douyin),
     BANK_CARD(R.drawable.vector_bank_card_circle_24, R.string.asset_classifications_bank_card),
     OTHER_CAPITAL(R.drawable.vector_asset_circle_24, R.string.asset_classifications_other_capital),
 
@@ -27,6 +28,7 @@ enum class AssetClassificationEnum(
     CREDIT_CARD(R.drawable.vector_credit_card_circle_24, R.string.asset_classifications_credit_card),
     ANT_CREDIT_PAY(R.drawable.vector_ant_credit_pay_circle_24, R.string.asset_classifications_ant_credit_pay),
     JD_IOUS(R.drawable.vector_jingdong_circle_24, R.string.asset_classifications_jd_ious),
+    DOUYIN_MONTH(R.drawable.vector_douyin_month_circle_24, R.string.asset_classifications_douyin_month),
     OTHER_CREDIT_CARD(R.drawable.vector_credit_card_other_circle_24, R.string.asset_classifications_other_credit_card),
 
     // 充值账户
@@ -81,10 +83,10 @@ enum class AssetClassificationEnum(
     companion object {
 
         /** 资金账户 */
-        val CAPITAL_ACCOUNT = arrayOf(CASH, WECHAT, ALIPAY, BANK_CARD, OTHER_CAPITAL)
+        val CAPITAL_ACCOUNT = arrayOf(CASH, WECHAT, ALIPAY, DOUYIN, BANK_CARD, OTHER_CAPITAL)
 
         /** 信用卡账户 */
-        val CREDIT_CARD_ACCOUNT = arrayOf(CREDIT_CARD, ANT_CREDIT_PAY, JD_IOUS, OTHER_CREDIT_CARD)
+        val CREDIT_CARD_ACCOUNT = arrayOf(CREDIT_CARD, ANT_CREDIT_PAY, JD_IOUS, DOUYIN_MONTH, OTHER_CREDIT_CARD)
 
         /** 充值账户 */
         val TOP_UP_ACCOUNT = arrayOf(PHONE_CHARGE, BUS_CARD, MEAL_CARD, MEMBER_CARD, DEPOSIT, OTHER_TOP_UP)

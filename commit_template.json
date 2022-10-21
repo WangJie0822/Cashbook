@@ -1,0 +1,80 @@
+{
+  "label": {
+    "hint": "每次操作前需先更新再提交！！！",
+    "typeOfChange": "修改类型",
+    "scopeOfChange": "影响范围",
+    "shortDescription": "简单说明",
+    "longDescription": "详细说明",
+    "breakingChanges": "重大改变",
+    "closedIssues": "本次解决的问题"
+  },
+  "keywords": {
+    "wrapWords": true,
+    "maxLineLength": 70,
+    "scopeWrapperStart": "(",
+    "scopeWrapperEnd": ")",
+    "descriptionSeparator": ": ",
+    "breakingChanges": "重大改变: ",
+    "breakingChangesEmpty": "无",
+    "closedIssues": "本次解决的问题: ",
+    "closedIssuesSeparator": ",",
+    "closedIssuesEmpty": "无"
+  },
+  "changeTypes": [
+    {
+      "title": "新增功能",
+      "action": "新增功能",
+      "description": "包含新增单个或多个功能并对其他类或方法进行了修改，优化等操作，但主要是以新增功能为主的提交。"
+    },
+    {
+      "title": "修复bug",
+      "action": "修复bug",
+      "description": "包含修复问题并新增了代码，优化了部分代码，删除了某些代码等操作，但主要是以修复bug为主的提交。"
+    },
+    {
+      "title": "修改文档",
+      "action": "修改文档",
+      "description": "包含修改了文档中的日志，文档中说明，在文档中新增内容等，但主要以修改文档为主的操作。"
+    },
+    {
+      "title": "代码重构",
+      "action": "代码重构",
+      "description": "包含修改代码并新增了代码、删除了代码等，但主要已修改代码为主，未对原来的代码进行新增功能和bug修复。"
+    },
+    {
+      "title": "项目配置",
+      "action": "项目配置",
+      "description": "包含修改build.gradle、setting.gradle等gradle文件、以及其他项目配置等。"
+    },
+    {
+      "title": "改善性能和体验",
+      "action": "改善性能和体验",
+      "description": "以优化体验和优化代码及算法或逻辑，但不影响原功能为主的提交。可包含删除代码，修改代码，新增代码等。"
+    },
+    {
+      "title": "测试用例的修改",
+      "action": "测试用例的修改",
+      "description": "仅修改（包含删除等）或新增了测试用例的内容。"
+    },
+    {
+      "title": "回滚版本",
+      "action": "回滚版本",
+      "description": "对代码版本进行了回滚，无论时单个版本还是多个版本的回滚。"
+    },
+    {
+      "title": "更新冲突并合并",
+      "action": "更新冲突并合并",
+      "description": "发生了更新代码冲突，并进行合并等操作，提交请选择该类型。"
+    },
+    {
+      "title": "删除代码或文件",
+      "action": "删除代码或文件",
+      "description": "仅仅删除了无用的代码或者文件。"
+    },
+    {
+      "title": "不知道如何归类的提交",
+      "action": "不知道如何归类的提交",
+      "description": "不知道的类型请选择该类型。"
+    }
+  ]
+}
