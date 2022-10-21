@@ -34,7 +34,7 @@ fun String.shaEncode(): String {
     val byteArray = this.toByteArray()
     val md5Bytes = sha.digest(byteArray)
     val sb = StringBuilder()
-    md5Bytes.forEachIndexed { index, byte ->
+    md5Bytes.forEachIndexed { _, byte ->
         val value = byte.toInt() and 0xff
         if (value < 16) {
             sb.append("0")
