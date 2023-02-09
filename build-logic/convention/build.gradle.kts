@@ -10,9 +10,10 @@ java {
 }
 
 dependencies {
-    implementation(libs.android.gradlePlugin)
-    implementation(libs.kotlin.gradlePlugin)
-    implementation(libs.squareup.javapoet)
+    compileOnly(libs.android.gradle.plugin)
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.google.devtools.ksp.gradle.plugin)
+    compileOnly(libs.squareup.javapoet)
 }
 
 gradlePlugin {
@@ -21,9 +22,33 @@ gradlePlugin {
             id = "cashbook.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+        register("androidApplicationCompose") {
+            id = "cashbook.android.application.compose"
+            implementationClass = "AndroidApplicationComposeConventionPlugin"
+        }
+        register("androidApplicationJacoco") {
+            id = "cashbook.android.application.jacoco"
+            implementationClass = "AndroidApplicationJacocoConventionPlugin"
+        }
         register("androidLibrary") {
             id = "cashbook.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidFeature") {
+            id = "cashbook.android.library.feature"
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
+        register("androidRoom") {
+            id = "cashbook.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
+        }
+        register("androidLibraryCompose") {
+            id = "cashbook.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
+        register("androidLibraryJacoco") {
+            id = "cashbook.android.library.jacoco"
+            implementationClass = "AndroidLibraryJacocoConventionPlugin"
         }
     }
 }

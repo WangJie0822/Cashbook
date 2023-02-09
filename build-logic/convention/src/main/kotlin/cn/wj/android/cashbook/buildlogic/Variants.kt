@@ -1,4 +1,4 @@
-@file:Suppress("unused", "UnstableApiUsage")
+@file:Suppress("unused", "UnstableApiUsage", "UnusedReceiverParameter")
 
 package cn.wj.android.cashbook.buildlogic
 
@@ -6,14 +6,14 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
-import org.gradle.api.Project
 import java.io.File
 import javax.lang.model.element.Modifier
+import org.gradle.api.Project
 
 /**
  * 维度枚举
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2022/9/2
+ * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/2
  */
 enum class FlavorDimension {
     ContentType
@@ -28,7 +28,7 @@ enum class FlavorDimension {
  * @param versionNameSuffix 版本名后缀
  * @param backupDirSuffix 备份文件夹后缀
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2022/9/2
+ * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/2
  */
 enum class Flavor(
     val dimension: FlavorDimension,

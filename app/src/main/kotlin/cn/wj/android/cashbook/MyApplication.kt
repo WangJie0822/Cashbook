@@ -38,13 +38,6 @@ import org.koin.core.logger.Level
  */
 class MyApplication : Application() {
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-
-        // 安装 dex
-        MultiDex.install(this)
-    }
-
     override fun onCreate() {
         super.onCreate()
 
@@ -87,6 +80,8 @@ class MyApplication : Application() {
 
         // 初始化 DoraemonKit
         initDoraemon()
+
+
     }
 
     /** 初始化通知渠道 */

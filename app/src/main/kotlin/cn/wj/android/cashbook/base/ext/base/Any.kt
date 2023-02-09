@@ -10,7 +10,7 @@ import java.text.DecimalFormat
 /**
  * 任意对象拓展
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/3/25
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/3/25
  */
 
 /** 使用类名作为日志打印 TAG */

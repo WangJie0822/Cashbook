@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.R
  *
  * - 可设置 [setCompoundDrawables] 尺寸
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/3/17
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/3/17
  */
 class FixedTextView
 @JvmOverloads

@@ -8,6 +8,7 @@ pluginManagement {
         maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin/") }
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
         maven { setUrl("https://maven.aliyun.com/repository/google/") }
+        maven { setUrl("https://repo1.maven.org/maven2/") }
         gradlePluginPortal()
         google()
         mavenCentral()
@@ -22,6 +23,7 @@ dependencyResolutionManagement {
         maven { setUrl("https://s01.oss.sonatype.org/content/repositories/releases/") }
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
         maven { setUrl("https://maven.aliyun.com/repository/google/") }
+        maven { setUrl("https://repo1.maven.org/maven2/") }
         maven { setUrl("https://jitpack.io") }
         google()
         mavenCentral()
@@ -30,7 +32,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         // mavenCentral 中的依赖仓库
         create("libs") {
-            from("io.github.wangjie0822:catalog:gradle.7.4.2-1.2.5")
+            from(files("./gradle/libs.version.toml"))
         }
         // 签名配置信息
         create("signingLibs") {
@@ -43,3 +45,14 @@ dependencyResolutionManagement {
 rootProject.name = "Cashbook"
 // 项目包含的 Module
 include(":app")
+include(
+    ":feature:record",
+    ":feature:settings",
+)
+include(
+    ":core:common",
+    ":core:model",
+    ":core:database",
+    ":core:design",
+    ":core:MPChart",
+)

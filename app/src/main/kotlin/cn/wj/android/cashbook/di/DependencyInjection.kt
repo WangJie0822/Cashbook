@@ -36,7 +36,7 @@ import retrofit2.Retrofit
 /**
  * 依赖注入模块
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/5/11
+ * > [王杰](mailto:15555650921@163.com) 创建于 20201/5/11
  */
 
 @OptIn(ExperimentalSerializationApi::class)

@@ -12,7 +12,7 @@
 ///**
 // * 皮肤管理类
 // *
-// * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/4/26
+// * > [王杰](mailto:15555650921@163.com) 创建于 2021/4/26
 // */
 //object SkinManager {
 //

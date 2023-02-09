@@ -5,12 +5,12 @@ import org.gradle.api.Project
 /**
  * 应用配置数据
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2022/9/5
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/7
  */
 object ApplicationSetting {
 
     object Config {
-        const val compileSdk = 32
+        const val compileSdk = 33
         const val minSdk = 21
         const val targetSdk = 30
         val versionCode = generateVersionCode()
@@ -30,6 +30,8 @@ object ApplicationSetting {
         const val PLUGIN_ANDROID_APPLICATION = "com.android.application"
         const val PLUGIN_ANDROID_LIBRARY = "com.android.library"
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
+        const val PLUGIN_JACOCO = "org.gradle.jacoco"
+        const val PLUGIN_GOOGLE_KSP = "com.google.devtools.ksp"
     }
 }
 

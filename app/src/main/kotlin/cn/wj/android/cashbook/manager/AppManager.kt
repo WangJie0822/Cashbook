@@ -16,7 +16,7 @@ typealias ForegroundCallback = (Boolean) -> Unit
  * 应用程序 [Activity] 管理类
  * - 用于 [Activity] 管理和应用程序退出
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/3/16
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/3/16
  */
 @Suppress("unused")
 object AppManager {

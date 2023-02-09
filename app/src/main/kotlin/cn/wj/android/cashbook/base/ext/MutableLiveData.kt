@@ -9,7 +9,7 @@ import cn.wj.android.cashbook.base.ext.base.toNewList
 /**
  * [MutableLiveData] 相关
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/3/25
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/3/25
  */
 
 /** 当 [MutableLiveData] 泛型类型为 [ArrayList] 时添加 [list] 数据并更新 */

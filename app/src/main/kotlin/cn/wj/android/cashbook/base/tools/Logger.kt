@@ -8,7 +8,7 @@ import com.orhanobut.logger.Printer
 /**
  * 日志打印相关
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/4/9
+ * > [王杰](mailto:15555650921@163.com) 创建于 2021/4/9
  */
 
 /** 使用临时 [tag] 获取 [Printer] 对象打印日志 */

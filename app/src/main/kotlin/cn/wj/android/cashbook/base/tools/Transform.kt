@@ -20,7 +20,7 @@ import kotlinx.serialization.modules.SerializersModule
 /**
  * 数据转换相关
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 20201/3/8
+ * > [王杰](mailto:15555650921@163.com) 创建于 20201/3/8
  */
 
 /** 默认 [Json] 解析 */

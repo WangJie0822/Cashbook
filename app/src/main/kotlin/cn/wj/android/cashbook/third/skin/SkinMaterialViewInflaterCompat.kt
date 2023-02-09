@@ -15,7 +15,7 @@
 // * Material 库换肤兼容
 // * * 用于兼容 [ShapeableImageView] 换肤
 // *
-// * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2021/4/19
+// * > [王杰](mailto:15555650921@163.com) 创建于 2021/4/19
 // */
 //class SkinMaterialViewInflaterCompat : SkinLayoutInflater {
 //    override fun createView(context: Context, name: String?, attrs: AttributeSet): View? {
