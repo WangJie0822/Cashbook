@@ -10,13 +10,11 @@ import cn.wj.android.cashbook.base.tools.jumpBrowser
 import cn.wj.android.cashbook.base.tools.jumpSendEmail
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.config.AppConfigs
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ABOUT_US
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityAboutUsBinding
 import cn.wj.android.cashbook.manager.UpdateManager
 import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.AboutUsViewModel
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -24,7 +22,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/17
  */
-@Route(path = ROUTE_PATH_ABOUT_US)
 class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>() {
 
     override val viewModel: AboutUsViewModel by viewModel()
@@ -56,7 +53,8 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
                     if (isWifiAvailable() || AppConfigs.mobileNetworkDownloadEnable) {
                         // WIFI 可用或允许使用流量下载，直接开始下载
                         UpdateManager.startDownload(info)
-                        viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()
+                        viewModel.snackbarEvent.value =
+                            R.string.start_background_download.string.toSnackbarModel()
                     } else {
                         // 未连接 WIFI 且未允许流量下载，弹窗提示
                         GeneralDialog.newBuilder()
@@ -67,7 +65,8 @@ class AboutUsActivity : BaseActivity<AboutUsViewModel, ActivityAboutUsBinding>()
                                 AppConfigs.mobileNetworkDownloadEnable = it
                                 // 开始下载
                                 UpdateManager.startDownload(info)
-                                viewModel.snackbarEvent.value = R.string.start_background_download.string.toSnackbarModel()
+                                viewModel.snackbarEvent.value =
+                                    R.string.start_background_download.string.toSnackbarModel()
                             }
                             .show(supportFragmentManager)
                     }

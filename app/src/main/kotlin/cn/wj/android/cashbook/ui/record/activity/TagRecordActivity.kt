@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_TAG_RECORD
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.databinding.ActivityTagRecordBinding
@@ -17,7 +16,6 @@ import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.TagRecordViewModel
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -25,7 +23,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2022/8/9
  */
-@Route(path = ROUTE_PATH_RECORD_TAG_RECORD)
 class TagRecordActivity : BaseActivity<TagRecordViewModel, ActivityTagRecordBinding>() {
 
     override val viewModel: TagRecordViewModel by viewModel()

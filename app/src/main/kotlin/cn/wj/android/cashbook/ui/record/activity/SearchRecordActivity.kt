@@ -5,13 +5,11 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_SEARCH
 import cn.wj.android.cashbook.databinding.ActivitySearchRecordBinding
 import cn.wj.android.cashbook.ui.record.adapter.SearchRecordPagingRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.SearchRecordViewModel
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -20,7 +18,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/23
  */
-@Route(path = ROUTE_PATH_RECORD_SEARCH)
 class SearchRecordActivity : BaseActivity<SearchRecordViewModel, ActivitySearchRecordBinding>() {
 
     override val viewModel: SearchRecordViewModel by viewModel()
@@ -43,11 +40,13 @@ class SearchRecordActivity : BaseActivity<SearchRecordViewModel, ActivitySearchR
                 registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
 
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                        this@SearchRecordActivity.viewModel.showNoData.value = this@apply.itemCount <= 0
+                        this@SearchRecordActivity.viewModel.showNoData.value =
+                            this@apply.itemCount <= 0
                     }
 
                     override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                        this@SearchRecordActivity.viewModel.showNoData.value = this@apply.itemCount <= 0
+                        this@SearchRecordActivity.viewModel.showNoData.value =
+                            this@apply.itemCount <= 0
                     }
                 })
             }

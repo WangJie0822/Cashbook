@@ -11,13 +11,11 @@ import cn.wj.android.cashbook.base.ext.base.isContentScheme
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.isContentScheme
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BACKUP
 import cn.wj.android.cashbook.data.enums.AutoBackupEnum
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityBackupBinding
 import cn.wj.android.cashbook.third.result.createForActivityResultLauncher
 import cn.wj.android.cashbook.ui.main.viewmodel.BackupViewModel
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -26,7 +24,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/8/6
  */
-@Route(path = ROUTE_PATH_BACKUP)
 class BackupActivity : BaseActivity<BackupViewModel, ActivityBackupBinding>() {
 
     override val viewModel: BackupViewModel by viewModel()

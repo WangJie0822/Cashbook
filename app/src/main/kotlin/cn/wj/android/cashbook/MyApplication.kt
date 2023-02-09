@@ -21,7 +21,6 @@ import cn.wj.android.cashbook.di.repositoryModule
 import cn.wj.android.cashbook.di.viewModelModule
 import cn.wj.android.cashbook.manager.AppManager
 import cn.wj.android.cashbook.third.logger.MyFormatStrategy
-import com.alibaba.android.arouter.launcher.ARouter
 import com.didichuxing.doraemonkit.DoraemonKit
 import com.didichuxing.doraemonkit.kit.IKit
 import com.orhanobut.logger.AndroidLogAdapter
@@ -63,14 +62,6 @@ class MyApplication : Application() {
             androidContext(this@MyApplication)
             modules(listOf(netModule, dbModule, repositoryModule, viewModelModule))
         }
-
-        // 初始化 ARouter
-        if (BuildConfig.DEBUG) {
-            // Debug 模式或非线上模式
-            ARouter.openLog()
-            ARouter.openDebug()
-        }
-        ARouter.init(this)
 
         // 应用主题
         CurrentDayNightLiveData.applyTheme()

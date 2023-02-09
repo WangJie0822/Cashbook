@@ -8,7 +8,6 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_EDIT
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
@@ -16,7 +15,6 @@ import cn.wj.android.cashbook.databinding.ActivityEditAssetBinding
 import cn.wj.android.cashbook.ui.asset.dialog.SelectAssetClassificationDialog
 import cn.wj.android.cashbook.ui.asset.dialog.SelectDayDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.EditAssetViewModel
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -24,7 +22,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/2
  */
-@Route(path = ROUTE_PATH_ASSET_EDIT)
 class EditAssetActivity : BaseActivity<EditAssetViewModel, ActivityEditAssetBinding>() {
 
     override val viewModel: EditAssetViewModel by viewModel()

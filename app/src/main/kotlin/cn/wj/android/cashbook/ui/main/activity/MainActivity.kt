@@ -15,7 +15,13 @@ import cn.wj.android.cashbook.base.ext.scrollToTop
 import cn.wj.android.cashbook.base.tools.isWifiAvailable
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.config.AppConfigs
-import cn.wj.android.cashbook.data.constants.*
+import cn.wj.android.cashbook.data.constants.ACTION_CONTENT
+import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
+import cn.wj.android.cashbook.data.constants.MAIN_BACK_PRESS_INTERVAL_MS
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BACKUP
+import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_CALENDAR
+import cn.wj.android.cashbook.data.constants.SHORTCUTS_ASSET
+import cn.wj.android.cashbook.data.constants.SHORTCUTS_RECORD
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import cn.wj.android.cashbook.data.model.UiNavigationModel
@@ -30,7 +36,6 @@ import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -41,7 +46,6 @@ import kotlin.math.absoluteValue
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
-@Route(path = ROUTE_PATH_MAIN)
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override val viewModel: MainViewModel by viewModel()
@@ -102,12 +106,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 自动备份
         viewModel.autoBackup()
 
-        intent.getStringExtra(ACTION_CONTENT)?.let { action->
+        intent.getStringExtra(ACTION_CONTENT)?.let { action ->
             when (action) {
                 SHORTCUTS_RECORD -> {
                     // 记一笔
                     viewModel.onAddClick.invoke()
                 }
+
                 SHORTCUTS_ASSET -> {
                     // 资产
                     viewModel.onMyAssetClick.invoke()

@@ -9,7 +9,6 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_MY
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.databinding.ActivityMyBooksBinding
@@ -22,7 +21,6 @@ import cn.wj.android.cashbook.widget.recyclerview.adapter.ADAPTER_ANIM_ALL
 import cn.wj.android.cashbook.widget.recyclerview.adapter.ADAPTER_ANIM_CHANGED
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -30,7 +28,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于2021/5/25
  */
-@Route(path = ROUTE_PATH_BOOKS_MY)
 class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>() {
 
     override val viewModel: MyBooksViewModel by viewModel()
@@ -43,7 +40,8 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
     )
 
     /** 编辑账本 launcher */
-    private val editBooksResultLauncher = createForActivityResultLauncher(ActivityResultContracts.StartActivityForResult())
+    private val editBooksResultLauncher =
+        createForActivityResultLauncher(ActivityResultContracts.StartActivityForResult())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,13 +77,20 @@ class MyBooksActivity : BaseActivity<MyBooksViewModel, ActivityMyBooksBinding>()
                             when (menuItem.itemId) {
                                 R.id.modify -> {
                                     // 修改
-                                    editBooksResultLauncher.launch(EditBooksActivity.parseIntent(context, item))
+                                    editBooksResultLauncher.launch(
+                                        EditBooksActivity.parseIntent(
+                                            context,
+                                            item
+                                        )
+                                    )
                                 }
+
                                 R.id.delete -> {
                                     // 删除
                                     if (item.selected) {
                                         // 已选择账本不能删除
-                                        viewModel.snackbarEvent.value = R.string.cannot_delete_selected_books.string.toSnackbarModel()
+                                        viewModel.snackbarEvent.value =
+                                            R.string.cannot_delete_selected_books.string.toSnackbarModel()
                                         return@setOnMenuItemClickListener true
                                     }
                                     GeneralDialog.newBuilder()

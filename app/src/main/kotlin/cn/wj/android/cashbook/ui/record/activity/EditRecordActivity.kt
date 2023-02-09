@@ -11,7 +11,6 @@ import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_RECORD
 import cn.wj.android.cashbook.data.constants.EVENT_TAG_CHANGE
 import cn.wj.android.cashbook.data.constants.EVENT_TAG_DELETE
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_EDIT
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.databinding.ActivityEditRecordBinding
@@ -22,7 +21,6 @@ import cn.wj.android.cashbook.ui.record.dialog.CalculatorDialog
 import cn.wj.android.cashbook.ui.record.dialog.DateTimePickerDialog
 import cn.wj.android.cashbook.ui.record.dialog.SelectTagDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.EditRecordViewModel
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -31,7 +29,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/28
  */
-@Route(path = ROUTE_PATH_RECORD_EDIT)
 class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordBinding>() {
 
     override val viewModel: EditRecordViewModel by viewModel()
@@ -42,7 +39,8 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
     }
 
     /** 选择关联记录启动器 */
-    private val selectAssociatedRecordResultLauncher = createForActivityResultLauncher(ActivityResultContracts.StartActivityForResult())
+    private val selectAssociatedRecordResultLauncher =
+        createForActivityResultLauncher(ActivityResultContracts.StartActivityForResult())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +90,14 @@ class EditRecordActivity : BaseActivity<EditRecordViewModel, ActivityEditRecordB
         }
         // 跳转选择关联记录
         viewModel.jumpSelectAssociatedRecordEvent.observe(this) {
-            selectAssociatedRecordResultLauncher.launch(SelectAssociatedRecordActivity.parseIntent(context, viewModel.dateStr.value.orEmpty(), viewModel.calculatorStr.get().orEmpty(), it)) { result ->
+            selectAssociatedRecordResultLauncher.launch(
+                SelectAssociatedRecordActivity.parseIntent(
+                    context,
+                    viewModel.dateStr.value.orEmpty(),
+                    viewModel.calculatorStr.get().orEmpty(),
+                    it
+                )
+            ) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.getParcelableExtra<RecordEntity>(ACTION_RECORD)?.let { selected ->
                         viewModel.associatedRecord.value = selected

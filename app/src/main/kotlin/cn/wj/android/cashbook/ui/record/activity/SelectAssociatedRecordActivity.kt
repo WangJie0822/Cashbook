@@ -6,14 +6,16 @@ import android.content.Intent
 import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.*
+import cn.wj.android.cashbook.data.constants.ACTION_CURRENT_AMOUNT
+import cn.wj.android.cashbook.data.constants.ACTION_DATE
+import cn.wj.android.cashbook.data.constants.ACTION_REFUND
+import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
 import cn.wj.android.cashbook.data.entity.RecordEntity
 import cn.wj.android.cashbook.databinding.ActivitySelectAccosiatedRecordBinding
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.SelectAssociatedRecordViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -22,8 +24,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/16
  */
-@Route(path = ROUTE_PATH_RECORD_SELECT_ASSOCIATED)
-class SelectAssociatedRecordActivity : BaseActivity<SelectAssociatedRecordViewModel, ActivitySelectAccosiatedRecordBinding>() {
+class SelectAssociatedRecordActivity :
+    BaseActivity<SelectAssociatedRecordViewModel, ActivitySelectAccosiatedRecordBinding>() {
 
     override val viewModel: SelectAssociatedRecordViewModel by viewModel()
 
@@ -67,13 +69,14 @@ class SelectAssociatedRecordActivity : BaseActivity<SelectAssociatedRecordViewMo
     companion object {
 
         /** 使用 [context] 开启生成跳转选择关联记录界面 [Intent]，修改时传递 日期 [date]、金额 [amount]、是否是退款 */
-        fun parseIntent(context: Context, date: String, amount: String, refund: Boolean): Intent = Intent(context, SelectAssociatedRecordActivity::class.java).apply {
-            if (context !is Activity) {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        fun parseIntent(context: Context, date: String, amount: String, refund: Boolean): Intent =
+            Intent(context, SelectAssociatedRecordActivity::class.java).apply {
+                if (context !is Activity) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                putExtra(ACTION_DATE, date)
+                putExtra(ACTION_CURRENT_AMOUNT, amount)
+                putExtra(ACTION_REFUND, refund)
             }
-            putExtra(ACTION_DATE, date)
-            putExtra(ACTION_CURRENT_AMOUNT, amount)
-            putExtra(ACTION_REFUND, refund)
-        }
     }
 }

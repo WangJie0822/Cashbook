@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import androidx.appcompat.widget.PopupMenu
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_RECORD_TAG_MANAGER
 import cn.wj.android.cashbook.data.entity.TagEntity
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.databinding.ActivityTagManagerBinding
@@ -15,7 +14,6 @@ import cn.wj.android.cashbook.ui.record.dialog.EditTagDialog
 import cn.wj.android.cashbook.ui.record.viewmodel.TagManagerViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.FlowLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -23,7 +21,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2022/8/8
  */
-@Route(path = ROUTE_PATH_RECORD_TAG_MANAGER)
 class TagManagerActivity : BaseActivity<TagManagerViewModel, ActivityTagManagerBinding>() {
 
     override val viewModel: TagManagerViewModel by viewModel()
@@ -86,10 +83,12 @@ class TagManagerActivity : BaseActivity<TagManagerViewModel, ActivityTagManagerB
                                         viewModel.updateTag(modified)
                                     }
                                 }
+
                                 R.id.delete -> {
                                     // 删除
                                     viewModel.deleteTag(tag)
                                 }
+
                                 R.id.statistics -> {
                                     // 统计数据
                                     TagRecordActivity.actionStart(this@TagManagerActivity, tag)

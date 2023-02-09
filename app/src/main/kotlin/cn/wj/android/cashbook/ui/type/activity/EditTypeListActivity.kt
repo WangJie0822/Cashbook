@@ -5,12 +5,10 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_LIST_EDIT
 import cn.wj.android.cashbook.data.enums.RecordTypeEnum
 import cn.wj.android.cashbook.databinding.ActivityEditTypeListBinding
 import cn.wj.android.cashbook.ui.type.adapter.EditTypeListVpAdapter
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeListViewModel
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -18,7 +16,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/29
  */
-@Route(path = ROUTE_PATH_TYPE_LIST_EDIT)
 class EditTypeListActivity : BaseActivity<EditTypeListViewModel, ActivityEditTypeListBinding>() {
 
     override val viewModel: EditTypeListViewModel by viewModel()
@@ -33,7 +30,9 @@ class EditTypeListActivity : BaseActivity<EditTypeListViewModel, ActivityEditTyp
         setContentView(R.layout.activity_edit_type_list)
 
         // 获取选中分类
-        viewModel.currentItem.value = intent.getIntExtra(ACTION_SELECTED, RecordTypeEnum.EXPENDITURE.position).orElse(RecordTypeEnum.EXPENDITURE.position)
+        viewModel.currentItem.value =
+            intent.getIntExtra(ACTION_SELECTED, RecordTypeEnum.EXPENDITURE.position)
+                .orElse(RecordTypeEnum.EXPENDITURE.position)
 
         // 配置 ViewPager2
         binding.vpType.adapter = adapter

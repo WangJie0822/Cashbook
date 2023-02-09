@@ -5,7 +5,6 @@ import android.view.View
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ui.BaseActivity
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INVISIBLE
 import cn.wj.android.cashbook.data.entity.AssetEntity
 import cn.wj.android.cashbook.data.model.NoDataModel
 import cn.wj.android.cashbook.databinding.ActivityInvisibleAssetBinding
@@ -13,7 +12,6 @@ import cn.wj.android.cashbook.ui.asset.dialog.InvisibleAssetLongClickMenuDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.InvisibleAssetViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -21,8 +19,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/7
  */
-@Route(path = ROUTE_PATH_ASSET_INVISIBLE)
-class InvisibleAssetActivity : BaseActivity<InvisibleAssetViewModel, ActivityInvisibleAssetBinding>() {
+class InvisibleAssetActivity :
+    BaseActivity<InvisibleAssetViewModel, ActivityInvisibleAssetBinding>() {
 
     override val viewModel: InvisibleAssetViewModel by viewModel()
 

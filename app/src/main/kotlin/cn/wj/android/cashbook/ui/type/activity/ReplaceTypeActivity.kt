@@ -4,13 +4,11 @@ import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_REPLACE
 import cn.wj.android.cashbook.data.entity.TypeEntity
 import cn.wj.android.cashbook.databinding.ActivityReplaceTypeBinding
 import cn.wj.android.cashbook.ui.type.viewmodel.ReplaceTypeViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -18,7 +16,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/7/2
  */
-@Route(path = ROUTE_PATH_TYPE_REPLACE)
 class ReplaceTypeActivity : BaseActivity<ReplaceTypeViewModel, ActivityReplaceTypeBinding>() {
 
     override val viewModel: ReplaceTypeViewModel by viewModel()

@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.DisposableEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.ui.MainApp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -18,6 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             val systemUiController = rememberSystemUiController()

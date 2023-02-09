@@ -63,7 +63,6 @@ android {
 
 kapt {
     arguments {
-        arg("AROUTER_MODULE_NAME", project.name)
         arg("room.schemaLocation", "$projectDir/schemas")
     }
 }
@@ -134,10 +133,6 @@ dependencies {
 
     // MMKV 数据存储
     implementation(libs.tencent.mmkv)
-
-    // ARouter 路由
-    implementation(libs.alibaba.arouter.api)
-    kapt(libs.alibaba.arouter.compiler)
 
     // DoraemonKit
     debugImplementation(libs.didi.doraemonkit.debug)

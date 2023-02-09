@@ -5,14 +5,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_SELECTED
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_TYPE_EDIT
 import cn.wj.android.cashbook.data.entity.TypeIconEntity
 import cn.wj.android.cashbook.data.entity.TypeIconGroupEntity
 import cn.wj.android.cashbook.databinding.ActivityEditTypeBinding
 import cn.wj.android.cashbook.ui.type.viewmodel.EditTypeViewModel
 import cn.wj.android.cashbook.widget.recyclerview.adapter.simple.SimpleRvListAdapter
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -20,7 +18,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/30
  */
-@Route(path = ROUTE_PATH_TYPE_EDIT)
 class EditTypeActivity : BaseActivity<EditTypeViewModel, ActivityEditTypeBinding>() {
 
     override val viewModel: EditTypeViewModel by viewModel()

@@ -17,9 +17,6 @@ import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.data.model.SnackbarModel
 import cn.wj.android.cashbook.manager.ProgressDialogManager
-import com.alibaba.android.arouter.facade.Postcard
-import com.alibaba.android.arouter.facade.callback.NavigationCallback
-import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.snackbar.Snackbar
 
 /**
@@ -207,25 +204,6 @@ abstract class BaseDialog<VM : BaseViewModel, DB : ViewDataBinding> : AppCompatD
         // Ui 界面处理
         viewModel.uiNavigationEvent.observe(this) {
             logger().d("uiNavigation: $it")
-            it.jump?.let { model ->
-                ARouter.getInstance().build(model.path).with(model.data)
-                    .navigation(context, object : NavigationCallback {
-                        override fun onFound(postcard: Postcard?) {
-                        }
-
-                        override fun onLost(postcard: Postcard?) {
-                        }
-
-                        override fun onArrival(postcard: Postcard?) {
-                            model.onArrival?.invoke()
-                        }
-
-                        override fun onInterrupt(postcard: Postcard?) {
-                            model.onIntercept?.invoke()
-                        }
-
-                    })
-            }
             it.close?.let { model ->
                 dismiss()
                 if (model.both) {

@@ -7,8 +7,6 @@ import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_ASSET
 import cn.wj.android.cashbook.data.constants.EVENT_RECORD_CHANGE
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_ASSET_INFO
-import cn.wj.android.cashbook.data.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.databinding.ActivityAssetInfoBinding
 import cn.wj.android.cashbook.ui.asset.dialog.AssetMoreInfoDialog
 import cn.wj.android.cashbook.ui.asset.viewmodel.AssetInfoViewModel
@@ -16,7 +14,6 @@ import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.record.adapter.DateRecordPagingRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.jeremyliao.liveeventbus.LiveEventBus
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -25,7 +22,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/7
  */
-@Route(path = ROUTE_PATH_ASSET_INFO)
 class AssetInfoActivity : BaseActivity<AssetInfoViewModel, ActivityAssetInfoBinding>() {
 
     override val viewModel: AssetInfoViewModel by viewModel()

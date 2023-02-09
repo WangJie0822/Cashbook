@@ -9,7 +9,6 @@ import cn.wj.android.cashbook.biometric.biometric
 import cn.wj.android.cashbook.biometric.supportBiometric
 import cn.wj.android.cashbook.biometric.tryAuthenticate
 import cn.wj.android.cashbook.data.config.AppConfigs
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_SETTING
 import cn.wj.android.cashbook.data.enums.DayNightEnum
 import cn.wj.android.cashbook.data.live.CurrentDayNightLiveData
 import cn.wj.android.cashbook.data.live.PasswordLiveData
@@ -18,7 +17,6 @@ import cn.wj.android.cashbook.databinding.ActivitySettingBinding
 import cn.wj.android.cashbook.ui.main.dialog.EditPasswordDialog
 import cn.wj.android.cashbook.ui.main.dialog.VerifyPasswordDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.SettingViewModel
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -27,7 +25,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/22
  */
-@Route(path = ROUTE_PATH_SETTING)
 class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>() {
 
     override val viewModel: SettingViewModel by viewModel()

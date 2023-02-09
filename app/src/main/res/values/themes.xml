@@ -7,7 +7,7 @@
 
     <!-- 兼容 values-v 不同版本 -->
     <style name="PlatformAdjusted.Theme.Cashbook" parent="NightAdjusted.Theme.Cashbook">
-        <item name="android:statusBarColor">@color/color_primary</item>
+        <item name="android:statusBarColor">@color/transparent_light</item>
     </style>
 
     <!-- 应用主题 -->

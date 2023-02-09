@@ -7,11 +7,9 @@ import android.os.Bundle
 import cn.wj.android.cashbook.R
 import cn.wj.android.cashbook.base.ui.BaseActivity
 import cn.wj.android.cashbook.data.constants.ACTION_BOOKS
-import cn.wj.android.cashbook.data.constants.ROUTE_PATH_BOOKS_EDIT
 import cn.wj.android.cashbook.data.entity.BooksEntity
 import cn.wj.android.cashbook.databinding.ActivityEditBooksBinding
 import cn.wj.android.cashbook.ui.books.viewmodel.EditBooksViewModel
-import com.alibaba.android.arouter.facade.annotation.Route
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -19,7 +17,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/27
  */
-@Route(path = ROUTE_PATH_BOOKS_EDIT)
 class EditBooksActivity : BaseActivity<EditBooksViewModel, ActivityEditBooksBinding>() {
 
     override val viewModel: EditBooksViewModel by viewModel()
@@ -35,11 +32,12 @@ class EditBooksActivity : BaseActivity<EditBooksViewModel, ActivityEditBooksBind
     companion object {
 
         /** 使用 [context] 开启生成跳转编辑账本界面 [Intent]，修改时传递 [books] 对象，新增为 `null` */
-        fun parseIntent(context: Context, books: BooksEntity? = null): Intent = Intent(context, EditBooksActivity::class.java).apply {
-            if (context !is Activity) {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        fun parseIntent(context: Context, books: BooksEntity? = null): Intent =
+            Intent(context, EditBooksActivity::class.java).apply {
+                if (context !is Activity) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                putExtra(ACTION_BOOKS, books)
             }
-            putExtra(ACTION_BOOKS, books)
-        }
     }
 }
