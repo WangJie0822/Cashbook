@@ -2,21 +2,21 @@ package cn.wj.android.cashbook.feature.record.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import cn.wj.android.cashbook.feature.record.screen.LauncherContentRoute
+import cn.wj.android.cashbook.feature.record.screen.LauncherCollapsedTitleScreen
+import cn.wj.android.cashbook.feature.record.screen.LauncherContentScreen
+import cn.wj.android.cashbook.feature.record.screen.LauncherPinnedTitleScreen
 
 @Composable
-fun LauncherContent(
-    modifier: Modifier = Modifier,
-    onMenuIconClick: () -> Unit,
-    onSearchIconClick: () -> Unit,
-    onCalendarIconClick: () -> Unit,
-    onAssetIconClick: () -> Unit,
-) {
-    LauncherContentRoute(
-        modifier = modifier,
-        onMenuIconClick = onMenuIconClick,
-        onSearchIconClick = onSearchIconClick,
-        onCalendarIconClick = onCalendarIconClick,
-        onAssetIconClick = onAssetIconClick,
-    )
+fun LauncherPinnedTitleContent() {
+    LauncherPinnedTitleScreen()
+}
+
+@Composable
+fun LauncherCollapsedTitleContent() {
+    LauncherCollapsedTitleScreen()
+}
+
+@Composable
+fun LauncherContent(modifier: Modifier) {
+    LauncherContentScreen(modifier)
 }

@@ -158,6 +158,8 @@ dependencies {
     implementation(project(":feature:record"))
 
     implementation(project(":core:ui"))
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
 
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)

@@ -1,83 +1,231 @@
+@file:OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
+)
+
 package cn.wj.android.cashbook.feature.settings.screen
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WebAsset
-import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import cn.wj.android.cashbook.feature.settings.model.LauncherMenuItemModel
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
+import cn.wj.android.cashbook.core.ui.LargeTopAppBar
+import cn.wj.android.cashbook.core.ui.TopAppBarDefaults
+import cn.wj.android.cashbook.core.ui.TopAppBarScrollBehavior
+import cn.wj.android.cashbook.feature.settings.R
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherRoute(
-    modifier: Modifier = Modifier,
-    content: @Composable (Modifier, DrawerState) -> Unit,
+    onMenuClick: (LauncherMenuAction) -> Unit,
+    pinnedTitle: @Composable () -> Unit,
+    collapsedTitle: @Composable () -> Unit,
+    content: @Composable (Modifier) -> Unit,
 ) {
-    // TODO 设置项列表
-    val menus = arrayListOf(
-        LauncherMenuItemModel(Icons.Default.LibraryBooks, "我的账本") {
-        },
-        LauncherMenuItemModel(Icons.Default.WebAsset, "我的资产") {
-        },
-        LauncherMenuItemModel(Icons.Default.Category, "我的分类") {
-        },
-        LauncherMenuItemModel(Icons.Default.Layers, "我的标签") {
-        },
-        LauncherMenuItemModel(Icons.Default.Settings, "设置") {
-        },
-        LauncherMenuItemModel(Icons.Default.Info, "关于我们") {
-        },
+    LauncherScreen(
+        onMenuClick = onMenuClick,
+        pinnedTitle = pinnedTitle,
+        collapsedTitle = collapsedTitle,
+        content = content,
     )
-    LauncherScreen(menus = menus, modifier = modifier, content = content)
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherScreen(
-    menus: List<LauncherMenuItemModel>,
-    modifier: Modifier,
-    content: @Composable (Modifier, DrawerState) -> Unit,
+    onMenuClick: (LauncherMenuAction) -> Unit,
+    pinnedTitle: @Composable () -> Unit,
+    collapsedTitle: @Composable () -> Unit,
+    content: @Composable (Modifier) -> Unit,
 ) {
+    // 协程
+    val coroutineScope = rememberCoroutineScope()
+    // 抽屉状态
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     ModalNavigationDrawer(
         drawerState = drawerState,
-        modifier = modifier,
         drawerContent = {
-            ModalDrawerSheet {
-                Text(text = "标题")
-                menus.forEach { menuItem ->
-                    NavigationDrawerItem(
-                        icon = {
-                            Icon(imageVector = menuItem.vectorStart, contentDescription = null)
-                        },
-                        label = {
-                            Text(text = menuItem.tittle)
-                        },
-                        selected = false,
-                        onClick = menuItem.onClick,
-                    )
+            LauncherSheet { action ->
+                onMenuClick(action)
+                // 关闭抽屉
+                coroutineScope.launch {
+                    drawerState.close()
                 }
             }
         },
     ) {
-        Scaffold {
-            content(modifier, drawerState)
+        // 滚动行为
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                LauncherTopBar(
+                    scrollBehavior = scrollBehavior,
+                    onMenuClick = { action ->
+                        when (action) {
+                            LauncherMenuAction.MENU -> {
+                                // 菜单点击，展示抽屉菜单
+                                coroutineScope.launch {
+                                    drawerState.open()
+                                }
+                            }
+
+                            else -> {
+                                // 其它功能点击
+                                onMenuClick(action)
+                            }
+                        }
+                    },
+                    pinnedTitle = pinnedTitle,
+                    collapsedTitle = collapsedTitle,
+                )
+            },
+        ) { paddingValues ->
+            content(
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+            )
         }
+    }
+}
+
+@Composable
+internal fun LauncherTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    onMenuClick: (LauncherMenuAction) -> Unit,
+    pinnedTitle: @Composable () -> Unit,
+    collapsedTitle: @Composable () -> Unit
+) {
+    LargeTopAppBar(
+        scrollBehavior = scrollBehavior,
+        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+        pinnedTitle = pinnedTitle,
+        collapsedTitle = collapsedTitle,
+        navigationIcon = {
+            IconButton(onClick = { onMenuClick(LauncherMenuAction.MENU) }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = { onMenuClick(LauncherMenuAction.SEARCH) }) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                )
+            }
+            IconButton(onClick = { onMenuClick(LauncherMenuAction.CALENDAR) }) {
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                )
+            }
+            IconButton(onClick = { onMenuClick(LauncherMenuAction.MY_ASSET) }) {
+                Icon(
+                    imageVector = Icons.Default.WebAsset,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                )
+            }
+        },
+    )
+}
+
+@Composable
+fun LauncherSheet(
+    onMenuClick: (LauncherMenuAction) -> Unit,
+) {
+    ModalDrawerSheet {
+        Text(
+            text = stringResource(id = R.string.sheet_title),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(24.dp)
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.my_books)) },
+            icon = { Icon(imageVector = Icons.Default.LibraryBooks, contentDescription = null) },
+            selected = false,
+            onClick = { onMenuClick(LauncherMenuAction.MY_BOOK) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.my_assets)) },
+            icon = { Icon(imageVector = Icons.Default.WebAsset, contentDescription = null) },
+            selected = false,
+            onClick = { onMenuClick(LauncherMenuAction.MY_ASSET) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.my_categories)) },
+            icon = { Icon(imageVector = Icons.Default.Category, contentDescription = null) },
+            selected = false,
+            onClick = { onMenuClick(LauncherMenuAction.MY_CATEGORY) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.my_tags)) },
+            icon = { Icon(imageVector = Icons.Default.Layers, contentDescription = null) },
+            selected = false,
+            onClick = { onMenuClick(LauncherMenuAction.MY_TAG) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        Divider(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth()
+                .height(1.dp)
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.settings)) },
+            icon = { Icon(imageVector = Icons.Default.Settings, contentDescription = null) },
+            selected = false,
+            onClick = { onMenuClick(LauncherMenuAction.SETTING) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.about_us)) },
+            icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
+            selected = false,
+            onClick = { onMenuClick(LauncherMenuAction.ABOUT_US) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
     }
 }
