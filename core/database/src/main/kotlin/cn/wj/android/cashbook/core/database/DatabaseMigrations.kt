@@ -2,7 +2,7 @@ package cn.wj.android.cashbook.core.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import cn.wj.android.cashbook.core.model.SWITCH_INT_ON
+import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 
 object DatabaseMigrations {
 

@@ -38,6 +38,10 @@ gradlePlugin {
             id = "cashbook.android.library.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
+        register("androidHilt") {
+            id = "cashbook.android.hilt"
+            implementationClass = "AndroidHiltConventionPlugin"
+        }
         register("androidRoom") {
             id = "cashbook.android.room"
             implementationClass = "AndroidRoomConventionPlugin"

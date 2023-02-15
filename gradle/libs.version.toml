@@ -26,6 +26,12 @@ google-gson = "2.10.1"
 google-accompanist = "0.28.0"
 # ksp [Github](https://github.com/google/ksp)
 google-devtools-ksp = "1.8.0-1.0.9"
+# protobuf [Github](https://github.com/protocolbuffers/protobuf)
+google-protobuf = "3.21.12"
+google-protobuf-plugin = "0.8.19"
+# hilt
+google-hilt = "2.44.2"
+androidx-hilt = "1.0.0"
 
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
 android-gradle-plugin = "7.4.1"
@@ -43,6 +49,7 @@ androidx-cardview = "1.0.0"
 androidx-viewpager2 = "1.0.0"
 # 约束性布局 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-constraintlayout = "2.1.4"
+androidx-constraintlayout-compose = "1.0.1"
 # multidex 分包 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-multidex = "2.0.1"
 # core 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
@@ -66,6 +73,8 @@ androidx-paging = "3.1.1"
 androidx-navigation = "2.5.3"
 # WorkManager 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-work = "2.7.1"
+# DataStore 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
+androidx-datastore = "1.0.0"
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-test = "1.4.0"
 # espresso [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
@@ -181,6 +190,16 @@ google-accompanist-flowlayout = { group = "com.google.accompanist", name = "acco
 google-accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "google-accompanist" }
 google-accompanist-testharness = { group = "com.google.accompanist", name = "accompanist-testharness", version.ref = "google-accompanist" }
 google-devtools-ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "google-devtools-ksp" }
+# protobuf [Github](https://github.com/protocolbuffers/protobuf)
+google-protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "google-protobuf" }
+google-protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "google-protobuf" }
+# hilt
+google-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "google-hilt" }
+google-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "google-hilt" }
+google-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "google-hilt" }
+androidx-hilt-ext-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt" }
+androidx-hilt-ext-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidx-hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidx-hilt" }
 
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "android-gradle-plugin" }
@@ -198,6 +217,7 @@ androidx-cardview = { group = "androidx.cardview", name = "cardview", version.re
 androidx-viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "androidx-viewpager2" }
 # 约束性布局 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
+androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "androidx-constraintlayout-compose" }
 # multidex 分包 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "androidx-multidex" }
 # core 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
@@ -300,6 +320,15 @@ androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx"
 androidx-work-rxjava2 = { group = "androidx.work", name = "work-rxjava2", version.ref = "androidx-work" }
 androidx-work-rxjava3 = { group = "androidx.work", name = "work-rxjava3", version.ref = "androidx-work" }
 androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "androidx-work" }
+# DataStore 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
+androidx-datastore-proto = { group = "androidx.datastore", name = "datastore", version.ref = "androidx-datastore" }
+androidx-datastore-proto-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "androidx-datastore" }
+androidx-datastore-proto-rxjava2 = { group = "androidx.datastore", name = "datastore-rxjava2", version.ref = "androidx-datastore" }
+androidx-datastore-proto-rxjava3 = { group = "androidx.datastore", name = "datastore-rxjava3", version.ref = "androidx-datastore" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
+androidx-datastore-preferences-rxjava2 = { group = "androidx.datastore", name = "datastore-preferences-rxjava2", version.ref = "androidx-datastore" }
+androidx-datastore-preferences-rxjava3 = { group = "androidx.datastore", name = "datastore-preferences-rxjava3", version.ref = "androidx-datastore" }
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test" }
 androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidx-test" }
@@ -467,3 +496,7 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "google-devtools-ksp" }
+# protobuf [Github](https://github.com/protocolbuffers/protobuf)
+google-protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf-plugin" }
+# Hilt
+google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "google-hilt" }

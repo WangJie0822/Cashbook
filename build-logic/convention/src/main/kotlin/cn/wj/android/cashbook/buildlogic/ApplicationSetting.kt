@@ -30,8 +30,10 @@ object ApplicationSetting {
         const val PLUGIN_ANDROID_APPLICATION = "com.android.application"
         const val PLUGIN_ANDROID_LIBRARY = "com.android.library"
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
+        const val PLUGIN_KOTLIN_KAPT = "org.jetbrains.kotlin.kapt"
         const val PLUGIN_JACOCO = "org.gradle.jacoco"
         const val PLUGIN_GOOGLE_KSP = "com.google.devtools.ksp"
+        const val PLUGIN_GOOGLE_HILT = "dagger.hilt.android.plugin"
     }
 }
 

@@ -5,6 +5,7 @@ plugins {
     id("cashbook.android.application")
     id("cashbook.android.application.compose")
     id("cashbook.android.application.jacoco")
+    id("cashbook.android.hilt")
     // Kotlin 注解处理
     kotlin("kapt")
     // Kotlin json 转换
@@ -27,7 +28,7 @@ android {
 
     buildFeatures {
         dataBinding {
-            isEnabled = true
+            enable = true
         }
     }
 
@@ -153,7 +154,10 @@ dependencies {
     // 设计
     implementation(project(":core:design"))
 
+    implementation(project(":feature:settings"))
     implementation(project(":feature:record"))
+
+    implementation(project(":core:ui"))
 
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)

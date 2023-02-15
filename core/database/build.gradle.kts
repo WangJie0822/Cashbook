@@ -2,6 +2,7 @@ plugins {
     id("cashbook.android.library")
     id("cashbook.android.library.jacoco")
     id("cashbook.android.room")
+    id("cashbook.android.hilt")
 }
 
 android {
@@ -11,6 +12,5 @@ android {
 dependencies {
 
     implementation(project(":core:model"))
-
-    implementation(libs.insert.koin.android)
+    implementation(project(":core:common"))
 }

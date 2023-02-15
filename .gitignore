@@ -49,6 +49,7 @@ captures/
 .idea/kotlinScripting.xml
 .idea/git_toolbox_prj.xml
 .idea/androidTestResultsUserPreferences.xml
+.idea/shelf
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.

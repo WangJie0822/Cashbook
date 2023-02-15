@@ -50,9 +50,12 @@ include(
     ":feature:settings",
 )
 include(
+    ":core:data",
+    ":core:database",
+    ":core:datastore",
     ":core:common",
     ":core:model",
-    ":core:database",
     ":core:design",
+    ":core:ui",
     ":core:MPChart",
 )

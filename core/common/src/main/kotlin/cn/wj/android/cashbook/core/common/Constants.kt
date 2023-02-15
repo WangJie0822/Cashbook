@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package cn.wj.android.cashbook.core.model
+package cn.wj.android.cashbook.core.common
 
 /**
  * 常量

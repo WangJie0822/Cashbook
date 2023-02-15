@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.sp
 /**
  * 字体排版
  */
-internal val NiaTypography = Typography(
+internal val CashbookTypography = Typography(
     displayLarge = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 57.sp,

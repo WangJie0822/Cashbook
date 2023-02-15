@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="record_current_month_income">本月收入</string>
+    <string name="record_current_month_expend">本月支出</string>
+    <string name="record_current_month_balance">本月结余</string>
+</resources>

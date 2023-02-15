@@ -11,7 +11,9 @@ import androidx.core.view.WindowCompat
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.ui.MainApp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +35,6 @@ class MainActivity : ComponentActivity() {
 
             CashbookTheme(
                 darkTheme = darkTheme,
-                androidTheme = false,
                 disableDynamicTheming = true,
             ) {
                 MainApp()

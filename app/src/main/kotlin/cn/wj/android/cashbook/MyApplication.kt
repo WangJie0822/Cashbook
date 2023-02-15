@@ -8,7 +8,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import androidx.multidex.MultiDex
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.tools.jumpAppDetails
@@ -25,6 +24,7 @@ import com.didichuxing.doraemonkit.DoraemonKit
 import com.didichuxing.doraemonkit.kit.IKit
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.HiltAndroidApp
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -35,6 +35,7 @@ import org.koin.core.logger.Level
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
+@HiltAndroidApp
 class MyApplication : Application() {
 
     override fun onCreate() {
