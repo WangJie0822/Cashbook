@@ -9,6 +9,7 @@ enum class LauncherMenuAction {
     MENU,
     SEARCH,
     CALENDAR,
+    ADD,
     MY_BOOK,
     MY_ASSET,
     MY_CATEGORY,

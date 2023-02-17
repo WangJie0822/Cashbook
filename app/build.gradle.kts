@@ -174,4 +174,5 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.google.accompanist.systemuicontroller)
+    implementation(libs.google.accompanist.navigation.animation)
 }

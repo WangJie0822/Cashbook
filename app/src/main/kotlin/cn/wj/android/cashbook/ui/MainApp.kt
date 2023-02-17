@@ -1,6 +1,8 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package cn.wj.android.cashbook.ui
 
-import android.annotation.SuppressLint
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumedWindowInsets
@@ -12,19 +14,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.feature.record.navigation.LauncherCollapsedTitleContent
 import cn.wj.android.cashbook.feature.record.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.record.navigation.LauncherPinnedTitleContent
+import cn.wj.android.cashbook.feature.record.navigation.editRecordScreen
+import cn.wj.android.cashbook.feature.record.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
+/** 开始默认显示路径 */
 private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+/** 应用入口 */
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalLayoutApi::class
@@ -32,13 +37,13 @@ private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 @Composable
 fun MainApp() {
     CashbookBackground {
-        val navController = rememberNavController()
+        val navController = rememberAnimatedNavController()
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onBackground,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
         ) { paddingValues ->
-            NavHost(
+            AnimatedNavHost(
                 navController = navController,
                 modifier = Modifier
                     .fillMaxSize()
@@ -49,6 +54,10 @@ fun MainApp() {
                 settingsLauncherScreen(
                     onMenuClick = { action ->
                         when (action) {
+                            LauncherMenuAction.ADD -> {
+                                navController.naviToEditRecord()
+                            }
+
                             LauncherMenuAction.SEARCH -> {
 
                             }
@@ -88,6 +97,11 @@ fun MainApp() {
                     collapsedTitle = { LauncherCollapsedTitleContent() },
                     content = { modifier ->
                         LauncherContent(modifier = modifier)
+                    },
+                )
+                editRecordScreen(
+                    onBackClick = {
+                        navController.popBackStack()
                     },
                 )
             }

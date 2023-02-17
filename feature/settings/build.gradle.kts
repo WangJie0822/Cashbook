@@ -18,4 +18,8 @@ dependencies {
 
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    implementation(libs.google.accompanist.navigation.animation)
 }
