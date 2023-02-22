@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import cn.wj.android.cashbook.feature.record.screen.EditRecordScreen
+import cn.wj.android.cashbook.feature.record.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.record.screen.LauncherCollapsedTitleScreen
 import cn.wj.android.cashbook.feature.record.screen.LauncherContentScreen
 import cn.wj.android.cashbook.feature.record.screen.LauncherPinnedTitleScreen
@@ -26,7 +26,7 @@ fun NavController.naviToEditRecord() {
  */
 fun NavGraphBuilder.editRecordScreen(onBackClick: () -> Unit) {
     composable(ROUTE_EDIT_RECORD) {
-        EditRecordScreen(
+        EditRecordRoute(
             onBackClick = onBackClick,
         )
     }

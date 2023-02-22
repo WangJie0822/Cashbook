@@ -101,9 +101,19 @@ object DatabaseMigrations {
         }
     }
 
+    /**
+     * 数据库升级 6 -> 7
+     * - db_asset、db_record 表金额类型由 float 修改为 double
+     */
+    val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+        }
+    }
+
     /** 数据库升级列表 */
     val MIGRATION_LIST =
-        arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+        arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
 }
 
 internal fun String.toDoubleOrZero() = this.toDoubleOrNull() ?: 0.0

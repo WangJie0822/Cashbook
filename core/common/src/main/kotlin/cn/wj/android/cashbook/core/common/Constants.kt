@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package cn.wj.android.cashbook.core.common
 
 /**
@@ -16,6 +14,9 @@ const val SWITCH_INT_ON = 1
 
 /** 开关 - 关 */
 const val SWITCH_INT_OFF = 0
+
+/** 记录类型显示列数 */
+const val RECORD_TYPE_COLUMNS = 5
 
 /** 通知渠道 - 应用 */
 const val NOTIFICATION_CHANNEL_APP = "channel_app"

@@ -75,6 +75,8 @@ androidx-navigation = "2.5.3"
 androidx-work = "2.7.1"
 # DataStore 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-datastore = "1.0.0"
+# Annotation [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
+androidx-annotation = "1.5.0"
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-test = "1.4.0"
 # espresso [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
@@ -337,6 +339,8 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
 androidx-datastore-preferences-rxjava2 = { group = "androidx.datastore", name = "datastore-preferences-rxjava2", version.ref = "androidx-datastore" }
 androidx-datastore-preferences-rxjava3 = { group = "androidx.datastore", name = "datastore-preferences-rxjava3", version.ref = "androidx-datastore" }
+# Annotation [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
+androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidx-annotation" }
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test" }
 androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidx-test" }

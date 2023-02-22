@@ -94,6 +94,22 @@ val DarkAndroidColorScheme = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
+val LightExtendedColors = ExtendedColors(
+    selected = md_theme_light_inversePrimary,
+    unselected = md_theme_light_outlineVariant,
+    income = Color(0xFF00ACC1),
+    expenditure = Color(0xFFD7072F),
+    transfer = Color(0xFF2196F3),
+)
+
+val DarkExtendedColors = ExtendedColors(
+    selected = md_theme_dark_inversePrimary,
+    unselected = md_theme_dark_outlineVariant,
+    income = Color(0xFF00838F),
+    expenditure = Color(0xFFD7072F),
+    transfer = Color(0xFF2196F3),
+)
+
 /**
  * 白色 Android 主题渐变色
  */
@@ -135,6 +151,8 @@ fun CashbookTheme(
 
         else -> if (darkTheme) DarkAndroidColorScheme else LightAndroidColorScheme
     }
+    // 拓展颜色
+    val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors
     // 渐变色
     val emptyGradientColors = GradientColors(container = colorScheme.surfaceColorAtElevation(2.dp))
     val gradientColors = when {
@@ -151,6 +169,7 @@ fun CashbookTheme(
     }
     // 组合
     CompositionLocalProvider(
+        LocalExtendedColors provides extendedColors,
         LocalGradientColors provides gradientColors,
         LocalBackgroundTheme provides backgroundTheme,
         LocalTintTheme provides tintTheme,

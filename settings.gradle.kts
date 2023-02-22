@@ -55,6 +55,7 @@ include(
     ":core:datastore",
     ":core:common",
     ":core:model",
+    ":core:domain",
     ":core:design",
     ":core:ui",
     ":core:MPChart",
