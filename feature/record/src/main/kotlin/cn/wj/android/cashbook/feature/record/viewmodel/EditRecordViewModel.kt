@@ -2,13 +2,19 @@ package cn.wj.android.cashbook.feature.record.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.Symbol
+import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
+import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.GetRecordTypeListUseCase
+import cn.wj.android.cashbook.domain.usecase.GetVisibleAssetListUseCase
+import cn.wj.android.cashbook.feature.record.enums.BottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,14 +30,18 @@ class EditRecordViewModel @Inject constructor(
     private val typeRepository: TypeRepository,
     private val getDefaultRecordUseCase: GetDefaultRecordUseCase,
     private val getRecordTypeListUseCase: GetRecordTypeListUseCase,
+    private val getVisibleAssetListUseCase: GetVisibleAssetListUseCase,
 ) : ViewModel() {
 
+    /** 显示底部弹窗数据 */
+    val showBottomSheet: MutableStateFlow<BottomSheetEnum> = MutableStateFlow(BottomSheetEnum.NONE)
+
     /** 经过修改的记录数据 */
-    private val modifiedRecordData: MutableStateFlow<RecordEntity?> = MutableStateFlow(null)
+    private val mutableRecordData: MutableStateFlow<RecordEntity?> = MutableStateFlow(null)
 
     /** 实际显示数据源 */
     private val recordData =
-        combine(getDefaultRecordUseCase(), modifiedRecordData) { default, modified ->
+        combine(getDefaultRecordUseCase(), mutableRecordData) { default, modified ->
             modified ?: default
         }
 
@@ -64,17 +74,132 @@ class EditRecordViewModel @Inject constructor(
             initialValue = listOf()
         )
 
+    /** 备注文本 */
+    val remarkData: StateFlow<String> = recordData
+        .map { it.remark }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ""
+        )
+
+    /** 资产列表 */
+    val assetListData: StateFlow<List<AssetEntity>> = getVisibleAssetListUseCase()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = listOf()
+        )
+
+    /** 资产文本 */
+    val assetData: StateFlow<String> = recordData
+        .map {
+            val asset = it.asset
+            if (null == asset) {
+                ""
+            } else {
+                "${asset.name}(${asset.displayBalance})"
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ""
+        )
+
+    /** 关联资产文本 */
+    val relatedAssetData: StateFlow<String> = recordData
+        .map {
+            val asset = it.relatedAsset
+            if (null == asset) {
+                ""
+            } else {
+                "${asset.name}(${asset.displayBalance})"
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ""
+        )
+
+    /** 时间文本 */
+    val dateTimeData: StateFlow<String> = recordData
+        .map {
+            it.modifyTime
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ""
+        )
+
+    /** 标签文本 */
+    val tagsData: StateFlow<String> = recordData
+        .map {
+            if (it.tags.isEmpty()) {
+                ""
+            } else {
+                StringBuilder().run {
+                    it.tags.forEach { tag ->
+                        if (!isBlank()) {
+                            append(",")
+                        }
+                        append(tag.name)
+                    }
+                    toString()
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ""
+        )
+
+    /** 手续费文本 */
+    val chargesData: StateFlow<String> = recordData
+        .map {
+            if (it.charges.toBigDecimalOrZero() == BigDecimal.ZERO) {
+                ""
+            } else {
+                "${Symbol.rmb}${it.charges}"
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ""
+        )
+
+    /** 优惠文本 */
+    val concessionsData: StateFlow<String> = recordData
+        .map {
+            if (it.concessions.toBigDecimalOrZero() == BigDecimal.ZERO) {
+                ""
+            } else {
+                "${Symbol.rmb}${it.concessions}"
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ""
+        )
+
+    /** 是否可报销 */
+    val reimbursableData: StateFlow<Boolean> = recordData
+        .map { it.reimbursable }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = false
+        )
 
     /** 类型分类点击切换为 [typeCategory] */
     fun onTypeCategoryTabSelected(typeCategory: RecordTypeCategoryEnum) {
         viewModelScope.launch {
-            modifiedRecordData.value = recordData.first().copy(typeCategory = typeCategory)
-        }
-    }
-
-    fun onAmountChange(value: String) {
-        viewModelScope.launch {
-            modifiedRecordData.value = recordData.first().copy(amount = value)
+            mutableRecordData.value = recordData.first().copy(typeCategory = typeCategory)
         }
     }
 
@@ -96,8 +221,29 @@ class EditRecordViewModel @Inject constructor(
                 }
             }
             selected?.let {
-                modifiedRecordData.value = recordData.first().copy(type = it)
+                mutableRecordData.value = recordData.first().copy(type = it)
             }
         }
+    }
+
+    /** 备注文本变化为 [remark] */
+    fun onRemarkTextChanged(remark: String) {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(remark = remark)
+        }
+    }
+
+    fun onBottomSheetAction(action: BottomSheetEnum) {
+        showBottomSheet.value = action
+    }
+
+    fun onAssetItemClick(item: AssetEntity?) {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(asset = item)
+        }
+    }
+
+    /** TODO 尝试保存记录 */
+    fun trySaveRecord() {
     }
 }

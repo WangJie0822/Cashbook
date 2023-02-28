@@ -1,5 +1,7 @@
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
+import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.getIdByString
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
@@ -40,21 +42,38 @@ class GetDefaultRecordUseCase @Inject constructor(
                 typeCategory = recordTypeById.typeCategory,
                 type = recordTypeById.asEntity(),
                 asset = assetById?.asEntity(),
-                intoAsset = null,
+                relatedAsset = null,
                 amount = "0",
-                charge = "",
+                charges = "",
                 concessions = "",
                 remark = "",
                 reimbursable = false,
                 associated = listOf(),
                 tags = listOf(),
-                modifyTime = "",
+                modifyTime = System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS),
             )
         }
     }
 
     private fun AssetModel.asEntity(): AssetEntity {
-        return AssetEntity()
+        return AssetEntity(
+            id = this.id,
+            booksId = this.booksId,
+            name = this.name,
+            iconResId = this.iconResId,
+            totalAmount = this.totalAmount,
+            billingDate = this.billingDate,
+            repaymentDate = this.repaymentDate,
+            type = this.type,
+            classification = this.classification,
+            invisible = this.invisible,
+            openBank = this.openBank,
+            cardNo = this.cardNo,
+            remark = this.remark,
+            sort = this.sort,
+            modifyTime = this.modifyTime,
+            balance = this.balance,
+        )
     }
 
     private fun RecordTypeModel.asEntity(): RecordTypeEntity {
@@ -66,6 +85,7 @@ class GetDefaultRecordUseCase @Inject constructor(
             sort = this.sort,
             child = listOf(),
             selected = false,
+            shapeType = -1,
         )
     }
 }

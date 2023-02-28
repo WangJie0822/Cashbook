@@ -96,7 +96,7 @@ val DarkAndroidColorScheme = darkColorScheme(
 
 val LightExtendedColors = ExtendedColors(
     selected = md_theme_light_inversePrimary,
-    unselected = md_theme_light_outlineVariant,
+    unselected = md_theme_light_outline,
     income = Color(0xFF00ACC1),
     expenditure = Color(0xFFD7072F),
     transfer = Color(0xFF2196F3),
@@ -104,7 +104,7 @@ val LightExtendedColors = ExtendedColors(
 
 val DarkExtendedColors = ExtendedColors(
     selected = md_theme_dark_inversePrimary,
-    unselected = md_theme_dark_outlineVariant,
+    unselected = md_theme_dark_outline,
     income = Color(0xFF00838F),
     expenditure = Color(0xFFD7072F),
     transfer = Color(0xFF2196F3),

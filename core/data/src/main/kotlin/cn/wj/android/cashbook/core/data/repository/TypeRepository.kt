@@ -9,8 +9,6 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 /**
@@ -42,16 +40,6 @@ class TypeRepository @Inject constructor(
                     it.asModel(parentId)
                 }
         }
-
-    fun getRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): Flow<List<RecordTypeModel>> {
-        // 查询类型数据并返回
-        return typeDao.queryByTypeCategory(typeCategory.name)
-            .map { list ->
-                list.map {
-                    it.asModel()
-                }
-            }
-    }
 }
 
 private fun TypeTable.asModel(parentId: Long = -1L): RecordTypeModel {

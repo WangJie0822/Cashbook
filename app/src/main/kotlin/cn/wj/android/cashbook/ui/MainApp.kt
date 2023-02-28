@@ -103,6 +103,12 @@ fun MainApp() {
                     onBackClick = {
                         navController.popBackStack()
                     },
+                    onTypeSettingClick = {
+                        // TODO
+                    },
+                    onAddAssetClick = {
+                        // TODO
+                    },
                 )
             }
         }

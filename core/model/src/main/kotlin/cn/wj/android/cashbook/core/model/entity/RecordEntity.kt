@@ -11,9 +11,9 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
  * @param typeCategory 记录类型分类
  * @param type 记录类型
  * @param asset 关联资产
- * @param intoAsset 转账转入资产
+ * @param relatedAsset 转账转入资产
  * @param amount 记录金额
- * @param charge 转账手续费
+ * @param charges 转账手续费
  * @param concessions 优惠
  * @param remark 备注
  * @param associated 关联记录
@@ -29,9 +29,9 @@ data class RecordEntity(
     val typeCategory: RecordTypeCategoryEnum,
     val type: RecordTypeEntity,
     val asset: AssetEntity?,
-    val intoAsset: AssetEntity?,
+    val relatedAsset: AssetEntity?,
     val amount: String,
-    val charge: String,
+    val charges: String,
     val concessions: String,
     val remark: String,
     val reimbursable: Boolean,

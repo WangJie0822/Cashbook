@@ -1,10 +1,8 @@
 package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import cn.wj.android.cashbook.core.database.table.AssetTable
-import cn.wj.android.cashbook.core.database.table.TypeTable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -16,5 +14,8 @@ import kotlinx.coroutines.flow.Flow
 interface AssetDao {
 
     @Query("SELECT * FROM db_asset WHERE id=:assetId")
-    suspend fun queryAssetById(assetId:Long):AssetTable?
+    suspend fun queryAssetById(assetId: Long): AssetTable?
+
+    @Query("SELECT * FROM db_asset WHERE books_id=:bookId")
+    suspend fun queryVisibleAssetByBookId(bookId: Long): List<AssetTable>
 }

@@ -87,34 +87,3 @@ internal fun LauncherContentScreen(modifier: Modifier = Modifier) {
         }
     }
 }
-
-/** 首页标题固定部分预览 */
-@DevicePreviews
-@Composable
-internal fun LauncherPinnedTitleScreenPreview() {
-    CashbookTheme {
-        Surface(color = MaterialTheme.colorScheme.primary) {
-            LauncherPinnedTitleScreen()
-        }
-    }
-}
-
-/** 首页标题可折叠部分预览 */
-@DevicePreviews
-@Composable
-internal fun LauncherCollapsedTitleScreenPreview() {
-    CashbookTheme {
-        Surface(color = MaterialTheme.colorScheme.primary) {
-            LauncherCollapsedTitleScreen()
-        }
-    }
-}
-
-/** 首页内容部分预览 */
-@DevicePreviews
-@Composable
-internal fun LauncherContentScreenPreview() {
-    CashbookTheme {
-        LauncherContentScreenPreview()
-    }
-}

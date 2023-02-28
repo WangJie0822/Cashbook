@@ -24,10 +24,16 @@ fun NavController.naviToEditRecord() {
  *
  * @param onBackClick 返回点击
  */
-fun NavGraphBuilder.editRecordScreen(onBackClick: () -> Unit) {
+fun NavGraphBuilder.editRecordScreen(
+    onBackClick: () -> Unit,
+    onTypeSettingClick: () -> Unit,
+    onAddAssetClick: () -> Unit,
+) {
     composable(ROUTE_EDIT_RECORD) {
         EditRecordRoute(
             onBackClick = onBackClick,
+            onTypeSettingClick = onTypeSettingClick,
+            onAddAssetClick = onAddAssetClick,
         )
     }
 }

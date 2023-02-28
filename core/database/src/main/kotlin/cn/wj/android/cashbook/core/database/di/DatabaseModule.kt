@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.core.database.di
 
 import android.content.Context
 import androidx.room.Room
+import cn.wj.android.cashbook.core.common.DB_FILE_NAME
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.dao.AssetDao
@@ -30,9 +31,9 @@ object DatabaseModule {
         .databaseBuilder(
             context,
             CashbookDatabase::class.java,
-            "cashbook.db",
+            DB_FILE_NAME,
         )
-        .createFromAsset("cashbook.db")
+        .createFromAsset(DB_FILE_NAME)
         .addMigrations(*DatabaseMigrations.MIGRATION_LIST)
         .build()
 

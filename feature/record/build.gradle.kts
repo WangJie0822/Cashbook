@@ -25,5 +25,8 @@ dependencies {
 
     implementation(libs.androidx.hilt.navigation.compose)
 
+    // navigation 动画
     implementation(libs.google.accompanist.navigation.animation)
+    // 流式布局
+    implementation(libs.google.accompanist.flowlayout)
 }

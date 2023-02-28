@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "ecd198fcf3e7762b53bd5f43ee49f3b3",
+    "identityHash": "06fc7ede4e79d3147f8e4aebe0a2cf23",
     "entities": [
       {
         "tableName": "db_books",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "db_asset",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `books_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `total_amount` REAL NOT NULL, `billing_date` TEXT NOT NULL, `repayment_date` TEXT NOT NULL, `type` TEXT NOT NULL, `classification` TEXT NOT NULL, `invisible` INTEGER NOT NULL, `open_bank` TEXT NOT NULL, `card_no` TEXT NOT NULL, `remark` TEXT NOT NULL, `sort` INTEGER NOT NULL, `create_time` INTEGER NOT NULL, `modify_time` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `books_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `balance` REAL NOT NULL, `total_amount` REAL NOT NULL, `billing_date` TEXT NOT NULL, `repayment_date` TEXT NOT NULL, `type` TEXT NOT NULL, `classification` TEXT NOT NULL, `invisible` INTEGER NOT NULL, `open_bank` TEXT NOT NULL, `card_no` TEXT NOT NULL, `remark` TEXT NOT NULL, `sort` INTEGER NOT NULL, `modify_time` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -62,6 +62,12 @@
             "fieldPath": "name",
             "columnName": "name",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "balance",
+            "columnName": "balance",
+            "affinity": "REAL",
             "notNull": true
           },
           {
@@ -121,12 +127,6 @@
           {
             "fieldPath": "sort",
             "columnName": "sort",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "createTime",
-            "columnName": "create_time",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -324,7 +324,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ecd198fcf3e7762b53bd5f43ee49f3b3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '06fc7ede4e79d3147f8e4aebe0a2cf23')"
     ]
   }
 }
