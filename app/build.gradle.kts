@@ -154,8 +154,13 @@ dependencies {
     // 设计
     implementation(project(":core:design"))
 
+    // 功能
+    implementation(project(":feature:tags"))
+    implementation(project(":feature:types"))
+    implementation(project(":feature:books"))
+    implementation(project(":feature:assets"))
+    implementation(project(":feature:records"))
     implementation(project(":feature:settings"))
-    implementation(project(":feature:record"))
 
     implementation(project(":core:ui"))
     implementation(project(":core:model"))

@@ -16,13 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
-import cn.wj.android.cashbook.feature.record.navigation.LauncherCollapsedTitleContent
-import cn.wj.android.cashbook.feature.record.navigation.LauncherContent
-import cn.wj.android.cashbook.feature.record.navigation.LauncherPinnedTitleContent
-import cn.wj.android.cashbook.feature.record.navigation.editRecordScreen
-import cn.wj.android.cashbook.feature.record.navigation.naviToEditRecord
+import cn.wj.android.cashbook.feature.records.navigation.LauncherCollapsedTitleContent
+import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
+import cn.wj.android.cashbook.feature.records.navigation.LauncherPinnedTitleContent
+import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
+import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
+import cn.wj.android.cashbook.feature.tags.navigation.myTagsScreen
+import cn.wj.android.cashbook.feature.tags.navigation.naviToMyTags
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
@@ -79,7 +81,7 @@ fun MainApp() {
                             }
 
                             LauncherMenuAction.MY_TAG -> {
-
+                                navController.naviToMyTags()
                             }
 
                             LauncherMenuAction.SETTING -> {
@@ -97,6 +99,14 @@ fun MainApp() {
                     collapsedTitle = { LauncherCollapsedTitleContent() },
                     content = { modifier ->
                         LauncherContent(modifier = modifier)
+                    },
+                )
+                myTagsScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onTagStatisticClick = {
+
                     },
                 )
                 editRecordScreen(

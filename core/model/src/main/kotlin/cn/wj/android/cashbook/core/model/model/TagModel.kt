@@ -1,4 +1,6 @@
 package cn.wj.android.cashbook.core.model.model
 
-class TagModel {
-}
+data class TagModel(
+    val id: Long,
+    val name: String,
+)

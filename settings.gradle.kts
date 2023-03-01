@@ -46,7 +46,11 @@ rootProject.name = "Cashbook"
 // 项目包含的 Module
 include(":app")
 include(
-    ":feature:record",
+    ":feature:tags",
+    ":feature:types",
+    ":feature:books",
+    ":feature:assets",
+    ":feature:records",
     ":feature:settings",
 )
 include(

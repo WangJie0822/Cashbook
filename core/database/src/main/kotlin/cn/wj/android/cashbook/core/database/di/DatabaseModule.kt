@@ -6,6 +6,7 @@ import cn.wj.android.cashbook.core.common.DB_FILE_NAME
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.dao.AssetDao
+import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import dagger.Module
 import dagger.Provides
@@ -48,5 +49,11 @@ object DatabaseModule {
     fun providesAssetDao(
         database: CashbookDatabase
     ): AssetDao = database.assetDao()
+
+    @Provides
+    @Singleton
+    fun providesTagDao(
+        database: CashbookDatabase
+    ): TagDao = database.tagDao()
 
 }

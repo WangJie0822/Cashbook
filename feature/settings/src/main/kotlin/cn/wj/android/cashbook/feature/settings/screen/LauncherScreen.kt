@@ -41,11 +41,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.design.component.FixedLargeTopAppBar
+import cn.wj.android.cashbook.core.design.component.TopAppBarDefaults
+import cn.wj.android.cashbook.core.design.component.TopAppBarScrollBehavior
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.LargeTopAppBar
-import cn.wj.android.cashbook.core.ui.TopAppBarDefaults
-import cn.wj.android.cashbook.core.ui.TopAppBarScrollBehavior
 import cn.wj.android.cashbook.feature.settings.R
 import kotlinx.coroutines.launch
 
@@ -161,17 +161,22 @@ internal fun LauncherTopBar(
     pinnedTitle: @Composable () -> Unit,
     collapsedTitle: @Composable () -> Unit
 ) {
-    LargeTopAppBar(
+    FixedLargeTopAppBar(
         scrollBehavior = scrollBehavior,
-        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+        ),
         pinnedTitle = pinnedTitle,
         collapsedTitle = collapsedTitle,
+        titleTextStyle = MaterialTheme.typography.titleSmall,
         navigationIcon = {
             IconButton(onClick = { onMenuClick(LauncherMenuAction.MENU) }) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
         },
@@ -180,21 +185,18 @@ internal fun LauncherTopBar(
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
             IconButton(onClick = { onMenuClick(LauncherMenuAction.CALENDAR) }) {
                 Icon(
                     imageVector = Icons.Default.CalendarMonth,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
             IconButton(onClick = { onMenuClick(LauncherMenuAction.MY_ASSET) }) {
                 Icon(
                     imageVector = Icons.Default.WebAsset,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
         },
