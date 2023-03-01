@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="please_select_asset">请选择一个资产</string>
+    <string name="unable_to_select_invisible_asset">无法选择隐藏资产</string>
+    <string name="add">添加</string>
+    <string name="unselect_asset">不选择资产</string>
+    <string name="used_with_colon">已用：</string>
+</resources>

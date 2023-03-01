@@ -1,18 +1,12 @@
 package cn.wj.android.cashbook.core.common.model
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
-class DataVersion {
+typealias DataVersion = MutableStateFlow<Int>
 
-    val version = MutableStateFlow(0)
-
-    inline fun <R> map(crossinline transform: suspend (value: Int) -> R): Flow<R> {
-        return version.map(transform)
-    }
-
-    fun update() {
-        version.value = ++version.value
+fun DataVersion.updateVersion() {
+    update {
+        it + 1
     }
 }

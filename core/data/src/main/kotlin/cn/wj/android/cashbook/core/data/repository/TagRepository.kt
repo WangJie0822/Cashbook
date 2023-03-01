@@ -1,19 +1,22 @@
 package cn.wj.android.cashbook.core.data.repository
 
 import cn.wj.android.cashbook.core.common.model.DataVersion
+import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.table.TagTable
 import cn.wj.android.cashbook.core.model.model.TagModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class TagRepository @Inject constructor(
     private val tagDao: TagDao
 ) {
 
-    private val dataVersion = DataVersion()
+    private val dataVersion: DataVersion = MutableStateFlow(0)
 
     val tagListData: Flow<List<TagModel>> = dataVersion.map {
         getAllTagList()
@@ -33,13 +36,13 @@ class TagRepository @Inject constructor(
         } else {
             tagDao.update(tagTable)
         }
-        dataVersion.update()
+        dataVersion.updateVersion()
     }
 
     suspend fun deleteTag(tag: TagModel) = withContext(Dispatchers.IO) {
         val tagTable = tag.asTable()
         tagDao.delete(tagTable)
-        dataVersion.update()
+        dataVersion.updateVersion()
     }
 
     private fun TagTable.asModel(): TagModel {

@@ -6,12 +6,11 @@ import cn.wj.android.cashbook.core.common.tools.getIdByString
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
-import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
+import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -53,27 +52,6 @@ class GetDefaultRecordUseCase @Inject constructor(
                 modifyTime = System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS),
             )
         }
-    }
-
-    private fun AssetModel.asEntity(): AssetEntity {
-        return AssetEntity(
-            id = this.id,
-            booksId = this.booksId,
-            name = this.name,
-            iconResId = this.iconResId,
-            totalAmount = this.totalAmount,
-            billingDate = this.billingDate,
-            repaymentDate = this.repaymentDate,
-            type = this.type,
-            classification = this.classification,
-            invisible = this.invisible,
-            openBank = this.openBank,
-            cardNo = this.cardNo,
-            remark = this.remark,
-            sort = this.sort,
-            modifyTime = this.modifyTime,
-            balance = this.balance,
-        )
     }
 
     private fun RecordTypeModel.asEntity(): RecordTypeEntity {

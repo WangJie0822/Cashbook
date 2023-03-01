@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
+import cn.wj.android.cashbook.feature.assets.navigation.selectAssetBottomSheet
 import cn.wj.android.cashbook.feature.records.navigation.LauncherCollapsedTitleContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherPinnedTitleContent
@@ -113,11 +114,11 @@ fun MainApp() {
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    onTypeSettingClick = {
-                        // TODO
-                    },
-                    onAddAssetClick = {
-                        // TODO
+                    selectAssetBottomSheet = { onAssetItemClick ->
+                        selectAssetBottomSheet(
+                            onAddAssetClick = { /*TODO*/ },
+                            onAssetItemClick = onAssetItemClick
+                        )
                     },
                 )
             }

@@ -95,10 +95,29 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun EditRecordRoute(
     onBackClick: () -> Unit,
-    onTypeSettingClick: () -> Unit,
-    onAddAssetClick: () -> Unit,
-    viewModel: EditRecordViewModel = hiltViewModel(),
+    selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
 ) {
+
+    EditRecordScreen(
+        onBackClick = onBackClick,
+        selectAssetBottomSheet = selectAssetBottomSheet,
+    )
+}
+
+/**
+ * 编辑记录界面
+ *
+ * @param onBackClick 返回点击
+ */
+@Composable
+internal fun EditRecordScreen(
+    onBackClick: () -> Unit,
+    selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    viewModel: EditRecordViewModel = hiltViewModel()
+) {
+
     // 选中分类
     val selectedTypeCategory: RecordTypeCategoryEnum by viewModel.typeCategory.collectAsStateWithLifecycle()
     // 金额数据
@@ -125,81 +144,6 @@ internal fun EditRecordRoute(
     // 底部菜单状态
     val bottomSheetEnum: BottomSheetEnum by viewModel.showBottomSheet.collectAsStateWithLifecycle()
 
-    // 资产数据
-    val assetList: List<AssetEntity> by viewModel.assetListData.collectAsStateWithLifecycle()
-
-    EditRecordScreen(
-        onBackClick = onBackClick,
-        selectedTypeCategory = selectedTypeCategory,
-        onTabSelected = viewModel::onTypeCategoryTabSelected,
-        amount = amount,
-        onAmountClick = { viewModel.onBottomSheetAction(BottomSheetEnum.AMOUNT) },
-        typeList = typeList,
-        onTypeClick = viewModel::onTypeClick,
-        onTypeSettingClick = onTypeSettingClick,
-        remark = remark,
-        onRemarkTextChanged = viewModel::onRemarkTextChanged,
-        assetName = assetName,
-        onAssetClick = { viewModel.onBottomSheetAction(BottomSheetEnum.ASSETS) },
-        relatedAssetName = relatedAssetName,
-        onRelatedAssetClick = { viewModel.onBottomSheetAction(BottomSheetEnum.ASSETS) },
-        dateTime = dateTime,
-        onDateTimeClick = {},
-        tags = tags,
-        onTagsClick = { viewModel.onBottomSheetAction(BottomSheetEnum.TAGS) },
-        charges = charges,
-        onChargesClick = {},
-        concessions = concessions,
-        onConcessionsClick = {},
-        reimbursable = reimbursable,
-        onReimbursableClick = {},
-        bottomSheetEnum = bottomSheetEnum,
-        assetList = assetList,
-        onAssetItemClick = viewModel::onAssetItemClick,
-        onAddAssetClick = onAddAssetClick,
-        onSaveClick = viewModel::trySaveRecord,
-    )
-}
-
-/**
- * 编辑记录界面
- *
- * @param onBackClick 返回点击
- */
-@Composable
-internal fun EditRecordScreen(
-    onBackClick: () -> Unit,
-    selectedTypeCategory: RecordTypeCategoryEnum,
-    onTabSelected: (RecordTypeCategoryEnum) -> Unit,
-    amount: String,
-    onAmountClick: () -> Unit,
-    typeList: List<RecordTypeEntity>,
-    onTypeClick: (RecordTypeEntity) -> Unit,
-    onTypeSettingClick: () -> Unit,
-    remark: String,
-    onRemarkTextChanged: (String) -> Unit,
-    assetName: String,
-    onAssetClick: () -> Unit,
-    relatedAssetName: String,
-    onRelatedAssetClick: () -> Unit,
-    dateTime: String,
-    onDateTimeClick: () -> Unit,
-    tags: String,
-    onTagsClick: () -> Unit,
-    charges: String,
-    onChargesClick: () -> Unit,
-    concessions: String,
-    onConcessionsClick: () -> Unit,
-    reimbursable: Boolean,
-    onReimbursableClick: () -> Unit,
-    bottomSheetEnum: BottomSheetEnum,
-    onSaveClick: () -> Unit,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    assetList: List<AssetEntity>,
-    onAssetItemClick: (AssetEntity?) -> Unit,
-    onAddAssetClick: () -> Unit,
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-) {
     // 主色调
     val primaryColor = when (selectedTypeCategory) {
         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
@@ -219,21 +163,16 @@ internal fun EditRecordScreen(
                     modifier = Modifier.defaultMinSize(minHeight = 400.dp)
                 )
 
-                BottomSheetEnum.ASSETS -> AssetBottomSheet(
-                    assetList = assetList,
-                    onAssetItemClick = {
-                        onAssetItemClick(it)
-                        coroutineScope.launch {
-                            sheetState.hide()
-                        }
-                    },
-                    onAddAssetClick = {
-                        onAddAssetClick()
-                        coroutineScope.launch {
-                            sheetState.hide()
-                        }
-                    },
-                )
+                BottomSheetEnum.ASSETS, BottomSheetEnum.RELATED_ASSETS -> selectAssetBottomSheet {
+                    if (bottomSheetEnum == BottomSheetEnum.ASSETS) {
+                        viewModel.onAssetItemClick(it)
+                    } else {
+                        viewModel.onRelatedAssetItemClick(it)
+                    }
+                    coroutineScope.launch {
+                        sheetState.hide()
+                    }
+                }
 
                 BottomSheetEnum.TAGS -> Text(
                     text = "tags",
@@ -245,11 +184,11 @@ internal fun EditRecordScreen(
         Scaffold(topBar = {
             EditRecordTopBar(
                 selectedTabIndex = selectedTypeCategory.position,
-                onTabSelected = onTabSelected,
+                onTabSelected = viewModel::onTypeCategoryTabSelected,
                 onBackClick = onBackClick,
             )
         }, floatingActionButton = {
-            FloatingActionButton(onClick = onSaveClick) {
+            FloatingActionButton(onClick = { /* TODO onSaveClick*/ }) {
                 Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
             }
         }) { paddingValues ->
@@ -270,7 +209,7 @@ internal fun EditRecordScreen(
                             amount = amount,
                             primaryColor = primaryColor,
                             onAmountClick = {
-                                onAmountClick()
+                                /* TODO onAmountClick()*/
                                 coroutineScope.launch {
                                     sheetState.show()
                                 }
@@ -299,7 +238,7 @@ internal fun EditRecordScreen(
                             showMore = false,
                             title = stringResource(id = R.string.settings),
                             selected = true,
-                            onTypeClick = onTypeSettingClick,
+                            onTypeClick = { /* TODO onTypeSettingClick*/ },
                         )
                     } else {
                         TypeItem(
@@ -310,7 +249,7 @@ internal fun EditRecordScreen(
                             showMore = it.child.isNotEmpty(),
                             title = it.name,
                             selected = it.selected,
-                            onTypeClick = { onTypeClick(it) },
+                            onTypeClick = { viewModel.onTypeClick(it) },
                         )
                     }
                 }
@@ -329,7 +268,10 @@ internal fun EditRecordScreen(
                             modifier = Modifier.fillMaxWidth(),
                         )
                         // 备注信息
-                        Remark(remark = remark, onRemarkTextChanged = onRemarkTextChanged)
+                        Remark(
+                            remark = remark,
+                            onRemarkTextChanged = viewModel::onRemarkTextChanged
+                        )
 
                         // 其他选项
                         FlowRow(
@@ -344,7 +286,7 @@ internal fun EditRecordScreen(
                             FilterChip(
                                 selected = hasAsset,
                                 onClick = {
-                                    onAssetClick()
+                                    viewModel.onBottomSheetAction(BottomSheetEnum.ASSETS)
                                     coroutineScope.launch {
                                         sheetState.show()
                                     }
@@ -358,7 +300,7 @@ internal fun EditRecordScreen(
                                 FilterChip(
                                     selected = hasRelatedAsset,
                                     onClick = {
-                                        onRelatedAssetClick()
+                                        viewModel.onBottomSheetAction(BottomSheetEnum.RELATED_ASSETS)
                                         coroutineScope.launch {
                                             sheetState.show()
                                         }
@@ -370,7 +312,7 @@ internal fun EditRecordScreen(
                             // 记录时间
                             FilterChip(
                                 selected = true,
-                                onClick = onDateTimeClick,
+                                onClick = { /*TODO onDateTimeClick*/ },
                                 label = { Text(text = dateTime) },
                             )
 
@@ -379,7 +321,7 @@ internal fun EditRecordScreen(
                             FilterChip(
                                 selected = hasTags,
                                 onClick = {
-                                    onTagsClick()
+                                    /* TODO onTagsClick()*/
                                     coroutineScope.launch {
                                         sheetState.show()
                                     }
@@ -391,7 +333,7 @@ internal fun EditRecordScreen(
                                 // 只有支出类型显示是否可报销
                                 FilterChip(
                                     selected = reimbursable,
-                                    onClick = onReimbursableClick,
+                                    onClick = { /*TODO onReimbursableClick*/ },
                                     leadingIcon = {
                                         if (reimbursable) {
                                             Icon(
@@ -408,7 +350,7 @@ internal fun EditRecordScreen(
                             val hasCharges = charges.isNotBlank()
                             FilterChip(
                                 selected = hasCharges,
-                                onClick = onChargesClick,
+                                onClick = { /*TODO onChargesClick*/ },
                                 label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":$charges" else "") },
                             )
 
@@ -416,7 +358,7 @@ internal fun EditRecordScreen(
                             val hasConcessions = concessions.isNotBlank()
                             FilterChip(
                                 selected = hasConcessions,
-                                onClick = onConcessionsClick,
+                                onClick = { /* TODO onConcessionsClick*/ },
                                 label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":$concessions" else "") },
                             )
                         }

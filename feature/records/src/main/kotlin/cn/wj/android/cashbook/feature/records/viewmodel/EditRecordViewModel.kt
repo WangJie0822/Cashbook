@@ -11,7 +11,6 @@ import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.GetRecordTypeListUseCase
-import cn.wj.android.cashbook.domain.usecase.GetVisibleAssetListUseCase
 import cn.wj.android.cashbook.feature.records.enums.BottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
@@ -31,7 +30,6 @@ class EditRecordViewModel @Inject constructor(
     private val typeRepository: TypeRepository,
     private val getDefaultRecordUseCase: GetDefaultRecordUseCase,
     private val getRecordTypeListUseCase: GetRecordTypeListUseCase,
-    private val getVisibleAssetListUseCase: GetVisibleAssetListUseCase,
 ) : ViewModel() {
 
     /** 显示底部弹窗数据 */
@@ -82,14 +80,6 @@ class EditRecordViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = ""
-        )
-
-    /** 资产列表 */
-    val assetListData: StateFlow<List<AssetEntity>> = getVisibleAssetListUseCase()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = listOf()
         )
 
     /** 资产文本 */
@@ -241,6 +231,12 @@ class EditRecordViewModel @Inject constructor(
     fun onAssetItemClick(item: AssetEntity?) {
         viewModelScope.launch {
             mutableRecordData.value = recordData.first().copy(asset = item)
+        }
+    }
+
+    fun onRelatedAssetItemClick(item: AssetEntity?) {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(relatedAsset = item)
         }
     }
 

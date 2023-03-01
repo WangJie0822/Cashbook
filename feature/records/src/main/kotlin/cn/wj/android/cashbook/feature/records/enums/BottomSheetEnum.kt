@@ -13,6 +13,8 @@ enum class BottomSheetEnum {
     AMOUNT,
     /** 资产列表 */
     ASSETS,
+    /** 关联资产列表 */
+    RELATED_ASSETS,
     /** 标签 */
     TAGS,
 }
