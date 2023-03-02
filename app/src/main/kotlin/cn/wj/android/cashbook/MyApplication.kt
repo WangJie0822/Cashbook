@@ -8,27 +8,15 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import cn.wj.android.cashbook.base.ext.base.logger
-import cn.wj.android.cashbook.base.ext.base.string
-import cn.wj.android.cashbook.base.tools.jumpAppDetails
-import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_APP
-import cn.wj.android.cashbook.data.constants.NOTIFICATION_CHANNEL_UPDATE
-import cn.wj.android.cashbook.data.live.CurrentDayNightLiveData
-import cn.wj.android.cashbook.di.dbModule
-import cn.wj.android.cashbook.di.netModule
-import cn.wj.android.cashbook.di.repositoryModule
-import cn.wj.android.cashbook.di.viewModelModule
-import cn.wj.android.cashbook.manager.AppManager
-import cn.wj.android.cashbook.third.logger.MyFormatStrategy
-import com.didichuxing.doraemonkit.DoraemonKit
-import com.didichuxing.doraemonkit.kit.IKit
+import cn.wj.android.cashbook.core.common.NOTIFICATION_CHANNEL_APP
+import cn.wj.android.cashbook.core.common.NOTIFICATION_CHANNEL_UPDATE
+import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.string
+import cn.wj.android.cashbook.core.common.manager.AppManager
+import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.HiltAndroidApp
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
 
 /**
  * 全局应用
@@ -57,21 +45,8 @@ class MyApplication : Application() {
         })
         logger().d("MyApplication onCreate ${BuildConfig.VERSION_NAME}")
 
-        // 初始化 Koin
-        startKoin {
-            androidLogger(Level.NONE)
-            androidContext(this@MyApplication)
-            modules(listOf(netModule, dbModule, repositoryModule, viewModelModule))
-        }
-
-        // 应用主题
-        CurrentDayNightLiveData.applyTheme()
-
         // 初始化通知渠道
         initNotificationChannel()
-
-        // 初始化 DoraemonKit
-        initDoraemon()
 
 
     }
@@ -98,34 +73,5 @@ class MyApplication : Application() {
             }
             nm.createNotificationChannels(mutableListOf(appChannel, updateChannel))
         }
-    }
-
-    /** 初始化 DoraemonKit */
-    private fun initDoraemon() {
-
-        fun createKit(name: Int, onClick: (Context) -> Unit): IKit {
-            return object : IKit {
-                override fun getCategory() = 4
-
-                override fun getName() = name
-
-                override fun getIcon() = R.drawable.ic_launcher
-
-                override fun onClick(context: Context) {
-                    onClick.invoke(context)
-                }
-
-                override fun onAppInit(context: Context?) {
-                }
-            }
-        }
-
-        DoraemonKit.install(
-            this, arrayListOf(
-                createKit(R.string.application_details) {
-                    jumpAppDetails()
-                }
-            )
-        )
     }
 }

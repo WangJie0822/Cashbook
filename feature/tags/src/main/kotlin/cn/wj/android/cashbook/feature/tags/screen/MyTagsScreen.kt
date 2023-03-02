@@ -99,7 +99,7 @@ internal fun MyTagsScreen(
                         Box {
                             var expanded by remember { mutableStateOf(false) }
                             FilterChip(
-                                selected = false,
+                                selected = true,
                                 onClick = { expanded = true },
                                 label = { Text(text = it.name) },
                             )

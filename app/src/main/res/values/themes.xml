@@ -7,7 +7,7 @@
 
     <!-- 兼容 values-v 不同版本 -->
     <style name="PlatformAdjusted.Theme.Cashbook" parent="NightAdjusted.Theme.Cashbook">
-        <item name="android:statusBarColor">@color/transparent_light</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <!-- 应用主题 -->
@@ -30,34 +30,5 @@
         <!-- 退出启动页后使用的主题 -->
         <item name="postSplashScreenTheme">@style/Theme.Cashbook</item>
     </style>
-
-    <!-- 弹窗默认主题 -->
-    <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog" />
-
-    <!-- 全半透明背景 -->
-    <style name="Theme.Cashbook.Dialog.Transparent">
-        <item name="android:windowBackground">@drawable/shape_window_background_transparent</item>
-    </style>
-
-    <!-- 底部抽屉弹窗 -->
-    <style name="Theme.Cashbook.Dialog.BottomSheet">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowAnimationStyle">
-            @style/Animation.MaterialComponents.BottomSheetDialog
-        </item>
-        <item name="bottomSheetStyle">@style/Widget.MaterialComponents.BottomSheet.Modal</item>
-    </style>
-
-    <!-- 警告弹窗 -->
-    <style name="Theme.Cashbook.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert" />
-
-    <!-- AppBar 样式 -->
-    <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
-
-    <!-- Popup 样式 -->
-    <style name="Theme.Cashbook.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
-
-    <!-- PopupMenu 字体样式 -->
-    <style name="TextAppearance.Cashbook.PopupMenu" parent="android:TextAppearance.Material.Caption" />
 
 </resources>

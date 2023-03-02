@@ -29,7 +29,7 @@
         tools:targetApi="o">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,14 +47,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <receiver
-            android:name=".receiver.EventReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="${applicationId}.EventReceiver" />
-            </intent-filter>
-        </receiver>
 
     </application>
 
