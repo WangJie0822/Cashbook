@@ -1,63 +1,29 @@
 package cn.wj.android.cashbook.core.data.repository
 
-import cn.wj.android.cashbook.core.common.model.DataVersion
-import cn.wj.android.cashbook.core.common.model.updateVersion
-import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.table.TagTable
 import cn.wj.android.cashbook.core.model.model.TagModel
-import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
-class TagRepository @Inject constructor(
-    private val tagDao: TagDao
-) {
+interface TagRepository {
 
-    private val dataVersion: DataVersion = MutableStateFlow(0)
+    val tagListData: Flow<List<TagModel>>
 
-    val tagListData: Flow<List<TagModel>> = dataVersion.map {
-        getAllTagList()
-    }
+    suspend fun updateTag(tag: TagModel)
 
-    private suspend fun getAllTagList(): List<TagModel> = withContext(Dispatchers.IO) {
-        tagDao.queryAll()
-            .map {
-                it.asModel()
-            }
-    }
+    suspend fun deleteTag(tag: TagModel)
+}
 
-    suspend fun updateTag(tag: TagModel) = withContext(Dispatchers.IO) {
-        val tagTable = tag.asTable()
-        if (null == tagTable.id) {
-            tagDao.insert(tagTable)
-        } else {
-            tagDao.update(tagTable)
-        }
-        dataVersion.updateVersion()
-    }
+internal fun TagTable.asModel(): TagModel {
+    return TagModel(
+        id = this.id ?: -1L,
+        name = this.name,
+    )
+}
 
-    suspend fun deleteTag(tag: TagModel) = withContext(Dispatchers.IO) {
-        val tagTable = tag.asTable()
-        tagDao.delete(tagTable)
-        dataVersion.updateVersion()
-    }
-
-    private fun TagTable.asModel(): TagModel {
-        return TagModel(
-            id = this.id ?: -1L,
-            name = this.name,
-        )
-    }
-
-    private fun TagModel.asTable(): TagTable {
-        return TagTable(
-            id = if (this.id == -1L) null else this.id,
-            name = this.name,
-            booksId = -1L,
-        )
-    }
-
+internal fun TagModel.asTable(): TagTable {
+    return TagTable(
+        id = if (this.id == -1L) null else this.id,
+        name = this.name,
+        booksId = -1L,
+    )
 }

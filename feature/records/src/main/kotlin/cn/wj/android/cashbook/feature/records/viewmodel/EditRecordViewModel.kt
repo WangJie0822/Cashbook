@@ -3,14 +3,16 @@ package cn.wj.android.cashbook.feature.records.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.Symbol
+import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.data.repository.TypeRepository
+import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
-import cn.wj.android.cashbook.domain.usecase.GetRecordTypeListUseCase
 import cn.wj.android.cashbook.feature.records.enums.BottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
@@ -27,9 +29,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class EditRecordViewModel @Inject constructor(
-    private val typeRepository: TypeRepository,
-    private val getDefaultRecordUseCase: GetDefaultRecordUseCase,
-    private val getRecordTypeListUseCase: GetRecordTypeListUseCase,
+    assetRepository: AssetRepository,
+    getDefaultRecordUseCase: GetDefaultRecordUseCase,
 ) : ViewModel() {
 
     /** 显示底部弹窗数据 */
@@ -62,15 +63,13 @@ class EditRecordViewModel @Inject constructor(
             initialValue = ""
         )
 
-    /** 标签列表 */
-    val typeListData: StateFlow<List<RecordTypeEntity>> = recordData
-        .map {
-            getRecordTypeListUseCase(it)
-        }
+    /** 选中类型数据 */
+    val selectedTypeData: StateFlow<RecordTypeEntity?> = recordData
+        .map { it.type }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = listOf()
+            initialValue = null
         )
 
     /** 备注文本 */
@@ -85,7 +84,7 @@ class EditRecordViewModel @Inject constructor(
     /** 资产文本 */
     val assetData: StateFlow<String> = recordData
         .map {
-            val asset = it.asset
+            val asset = assetRepository.getAssetById(it.assetId)?.asEntity()
             if (null == asset) {
                 ""
             } else {
@@ -101,7 +100,7 @@ class EditRecordViewModel @Inject constructor(
     /** 关联资产文本 */
     val relatedAssetData: StateFlow<String> = recordData
         .map {
-            val asset = it.relatedAsset
+            val asset = assetRepository.getAssetById(it.relatedAssetId)?.asEntity()
             if (null == asset) {
                 ""
             } else {
@@ -128,19 +127,20 @@ class EditRecordViewModel @Inject constructor(
     /** 标签文本 */
     val tagsData: StateFlow<String> = recordData
         .map {
-            if (it.tags.isEmpty()) {
-                ""
-            } else {
-                StringBuilder().run {
-                    it.tags.forEach { tag ->
-                        if (!isBlank()) {
-                            append(",")
-                        }
-                        append(tag.name)
-                    }
-                    toString()
-                }
-            }
+//           TODO  if (it.tags.isEmpty()) {
+//                ""
+//            } else {
+//                StringBuilder().run {
+//                    it.tags.forEach { tag ->
+//                        if (!isBlank()) {
+//                            append(",")
+//                        }
+//                        append(tag.name)
+//                    }
+//                    toString()
+//                }
+//            }
+            ""
         }
         .stateIn(
             scope = viewModelScope,
@@ -195,23 +195,9 @@ class EditRecordViewModel @Inject constructor(
     }
 
     /** 类型点击切换为 [type] */
-    fun onTypeClick(type: RecordTypeEntity) {
+    fun onTypeClick(type: RecordTypeEntity?) {
         viewModelScope.launch {
-            val selected = if (!type.selected) {
-                // 当前为选中，更新为选中
-                type.copy(selected = true)
-            } else {
-                // 当前已选中，取消选中
-                if (type.parentId == -1L) {
-                    // 二级分类，选择父类型
-                    (typeListData.first().firstOrNull { it.id == type.parentId }
-                        ?: typeListData.first().first()).copy(selected = true)
-                } else {
-                    // 一级分类，无法取消，不做处理
-                    null
-                }
-            }
-            selected?.let {
+            type?.let {
                 mutableRecordData.value = recordData.first().copy(type = it)
             }
         }
@@ -230,17 +216,25 @@ class EditRecordViewModel @Inject constructor(
 
     fun onAssetItemClick(item: AssetEntity?) {
         viewModelScope.launch {
-            mutableRecordData.value = recordData.first().copy(asset = item)
+            mutableRecordData.value = recordData.first().copy(assetId = item?.id ?: -1L)
         }
     }
 
     fun onRelatedAssetItemClick(item: AssetEntity?) {
         viewModelScope.launch {
-            mutableRecordData.value = recordData.first().copy(relatedAsset = item)
+            mutableRecordData.value = recordData.first().copy(relatedAssetId = item?.id ?: -1L)
         }
     }
 
     /** TODO 尝试保存记录 */
     fun trySaveRecord() {
+
     }
 }
+
+val AssetEntity.displayBalance: String
+    get() = if (type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+        (totalAmount.toBigDecimalOrZero() - balance.toBigDecimalOrZero()).decimalFormat()
+    } else {
+        balance
+    }

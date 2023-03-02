@@ -3,11 +3,14 @@
 package cn.wj.android.cashbook.feature.records.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
+import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherCollapsedTitleScreen
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
@@ -27,11 +30,13 @@ fun NavController.naviToEditRecord() {
  */
 fun NavGraphBuilder.editRecordScreen(
     onBackClick: () -> Unit,
+    selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
 ) {
     composable(ROUTE_EDIT_RECORD) {
         EditRecordRoute(
             onBackClick = onBackClick,
+            selectTypeList = selectTypeList,
             selectAssetBottomSheet = selectAssetBottomSheet,
         )
     }

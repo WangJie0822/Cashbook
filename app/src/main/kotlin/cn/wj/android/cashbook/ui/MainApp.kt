@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHE
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
 import cn.wj.android.cashbook.feature.tags.navigation.myTagsScreen
 import cn.wj.android.cashbook.feature.tags.navigation.naviToMyTags
+import cn.wj.android.cashbook.feature.types.navigation.SelectRecordTypeList
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
@@ -113,6 +114,17 @@ fun MainApp() {
                 editRecordScreen(
                     onBackClick = {
                         navController.popBackStack()
+                    },
+                    selectTypeList = { modifier, typeCategory, selectedType, overTypeList, underTypeList, onTypeSelected ->
+                        SelectRecordTypeList(
+                            modifier = modifier,
+                            typeCategory = typeCategory,
+                            selectedType = selectedType,
+                            overTypeList = overTypeList,
+                            underTypeList = underTypeList,
+                            onTypeSelected = onTypeSelected,
+                            onTypeSettingClick = { /*TODO*/ },
+                        )
                     },
                     selectAssetBottomSheet = { onAssetItemClick ->
                         selectAssetBottomSheet(

@@ -42,12 +42,4 @@ data class AssetEntity(
     val sort: Int,
     val modifyTime: String,
     val balance: String
-) {
-
-    /**
-     * 显示的余额
-     * - TODO 处理信用卡类型显示
-     */
-    val displayBalance: String
-        get() = balance
-}
+)

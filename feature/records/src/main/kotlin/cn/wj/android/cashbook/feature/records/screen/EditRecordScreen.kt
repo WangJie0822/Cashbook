@@ -3,15 +3,12 @@
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
     ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class,
 )
 
 package cn.wj.android.cashbook.feature.records.screen
 
-import cn.wj.android.cashbook.core.ui.R as UIR
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,26 +18,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridScope
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Divider
@@ -66,25 +50,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
-import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
-import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.records.R
-import cn.wj.android.cashbook.feature.records.enums.AssetListTypeEnum
 import cn.wj.android.cashbook.feature.records.enums.BottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.TabItem
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
@@ -95,11 +71,13 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun EditRecordRoute(
     onBackClick: () -> Unit,
+    selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
 ) {
 
     EditRecordScreen(
         onBackClick = onBackClick,
+        selectTypeList = selectTypeList,
         selectAssetBottomSheet = selectAssetBottomSheet,
     )
 }
@@ -112,18 +90,19 @@ internal fun EditRecordRoute(
 @Composable
 internal fun EditRecordScreen(
     onBackClick: () -> Unit,
+    selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    viewModel: EditRecordViewModel = hiltViewModel()
+    viewModel: EditRecordViewModel = hiltViewModel(),
 ) {
 
     // 选中分类
     val selectedTypeCategory: RecordTypeCategoryEnum by viewModel.typeCategory.collectAsStateWithLifecycle()
     // 金额数据
     val amount: String by viewModel.amountData.collectAsStateWithLifecycle()
-    // 类型列表数据
-    val typeList: List<RecordTypeEntity> by viewModel.typeListData.collectAsStateWithLifecycle()
+    // 选中类型数据
+    val selectedType: RecordTypeEntity? by viewModel.selectedTypeData.collectAsStateWithLifecycle()
     // 备注数据
     val remark: String by viewModel.remarkData.collectAsStateWithLifecycle()
     // 资产名
@@ -188,16 +167,16 @@ internal fun EditRecordScreen(
                 onBackClick = onBackClick,
             )
         }, floatingActionButton = {
-            FloatingActionButton(onClick = { /* TODO onSaveClick*/ }) {
+            FloatingActionButton(onClick = viewModel::trySaveRecord) {
                 Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
             }
         }) { paddingValues ->
-            EditRecordLazyGrid(modifier = Modifier.padding(paddingValues)) {
-                item(
-                    span = {
-                        GridItemSpan(maxLineSpan)
-                    },
-                ) {
+
+            selectTypeList(
+                Modifier.padding(paddingValues),
+                selectedTypeCategory,
+                selectedType,
+                {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -209,7 +188,7 @@ internal fun EditRecordScreen(
                             amount = amount,
                             primaryColor = primaryColor,
                             onAmountClick = {
-                                /* TODO onAmountClick()*/
+//                              TODO  viewModel.onAmountClick
                                 coroutineScope.launch {
                                     sheetState.show()
                                 }
@@ -225,39 +204,8 @@ internal fun EditRecordScreen(
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                         )
                     }
-                }
-                // 分类列表
-                items(typeList) {
-                    if (it == RECORD_TYPE_SETTINGS) {
-                        // 设置项
-                        TypeItem(
-                            modifier = Modifier.animateItemPlacement(),
-                            first = true,
-                            shapeType = it.shapeType,
-                            iconResId = UIR.drawable.vector_baseline_settings_24,
-                            showMore = false,
-                            title = stringResource(id = R.string.settings),
-                            selected = true,
-                            onTypeClick = { /* TODO onTypeSettingClick*/ },
-                        )
-                    } else {
-                        TypeItem(
-                            modifier = Modifier.animateItemPlacement(),
-                            first = it.parentId == -1L,
-                            shapeType = it.shapeType,
-                            iconResId = it.iconResId,
-                            showMore = it.child.isNotEmpty(),
-                            title = it.name,
-                            selected = it.selected,
-                            onTypeClick = { viewModel.onTypeClick(it) },
-                        )
-                    }
-                }
-                item(
-                    span = {
-                        GridItemSpan(maxLineSpan)
-                    },
-                ) {
+                },
+                {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -321,6 +269,7 @@ internal fun EditRecordScreen(
                             FilterChip(
                                 selected = hasTags,
                                 onClick = {
+
                                     /* TODO onTagsClick()*/
                                     coroutineScope.launch {
                                         sheetState.show()
@@ -364,7 +313,7 @@ internal fun EditRecordScreen(
                         }
                     }
                 }
-            }
+            ) { viewModel.onTypeClick(it) }
         }
     }
 }
@@ -425,15 +374,6 @@ internal fun EditRecordTopBar(
 }
 
 @Composable
-internal fun EditRecordLazyGrid(modifier: Modifier = Modifier, content: LazyGridScope.() -> Unit) {
-    LazyVerticalGrid(
-        modifier = modifier,
-        columns = GridCells.Fixed(RECORD_TYPE_COLUMNS),
-        content = content,
-    )
-}
-
-@Composable
 internal fun Remark(
     remark: String,
     onRemarkTextChanged: (String) -> Unit,
@@ -484,252 +424,5 @@ internal fun Amount(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(8.dp),
         )
-    }
-}
-
-@Composable
-internal fun TypeItem(
-    modifier: Modifier = Modifier,
-    first: Boolean,
-    shapeType: Int,
-    iconResId: Int,
-    showMore: Boolean,
-    title: String,
-    selected: Boolean,
-    onTypeClick: () -> Unit
-) {
-    // 背景颜色，用于区分一级分类、二级分类
-    val backgroundColor =
-        if (first) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant
-    val backgroundShape = if (first) {
-        RectangleShape
-    } else {
-        when (shapeType) {
-            -1 -> RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
-            1 -> RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
-            else -> RectangleShape
-        }
-    }
-    // 列表数据
-    ConstraintLayout(
-        modifier = modifier
-            .padding(top = 4.dp, bottom = 4.dp)
-            .background(color = backgroundColor, shape = backgroundShape)
-            .clickable(onClick = onTypeClick)
-            .padding(top = 4.dp, bottom = 4.dp)
-    ) {
-        // 约束条件
-        val (iconBg, iconMore, text) = createRefs()
-        // 根据选中状态显示主要颜色
-        val color =
-            if (selected) LocalExtendedColors.current.selected else LocalExtendedColors.current.unselected
-        // 记录类型对应的图标，使用圆形边框
-        Icon(
-            painter = painterResource(id = iconResId),
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier
-                .size(32.dp)
-                .border(border = BorderStroke(1.dp, color), shape = CircleShape)
-                .clip(CircleShape)
-                .padding(4.dp)
-                .constrainAs(iconBg) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        )
-        if (showMore) {
-            // 横向菜单标记，一级分类有二级分类时显示
-            Icon(
-                modifier = Modifier
-                    .size(12.dp)
-                    .border(border = BorderStroke(1.dp, backgroundColor), shape = CircleShape)
-                    .clip(CircleShape)
-                    .constrainAs(iconMore) {
-                        bottom.linkTo(iconBg.bottom)
-                        end.linkTo(iconBg.end)
-                    },
-                imageVector = Icons.Default.MoreHoriz,
-                contentDescription = null,
-                tint = color
-            )
-        }
-        // 类型名称
-        Text(
-            modifier = Modifier.constrainAs(text) {
-                top.linkTo(iconBg.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom)
-            }, text = title, color = color, style = MaterialTheme.typography.labelMedium
-        )
-    }
-}
-
-/**
- * 选择资产菜单
- */
-@Composable
-internal fun AssetBottomSheet(
-    assetList: List<AssetEntity>,
-    onAssetItemClick: (AssetEntity?) -> Unit,
-    onAddAssetClick: () -> Unit,
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        content = {
-            item {
-                ConstraintLayout(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                ) {
-                    val (title, subTitle, add) = createRefs()
-                    Text(
-                        text = "选择一个资产账户",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.constrainAs(title) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                        },
-                    )
-                    Text(
-                        text = "无法选择隐藏资产",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.constrainAs(subTitle) {
-                            top.linkTo(title.bottom, 8.dp)
-                            start.linkTo(parent.start)
-                        },
-                    )
-                    TextButton(
-                        modifier = Modifier.constrainAs(add) {
-                            top.linkTo(parent.top)
-                            end.linkTo(parent.end)
-                            bottom.linkTo(parent.bottom)
-                        },
-                        onClick = onAddAssetClick,
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
-                    ) {
-                        Text(text = "添加")
-                    }
-                }
-            }
-            item {
-                AssetItem(
-                    type = AssetListTypeEnum.NO_SELECT,
-                    name = "不选择账户",
-                    iconResId = R.drawable.vector_baseline_not_select_24,
-                    balance = "",
-                    totalAmount = "",
-                    onAssetItemClick = { onAssetItemClick(null) },
-                )
-            }
-            items(assetList) {
-                val type = if (it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
-                    AssetListTypeEnum.CREDIT_CARD
-                } else {
-                    AssetListTypeEnum.CAPITAL
-                }
-                AssetItem(
-                    type = type,
-                    name = it.name,
-                    iconResId = it.iconResId,
-                    balance = it.balance,
-                    totalAmount = it.totalAmount,
-                    onAssetItemClick = { onAssetItemClick(it) },
-                )
-            }
-        },
-    )
-}
-
-@Composable
-internal fun AssetItem(
-    type: AssetListTypeEnum,
-    name: String,
-    iconResId: Int,
-    balance: String,
-    totalAmount: String,
-    onAssetItemClick: () -> Unit
-) {
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 70.dp)
-            .clickable {
-                onAssetItemClick()
-            }
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-    ) {
-        val isNoSelect = type == AssetListTypeEnum.NO_SELECT
-        val isCreditCard = type == AssetListTypeEnum.CREDIT_CARD
-
-        val (iconRef, nameRef, balanceRef, progressRef, usedRef) = createRefs()
-
-        Icon(
-            painter = painterResource(id = iconResId),
-            contentDescription = null,
-            modifier = Modifier.constrainAs(iconRef) {
-                start.linkTo(parent.start)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-            },
-        )
-        Text(
-            text = name,
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.constrainAs(nameRef) {
-                start.linkTo(iconRef.end, 8.dp)
-                top.linkTo(parent.top)
-                if (!isCreditCard) {
-                    bottom.linkTo(parent.bottom)
-                } else {
-                    bottom.linkTo(progressRef.top)
-                }
-            },
-        )
-
-        if (!isNoSelect) {
-            Text(
-                text = Symbol.rmb + if (isCreditCard) totalAmount else balance,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.constrainAs(balanceRef) {
-                    end.linkTo(parent.end)
-                    top.linkTo(nameRef.top)
-                    bottom.linkTo(nameRef.bottom)
-                },
-            )
-        }
-
-        if (isCreditCard) {
-            // 信用卡类型
-            var floatTotalAmount = totalAmount.toFloatOrNull() ?: 1f
-            if (floatTotalAmount == 0f) {
-                floatTotalAmount = 1f
-            }
-            val progress = (balance.toFloatOrNull() ?: 0f) / floatTotalAmount
-            LinearProgressIndicator(
-                progress = progress,
-                modifier = Modifier.constrainAs(progressRef) {
-                    start.linkTo(nameRef.start)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                },
-            )
-            Text(
-                text = stringResource(id = R.string.used_with_colon) + Symbol.rmb + balance,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.constrainAs(usedRef) {
-                    start.linkTo(progressRef.start)
-                    top.linkTo(progressRef.bottom)
-                },
-            )
-        }
     }
 }

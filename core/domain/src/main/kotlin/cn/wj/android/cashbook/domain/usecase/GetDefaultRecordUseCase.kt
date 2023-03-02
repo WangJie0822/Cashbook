@@ -3,14 +3,12 @@ package cn.wj.android.cashbook.domain.usecase
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.getIdByString
-import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
-import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.map
  */
 class GetDefaultRecordUseCase @Inject constructor(
     private val typeRepository: TypeRepository,
-    private val assetRepository: AssetRepository,
     private val appPreferencesDataSource: AppPreferencesDataSource
 ) {
 
@@ -33,22 +30,18 @@ class GetDefaultRecordUseCase @Inject constructor(
             val recordTypeById = typeRepository.getRecordTypeById(appDataModel.defaultTypeId)
                 ?: typeRepository.getFirstRecordTypeListByCategory(RecordTypeCategoryEnum.EXPENDITURE)
                     .first()
-            // 获取上次使用的资产信息
-            val assetById = assetRepository.getAssetById(appDataModel.lastAssetId)
             RecordEntity(
                 id = -1L,
                 booksId = appDataModel.currentBookId,
                 typeCategory = recordTypeById.typeCategory,
                 type = recordTypeById.asEntity(),
-                asset = assetById?.asEntity(),
-                relatedAsset = null,
+                assetId = appDataModel.lastAssetId,
+                relatedAssetId = -1L,
                 amount = "0",
                 charges = "",
                 concessions = "",
                 remark = "",
                 reimbursable = false,
-                associated = listOf(),
-                tags = listOf(),
                 modifyTime = System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS),
             )
         }

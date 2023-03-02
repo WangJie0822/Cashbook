@@ -29,6 +29,9 @@ interface TypeDao {
     @Query("SELECT * FROM db_type WHERE type_level=:typeLevel AND type_category=:typeCategory")
     suspend fun queryByLevelAndTypeCategory(typeLevel: String, typeCategory: String): List<TypeTable>
 
+    @Query("SELECT * FROM db_type WHERE type_level=:typeLevel")
+    suspend fun queryByLevel(typeLevel: String): List<TypeTable>
+
     @Query("SELECT * FROM db_type WHERE parent_id=:parentId")
     suspend fun queryByParentId(parentId: Long):List<TypeTable>
 
