@@ -67,7 +67,7 @@ internal fun SelectRecordTypeListScreen(
         }
 
         // 分类列表
-        items(typeList) { type ->
+        items(typeList, key = { it.id }) { type ->
             if (type == RECORD_TYPE_SETTINGS) {
                 // 设置项
                 TypeItem(
@@ -95,7 +95,7 @@ internal fun SelectRecordTypeListScreen(
                             type.copy(selected = true)
                         } else {
                             // 当前已选中，取消选中
-                            if (type.parentId == -1L) {
+                            if (type.parentId != -1L) {
                                 // 二级分类，选择父类型
                                 (typeList.firstOrNull { it.id == type.parentId }
                                     ?: typeList.first()).copy(selected = true)

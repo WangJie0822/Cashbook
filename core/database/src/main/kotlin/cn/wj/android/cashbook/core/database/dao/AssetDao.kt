@@ -1,7 +1,9 @@
 package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import kotlinx.coroutines.flow.Flow
 
@@ -12,6 +14,12 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface AssetDao {
+
+    @Insert
+    suspend fun insert(assetTable: AssetTable)
+
+    @Update
+    suspend fun update(assetTable: AssetTable)
 
     @Query("SELECT * FROM db_asset WHERE id=:assetId")
     suspend fun queryAssetById(assetId: Long): AssetTable?

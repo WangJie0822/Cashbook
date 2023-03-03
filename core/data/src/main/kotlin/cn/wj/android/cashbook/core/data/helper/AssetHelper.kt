@@ -2,8 +2,17 @@ package cn.wj.android.cashbook.core.data.helper
 
 import cn.wj.android.cashbook.core.data.R
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
+import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 
-object AssetHelper {
+internal object AssetHelper {
+
+    fun getNameResIdByType(type: ClassificationTypeEnum): Int = when (type) {
+        ClassificationTypeEnum.CAPITAL_ACCOUNT -> R.string.asset_classifications_capital_account
+        ClassificationTypeEnum.CREDIT_CARD_ACCOUNT -> R.string.asset_classifications_credit_card_account
+        ClassificationTypeEnum.TOP_UP_ACCOUNT -> R.string.asset_classifications_top_up_account
+        ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT -> R.string.asset_classifications_investment_financial_account
+        ClassificationTypeEnum.DEBT_ACCOUNT -> R.string.asset_classifications_debt_account
+    }
 
     fun getIconResIdByType(type: AssetClassificationEnum): Int = when (type) {
         AssetClassificationEnum.CASH -> R.drawable.vector_cash_circle_24
@@ -28,6 +37,7 @@ object AssetHelper {
         AssetClassificationEnum.OTHER_INVESTMENT_FINANCIAL -> R.drawable.vector_financial_circle_24
         AssetClassificationEnum.BORROW -> R.drawable.vector_borrow_circle_24
         AssetClassificationEnum.LEND -> R.drawable.vector_lend_circle_24
+        AssetClassificationEnum.DEBT -> R.drawable.vector_lend_circle_24
         AssetClassificationEnum.BANK_CARD_ZG -> R.drawable.vector_bank_zg_24
         AssetClassificationEnum.BANK_CARD_ZS -> R.drawable.vector_bank_zs_24
         AssetClassificationEnum.BANK_CARD_GS -> R.drawable.vector_bank_gs_24
@@ -68,6 +78,7 @@ object AssetHelper {
         AssetClassificationEnum.OTHER_INVESTMENT_FINANCIAL -> R.string.asset_classifications_other_investment_financial
         AssetClassificationEnum.BORROW -> R.string.asset_classifications_borrow
         AssetClassificationEnum.LEND -> R.string.asset_classifications_lend
+        AssetClassificationEnum.DEBT -> R.string.asset_classifications_debt_account
         AssetClassificationEnum.BANK_CARD_ZG -> R.string.asset_classifications_bank_zg
         AssetClassificationEnum.BANK_CARD_ZS -> R.string.asset_classifications_bank_zs
         AssetClassificationEnum.BANK_CARD_GS -> R.string.asset_classifications_bank_gs
@@ -85,3 +96,31 @@ object AssetHelper {
         AssetClassificationEnum.BANK_CARD_XY -> R.string.asset_classifications_bank_xy
     }
 }
+
+val ClassificationTypeEnum.nameResId: Int
+    get() = AssetHelper.getNameResIdByType(this)
+
+val AssetClassificationEnum.iconResId: Int
+    get() = AssetHelper.getIconResIdByType(this)
+
+val AssetClassificationEnum.nameResId: Int
+    get() = AssetHelper.getNameResIdByType(this)
+
+val assetClassificationEnumBanks: Array<AssetClassificationEnum>
+    get() = arrayOf(
+        AssetClassificationEnum.BANK_CARD_ZG,
+        AssetClassificationEnum.BANK_CARD_ZS,
+        AssetClassificationEnum.BANK_CARD_GS,
+        AssetClassificationEnum.BANK_CARD_NY,
+        AssetClassificationEnum.BANK_CARD_JS,
+        AssetClassificationEnum.BANK_CARD_JT,
+        AssetClassificationEnum.BANK_CARD_YZ,
+        AssetClassificationEnum.BANK_CARD_HX,
+        AssetClassificationEnum.BANK_CARD_BJ,
+        AssetClassificationEnum.BANK_CARD_MS,
+        AssetClassificationEnum.BANK_CARD_GD,
+        AssetClassificationEnum.BANK_CARD_ZX,
+        AssetClassificationEnum.BANK_CARD_GF,
+        AssetClassificationEnum.BANK_CARD_PF,
+        AssetClassificationEnum.BANK_CARD_XY
+    )

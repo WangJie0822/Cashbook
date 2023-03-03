@@ -40,6 +40,7 @@ enum class AssetClassificationEnum {
     // 债务
     BORROW/*(R.drawable.vector_borrow_circle_24, R.string.asset_classifications_borrow)*/,
     LEND/*(R.drawable.vector_lend_circle_24, R.string.asset_classifications_lend)*/,
+    DEBT/*(R.drawable.vector_lend_circle_24, R.string.asset_classifications_lend)*/,
 
     // 银行卡
     BANK_CARD_ZG/*(R.drawable.vector_bank_zg_24, R.string.asset_classifications_bank_zg)*/,

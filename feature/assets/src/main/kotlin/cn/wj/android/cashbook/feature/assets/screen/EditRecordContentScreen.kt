@@ -10,11 +10,13 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.TextButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,10 +34,10 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.SelectAssetViewModel
  * 选择资产菜单
  */
 @Composable
-internal fun SelectAssetBottomSheet(
+internal fun SelectAssetBottomSheetScreen(
     onAddAssetClick: () -> Unit,
     onAssetItemClick: (AssetEntity?) -> Unit,
-    viewModel:SelectAssetViewModel = hiltViewModel()
+    viewModel: SelectAssetViewModel = hiltViewModel()
 ) {
     val assetList by viewModel.assetListData.collectAsStateWithLifecycle()
     LazyColumn(
@@ -134,6 +136,7 @@ internal fun AssetItem(
         Icon(
             painter = painterResource(id = iconResId),
             contentDescription = null,
+            tint = if(isNoSelect) LocalContentColor.current else Color.Unspecified,
             modifier = Modifier.constrainAs(iconRef) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)

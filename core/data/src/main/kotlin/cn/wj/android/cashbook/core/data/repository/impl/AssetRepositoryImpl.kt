@@ -1,11 +1,15 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
 import cn.wj.android.cashbook.core.common.model.DataVersion
+import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
+import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
+import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.model.AssetModel
+import cn.wj.android.cashbook.core.model.transfer.asModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -37,5 +41,17 @@ class AssetRepositoryImpl @Inject constructor(
     override suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel> {
         return assetDao.queryVisibleAssetByBookId(bookId)
             .map { it.asModel() }
+    }
+
+    override suspend fun updateAsset(asset: AssetEntity) {
+        withContext(Dispatchers.IO) {
+            val table = asset.asModel().asTable()
+            if (null == table.id) {
+                assetDao.insert(table)
+            } else {
+                assetDao.update(table)
+            }
+            dataVersion.updateVersion()
+        }
     }
 }

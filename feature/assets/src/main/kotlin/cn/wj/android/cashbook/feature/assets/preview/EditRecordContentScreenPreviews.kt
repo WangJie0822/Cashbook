@@ -8,14 +8,14 @@ import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.feature.assets.R
 import cn.wj.android.cashbook.feature.assets.enums.BottomAssetListTypeEnum
 import cn.wj.android.cashbook.feature.assets.screen.AssetItem
-import cn.wj.android.cashbook.feature.assets.screen.SelectAssetBottomSheet
+import cn.wj.android.cashbook.feature.assets.screen.SelectAssetBottomSheetScreen
 
 @DevicePreviews
 @Composable
 internal fun SelectAssetBottomSheetPreview() {
     CashbookTheme {
         Surface {
-            SelectAssetBottomSheet(onAddAssetClick = { }, onAssetItemClick = {})
+            SelectAssetBottomSheetScreen(onAddAssetClick = { }, onAssetItemClick = {})
         }
     }
 }

@@ -250,7 +250,6 @@ internal fun LauncherSheet(
         Divider(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .fillMaxWidth()
                 .height(1.dp)
         )
         NavigationDrawerItem(

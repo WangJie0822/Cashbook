@@ -13,7 +13,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
 
-    implementation(libs.coil.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
 
     debugApi(libs.androidx.compose.ui.tooling)
     api(libs.androidx.compose.ui.tooling.preview)

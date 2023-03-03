@@ -11,6 +11,7 @@ import androidx.navigation.NavGraphBuilder
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.ui.controller
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherCollapsedTitleScreen
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
@@ -25,17 +26,14 @@ fun NavController.naviToEditRecord() {
 
 /**
  * 编辑记录
- *
- * @param onBackClick 返回点击
  */
 fun NavGraphBuilder.editRecordScreen(
-    onBackClick: () -> Unit,
     selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
-    selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
+    selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
 ) {
     composable(ROUTE_EDIT_RECORD) {
         EditRecordRoute(
-            onBackClick = onBackClick,
+            onBackClick = { controller?.popBackStack() },
             selectTypeList = selectTypeList,
             selectAssetBottomSheet = selectAssetBottomSheet,
         )

@@ -45,6 +45,24 @@ fun <N : Number> N.dateFormat(format: String = DATE_FORMAT_DEFAULT): String {
     }
 }
 
+fun String.parseDate(format: String = DATE_FORMAT_DEFAULT): Date? {
+    return try {
+        SimpleDateFormat(format, Locale.getDefault()).parse(this)
+    } catch (throwable: Throwable) {
+        logger().e(throwable, "parseDate")
+        null
+    }
+}
+
+fun String.parseDateLong(format: String = DATE_FORMAT_DEFAULT): Long {
+    return try {
+        parseDate(format)?.time ?: System.currentTimeMillis()
+    } catch (throwable: Throwable) {
+        logger().e(throwable, "parseDate")
+        System.currentTimeMillis()
+    }
+}
+
 /** 根据[format]格式化时间，[format]默认[DATE_FORMAT_DEFAULT] */
 @JvmOverloads
 fun Date.dateFormat(format: String = DATE_FORMAT_DEFAULT): String {

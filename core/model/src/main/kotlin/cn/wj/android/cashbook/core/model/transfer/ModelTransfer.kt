@@ -39,3 +39,24 @@ fun AssetModel.asEntity(): AssetEntity {
         balance = this.balance,
     )
 }
+
+fun AssetEntity.asModel():  AssetModel{
+    return AssetModel(
+        id = this.id,
+        booksId = this.booksId,
+        name = this.name,
+        iconResId = this.iconResId,
+        totalAmount = this.totalAmount,
+        billingDate = this.billingDate,
+        repaymentDate = this.repaymentDate,
+        type = this.type,
+        classification = this.classification,
+        invisible = this.invisible,
+        openBank = this.openBank,
+        cardNo = this.cardNo,
+        remark = this.remark,
+        sort = this.sort,
+        modifyTime = this.modifyTime,
+        balance = this.balance,
+    )
+}

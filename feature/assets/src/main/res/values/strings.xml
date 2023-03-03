@@ -5,4 +5,24 @@
     <string name="add">添加</string>
     <string name="unselect_asset">不选择资产</string>
     <string name="used_with_colon">已用：</string>
+    <string name="new_asset">新建资产</string>
+    <string name="edit_asset">编辑资产</string>
+    <string name="asset_classification">资产类型</string>
+    <string name="select_asset_classification">选择资产类型</string>
+    <string name="select_bank">选择银行</string>
+    <string name="asset_name">资产名称</string>
+    <string name="please_enter_asset_name">请输入资产名称</string>
+    <string name="total_amount">总额度</string>
+    <string name="please_enter_total_amount">请输入总额度</string>
+    <string name="balance">余额</string>
+    <string name="arrears">欠款</string>
+    <string name="open_bank">开户行</string>
+    <string name="card_no">卡号</string>
+    <string name="remark">备注</string>
+    <string name="asset_balance">资产余额</string>
+    <string name="billing_date">账单日</string>
+    <string name="repayment_date">还款日</string>
+    <string name="please_select">请选择</string>
+    <string name="invisible_asset">隐藏资产</string>
+    <string name="invisible_asset_hint">隐藏不使用的资产，将不会在资产列表显示</string>
 </resources>

@@ -16,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
-import cn.wj.android.cashbook.feature.assets.navigation.selectAssetBottomSheet
+import cn.wj.android.cashbook.core.ui.controller
+import cn.wj.android.cashbook.feature.assets.navigation.SelectAssetBottomSheet
+import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
+import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
 import cn.wj.android.cashbook.feature.records.navigation.LauncherCollapsedTitleContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherPinnedTitleContent
@@ -49,12 +52,14 @@ fun MainApp() {
         ) { paddingValues ->
             AnimatedNavHost(
                 navController = navController,
+                startDestination = START_DESTINATION,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
                     .consumedWindowInsets(paddingValues),
-                startDestination = START_DESTINATION
             ) {
+                controller = navController
+
                 settingsLauncherScreen(
                     onMenuClick = { action ->
                         when (action) {
@@ -104,17 +109,11 @@ fun MainApp() {
                     },
                 )
                 myTagsScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
                     onTagStatisticClick = {
-
+                        // TODO
                     },
                 )
                 editRecordScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
                     selectTypeList = { modifier, typeCategory, selectedType, overTypeList, underTypeList, onTypeSelected ->
                         SelectRecordTypeList(
                             modifier = modifier,
@@ -126,13 +125,16 @@ fun MainApp() {
                             onTypeSettingClick = { /*TODO*/ },
                         )
                     },
-                    selectAssetBottomSheet = { onAssetItemClick ->
-                        selectAssetBottomSheet(
-                            onAddAssetClick = { /*TODO*/ },
+                    selectAssetBottomSheet = { selectedType, related, onAssetItemClick ->
+                        SelectAssetBottomSheet(
+                            selectedType = selectedType,
+                            related = related,
+                            onAddAssetClick = { navController.naviToEditAsset() },
                             onAssetItemClick = onAssetItemClick
                         )
                     },
                 )
+                editAssetScreen()
             }
         }
     }

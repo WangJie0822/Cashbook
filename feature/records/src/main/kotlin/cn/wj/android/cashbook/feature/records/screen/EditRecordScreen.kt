@@ -41,7 +41,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -56,12 +55,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
+import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.records.R
-import cn.wj.android.cashbook.feature.records.enums.BottomSheetEnum
+import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.TabItem
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 import com.google.accompanist.flowlayout.FlowRow
@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 internal fun EditRecordRoute(
     onBackClick: () -> Unit,
     selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
-    selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
+    selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
 ) {
 
     EditRecordScreen(
@@ -91,7 +91,7 @@ internal fun EditRecordRoute(
 internal fun EditRecordScreen(
     onBackClick: () -> Unit,
     selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
-    selectAssetBottomSheet: @Composable ((AssetEntity?) -> Unit) -> Unit,
+    selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     viewModel: EditRecordViewModel = hiltViewModel(),
@@ -121,7 +121,7 @@ internal fun EditRecordScreen(
     val reimbursable: Boolean by viewModel.reimbursableData.collectAsStateWithLifecycle()
 
     // 底部菜单状态
-    val bottomSheetEnum: BottomSheetEnum by viewModel.showBottomSheet.collectAsStateWithLifecycle()
+    val bottomSheetEnum: EditRecordBottomSheetEnum by viewModel.bottomSheetData.collectAsStateWithLifecycle()
 
     // 主色调
     val primaryColor = when (selectedTypeCategory) {
@@ -135,25 +135,30 @@ internal fun EditRecordScreen(
         sheetContent = {
             // TODO 底部弹窗
             when (bottomSheetEnum) {
-                BottomSheetEnum.NONE -> Spacer(modifier = Modifier.height(1.dp))
+                EditRecordBottomSheetEnum.NONE -> Spacer(modifier = Modifier.height(1.dp))
 
-                BottomSheetEnum.AMOUNT -> Text(
+                EditRecordBottomSheetEnum.AMOUNT -> Text(
                     text = "amount",
                     modifier = Modifier.defaultMinSize(minHeight = 400.dp)
                 )
 
-                BottomSheetEnum.ASSETS, BottomSheetEnum.RELATED_ASSETS -> selectAssetBottomSheet {
-                    if (bottomSheetEnum == BottomSheetEnum.ASSETS) {
-                        viewModel.onAssetItemClick(it)
-                    } else {
-                        viewModel.onRelatedAssetItemClick(it)
-                    }
-                    coroutineScope.launch {
-                        sheetState.hide()
+                EditRecordBottomSheetEnum.ASSETS, EditRecordBottomSheetEnum.RELATED_ASSETS -> {
+                    selectAssetBottomSheet(
+                        selectedType,
+                        bottomSheetEnum == EditRecordBottomSheetEnum.RELATED_ASSETS
+                    ) {
+                        if (bottomSheetEnum == EditRecordBottomSheetEnum.ASSETS) {
+                            viewModel.onAssetItemClick(it)
+                        } else {
+                            viewModel.onRelatedAssetItemClick(it)
+                        }
+                        coroutineScope.launch {
+                            sheetState.hide()
+                        }
                     }
                 }
 
-                BottomSheetEnum.TAGS -> Text(
+                EditRecordBottomSheetEnum.TAGS -> Text(
                     text = "tags",
                     modifier = Modifier.defaultMinSize(minHeight = 800.dp)
                 )
@@ -188,15 +193,13 @@ internal fun EditRecordScreen(
                             amount = amount,
                             primaryColor = primaryColor,
                             onAmountClick = {
-//                              TODO  viewModel.onAmountClick
+                                viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.AMOUNT)
                                 coroutineScope.launch {
                                     sheetState.show()
                                 }
                             },
                         )
-                        Divider(
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Divider()
                         Text(
                             text = stringResource(id = R.string.record_type),
                             color = MaterialTheme.colorScheme.onSurface,
@@ -212,9 +215,7 @@ internal fun EditRecordScreen(
                             .padding(top = 8.dp, start = 16.dp, end = 16.dp)
                             .animateItemPlacement(),
                     ) {
-                        Divider(
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Divider()
                         // 备注信息
                         Remark(
                             remark = remark,
@@ -234,7 +235,7 @@ internal fun EditRecordScreen(
                             FilterChip(
                                 selected = hasAsset,
                                 onClick = {
-                                    viewModel.onBottomSheetAction(BottomSheetEnum.ASSETS)
+                                    viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.ASSETS)
                                     coroutineScope.launch {
                                         sheetState.show()
                                     }
@@ -248,7 +249,7 @@ internal fun EditRecordScreen(
                                 FilterChip(
                                     selected = hasRelatedAsset,
                                     onClick = {
-                                        viewModel.onBottomSheetAction(BottomSheetEnum.RELATED_ASSETS)
+                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.RELATED_ASSETS)
                                         coroutineScope.launch {
                                             sheetState.show()
                                         }
@@ -269,8 +270,7 @@ internal fun EditRecordScreen(
                             FilterChip(
                                 selected = hasTags,
                                 onClick = {
-
-                                    /* TODO onTagsClick()*/
+                                    viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.TAGS)
                                     coroutineScope.launch {
                                         sheetState.show()
                                     }
@@ -378,15 +378,10 @@ internal fun Remark(
     remark: String,
     onRemarkTextChanged: (String) -> Unit,
 ) {
-    TextField(
-        value = remark,
+    CompatTextField(
+        initializedText = remark,
+        label = stringResource(id = R.string.remark),
         onValueChange = onRemarkTextChanged,
-        label = {
-            Text(
-                text = stringResource(id = R.string.remark),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        },
         colors = TextFieldDefaults.outlinedTextFieldColors(),
         modifier = Modifier
             .fillMaxWidth()

@@ -1,0 +1,92 @@
+package cn.wj.android.cashbook.core.design.component
+
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CompatTextField(
+    modifier: Modifier = Modifier,
+    initializedText: String,
+    label: String,
+    placeholder: String? = null,
+    supportingText: String? = null,
+    onValueChange: (String) -> Unit,
+    onValueVerify: ((String) -> Boolean)? = null,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = false,
+    maxLines: Int = Int.MAX_VALUE,
+    maxLength: Int = Int.MAX_VALUE,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = TextFieldDefaults.filledShape,
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+) {
+    var text by remember {
+        mutableStateOf(initializedText)
+    }
+    val verify: (String) -> Boolean = {
+        it.length <= maxLength && onValueVerify?.invoke(it) != false
+    }
+    val placeholderL: @Composable (() -> Unit)? = if (!placeholder.isNullOrBlank()) {
+        { Text(text = placeholder) }
+    } else {
+        null
+    }
+    val supportingTextL: @Composable (() -> Unit)? = if (!supportingText.isNullOrBlank()) {
+        { Text(text = supportingText) }
+    } else {
+        null
+    }
+
+    TextField(
+        value = text,
+        onValueChange = {
+            if (verify(it)) {
+                text = it
+                onValueChange(it)
+            }
+        },
+        label = { Text(text = label) },
+        placeholder = placeholderL,
+        supportingText = supportingTextL,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        isError = isError,
+        colors = colors,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        interactionSource = interactionSource,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        shape = shape,
+        modifier = modifier,
+    )
+}
