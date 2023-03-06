@@ -11,4 +11,7 @@
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
     <string name="tag_delete_hint_format">确认要删除“%1$s”标签吗？删除标签不会影响已有账单，仅清除账单标签数据</string>
+    <string name="allow_multiple_choices">允许多选</string>
+    <string name="please_select_tags">请选择标签</string>
+    <string name="add">添加</string>
 </resources>

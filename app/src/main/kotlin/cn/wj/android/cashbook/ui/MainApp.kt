@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
+import cn.wj.android.cashbook.feature.tags.navigation.SelectTagsBottomSheet
 import cn.wj.android.cashbook.feature.tags.navigation.myTagsScreen
 import cn.wj.android.cashbook.feature.tags.navigation.naviToMyTags
 import cn.wj.android.cashbook.feature.types.navigation.SelectRecordTypeList
@@ -131,6 +132,12 @@ fun MainApp() {
                             related = related,
                             onAddAssetClick = { navController.naviToEditAsset() },
                             onAssetItemClick = onAssetItemClick
+                        )
+                    },
+                    selectTagBottomSheet = { list, onTagItemClick ->
+                        SelectTagsBottomSheet(
+                            selectedTagIds = list,
+                            onTagItemClick = onTagItemClick
                         )
                     },
                 )

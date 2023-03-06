@@ -24,8 +24,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 data class RecordEntity(
     val id: Long,
     val booksId: Long,
-    val typeCategory: RecordTypeCategoryEnum,
-    val type: RecordTypeEntity,
+    val type: Long,
     val assetId: Long,
     val relatedAssetId: Long,
     val amount: String,

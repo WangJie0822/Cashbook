@@ -46,4 +46,9 @@ class TagRepositoryImpl @Inject constructor(
         tagDao.delete(tagTable)
         dataVersion.updateVersion()
     }
+
+    override suspend fun getRelatedTag(recordId: Long): List<TagModel> {
+        return tagDao.queryByRecordId(recordId)
+            .map { it.asModel() }
+    }
 }

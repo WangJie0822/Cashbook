@@ -3,12 +3,15 @@ package cn.wj.android.cashbook.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import cn.wj.android.cashbook.core.database.dao.AssetDao
+import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.BooksTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.TagTable
+import cn.wj.android.cashbook.core.database.table.TagWithRecordTable
 import cn.wj.android.cashbook.core.database.table.TypeTable
 
 /**
@@ -17,7 +20,10 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/15
  */
 @Database(
-    entities = [BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class],
+    entities = [
+        BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class,
+        TagWithRecordTable::class, RecordWithRelatedTable::class,
+    ],
     version = 7
 )
 abstract class CashbookDatabase : RoomDatabase() {
@@ -31,4 +37,6 @@ abstract class CashbookDatabase : RoomDatabase() {
     /** 获取标签数据库操作接口 */
     abstract fun tagDao(): TagDao
 
+    /** 获取记录数据库操作接口 */
+    abstract fun recordDao(): RecordDao
 }

@@ -44,9 +44,11 @@ class TypeRepositoryImpl @Inject constructor(
             list.filter { it.typeCategory == RecordTypeCategoryEnum.TRANSFER }
         }
 
-    override suspend fun getRecordTypeById(typeId: Long): RecordTypeModel? =
+    override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel =
         withContext(Dispatchers.IO) {
             typeDao.queryById(typeId)?.asModel()
+                ?: getFirstRecordTypeListByCategory(RecordTypeCategoryEnum.EXPENDITURE)
+                    .first()
         }
 
     override suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel> =

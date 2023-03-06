@@ -59,6 +59,7 @@ import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.records.R
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
@@ -70,15 +71,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun EditRecordRoute(
+    recordId: Long,
     onBackClick: () -> Unit,
     selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
+    selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
 ) {
 
     EditRecordScreen(
+        recordId = recordId,
         onBackClick = onBackClick,
         selectTypeList = selectTypeList,
         selectAssetBottomSheet = selectAssetBottomSheet,
+        selectTagBottomSheet = selectTagBottomSheet,
     )
 }
 
@@ -89,12 +94,16 @@ internal fun EditRecordRoute(
  */
 @Composable
 internal fun EditRecordScreen(
+    recordId: Long,
     onBackClick: () -> Unit,
     selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
+    selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    viewModel: EditRecordViewModel = hiltViewModel(),
+    viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
+        recordIdData.value = recordId
+    },
 ) {
 
     // 选中分类
@@ -112,7 +121,8 @@ internal fun EditRecordScreen(
     // 时间
     val dateTime: String by viewModel.dateTimeData.collectAsStateWithLifecycle()
     // 标签
-    val tags: String by viewModel.tagsData.collectAsStateWithLifecycle()
+    val tagsIdList: List<Long> by viewModel.tagsIdData.collectAsStateWithLifecycle()
+    val tagsText: String by viewModel.tagsTextData.collectAsStateWithLifecycle()
     // 手续费
     val charges: String by viewModel.chargesData.collectAsStateWithLifecycle()
     // 优惠
@@ -158,10 +168,11 @@ internal fun EditRecordScreen(
                     }
                 }
 
-                EditRecordBottomSheetEnum.TAGS -> Text(
-                    text = "tags",
-                    modifier = Modifier.defaultMinSize(minHeight = 800.dp)
-                )
+                EditRecordBottomSheetEnum.TAGS -> {
+                    selectTagBottomSheet(tagsIdList) {
+                        viewModel.onTagItemClick(it)
+                    }
+                }
             }
 
         }) {
@@ -266,7 +277,7 @@ internal fun EditRecordScreen(
                             )
 
                             // 标签
-                            val hasTags = tags.isNotBlank()
+                            val hasTags = tagsText.isNotBlank()
                             FilterChip(
                                 selected = hasTags,
                                 onClick = {
@@ -275,7 +286,7 @@ internal fun EditRecordScreen(
                                         sheetState.show()
                                     }
                                 },
-                                label = { Text(text = stringResource(id = R.string.tags) + if (hasTags) ":$tags" else "") },
+                                label = { Text(text = stringResource(id = R.string.tags) + if (hasTags) ":$tagsText" else "") },
                             )
 
                             if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {

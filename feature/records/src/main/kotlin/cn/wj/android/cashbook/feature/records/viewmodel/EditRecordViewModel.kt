@@ -8,13 +8,17 @@ import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
+import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
+import cn.wj.android.cashbook.domain.usecase.GetDefaultTagListUseCase
+import cn.wj.android.cashbook.domain.usecase.asEntity
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
@@ -26,7 +30,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -34,29 +37,31 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class EditRecordViewModel @Inject constructor(
     assetRepository: AssetRepository,
+    typeRepository: TypeRepository,
     getDefaultRecordUseCase: GetDefaultRecordUseCase,
+    getDefaultTagListUseCase: GetDefaultTagListUseCase,
 ) : ViewModel() {
 
     /** 显示底部弹窗数据 */
-    val bottomSheetData: MutableStateFlow<EditRecordBottomSheetEnum> = MutableStateFlow(EditRecordBottomSheetEnum.NONE)
+    val bottomSheetData: MutableStateFlow<EditRecordBottomSheetEnum> =
+        MutableStateFlow(EditRecordBottomSheetEnum.NONE)
+
+    /** 记录 id 数据 */
+    val recordIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
+
+    /** 默认记录数据 */
+    private val defaultRecordData: Flow<RecordEntity> = recordIdData.mapLatest {
+        getDefaultRecordUseCase(it)
+    }
 
     /** 经过修改的记录数据 */
     private val mutableRecordData: MutableStateFlow<RecordEntity?> = MutableStateFlow(null)
 
     /** 实际显示数据源 */
     private val recordData: Flow<RecordEntity> =
-        combine(getDefaultRecordUseCase(), mutableRecordData) { default, modified ->
+        combine(defaultRecordData, mutableRecordData) { default, modified ->
             modified ?: default
         }
-
-    /** 类型标签数据 */
-    val typeCategory: StateFlow<RecordTypeCategoryEnum> = recordData
-        .mapLatest { it.typeCategory }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = RecordTypeCategoryEnum.EXPENDITURE
-        )
 
     /** 金额 */
     val amountData: StateFlow<String> = recordData
@@ -69,12 +74,31 @@ class EditRecordViewModel @Inject constructor(
 
     /** 选中类型数据 */
     val selectedTypeData: StateFlow<RecordTypeEntity?> = recordData
-        .mapLatest { it.type }
+        .mapLatest { typeRepository.getNoNullRecordTypeById(it.type).asEntity() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = null
         )
+
+    private val defaultTypeCategory: Flow<RecordTypeCategoryEnum> = selectedTypeData
+        .mapLatest {
+            it?.typeCategory ?: RecordTypeCategoryEnum.EXPENDITURE
+        }
+
+    private val mutableTypeCategory: MutableStateFlow<RecordTypeCategoryEnum?> =
+        MutableStateFlow(null)
+
+    /** 类型标签数据 */
+    val typeCategory: StateFlow<RecordTypeCategoryEnum> =
+        combine(defaultTypeCategory, mutableTypeCategory) { default, mutable ->
+            mutable ?: default
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = RecordTypeCategoryEnum.EXPENDITURE
+            )
 
     /** 备注文本 */
     val remarkData: StateFlow<String> = recordData
@@ -92,7 +116,7 @@ class EditRecordViewModel @Inject constructor(
             if (null == asset) {
                 ""
             } else {
-                "${asset.name}(${asset.displayBalance})"
+                "${asset.name}(${Symbol.rmb} ${asset.displayBalance})"
             }
         }
         .stateIn(
@@ -108,7 +132,7 @@ class EditRecordViewModel @Inject constructor(
             if (null == asset) {
                 ""
             } else {
-                "${asset.name}(${asset.displayBalance})"
+                "${asset.name}(${Symbol.rmb} ${asset.displayBalance})"
             }
         }
         .stateIn(
@@ -128,23 +152,48 @@ class EditRecordViewModel @Inject constructor(
             initialValue = ""
         )
 
+    /** TODO 默认标签数据 */
+    private val defaultTagsData: Flow<List<TagEntity>> = recordIdData.mapLatest {
+        getDefaultTagListUseCase(it)
+    }
+
+    /** 可修改的标签数据 */
+    private val mutableTagsData: MutableStateFlow<List<TagEntity>?> = MutableStateFlow(listOf())
+
+    /** 最终标签数据 */
+    private val tagsData: StateFlow<List<TagEntity>> =
+        combine(defaultTagsData, mutableTagsData) { default, mutable ->
+            mutable ?: default
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = listOf()
+            )
+
+    /** 标签 id 列表 */
+    val tagsIdData: StateFlow<List<Long>> = tagsData
+        .mapLatest { list ->
+            list.map { it.id }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = listOf()
+        )
+
     /** 标签文本 */
-    val tagsData: StateFlow<String> = recordData
-        .mapLatest {
-//           TODO  if (it.tags.isEmpty()) {
-//                ""
-//            } else {
-//                StringBuilder().run {
-//                    it.tags.forEach { tag ->
-//                        if (!isBlank()) {
-//                            append(",")
-//                        }
-//                        append(tag.name)
-//                    }
-//                    toString()
-//                }
-//            }
-            ""
+    val tagsTextData: StateFlow<String> = tagsData
+        .mapLatest { list ->
+            StringBuilder().run {
+                list.forEach { tag ->
+                    if (!isBlank()) {
+                        append(",")
+                    }
+                    append(tag.name)
+                }
+                toString()
+            }
         }
         .stateIn(
             scope = viewModelScope,
@@ -194,7 +243,7 @@ class EditRecordViewModel @Inject constructor(
     /** 类型分类点击切换为 [typeCategory] */
     fun onTypeCategoryTabSelected(typeCategory: RecordTypeCategoryEnum) {
         viewModelScope.launch {
-            mutableRecordData.value = recordData.first().copy(typeCategory = typeCategory)
+            mutableTypeCategory.value = typeCategory
         }
     }
 
@@ -202,7 +251,7 @@ class EditRecordViewModel @Inject constructor(
     fun onTypeClick(type: RecordTypeEntity?) {
         viewModelScope.launch {
             type?.let {
-                mutableRecordData.value = recordData.first().copy(type = it)
+                mutableRecordData.value = recordData.first().copy(type = it.id)
             }
         }
     }
@@ -227,6 +276,24 @@ class EditRecordViewModel @Inject constructor(
     fun onRelatedAssetItemClick(item: AssetEntity?) {
         viewModelScope.launch {
             mutableRecordData.value = recordData.first().copy(relatedAssetId = item?.id ?: -1L)
+        }
+    }
+
+    fun onTagItemClick(item: TagEntity) {
+        viewModelScope.launch {
+            val list = arrayListOf<TagEntity>()
+            var needAdd = true
+            tagsData.first().forEach {
+                if (it.id != item.id) {
+                    list.add(it)
+                } else {
+                    needAdd = false
+                }
+            }
+            if (needAdd) {
+                list.add(item)
+            }
+            mutableTagsData.value = list
         }
     }
 

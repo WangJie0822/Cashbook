@@ -1,5 +1,7 @@
 package cn.wj.android.cashbook.core.model.entity
 
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+
 /**
  * 记录类型数据实体
  *
@@ -19,6 +21,7 @@ data class RecordTypeEntity(
     val parentId: Long,
     val name: String,
     val iconResId: Int,
+    val typeCategory: RecordTypeCategoryEnum,
     val sort: Int,
     val child: List<RecordTypeEntity>,
     val selected: Boolean,
@@ -35,6 +38,7 @@ val RECORD_TYPE_SETTINGS: RecordTypeEntity
         sort = 0,
         child = listOf(),
         selected = true,
+        typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         shapeType = 0,
     )
 

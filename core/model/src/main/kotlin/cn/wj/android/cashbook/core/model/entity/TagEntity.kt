@@ -11,4 +11,5 @@ package cn.wj.android.cashbook.core.model.entity
 data class TagEntity(
     val id: Long,
     val name: String,
+    val selected: Boolean,
 )

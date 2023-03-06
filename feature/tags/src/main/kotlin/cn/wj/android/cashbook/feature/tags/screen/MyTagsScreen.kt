@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package cn.wj.android.cashbook.feature.tags.screen
 
 import androidx.compose.foundation.layout.Box
@@ -52,6 +50,7 @@ internal fun MyTagsRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyTagsScreen(
     onBackClick: () -> Unit,
@@ -155,6 +154,7 @@ internal fun MyTagsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTagDialog(
     tagEntity: TagEntity?,
@@ -193,7 +193,7 @@ fun EditTagDialog(
         confirmButton = {
             TextButton(onClick = {
                 onConfirm(
-                    tagEntity?.copy(name = tagName) ?: TagEntity(-1L, tagName)
+                    tagEntity?.copy(name = tagName) ?: TagEntity(-1L, tagName, false)
                 )
             }) {
                 Text(text = stringResource(id = R.string.confirm))

@@ -19,6 +19,6 @@ fun EditTagDialogPreview() {
 @Composable
 fun DeleteTagDialogPreview() {
     CashbookTheme {
-        DeleteTagDialog(tagEntity = TagEntity(-1L, "测试"), onConfirm = {}, onDismiss = {})
+        DeleteTagDialog(tagEntity = TagEntity(-1L, "测试", false), onConfirm = {}, onDismiss = {})
     }
 }

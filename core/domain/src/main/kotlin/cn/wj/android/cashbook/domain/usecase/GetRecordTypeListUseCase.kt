@@ -89,19 +89,20 @@ class GetRecordTypeListUseCase @Inject constructor(
             }
             .first()
     }
+}
 
-    private fun RecordTypeModel.asEntity(
-        child: List<RecordTypeEntity> = listOf()
-    ): RecordTypeEntity {
-        return RecordTypeEntity(
-            id = this.id,
-            parentId = this.parentId,
-            name = this.name,
-            iconResId = getIdByString(this.iconName, "drawable"),
-            sort = this.sort,
-            child = child,
-            selected = false,
-            shapeType = -1,
-        )
-    }
+fun RecordTypeModel.asEntity(
+    child: List<RecordTypeEntity> = listOf()
+): RecordTypeEntity {
+    return RecordTypeEntity(
+        id = this.id,
+        parentId = this.parentId,
+        name = this.name,
+        iconResId = getIdByString(this.iconName, "drawable"),
+        sort = this.sort,
+        typeCategory = this.typeCategory,
+        child = child,
+        selected = false,
+        shapeType = -1,
+    )
 }

@@ -26,4 +26,7 @@ interface TagDao {
 
     @Query("SELECT * FROM db_tag")
     suspend fun queryAll(): List<TagTable>
+
+    @Query("SELECT * FROM db_tag WHERE id IN (SELECT tag_id FROM db_tag_with_record WHERE record_id=:recordId)")
+    suspend fun queryByRecordId(recordId: Long): List<TagTable>
 }

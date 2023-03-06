@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.TextButton
 import androidx.compose.material3.Icon
@@ -24,6 +23,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
+import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.feature.assets.R
@@ -75,11 +75,14 @@ internal fun SelectAssetBottomSheetScreen(
                             bottom.linkTo(parent.bottom)
                         },
                         onClick = onAddAssetClick,
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
                     ) {
-                        Text(text = stringResource(id = R.string.add))
+                        Text(
+                            text = stringResource(id = R.string.add),
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
                     }
                 }
+                CommonDivider()
             }
             item {
                 AssetItem(
@@ -136,7 +139,7 @@ internal fun AssetItem(
         Icon(
             painter = painterResource(id = iconResId),
             contentDescription = null,
-            tint = if(isNoSelect) LocalContentColor.current else Color.Unspecified,
+            tint = if (isNoSelect) LocalContentColor.current else Color.Unspecified,
             modifier = Modifier.constrainAs(iconRef) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)

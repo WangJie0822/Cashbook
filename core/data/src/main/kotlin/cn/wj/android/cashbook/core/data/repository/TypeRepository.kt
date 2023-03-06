@@ -21,7 +21,7 @@ interface TypeRepository {
 
     val firstTransferTypeListData: Flow<List<RecordTypeModel>>
 
-    suspend fun getRecordTypeById(typeId: Long): RecordTypeModel?
+    suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel
 
     suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel>
 

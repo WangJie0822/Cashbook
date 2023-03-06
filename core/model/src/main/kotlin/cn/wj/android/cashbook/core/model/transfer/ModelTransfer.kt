@@ -1,14 +1,17 @@
 package cn.wj.android.cashbook.core.model.transfer
 
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
+import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.model.AssetModel
+import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 
-fun TagModel.asEntity(): TagEntity {
+fun TagModel.asEntity(selected: Boolean = false): TagEntity {
     return TagEntity(
-        this.id,
-        this.name,
+        id = this.id,
+        name = this.name,
+        selected = selected,
     )
 }
 
@@ -40,7 +43,7 @@ fun AssetModel.asEntity(): AssetEntity {
     )
 }
 
-fun AssetEntity.asModel():  AssetModel{
+fun AssetEntity.asModel(): AssetModel {
     return AssetModel(
         id = this.id,
         booksId = this.booksId,
@@ -58,5 +61,21 @@ fun AssetEntity.asModel():  AssetModel{
         sort = this.sort,
         modifyTime = this.modifyTime,
         balance = this.balance,
+    )
+}
+
+fun RecordModel.asEntity(): RecordEntity {
+    return RecordEntity(
+        this.id,
+        this.booksId,
+        this.type,
+        this.asset,
+        this.intoAsset,
+        this.amount,
+        this.charge,
+        this.concessions,
+        this.remark,
+        this.reimbursable,
+        this.modifyTime
     )
 }

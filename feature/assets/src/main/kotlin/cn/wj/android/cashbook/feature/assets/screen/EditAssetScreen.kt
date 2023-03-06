@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -48,6 +47,7 @@ import cn.wj.android.cashbook.core.common.PATTERN_SIGN_MONEY
 import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
+import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.CommonTopBar
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
@@ -194,7 +194,7 @@ internal fun EditAssetScreen(
                     )
                 }
 
-                Divider(
+                CommonDivider(
                     modifier = Modifier.height(8.dp),
                     color = DividerDefaults.color.copy(alpha = 0.1f)
                 )
@@ -296,7 +296,7 @@ internal fun SelectAssetClassificationTypeSheet(onItemClick: (ClassificationType
                 .fillMaxWidth()
                 .padding(16.dp)
         )
-        Divider()
+        CommonDivider()
 
         LazyColumn(
             content = {
@@ -338,8 +338,7 @@ internal fun SelectAssetClassificationSheet(onItemClick: (AssetClassificationEnu
                 .fillMaxWidth()
                 .padding(16.dp)
         )
-
-        Divider()
+        CommonDivider()
 
         LazyColumn(
             content = {
