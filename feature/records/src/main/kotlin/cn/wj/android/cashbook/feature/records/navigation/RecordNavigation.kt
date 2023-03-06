@@ -32,7 +32,7 @@ fun NavController.naviToEditRecord(recordId: Long = -1L) {
  */
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.editRecordScreen(
-    selectTypeList: @Composable (Modifier, RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
+    selectTypeList: @Composable (RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
 ) {

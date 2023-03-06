@@ -115,9 +115,8 @@ fun MainApp() {
                     },
                 )
                 editRecordScreen(
-                    selectTypeList = { modifier, typeCategory, selectedType, overTypeList, underTypeList, onTypeSelected ->
+                    selectTypeList = { typeCategory, selectedType, overTypeList, underTypeList, onTypeSelected ->
                         SelectRecordTypeList(
-                            modifier = modifier,
                             typeCategory = typeCategory,
                             selectedType = selectedType,
                             overTypeList = overTypeList,

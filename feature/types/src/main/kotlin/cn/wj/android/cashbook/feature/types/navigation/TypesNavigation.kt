@@ -9,7 +9,6 @@ import cn.wj.android.cashbook.feature.types.screen.SelectRecordTypeListScreen
 
 @Composable
 fun SelectRecordTypeList(
-    modifier: Modifier,
     typeCategory: RecordTypeCategoryEnum,
     selectedType: RecordTypeEntity?,
     overTypeList: @Composable LazyGridItemScope.() -> Unit,
@@ -18,7 +17,6 @@ fun SelectRecordTypeList(
     onTypeSettingClick: () -> Unit,
 ) {
     SelectRecordTypeListScreen(
-        modifier = modifier,
         typeCategory = typeCategory,
         selectedType = selectedType,
         overTypeList = overTypeList,

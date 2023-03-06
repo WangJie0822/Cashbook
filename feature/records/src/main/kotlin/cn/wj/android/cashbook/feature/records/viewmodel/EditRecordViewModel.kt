@@ -279,6 +279,12 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
+    fun onDateTimePicked(dateTime: String) {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(modifyTime = dateTime)
+        }
+    }
+
     fun onTagItemClick(item: TagEntity) {
         viewModelScope.launch {
             val list = arrayListOf<TagEntity>()
@@ -295,6 +301,20 @@ class EditRecordViewModel @Inject constructor(
             }
             mutableTagsData.value = list
         }
+    }
+
+    fun onReimbursableClick() {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(reimbursable = !reimbursableData.value)
+        }
+    }
+
+    fun onChargesClick() {
+        // TODO
+    }
+
+    fun onConcessionsClick() {
+        // TODO
     }
 
     /** TODO 尝试保存记录 */
