@@ -74,7 +74,7 @@ class EditRecordViewModel @Inject constructor(
 
     /** 选中类型数据 */
     val selectedTypeData: StateFlow<RecordTypeEntity?> = recordData
-        .mapLatest { typeRepository.getNoNullRecordTypeById(it.type).asEntity() }
+        .mapLatest { typeRepository.getNoNullRecordTypeById(it.typeId).asEntity() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -152,7 +152,7 @@ class EditRecordViewModel @Inject constructor(
             initialValue = ""
         )
 
-    /** TODO 默认标签数据 */
+    /** 默认标签数据 */
     private val defaultTagsData: Flow<List<TagEntity>> = recordIdData.mapLatest {
         getDefaultTagListUseCase(it)
     }
@@ -207,7 +207,7 @@ class EditRecordViewModel @Inject constructor(
             if (it.charges.toBigDecimalOrZero() == BigDecimal.ZERO) {
                 ""
             } else {
-                "${Symbol.rmb}${it.charges}"
+                it.charges
             }
         }
         .stateIn(
@@ -222,7 +222,7 @@ class EditRecordViewModel @Inject constructor(
             if (it.concessions.toBigDecimalOrZero() == BigDecimal.ZERO) {
                 ""
             } else {
-                "${Symbol.rmb}${it.concessions}"
+                it.concessions
             }
         }
         .stateIn(
@@ -240,6 +240,13 @@ class EditRecordViewModel @Inject constructor(
             initialValue = false
         )
 
+    /** 金额变化 */
+    fun onAmountChanged(amount: String) {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(amount = amount)
+        }
+    }
+
     /** 类型分类点击切换为 [typeCategory] */
     fun onTypeCategoryTabSelected(typeCategory: RecordTypeCategoryEnum) {
         viewModelScope.launch {
@@ -251,7 +258,7 @@ class EditRecordViewModel @Inject constructor(
     fun onTypeClick(type: RecordTypeEntity?) {
         viewModelScope.launch {
             type?.let {
-                mutableRecordData.value = recordData.first().copy(type = it.id)
+                mutableRecordData.value = recordData.first().copy(typeId = it.id)
             }
         }
     }
@@ -305,16 +312,21 @@ class EditRecordViewModel @Inject constructor(
 
     fun onReimbursableClick() {
         viewModelScope.launch {
-            mutableRecordData.value = recordData.first().copy(reimbursable = !reimbursableData.value)
+            mutableRecordData.value =
+                recordData.first().copy(reimbursable = !reimbursableData.value)
         }
     }
 
-    fun onChargesClick() {
-        // TODO
+    fun onChargesChanged(charges: String) {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(charges = charges)
+        }
     }
 
-    fun onConcessionsClick() {
-        // TODO
+    fun onConcessionsChanged(concessions: String) {
+        viewModelScope.launch {
+            mutableRecordData.value = recordData.first().copy(concessions = concessions)
+        }
     }
 
     /** TODO 尝试保存记录 */

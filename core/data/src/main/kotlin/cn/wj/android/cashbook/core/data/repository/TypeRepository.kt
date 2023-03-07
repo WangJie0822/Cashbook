@@ -28,10 +28,10 @@ interface TypeRepository {
     suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel>
 }
 
-internal fun TypeTable.asModel(parentId: Long = -1L): RecordTypeModel {
+internal fun TypeTable.asModel(): RecordTypeModel {
     return RecordTypeModel(
         id = this.id.orElse(-1L),
-        parentId = parentId,
+        parentId = this.parentId,
         name = this.name,
         iconName = this.iconName,
         typeLevel = TypeLevelEnum.valueOf(this.typeLevel),

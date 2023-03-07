@@ -13,6 +13,12 @@ enum class EditRecordBottomSheetEnum {
     /** 金额 */
     AMOUNT,
 
+    /** 手续费 */
+    CHARGES,
+
+    /** 优惠 */
+    CONCESSIONS,
+
     /** 资产列表 */
     ASSETS,
 

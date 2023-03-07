@@ -9,9 +9,11 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
 /**
@@ -19,6 +21,7 @@ import kotlinx.coroutines.withContext
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/20
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class TypeRepositoryImpl @Inject constructor(
     private val typeDao: TypeDao,
 ) : TypeRepository {
@@ -30,17 +33,17 @@ class TypeRepositoryImpl @Inject constructor(
     }
 
     override val firstExpenditureTypeListData: Flow<List<RecordTypeModel>> =
-        firstTypeListData.map { list ->
+        firstTypeListData.mapLatest { list ->
             list.filter { it.typeCategory == RecordTypeCategoryEnum.EXPENDITURE }
         }
 
     override val firstIncomeTypeListData: Flow<List<RecordTypeModel>> =
-        firstTypeListData.map { list ->
+        firstTypeListData.mapLatest { list ->
             list.filter { it.typeCategory == RecordTypeCategoryEnum.INCOME }
         }
 
     override val firstTransferTypeListData: Flow<List<RecordTypeModel>> =
-        firstTypeListData.map { list ->
+        firstTypeListData.mapLatest { list ->
             list.filter { it.typeCategory == RecordTypeCategoryEnum.TRANSFER }
         }
 
@@ -71,7 +74,7 @@ class TypeRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             typeDao.queryByParentId(parentId)
                 .map {
-                    it.asModel(parentId)
+                    it.asModel()
                 }
         }
 }

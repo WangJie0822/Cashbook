@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -56,6 +55,7 @@ import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_TIME
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
+import cn.wj.android.cashbook.core.design.component.Calculator
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
@@ -152,16 +152,55 @@ internal fun EditRecordScreen(
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
-            // TODO 底部弹窗
+            // 底部弹窗
             when (bottomSheetEnum) {
                 EditRecordBottomSheetEnum.NONE -> Spacer(modifier = Modifier.height(1.dp))
 
-                EditRecordBottomSheetEnum.AMOUNT -> Text(
-                    text = "amount",
-                    modifier = Modifier.defaultMinSize(minHeight = 400.dp)
-                )
+                EditRecordBottomSheetEnum.AMOUNT, EditRecordBottomSheetEnum.CHARGES, EditRecordBottomSheetEnum.CONCESSIONS -> {
+                    // 显示计算器弹窗
+                    when (bottomSheetEnum) {
+                        EditRecordBottomSheetEnum.AMOUNT -> {
+                            Calculator(defaultText = amount,
+                                primaryColor = primaryColor,
+                                onConfirmClick = {
+                                    viewModel.onAmountChanged(it)
+                                    coroutineScope.launch {
+                                        sheetState.hide()
+                                    }
+                                }
+                            )
+                        }
+
+                        EditRecordBottomSheetEnum.CHARGES -> {
+                            Calculator(defaultText = charges,
+                                primaryColor = primaryColor,
+                                onConfirmClick = {
+                                    viewModel.onChargesChanged(it)
+                                    coroutineScope.launch {
+                                        sheetState.hide()
+                                    }
+                                }
+                            )
+                        }
+
+                        EditRecordBottomSheetEnum.CONCESSIONS -> {
+                            Calculator(defaultText = concessions,
+                                primaryColor = primaryColor,
+                                onConfirmClick = {
+                                    viewModel.onConcessionsChanged(it)
+                                    coroutineScope.launch {
+                                        sheetState.hide()
+                                    }
+                                }
+                            )
+                        }
+
+                        else -> {}
+                    }
+                }
 
                 EditRecordBottomSheetEnum.ASSETS, EditRecordBottomSheetEnum.RELATED_ASSETS -> {
+                    // 显示选择资产弹窗
                     selectAssetBottomSheet(
                         selectedType,
                         bottomSheetEnum == EditRecordBottomSheetEnum.RELATED_ASSETS
@@ -178,6 +217,7 @@ internal fun EditRecordScreen(
                 }
 
                 EditRecordBottomSheetEnum.TAGS -> {
+                    // 显示选择标签弹窗
                     selectTagBottomSheet(tagsIdList) {
                         viewModel.onTagItemClick(it)
                     }
@@ -323,6 +363,8 @@ internal fun EditRecordScreen(
                                     },
                                     label = { Text(text = stringResource(id = R.string.tags) + if (hasTags) ":$tagsText" else "") },
                                 )
+                                
+                                // TODO 关联的支出记录
 
                                 if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
                                     // 只有支出类型显示是否可报销
@@ -345,16 +387,26 @@ internal fun EditRecordScreen(
                                 val hasCharges = charges.isNotBlank()
                                 FilterChip(
                                     selected = hasCharges,
-                                    onClick = viewModel::onChargesClick,
-                                    label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":$charges" else "") },
+                                    onClick = {
+                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CHARGES)
+                                        coroutineScope.launch {
+                                            sheetState.show()
+                                        }
+                                    },
+                                    label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${Symbol.rmb}$charges" else "") },
                                 )
 
                                 // 优惠
                                 val hasConcessions = concessions.isNotBlank()
                                 FilterChip(
                                     selected = hasConcessions,
-                                    onClick = viewModel::onConcessionsClick,
-                                    label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":$concessions" else "") },
+                                    onClick = {
+                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CONCESSIONS)
+                                        coroutineScope.launch {
+                                            sheetState.show()
+                                        }
+                                    },
+                                    label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.rmb}$concessions" else "") },
                                 )
                             }
                         }

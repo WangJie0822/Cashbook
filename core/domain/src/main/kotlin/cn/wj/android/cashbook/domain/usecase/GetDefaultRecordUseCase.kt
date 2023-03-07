@@ -34,7 +34,7 @@ class GetDefaultRecordUseCase @Inject constructor(
         RecordEntity(
             id = -1L,
             booksId = appDataModel.currentBookId,
-            type = recordTypeById.id,
+            typeId = recordTypeById.id,
             assetId = appDataModel.lastAssetId,
             relatedAssetId = -1L,
             amount = "0",
