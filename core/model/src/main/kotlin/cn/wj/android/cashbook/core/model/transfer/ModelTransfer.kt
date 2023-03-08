@@ -68,11 +68,27 @@ fun RecordModel.asEntity(): RecordEntity {
     return RecordEntity(
         this.id,
         this.booksId,
-        this.type,
-        this.asset,
-        this.intoAsset,
+        this.typeId,
+        this.assetId,
+        this.relatedAssetId,
         this.amount,
-        this.charge,
+        this.charges,
+        this.concessions,
+        this.remark,
+        this.reimbursable,
+        this.modifyTime
+    )
+}
+
+fun RecordEntity.asModel(): RecordModel {
+    return RecordModel(
+        this.id,
+        this.booksId,
+        this.typeId,
+        this.assetId,
+        this.relatedAssetId,
+        this.amount,
+        this.charges,
         this.concessions,
         this.remark,
         this.reimbursable,

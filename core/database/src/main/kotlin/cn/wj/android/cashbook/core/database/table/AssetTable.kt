@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey
  * @param id 资产主键，自增长
  * @param booksId 所属账本主键
  * @param name 资产名称
- * @param balance 资产余额
+ * @param balance 资产余额，信用卡为已使用额度
  * @param totalAmount 总额度，信用卡使用
  * @param billingDate 账单日，信用卡使用
  * @param repaymentDate 还款日，信用卡使用

@@ -11,6 +11,8 @@ android {
 
 dependencies {
 
+    androidTestImplementation(project(":core:testing"))
+
     implementation(project(":core:model"))
     implementation(project(":core:common"))
 }

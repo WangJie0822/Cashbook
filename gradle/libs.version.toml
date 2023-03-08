@@ -263,8 +263,7 @@ androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
 androidx-compose-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding" }
 androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text" }
 androidx-compose-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
-androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test" }
-androidx-compose-ui-test-junit-4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 # activity 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "androidx-activity" }
@@ -365,8 +364,8 @@ androidx-test-ext-truth = { group = "androidx.test.ext", name = "truth", version
 # Koin [Github](https://github.com/InsertKoinIO/koin) [指南](https://insert-koin.io/)
 insert-koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "insert-koin" }
 insert-koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "insert-koin" }
-insert-koin-test-junit-4 = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "insert-koin" }
-insert-koin-test-junit-5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "insert-koin" }
+insert-koin-test-junit = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "insert-koin" }
+insert-koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "insert-koin" }
 insert-koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "insert-koin-android" }
 insert-koin-android-compat = { group = "io.insert-koin", name = "koin-android-compat", version.ref = "insert-koin-android" }
 insert-koin-android-workmanager = { group = "io.insert-koin", name = "koin-android-workmanager", version.ref = "insert-koin-android" }

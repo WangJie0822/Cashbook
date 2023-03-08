@@ -16,7 +16,7 @@ import cn.wj.android.cashbook.core.database.table.TagTable
 interface TagDao {
 
     @Insert
-    suspend fun insert(tag: TagTable)
+    suspend fun insert(tag: TagTable): Long
 
     @Update
     suspend fun update(tag: TagTable)

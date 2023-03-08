@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
@@ -15,9 +16,14 @@ import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO
+import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL
+import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.GetDefaultTagListUseCase
+import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.asEntity
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +46,7 @@ class EditRecordViewModel @Inject constructor(
     typeRepository: TypeRepository,
     getDefaultRecordUseCase: GetDefaultRecordUseCase,
     getDefaultTagListUseCase: GetDefaultTagListUseCase,
+    private val saveRecordUseCase: SaveRecordUseCase,
 ) : ViewModel() {
 
     /** 显示底部弹窗数据 */
@@ -240,6 +247,10 @@ class EditRecordViewModel @Inject constructor(
             initialValue = false
         )
 
+    fun onBottomSheetAction(action: EditRecordBottomSheetEnum) {
+        bottomSheetData.value = action
+    }
+
     /** 金额变化 */
     fun onAmountChanged(amount: String) {
         viewModelScope.launch {
@@ -268,10 +279,6 @@ class EditRecordViewModel @Inject constructor(
         viewModelScope.launch {
             mutableRecordData.value = recordData.first().copy(remark = remark)
         }
-    }
-
-    fun onBottomSheetAction(action: EditRecordBottomSheetEnum) {
-        bottomSheetData.value = action
     }
 
     fun onAssetItemClick(item: AssetEntity?) {
@@ -329,9 +336,30 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
-    /** TODO 尝试保存记录 */
-    fun trySaveRecord() {
+    /** 尝试保存记录 */
+    suspend fun trySaveRecord(): ResultModel {
+        val recordEntity = recordData.first()
+        if (recordEntity.amount.toDoubleOrZero() == 0.0) {
+            // 记录金额不能为 0
+            return ResultModel.failure(FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO)
+        }
+        // 检查类型数据，类型不能为空
+        val typeEntity =
+            selectedTypeData.value ?: return ResultModel.failure(FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL)
+        // 支出分类
+        val typeCategory = typeCategory.value
+        if (typeEntity.typeCategory != typeCategory) {
+            // 类型与支出类型不匹配
+            return ResultModel.failure(FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY)
+        }
 
+        // TODO 关联记录
+        return try {
+            saveRecordUseCase(recordEntity, tagsData.value)
+            ResultModel.success()
+        } catch (throwable: Throwable) {
+            ResultModel.failure(throwable)
+        }
     }
 }
 

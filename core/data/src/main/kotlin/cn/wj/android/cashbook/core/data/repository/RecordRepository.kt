@@ -1,28 +1,49 @@
 package cn.wj.android.cashbook.core.data.repository
 
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
+import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.tools.dateFormat
+import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.model.RecordModel
-import cn.wj.android.cashbook.core.model.model.RecordTypeModel
+import cn.wj.android.cashbook.core.model.model.TagModel
 
 interface RecordRepository {
 
     suspend fun queryById(recordId: Long): RecordModel?
+
+    suspend fun updateRecord(record: RecordModel, tags: List<TagModel>)
 }
 
 internal fun RecordTable.asModel(): RecordModel {
     return RecordModel(
         id = this.id ?: -1L,
         booksId = this.booksId,
-        type = this.typeId,
-        asset = this.assetId,
-        intoAsset = this.intoAssetId,
+        typeId = this.typeId,
+        assetId = this.assetId,
+        relatedAssetId = this.intoAssetId,
         amount = this.amount.toString(),
-        charge = this.charge.toString(),
+        charges = this.charge.toString(),
         concessions = this.concessions.toString(),
         remark = this.remark,
         reimbursable = this.reimbursable == SWITCH_INT_ON,
         modifyTime = this.modifyTime.dateFormat(),
+    )
+}
+
+internal fun RecordModel.asTable(): RecordTable {
+    return RecordTable(
+        id = if (this.id == -1L) null else this.id,
+        booksId = this.booksId,
+        typeId = this.typeId,
+        assetId = this.assetId,
+        intoAssetId = this.relatedAssetId,
+        amount = this.amount.toDoubleOrZero(),
+        charge = this.charges.toDoubleOrZero(),
+        concessions = this.concessions.toDoubleOrZero(),
+        remark = this.remark,
+        reimbursable = if (this.reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
+        modifyTime = this.modifyTime.parseDateLong(),
     )
 }

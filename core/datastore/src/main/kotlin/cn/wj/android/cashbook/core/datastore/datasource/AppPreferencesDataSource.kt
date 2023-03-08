@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
 import cn.wj.android.cashbook.core.datastore.AppPreferences
+import cn.wj.android.cashbook.core.datastore.copy
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.map
@@ -24,4 +25,7 @@ class AppPreferencesDataSource @Inject constructor(
             )
         }
 
+    suspend fun updateLastAssetId(lastAssetId: Long) {
+        appPreferences.updateData { it.copy { this.lastAssetId = lastAssetId } }
+    }
 }

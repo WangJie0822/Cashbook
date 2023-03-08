@@ -28,6 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetLayout
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -38,6 +40,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.completeZero
+import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.common.ext.toIntOrZero
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_TIME
@@ -62,6 +66,7 @@ import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.feature.records.R
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.TabItem
@@ -149,6 +154,10 @@ internal fun EditRecordScreen(
         RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
     }
 
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
@@ -225,17 +234,53 @@ internal fun EditRecordScreen(
             }
 
         }) {
-        Scaffold(topBar = {
-            EditRecordTopBar(
-                selectedTabIndex = selectedTypeCategory.position,
-                onTabSelected = viewModel::onTypeCategoryTabSelected,
-                onBackClick = onBackClick,
-            )
-        }, floatingActionButton = {
-            FloatingActionButton(onClick = viewModel::trySaveRecord) {
-                Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
-            }
-        }) { paddingValues ->
+        Scaffold(
+            topBar = {
+                EditRecordTopBar(
+                    selectedTabIndex = selectedTypeCategory.position,
+                    onTabSelected = viewModel::onTypeCategoryTabSelected,
+                    onBackClick = onBackClick,
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(snackbarHostState)
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    coroutineScope.launch {
+                        val result = viewModel.trySaveRecord()
+                        if (result is ResultModel.Failure<*>) {
+                            when (result.code) {
+                                ResultModel.Failure.FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO -> {
+                                    // 金额不能为 0
+                                    snackbarHostState.showSnackbar(R.string.amount_must_not_be_zero.string)
+                                }
+
+                                ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL,
+                                ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY -> {
+                                    // 未选择类型或类型与支出分类不匹配
+                                    snackbarHostState.showSnackbar(R.string.please_select_type.string)
+                                }
+
+                                else -> {
+                                    // 保存失败
+                                    snackbarHostState.showSnackbar(
+                                        R.string.save_failure_format.string.format(
+                                            result.code
+                                        )
+                                    )
+                                }
+                            }
+                        } else {
+                            // 保存成功，关闭当前界面
+                            onBackClick()
+                        }
+                    }
+                }) {
+                    Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
+                }
+            },
+        ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 selectTypeList(
                     selectedTypeCategory,
@@ -363,7 +408,7 @@ internal fun EditRecordScreen(
                                     },
                                     label = { Text(text = stringResource(id = R.string.tags) + if (hasTags) ":$tagsText" else "") },
                                 )
-                                
+
                                 // TODO 关联的支出记录
 
                                 if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
@@ -396,18 +441,20 @@ internal fun EditRecordScreen(
                                     label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${Symbol.rmb}$charges" else "") },
                                 )
 
-                                // 优惠
-                                val hasConcessions = concessions.isNotBlank()
-                                FilterChip(
-                                    selected = hasConcessions,
-                                    onClick = {
-                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CONCESSIONS)
-                                        coroutineScope.launch {
-                                            sheetState.show()
-                                        }
-                                    },
-                                    label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.rmb}$concessions" else "") },
-                                )
+                                if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
+                                    // 非收入类型才有优惠
+                                    val hasConcessions = concessions.isNotBlank()
+                                    FilterChip(
+                                        selected = hasConcessions,
+                                        onClick = {
+                                            viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CONCESSIONS)
+                                            coroutineScope.launch {
+                                                sheetState.show()
+                                            }
+                                        },
+                                        label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.rmb}$concessions" else "") },
+                                    )
+                                }
                             }
                         }
                     },
