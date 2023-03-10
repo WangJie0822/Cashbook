@@ -2,8 +2,8 @@ package cn.wj.android.cashbook.feature.records.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -11,12 +11,11 @@ import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.controller
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
-import cn.wj.android.cashbook.feature.records.screen.LauncherCollapsedTitleScreen
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
-import cn.wj.android.cashbook.feature.records.screen.LauncherPinnedTitleScreen
 import com.google.accompanist.navigation.animation.composable
 
 private const val ROUTE_EDIT_RECORD_KEY = "recordId"
@@ -53,23 +52,14 @@ fun NavGraphBuilder.editRecordScreen(
     }
 }
 
-@Composable
-fun LauncherPinnedTitleContent() {
-    LauncherPinnedTitleScreen()
-}
-
-@Composable
-fun LauncherCollapsedTitleContent() {
-    LauncherCollapsedTitleScreen()
-}
-
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LauncherContent(
-    modifier: Modifier,
+    onMenuClick: (LauncherMenuAction) -> Unit,
     onRecordItemEditClick: (Long) -> Unit,
 ) {
     LauncherContentScreen(
-        modifier = modifier,
+        onMenuClick = onMenuClick,
         onRecordItemEditClick = onRecordItemEditClick,
     )
 }

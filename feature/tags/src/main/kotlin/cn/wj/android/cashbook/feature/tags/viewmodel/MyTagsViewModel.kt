@@ -50,6 +50,7 @@ class MyTagsViewModel @Inject constructor(
 
     fun modifyTag(tag: TagEntity) {
         viewModelScope.launch {
+            // TODO 事件校验
             tagRepository.updateTag(tag.asModel())
             dismissDialog()
         }
@@ -57,6 +58,7 @@ class MyTagsViewModel @Inject constructor(
 
     fun deleteTag(tag: TagEntity) {
         viewModelScope.launch {
+            // TODO 事件校验
             tagRepository.deleteTag(tag.asModel())
             dismissDialog()
         }

@@ -18,9 +18,7 @@ import cn.wj.android.cashbook.core.ui.controller
 import cn.wj.android.cashbook.feature.assets.navigation.SelectAssetBottomSheet
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
-import cn.wj.android.cashbook.feature.records.navigation.LauncherCollapsedTitleContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
-import cn.wj.android.cashbook.feature.records.navigation.LauncherPinnedTitleContent
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
@@ -59,53 +57,58 @@ fun MainApp() {
             ) {
                 controller = navController
 
-                settingsLauncherScreen(
-                    onMenuClick = { action ->
-                        when (action) {
-                            LauncherMenuAction.ADD -> {
-                                navController.naviToEditRecord()
-                            }
-
-                            LauncherMenuAction.SEARCH -> {
-
-                            }
-
-                            LauncherMenuAction.CALENDAR -> {
-
-                            }
-
-                            LauncherMenuAction.MY_ASSET -> {
-
-                            }
-
-                            LauncherMenuAction.MY_BOOK -> {
-
-                            }
-
-                            LauncherMenuAction.MY_CATEGORY -> {
-
-                            }
-
-                            LauncherMenuAction.MY_TAG -> {
-                                navController.naviToMyTags()
-                            }
-
-                            LauncherMenuAction.SETTING -> {
-
-                            }
-
-                            LauncherMenuAction.ABOUT_US -> {
-
-                            }
-
-                            else -> {}
+                val onLauncherMenuClick: (LauncherMenuAction) -> Unit = { action ->
+                    when (action) {
+                        LauncherMenuAction.ADD -> {
+                            navController.naviToEditRecord()
                         }
-                    },
-                    pinnedTitle = { LauncherPinnedTitleContent() },
-                    collapsedTitle = { LauncherCollapsedTitleContent() },
-                    content = { modifier ->
+
+                        LauncherMenuAction.SEARCH -> {
+
+                        }
+
+                        LauncherMenuAction.CALENDAR -> {
+
+                        }
+
+                        LauncherMenuAction.MY_ASSET -> {
+
+                        }
+
+                        LauncherMenuAction.MY_BOOK -> {
+
+                        }
+
+                        LauncherMenuAction.MY_CATEGORY -> {
+
+                        }
+
+                        LauncherMenuAction.MY_TAG -> {
+                            navController.naviToMyTags()
+                        }
+
+                        LauncherMenuAction.SETTING -> {
+
+                        }
+
+                        LauncherMenuAction.ABOUT_US -> {
+
+                        }
+
+                        else -> {}
+                    }
+                }
+                settingsLauncherScreen(
+                    onMenuClick = onLauncherMenuClick,
+                    content = { openDrawer ->
                         LauncherContent(
-                            modifier = modifier,
+                            onMenuClick = {
+                                if (it == LauncherMenuAction.MENU) {
+                                    openDrawer()
+                                } else {
+                                    onLauncherMenuClick(it)
+                                }
+                            },
                             onRecordItemEditClick = {
                                 navController.naviToEditRecord(it)
                             },

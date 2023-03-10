@@ -1,42 +1,45 @@
 package cn.wj.android.cashbook.feature.records.preview
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.BackdropValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.ui.DevicePreviews
-import cn.wj.android.cashbook.feature.records.screen.LauncherCollapsedTitleScreen
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
-import cn.wj.android.cashbook.feature.records.screen.LauncherPinnedTitleScreen
+import cn.wj.android.cashbook.feature.records.screen.LauncherTopBar
 
 /** 首页标题固定部分预览 */
+@OptIn(ExperimentalMaterialApi::class)
 @DevicePreviews
 @Composable
-internal fun LauncherPinnedTitleScreenPreview() {
+internal fun LauncherTopTitleBarPreview() {
     CashbookTheme {
-        Surface(color = MaterialTheme.colorScheme.primary) {
-            LauncherPinnedTitleScreen()
-        }
-    }
-}
-
-/** 首页标题可折叠部分预览 */
-@DevicePreviews
-@Composable
-internal fun LauncherCollapsedTitleScreenPreview() {
-    CashbookTheme {
-        Surface(color = MaterialTheme.colorScheme.primary) {
-            LauncherCollapsedTitleScreen()
+        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.primary)) {
+            LauncherTopBar(
+                backdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
+                onMenuClick = {},
+            )
+            LauncherTopBar(
+                backdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed),
+                onMenuClick = {},
+            )
         }
     }
 }
 
 /** 首页内容部分预览 */
+@OptIn(ExperimentalMaterialApi::class)
 @DevicePreviews
 @Composable
 internal fun LauncherContentScreenPreview() {
     CashbookTheme {
         LauncherContentScreen(
+            onMenuClick = {},
             onRecordItemEditClick = {},
         )
     }

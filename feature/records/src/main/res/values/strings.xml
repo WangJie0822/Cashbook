@@ -4,7 +4,9 @@
     <string name="current_month_income">本月收入</string>
     <string name="current_month_expend">本月支出</string>
     <string name="current_month_balance">本月结余</string>
-
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+    <string name="before_yesterday">前天</string>
     <string name="income">收入</string>
     <string name="expend">支出</string>
     <string name="transfer">转账</string>

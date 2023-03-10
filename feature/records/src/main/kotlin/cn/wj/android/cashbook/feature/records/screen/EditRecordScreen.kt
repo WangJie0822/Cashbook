@@ -26,8 +26,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetLayout
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ModalBottomSheetScaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
@@ -158,7 +157,52 @@ internal fun EditRecordScreen(
         SnackbarHostState()
     }
 
-    ModalBottomSheetLayout(
+    ModalBottomSheetScaffold(
+        topBar = {
+            EditRecordTopBar(
+                selectedTabIndex = selectedTypeCategory.position,
+                onTabSelected = viewModel::onTypeCategoryTabSelected,
+                onBackClick = onBackClick,
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                coroutineScope.launch {
+                    val result = viewModel.trySaveRecord()
+                    if (result is ResultModel.Failure<*>) {
+                        when (result.code) {
+                            ResultModel.Failure.FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO -> {
+                                // 金额不能为 0
+                                snackbarHostState.showSnackbar(R.string.amount_must_not_be_zero.string)
+                            }
+
+                            ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL,
+                            ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY -> {
+                                // 未选择类型或类型与支出分类不匹配
+                                snackbarHostState.showSnackbar(R.string.please_select_type.string)
+                            }
+
+                            else -> {
+                                // 保存失败
+                                snackbarHostState.showSnackbar(
+                                    R.string.save_failure_format.string.format(
+                                        result.code
+                                    )
+                                )
+                            }
+                        }
+                    } else {
+                        // 保存成功，关闭当前界面
+                        onBackClick()
+                    }
+                }
+            }) {
+                Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
+            }
+        },
         sheetState = sheetState,
         sheetContent = {
             // 底部弹窗
@@ -232,235 +276,187 @@ internal fun EditRecordScreen(
                     }
                 }
             }
-
-        }) {
-        Scaffold(
-            topBar = {
-                EditRecordTopBar(
-                    selectedTabIndex = selectedTypeCategory.position,
-                    onTabSelected = viewModel::onTypeCategoryTabSelected,
-                    onBackClick = onBackClick,
-                )
-            },
-            snackbarHost = {
-                SnackbarHost(snackbarHostState)
-            },
-            floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    coroutineScope.launch {
-                        val result = viewModel.trySaveRecord()
-                        if (result is ResultModel.Failure<*>) {
-                            when (result.code) {
-                                ResultModel.Failure.FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO -> {
-                                    // 金额不能为 0
-                                    snackbarHostState.showSnackbar(R.string.amount_must_not_be_zero.string)
+        },
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            selectTypeList(
+                selectedTypeCategory,
+                selectedType,
+                {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                            .animateItemPlacement(),
+                    ) {
+                        // 金额显示
+                        Amount(
+                            amount = amount,
+                            primaryColor = primaryColor,
+                            onAmountClick = {
+                                viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.AMOUNT)
+                                coroutineScope.launch {
+                                    sheetState.show()
                                 }
-
-                                ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL,
-                                ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY -> {
-                                    // 未选择类型或类型与支出分类不匹配
-                                    snackbarHostState.showSnackbar(R.string.please_select_type.string)
-                                }
-
-                                else -> {
-                                    // 保存失败
-                                    snackbarHostState.showSnackbar(
-                                        R.string.save_failure_format.string.format(
-                                            result.code
-                                        )
-                                    )
-                                }
-                            }
-                        } else {
-                            // 保存成功，关闭当前界面
-                            onBackClick()
-                        }
+                            },
+                        )
+                        Divider()
+                        Text(
+                            text = stringResource(id = R.string.record_type),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                        )
                     }
-                }) {
-                    Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
-                }
-            },
-        ) { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
-                selectTypeList(
-                    selectedTypeCategory,
-                    selectedType,
-                    {
-                        Column(
+                },
+                {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                            .animateItemPlacement(),
+                    ) {
+                        Divider()
+                        // 备注信息
+                        Remark(
+                            remark = remark,
+                            onRemarkTextChanged = viewModel::onRemarkTextChanged
+                        )
+
+                        // 其他选项
+                        FlowRow(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                                .animateItemPlacement(),
+                                .padding(top = 8.dp),
+                            mainAxisSpacing = 8.dp,
+                            crossAxisSpacing = 4.dp,
                         ) {
-                            // 金额显示
-                            Amount(
-                                amount = amount,
-                                primaryColor = primaryColor,
-                                onAmountClick = {
-                                    viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.AMOUNT)
+                            // 目标资产
+                            val hasAsset = assetName.isNotBlank()
+                            FilterChip(
+                                selected = hasAsset,
+                                onClick = {
+                                    viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.ASSETS)
                                     coroutineScope.launch {
                                         sheetState.show()
                                     }
                                 },
-                            )
-                            Divider()
-                            Text(
-                                text = stringResource(id = R.string.record_type),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                            )
-                        }
-                    },
-                    {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                                .animateItemPlacement(),
-                        ) {
-                            Divider()
-                            // 备注信息
-                            Remark(
-                                remark = remark,
-                                onRemarkTextChanged = viewModel::onRemarkTextChanged
+                                label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":$assetName" else "") },
                             )
 
-                            // 其他选项
-                            FlowRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp),
-                                mainAxisSpacing = 8.dp,
-                                crossAxisSpacing = 4.dp,
-                            ) {
-                                // 目标资产
-                                val hasAsset = assetName.isNotBlank()
+                            if (selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                                // 只有转账类型显示关联资产
+                                val hasRelatedAsset = relatedAssetName.isNotBlank()
                                 FilterChip(
-                                    selected = hasAsset,
+                                    selected = hasRelatedAsset,
                                     onClick = {
-                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.ASSETS)
+                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.RELATED_ASSETS)
                                         coroutineScope.launch {
                                             sheetState.show()
                                         }
                                     },
-                                    label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":$assetName" else "") },
+                                    label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":$relatedAssetName" else "") },
                                 )
+                            }
 
-                                if (selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                                    // 只有转账类型显示关联资产
-                                    val hasRelatedAsset = relatedAssetName.isNotBlank()
-                                    FilterChip(
-                                        selected = hasRelatedAsset,
-                                        onClick = {
-                                            viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.RELATED_ASSETS)
-                                            coroutineScope.launch {
-                                                sheetState.show()
-                                            }
-                                        },
-                                        label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":$relatedAssetName" else "") },
+                            val activity = LocalContext.current as FragmentActivity
+                            // 记录时间
+                            FilterChip(
+                                selected = true,
+                                onClick = {
+                                    // FIXME 临时方案，后续需要修改
+                                    var date = dateTime.parseDateLong().dateFormat(
+                                        DATE_FORMAT_DATE
                                     )
-                                }
+                                    var time = dateTime.parseDateLong().dateFormat(
+                                        DATE_FORMAT_TIME
+                                    )
+                                    val datePicker = MaterialDatePicker.Builder.datePicker()
+                                        .setSelection(dateTime.parseDateLong())
+                                        .build()
+                                    val timePicker = MaterialTimePicker.Builder()
+                                        .setTimeFormat(CLOCK_24H)
+                                        .setHour(time.split(":").first().toIntOrZero())
+                                        .setMinute(time.split(":").last().toIntOrZero())
+                                        .build()
+                                    timePicker.addOnPositiveButtonClickListener {
+                                        time =
+                                            (timePicker.hour.completeZero() + ":" + timePicker.minute.completeZero())
+                                        viewModel.onDateTimePicked("$date ${time}:00")
+                                    }
+                                    datePicker.addOnPositiveButtonClickListener {
+                                        date = it.dateFormat(DATE_FORMAT_DATE)
+                                        timePicker.show(activity.supportFragmentManager, null)
+                                    }
+                                    datePicker.show(activity.supportFragmentManager, null)
+                                },
+                                label = { Text(text = dateTime) },
+                            )
 
-                                val activity = LocalContext.current as FragmentActivity
-                                // 记录时间
+                            // 标签
+                            val hasTags = tagsText.isNotBlank()
+                            FilterChip(
+                                selected = hasTags,
+                                onClick = {
+                                    viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.TAGS)
+                                    coroutineScope.launch {
+                                        sheetState.show()
+                                    }
+                                },
+                                label = { Text(text = stringResource(id = R.string.tags) + if (hasTags) ":$tagsText" else "") },
+                            )
+
+                            // TODO 关联的支出记录
+
+                            if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+                                // 只有支出类型显示是否可报销
                                 FilterChip(
-                                    selected = true,
-                                    onClick = {
-                                        // FIXME 临时方案，后续需要修改
-                                        var date = dateTime.parseDateLong().dateFormat(
-                                            DATE_FORMAT_DATE
-                                        )
-                                        var time = dateTime.parseDateLong().dateFormat(
-                                            DATE_FORMAT_TIME
-                                        )
-                                        val datePicker = MaterialDatePicker.Builder.datePicker()
-                                            .setSelection(dateTime.parseDateLong())
-                                            .build()
-                                        val timePicker = MaterialTimePicker.Builder()
-                                            .setTimeFormat(CLOCK_24H)
-                                            .setHour(time.split(":").first().toIntOrZero())
-                                            .setMinute(time.split(":").last().toIntOrZero())
-                                            .build()
-                                        timePicker.addOnPositiveButtonClickListener {
-                                            time =
-                                                (timePicker.hour.completeZero() + ":" + timePicker.minute.completeZero())
-                                            viewModel.onDateTimePicked("$date ${time}:00")
+                                    selected = reimbursable,
+                                    onClick = viewModel::onReimbursableClick,
+                                    leadingIcon = {
+                                        if (reimbursable) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                            )
                                         }
-                                        datePicker.addOnPositiveButtonClickListener {
-                                            date = it.dateFormat(DATE_FORMAT_DATE)
-                                            timePicker.show(activity.supportFragmentManager, null)
-                                        }
-                                        datePicker.show(activity.supportFragmentManager, null)
                                     },
-                                    label = { Text(text = dateTime) },
+                                    label = { Text(text = stringResource(id = R.string.reimbursable)) },
                                 )
+                            }
 
-                                // 标签
-                                val hasTags = tagsText.isNotBlank()
+                            // 手续费
+                            val hasCharges = charges.isNotBlank()
+                            FilterChip(
+                                selected = hasCharges,
+                                onClick = {
+                                    viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CHARGES)
+                                    coroutineScope.launch {
+                                        sheetState.show()
+                                    }
+                                },
+                                label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${Symbol.rmb}$charges" else "") },
+                            )
+
+                            if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
+                                // 非收入类型才有优惠
+                                val hasConcessions = concessions.isNotBlank()
                                 FilterChip(
-                                    selected = hasTags,
+                                    selected = hasConcessions,
                                     onClick = {
-                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.TAGS)
+                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CONCESSIONS)
                                         coroutineScope.launch {
                                             sheetState.show()
                                         }
                                     },
-                                    label = { Text(text = stringResource(id = R.string.tags) + if (hasTags) ":$tagsText" else "") },
+                                    label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.rmb}$concessions" else "") },
                                 )
-
-                                // TODO 关联的支出记录
-
-                                if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                                    // 只有支出类型显示是否可报销
-                                    FilterChip(
-                                        selected = reimbursable,
-                                        onClick = viewModel::onReimbursableClick,
-                                        leadingIcon = {
-                                            if (reimbursable) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Check,
-                                                    contentDescription = null,
-                                                )
-                                            }
-                                        },
-                                        label = { Text(text = stringResource(id = R.string.reimbursable)) },
-                                    )
-                                }
-
-                                // 手续费
-                                val hasCharges = charges.isNotBlank()
-                                FilterChip(
-                                    selected = hasCharges,
-                                    onClick = {
-                                        viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CHARGES)
-                                        coroutineScope.launch {
-                                            sheetState.show()
-                                        }
-                                    },
-                                    label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${Symbol.rmb}$charges" else "") },
-                                )
-
-                                if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
-                                    // 非收入类型才有优惠
-                                    val hasConcessions = concessions.isNotBlank()
-                                    FilterChip(
-                                        selected = hasConcessions,
-                                        onClick = {
-                                            viewModel.onBottomSheetAction(EditRecordBottomSheetEnum.CONCESSIONS)
-                                            coroutineScope.launch {
-                                                sheetState.show()
-                                            }
-                                        },
-                                        label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.rmb}$concessions" else "") },
-                                    )
-                                }
                             }
                         }
-                    },
-                    viewModel::onTypeClick,
-                )
-            }
+                    }
+                },
+                viewModel::onTypeClick,
+            )
         }
     }
 }
