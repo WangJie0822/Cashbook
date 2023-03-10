@@ -64,6 +64,12 @@ fun LauncherCollapsedTitleContent() {
 }
 
 @Composable
-fun LauncherContent(modifier: Modifier) {
-    LauncherContentScreen(modifier)
+fun LauncherContent(
+    modifier: Modifier,
+    onRecordItemEditClick: (Long) -> Unit,
+) {
+    LauncherContentScreen(
+        modifier = modifier,
+        onRecordItemEditClick = onRecordItemEditClick,
+    )
 }

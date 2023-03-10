@@ -1,7 +1,5 @@
 package cn.wj.android.cashbook.domain.usecase
 
-import android.util.Log
-import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.tools.getIdByString
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
@@ -35,7 +33,6 @@ class GetRecordTypeListUseCase @Inject constructor(
             RecordTypeCategoryEnum.TRANSFER -> typeRepository.firstTransferTypeListData
         }
             .map { list ->
-                logger("111").d(list.toString())
                 list.map { model ->
                     model.asEntity(
                         child = typeRepository.getSecondRecordTypeListByParentId(model.id)
@@ -46,8 +43,7 @@ class GetRecordTypeListUseCase @Inject constructor(
                     .sortedBy { it.sort }
             }
             .map { list ->
-                logger("222").d(selectedType.toString() + "  ---   " + list.toString())
-                val selectedEntity = selectedType ?: list.first().child.first()
+                val selectedEntity = selectedType ?: list.first()
                 // 最终输出结果
                 val result = arrayListOf<RecordTypeEntity>()
                 // 是否选中一级类型
@@ -67,7 +63,6 @@ class GetRecordTypeListUseCase @Inject constructor(
                         val childCount = first.child.size
                         first.child.forEachIndexed { index, second ->
                             // 二级分类是否选中
-                            logger("444").d(second)
                             val secondSelected = if (selectFirst) {
                                 false
                             } else {
@@ -90,7 +85,6 @@ class GetRecordTypeListUseCase @Inject constructor(
                 }
                 // 在末尾添加设置数据
                 result.add(RECORD_TYPE_SETTINGS)
-                logger("333").d(result.toString())
                 result.toList()
             }
             .first()

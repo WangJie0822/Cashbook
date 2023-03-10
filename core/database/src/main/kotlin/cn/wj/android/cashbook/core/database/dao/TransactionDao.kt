@@ -45,7 +45,7 @@ interface TransactionDao {
 
     @Query(
         value = """
-        SELECT * FROM db_record WHERE id=:assetId
+        SELECT * FROM db_asset WHERE id=:assetId
     """
     )
     fun queryAssetById(assetId: Long): AssetTable?
@@ -57,14 +57,62 @@ interface TransactionDao {
     )
     fun queryTypeById(typeId: Long): TypeTable?
 
+    @Query(
+        value = """
+        SELECT * FROM db_record WHERE id=:recordId
+    """
+    )
+    fun queryRecordById(recordId: Long): RecordTable?
+
     @Throws(DataTransactionException::class)
     @Transaction
-    fun updateRecord(recordTable: RecordTable, tags: List<Long>) {
-        // 获取类型信息
-        val type = queryTypeById(recordTable.typeId)
-            ?: throw DataTransactionException("Type must not be null")
-        val category = RecordTypeCategoryEnum.valueOf(type.typeCategory)
-        val insert = null == recordTable.id
+    fun updateRecordTransaction(recordTable: RecordTable, tags: List<Long>) {
+        if (null != recordTable.id) {
+            // 修改记录，获取之前记录信息
+            val oldRecord = queryRecordById(recordTable.id)
+                ?: throw DataTransactionException("Record id not found")
+            val oldType = queryTypeById(oldRecord.typeId)
+                ?: throw DataTransactionException("Type must not be null")
+            val oldCategory = RecordTypeCategoryEnum.valueOf(oldType.typeCategory)
+            // 计算之前记录涉及金额
+            val oldRecordAmount = if (oldCategory == RecordTypeCategoryEnum.INCOME) {
+                // 收入，金额 - 手续费
+                oldRecord.amount.toBigDecimalOrZero() - oldRecord.charge.toBigDecimalOrZero()
+            } else {
+                // 支出、转账，金额 + 手续费 - 优惠
+                oldRecord.amount.toBigDecimal() + oldRecord.charge.toBigDecimalOrZero() - oldRecord.concessions.toBigDecimalOrZero()
+            }
+            queryAssetById(oldRecord.assetId)?.let { asset ->
+                // 计算回退已用额度 or 余额
+                val balance =
+                    if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                        // 信用卡账户，已用额度 - 记录金额
+                        asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                    } else {
+                        // 非信用卡账户，余额 + 记录金额
+                        asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                    }
+                // 更新资产
+                updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+            }
+            if (oldCategory == RecordTypeCategoryEnum.TRANSFER) {
+                // 转账类型，更新关联资产信息
+                queryAssetById(oldRecord.intoAssetId)?.let { asset ->
+                    // 计算回退已用额度 or 余额
+                    val balance =
+                        if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                            // 信用卡账户，已用额度 + 记录金额
+                            asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                        } else {
+                            // 非信用卡账户，余额 - 记录金额
+                            asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                        }
+                    // 更新资产
+                    updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+                }
+            }
+        }
+
         // 更新或插入记录
         val id = if (recordTable.id == null) {
             insertRecord(recordTable)
@@ -72,6 +120,11 @@ interface TransactionDao {
             updateRecord(recordTable)
             recordTable.id
         }
+
+        // 获取类型信息
+        val type = queryTypeById(recordTable.typeId)
+            ?: throw DataTransactionException("Type must not be null")
+        val category = RecordTypeCategoryEnum.valueOf(type.typeCategory)
 
         // 计算此次记录涉及金额
         val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
@@ -81,6 +134,7 @@ interface TransactionDao {
             // 支出、转账，金额 + 手续费 - 优惠
             recordTable.amount.toBigDecimal() + recordTable.charge.toBigDecimalOrZero() - recordTable.concessions.toBigDecimalOrZero()
         }
+
         // 更新相关资产信息
         queryAssetById(recordTable.assetId)?.let { asset ->
             // 计算已用额度 or 余额
@@ -113,7 +167,7 @@ interface TransactionDao {
             }
         }
 
-        if (!insert) {
+        if (null != recordTable.id) {
             // 更新数据，移除旧的关联标签
             deleteOldRelatedTags(id)
         }
@@ -123,5 +177,7 @@ interface TransactionDao {
             insertTags.add(TagWithRecordTable(id = null, recordId = id, tagId = it))
         }
         insertRelatedTags(insertTags)
+
+        // TODO 更新关联记录
     }
 }

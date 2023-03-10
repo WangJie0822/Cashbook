@@ -76,7 +76,7 @@ fun RecordModel.asEntity(): RecordEntity {
         this.concessions,
         this.remark,
         this.reimbursable,
-        this.modifyTime
+        this.recordTime
     )
 }
 
@@ -92,6 +92,6 @@ fun RecordEntity.asModel(): RecordModel {
         this.concessions,
         this.remark,
         this.reimbursable,
-        this.modifyTime
+        this.recordTime
     )
 }

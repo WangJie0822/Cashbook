@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.core.model.entity
+package cn.wj.android.cashbook.core.model.model
 
 
 /**
@@ -6,9 +6,9 @@ package cn.wj.android.cashbook.core.model.entity
  *
  * @param id 主键自增长
  *  @param booksId 关联账本 id
- * @param typeId 记录类型 id
- * @param assetId 关联资产 id
- * @param relatedAssetId 转账转入资产 id
+ * @param type 记录类型
+ * @param asset 关联资产
+ * @param relatedAsset 转账转入资产
  * @param amount 记录金额
  * @param charges 转账手续费
  * @param concessions 优惠
@@ -18,16 +18,17 @@ package cn.wj.android.cashbook.core.model.entity
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
-data class RecordEntity(
+data class RecordViewsModel(
     val id: Long,
     val booksId: Long,
-    val typeId: Long,
-    val assetId: Long,
-    val relatedAssetId: Long,
+    val type: RecordTypeModel,
+    val asset: AssetModel?,
+    val relatedAsset: AssetModel?,
     val amount: String,
     val charges: String,
     val concessions: String,
     val remark: String,
     val reimbursable: Boolean,
+    val relatedTags: List<TagModel>,
     val recordTime: String,
 )

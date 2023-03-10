@@ -17,7 +17,7 @@ import androidx.room.PrimaryKey
  * @param charge 手续费
  * @param remark 备注
  * @param reimbursable 能否报销
- * @param modifyTime 修改时间
+ * @param recordTime 修改时间
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
@@ -33,5 +33,5 @@ data class RecordTable(
     @ColumnInfo(name = "charge") val charge: Double,
     val remark: String,
     val reimbursable: Int,
-    @ColumnInfo(name = "modify_time") val modifyTime: Long
+    @ColumnInfo(name = "record_time") val recordTime: Long
 )

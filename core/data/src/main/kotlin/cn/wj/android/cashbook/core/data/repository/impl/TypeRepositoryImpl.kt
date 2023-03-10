@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.DataVersion
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
@@ -12,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
@@ -28,7 +28,7 @@ class TypeRepositoryImpl @Inject constructor(
 
     private val dataVersion: DataVersion = MutableStateFlow(0)
 
-    private val firstTypeListData: Flow<List<RecordTypeModel>> = dataVersion.map {
+    private val firstTypeListData: Flow<List<RecordTypeModel>> = dataVersion.mapLatest {
         getFirstRecordTypeList()
     }
 
@@ -64,10 +64,12 @@ class TypeRepositoryImpl @Inject constructor(
 
     private suspend fun getFirstRecordTypeList(): List<RecordTypeModel> =
         withContext(Dispatchers.IO) {
-            typeDao.queryByLevel(TypeLevelEnum.FIRST.name)
+            val result = typeDao.queryByLevel(TypeLevelEnum.FIRST.name)
                 .map {
                     it.asModel()
                 }
+            this@TypeRepositoryImpl.logger().i("getFirstRecordTypeList() result = <$result>")
+            result
         }
 
     override suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel> =

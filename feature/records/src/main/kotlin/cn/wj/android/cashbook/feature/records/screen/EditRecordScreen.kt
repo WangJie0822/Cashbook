@@ -385,7 +385,7 @@ internal fun EditRecordScreen(
                                         timePicker.addOnPositiveButtonClickListener {
                                             time =
                                                 (timePicker.hour.completeZero() + ":" + timePicker.minute.completeZero())
-                                            viewModel.onDateTimePicked("$date $time")
+                                            viewModel.onDateTimePicked("$date ${time}:00")
                                         }
                                         datePicker.addOnPositiveButtonClickListener {
                                             date = it.dateFormat(DATE_FORMAT_DATE)

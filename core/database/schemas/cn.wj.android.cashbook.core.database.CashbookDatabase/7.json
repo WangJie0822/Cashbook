@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "7946997bb9e0fd258081d442d10ea0a8",
+    "identityHash": "ad76d43925cd3ecedb62ec63e44d8bd1",
     "entities": [
       {
         "tableName": "db_books",
@@ -210,7 +210,7 @@
       },
       {
         "tableName": "db_record",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `type_id` INTEGER NOT NULL, `asset_id` INTEGER NOT NULL, `into_asset_id` INTEGER NOT NULL, `books_id` INTEGER NOT NULL, `amount` REAL NOT NULL, `concessions` REAL NOT NULL, `charge` REAL NOT NULL, `remark` TEXT NOT NULL, `reimbursable` INTEGER NOT NULL, `modify_time` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `type_id` INTEGER NOT NULL, `asset_id` INTEGER NOT NULL, `into_asset_id` INTEGER NOT NULL, `books_id` INTEGER NOT NULL, `amount` REAL NOT NULL, `concessions` REAL NOT NULL, `charge` REAL NOT NULL, `remark` TEXT NOT NULL, `reimbursable` INTEGER NOT NULL, `record_time` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -273,8 +273,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "modifyTime",
-            "columnName": "modify_time",
+            "fieldPath": "recordTime",
+            "columnName": "record_time",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -388,7 +388,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7946997bb9e0fd258081d442d10ea0a8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ad76d43925cd3ecedb62ec63e44d8bd1')"
     ]
   }
 }

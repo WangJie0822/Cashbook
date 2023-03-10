@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalAnimationApi::class)
-
 package cn.wj.android.cashbook.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -40,7 +38,7 @@ private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 /** 应用入口 */
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalLayoutApi::class
+    ExperimentalLayoutApi::class, ExperimentalAnimationApi::class
 )
 @Composable
 fun MainApp() {
@@ -106,7 +104,12 @@ fun MainApp() {
                     pinnedTitle = { LauncherPinnedTitleContent() },
                     collapsedTitle = { LauncherCollapsedTitleContent() },
                     content = { modifier ->
-                        LauncherContent(modifier = modifier)
+                        LauncherContent(
+                            modifier = modifier,
+                            onRecordItemEditClick = {
+                                navController.naviToEditRecord(it)
+                            },
+                        )
                     },
                 )
                 myTagsScreen(

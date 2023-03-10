@@ -8,6 +8,7 @@ package cn.wj.android.cashbook.core.common
 
 /** 数据库文件名 */
 const val DB_FILE_NAME = "cashbook.db"
+const val DB_INIT_FILE_NAME = "cashbook_init.db"
 
 /** 开关 - 开 */
 const val SWITCH_INT_ON = 1

@@ -14,7 +14,7 @@ package cn.wj.android.cashbook.core.model.model
  * @param concessions 优惠
  * @param remark 备注
  * @param reimbursable 能否报销
- * @param modifyTime 修改时间
+ * @param recordTime 修改时间
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
@@ -29,5 +29,5 @@ data class RecordModel(
     val concessions: String,
     val remark: String,
     val reimbursable: Boolean,
-    val modifyTime: String,
+    val recordTime: String,
 )

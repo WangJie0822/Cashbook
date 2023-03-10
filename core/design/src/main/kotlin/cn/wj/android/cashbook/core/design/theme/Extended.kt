@@ -11,9 +11,9 @@ import androidx.compose.ui.graphics.Color
 data class ExtendedColors(
     val selected: Color = Color.Unspecified,
     val unselected: Color = Color.Unspecified,
-    val income:Color = Color.Unspecified,
-    val expenditure:Color = Color.Unspecified,
-    val transfer:Color = Color.Unspecified,
+    val income: Color = Color.Unspecified,
+    val expenditure: Color = Color.Unspecified,
+    val transfer: Color = Color.Unspecified,
 )
 
 /**

@@ -27,7 +27,6 @@ import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.asEntity
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.math.BigDecimal
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -151,7 +150,7 @@ class EditRecordViewModel @Inject constructor(
     /** 时间文本 */
     val dateTimeData: StateFlow<String> = recordData
         .mapLatest {
-            it.modifyTime
+            it.recordTime
         }
         .stateIn(
             scope = viewModelScope,
@@ -165,7 +164,7 @@ class EditRecordViewModel @Inject constructor(
     }
 
     /** 可修改的标签数据 */
-    private val mutableTagsData: MutableStateFlow<List<TagEntity>?> = MutableStateFlow(listOf())
+    private val mutableTagsData: MutableStateFlow<List<TagEntity>?> = MutableStateFlow(null)
 
     /** 最终标签数据 */
     private val tagsData: StateFlow<List<TagEntity>> =
@@ -211,7 +210,7 @@ class EditRecordViewModel @Inject constructor(
     /** 手续费文本 */
     val chargesData: StateFlow<String> = recordData
         .mapLatest {
-            if (it.charges.toBigDecimalOrZero() == BigDecimal.ZERO) {
+            if (it.charges.toDoubleOrZero() == 0.0) {
                 ""
             } else {
                 it.charges
@@ -226,7 +225,7 @@ class EditRecordViewModel @Inject constructor(
     /** 优惠文本 */
     val concessionsData: StateFlow<String> = recordData
         .mapLatest {
-            if (it.concessions.toBigDecimalOrZero() == BigDecimal.ZERO) {
+            if (it.concessions.toDoubleOrZero() == 0.0) {
                 ""
             } else {
                 it.concessions
@@ -295,7 +294,7 @@ class EditRecordViewModel @Inject constructor(
 
     fun onDateTimePicked(dateTime: String) {
         viewModelScope.launch {
-            mutableRecordData.value = recordData.first().copy(modifyTime = dateTime)
+            mutableRecordData.value = recordData.first().copy(recordTime = dateTime)
         }
     }
 
@@ -345,7 +344,9 @@ class EditRecordViewModel @Inject constructor(
         }
         // 检查类型数据，类型不能为空
         val typeEntity =
-            selectedTypeData.value ?: return ResultModel.failure(FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL)
+            selectedTypeData.value ?: return ResultModel.failure(
+                FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL
+            )
         // 支出分类
         val typeCategory = typeCategory.value
         if (typeEntity.typeCategory != typeCategory) {
@@ -355,7 +356,14 @@ class EditRecordViewModel @Inject constructor(
 
         // TODO 关联记录
         return try {
-            saveRecordUseCase(recordEntity, tagsData.value)
+            saveRecordUseCase(
+                recordEntity.copy(
+                    relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
+                    concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) "" else recordEntity.concessions,
+                    reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
+                ),
+                tagsData.value,
+            )
             ResultModel.success()
         } catch (throwable: Throwable) {
             ResultModel.failure(throwable)
@@ -363,7 +371,7 @@ class EditRecordViewModel @Inject constructor(
     }
 }
 
-val AssetEntity.displayBalance: String
+private val AssetEntity.displayBalance: String
     get() = if (type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
         (totalAmount.toBigDecimalOrZero() - balance.toBigDecimalOrZero()).decimalFormat()
     } else {

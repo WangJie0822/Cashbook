@@ -48,6 +48,10 @@ internal object CalculatorUtils {
     }
 
     fun onComputeSignClick(text: String, sign: String): String {
+        if (text.startsWith(SYMBOL_ERROR)) {
+            // 错误提示，不处理
+            return text
+        }
         // 最后一个符号
         val last = text.last().toString()
         return if (hasComputeSign(last) || last == SYMBOL_POINT) {
@@ -63,6 +67,10 @@ internal object CalculatorUtils {
     }
 
     fun onNumberClick(text: String, number: String): String {
+        if (text.startsWith(SYMBOL_ERROR)) {
+            // 错误提示，不处理
+            return text
+        }
         return when {
             text == SYMBOL_ZERO -> {
                 // 为 0 时直接替换值
@@ -82,6 +90,10 @@ internal object CalculatorUtils {
     }
 
     fun onPointClick(text: String): String {
+        if (text.startsWith(SYMBOL_ERROR)) {
+            // 错误提示，不处理
+            return text
+        }
         val last = text.last().toString()
         return if (hasComputeSign(last) || last == SYMBOL_BRACKET_START) {
             // 是计算符号或括号开始，添加 0
@@ -107,6 +119,10 @@ internal object CalculatorUtils {
     }
 
     fun onBracketClick(text: String): String {
+        if (text.startsWith(SYMBOL_ERROR)) {
+            // 错误提示，不处理
+            return text
+        }
         val last = text.last().toString()
         val startCount = text.count { it.toString() == SYMBOL_BRACKET_START }
         val endCount = text.count { it.toString() == SYMBOL_BRACKET_END }
@@ -138,15 +154,17 @@ internal object CalculatorUtils {
     }
 
     fun onEqualsClick(text: String): String {
+        if (text.startsWith(SYMBOL_ERROR)) {
+            // 错误提示，不处理
+            return text
+        }
         val result = calculatorFromString(text)
-        return if (result.startsWith(SYMBOL_ERROR)) {
+        if (result.startsWith(SYMBOL_ERROR)) {
             if (history.isBlank()) {
                 history = text
             }
-            result.replace(SYMBOL_ERROR, "")
-        } else {
-            result
         }
+        return result
     }
 
     private fun calculatorFromString(text: String): String {

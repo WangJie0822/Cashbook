@@ -1,13 +1,8 @@
 package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
 import cn.wj.android.cashbook.core.database.table.RecordTable
-import cn.wj.android.cashbook.core.database.table.TagTable
-import kotlinx.coroutines.flow.Flow
 
 /**
  * 记录数据库操作类
@@ -17,6 +12,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RecordDao {
 
-    @Query("SELECT * FROM db_record WHERE id=:recordId")
-    suspend fun queryById(recordId:Long):RecordTable?
+    @Query(
+        value = """
+        SELECT * FROM db_record WHERE id=:recordId
+    """
+    )
+    suspend fun queryById(recordId: Long): RecordTable?
+
+    @Query(
+        value = """
+        SELECT * FROM db_record WHERE books_id=:booksId AND record_time>=:dateTime
+    """
+    )
+    suspend fun queryByBooksIdAfterDate(booksId: Long, dateTime: Long): List<RecordTable>
 }

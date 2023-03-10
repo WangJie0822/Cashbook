@@ -8,8 +8,11 @@ import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
+import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
+
+    val currentMonthRecordListData: Flow<List<RecordModel>>
 
     suspend fun queryById(recordId: Long): RecordModel?
 
@@ -28,7 +31,7 @@ internal fun RecordTable.asModel(): RecordModel {
         concessions = this.concessions.toString(),
         remark = this.remark,
         reimbursable = this.reimbursable == SWITCH_INT_ON,
-        modifyTime = this.modifyTime.dateFormat(),
+        recordTime = this.recordTime.dateFormat(),
     )
 }
 
@@ -44,6 +47,6 @@ internal fun RecordModel.asTable(): RecordTable {
         concessions = this.concessions.toDoubleOrZero(),
         remark = this.remark,
         reimbursable = if (this.reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
-        modifyTime = this.modifyTime.parseDateLong(),
+        recordTime = this.recordTime.parseDateLong(),
     )
 }

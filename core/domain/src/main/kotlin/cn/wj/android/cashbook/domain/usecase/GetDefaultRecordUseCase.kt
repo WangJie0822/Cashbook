@@ -42,7 +42,7 @@ class GetDefaultRecordUseCase @Inject constructor(
             concessions = "",
             remark = "",
             reimbursable = false,
-            modifyTime = System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS),
+            recordTime = System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS),
         )
     }
 }

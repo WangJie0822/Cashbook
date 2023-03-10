@@ -40,6 +40,7 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
         TextField(
             value = text,
             onValueChange = { text = it },
+            readOnly = true,
             colors = TextFieldDefaults.outlinedTextFieldColors(textColor = primaryColor),
             modifier = Modifier.fillMaxWidth(),
         )

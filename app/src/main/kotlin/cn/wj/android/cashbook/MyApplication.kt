@@ -45,6 +45,11 @@ class MyApplication : Application() {
         })
         logger().d("MyApplication onCreate ${BuildConfig.VERSION_NAME}")
 
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            logger("UncaughtException").e(throwable, "UncaughtException $thread")
+            AppManager.finishAllActivity()
+        }
+
         // 初始化通知渠道
         initNotificationChannel()
 

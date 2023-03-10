@@ -36,6 +36,8 @@ internal fun LauncherCollapsedTitleScreenPreview() {
 @Composable
 internal fun LauncherContentScreenPreview() {
     CashbookTheme {
-        LauncherContentScreen()
+        LauncherContentScreen(
+            onRecordItemEditClick = {},
+        )
     }
 }
