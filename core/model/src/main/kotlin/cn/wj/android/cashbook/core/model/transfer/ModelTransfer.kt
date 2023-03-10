@@ -1,9 +1,11 @@
 package cn.wj.android.cashbook.core.model.transfer
 
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
+import cn.wj.android.cashbook.core.model.entity.BooksEntity
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.model.AssetModel
+import cn.wj.android.cashbook.core.model.model.BooksModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 
@@ -93,5 +95,14 @@ fun RecordEntity.asModel(): RecordModel {
         this.remark,
         this.reimbursable,
         this.recordTime
+    )
+}
+
+fun BooksModel.asEntity(): BooksEntity {
+    return BooksEntity(
+        id = this.id,
+        name = this.name,
+        description = this.description,
+        modifyTime = this.modifyTime
     )
 }

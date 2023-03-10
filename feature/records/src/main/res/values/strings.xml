@@ -9,6 +9,10 @@
     <string name="before_yesterday">前天</string>
     <string name="income">收入</string>
     <string name="expend">支出</string>
+    <string name="income_with_colon">收：</string>
+    <string name="expend_with_colon">支：</string>
+    <string name="launcher_no_data_hint">当前页仅显示本月数据</string>
+    <string name="launcher_no_data_button">点击查看其它月份</string>
     <string name="transfer">转账</string>
     <string name="record_type">记录类型</string>
     <string name="settings">设置</string>

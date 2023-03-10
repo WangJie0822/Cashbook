@@ -16,7 +16,6 @@ import cn.wj.android.cashbook.core.model.model.TagModel
 import java.util.Calendar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 
 class RecordRepositoryImpl @Inject constructor(
@@ -25,7 +24,7 @@ class RecordRepositoryImpl @Inject constructor(
     appPreferencesDataSource: AppPreferencesDataSource
 ) : RecordRepository {
 
-    private val dataVersion: DataVersion = MutableStateFlow(0)
+    private val dataVersion: DataVersion = DataVersion()
 
     override val currentMonthRecordListData: Flow<List<RecordModel>> =
         combine(dataVersion, appPreferencesDataSource.appData) { _, appData ->

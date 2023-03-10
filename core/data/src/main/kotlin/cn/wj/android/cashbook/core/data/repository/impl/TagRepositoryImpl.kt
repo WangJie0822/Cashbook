@@ -10,7 +10,6 @@ import cn.wj.android.cashbook.core.model.model.TagModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -18,7 +17,7 @@ class TagRepositoryImpl @Inject constructor(
     private val tagDao: TagDao
 ) : TagRepository {
 
-    private val dataVersion: DataVersion = MutableStateFlow(0)
+    private val dataVersion: DataVersion = DataVersion()
 
     override val tagListData: Flow<List<TagModel>> = dataVersion.map {
         getAllTagList()

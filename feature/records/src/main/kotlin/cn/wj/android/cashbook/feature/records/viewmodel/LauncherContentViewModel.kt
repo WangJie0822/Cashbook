@@ -4,17 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.model.model.RecordViewsModel
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.domain.usecase.GetCurrentBooksUseCase
 import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 
 /**
@@ -25,26 +27,86 @@ import kotlinx.coroutines.flow.stateIn
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class LauncherContentViewModel @Inject constructor(
-    recordRepository: RecordRepository,
+    getCurrentBooksUseCase: GetCurrentBooksUseCase,
     getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
 ) : ViewModel() {
 
-    // TODO
-    val bookName: StateFlow<String> = flowOf("默认账本")
+    val bookName: StateFlow<String> = getCurrentBooksUseCase()
+        .mapLatest { it.name }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "默认账本",
+            initialValue = "",
         )
 
-    val monthIncome: StateFlow<String> = flowOf("0")
+    val currentMonthRecordListMapData: StateFlow<Map<String, List<RecordViewsEntity>>> =
+        getCurrentMonthRecordViewsUseCase()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = mapOf(),
+            )
+
+    private val currentMonthRecordListData: Flow<List<RecordViewsEntity>> =
+        currentMonthRecordListMapData
+            .mapLatest { map ->
+                val result = arrayListOf<RecordViewsEntity>()
+                map.forEach {
+                    result.addAll(it.value)
+                }
+                result
+            }
+
+    val monthIncome: StateFlow<String> = currentMonthRecordListData
+        .mapLatest { recordList ->
+            var totalIncome = BigDecimal.ZERO
+            recordList.forEach { record ->
+                when (record.type.typeCategory) {
+                    RecordTypeCategoryEnum.EXPENDITURE -> {
+                        // 支出
+                    }
+
+                    RecordTypeCategoryEnum.INCOME -> {
+                        // 收入
+                        totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
+                    }
+
+                    RecordTypeCategoryEnum.TRANSFER -> {
+                        // 转账
+                        totalIncome += record.concessions.toBigDecimalOrZero()
+                    }
+                }
+            }
+            totalIncome.decimalFormat()
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = "0",
         )
 
-    val monthExpand: StateFlow<String> = flowOf("0")
+    val monthExpand: StateFlow<String> = currentMonthRecordListData
+        .mapLatest { recordList ->
+            var totalExpenditure = BigDecimal.ZERO
+            recordList.forEach { record ->
+                when (record.type.typeCategory) {
+                    RecordTypeCategoryEnum.EXPENDITURE -> {
+                        // 支出
+                        totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
+                    }
+
+                    RecordTypeCategoryEnum.INCOME -> {
+                        // 收入
+                    }
+
+                    RecordTypeCategoryEnum.TRANSFER -> {
+                        // 转账
+                        totalExpenditure += record.charges.toBigDecimalOrZero()
+                    }
+                }
+            }
+            totalExpenditure.decimalFormat()
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -52,19 +114,11 @@ class LauncherContentViewModel @Inject constructor(
         )
 
     val monthBalance: StateFlow<String> = combine(monthIncome, monthExpand) { income, expand ->
-        (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).toPlainString().decimalFormat()
+        (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
     }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = "0",
         )
-
-    val currentMonthRecordListData: StateFlow<Map<String, List<RecordViewsEntity>>> =
-        getCurrentMonthRecordViewsUseCase()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = mapOf(),
-            )
 }

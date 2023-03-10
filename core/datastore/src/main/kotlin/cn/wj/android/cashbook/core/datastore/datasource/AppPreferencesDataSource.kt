@@ -25,6 +25,10 @@ class AppPreferencesDataSource @Inject constructor(
             )
         }
 
+    suspend fun updateCurrentBookId(bookId: Long) {
+        appPreferences.updateData { it.copy { this.currentBookId = bookId } }
+    }
+
     suspend fun updateLastAssetId(lastAssetId: Long) {
         appPreferences.updateData { it.copy { this.lastAssetId = lastAssetId } }
     }

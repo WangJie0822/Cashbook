@@ -12,7 +12,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
@@ -26,7 +25,7 @@ class TypeRepositoryImpl @Inject constructor(
     private val typeDao: TypeDao,
 ) : TypeRepository {
 
-    private val dataVersion: DataVersion = MutableStateFlow(0)
+    private val dataVersion: DataVersion = DataVersion()
 
     private val firstTypeListData: Flow<List<RecordTypeModel>> = dataVersion.mapLatest {
         getFirstRecordTypeList()

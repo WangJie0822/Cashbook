@@ -3,9 +3,11 @@ package cn.wj.android.cashbook.feature.records.screen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,11 +33,13 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetLayout
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
+import cn.wj.android.cashbook.core.common.ext.decimalFormat
+import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
+import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.TopAppBar
 import cn.wj.android.cashbook.core.design.component.TopAppBarDefaults
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
@@ -58,12 +65,13 @@ import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.records.R
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
+import java.math.BigDecimal
 import java.util.Calendar
 
 /** 首页内容部分 */
 @OptIn(
-    ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterialApi::class
+    ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
 )
 @Composable
 internal fun LauncherContentScreen(
@@ -81,7 +89,7 @@ internal fun LauncherContentScreen(
     // 月结余
     val monthBalance by viewModel.monthBalance.collectAsStateWithLifecycle()
     // 记录数据
-    val recordMap by viewModel.currentMonthRecordListData.collectAsStateWithLifecycle()
+    val recordMap by viewModel.currentMonthRecordListMapData.collectAsStateWithLifecycle()
 
     val todayInt = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
@@ -111,57 +119,105 @@ internal fun LauncherContentScreen(
                 peekHeight = paddingValues.calculateTopPadding(),
                 frontLayerScrimColor = Color.Unspecified,
                 backLayerContent = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(paddingValues)
-                            .padding(16.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimary) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(paddingValues)
+                                .padding(16.dp),
                         ) {
+                            Column(
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text(
+                                    text = "${stringResource(id = R.string.current_month_income)} ${Symbol.rmb}$monthIncome",
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                                Text(
+                                    text = "${stringResource(id = R.string.current_month_balance)} ${Symbol.rmb}$monthBalance",
+                                )
+                            }
                             Text(
-                                text = "${stringResource(id = R.string.current_month_income)} ${Symbol.rmb}$monthIncome",
-                            )
-                            Spacer(modifier = Modifier.height(24.dp))
-                            Text(
-                                text = "${stringResource(id = R.string.current_month_balance)} ${Symbol.rmb}$monthBalance",
+                                modifier = Modifier.weight(1f),
+                                text = "${stringResource(id = R.string.current_month_expend)} ${Symbol.rmb}$monthExpand",
                             )
                         }
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = "${stringResource(id = R.string.current_month_expend)} ${Symbol.rmb}$monthExpand",
-                        )
                     }
                 },
                 frontLayerContent = {
-                    LazyColumn {
-                        recordMap.keys.reversed().forEach { key ->
-                            stickyHeader {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                                ) {
-                                    Text(
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        if (recordMap.isEmpty()) {
+                            Empty(
+                                imageResId = R.drawable.vector_no_data_200,
+                                hintResId = R.string.launcher_no_data_hint,
+                                buttonResId = R.string.launcher_no_data_button,
+                                onButtonClick = { onMenuClick(LauncherMenuAction.CALENDAR) },
+                            )
+                            return@Box
+                        }
+                        LazyColumn {
+                            recordMap.keys.reversed().forEach { key ->
+                                val recordList = recordMap[key] ?: listOf()
+                                stickyHeader {
+                                    Row(
                                         modifier = Modifier
-                                            .weight(1f),
-                                        text = when (key.toInt()) {
-                                            todayInt -> stringResource(id = R.string.today)
-                                            todayInt - 1 -> stringResource(id = R.string.yesterday)
-                                            todayInt - 2 -> stringResource(id = R.string.before_yesterday)
-                                            else -> key
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    ) {
+                                        Text(
+                                            modifier = Modifier
+                                                .weight(1f),
+                                            text = when (key.toInt()) {
+                                                todayInt -> stringResource(id = R.string.today)
+                                                todayInt - 1 -> stringResource(id = R.string.yesterday)
+                                                todayInt - 2 -> stringResource(id = R.string.before_yesterday)
+                                                else -> key
+                                            }
+                                        )
+                                        var totalExpenditure = BigDecimal.ZERO
+                                        var totalIncome = BigDecimal.ZERO
+                                        recordList.forEach { record ->
+                                            when (record.type.typeCategory) {
+                                                RecordTypeCategoryEnum.EXPENDITURE -> {
+                                                    // 支出
+                                                    totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
+                                                }
+
+                                                RecordTypeCategoryEnum.INCOME -> {
+                                                    // 收入
+                                                    totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
+                                                }
+
+                                                RecordTypeCategoryEnum.TRANSFER -> {
+                                                    // 转账
+                                                    totalExpenditure += record.charges.toBigDecimalOrZero()
+                                                    totalIncome += record.concessions.toBigDecimalOrZero()
+                                                }
+                                            }
                                         }
-                                    )
-                                    Text(text = "总计") // TODO
+                                        Text(text = buildString {
+                                            val hasIncome = totalIncome.toDouble() != 0.0
+                                            if (hasIncome) {
+                                                append(stringResource(id = R.string.income_with_colon) + Symbol.rmb + totalIncome.decimalFormat())
+                                            }
+                                            if (totalExpenditure.toDouble() != 0.0) {
+                                                if (hasIncome) {
+                                                    append(", ")
+                                                }
+                                                append(stringResource(id = R.string.expend_with_colon) + Symbol.rmb + totalExpenditure.decimalFormat())
+                                            }
+                                        })
+                                    }
                                 }
-                            }
-                            items(recordMap[key] ?: listOf(), key = { it.id }) {
-                                RecordListItem(
-                                    recordViewsEntity = it,
-                                    onRecordItemEditClick = onRecordItemEditClick
-                                )
+                                items(recordList, key = { it.id }) {
+                                    RecordListItem(
+                                        recordViewsEntity = it,
+                                        onRecordItemEditClick = onRecordItemEditClick
+                                    )
+                                }
                             }
                         }
                     }

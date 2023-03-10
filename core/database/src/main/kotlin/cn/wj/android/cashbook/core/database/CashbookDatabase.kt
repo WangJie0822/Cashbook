@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import cn.wj.android.cashbook.core.database.dao.AssetDao
+import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
@@ -41,5 +42,9 @@ abstract class CashbookDatabase : RoomDatabase() {
     /** 获取记录数据库操作接口 */
     abstract fun recordDao(): RecordDao
 
+    /** 获取账本数据库操作接口 */
+    abstract fun booksDao(): BooksDao
+
+    /** 复杂事务数据库操作接口 */
     abstract fun transactionDao(): TransactionDao
 }

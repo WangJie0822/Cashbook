@@ -13,7 +13,6 @@ import cn.wj.android.cashbook.core.model.transfer.asModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
 
@@ -27,7 +26,7 @@ class AssetRepositoryImpl @Inject constructor(
     appPreferencesDataSource: AppPreferencesDataSource,
 ) : AssetRepository {
 
-    private val dataVersion: DataVersion = MutableStateFlow(0)
+    private val dataVersion: DataVersion = DataVersion()
 
     override val currentVisibleAssetListData: Flow<List<AssetModel>> =
         combine(dataVersion, appPreferencesDataSource.appData) { _, appData ->

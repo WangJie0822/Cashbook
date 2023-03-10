@@ -10,3 +10,5 @@ fun DataVersion.updateVersion() {
         it + 1
     }
 }
+
+fun DataVersion(): MutableStateFlow<Int> = MutableStateFlow(0)
