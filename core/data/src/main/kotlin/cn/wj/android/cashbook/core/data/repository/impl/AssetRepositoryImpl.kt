@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
-import cn.wj.android.cashbook.core.common.model.DataVersion
+import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
@@ -26,10 +26,8 @@ class AssetRepositoryImpl @Inject constructor(
     appPreferencesDataSource: AppPreferencesDataSource,
 ) : AssetRepository {
 
-    private val dataVersion: DataVersion = DataVersion()
-
     override val currentVisibleAssetListData: Flow<List<AssetModel>> =
-        combine(dataVersion, appPreferencesDataSource.appData) { _, appData ->
+        combine(assetDataVersion, appPreferencesDataSource.appData) { _, appData ->
             getVisibleAssetsByBookId(appData.currentBookId)
         }
 
@@ -50,7 +48,7 @@ class AssetRepositoryImpl @Inject constructor(
             } else {
                 assetDao.update(table)
             }
-            dataVersion.updateVersion()
+            assetDataVersion.updateVersion()
         }
     }
 }

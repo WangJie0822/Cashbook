@@ -75,7 +75,7 @@ internal fun SelectTagBottomSheetScreen(
                     ) {
                         Text(
                             text = stringResource(id = R.string.add),
-                            color = MaterialTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }

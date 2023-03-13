@@ -26,8 +26,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BackdropScaffold
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,10 +37,15 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetLayout
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,8 +59,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
+import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
+import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.TopAppBar
 import cn.wj.android.cashbook.core.design.component.TopAppBarDefaults
@@ -63,10 +70,15 @@ import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.feature.records.R
+import cn.wj.android.cashbook.feature.records.model.RecordDialogState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import java.math.BigDecimal
 import java.util.Calendar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /** 首页内容部分 */
 @OptIn(
@@ -80,8 +92,19 @@ internal fun LauncherContentScreen(
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
     viewModel: LauncherContentViewModel = hiltViewModel(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
 
+    if (sheetState.isVisible) {
+        BackPressHandler {
+            coroutineScope.launch {
+                sheetState.hide()
+            }
+        }
+    }
+
+    // 账本名称
+    val booksName by viewModel.bookName.collectAsStateWithLifecycle()
     // 月收入
     val monthIncome by viewModel.monthIncome.collectAsStateWithLifecycle()
     // 月支出
@@ -91,22 +114,45 @@ internal fun LauncherContentScreen(
     // 记录数据
     val recordMap by viewModel.currentMonthRecordListMapData.collectAsStateWithLifecycle()
 
+    /** 弹窗状态 */
+    val dialogState: RecordDialogState by viewModel.dialogState.collectAsStateWithLifecycle()
+
+    val selectedRecord by viewModel.selectedRecordData.collectAsStateWithLifecycle()
+
     val todayInt = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
-            // TODO
-            Divider()
+            if (null == selectedRecord) {
+                Spacer(modifier = Modifier.height(1.dp))
+            } else {
+                RecordDetailsSheet(
+                    recordEntity = selectedRecord!!,
+                    onRecordItemEditClick = {
+                        coroutineScope.launch {
+                            sheetState.hide()
+                        }
+                        onRecordItemEditClick(it)
+                    },
+                    onRecordItemDeleteClick = viewModel::onRecordDeleteClick,
+                )
+            }
         },
     ) {
         Scaffold(
             topBar = {
                 LauncherTopBar(
+                    booksName = booksName,
                     backdropScaffoldState = scaffoldState,
                     onMenuClick = onMenuClick,
                 )
             },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             floatingActionButton = {
                 FloatingActionButton(onClick = { onMenuClick(LauncherMenuAction.ADD) }) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null)
@@ -115,7 +161,7 @@ internal fun LauncherContentScreen(
         ) { paddingValues ->
             BackdropScaffold(
                 scaffoldState = scaffoldState,
-                appBar = {/* 使用上层 topBar 处理 */ },
+                appBar = { /* 使用上层 topBar 处理 */ },
                 peekHeight = paddingValues.calculateTopPadding(),
                 frontLayerScrimColor = Color.Unspecified,
                 backLayerContent = {
@@ -148,6 +194,44 @@ internal fun LauncherContentScreen(
                     Box(
                         modifier = Modifier.fillMaxSize(),
                     ) {
+                        (dialogState as? RecordDialogState.Show)?.let { state ->
+                            // 显示删除确认弹窗
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }
+                            AlertDialog(
+                                onDismissRequest = viewModel::onDismiss,
+                                text = {
+                                    Text(text = stringResource(id = R.string.record_delete_hint))
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        coroutineScope.launch {
+                                            val result = viewModel.tryDeleteRecord(state.recordId)
+                                            if (result is ResultModel.Failure<*>) {
+                                                // 删除失败
+                                                snackbarHostState.showSnackbar(
+                                                    R.string.delete_failed_format.string.format(
+                                                        result.code
+                                                    )
+                                                )
+                                            } else {
+                                                // 删除成功
+                                                viewModel.onDismiss()
+                                            }
+                                        }
+                                    }) {
+                                        Text(text = stringResource(id = R.string.confirm))
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = viewModel::onDismiss) {
+                                        Text(text = stringResource(id = R.string.cancel))
+                                    }
+                                },
+                            )
+                        }
+
                         if (recordMap.isEmpty()) {
                             Empty(
                                 imageResId = R.drawable.vector_no_data_200,
@@ -215,7 +299,12 @@ internal fun LauncherContentScreen(
                                 items(recordList, key = { it.id }) {
                                     RecordListItem(
                                         recordViewsEntity = it,
-                                        onRecordItemEditClick = onRecordItemEditClick
+                                        onRecordItemClick = {
+                                            viewModel.onRecordItemClick(it)
+                                            coroutineScope.launch {
+                                                sheetState.show()
+                                            }
+                                        }
                                     )
                                 }
                             }
@@ -230,13 +319,10 @@ internal fun LauncherContentScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 internal fun LauncherTopBar(
+    booksName: String,
     backdropScaffoldState: BackdropScaffoldState,
     onMenuClick: (LauncherMenuAction) -> Unit,
-    viewModel: LauncherContentViewModel = hiltViewModel(),
 ) {
-    // 账本名称
-    val bookName by viewModel.bookName.collectAsStateWithLifecycle()
-
     TopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = Color.Transparent,
@@ -246,7 +332,7 @@ internal fun LauncherTopBar(
         ),
         title = {
             if (backdropScaffoldState.isConcealed) {
-                Text(text = bookName)
+                Text(text = booksName)
             }
         },
         navigationIcon = {
@@ -284,12 +370,11 @@ internal fun LauncherTopBar(
 @Composable
 internal fun RecordListItem(
     recordViewsEntity: RecordViewsEntity,
-    onRecordItemEditClick: (Long) -> Unit
+    onRecordItemClick: () -> Unit
 ) {
     ListItem(
         modifier = Modifier.clickable {
-            // FIXME
-            onRecordItemEditClick(recordViewsEntity.id)
+            onRecordItemClick()
         },
         leadingContent = {
             Icon(
@@ -355,17 +440,22 @@ internal fun RecordListItem(
                 )
                 recordViewsEntity.asset?.let { asset ->
                     Text(text = buildAnnotatedString {
-                        if (recordViewsEntity.charges.toDoubleOrZero() != 0.0 || recordViewsEntity.concessions.toDoubleOrZero() != 0.0) {
+                        val hasCharges = recordViewsEntity.charges.toDoubleOrZero() > 0.0
+                        val hasConcessions = recordViewsEntity.concessions.toDoubleOrZero() > 0.0
+                        if (hasCharges || hasConcessions) {
                             // 有手续费、优惠信息
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
                                 append("(")
                             }
-                            if (recordViewsEntity.charges.isNotBlank()) {
+                            if (hasCharges) {
                                 withStyle(style = SpanStyle(color = LocalExtendedColors.current.expenditure)) {
                                     append("-${Symbol.rmb}${recordViewsEntity.charges}")
                                 }
                             }
-                            if (recordViewsEntity.concessions.isNotBlank()) {
+                            if (hasConcessions) {
+                                if (hasCharges) {
+                                    append(" ")
+                                }
                                 withStyle(style = SpanStyle(color = LocalExtendedColors.current.income)) {
                                     append("+${Symbol.rmb}${recordViewsEntity.concessions}")
                                 }
@@ -383,4 +473,230 @@ internal fun RecordListItem(
             }
         },
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun RecordDetailsSheet(
+    recordEntity: RecordViewsEntity,
+    onRecordItemEditClick: (Long) -> Unit,
+    onRecordItemDeleteClick: (Long) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(id = R.string.record_details),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(
+                onClick = { onRecordItemEditClick(recordEntity.id) },
+            ) {
+                Text(
+                    text = stringResource(id = R.string.edit),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            TextButton(
+                onClick = { onRecordItemDeleteClick(recordEntity.id) },
+            ) {
+                Text(
+                    text = stringResource(id = R.string.delete),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        }
+        CommonDivider()
+
+        // 金额
+        ListItem(
+            headlineText = { Text(text = stringResource(id = R.string.amount)) },
+            trailingContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (recordEntity.type.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && recordEntity.reimbursable) {
+                        // 支出类型，并且可报销
+                        val text = if (recordEntity.relatedRecord.isEmpty()) {
+                            // 未报销
+                            stringResource(id = R.string.reimbursable)
+                        } else {
+                            // 已报销
+                            stringResource(id = R.string.reimbursed)
+                        }
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                    }
+                    Text(
+                        text = "${Symbol.rmb}${recordEntity.amount}",
+                        color = when (recordEntity.type.typeCategory) {
+                            RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
+                            RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
+                            RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
+                        },
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            },
+        )
+
+        if (recordEntity.charges.toDoubleOrZero() > 0.0) {
+            // 手续费
+            ListItem(
+                headlineText = { Text(text = stringResource(id = R.string.charges)) },
+                trailingContent = {
+                    Text(
+                        text = "-${Symbol.rmb}${recordEntity.charges}",
+                        color = LocalExtendedColors.current.expenditure,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                },
+            )
+        }
+
+        if (recordEntity.type.typeCategory != RecordTypeCategoryEnum.INCOME && recordEntity.concessions.toDoubleOrZero() > 0.0) {
+            // 优惠
+            ListItem(
+                headlineText = { Text(text = stringResource(id = R.string.concessions)) },
+                trailingContent = {
+                    Text(
+                        text = "+${Symbol.rmb}${recordEntity.concessions}",
+                        color = LocalExtendedColors.current.income,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                },
+            )
+        }
+
+        // 类型
+        ListItem(
+            headlineText = { Text(text = stringResource(id = R.string.type)) },
+            trailingContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = recordEntity.type.iconResId),
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
+                    Text(
+                        text = recordEntity.type.name,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            },
+        )
+
+        // TODO 关联的记录
+
+        recordEntity.asset?.let { asset ->
+            // 资产
+            ListItem(
+                headlineText = { Text(text = stringResource(id = R.string.asset)) },
+                trailingContent = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = asset.iconResId),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                        Text(
+                            text = asset.name,
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                        // 关联资产
+                        recordEntity.relatedAsset?.let { related ->
+                            Text(
+                                text = "->",
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                            )
+                            Icon(
+                                painter = painterResource(id = related.iconResId),
+                                contentDescription = null,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.padding(end = 8.dp),
+                            )
+                            Text(
+                                text = related.name,
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        }
+                    }
+                },
+            )
+        }
+
+        if (recordEntity.relatedTags.isNotEmpty()) {
+            // 标签
+            ListItem(
+                headlineText = { Text(text = stringResource(id = R.string.tags)) },
+                trailingContent = {
+                    val tagsText = with(StringBuilder()) {
+                        recordEntity.relatedTags.forEach { tag ->
+                            if (!isBlank()) {
+                                append(",")
+                            }
+                            append(tag.name)
+                        }
+                        var result = toString()
+                        if (result.length > 12) {
+                            result = result.substring(0, 12) + "…"
+                        }
+                        result
+                    }
+                    Text(
+                        text = tagsText,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .padding(horizontal = 4.dp),
+                    )
+                },
+            )
+        }
+
+        if (recordEntity.remark.isNotBlank()) {
+            // 备注
+            ListItem(
+                headlineText = { Text(text = stringResource(id = R.string.remark)) },
+                trailingContent = {
+                    Text(
+                        text = recordEntity.remark,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                },
+            )
+        }
+
+        // 时间
+        ListItem(
+            headlineText = { Text(text = stringResource(id = R.string.time)) },
+            trailingContent = {
+                Text(
+                    text = recordEntity.recordTime,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            },
+        )
+    }
 }

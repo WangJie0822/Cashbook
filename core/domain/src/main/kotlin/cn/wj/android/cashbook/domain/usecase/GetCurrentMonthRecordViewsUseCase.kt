@@ -70,6 +70,7 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
             this.remark,
             this.reimbursable,
             this.relatedTags.map { it.asEntity() },
+            listOf(), // TODO
             this.recordTime,
         )
     }

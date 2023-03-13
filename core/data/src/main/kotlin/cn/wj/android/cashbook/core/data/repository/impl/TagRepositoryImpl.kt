@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
-import cn.wj.android.cashbook.core.common.model.DataVersion
+import cn.wj.android.cashbook.core.common.model.tagDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
@@ -17,9 +17,7 @@ class TagRepositoryImpl @Inject constructor(
     private val tagDao: TagDao
 ) : TagRepository {
 
-    private val dataVersion: DataVersion = DataVersion()
-
-    override val tagListData: Flow<List<TagModel>> = dataVersion.map {
+    override val tagListData: Flow<List<TagModel>> = tagDataVersion.map {
         getAllTagList()
     }
 
@@ -37,13 +35,13 @@ class TagRepositoryImpl @Inject constructor(
         } else {
             tagDao.update(tagTable)
         }
-        dataVersion.updateVersion()
+        tagDataVersion.updateVersion()
     }
 
     override suspend fun deleteTag(tag: TagModel) = withContext(Dispatchers.IO) {
         val tagTable = tag.asTable()
         tagDao.delete(tagTable)
-        dataVersion.updateVersion()
+        tagDataVersion.updateVersion()
     }
 
     override suspend fun getRelatedTag(recordId: Long): List<TagModel> {

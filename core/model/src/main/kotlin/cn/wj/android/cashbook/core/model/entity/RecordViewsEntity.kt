@@ -30,5 +30,6 @@ data class RecordViewsEntity(
     val remark: String,
     val reimbursable: Boolean,
     val relatedTags: List<TagEntity>,
+    val relatedRecord: List<RecordViewsEntity>,
     val recordTime: String,
 )

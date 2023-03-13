@@ -27,4 +27,15 @@
     <string name="amount_must_not_be_zero">金额不能为0</string>
     <string name="please_select_type">请选择类型</string>
     <string name="save_failure_format">保存失败 code=%1$s</string>
+    <string name="record_details">记录详情</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="amount">金额</string>
+    <string name="cancel">取消</string>
+    <string name="record_delete_hint">确认要删除这条记录吗？</string>
+    <string name="delete_failed_format">删除失败 code=%1$s</string>
+    <string name="reimbursed">已报销</string>
+    <string name="type">类型</string>
+    <string name="asset">资产</string>
+    <string name="time">时间</string>
 </resources>

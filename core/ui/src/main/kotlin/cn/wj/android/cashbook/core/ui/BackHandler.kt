@@ -11,7 +11,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.staticCompositionLocalOf
 
 /**
- * 用于拦截点击事件
+ * 用于拦截返回事件
  *
  * - 必须在提供了 [LocalBackPressedDispatcher] 后才能使用
  *

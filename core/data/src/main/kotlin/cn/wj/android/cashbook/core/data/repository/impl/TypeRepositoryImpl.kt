@@ -1,7 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
-import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.model.DataVersion
+import cn.wj.android.cashbook.core.common.model.typeDataVersion
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.database.dao.TypeDao
@@ -25,9 +24,7 @@ class TypeRepositoryImpl @Inject constructor(
     private val typeDao: TypeDao,
 ) : TypeRepository {
 
-    private val dataVersion: DataVersion = DataVersion()
-
-    private val firstTypeListData: Flow<List<RecordTypeModel>> = dataVersion.mapLatest {
+    private val firstTypeListData: Flow<List<RecordTypeModel>> = typeDataVersion.mapLatest {
         getFirstRecordTypeList()
     }
 
@@ -67,7 +64,6 @@ class TypeRepositoryImpl @Inject constructor(
                 .map {
                     it.asModel()
                 }
-            this@TypeRepositoryImpl.logger().i("getFirstRecordTypeList() result = <$result>")
             result
         }
 

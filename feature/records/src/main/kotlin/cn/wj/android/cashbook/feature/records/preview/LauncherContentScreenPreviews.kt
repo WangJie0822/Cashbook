@@ -21,10 +21,12 @@ internal fun LauncherTopTitleBarPreview() {
     CashbookTheme {
         Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.primary)) {
             LauncherTopBar(
+                booksName = "默认账本",
                 backdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
                 onMenuClick = {},
             )
             LauncherTopBar(
+                booksName = "默认账本",
                 backdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed),
                 onMenuClick = {},
             )

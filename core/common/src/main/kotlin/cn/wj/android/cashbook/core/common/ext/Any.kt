@@ -10,7 +10,8 @@ val Any.tag: String
 
 /** 使用 [tag] 或者为空时使用 [Any.tag] 作为日志打印 TAG 获取 [Printer] 对象进行日志打印 */
 fun Any.logger(tag: String? = null): Printer {
-    return funLogger(tag ?: this.tag)
+    val realTag = (tag ?: this.tag) + "(${this.hashCode()})"
+    return funLogger(realTag)
 }
 
 /** 当对象为 null 时使用备用对象 [t] */

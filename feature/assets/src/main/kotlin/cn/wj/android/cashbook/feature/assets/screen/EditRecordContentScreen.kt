@@ -78,7 +78,7 @@ internal fun SelectAssetBottomSheetScreen(
                     ) {
                         Text(
                             text = stringResource(id = R.string.add),
-                            color = MaterialTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }

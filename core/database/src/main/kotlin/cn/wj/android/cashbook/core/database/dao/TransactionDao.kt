@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -25,48 +26,51 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 interface TransactionDao {
 
     @Insert
-    fun insertRecord(recordTable: RecordTable): Long
+    suspend fun insertRecord(recordTable: RecordTable): Long
 
     @Insert
-    fun insertRelatedTags(tagWithRecordTable: List<TagWithRecordTable>)
+    suspend fun insertRelatedTags(tagWithRecordTable: List<TagWithRecordTable>)
+
+    @Delete
+    suspend fun deleteRecord(recordTable: RecordTable): Int
 
     @Query(
         value = """
         DELETE FROM db_tag_with_record WHERE record_id=:recordId
     """
     )
-    fun deleteOldRelatedTags(recordId: Long)
+    suspend fun deleteOldRelatedTags(recordId: Long)
 
     @Update
-    fun updateRecord(recordTable: RecordTable)
+    suspend fun updateRecord(recordTable: RecordTable)
 
     @Update
-    fun updateAsset(assetTable: AssetTable)
+    suspend fun updateAsset(assetTable: AssetTable)
 
     @Query(
         value = """
         SELECT * FROM db_asset WHERE id=:assetId
     """
     )
-    fun queryAssetById(assetId: Long): AssetTable?
+    suspend fun queryAssetById(assetId: Long): AssetTable?
 
     @Query(
         value = """
         SELECT * FROM db_type WHERE id=:typeId
     """
     )
-    fun queryTypeById(typeId: Long): TypeTable?
+    suspend fun queryTypeById(typeId: Long): TypeTable?
 
     @Query(
         value = """
         SELECT * FROM db_record WHERE id=:recordId
     """
     )
-    fun queryRecordById(recordId: Long): RecordTable?
+    suspend fun queryRecordById(recordId: Long): RecordTable?
 
     @Throws(DataTransactionException::class)
     @Transaction
-    fun updateRecordTransaction(recordTable: RecordTable, tags: List<Long>) {
+    suspend fun updateRecordTransaction(recordTable: RecordTable, tags: List<Long>) {
         if (null != recordTable.id) {
             // 修改记录，获取之前记录信息
             val oldRecord = queryRecordById(recordTable.id)
@@ -180,4 +184,48 @@ interface TransactionDao {
 
         // TODO 更新关联记录
     }
+
+    @Throws(DataTransactionException::class)
+    @Transaction
+    suspend fun deleteRecordTransaction(recordId: Long) {
+        // 获取记录信息
+        val record =
+            queryRecordById(recordId) ?: throw DataTransactionException("Record id not found")
+        val type = queryTypeById(record.typeId)
+            ?: throw DataTransactionException("Type must not be null")
+        val category = RecordTypeCategoryEnum.valueOf(type.typeCategory)
+        // 计算之前记录涉及金额
+        val oldRecordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
+            // 收入，金额 - 手续费
+            record.amount.toBigDecimalOrZero() - record.charge.toBigDecimalOrZero()
+        } else {
+            // 支出、转账，金额 + 手续费 - 优惠
+            record.amount.toBigDecimal() + record.charge.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero()
+        }
+        queryAssetById(record.assetId)?.let { asset ->
+            // 计算回退已用额度 or 余额
+            val balance =
+                if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                    // 信用卡账户，已用额度 - 记录金额
+                    asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                } else {
+                    // 非信用卡账户，余额 + 记录金额
+                    asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                }
+            // 更新资产
+            updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+        }
+
+        // 移除关联标签
+        deleteOldRelatedTags(recordId)
+
+        // TODO 移除关联记录
+
+        // 删除当前记录
+        val result = deleteRecord(record)
+        if (result <= 0) {
+            throw DataTransactionException("Record delete failed!")
+        }
+    }
+
 }

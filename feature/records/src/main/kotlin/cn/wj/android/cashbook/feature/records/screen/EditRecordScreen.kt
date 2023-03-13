@@ -165,9 +165,7 @@ internal fun EditRecordScreen(
                 onBackClick = onBackClick,
             )
         },
-        snackbarHost = {
-            SnackbarHost(snackbarHostState)
-        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 coroutineScope.launch {
@@ -382,7 +380,7 @@ internal fun EditRecordScreen(
                                     timePicker.addOnPositiveButtonClickListener {
                                         time =
                                             (timePicker.hour.completeZero() + ":" + timePicker.minute.completeZero())
-                                        viewModel.onDateTimePicked("$date ${time}:00")
+                                        viewModel.onDateTimePicked("$date $time")
                                     }
                                     datePicker.addOnPositiveButtonClickListener {
                                         date = it.dateFormat(DATE_FORMAT_DATE)

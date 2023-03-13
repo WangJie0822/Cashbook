@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
-import cn.wj.android.cashbook.core.common.model.DataVersion
+import cn.wj.android.cashbook.core.common.model.bookDataVersion
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.database.dao.BooksDao
@@ -17,9 +17,9 @@ class BooksRepositoryImpl @Inject constructor(
     private val booksDao: BooksDao
 ) : BooksRepository {
 
-    private val dataVersion: DataVersion = DataVersion()
-
-    override val booksListData: Flow<List<BooksModel>> = dataVersion.mapLatest { getAllBooksList() }
+    override val booksListData: Flow<List<BooksModel>> =
+        bookDataVersion
+            .mapLatest { getAllBooksList() }
 
     private suspend fun getAllBooksList(): List<BooksModel> = withContext(Dispatchers.IO) {
         booksDao.queryAll().map { it.asModel() }

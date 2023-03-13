@@ -6,13 +6,17 @@ import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.GetCurrentBooksUseCase
 import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCase
+import cn.wj.android.cashbook.feature.records.model.RecordDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -29,7 +33,11 @@ import kotlinx.coroutines.flow.stateIn
 class LauncherContentViewModel @Inject constructor(
     getCurrentBooksUseCase: GetCurrentBooksUseCase,
     getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
+    private val deleteRecordUseCase: DeleteRecordUseCase,
 ) : ViewModel() {
+
+    val dialogState: MutableStateFlow<RecordDialogState> =
+        MutableStateFlow(RecordDialogState.Dismiss)
 
     val bookName: StateFlow<String> = getCurrentBooksUseCase()
         .mapLatest { it.name }
@@ -113,12 +121,37 @@ class LauncherContentViewModel @Inject constructor(
             initialValue = "0",
         )
 
-    val monthBalance: StateFlow<String> = combine(monthIncome, monthExpand) { income, expand ->
-        (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
+    val monthBalance: StateFlow<String> =
+        combine(monthIncome, monthExpand) { income, expand ->
+            (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = "0",
+            )
+
+    /** 选中的记录数据 */
+    val selectedRecordData: MutableStateFlow<RecordViewsEntity?> = MutableStateFlow(null)
+
+    fun onRecordItemClick(recordViewsEntity: RecordViewsEntity) {
+        selectedRecordData.value = recordViewsEntity
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "0",
-        )
+
+    fun onRecordDeleteClick(recordId: Long) {
+        dialogState.value = RecordDialogState.Show(recordId)
+    }
+
+    fun onDismiss() {
+        dialogState.value = RecordDialogState.Dismiss
+    }
+
+    suspend fun tryDeleteRecord(recordId: Long): ResultModel {
+        return try {
+//            deleteRecordUseCase(recordId)
+            ResultModel.failure(0)
+        } catch (throwable: Throwable) {
+            ResultModel.failure(throwable)
+        }
+    }
 }
