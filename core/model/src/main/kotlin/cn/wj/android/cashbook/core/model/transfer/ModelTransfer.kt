@@ -3,10 +3,14 @@ package cn.wj.android.cashbook.core.model.transfer
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.BooksEntity
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
+import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.BooksModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
+import cn.wj.android.cashbook.core.model.model.RecordTypeModel
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 
 fun TagModel.asEntity(selected: Boolean = false): TagEntity {
@@ -106,3 +110,38 @@ fun BooksModel.asEntity(): BooksEntity {
         modifyTime = this.modifyTime
     )
 }
+
+fun RecordTypeModel.asEntity(
+    child: List<RecordTypeEntity> = listOf()
+): RecordTypeEntity {
+    return RecordTypeEntity(
+        id = this.id,
+        parentId = this.parentId,
+        name = this.name,
+        iconResName = this.iconName,
+        sort = this.sort,
+        typeCategory = this.typeCategory,
+        child = child,
+        selected = false,
+        shapeType = -1,
+        needRelated = needRelated,
+    )
+}
+
+//fun RecordViewsModel.asEntity(): RecordViewsEntity {
+//    return RecordViewsEntity(
+//        this.id,
+//        this.booksId,
+//        this.type.asEntity(),
+//        this.asset?.asEntity(),
+//        this.relatedAsset?.asEntity(),
+//        this.amount,
+//        this.charges,
+//        this.concessions,
+//        this.remark,
+//        this.reimbursable,
+//        this.relatedTags.map { it.asEntity() },
+//        this.relatedRecord.map { it.asEntity() },
+//        this.recordTime,
+//    )
+//}

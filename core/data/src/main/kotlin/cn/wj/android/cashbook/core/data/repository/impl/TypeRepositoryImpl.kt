@@ -4,6 +4,7 @@ import cn.wj.android.cashbook.core.common.model.typeDataVersion
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.database.dao.TypeDao
+import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
@@ -22,6 +23,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalCoroutinesApi::class)
 class TypeRepositoryImpl @Inject constructor(
     private val typeDao: TypeDao,
+    private val appPreferencesDataSource: AppPreferencesDataSource,
 ) : TypeRepository {
 
     private val firstTypeListData: Flow<List<RecordTypeModel>> = typeDataVersion.mapLatest {
@@ -45,7 +47,7 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel =
         withContext(Dispatchers.IO) {
-            typeDao.queryById(typeId)?.asModel()
+            typeDao.queryById(typeId)?.asModel(appPreferencesDataSource.needRelated(typeId))
                 ?: getFirstRecordTypeListByCategory(RecordTypeCategoryEnum.EXPENDITURE)
                     .first()
         }
@@ -54,7 +56,7 @@ class TypeRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             typeDao.queryByLevelAndTypeCategory(TypeLevelEnum.FIRST.name, typeCategory.name)
                 .map {
-                    it.asModel()
+                    it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
                 }
         }
 
@@ -62,7 +64,7 @@ class TypeRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             val result = typeDao.queryByLevel(TypeLevelEnum.FIRST.name)
                 .map {
-                    it.asModel()
+                    it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
                 }
             result
         }
@@ -71,7 +73,7 @@ class TypeRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             typeDao.queryByParentId(parentId)
                 .map {
-                    it.asModel()
+                    it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
                 }
         }
 }

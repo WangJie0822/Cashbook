@@ -1,12 +1,24 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
 }
 
 group = "cn.wj.android.cashbook.buildlogic"
 
+val javaVersion = JavaVersion.VERSION_17
+
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = javaVersion.toString()
+    }
+}
+kotlin {
+    jvmToolchain(javaVersion.ordinal + 1)
 }
 
 dependencies {
@@ -53,6 +65,18 @@ gradlePlugin {
         register("androidLibraryJacoco") {
             id = "cashbook.android.library.jacoco"
             implementationClass = "AndroidLibraryJacocoConventionPlugin"
+        }
+        register("androidTest") {
+            id = "cashbook.android.test"
+            implementationClass = "AndroidTestConventionPlugin"
+        }
+        register("androidFlavors") {
+            id = "cashbook.android.application.flavors"
+            implementationClass = "AndroidApplicationFlavorsConventionPlugin"
+        }
+        register("jvmLibrary") {
+            id = "cashbook.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
         }
     }
 }

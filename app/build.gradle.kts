@@ -1,11 +1,15 @@
+@file:Suppress("UnstableApiUsage")
+
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 
 plugins {
     // Android Kotlin 应用
     id("cashbook.android.application")
     id("cashbook.android.application.compose")
+    id("cashbook.android.application.flavors")
     id("cashbook.android.application.jacoco")
     id("cashbook.android.hilt")
+    id("jacoco")
     // Kotlin 注解处理
     kotlin("kapt")
     // Kotlin json 转换
@@ -24,6 +28,30 @@ android {
 
         // 开启 Dex 分包
         multiDexEnabled = true
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    buildTypes {
+        getByName("debug") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = getByName("release").signingConfig
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
 
     // 配置 APK 输出路径
@@ -36,11 +64,6 @@ android {
         { variant, _ ->
             "Cashbook_${variant.versionName}.apk"
         })
-
-    lint {
-        // 出现错误不终止编译
-        abortOnError = false
-    }
 }
 
 dependencies {

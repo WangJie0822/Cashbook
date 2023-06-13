@@ -3,10 +3,11 @@
 pluginManagement {
     // 配置插件仓库
     repositories {
-        maven { setUrl("https://s01.oss.sonatype.org/content/repositories/releases/") }
-        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin/") }
+        maven { setUrl("https://maven.aliyun.com/repository/central/") }
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
         maven { setUrl("https://maven.aliyun.com/repository/google/") }
+        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin/") }
+        maven { setUrl("https://maven.aliyun.com/repository/apache-snapshots/") }
         maven { setUrl("https://repo1.maven.org/maven2/") }
         gradlePluginPortal()
         google()
@@ -17,9 +18,10 @@ pluginManagement {
 dependencyResolutionManagement {
     // 配置三方依赖仓库
     repositories {
-        maven { setUrl("https://s01.oss.sonatype.org/content/repositories/releases/") }
+        maven { setUrl("https://maven.aliyun.com/repository/central/") }
         maven { setUrl("https://maven.aliyun.com/repository/public/") }
         maven { setUrl("https://maven.aliyun.com/repository/google/") }
+        maven { setUrl("https://maven.aliyun.com/repository/apache-snapshots/") }
         maven { setUrl("https://repo1.maven.org/maven2/") }
         maven { setUrl("https://jitpack.io") }
         google()

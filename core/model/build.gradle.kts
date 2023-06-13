@@ -1,3 +1,3 @@
 plugins {
-    id("kotlin")
+    id("cashbook.jvm.library")
 }

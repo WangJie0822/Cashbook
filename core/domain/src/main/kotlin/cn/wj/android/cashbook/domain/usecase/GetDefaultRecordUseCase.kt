@@ -6,6 +6,9 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
+import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.model.RecordModel
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers

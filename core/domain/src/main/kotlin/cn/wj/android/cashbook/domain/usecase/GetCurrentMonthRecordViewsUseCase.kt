@@ -34,7 +34,7 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
                 .forEach {
                     val key = it.recordTime.split(" ").firstOrNull()?.split("-")?.lastOrNull()
                         ?.toIntOrNull()?.toString()
-                    val entity = RecordViewsModel(
+                    val model = RecordViewsModel(
                         it.id,
                         it.booksId,
                         typeRepository.getNoNullRecordTypeById(it.typeId),
@@ -46,12 +46,13 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
                         it.remark,
                         it.reimbursable,
                         tagRepository.getRelatedTag(it.id),
-                        it.recordTime
+                        listOf(), // TODO
+                        it.recordTime,
                     ).asEntity()
                     if (map.containsKey(key)) {
-                        map[key]!!.add(entity)
+                        map[key]!!.add(model)
                     } else {
-                        map[key] = arrayListOf(entity)
+                        map[key] = arrayListOf(model)
                     }
                 }
             map
@@ -60,10 +61,13 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
     private fun RecordViewsModel.asEntity(): RecordViewsEntity {
         return RecordViewsEntity(
             this.id,
-            this.booksId,
-            this.type.asEntity(),
-            this.asset?.asEntity(),
-            this.relatedAsset?.asEntity(),
+            this.type.typeCategory,
+            this.type.name,
+            this.type.iconName,
+            this.asset?.name,
+            this.asset?.iconResId,
+            this.relatedAsset?.name,
+            this.relatedAsset?.iconResId,
             this.amount,
             this.charges,
             this.concessions,

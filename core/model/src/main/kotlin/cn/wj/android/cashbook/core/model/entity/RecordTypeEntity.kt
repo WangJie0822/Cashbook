@@ -8,7 +8,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
  * @param id 类型 id
  * @param parentId 二级分类父类型 id，一级类型默认为 -1L
  * @param name 类型名称
- * @param iconResId 类型图标资源 id
+ * @param iconResName 类型图标资源 id
  * @param sort 排序关键字
  * @param child 一级分类的二级分类列表
  * @param selected 是否是选中状态
@@ -20,12 +20,13 @@ data class RecordTypeEntity(
     val id: Long,
     val parentId: Long,
     val name: String,
-    val iconResId: Int,
+    val iconResName: String,
     val typeCategory: RecordTypeCategoryEnum,
     val sort: Int,
     val child: List<RecordTypeEntity>,
     val selected: Boolean,
     val shapeType: Int,
+    val needRelated:Boolean,
 )
 
 /** 固定类型 - 设置 */
@@ -34,11 +35,12 @@ val RECORD_TYPE_SETTINGS: RecordTypeEntity
         id = -1001L,
         parentId = -1L,
         name = "",
-        iconResId = 0,
+        iconResName = "",
         sort = 0,
         child = listOf(),
         selected = true,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         shapeType = 0,
+        needRelated = false,
     )
 

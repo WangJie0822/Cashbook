@@ -83,7 +83,7 @@ internal fun MyTagsScreen(
             if (tagList.isEmpty()) {
                 Empty(
                     modifier = Modifier.fillMaxSize(),
-                    imageResId = R.drawable.vector_no_data_200,
+                    imageResId = cn.wj.android.cashbook.core.common.R.drawable.vector_no_data_200,
                     hintResId = R.string.tags_empty_hint
                 )
             } else {

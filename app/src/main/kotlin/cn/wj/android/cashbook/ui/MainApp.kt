@@ -3,7 +3,7 @@ package cn.wj.android.cashbook.ui
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +21,7 @@ import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
+import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
 import cn.wj.android.cashbook.feature.tags.navigation.SelectTagsBottomSheet
@@ -53,7 +54,7 @@ fun MainApp() {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .consumedWindowInsets(paddingValues),
+                    .consumeWindowInsets(paddingValues),
             ) {
                 controller = navController
 
@@ -146,6 +147,7 @@ fun MainApp() {
                         )
                     },
                 )
+                selectRelatedRecordScreen()
                 editAssetScreen()
             }
         }

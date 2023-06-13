@@ -28,7 +28,7 @@ interface TypeRepository {
     suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel>
 }
 
-internal fun TypeTable.asModel(): RecordTypeModel {
+internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {
     return RecordTypeModel(
         id = this.id.orElse(-1L),
         parentId = this.parentId,
@@ -38,5 +38,6 @@ internal fun TypeTable.asModel(): RecordTypeModel {
         typeCategory = RecordTypeCategoryEnum.valueOf(this.typeCategory),
         protected = this.protected == SWITCH_INT_ON,
         sort = this.sort,
+        needRelated = needRelated,
     )
 }

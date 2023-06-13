@@ -1,11 +1,18 @@
 import cn.wj.android.cashbook.buildlogic.ApplicationSetting
-import cn.wj.android.cashbook.buildlogic.configureBuildTypes
 import cn.wj.android.cashbook.buildlogic.configureFlavors
+import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
+import cn.wj.android.cashbook.buildlogic.configurePrintApksTask
+import cn.wj.android.cashbook.buildlogic.disableUnnecessaryAndroidTests
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.kotlin
 
 /**
  * Android Kotlin Library 插件
@@ -24,8 +31,19 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
+                defaultConfig.targetSdk = ApplicationSetting.Config.targetSdk
                 configureFlavors(this)
-                configureBuildTypes(this)
+                configureGradleManagedDevices(this)
+            }
+
+            extensions.configure<LibraryAndroidComponentsExtension> {
+                configurePrintApksTask(this)
+                disableUnnecessaryAndroidTests(target)
+            }
+
+            dependencies {
+                add("androidTestImplementation", kotlin("test"))
+                add("testImplementation", kotlin("test"))
             }
         }
     }

@@ -85,6 +85,7 @@ internal fun EditRecordRoute(
     selectTypeList: @Composable (RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
+    onSelectRelatedRecordClick: () -> Unit,
 ) {
 
     EditRecordScreen(
@@ -93,6 +94,7 @@ internal fun EditRecordRoute(
         selectTypeList = selectTypeList,
         selectAssetBottomSheet = selectAssetBottomSheet,
         selectTagBottomSheet = selectTagBottomSheet,
+        onSelectRelatedRecordClick = onSelectRelatedRecordClick,
     )
 }
 
@@ -112,8 +114,9 @@ internal fun EditRecordScreen(
     selectTypeList: @Composable (RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    onSelectRelatedRecordClick: () -> Unit,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
         recordIdData.value = recordId
     },
@@ -142,6 +145,8 @@ internal fun EditRecordScreen(
     val concessions: String by viewModel.concessionsData.collectAsStateWithLifecycle()
     // 是否可报销
     val reimbursable: Boolean by viewModel.reimbursableData.collectAsStateWithLifecycle()
+    // 关联支出记录
+    val relatedRecordList: Map<Long, String> by viewModel.relatedRecordTextListData.collectAsStateWithLifecycle()
 
     // 底部菜单状态
     val bottomSheetEnum: EditRecordBottomSheetEnum by viewModel.bottomSheetData.collectAsStateWithLifecycle()
@@ -404,8 +409,6 @@ internal fun EditRecordScreen(
                                 label = { Text(text = stringResource(id = R.string.tags) + if (hasTags) ":$tagsText" else "") },
                             )
 
-                            // TODO 关联的支出记录
-
                             if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
                                 // 只有支出类型显示是否可报销
                                 FilterChip(
@@ -449,6 +452,25 @@ internal fun EditRecordScreen(
                                     },
                                     label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.rmb}$concessions" else "") },
                                 )
+                            }
+
+                            // 关联的支出记录
+                            if (selectedTypeCategory == RecordTypeCategoryEnum.INCOME/* FIXME && selectedType?.needRelated == true*/) {
+                                if (relatedRecordList.isEmpty()) {
+                                    FilterChip(
+                                        selected = false,
+                                        onClick = onSelectRelatedRecordClick,
+                                        label = { Text(text = stringResource(id = R.string.related_record)) },
+                                    )
+                                } else {
+                                    relatedRecordList.forEach {
+                                        FilterChip(
+                                            selected = true,
+                                            onClick = { /*TODO*/ },
+                                            label = { Text(text = it.value) },
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

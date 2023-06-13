@@ -26,4 +26,5 @@ data class RecordTypeModel(
     val typeCategory: RecordTypeCategoryEnum,
     val protected: Boolean,
     val sort: Int,
+    val needRelated:Boolean,
 )

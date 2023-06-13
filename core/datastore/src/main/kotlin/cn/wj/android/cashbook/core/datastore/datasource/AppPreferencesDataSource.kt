@@ -5,6 +5,7 @@ import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.copy
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /**
@@ -22,6 +23,8 @@ class AppPreferencesDataSource @Inject constructor(
                 currentBookId = it.currentBookId,
                 defaultTypeId = it.defaultTypeId,
                 lastAssetId = it.lastAssetId,
+                refundTypeId = it.refundTypeId,
+                reimburseTypeId = it.refundTypeId,
             )
         }
 
@@ -31,5 +34,10 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateLastAssetId(lastAssetId: Long) {
         appPreferences.updateData { it.copy { this.lastAssetId = lastAssetId } }
+    }
+
+    suspend fun needRelated(typeId: Long): Boolean {
+        val appDataModel = appData.first()
+        return typeId == appDataModel.reimburseTypeId || typeId == appDataModel.refundTypeId
     }
 }

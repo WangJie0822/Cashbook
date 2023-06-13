@@ -681,6 +681,7 @@ internal object DatabaseHelper {
                 R.string.type_salary.string,
                 R.string.type_icon_name_salary.string,
                 0,
+                true
             ).asTable()
         )
         // 奖金
@@ -690,6 +691,7 @@ internal object DatabaseHelper {
                 R.string.type_bonus.string,
                 R.string.type_icon_name_bonus.string,
                 1,
+                true
             ).asTable()
         )
         // 退款
@@ -750,6 +752,7 @@ internal object DatabaseHelper {
                 R.string.type_account_transfer.string,
                 R.string.type_icon_name_account_transfer.string,
                 0,
+                true
             ).asTable()
         )
         // 还信用卡
@@ -759,6 +762,7 @@ internal object DatabaseHelper {
                 R.string.type_credit_card_payment.string,
                 R.string.type_icon_name_credit_card_payment.string,
                 1,
+                true
             ).asTable()
         )
         // 取款
@@ -768,6 +772,7 @@ internal object DatabaseHelper {
                 R.string.type_withdrawals.string,
                 R.string.type_icon_name_withdrawals.string,
                 2,
+                true
             ).asTable()
         )
         // 存款
@@ -777,6 +782,7 @@ internal object DatabaseHelper {
                 R.string.type_deposit.string,
                 R.string.type_icon_name_deposit.string,
                 3,
+                true
             ).asTable()
         )
         // 借入
@@ -786,6 +792,7 @@ internal object DatabaseHelper {
                 R.string.type_borrow.string,
                 R.string.type_icon_name_borrow.string,
                 4,
+                true
             ).asTable()
         )
         // 借出
@@ -795,6 +802,7 @@ internal object DatabaseHelper {
                 R.string.type_lend.string,
                 R.string.type_icon_name_lend.string,
                 5,
+                true
             ).asTable()
         )
         // 还款
@@ -804,6 +812,7 @@ internal object DatabaseHelper {
                 R.string.type_repayment.string,
                 R.string.type_icon_name_repayment.string,
                 6,
+                true
             ).asTable()
         )
         // 收款
@@ -813,6 +822,7 @@ internal object DatabaseHelper {
                 R.string.type_proceeds.string,
                 R.string.type_icon_name_proceeds.string,
                 7,
+                true
             ).asTable()
         )
         // 其它
@@ -841,7 +851,8 @@ internal object DatabaseHelper {
             typeLevel = TypeLevelEnum.FIRST,
             typeCategory = typeCategory,
             protected = protected,
-            sort = sort
+            sort = sort,
+            needRelated = false,
         )
     }
 
@@ -860,7 +871,8 @@ internal object DatabaseHelper {
             typeLevel = TypeLevelEnum.SECOND,
             typeCategory = parentId.typeCategory,
             protected = protected,
-            sort = sort
+            sort = sort,
+            needRelated = false,
         ).asTable()
     }
 

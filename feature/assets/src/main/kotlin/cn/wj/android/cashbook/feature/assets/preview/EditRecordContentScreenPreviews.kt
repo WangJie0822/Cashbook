@@ -37,7 +37,7 @@ internal fun AssetItemPreview() {
                 AssetItem(
                     type = BottomAssetListTypeEnum.CREDIT_CARD,
                     name = "信用卡",
-                    iconResId = R.drawable.vector_type_credit_card_payment_24,
+                    iconResId = cn.wj.android.cashbook.core.data.R.drawable.vector_type_credit_card_payment_24,
                     balance = "5656",
                     totalAmount = "30000",
                     onAssetItemClick = {},
@@ -45,7 +45,7 @@ internal fun AssetItemPreview() {
                 AssetItem(
                     type = BottomAssetListTypeEnum.CAPITAL,
                     name = "银行卡",
-                    iconResId = R.drawable.vector_type_credit_card_payment_24,
+                    iconResId = cn.wj.android.cashbook.core.data.R.drawable.vector_type_credit_card_payment_24,
                     balance = "5656",
                     totalAmount = "",
                     onAssetItemClick = {},

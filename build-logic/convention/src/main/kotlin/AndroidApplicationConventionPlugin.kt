@@ -1,9 +1,14 @@
-import cn.wj.android.cashbook.buildlogic.*
+import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import cn.wj.android.cashbook.buildlogic.configurePrintApksTask
+import cn.wj.android.cashbook.buildlogic.version
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 /**
  * Kotlin Android Application 插件
@@ -20,11 +25,27 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
             }
 
-            extensions.configure<BaseAppModuleExtension> {
+            extensions.configure<KotlinProjectExtension> {
+                jvmToolchain(ApplicationSetting.Config.javaVersion.version)
+            }
+
+            extensions.configure<ApplicationExtension> {
+
+                with(defaultConfig) {
+                    targetSdk = ApplicationSetting.Config.targetSdk
+
+                    // 应用版本号
+                    versionCode = ApplicationSetting.Config.versionCode
+                    // 应用版本名
+                    versionName = ApplicationSetting.Config.versionName
+                }
+
                 configureKotlinAndroid(this)
-                configureSigningConfigs(this)
-                configureFlavors(this)
-                configureBuildTypes(this)
+                configureGradleManagedDevices(this)
+            }
+
+            extensions.configure<ApplicationAndroidComponentsExtension> {
+                configurePrintApksTask(this)
             }
         }
     }

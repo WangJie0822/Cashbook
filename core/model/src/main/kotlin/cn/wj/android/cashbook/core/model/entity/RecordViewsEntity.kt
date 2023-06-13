@@ -1,14 +1,12 @@
 package cn.wj.android.cashbook.core.model.entity
 
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+
 
 /**
  * 记录数据实体类
  *
  * @param id 主键自增长
- *  @param booksId 关联账本 id
- * @param type 记录类型
- * @param asset 关联资产
- * @param relatedAsset 转账转入资产
  * @param amount 记录金额
  * @param charges 转账手续费
  * @param concessions 优惠
@@ -20,10 +18,13 @@ package cn.wj.android.cashbook.core.model.entity
  */
 data class RecordViewsEntity(
     val id: Long,
-    val booksId: Long,
-    val type: RecordTypeEntity,
-    val asset: AssetEntity?,
-    val relatedAsset: AssetEntity?,
+    val typeCategory: RecordTypeCategoryEnum,
+    val typeName: String,
+    val typeIconResName: String,
+    val assetName: String?,
+    val assetIconResId: Int?,
+    val relatedAssetName: String?,
+    val relatedAssetIconResId: Int?,
     val amount: String,
     val charges: String,
     val concessions: String,

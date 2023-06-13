@@ -52,8 +52,6 @@ class MyApplication : Application() {
 
         // 初始化通知渠道
         initNotificationChannel()
-
-
     }
 
     /** 初始化通知渠道 */

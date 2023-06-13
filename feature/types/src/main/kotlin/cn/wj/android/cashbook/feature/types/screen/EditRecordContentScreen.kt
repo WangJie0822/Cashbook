@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
+import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
@@ -74,7 +76,7 @@ internal fun SelectRecordTypeListScreen(
                     modifier = Modifier.animateItemPlacement(),
                     first = true,
                     shapeType = type.shapeType,
-                    iconResId = R.drawable.vector_baseline_settings_24,
+                    iconPainter = painterResource(id = cn.wj.android.cashbook.core.ui.R.drawable.vector_baseline_settings_24),
                     showMore = false,
                     title = stringResource(id = R.string.settings),
                     selected = true,
@@ -85,7 +87,7 @@ internal fun SelectRecordTypeListScreen(
                     modifier = Modifier.animateItemPlacement(),
                     first = type.parentId == -1L,
                     shapeType = type.shapeType,
-                    iconResId = type.iconResId,
+                    iconPainter = painterDrawableResource(idStr = type.iconResName),
                     showMore = type.child.isNotEmpty(),
                     title = type.name,
                     selected = type.selected,
@@ -134,7 +136,7 @@ internal fun TypeItem(
     modifier: Modifier = Modifier,
     first: Boolean,
     shapeType: Int,
-    iconResId: Int,
+    iconPainter: Painter,
     showMore: Boolean,
     title: String,
     selected: Boolean,
@@ -167,7 +169,7 @@ internal fun TypeItem(
             if (selected) LocalExtendedColors.current.selected else LocalExtendedColors.current.unselected
         // 记录类型对应的图标，使用圆形边框
         Icon(
-            painter = painterResource(id = iconResId),
+            painter = iconPainter,
             contentDescription = null,
             tint = color,
             modifier = Modifier

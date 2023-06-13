@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.buildlogic
 
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 
 /**
@@ -16,6 +17,8 @@ object ApplicationSetting {
         val versionCode = generateVersionCode()
         val versionName = "v0.5.7_$versionCode"
 
+        val javaVersion = JavaVersion.VERSION_11
+
         /** 根据日期时间获取对应版本号 */
         private fun generateVersionCode(): Int {
             val sdf = java.text.SimpleDateFormat("yyMMddHH", java.util.Locale.CHINA)
@@ -29,13 +32,18 @@ object ApplicationSetting {
     object Plugin {
         const val PLUGIN_ANDROID_APPLICATION = "com.android.application"
         const val PLUGIN_ANDROID_LIBRARY = "com.android.library"
+        const val PLUGIN_ANDROID_TEST = "com.android.test"
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
         const val PLUGIN_KOTLIN_KAPT = "org.jetbrains.kotlin.kapt"
+        const val PLUGIN_KOTLIN_JVM = "org.jetbrains.kotlin.jvm"
         const val PLUGIN_JACOCO = "org.gradle.jacoco"
         const val PLUGIN_GOOGLE_KSP = "com.google.devtools.ksp"
         const val PLUGIN_GOOGLE_HILT = "dagger.hilt.android.plugin"
     }
 }
+
+val JavaVersion.version: Int
+    get() = ordinal + 1
 
 /** 拓展变量数据存储集合 */
 private val kvMap: HashMap<String, Any> = HashMap()

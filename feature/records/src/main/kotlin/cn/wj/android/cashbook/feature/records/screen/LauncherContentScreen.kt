@@ -66,6 +66,7 @@ import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.TopAppBar
 import cn.wj.android.cashbook.core.design.component.TopAppBarDefaults
+import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
@@ -221,7 +222,7 @@ internal fun LauncherContentScreen(
                                             }
                                         }
                                     }) {
-                                        Text(text = stringResource(id = R.string.confirm))
+                                        Text(text = stringResource(id = cn.wj.android.cashbook.core.design.R.string.confirm))
                                     }
                                 },
                                 dismissButton = {
@@ -234,7 +235,7 @@ internal fun LauncherContentScreen(
 
                         if (recordMap.isEmpty()) {
                             Empty(
-                                imageResId = R.drawable.vector_no_data_200,
+                                imageResId = cn.wj.android.cashbook.core.common.R.drawable.vector_no_data_200,
                                 hintResId = R.string.launcher_no_data_hint,
                                 buttonResId = R.string.launcher_no_data_button,
                                 onButtonClick = { onMenuClick(LauncherMenuAction.CALENDAR) },
@@ -264,7 +265,7 @@ internal fun LauncherContentScreen(
                                         var totalExpenditure = BigDecimal.ZERO
                                         var totalIncome = BigDecimal.ZERO
                                         recordList.forEach { record ->
-                                            when (record.type.typeCategory) {
+                                            when (record.typeCategory) {
                                                 RecordTypeCategoryEnum.EXPENDITURE -> {
                                                     // 支出
                                                     totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
@@ -378,13 +379,13 @@ internal fun RecordListItem(
         },
         leadingContent = {
             Icon(
-                painter = painterResource(id = recordViewsEntity.type.iconResId),
+                painter = painterDrawableResource(idStr = recordViewsEntity.typeIconResName),
                 contentDescription = null
             )
         },
         headlineText = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = recordViewsEntity.type.name)
+                Text(text = recordViewsEntity.typeName)
                 val tags = recordViewsEntity.relatedTags
                 if (tags.isNotEmpty()) {
                     val tagsText = with(StringBuilder()) {
@@ -431,14 +432,14 @@ internal fun RecordListItem(
                     text = buildAnnotatedString {
                         append("${Symbol.rmb}${recordViewsEntity.amount}")
                     },
-                    color = when (recordViewsEntity.type.typeCategory) {
+                    color = when (recordViewsEntity.typeCategory) {
                         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
                         RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
                         RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
                     },
                     style = MaterialTheme.typography.labelLarge,
                 )
-                recordViewsEntity.asset?.let { asset ->
+                recordViewsEntity.assetName?.let { assetName ->
                     Text(text = buildAnnotatedString {
                         val hasCharges = recordViewsEntity.charges.toDoubleOrZero() > 0.0
                         val hasConcessions = recordViewsEntity.concessions.toDoubleOrZero() > 0.0
@@ -464,9 +465,9 @@ internal fun RecordListItem(
                                 append(") ")
                             }
                         }
-                        append(asset.name)
-                        if (recordViewsEntity.type.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                            append(" -> ${recordViewsEntity.relatedAsset?.name}")
+                        append(assetName)
+                        if (recordViewsEntity.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                            append(" -> ${recordViewsEntity.relatedAssetName}")
                         }
                     })
                 }
@@ -523,7 +524,7 @@ internal fun RecordDetailsSheet(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (recordEntity.type.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && recordEntity.reimbursable) {
+                    if (recordEntity.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && recordEntity.reimbursable) {
                         // 支出类型，并且可报销
                         val text = if (recordEntity.relatedRecord.isEmpty()) {
                             // 未报销
@@ -540,7 +541,7 @@ internal fun RecordDetailsSheet(
                     }
                     Text(
                         text = "${Symbol.rmb}${recordEntity.amount}",
-                        color = when (recordEntity.type.typeCategory) {
+                        color = when (recordEntity.typeCategory) {
                             RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
                             RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
                             RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
@@ -565,7 +566,7 @@ internal fun RecordDetailsSheet(
             )
         }
 
-        if (recordEntity.type.typeCategory != RecordTypeCategoryEnum.INCOME && recordEntity.concessions.toDoubleOrZero() > 0.0) {
+        if (recordEntity.typeCategory != RecordTypeCategoryEnum.INCOME && recordEntity.concessions.toDoubleOrZero() > 0.0) {
             // 优惠
             ListItem(
                 headlineText = { Text(text = stringResource(id = R.string.concessions)) },
@@ -587,12 +588,12 @@ internal fun RecordDetailsSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = recordEntity.type.iconResId),
+                        painter = painterDrawableResource(idStr = recordEntity.typeIconResName),
                         contentDescription = null,
                         modifier = Modifier.padding(end = 8.dp),
                     )
                     Text(
-                        text = recordEntity.type.name,
+                        text = recordEntity.typeName,
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
@@ -601,7 +602,7 @@ internal fun RecordDetailsSheet(
 
         // TODO 关联的记录
 
-        recordEntity.asset?.let { asset ->
+        recordEntity.assetName?.let { assetName ->
             // 资产
             ListItem(
                 headlineText = { Text(text = stringResource(id = R.string.asset)) },
@@ -610,30 +611,30 @@ internal fun RecordDetailsSheet(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            painter = painterResource(id = asset.iconResId),
+                            painter = painterResource(id = recordEntity.assetIconResId!!),
                             contentDescription = null,
                             tint = Color.Unspecified,
                             modifier = Modifier.padding(end = 8.dp),
                         )
                         Text(
-                            text = asset.name,
+                            text = assetName,
                             style = MaterialTheme.typography.labelLarge,
                         )
                         // 关联资产
-                        recordEntity.relatedAsset?.let { related ->
+                        recordEntity.relatedAssetName?.let { relatedName ->
                             Text(
                                 text = "->",
                                 style = MaterialTheme.typography.labelLarge,
                                 modifier = Modifier.padding(horizontal = 8.dp),
                             )
                             Icon(
-                                painter = painterResource(id = related.iconResId),
+                                painter = painterResource(id = recordEntity.relatedAssetIconResId!!),
                                 contentDescription = null,
                                 tint = Color.Unspecified,
                                 modifier = Modifier.padding(end = 8.dp),
                             )
                             Text(
-                                text = related.name,
+                                text = relatedName,
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         }

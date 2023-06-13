@@ -2,7 +2,9 @@ import cn.wj.android.cashbook.buildlogic.*
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 /**
  * Kotlin Android Compose Application 插件
@@ -17,6 +19,10 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
                 apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
+            }
+
+            extensions.configure<KotlinProjectExtension> {
+                jvmToolchain(ApplicationSetting.Config.javaVersion.version)
             }
 
             val extension = extensions.getByType<ApplicationExtension>()

@@ -1,11 +1,11 @@
 package cn.wj.android.cashbook.domain.usecase
 
-import cn.wj.android.cashbook.core.common.tools.getIdByString
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
+import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.RecordTypeModel
+import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -20,7 +20,8 @@ import kotlinx.coroutines.withContext
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/22
  */
 class GetRecordTypeListUseCase @Inject constructor(
-    private val typeRepository: TypeRepository
+    private val typeRepository: TypeRepository,
+    private val appPreferencesDataSource: AppPreferencesDataSource,
 ) {
 
     suspend operator fun invoke(
@@ -85,24 +86,20 @@ class GetRecordTypeListUseCase @Inject constructor(
                 }
                 // 在末尾添加设置数据
                 result.add(RECORD_TYPE_SETTINGS)
-                result.toList()
+                if (typeCategory == RecordTypeCategoryEnum.INCOME) {
+                    // 更新退款、报销类型标记
+                    val appDataModel = appPreferencesDataSource.appData.first()
+                    result.map {
+                        if (it.id == appDataModel.refundTypeId || it.id == appDataModel.reimburseTypeId) {
+                            it.copy(needRelated = true)
+                        } else {
+                            it
+                        }
+                    }
+                } else {
+                    result
+                }
             }
             .first()
     }
-}
-
-fun RecordTypeModel.asEntity(
-    child: List<RecordTypeEntity> = listOf()
-): RecordTypeEntity {
-    return RecordTypeEntity(
-        id = this.id,
-        parentId = this.parentId,
-        name = this.name,
-        iconResId = getIdByString(this.iconName, "drawable"),
-        sort = this.sort,
-        typeCategory = this.typeCategory,
-        child = child,
-        selected = false,
-        shapeType = -1,
-    )
 }

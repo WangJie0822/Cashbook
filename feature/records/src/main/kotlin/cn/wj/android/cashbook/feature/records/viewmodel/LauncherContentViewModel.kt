@@ -69,7 +69,7 @@ class LauncherContentViewModel @Inject constructor(
         .mapLatest { recordList ->
             var totalIncome = BigDecimal.ZERO
             recordList.forEach { record ->
-                when (record.type.typeCategory) {
+                when (record.typeCategory) {
                     RecordTypeCategoryEnum.EXPENDITURE -> {
                         // 支出
                     }
@@ -97,7 +97,7 @@ class LauncherContentViewModel @Inject constructor(
         .mapLatest { recordList ->
             var totalExpenditure = BigDecimal.ZERO
             recordList.forEach { record ->
-                when (record.type.typeCategory) {
+                when (record.typeCategory) {
                     RecordTypeCategoryEnum.EXPENDITURE -> {
                         // 支出
                         totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
@@ -148,8 +148,8 @@ class LauncherContentViewModel @Inject constructor(
 
     suspend fun tryDeleteRecord(recordId: Long): ResultModel {
         return try {
-//            deleteRecordUseCase(recordId)
-            ResultModel.failure(0)
+            deleteRecordUseCase(recordId)
+            ResultModel.success()
         } catch (throwable: Throwable) {
             ResultModel.failure(throwable)
         }

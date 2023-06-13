@@ -22,9 +22,9 @@ import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAI
 import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
+import cn.wj.android.cashbook.domain.usecase.GetDefaultRelatedRecordListUseCase
 import cn.wj.android.cashbook.domain.usecase.GetDefaultTagListUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
-import cn.wj.android.cashbook.domain.usecase.asEntity
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -45,6 +45,7 @@ class EditRecordViewModel @Inject constructor(
     typeRepository: TypeRepository,
     getDefaultRecordUseCase: GetDefaultRecordUseCase,
     getDefaultTagListUseCase: GetDefaultTagListUseCase,
+    getDefaultRelatedRecordListUseCase: GetDefaultRelatedRecordListUseCase,
     private val saveRecordUseCase: SaveRecordUseCase,
 ) : ViewModel() {
 
@@ -245,6 +246,36 @@ class EditRecordViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = false
         )
+
+    /** 默认关联记录数据 */
+    private val defaultRelatedRecordListData: Flow<List<RecordEntity>> =
+        recordIdData.mapLatest { getDefaultRelatedRecordListUseCase(it) }
+
+    /** 可变关联记录数据 */
+    private val mutableRelatedRecordListData: MutableStateFlow<List<RecordEntity>?> =
+        MutableStateFlow(null)
+
+    /** 关联记录数据 */
+    val relatedRecordListData: Flow<List<RecordEntity>> =
+        combine(defaultRelatedRecordListData, mutableRelatedRecordListData) { default, mutable ->
+            mutable ?: default
+        }
+
+    /** 关联记录数据显示 */
+    val relatedRecordTextListData: StateFlow<Map<Long, String>> =
+        relatedRecordListData.mapLatest { list ->
+            val map = hashMapOf<Long, String>()
+            list.forEach {
+                val type = typeRepository.getNoNullRecordTypeById(it.typeId)
+                map[it.id] = "${type.name}(${Symbol.rmb}${it.amount})"
+            }
+            map
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = mapOf()
+            )
 
     fun onBottomSheetAction(action: EditRecordBottomSheetEnum) {
         bottomSheetData.value = action
