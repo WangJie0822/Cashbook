@@ -240,73 +240,73 @@ internal fun LauncherContentScreen(
                                 buttonResId = R.string.launcher_no_data_button,
                                 onButtonClick = { onMenuClick(LauncherMenuAction.CALENDAR) },
                             )
-                            return@Box
-                        }
-                        LazyColumn {
-                            recordMap.keys.reversed().forEach { key ->
-                                val recordList = recordMap[key] ?: listOf()
-                                stickyHeader {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .background(MaterialTheme.colorScheme.surface)
-                                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                                    ) {
-                                        Text(
+                        } else {
+                            LazyColumn {
+                                recordMap.keys.reversed().forEach { key ->
+                                    val recordList = recordMap[key] ?: listOf()
+                                    stickyHeader {
+                                        Row(
                                             modifier = Modifier
-                                                .weight(1f),
-                                            text = when (key.toInt()) {
-                                                todayInt -> stringResource(id = R.string.today)
-                                                todayInt - 1 -> stringResource(id = R.string.yesterday)
-                                                todayInt - 2 -> stringResource(id = R.string.before_yesterday)
-                                                else -> key
+                                                .fillMaxWidth()
+                                                .background(MaterialTheme.colorScheme.surface)
+                                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        ) {
+                                            Text(
+                                                modifier = Modifier
+                                                    .weight(1f),
+                                                text = when (key.toInt()) {
+                                                    todayInt -> stringResource(id = R.string.today)
+                                                    todayInt - 1 -> stringResource(id = R.string.yesterday)
+                                                    todayInt - 2 -> stringResource(id = R.string.before_yesterday)
+                                                    else -> key
+                                                }
+                                            )
+                                            var totalExpenditure = BigDecimal.ZERO
+                                            var totalIncome = BigDecimal.ZERO
+                                            recordList.forEach { record ->
+                                                when (record.typeCategory) {
+                                                    RecordTypeCategoryEnum.EXPENDITURE -> {
+                                                        // 支出
+                                                        totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
+                                                    }
+
+                                                    RecordTypeCategoryEnum.INCOME -> {
+                                                        // 收入
+                                                        totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
+                                                    }
+
+                                                    RecordTypeCategoryEnum.TRANSFER -> {
+                                                        // 转账
+                                                        totalExpenditure += record.charges.toBigDecimalOrZero()
+                                                        totalIncome += record.concessions.toBigDecimalOrZero()
+                                                    }
+                                                }
+                                            }
+                                            Text(text = buildString {
+                                                val hasIncome = totalIncome.toDouble() != 0.0
+                                                if (hasIncome) {
+                                                    append(stringResource(id = R.string.income_with_colon) + Symbol.rmb + totalIncome.decimalFormat())
+                                                }
+                                                if (totalExpenditure.toDouble() != 0.0) {
+                                                    if (hasIncome) {
+                                                        append(", ")
+                                                    }
+                                                    append(stringResource(id = R.string.expend_with_colon) + Symbol.rmb + totalExpenditure.decimalFormat())
+                                                }
+                                            })
+                                        }
+                                    }
+                                    items(recordList, key = { it.id }) {
+                                        RecordListItem(
+                                            recordViewsEntity = it,
+                                            onRecordItemClick = {
+                                                viewModel.onRecordItemClick(it)
+                                                coroutineScope.launch {
+                                                    sheetState.show()
+                                                }
                                             }
                                         )
-                                        var totalExpenditure = BigDecimal.ZERO
-                                        var totalIncome = BigDecimal.ZERO
-                                        recordList.forEach { record ->
-                                            when (record.typeCategory) {
-                                                RecordTypeCategoryEnum.EXPENDITURE -> {
-                                                    // 支出
-                                                    totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
-                                                }
-
-                                                RecordTypeCategoryEnum.INCOME -> {
-                                                    // 收入
-                                                    totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
-                                                }
-
-                                                RecordTypeCategoryEnum.TRANSFER -> {
-                                                    // 转账
-                                                    totalExpenditure += record.charges.toBigDecimalOrZero()
-                                                    totalIncome += record.concessions.toBigDecimalOrZero()
-                                                }
-                                            }
-                                        }
-                                        Text(text = buildString {
-                                            val hasIncome = totalIncome.toDouble() != 0.0
-                                            if (hasIncome) {
-                                                append(stringResource(id = R.string.income_with_colon) + Symbol.rmb + totalIncome.decimalFormat())
-                                            }
-                                            if (totalExpenditure.toDouble() != 0.0) {
-                                                if (hasIncome) {
-                                                    append(", ")
-                                                }
-                                                append(stringResource(id = R.string.expend_with_colon) + Symbol.rmb + totalExpenditure.decimalFormat())
-                                            }
-                                        })
                                     }
-                                }
-                                items(recordList, key = { it.id }) {
-                                    RecordListItem(
-                                        recordViewsEntity = it,
-                                        onRecordItemClick = {
-                                            viewModel.onRecordItemClick(it)
-                                            coroutineScope.launch {
-                                                sheetState.show()
-                                            }
-                                        }
-                                    )
                                 }
                             }
                         }

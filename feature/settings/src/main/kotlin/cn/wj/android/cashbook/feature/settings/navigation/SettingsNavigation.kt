@@ -4,17 +4,12 @@ package cn.wj.android.cashbook.feature.settings.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
 import com.google.accompanist.navigation.animation.composable
 
 const val ROUTE_SETTINGS_LAUNCHER = "settings/launcher"
-
-fun NavController.naviToSettingsLauncher() {
-    this.navigate(ROUTE_SETTINGS_LAUNCHER)
-}
 
 /**
  * 首页显示
