@@ -2,7 +2,7 @@
 
 package cn.wj.android.cashbook.buildlogic
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
@@ -20,7 +20,7 @@ enum class Signing {
  * 配置项目签名
  */
 fun Project.configureSigningConfigs(
-    commonExtension: CommonExtension<*, *, *, *>,
+    commonExtension: ApplicationExtension,
 ) {
     commonExtension.apply {
         val libs = extensions.getByType<VersionCatalogsExtension>().named("signingLibs")

@@ -208,6 +208,7 @@ google-accompanist-placeholder-material = { group = "com.google.accompanist", na
 google-accompanist-drawablepainter = { group = "com.google.accompanist", name = "accompanist-drawablepainter", version.ref = "google-accompanist" }
 google-accompanist-insets-ui = { group = "com.google.accompanist", name = "accompanist-insets-ui", version.ref = "google-accompanist" }
 google-accompanist-navigation-animation = { group = "com.google.accompanist", name = "accompanist-navigation-animation", version.ref = "google-accompanist" }
+google-accompanist-webview = { group = "com.google.accompanist", name = "accompanist-webview", version.ref = "google-accompanist" }
 google-devtools-ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "google-devtools-ksp" }
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 google-protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "google-protobuf" }

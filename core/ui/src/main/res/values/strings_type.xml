@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="income">收入</string>
+    <string name="expend">支出</string>
+    <string name="transfer">转账</string>
+    <string name="money_management">理财</string>
+    <string name="dining">餐饮</string>
+    <string name="daily">日常</string>
+    <string name="shopping">购物</string>
+    <string name="dress">服饰</string>
+    <string name="digital">数码</string>
+    <string name="entertainment">娱乐</string>
+    <string name="family">家庭</string>
+    <string name="parenting">育儿</string>
+    <string name="car">汽车</string>
+    <string name="interpersonal">人际关系</string>
+    <string name="traffic">交通</string>
+    <string name="housing">住房</string>
+    <string name="medical">医疗</string>
+    <string name="campus">校园</string>
+    <string name="tenement">物业</string>
+    <string name="other">其它</string>
+
+    <string name="type_salary">薪资</string>
+    <string name="type_bonus">奖金</string>
+    <string name="type_royalty">提成</string>
+    <string name="type_refund">退款</string>
+    <string name="type_reimburse">报销</string>
+    <string name="type_investment">投资</string>
+    <string name="type_provident_fund">公积金</string>
+    <string name="type_medicare">医保</string>
+    <string name="type_alimony">生活费</string>
+    <string name="type_pocket_money">零花钱</string>
+    <string name="type_lucky_money">压岁钱</string>
+    <string name="type_convert_payment">红包</string>
+    <string name="type_windfall">外快</string>
+    <string name="type_rent">租金</string>
+    <string name="type_tax_rebate">退税</string>
+    <string name="type_dividend">分红</string>
+    <string name="type_scholarship">奖学金</string>
+    <string name="type_benefit">津贴</string>
+
+    <string name="type_account_transfer">账户互转</string>
+    <string name="type_credit_card_payment">还信用卡</string>
+    <string name="type_withdrawals">取款</string>
+    <string name="type_deposit">存款</string>
+    <string name="type_borrow">借入</string>
+    <string name="type_lend">借出</string>
+    <string name="type_repayment">还款</string>
+    <string name="type_proceeds">收款</string>
+
+    <string name="type_stock">股票</string>
+    <string name="type_fund">基金</string>
+    <string name="type_money_management">理财</string>
+    <string name="type_gold">黄金</string>
+    <string name="type_bond">债券</string>
+    <string name="type_forex">外汇</string>
+    <string name="type_charge">手续费</string>
+
+    <string name="type_dining">餐饮</string>
+    <string name="type_three_meals">三餐</string>
+    <string name="type_breakfast">早餐</string>
+    <string name="type_lunch">午餐</string>
+    <string name="type_dinner">晚餐</string>
+    <string name="type_takeaway">外卖</string>
+    <string name="type_supper">夜宵</string>
+    <string name="type_food_ingredient">食材</string>
+    <string name="type_fruit">水果</string>
+    <string name="type_dessert">甜点</string>
+    <string name="type_snacks">零食</string>
+    <string name="type_drinks">饮料</string>
+    <string name="type_at">烟酒</string>
+    <string name="type_ats">烟酒零食</string>
+
+    <string name="type_daily_necessities">日用</string>
+    <string name="type_kitchen_daily_necessities">柴米油盐</string>
+    <string name="type_communication">通讯</string>
+    <string name="type_call_charge">话费</string>
+    <string name="type_net_fee">网费</string>
+    <string name="type_life">生活</string>
+    <string name="type_clean">清洁</string>
+    <string name="type_haircut">理发</string>
+    <string name="type_bath">洗澡</string>
+    <string name="type_express">快递</string>
+
+    <string name="type_shopping">购物</string>
+    <string name="type_digital_products">数码</string>
+    <string name="type_daily">日常</string>
+    <string name="type_electrical_appliances">电器</string>
+    <string name="type_clothes">鞋服</string>
+    <string name="type_furniture">家具</string>
+    <string name="type_beauty">美妆</string>
+    <string name="type_body_hair">洗护</string>
+    <string name="type_souvenir">纪念品</string>
+
+    <string name="type_hat">帽子</string>
+    <string name="type_coat">外套</string>
+    <string name="type_pants">裤子</string>
+    <string name="type_underwear">内衣</string>
+    <string name="type_bag">包包</string>
+    <string name="type_shoes">鞋子</string>
+    <string name="type_socks">袜子</string>
+    <string name="type_accessories">饰品</string>
+
+    <string name="type_mobile_phone">手机</string>
+    <string name="type_mobile_phone_accessories">手机配件</string>
+    <string name="type_member">付费会员</string>
+    <string name="type_camera">相机</string>
+
+    <string name="type_amusement">娱乐</string>
+    <string name="type_game">游戏</string>
+    <string name="type_party">聚会</string>
+    <string name="type_movie">电影</string>
+    <string name="type_sing">K歌</string>
+    <string name="type_show">演出</string>
+    <string name="type_travel">旅行</string>
+    <string name="type_tickets">门票</string>
+    <string name="type_excursion_fare">团费</string>
+    <string name="type_sport">运动</string>
+
+    <string name="type_family">家人</string>
+    <string name="type_parent">父母</string>
+    <string name="type_love">恋爱</string>
+    <string name="type_child">孩子</string>
+    <string name="type_pet">宠物</string>
+
+    <string name="type_parenting">育儿</string>
+    <string name="type_milk_powder">奶粉</string>
+    <string name="type_feeder">奶瓶</string>
+    <string name="type_supplementary_food">辅食</string>
+    <string name="type_diapers">纸尿裤</string>
+    <string name="type_kids">童装</string>
+    <string name="type_toy">玩具</string>
+    <string name="type_early_education">早教</string>
+    <string name="type_family_trip">亲子游</string>
+    <string name="type_vaccination">疫苗接种</string>
+
+    <string name="type_water_rate">水费</string>
+    <string name="type_electricity">电费</string>
+    <string name="type_gas_charge">燃气费</string>
+    <string name="type_garbage_fee">垃圾费</string>
+    <string name="type_property_costs">物业费</string>
+    <string name="type_heating_fee">取暖费</string>
+
+    <string name="type_book_education">文教</string>
+    <string name="type_tuition">学费</string>
+    <string name="type_stationery">文具</string>
+    <string name="type_exam">考试</string>
+    <string name="type_training">培训</string>
+    <string name="type_books">书籍</string>
+
+    <string name="type_car">汽车</string>
+    <string name="type_refuel">加油</string>
+    <string name="type_car_charge">充电</string>
+    <string name="type_parking">停车</string>
+    <string name="type_toll">通行费</string>
+    <string name="type_auto_parts">汽车配件</string>
+    <string name="type_repair">维修</string>
+    <string name="type_car_maintenance">保养</string>
+    <string name="type_car_wash">洗车</string>
+    <string name="type_illegal">违章</string>
+    <string name="type_car_insurance">车险</string>
+    <string name="type_car_inspection">车检</string>
+    <string name="type_car_loan">车贷</string>
+
+    <string name="type_interpersonal">人际关系</string>
+    <string name="type_cash_gift">礼金</string>
+    <string name="type_gift">礼品</string>
+    <string name="type_treat">请客</string>
+
+    <string name="type_traffic">交通</string>
+    <string name="type_bus">公交</string>
+    <string name="type_subway">地铁</string>
+    <string name="type_train">火车</string>
+    <string name="type_plane">飞机</string>
+    <string name="type_taxi">打车</string>
+    <string name="type_ship">轮船</string>
+    <string name="type_bicycle">自行车</string>
+
+    <string name="type_housing">住房</string>
+    <string name="type_house_rent">房租</string>
+    <string name="type_house_loan">房贷</string>
+    <string name="type_hotel">酒店</string>
+
+    <string name="type_medical">医疗</string>
+    <string name="type_medkit">医疗包</string>
+    <string name="type_registration">挂号</string>
+    <string name="type_diagnose">看诊</string>
+    <string name="type_drug">药品</string>
+    <string name="type_hospitalization">住院</string>
+    <string name="type_hygiene">保健</string>
+
+    <string name="type_other">其它</string>
+
+    <string name="type_coffee">咖啡</string>
+</resources>

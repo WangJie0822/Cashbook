@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sheet_title">记账本</string>
+    <string name="my_books">我的账本</string>
+    <string name="my_assets">我的资产</string>
+    <string name="my_categories">我的分类</string>
+    <string name="settings">设置</string>
+    <string name="about_us">关于我们</string>
+    <string name="about_us_description">这是一个免费的、开源的软件，目的是为了更加便捷、稳定的记录生活中的相关开支，当然你也可以自己为它添加个性化的功能。</string>
+    <string name="contact_me">联系我</string>
+    <string name="please_select_email">请选择邮箱</string>
+    <string name="please_select_web_browser">请选择浏览器</string>
+    <string name="github">Github</string>
+    <string name="gitee">Gitee</string>
+    <string name="switch_data_source">切换数据源</string>
+    <string name="data_source_hint">从不同的数据源获取版本、变更信息</string>
+    <string name="auto_check_update">自动检查更新</string>
+    <string name="check_update">检查更新</string>
+    <string name="it_is_the_latest_version">已是最新版本</string>
+    <string name="update_downloading_hint">更新下载中，请耐心等待</string>
+    <string name="start_background_download">开始后台下载</string>
+    <string name="ignore_this_version">忽略该版本</string>
+    <string name="no_more_prompt">不再提示</string>
+    <string name="no_wifi_download_available_hint">未连接Wi-Fi，确定使用数据流量下载吗？</string>
+    <string name="update">更新</string>
+    <string name="version_info">版本信息</string>
+    <string name="user_agreement_and_privacy_policy">用户协议和隐私政策</string>
+
+    <string name="show_notification">显示通知</string>
+    <string name="update_progress_title">下载进度</string>
+    <string name="update_notification_progress">更新通知进度</string>
+    <string name="hide_notification">取消通知</string>
+    <string name="channel_update_name">应用升级</string>
+    <string name="channel_update_description">该渠道用于通知更新下载进度</string>
+    <string name="channel_app_name">应用通知</string>
+    <string name="channel_app_description">该渠道用于通知应用信息</string>
+    <string name="update_error_title">下载失败</string>
+    <string name="retry">重试</string>
+
+    <string name="update_progress_format" translatable="false">%1$s%%</string>
+</resources>

@@ -70,9 +70,13 @@ gradlePlugin {
             id = "cashbook.android.test"
             implementationClass = "AndroidTestConventionPlugin"
         }
-        register("androidFlavors") {
+        register("androidApplicationFlavors") {
             id = "cashbook.android.application.flavors"
             implementationClass = "AndroidApplicationFlavorsConventionPlugin"
+        }
+        register("androidLibraryFlavors") {
+            id = "cashbook.android.library.flavors"
+            implementationClass = "AndroidLibraryFlavorsConventionPlugin"
         }
         register("jvmLibrary") {
             id = "cashbook.jvm.library"

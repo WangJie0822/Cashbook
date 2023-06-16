@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_tags">我的标签</string>
+    <string name="modify">修改</string>
+    <string name="delete">删除</string>
+    <string name="statistic_data">统计数据</string>
+    <string name="tags_empty_hint">还没有标签，点击右上角添加</string>
+    <string name="new_tag">新建标签</string>
+    <string name="edit_tag">编辑标签</string>
+    <string name="tag_name">标签名称</string>
+    <string name="tag_delete_hint_format">确认要删除“%1$s”标签吗？删除标签不会影响已有账单，仅清除账单标签数据</string>
+    <string name="allow_multiple_choices">允许多选</string>
+    <string name="please_select_tags">请选择标签</string>
+    <string name="add">添加</string>
+</resources>

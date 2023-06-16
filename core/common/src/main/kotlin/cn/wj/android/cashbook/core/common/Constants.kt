@@ -78,3 +78,9 @@ const val MS_WEEK = MS_DAY * 7L
 
 /** 最低密码长度 */
 const val PASSWORD_MIN_LENGTH = 6
+
+/** 下载地址 */
+const val ACTION_DOWNLOAD_URL = "action_download_url"
+
+/** APK 名称 */
+const val ACTION_APK_NAME = "action_apk_name"

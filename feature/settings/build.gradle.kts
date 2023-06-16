@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     id("cashbook.android.library.feature")
     id("cashbook.android.library.compose")
@@ -10,4 +12,15 @@ android {
 
 dependencies {
 
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // okhttp
+    implementation(libs.squareup.okhttp3)
+
+    // Markdown 解析
+    implementation(libs.noties.markwon)
+
+    // WebView
+    implementation(libs.google.accompanist.webview)
 }

@@ -34,9 +34,7 @@ android {
         }
     }
 
-    buildFeatures {
-        buildConfig = true
-    }
+    buildFeatures.buildConfig = true
 
     buildTypes {
         getByName("debug") {

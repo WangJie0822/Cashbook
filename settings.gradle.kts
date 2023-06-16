@@ -64,6 +64,7 @@ include(
     ":core:domain",
     ":core:design",
     ":core:ui",
+    ":core:network",
     ":core:testing",
     ":core:MPChart",
 )

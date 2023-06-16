@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.feature.settings.R
+import cn.wj.android.cashbook.core.ui.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

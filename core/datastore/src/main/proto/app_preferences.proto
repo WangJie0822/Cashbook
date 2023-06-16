@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_package = "cn.wj.android.cashbook.core.datastore";
+option java_multiple_files = true;
+
+/* 应用相关配置 */
+message AppPreferences {
+  sint64 currentBookId = 1; // 当前使用的账本 id
+  sint64 defaultTypeId = 2; // 默认类型 id
+  sint64 lastAssetId = 3; // 上一次使用资产 id
+  sint64 refundTypeId = 4; // 退款类型 id
+  sint64 reimburseTypeId = 5; // 报销类型 id
+  bool useGithub = 6; // 使用 github 源
+  bool autoCheckUpdate = 7; // 自动检查更新
+  string ignoreUpdateVersion = 8; // 忽略的更新版本
+  bool mobileNetworkDownloadEnable = 9; // 是否允许使用数据流量下载
+}

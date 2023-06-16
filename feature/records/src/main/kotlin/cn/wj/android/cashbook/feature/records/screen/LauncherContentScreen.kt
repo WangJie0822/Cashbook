@@ -73,7 +73,7 @@ import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.feature.records.R
+import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.model.RecordDialogState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import java.math.BigDecimal
@@ -222,7 +222,7 @@ internal fun LauncherContentScreen(
                                             }
                                         }
                                     }) {
-                                        Text(text = stringResource(id = cn.wj.android.cashbook.core.design.R.string.confirm))
+                                        Text(text = stringResource(id = R.string.confirm))
                                     }
                                 },
                                 dismissButton = {

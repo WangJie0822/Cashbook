@@ -20,7 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.model.entity.TagEntity
-import cn.wj.android.cashbook.feature.tags.R
+import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import cn.wj.android.cashbook.feature.tags.viewmodel.SelectTagViewModel
 import com.google.accompanist.flowlayout.FlowRow
