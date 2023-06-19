@@ -8,7 +8,6 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
-import cn.wj.android.cashbook.core.ui.controller
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.SelectAssetBottomSheetScreen
 import com.google.accompanist.navigation.animation.composable
@@ -36,6 +35,7 @@ fun NavController.naviToEditAsset(assetId: Long = -1L) {
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.editAssetScreen(
+    onBackClick: () -> Unit,
 ) {
     composable(
         route = ROUTE_EDIT_ASSET,
@@ -45,7 +45,7 @@ fun NavGraphBuilder.editAssetScreen(
         })
     ) {
         EditAssetRoute(
-            onBackClick = { controller?.popBackStack() },
+            onBackClick = onBackClick,
             assetId = it.arguments?.getLong(ROUTE_EDIT_ASSET_KEY) ?: -1L
         )
     }

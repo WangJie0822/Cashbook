@@ -69,7 +69,6 @@ import cn.wj.android.cashbook.core.design.component.TopAppBarDefaults
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
@@ -88,8 +87,12 @@ import kotlinx.coroutines.launch
 )
 @Composable
 internal fun LauncherContentScreen(
+    onAddClick: () -> Unit,
+    onMenuClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    onCalendarClick: () -> Unit,
+    onMyAssetClick: () -> Unit,
     onRecordItemEditClick: (Long) -> Unit,
-    onMenuClick: (LauncherMenuAction) -> Unit,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
     viewModel: LauncherContentViewModel = hiltViewModel(),
@@ -151,11 +154,14 @@ internal fun LauncherContentScreen(
                     booksName = booksName,
                     backdropScaffoldState = scaffoldState,
                     onMenuClick = onMenuClick,
+                    onSearchClick = onSearchClick,
+                    onCalendarClick = onCalendarClick,
+                    onMyAssetClick = onMyAssetClick,
                 )
             },
             snackbarHost = { SnackbarHost(snackbarHostState) },
             floatingActionButton = {
-                FloatingActionButton(onClick = { onMenuClick(LauncherMenuAction.ADD) }) {
+                FloatingActionButton(onClick = onAddClick) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null)
                 }
             },
@@ -238,7 +244,7 @@ internal fun LauncherContentScreen(
                                 imageResId = cn.wj.android.cashbook.core.common.R.drawable.vector_no_data_200,
                                 hintResId = R.string.launcher_no_data_hint,
                                 buttonResId = R.string.launcher_no_data_button,
-                                onButtonClick = { onMenuClick(LauncherMenuAction.CALENDAR) },
+                                onButtonClick = onCalendarClick,
                             )
                         } else {
                             LazyColumn {
@@ -322,7 +328,10 @@ internal fun LauncherContentScreen(
 internal fun LauncherTopBar(
     booksName: String,
     backdropScaffoldState: BackdropScaffoldState,
-    onMenuClick: (LauncherMenuAction) -> Unit,
+    onMenuClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    onCalendarClick: () -> Unit,
+    onMyAssetClick: () -> Unit,
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -337,7 +346,7 @@ internal fun LauncherTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = { onMenuClick(LauncherMenuAction.MENU) }) {
+            IconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = null,
@@ -345,19 +354,19 @@ internal fun LauncherTopBar(
             }
         },
         actions = {
-            IconButton(onClick = { onMenuClick(LauncherMenuAction.SEARCH) }) {
+            IconButton(onClick = onSearchClick) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = null,
                 )
             }
-            IconButton(onClick = { onMenuClick(LauncherMenuAction.CALENDAR) }) {
+            IconButton(onClick = onCalendarClick) {
                 Icon(
                     imageVector = Icons.Default.CalendarMonth,
                     contentDescription = null,
                 )
             }
-            IconButton(onClick = { onMenuClick(LauncherMenuAction.MY_ASSET) }) {
+            IconButton(onClick = onMyAssetClick) {
                 Icon(
                     imageVector = Icons.Default.WebAsset,
                     contentDescription = null,

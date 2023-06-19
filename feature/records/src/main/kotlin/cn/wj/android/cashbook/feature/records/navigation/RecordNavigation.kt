@@ -13,9 +13,8 @@ import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
-import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.controller
+import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
@@ -41,6 +40,8 @@ fun NavController.naviToSelectRelatedRecord() {
  */
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.editRecordScreen(
+    onBackClick: () -> Unit,
+    onSelectRelatedRecordClick: () -> Unit,
     selectTypeList: @Composable (RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
@@ -54,26 +55,29 @@ fun NavGraphBuilder.editRecordScreen(
     ) {
         EditRecordRoute(
             recordId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY) ?: -1L,
-            onBackClick = { controller?.popBackStack() },
+            onBackClick = onBackClick,
             selectTypeList = selectTypeList,
             selectAssetBottomSheet = selectAssetBottomSheet,
             selectTagBottomSheet = selectTagBottomSheet,
-            onSelectRelatedRecordClick = { controller?.naviToSelectRelatedRecord() },
+            onSelectRelatedRecordClick = onSelectRelatedRecordClick,
         )
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.selectRelatedRecordScreen() {
+fun NavGraphBuilder.selectRelatedRecordScreen(
+    onBackClick: () -> Unit,
+) {
     composable(
         route = ROUTE_SELECT_RELATED_RECORD,
     ) {
+        val navController = LocalNavController.current
         val parentEntry = remember(it) {
-            controller!!.getBackStackEntry(ROUTE_EDIT_RECORD)
+            navController.getBackStackEntry(ROUTE_EDIT_RECORD)
         }
         val parentViewModel = hiltViewModel<EditRecordViewModel>(parentEntry)
         SelectRelatedRecordRoute(
-            onBackPressed = { controller?.popBackStack() },
+            onBackPressed = onBackClick,
             parentViewModel = parentViewModel,
         )
     }
@@ -82,11 +86,19 @@ fun NavGraphBuilder.selectRelatedRecordScreen() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LauncherContent(
-    onMenuClick: (LauncherMenuAction) -> Unit,
+    onAddClick: () -> Unit,
+    onMenuClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    onCalendarClick: () -> Unit,
+    onMyAssetClick: () -> Unit,
     onRecordItemEditClick: (Long) -> Unit,
 ) {
     LauncherContentScreen(
         onMenuClick = onMenuClick,
+        onAddClick = onAddClick,
+        onSearchClick = onSearchClick,
+        onCalendarClick = onCalendarClick,
+        onMyAssetClick = onMyAssetClick,
         onRecordItemEditClick = onRecordItemEditClick,
     )
 }

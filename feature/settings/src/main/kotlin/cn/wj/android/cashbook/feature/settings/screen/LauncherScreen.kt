@@ -26,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
 import kotlinx.coroutines.CoroutineScope
@@ -35,17 +34,26 @@ import kotlinx.coroutines.launch
 /**
  * 首页显示
  *
- * @param onMenuClick 菜单点击回调
  * @param content 内容区
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherRoute(
-    onMenuClick: (LauncherMenuAction) -> Unit,
+    onMyAssetClick: () -> Unit,
+    onMyBookClick: () -> Unit,
+    onMyCategoryClick: () -> Unit,
+    onMyTagClick: () -> Unit,
+    onSettingClick: () -> Unit,
+    onAboutUsClick: () -> Unit,
     content: @Composable (() -> Unit) -> Unit,
 ) {
     LauncherScreen(
-        onMenuClick = onMenuClick,
+        onMyAssetClick = onMyAssetClick,
+        onMyBookClick = onMyBookClick,
+        onMyCategoryClick = onMyCategoryClick,
+        onMyTagClick = onMyTagClick,
+        onSettingClick = onSettingClick,
+        onAboutUsClick = onAboutUsClick,
         content = content,
     )
 }
@@ -53,13 +61,17 @@ internal fun LauncherRoute(
 /**
  * 首页显示
  *
- * @param onMenuClick 菜单点击回调
  * @param content 内容区
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherScreen(
-    onMenuClick: (LauncherMenuAction) -> Unit,
+    onMyAssetClick: () -> Unit,
+    onMyBookClick: () -> Unit,
+    onMyCategoryClick: () -> Unit,
+    onMyTagClick: () -> Unit,
+    onSettingClick: () -> Unit,
+    onAboutUsClick: () -> Unit,
     content: @Composable (() -> Unit) -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -73,16 +85,42 @@ internal fun LauncherScreen(
         }
     }
 
+    // 关闭抽屉
+    val closeDrawer = {
+        coroutineScope.launch {
+            drawerState.close()
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            LauncherSheet { action ->
-                onMenuClick(action)
-                // 关闭抽屉
-                coroutineScope.launch {
-                    drawerState.close()
-                }
-            }
+            LauncherSheet(
+                onMyAssetClick = {
+                    onMyAssetClick.invoke()
+                    closeDrawer.invoke()
+                },
+                onMyBookClick = {
+                    onMyBookClick.invoke()
+                    closeDrawer.invoke()
+                },
+                onMyCategoryClick = {
+                    onMyCategoryClick.invoke()
+                    closeDrawer.invoke()
+                },
+                onMyTagClick = {
+                    onMyTagClick.invoke()
+                    closeDrawer.invoke()
+                },
+                onSettingClick = {
+                    onSettingClick.invoke()
+                    closeDrawer.invoke()
+                },
+                onAboutUsClick = {
+                    onAboutUsClick.invoke()
+                    closeDrawer.invoke()
+                },
+            )
         },
     ) {
         content {
@@ -95,15 +133,21 @@ internal fun LauncherScreen(
 
 /**
  * 首页抽屉菜单
- *
- * @param onMenuClick 菜单点击回调
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherSheet(
-    onMenuClick: (LauncherMenuAction) -> Unit,
+    onMyAssetClick: () -> Unit,
+    onMyBookClick: () -> Unit,
+    onMyCategoryClick: () -> Unit,
+    onMyTagClick: () -> Unit,
+    onSettingClick: () -> Unit,
+    onAboutUsClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    ModalDrawerSheet {
+    ModalDrawerSheet(
+        modifier = modifier,
+    ) {
         Text(
             text = stringResource(id = R.string.sheet_title),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -114,28 +158,28 @@ internal fun LauncherSheet(
             label = { Text(text = stringResource(id = R.string.my_books)) },
             icon = { Icon(imageVector = Icons.Default.LibraryBooks, contentDescription = null) },
             selected = false,
-            onClick = { onMenuClick(LauncherMenuAction.MY_BOOK) },
+            onClick = onMyBookClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_assets)) },
             icon = { Icon(imageVector = Icons.Default.WebAsset, contentDescription = null) },
             selected = false,
-            onClick = { onMenuClick(LauncherMenuAction.MY_ASSET) },
+            onClick = onMyAssetClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_categories)) },
             icon = { Icon(imageVector = Icons.Default.Category, contentDescription = null) },
             selected = false,
-            onClick = { onMenuClick(LauncherMenuAction.MY_CATEGORY) },
+            onClick = onMyCategoryClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_tags)) },
             icon = { Icon(imageVector = Icons.Default.Layers, contentDescription = null) },
             selected = false,
-            onClick = { onMenuClick(LauncherMenuAction.MY_TAG) },
+            onClick = onMyTagClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         Divider(
@@ -147,14 +191,14 @@ internal fun LauncherSheet(
             label = { Text(text = stringResource(id = R.string.settings)) },
             icon = { Icon(imageVector = Icons.Default.Settings, contentDescription = null) },
             selected = false,
-            onClick = { onMenuClick(LauncherMenuAction.SETTING) },
+            onClick = onSettingClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.about_us)) },
             icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
             selected = false,
-            onClick = { onMenuClick(LauncherMenuAction.ABOUT_US) },
+            onClick = onAboutUsClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
     }

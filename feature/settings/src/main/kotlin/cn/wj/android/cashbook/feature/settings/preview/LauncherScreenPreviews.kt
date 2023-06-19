@@ -14,7 +14,14 @@ import cn.wj.android.cashbook.feature.settings.screen.LauncherSheet
 @Composable
 internal fun LauncherSheetPreview() {
     CashbookTheme {
-        LauncherSheet(onMenuClick = {})
+        LauncherSheet(
+            onMyAssetClick = { },
+            onMyBookClick = { },
+            onMyCategoryClick = { },
+            onMyTagClick = { },
+            onSettingClick = { },
+            onAboutUsClick = { },
+        )
     }
 }
 
@@ -26,8 +33,13 @@ internal fun LauncherScreenPreview() {
     CashbookTheme {
         LauncherScreen(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-            onMenuClick = {},
-            content = { },
+            onMyAssetClick = { },
+            onMyBookClick = { },
+            onMyCategoryClick = { },
+            onMyTagClick = { },
+            onSettingClick = { },
+            onAboutUsClick = { },
+            content = {},
         )
     }
 }

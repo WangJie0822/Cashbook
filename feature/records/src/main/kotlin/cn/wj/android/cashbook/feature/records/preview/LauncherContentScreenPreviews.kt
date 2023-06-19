@@ -24,11 +24,17 @@ internal fun LauncherTopTitleBarPreview() {
                 booksName = "默认账本",
                 backdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
                 onMenuClick = {},
+                onSearchClick = {},
+                onCalendarClick = {},
+                onMyAssetClick = {},
             )
             LauncherTopBar(
                 booksName = "默认账本",
                 backdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed),
                 onMenuClick = {},
+                onSearchClick = {},
+                onCalendarClick = {},
+                onMyAssetClick = {},
             )
         }
     }
@@ -42,6 +48,10 @@ internal fun LauncherContentScreenPreview() {
     CashbookTheme {
         LauncherContentScreen(
             onMenuClick = {},
+            onAddClick = {},
+            onSearchClick = {},
+            onCalendarClick = {},
+            onMyAssetClick = {},
             onRecordItemEditClick = {},
         )
     }

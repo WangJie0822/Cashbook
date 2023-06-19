@@ -36,6 +36,7 @@ class LauncherContentViewModel @Inject constructor(
     private val deleteRecordUseCase: DeleteRecordUseCase,
 ) : ViewModel() {
 
+    /** 弹窗状态数据 */
     val dialogState: MutableStateFlow<RecordDialogState> =
         MutableStateFlow(RecordDialogState.Dismiss)
 

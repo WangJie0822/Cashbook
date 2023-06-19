@@ -14,20 +14,20 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
-import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
-import cn.wj.android.cashbook.core.ui.controller
+import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.feature.assets.navigation.SelectAssetBottomSheet
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
+import cn.wj.android.cashbook.feature.records.navigation.naviToSelectRelatedRecord
 import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
@@ -45,34 +45,33 @@ private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 
 /** 应用入口 */
 @OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalLayoutApi::class, ExperimentalAnimationApi::class
+    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalAnimationApi::class
 )
 @Composable
 fun MainApp() {
     CashbookBackground {
         val navController = rememberAnimatedNavController()
         val snackbarHostState = remember { SnackbarHostState() }
-        Scaffold(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.onBackground,
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) { paddingValues ->
-            CashbookNavHost(
-                navController = navController,
-                onShowSnackbar = { message, action ->
-                    snackbarHostState.showSnackbar(
-                        message = message,
-                        actionLabel = action,
-                        duration = SnackbarDuration.Short,
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .consumeWindowInsets(paddingValues),
-            )
+        CompositionLocalProvider(LocalNavController provides navController) {
+            Scaffold(containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.onBackground,
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
+                CashbookNavHost(
+                    navController = navController,
+                    onShowSnackbar = { message, action ->
+                        snackbarHostState.showSnackbar(
+                            message = message,
+                            actionLabel = action,
+                            duration = SnackbarDuration.Short,
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .consumeWindowInsets(paddingValues),
+                )
+            }
         }
     }
 }
@@ -89,66 +88,23 @@ fun CashbookNavHost(
         startDestination = START_DESTINATION,
         modifier = modifier,
     ) {
-        controller = navController
 
-        val onLauncherMenuClick: (LauncherMenuAction) -> Unit = { action ->
-            when (action) {
-                LauncherMenuAction.ADD -> {
-                    navController.naviToEditRecord()
-                }
-
-                LauncherMenuAction.SEARCH -> {
-
-                }
-
-                LauncherMenuAction.CALENDAR -> {
-
-                }
-
-                LauncherMenuAction.MY_ASSET -> {
-
-                }
-
-                LauncherMenuAction.MY_BOOK -> {
-
-                }
-
-                LauncherMenuAction.MY_CATEGORY -> {
-
-                }
-
-                LauncherMenuAction.MY_TAG -> {
-                    navController.naviToMyTags()
-                }
-
-                LauncherMenuAction.SETTING -> {
-
-                }
-
-                LauncherMenuAction.ABOUT_US -> {
-                    navController.naviToAboutUs()
-                }
-
-                else -> {
-                    logger().d("this menu not handle here")
-                }
-            }
-        }
         // 启动页
         settingsLauncherScreen(
-            onMenuClick = onLauncherMenuClick,
+            onMyAssetClick = { /* TODO */ },
+            onMyBookClick = {/* TODO */ },
+            onMyCategoryClick = {/* TODO */ },
+            onMyTagClick = navController::naviToMyTags,
+            onSettingClick = {/* TODO */ },
+            onAboutUsClick = navController::naviToAboutUs,
             content = { openDrawer ->
                 LauncherContent(
-                    onMenuClick = {
-                        if (it == LauncherMenuAction.MENU) {
-                            openDrawer()
-                        } else {
-                            onLauncherMenuClick(it)
-                        }
-                    },
-                    onRecordItemEditClick = {
-                        navController.naviToEditRecord(it)
-                    },
+                    onMenuClick = openDrawer,
+                    onAddClick = navController::naviToEditRecord,
+                    onSearchClick = { /* TODO */ },
+                    onCalendarClick = { /* TODO */ },
+                    onMyAssetClick = { /* TODO */ },
+                    onRecordItemEditClick = navController::naviToEditRecord,
                 )
             },
         )
@@ -166,12 +122,13 @@ fun CashbookNavHost(
 
         // 我的标签
         myTagsScreen(
-            onTagStatisticClick = {
-                // TODO
-            },
+            onBackClick = navController::popBackStack,
+            onTagStatisticClick = { /* TODO */ },
         )
         // 编辑记录
         editRecordScreen(
+            onBackClick = navController::popBackStack,
+            onSelectRelatedRecordClick = navController::naviToSelectRelatedRecord,
             selectTypeList = { typeCategory, selectedType, overTypeList, underTypeList, onTypeSelected ->
                 SelectRecordTypeList(
                     typeCategory = typeCategory,
@@ -186,20 +143,23 @@ fun CashbookNavHost(
                 SelectAssetBottomSheet(
                     selectedType = selectedType,
                     related = related,
-                    onAddAssetClick = { navController.naviToEditAsset() },
+                    onAddAssetClick = navController::naviToEditAsset,
                     onAssetItemClick = onAssetItemClick
                 )
             },
             selectTagBottomSheet = { list, onTagItemClick ->
                 SelectTagsBottomSheet(
-                    selectedTagIds = list,
-                    onTagItemClick = onTagItemClick
+                    selectedTagIds = list, onTagItemClick = onTagItemClick
                 )
             },
         )
         // 选择关联记录
-        selectRelatedRecordScreen()
+        selectRelatedRecordScreen(
+            onBackClick = navController::popBackStack,
+        )
         // 编辑资产
-        editAssetScreen()
+        editAssetScreen(
+            onBackClick = navController::popBackStack,
+        )
     }
 }

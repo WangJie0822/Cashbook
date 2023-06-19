@@ -7,7 +7,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import cn.wj.android.cashbook.core.model.enums.LauncherMenuAction
 import cn.wj.android.cashbook.feature.settings.screen.AboutUsRoute
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
 import com.google.accompanist.navigation.animation.composable
@@ -26,16 +25,25 @@ fun NavController.naviToAboutUs() {
 /**
  * 首页显示
  *
- * @param onMenuClick 菜单点击回调
  * @param content 内容区
  */
 fun NavGraphBuilder.settingsLauncherScreen(
-    onMenuClick: (LauncherMenuAction) -> Unit,
+    onMyAssetClick: () -> Unit,
+    onMyBookClick: () -> Unit,
+    onMyCategoryClick: () -> Unit,
+    onMyTagClick: () -> Unit,
+    onSettingClick: () -> Unit,
+    onAboutUsClick: () -> Unit,
     content: @Composable (() -> Unit) -> Unit,
 ) {
     composable(route = ROUTE_SETTINGS_LAUNCHER) {
         LauncherRoute(
-            onMenuClick = onMenuClick,
+            onMyAssetClick = onMyAssetClick,
+            onMyBookClick = onMyBookClick,
+            onMyCategoryClick = onMyCategoryClick,
+            onMyTagClick = onMyTagClick,
+            onSettingClick = onSettingClick,
+            onAboutUsClick = onAboutUsClick,
             content = content,
         )
     }
