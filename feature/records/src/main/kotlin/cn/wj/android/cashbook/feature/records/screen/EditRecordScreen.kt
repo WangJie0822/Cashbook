@@ -118,7 +118,7 @@ internal fun EditRecordScreen(
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
-        recordIdData.value = recordId
+        updateRecordId(recordId)
     },
 ) {
 

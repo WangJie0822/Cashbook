@@ -1,8 +1,12 @@
 package cn.wj.android.cashbook.feature.records.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -22,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * 启动页内容 ViewModel
@@ -36,10 +41,15 @@ class LauncherContentViewModel @Inject constructor(
     private val deleteRecordUseCase: DeleteRecordUseCase,
 ) : ViewModel() {
 
-    /** 弹窗状态数据 */
-    val dialogState: MutableStateFlow<RecordDialogState> =
-        MutableStateFlow(RecordDialogState.Dismiss)
+    /** 标记 - 是否显示删除失败提示 */
+    var shouldDisplayDeleteFailedBookmark by mutableStateOf(-1)
 
+    /** 弹窗状态数据 */
+    private val _dialogState: MutableStateFlow<RecordDialogState> =
+        MutableStateFlow(RecordDialogState.Dismiss)
+    val dialogState: StateFlow<RecordDialogState> = _dialogState
+
+    /** 当前账本名称 */
     val bookName: StateFlow<String> = getCurrentBooksUseCase()
         .mapLatest { it.name }
         .stateIn(
@@ -48,6 +58,7 @@ class LauncherContentViewModel @Inject constructor(
             initialValue = "",
         )
 
+    /** 当前月记录数据 */
     val currentMonthRecordListMapData: StateFlow<Map<String, List<RecordViewsEntity>>> =
         getCurrentMonthRecordViewsUseCase()
             .stateIn(
@@ -133,26 +144,33 @@ class LauncherContentViewModel @Inject constructor(
             )
 
     /** 选中的记录数据 */
-    val selectedRecordData: MutableStateFlow<RecordViewsEntity?> = MutableStateFlow(null)
+    private val _selectedRecordData: MutableStateFlow<RecordViewsEntity?> = MutableStateFlow(null)
+    val selectedRecordData: StateFlow<RecordViewsEntity?> = _selectedRecordData
 
     fun onRecordItemClick(recordViewsEntity: RecordViewsEntity) {
-        selectedRecordData.value = recordViewsEntity
+        _selectedRecordData.value = recordViewsEntity
     }
 
     fun onRecordDeleteClick(recordId: Long) {
-        dialogState.value = RecordDialogState.Show(recordId)
+        _dialogState.value = RecordDialogState.Show(recordId)
     }
 
     fun onDismiss() {
-        dialogState.value = RecordDialogState.Dismiss
+        _dialogState.value = RecordDialogState.Dismiss
     }
 
-    suspend fun tryDeleteRecord(recordId: Long): ResultModel {
-        return try {
-            deleteRecordUseCase(recordId)
-            ResultModel.success()
-        } catch (throwable: Throwable) {
-            ResultModel.failure(throwable)
+    fun tryDeleteRecord(recordId: Long) {
+        viewModelScope.launch {
+            try {
+                deleteRecordUseCase(recordId)
+                // 删除成功，隐藏弹窗
+                onDismiss()
+            } catch (throwable: Throwable) {
+                this@LauncherContentViewModel.logger()
+                    .e(throwable, "tryDeleteRecord(recordId = <$recordId>) failed")
+                // 提示
+                shouldDisplayDeleteFailedBookmark = ResultModel.Failure.FAILURE_THROWABLE
+            }
         }
     }
 }

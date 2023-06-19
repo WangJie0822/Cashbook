@@ -50,11 +50,12 @@ class EditRecordViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** 显示底部弹窗数据 */
-    val bottomSheetData: MutableStateFlow<EditRecordBottomSheetEnum> =
+    private val _bottomSheetData: MutableStateFlow<EditRecordBottomSheetEnum> =
         MutableStateFlow(EditRecordBottomSheetEnum.NONE)
+    val bottomSheetData: StateFlow<EditRecordBottomSheetEnum> = _bottomSheetData
 
     /** 记录 id 数据 */
-    val recordIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
+    private val recordIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
 
     /** 默认记录数据 */
     private val defaultRecordData: Flow<RecordEntity> = recordIdData.mapLatest {
@@ -277,8 +278,12 @@ class EditRecordViewModel @Inject constructor(
                 initialValue = mapOf()
             )
 
+    fun updateRecordId(recordId: Long) {
+        recordIdData.tryEmit(recordId)
+    }
+
     fun onBottomSheetAction(action: EditRecordBottomSheetEnum) {
-        bottomSheetData.value = action
+        _bottomSheetData.value = action
     }
 
     /** 金额变化 */

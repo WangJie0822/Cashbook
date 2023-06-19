@@ -105,6 +105,7 @@ fun CashbookNavHost(
                     onCalendarClick = { /* TODO */ },
                     onMyAssetClick = { /* TODO */ },
                     onRecordItemEditClick = navController::naviToEditRecord,
+                    onShowSnackbar = onShowSnackbar,
                 )
             },
         )

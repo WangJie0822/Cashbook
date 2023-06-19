@@ -6,6 +6,7 @@ import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
@@ -53,6 +54,7 @@ internal fun LauncherContentScreenPreview() {
             onCalendarClick = {},
             onMyAssetClick = {},
             onRecordItemEditClick = {},
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
         )
     }
 }

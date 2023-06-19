@@ -37,14 +37,13 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetLayout
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,7 +58,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.design.component.CommonDivider
@@ -70,7 +68,6 @@ import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.model.RecordDialogState
@@ -93,11 +90,24 @@ internal fun LauncherContentScreen(
     onCalendarClick: () -> Unit,
     onMyAssetClick: () -> Unit,
     onRecordItemEditClick: (Long) -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
     viewModel: LauncherContentViewModel = hiltViewModel(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
+    val deleteFailedFormatText = stringResource(id = R.string.delete_failed_format)
+    LaunchedEffect(viewModel.shouldDisplayDeleteFailedBookmark) {
+        if (viewModel.shouldDisplayDeleteFailedBookmark > 0) {
+            val result = onShowSnackbar.invoke(
+                deleteFailedFormatText.format(viewModel.shouldDisplayDeleteFailedBookmark),
+                null
+            )
+            if (SnackbarResult.Dismissed == result) {
+                viewModel.shouldDisplayDeleteFailedBookmark = 0
+            }
+        }
+    }
 
     if (sheetState.isVisible) {
         BackPressHandler {
@@ -124,10 +134,6 @@ internal fun LauncherContentScreen(
     val selectedRecord by viewModel.selectedRecordData.collectAsStateWithLifecycle()
 
     val todayInt = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-
-    val snackbarHostState = remember {
-        SnackbarHostState()
-    }
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
@@ -159,7 +165,6 @@ internal fun LauncherContentScreen(
                     onMyAssetClick = onMyAssetClick,
                 )
             },
-            snackbarHost = { SnackbarHost(snackbarHostState) },
             floatingActionButton = {
                 FloatingActionButton(onClick = onAddClick) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null)
@@ -213,20 +218,7 @@ internal fun LauncherContentScreen(
                                 },
                                 confirmButton = {
                                     TextButton(onClick = {
-                                        coroutineScope.launch {
-                                            val result = viewModel.tryDeleteRecord(state.recordId)
-                                            if (result is ResultModel.Failure<*>) {
-                                                // 删除失败
-                                                snackbarHostState.showSnackbar(
-                                                    R.string.delete_failed_format.string.format(
-                                                        result.code
-                                                    )
-                                                )
-                                            } else {
-                                                // 删除成功
-                                                viewModel.onDismiss()
-                                            }
-                                        }
+                                        viewModel.tryDeleteRecord(state.recordId)
                                     }) {
                                         Text(text = stringResource(id = R.string.confirm))
                                     }

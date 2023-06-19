@@ -50,7 +50,7 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
                         it.recordTime,
                     ).asEntity()
                     if (map.containsKey(key)) {
-                        map[key]!!.add(model)
+                        map[key]?.add(model)
                     } else {
                         map[key] = arrayListOf(model)
                     }
