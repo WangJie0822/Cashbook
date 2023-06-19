@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.copy
 import cn.wj.android.cashbook.core.model.model.AppDataModel
@@ -31,6 +32,12 @@ class AppPreferencesDataSource @Inject constructor(
                 autoCheckUpdate = it.autoCheckUpdate,
                 ignoreUpdateVersion = it.ignoreUpdateVersion,
                 mobileNetworkDownloadEnable = it.mobileNetworkDownloadEnable,
+                needSecurityVerificationWhenLaunch = it.needSecurityVerificationWhenLaunch,
+                enableFingerprintVerification = it.enableFingerprintVerification,
+                passwordIv = it.passwordIv,
+                fingerprintIv = it.fingerprintIv,
+                passwordInfo = it.passwordInfo,
+                fingerprintPasswordInfo = it.fingerprintPasswordInfo,
             )
         }
 
@@ -58,6 +65,46 @@ class AppPreferencesDataSource @Inject constructor(
         appPreferences.updateData {
             it.copy {
                 this.mobileNetworkDownloadEnable = mobileNetworkDownloadEnable
+            }
+        }
+    }
+
+    suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean) {
+        appPreferences.updateData {
+            it.copy {
+                this.needSecurityVerificationWhenLaunch = needSecurityVerificationWhenLaunch
+            }
+        }
+    }
+
+    suspend fun updateEnableFingerprintVerification(enableFingerprintVerification: Boolean) {
+        appPreferences.updateData {
+            it.copy {
+                this.enableFingerprintVerification = enableFingerprintVerification
+            }
+        }
+    }
+
+    suspend fun updatePasswordIv(iv: String) {
+        logger().i("updatePasswordIv(iv = <$iv>)")
+        appPreferences.updateData { it.copy { this.passwordIv = iv } }
+    }
+
+    suspend fun updateFingerprintIv(iv: String) {
+        logger().i("updateFingerprintIv(iv = <$iv>)")
+        appPreferences.updateData { it.copy { this.fingerprintIv = iv } }
+    }
+
+    suspend fun updatePasswordInfo(passwordInfo: String) {
+        logger().i("updatePasswordInfo(iv = <$passwordInfo>)")
+        appPreferences.updateData { it.copy { this.passwordInfo = passwordInfo } }
+    }
+
+    suspend fun updateFingerprintPasswordInfo(fingerprintPasswordInfo: String) {
+        logger().i("updateFingerprintPasswordInfo(iv = <$fingerprintPasswordInfo>)")
+        appPreferences.updateData {
+            it.copy {
+                this.fingerprintPasswordInfo = fingerprintPasswordInfo
             }
         }
     }

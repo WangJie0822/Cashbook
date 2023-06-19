@@ -14,4 +14,10 @@ message AppPreferences {
   bool autoCheckUpdate = 7; // 自动检查更新
   string ignoreUpdateVersion = 8; // 忽略的更新版本
   bool mobileNetworkDownloadEnable = 9; // 是否允许使用数据流量下载
+  bool needSecurityVerificationWhenLaunch = 10; // 启动时进行安全验证
+  bool enableFingerprintVerification = 11; // 允许指纹验证
+  string passwordIv = 12; // 密码加密向量
+  string fingerprintIv = 13; // 指纹加密向量
+  string passwordInfo = 14; // 密码信息
+  string fingerprintPasswordInfo = 15; // 指纹密码信息
 }

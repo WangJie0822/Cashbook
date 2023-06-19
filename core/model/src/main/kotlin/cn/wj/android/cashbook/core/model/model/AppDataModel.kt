@@ -13,6 +13,12 @@ data class AppDataModel(
     val reimburseTypeId: Long,
     val useGithub: Boolean,
     val autoCheckUpdate: Boolean,
-    val ignoreUpdateVersion: String?,
+    val ignoreUpdateVersion: String,
     val mobileNetworkDownloadEnable: Boolean,
+    val needSecurityVerificationWhenLaunch: Boolean,
+    val enableFingerprintVerification: Boolean,
+    val passwordIv: String,
+    val fingerprintIv: String,
+    val passwordInfo: String,
+    val fingerprintPasswordInfo: String,
 )

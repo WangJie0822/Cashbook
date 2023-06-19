@@ -37,5 +37,21 @@
     <string name="update_error_title">下载失败</string>
     <string name="retry">重试</string>
 
+    <string name="mobile_network_download_enable">允许手机流量下载</string>
+    <string name="need_security_verification_when_launch">启动时安全验证</string>
+    <string name="enable_fingerprint_verification">允许指纹验证</string>
+    <string name="create_password">创建密码</string>
+    <string name="modify_password">修改密码</string>
+    <string name="clear_password">清除密码</string>
+    <string name="new_password">新密码</string>
+    <string name="confirm_password">确认密码</string>
+    <string name="please_enter_password">请输入密码</string>
+    <string name="please_confirm_password">请确认密码</string>
+    <string name="password_must_not_be_blank">密码不能为空</string>
+    <string name="password_confirm_failed">密码确认失败</string>
+    <string name="password_format_error">密码格式错误</string>
+    <string name="password_wrong">密码错误</string>
+    <string name="password_encode_failed">密码加密失败</string>
+
     <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

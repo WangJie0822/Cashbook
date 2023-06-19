@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import cn.wj.android.cashbook.feature.settings.screen.AboutUsRoute
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
+import cn.wj.android.cashbook.feature.settings.screen.SettingRoute
 import com.google.accompanist.navigation.animation.composable
 
 /** 设置 - 启动页路由 */
@@ -17,9 +18,17 @@ const val ROUTE_SETTINGS_LAUNCHER = "settings/launcher"
 /** 设置 - 关于我们路由 */
 const val ROUTE_SETTINGS_ABOUT_US = "settings/about_us"
 
+/** 设置 - 设置路由 */
+const val ROUTE_SETTINGS_SETTING = "settings/setting"
+
 /** 跳转到关于我们 */
 fun NavController.naviToAboutUs() {
     this.navigate(ROUTE_SETTINGS_ABOUT_US)
+}
+
+/** 跳转到设置 */
+fun NavController.naviToSetting() {
+    this.navigate(ROUTE_SETTINGS_SETTING)
 }
 
 /**
@@ -64,6 +73,19 @@ fun NavGraphBuilder.aboutUsScreen(
             onShowSnackbar = onShowSnackbar,
             onVersionInfoClick = onVersionInfoClick,
             onUserAgreementAndPrivacyPolicyClick = onUserAgreementAndPrivacyPolicyClick,
+        )
+    }
+}
+
+fun NavGraphBuilder.settingScreen(
+    onBackClick: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+
+) {
+    composable(route = ROUTE_SETTINGS_SETTING) {
+        SettingRoute(
+            onBackClick = onBackClick,
+            onShowSnackbar = onShowSnackbar,
         )
     }
 }

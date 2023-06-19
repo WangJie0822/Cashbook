@@ -32,6 +32,8 @@ import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScre
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
 import cn.wj.android.cashbook.feature.settings.navigation.naviToAboutUs
+import cn.wj.android.cashbook.feature.settings.navigation.naviToSetting
+import cn.wj.android.cashbook.feature.settings.navigation.settingScreen
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
 import cn.wj.android.cashbook.feature.tags.navigation.SelectTagsBottomSheet
 import cn.wj.android.cashbook.feature.tags.navigation.myTagsScreen
@@ -95,7 +97,7 @@ fun CashbookNavHost(
             onMyBookClick = {/* TODO */ },
             onMyCategoryClick = {/* TODO */ },
             onMyTagClick = navController::naviToMyTags,
-            onSettingClick = {/* TODO */ },
+            onSettingClick = navController::naviToSetting,
             onAboutUsClick = navController::naviToAboutUs,
             content = { openDrawer ->
                 LauncherContent(
@@ -119,6 +121,11 @@ fun CashbookNavHost(
             onUserAgreementAndPrivacyPolicyClick = {
                 // TODO 用户协议及隐私政策
             },
+        )
+        // 设置
+        settingScreen(
+            onBackClick = navController::popBackStack,
+            onShowSnackbar = onShowSnackbar,
         )
 
         // 我的标签

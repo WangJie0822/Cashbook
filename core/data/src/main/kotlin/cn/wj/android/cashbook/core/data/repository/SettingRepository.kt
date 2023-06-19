@@ -40,6 +40,40 @@ interface SettingRepository {
         coroutineContext: CoroutineContext = Dispatchers.IO
     )
 
+    /** 更新启动时是否需要安全验证配置 */
+    suspend fun updateNeedSecurityVerificationWhenLaunch(
+        needSecurityVerificationWhenLaunch: Boolean,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
+    /** 更新是否允许指纹验证配置 */
+    suspend fun updateEnableFingerprintVerification(
+        enableFingerprintVerification: Boolean,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
+    /** 更新密码加密向量 */
+    suspend fun updatePasswordIv(
+        iv: String,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
+    /** 更新指纹加密向量 */
+    suspend fun updateFingerprintIv(
+        iv: String,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
+    suspend fun updatePasswordInfo(
+        passwordInfo: String,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
+    suspend fun updateFingerprintPasswordInfo(
+        fingerprintPasswordInfo: String,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
     /** 检查更新 */
     suspend fun checkUpdate(
         coroutineContext: CoroutineContext = Dispatchers.IO

@@ -10,6 +10,11 @@ package cn.wj.android.cashbook.core.common
 const val DB_FILE_NAME = "cashbook.db"
 const val DB_INIT_FILE_NAME = "cashbook_init.db"
 
+/** 密码加密别名 */
+const val KEY_ALIAS_PASSWORD = "KEY_ALIAS_PASSWORD"
+/** 指纹加密别名 */
+const val KEY_ALIAS_FINGERPRINT = "KEY_ALIAS_FINGERPRINT"
+
 /** 开关 - 开 */
 const val SWITCH_INT_ON = 1
 

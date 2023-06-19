@@ -52,6 +52,46 @@ class SettingRepositoryImpl @Inject constructor(
         appPreferencesDataSource.updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable)
     }
 
+    override suspend fun updateNeedSecurityVerificationWhenLaunch(
+        needSecurityVerificationWhenLaunch: Boolean,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateNeedSecurityVerificationWhenLaunch(
+            needSecurityVerificationWhenLaunch
+        )
+    }
+
+    override suspend fun updateEnableFingerprintVerification(
+        enableFingerprintVerification: Boolean,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateEnableFingerprintVerification(enableFingerprintVerification)
+    }
+
+    override suspend fun updatePasswordIv(iv: String, coroutineContext: CoroutineContext) =
+        withContext(coroutineContext) {
+            appPreferencesDataSource.updatePasswordIv(iv)
+        }
+
+    override suspend fun updateFingerprintIv(iv: String, coroutineContext: CoroutineContext) =
+        withContext(coroutineContext) {
+            appPreferencesDataSource.updateFingerprintIv(iv)
+        }
+
+    override suspend fun updatePasswordInfo(
+        passwordInfo: String,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updatePasswordInfo(passwordInfo)
+    }
+
+    override suspend fun updateFingerprintPasswordInfo(
+        fingerprintPasswordInfo: String,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateFingerprintPasswordInfo(fingerprintPasswordInfo)
+    }
+
     override suspend fun checkUpdate(
         coroutineContext: CoroutineContext
     ): UpdateInfoEntity = withContext(coroutineContext) {
