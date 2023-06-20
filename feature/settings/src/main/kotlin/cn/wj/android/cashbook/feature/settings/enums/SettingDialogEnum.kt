@@ -18,4 +18,10 @@ enum class SettingDialogEnum {
 
     /** 清除密码 */
     CLEAR_PASSWORD,
+
+    /** 黑夜模式 */
+    DARK_MODE,
+
+    /** 动态配色 */
+    DYNAMIC_COLOR,
 }

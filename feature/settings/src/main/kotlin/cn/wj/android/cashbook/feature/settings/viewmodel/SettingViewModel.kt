@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.core.common.KEY_ALIAS_FINGERPRINT
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_PASSWORD
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
@@ -41,9 +42,6 @@ class SettingViewModel @Inject constructor(
 
     /** 是否需要显示提示 */
     var shouldDisplayBookmark by mutableStateOf("")
-
-    /** 是否需要显示指纹认证弹窗 */
-    var shouldDisplayFingerprintVerification by mutableStateOf<Cipher?>(null)
 
     /** 是否允许流量下载 */
     val mobileNetworkDownloadEnable = settingRepository.appDataMode
@@ -83,6 +81,24 @@ class SettingViewModel @Inject constructor(
     /** 是否有密码 */
     val hasPassword = passwordInfo
         .mapLatest { it.isNotBlank() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = false,
+        )
+
+    /** 黑夜模式 */
+    val darkMode = settingRepository.appDataMode
+        .mapLatest { it.darkMode }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = DarkModeEnum.FOLLOW_SYSTEM,
+        )
+
+    /** 动态配色 */
+    val dynamicColor = settingRepository.appDataMode
+        .mapLatest { it.dynamicColor }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -206,7 +222,7 @@ class SettingViewModel @Inject constructor(
             printFingerprintPwdSha = pwdSha
             dismissDialog()
             // 调用指纹加密
-            shouldDisplayFingerprintVerification = loadEncryptCipher(KEY_ALIAS_FINGERPRINT)
+            dialogState = DialogState.Shown(loadEncryptCipher(KEY_ALIAS_FINGERPRINT))
         }
     }
 
@@ -238,7 +254,7 @@ class SettingViewModel @Inject constructor(
     }
 
     fun onFingerprintVerifySuccess(cipher: Cipher) {
-        shouldDisplayFingerprintVerification = null
+        dismissDialog()
         val fingerprintPasswordInfo =
             cipher.doFinal(printFingerprintPwdSha.toByteArray()).toHexString()
         val fingerprintPasswordIv = cipher.iv.toHexString()
@@ -256,13 +272,33 @@ class SettingViewModel @Inject constructor(
 
     fun onFingerprintVerifyError(code: Int, msg: String) {
         logger().i("onFingerprintVerifyError(code = <$code>, msg = <$msg>)")
-        shouldDisplayFingerprintVerification = null
+        dismissDialog()
         printFingerprintPwdSha = ""
         shouldDisplayBookmark = msg
     }
 
+    fun onDarkModeSelected(darkMode: DarkModeEnum) {
+        viewModelScope.launch {
+            settingRepository.updateDarkMode(darkMode)
+        }
+    }
+
+    fun onDynamicColorSelected(dynamicColor: Boolean) {
+        viewModelScope.launch {
+            settingRepository.updateDynamicColor(dynamicColor)
+        }
+    }
+
     fun onClearPasswordClick() {
         dialogState = DialogState.Shown(SettingDialogEnum.CLEAR_PASSWORD)
+    }
+
+    fun onDarkModeClick() {
+        dialogState = DialogState.Shown(SettingDialogEnum.DARK_MODE)
+    }
+
+    fun onDynamicColorClick() {
+        dialogState = DialogState.Shown(SettingDialogEnum.DYNAMIC_COLOR)
     }
 
     fun dismissDialog() {

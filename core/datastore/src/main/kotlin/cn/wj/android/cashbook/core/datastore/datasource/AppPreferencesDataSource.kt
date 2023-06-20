@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.copy
+import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,6 +39,8 @@ class AppPreferencesDataSource @Inject constructor(
                 fingerprintIv = it.fingerprintIv,
                 passwordInfo = it.passwordInfo,
                 fingerprintPasswordInfo = it.fingerprintPasswordInfo,
+                darkMode = DarkModeEnum.typeOf(it.darkMode),
+                dynamicColor = it.dynamicColor,
             )
         }
 
@@ -107,6 +110,14 @@ class AppPreferencesDataSource @Inject constructor(
                 this.fingerprintPasswordInfo = fingerprintPasswordInfo
             }
         }
+    }
+
+    suspend fun updateDarkMode(darkModeEnum: DarkModeEnum) {
+        appPreferences.updateData { it.copy { this.darkMode = darkModeEnum.type } }
+    }
+
+    suspend fun updateDynamicColor(dynamicColor: Boolean) {
+        appPreferences.updateData { it.copy { this.dynamicColor = dynamicColor } }
     }
 
     suspend fun needRelated(typeId: Long): Boolean {

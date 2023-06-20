@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.core.data.repository.impl
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.network.datasource.NetworkDataSource
 import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
@@ -90,6 +91,20 @@ class SettingRepositoryImpl @Inject constructor(
         coroutineContext: CoroutineContext
     ) = withContext(coroutineContext) {
         appPreferencesDataSource.updateFingerprintPasswordInfo(fingerprintPasswordInfo)
+    }
+
+    override suspend fun updateDarkMode(
+        darkModeEnum: DarkModeEnum,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateDarkMode(darkModeEnum)
+    }
+
+    override suspend fun updateDynamicColor(
+        dynamicColor: Boolean,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateDynamicColor(dynamicColor)
     }
 
     override suspend fun checkUpdate(

@@ -60,6 +60,18 @@
     <string name="please_add_at_least_one_fingerprint">请添加至少一个有效指纹</string>
     <string name="please_set_device_credential_first">请先设置锁屏</string>
     <string name="fingerprint_verification_failed">指纹验证失败</string>
+    <string name="verity_fingerprint">验证指纹</string>
+    <string name="verity_fingerprint_to_open_fingerprint_login">验证指纹以开启指纹登录</string>
+    <string name="press_sensing_to_verity_fingerprint">请按压指纹感应区验证指纹</string>
+
+    <string name="dark_mode">黑夜模式</string>
+    <string name="follow_system">跟随系统</string>
+    <string name="light_mode">白天模式</string>
+    <string name="dynamic_color">动态配色</string>
+    <string name="dynamic_color_hint">从系统壁纸获取配色方案</string>
+    <string name="switch_on">开启</string>
+    <string name="switch_off">关闭</string>
+    <string name="close">关闭</string>
 
     <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

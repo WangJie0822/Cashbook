@@ -20,4 +20,6 @@ message AppPreferences {
   string fingerprintIv = 13; // 指纹加密向量
   string passwordInfo = 14; // 密码信息
   string fingerprintPasswordInfo = 15; // 指纹密码信息
+  int32 darkMode = 16; // 黑夜模式
+  bool dynamicColor = 17; // 动态配色
 }

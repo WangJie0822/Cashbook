@@ -62,7 +62,7 @@ internal fun BiometricAuthenticate(
                     onSuccess = onSuccess,
                     onError = onError
                 )
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            } else
                 BiometricAuthenticateM(
                     title = title,
                     subTitle = subTitle,
@@ -71,7 +71,6 @@ internal fun BiometricAuthenticate(
                     onSuccess = onSuccess,
                     onError = onError
                 )
-            }
         }
     }
 }
@@ -158,14 +157,9 @@ internal fun BiometricAuthenticateM(
 @SuppressLint("InlinedApi")
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
 internal fun checkBiometric(context: Context = AppManager.getContext().applicationContext): Int {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        checkBiometricUpM(context)
-    } else {
-        ERROR_HW_UNAVAILABLE
-    }
+    return checkBiometricUpM(context)
 }
 
-@RequiresApi(Build.VERSION_CODES.M)
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
 private fun checkBiometricUpM(context: Context): Int {
     val km = context.getSystemService(KeyguardManager::class.java)
