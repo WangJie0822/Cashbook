@@ -23,4 +23,7 @@ dependencies {
 
     // WebView
     implementation(libs.google.accompanist.webview)
+
+    // Constraintlayout
+    implementation(libs.androidx.constraintlayout.compose)
 }

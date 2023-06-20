@@ -3,7 +3,12 @@ package cn.wj.android.cashbook.core.design.component
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -17,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,5 +95,45 @@ fun CompatTextField(
         maxLines = maxLines,
         shape = shape,
         modifier = modifier,
+    )
+}
+
+@Composable
+fun PasswordTextField(
+    modifier: Modifier = Modifier,
+    initializedText: String,
+    label: String,
+    placeholder: String? = null,
+    supportingText: String? = null,
+    onValueChange: (String) -> Unit,
+    onValueVerify: ((String) -> Boolean)? = null,
+    isError: Boolean = false,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+) {
+    var visible by remember {
+        mutableStateOf(false)
+    }
+
+    CompatTextField(
+        modifier = modifier,
+        initializedText = initializedText,
+        label = label,
+        placeholder = placeholder,
+        supportingText = supportingText,
+        onValueChange = onValueChange,
+        onValueVerify = onValueVerify,
+        isError = isError,
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(
+                    imageVector = if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = null
+                )
+            }
+        },
+        visualTransformation = if (!visible) PasswordVisualTransformation() else VisualTransformation.None,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = if (!visible) KeyboardType.Password else KeyboardType.Text),
+        keyboardActions = keyboardActions,
     )
 }

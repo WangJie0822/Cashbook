@@ -9,15 +9,15 @@ import cn.wj.android.cashbook.core.common.KEY_ALIAS_FINGERPRINT
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_PASSWORD
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.design.security.hexToBytes
+import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
+import cn.wj.android.cashbook.core.design.security.loadEncryptCipher
+import cn.wj.android.cashbook.core.design.security.shaEncode
+import cn.wj.android.cashbook.core.design.security.toHexString
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
-import cn.wj.android.cashbook.feature.settings.security.hexToBytes
-import cn.wj.android.cashbook.feature.settings.security.loadDecryptCipher
-import cn.wj.android.cashbook.feature.settings.security.loadEncryptCipher
-import cn.wj.android.cashbook.feature.settings.security.shaEncode
-import cn.wj.android.cashbook.feature.settings.security.toHexString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.crypto.Cipher
 import javax.inject.Inject
@@ -247,6 +247,13 @@ class SettingViewModel @Inject constructor(
 
             // 密码正确，清除密码
             settingRepository.updatePasswordInfo("")
+            settingRepository.updatePasswordIv("")
+            // 关闭安全验证开关
+            settingRepository.updateNeedSecurityVerificationWhenLaunch(false)
+            // 关闭指纹验证
+            settingRepository.updateEnableFingerprintVerification(false)
+            settingRepository.updateFingerprintPasswordInfo("")
+            settingRepository.updateFingerprintIv("")
             // 隐藏弹窗
             dismissDialog()
             callback.invoke(SettingPasswordStateEnum.SUCCESS)

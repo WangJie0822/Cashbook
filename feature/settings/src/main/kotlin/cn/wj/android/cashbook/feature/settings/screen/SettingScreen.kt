@@ -11,17 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -40,25 +35,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CommonTopBar
-import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.PasswordTextField
+import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
+import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
+import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
-import cn.wj.android.cashbook.feature.settings.security.biometric.BiometricAuthenticate
-import cn.wj.android.cashbook.feature.settings.security.biometric.HW_AVAILABLE
-import cn.wj.android.cashbook.feature.settings.security.biometric.checkBiometric
 import cn.wj.android.cashbook.feature.settings.viewmodel.SettingViewModel
 import javax.crypto.Cipher
 
@@ -368,10 +360,10 @@ internal fun SettingContent(
                         .clickable { onBackupAndRecoveryClick.invoke() },
                     headlineText = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
                     trailingContent = {
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
-                                contentDescription = null,
-                            )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = null,
+                        )
                     },
                 )
             }
@@ -996,45 +988,5 @@ internal fun DynamicColorDialog(
                 Text(text = stringResource(id = R.string.close))
             }
         },
-    )
-}
-
-@Composable
-internal fun PasswordTextField(
-    modifier: Modifier = Modifier,
-    initializedText: String,
-    label: String,
-    placeholder: String? = null,
-    supportingText: String? = null,
-    onValueChange: (String) -> Unit,
-    onValueVerify: ((String) -> Boolean)? = null,
-    isError: Boolean = false,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-) {
-    var visible by remember {
-        mutableStateOf(false)
-    }
-
-    CompatTextField(
-        modifier = modifier,
-        initializedText = initializedText,
-        label = label,
-        placeholder = placeholder,
-        supportingText = supportingText,
-        onValueChange = onValueChange,
-        onValueVerify = onValueVerify,
-        isError = isError,
-        trailingIcon = {
-            IconButton(onClick = { visible = !visible }) {
-                Icon(
-                    imageVector = if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                    contentDescription = null
-                )
-            }
-        },
-        visualTransformation = if (!visible) PasswordVisualTransformation() else VisualTransformation.None,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = if (!visible) KeyboardType.Password else KeyboardType.Text),
-        keyboardActions = keyboardActions,
     )
 }

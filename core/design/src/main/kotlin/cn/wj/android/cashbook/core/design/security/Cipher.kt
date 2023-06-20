@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.feature.settings.security
+package cn.wj.android.cashbook.core.design.security
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -12,7 +12,7 @@ import javax.crypto.spec.IvParameterSpec
 private const val ANDROID_KEY_STORE = "AndroidKeyStore"
 
 /** 使用别名为 [keyAlias] 的密钥获取加密用的 [Cipher] */
-internal fun loadEncryptCipher(keyAlias: String): Cipher {
+fun loadEncryptCipher(keyAlias: String): Cipher {
     val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
     keyStore.load(null)
     if (!keyStore.containsAlias(keyAlias)) {
@@ -40,7 +40,7 @@ internal fun loadEncryptCipher(keyAlias: String): Cipher {
 }
 
 /** 使用别名为 [keyAlias] 的密钥和向量数据 [bytes] 获取解密用的 [Cipher] */
-internal fun loadDecryptCipher(keyAlias: String, bytes: ByteArray): Cipher {
+fun loadDecryptCipher(keyAlias: String, bytes: ByteArray): Cipher {
     val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
     keyStore.load(null)
     if (!keyStore.containsAlias(keyAlias)) {

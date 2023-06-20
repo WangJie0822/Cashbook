@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package cn.wj.android.cashbook.feature.settings.security.biometric
+package cn.wj.android.cashbook.core.design.security.biometric
 
 import android.annotation.SuppressLint
 import android.app.KeyguardManager
@@ -13,15 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
-import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.ui.R
-import com.orhanobut.logger.Logger
 import javax.crypto.Cipher
 
 @SuppressLint("InlinedApi")
-@RequiresPermission(android.Manifest.permission.USE_BIOMETRIC)
+@RequiresPermission(allOf = [android.Manifest.permission.USE_BIOMETRIC, android.Manifest.permission.USE_FINGERPRINT])
 @Composable
-internal fun BiometricAuthenticate(
+fun BiometricAuthenticate(
     title: String,
     subTitle: String,
     hint: String,
@@ -75,9 +73,9 @@ internal fun BiometricAuthenticate(
     }
 }
 
-internal val fingerprintManager: FingerprintManagerCompat by lazy {
-    FingerprintManagerCompat.from(AppManager.getContext().applicationContext)
-}
+internal val fingerprintManager: FingerprintManagerCompat
+    @Composable
+    get() = FingerprintManagerCompat.from(LocalContext.current.applicationContext)
 
 @RequiresApi(Build.VERSION_CODES.P)
 @RequiresPermission(android.Manifest.permission.USE_BIOMETRIC)
@@ -123,7 +121,6 @@ internal fun BiometricAuthenticateQ(
                         ?: throw RuntimeException("cipher is null!")
                     onSuccess.invoke(cipher)
                 } catch (throwable: Throwable) {
-                    Logger.e(throwable, "authenticate")
                     onError.invoke(ERROR_FAILED, verifyFailedText)
                 }
             }
@@ -151,16 +148,18 @@ internal fun BiometricAuthenticateM(
     onSuccess: (Cipher) -> Unit,
     onError: (Int, String) -> Unit,
 ) {
-
+    // TODO
 }
 
 @SuppressLint("InlinedApi")
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
-internal fun checkBiometric(context: Context = AppManager.getContext().applicationContext): Int {
+@Composable
+fun checkBiometric(context: Context = LocalContext.current.applicationContext): Int {
     return checkBiometricUpM(context)
 }
 
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
+@Composable
 private fun checkBiometricUpM(context: Context): Int {
     val km = context.getSystemService(KeyguardManager::class.java)
     return when {
