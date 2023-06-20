@@ -137,6 +137,28 @@ class SettingViewModel @Inject constructor(
         return SettingBookmarkEnum.NONE
     }
 
+    fun onModifyConfirm(oldPwd: String, newPwd: String, callback: (SettingBookmarkEnum) -> Unit) {
+        viewModelScope.launch {
+            // 使用 AndroidKeyStore 解密密码信息
+            val passwordIv = passwordIv.first()
+            this@SettingViewModel.logger()
+                .i("onModifyConfirm(oldPwd = <$oldPwd>, newPwd = <$newPwd>), passwordIv = <$passwordIv>")
+            val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, passwordIv.hexToBytes())
+            if (null == cipher) {
+                callback.invoke(SettingBookmarkEnum.PASSWORD_DECODE_FAILED)
+                return@launch
+            }
+            val pwdSha = cipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
+            if (oldPwd.shaEncode() == pwdSha) {
+                // 密码正确，保存新密码
+                callback.invoke(onCreateConfirm(newPwd))
+            } else {
+                // 密码错误，提示
+                callback.invoke(SettingBookmarkEnum.PASSWORD_WRONG)
+            }
+        }
+    }
+
     fun onClearConfirm(pwd: String, callback: (SettingBookmarkEnum) -> Unit) {
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
@@ -145,7 +167,7 @@ class SettingViewModel @Inject constructor(
                 .i("onClearConfirm(pwd = <$pwd>), passwordIv = <$passwordIv>")
             val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, passwordIv.hexToBytes())
             if (null == cipher) {
-                callback.invoke(SettingBookmarkEnum.PASSWORD_ENCODE_FAILED)
+                callback.invoke(SettingBookmarkEnum.PASSWORD_DECODE_FAILED)
                 return@launch
             }
             val pwdSha = cipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
@@ -160,7 +182,6 @@ class SettingViewModel @Inject constructor(
                 callback.invoke(SettingBookmarkEnum.PASSWORD_WRONG)
             }
         }
-
     }
 
     fun onClearPasswordClick() {

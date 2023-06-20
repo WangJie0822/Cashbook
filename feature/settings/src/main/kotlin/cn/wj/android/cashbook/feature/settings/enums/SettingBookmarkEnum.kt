@@ -22,6 +22,9 @@ enum class SettingBookmarkEnum {
     /** 加密失败 */
     PASSWORD_ENCODE_FAILED,
 
+    /** 解密失败 */
+    PASSWORD_DECODE_FAILED,
+
     /** 密码错误 */
     PASSWORD_WRONG,
 }

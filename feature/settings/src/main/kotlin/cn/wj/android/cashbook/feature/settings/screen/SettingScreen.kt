@@ -30,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -82,6 +81,7 @@ internal fun SettingRoute(
         onPasswordClick = viewModel::onPasswordClick,
         onClearPasswordClick = viewModel::onClearPasswordClick,
         onCreateConfirm = viewModel::onCreateConfirm,
+        onModifyConfirm = viewModel::onModifyConfirm,
         onClearConfirm = viewModel::onClearConfirm,
         onDialogDismiss = viewModel::dismissDialog,
         onBookmarkDismiss = viewModel::dismissBookmark,
@@ -107,6 +107,7 @@ internal fun SettingScreen(
     onPasswordClick: () -> Unit,
     onClearPasswordClick: () -> Unit,
     onCreateConfirm: (String) -> SettingBookmarkEnum,
+    onModifyConfirm: (String, String, (SettingBookmarkEnum) -> Unit) -> Unit,
     onClearConfirm: (String, (SettingBookmarkEnum) -> Unit) -> Unit,
     onDialogDismiss: () -> Unit,
     onBookmarkDismiss: () -> Unit,
@@ -153,6 +154,14 @@ internal fun SettingScreen(
                         // 创建密码
                         CreatePasswordDialog(
                             onConfirmClick = onCreateConfirm,
+                            onDismissClick = onDialogDismiss,
+                        )
+                    }
+
+                    SettingDialogEnum.MODIFY_PASSWORD -> {
+                        // 修改密码
+                        ModifyPasswordDialog(
+                            onConfirmClick = onModifyConfirm,
                             onDismissClick = onDialogDismiss,
                         )
                     }
@@ -224,7 +233,6 @@ internal fun SettingScreen(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CreatePasswordDialog(
     onConfirmClick: (String) -> SettingBookmarkEnum,
@@ -331,7 +339,127 @@ internal fun CreatePasswordDialog(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+
+@Composable
+internal fun ModifyPasswordDialog(
+    onConfirmClick: (String, String, (SettingBookmarkEnum) -> Unit) -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    // 提示文本
+    val passwordMustNotBeBlankText = stringResource(id = R.string.password_must_not_be_blank)
+    val passwordCannotBeSameText = stringResource(id = R.string.password_cannot_be_same)
+    val passwordFormatErrorText = stringResource(id = R.string.password_format_error)
+    val passwordEncodeFailedText = stringResource(id = R.string.password_encode_failed)
+    val passwordDecodeFailedText = stringResource(id = R.string.password_decode_failed)
+    val passwordWrongText = stringResource(id = R.string.password_wrong)
+
+    var pwd1 by remember {
+        mutableStateOf("")
+    }
+    var pwd1Error by remember {
+        mutableStateOf(false)
+    }
+    var pwd1SupportText by remember {
+        mutableStateOf("")
+    }
+    var pwd2 by remember {
+        mutableStateOf("")
+    }
+    var pwd2Error by remember {
+        mutableStateOf(false)
+    }
+    var pwd2SupportText by remember {
+        mutableStateOf("")
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismissClick,
+        title = { Text(text = stringResource(id = R.string.modify_password)) },
+        text = {
+            Column {
+                PasswordTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    initializedText = pwd1,
+                    label = stringResource(id = R.string.old_password),
+                    isError = pwd1Error,
+                    supportingText = pwd1SupportText,
+                    onValueChange = { pwd1 = it },
+                )
+                PasswordTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    initializedText = pwd2,
+                    label = stringResource(id = R.string.new_password),
+                    isError = pwd2Error,
+                    supportingText = pwd2SupportText,
+                    onValueChange = { pwd2 = it },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                if (pwd1.isBlank()) {
+                    pwd1Error = true
+                    pwd1SupportText = passwordMustNotBeBlankText
+                } else if (!pwd1.isMatch(PASSWORD_REGEX)) {
+                    pwd1Error = true
+                    pwd1SupportText = passwordFormatErrorText
+                } else {
+                    pwd1Error = false
+                    pwd1SupportText = ""
+                    when {
+                        pwd2.isBlank() -> {
+                            pwd2Error = true
+                            pwd2SupportText = passwordMustNotBeBlankText
+                        }
+
+                        !pwd2.isMatch(PASSWORD_REGEX) -> {
+                            pwd2Error = true
+                            pwd2SupportText = passwordFormatErrorText
+                        }
+
+                        pwd1 == pwd2 -> {
+                            pwd2Error = true
+                            pwd2SupportText = passwordCannotBeSameText
+                        }
+
+                        else -> {
+                            onConfirmClick.invoke(pwd1, pwd2) { result ->
+                                if (result == SettingBookmarkEnum.PASSWORD_ENCODE_FAILED) {
+                                    pwd2Error = true
+                                    pwd2SupportText = passwordEncodeFailedText
+                                } else if (result == SettingBookmarkEnum.PASSWORD_DECODE_FAILED) {
+                                    pwd2Error = false
+                                    pwd2SupportText = ""
+                                    pwd1Error = true
+                                    pwd1SupportText = passwordDecodeFailedText
+                                } else if (result == SettingBookmarkEnum.PASSWORD_WRONG) {
+                                    pwd2Error = false
+                                    pwd2SupportText = ""
+                                    pwd1Error = true
+                                    pwd1SupportText = passwordWrongText
+                                }
+                            }
+                        }
+                    }
+                }
+            }) {
+                Text(text = stringResource(id = R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissClick) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+    )
+}
+
+
 @Composable
 internal fun ClearPasswordDialog(
     onConfirmClick: (String, (SettingBookmarkEnum) -> Unit) -> Unit,
@@ -390,7 +518,7 @@ internal fun ClearPasswordDialog(
                                 // 密码错误
                                 pwdError = true
                                 pwdSupportText = passwordWrongText
-                            } else if (result == SettingBookmarkEnum.PASSWORD_ENCODE_FAILED) {
+                            } else if (result == SettingBookmarkEnum.PASSWORD_DECODE_FAILED) {
                                 pwdError = true
                                 pwdSupportText = passwordDecodeFailedText
                             }
