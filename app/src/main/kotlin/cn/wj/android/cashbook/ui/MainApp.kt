@@ -125,6 +125,7 @@ fun CashbookNavHost(
         // 设置
         settingScreen(
             onBackClick = navController::popBackStack,
+            onBackupAndRecoveryClick = {/*TODO*/ },
             onShowSnackbar = onShowSnackbar,
         )
 

@@ -70,6 +70,7 @@ import javax.crypto.Cipher
 @Composable
 internal fun SettingRoute(
     onBackClick: () -> Unit,
+    onBackupAndRecoveryClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
     hasFingerprint: Boolean = checkBiometric() == HW_AVAILABLE,
@@ -111,6 +112,7 @@ internal fun SettingRoute(
         onDialogDismiss = viewModel::dismissDialog,
         onBookmarkDismiss = viewModel::dismissBookmark,
         onBackClick = onBackClick,
+        onBackupAndRecoveryClick = onBackupAndRecoveryClick,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
     )
@@ -146,6 +148,7 @@ internal fun SettingScreen(
     onDarkModeSelected: (DarkModeEnum) -> Unit,
     onDynamicColorSelected: (Boolean) -> Unit,
     onBackClick: () -> Unit,
+    onBackupAndRecoveryClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
@@ -193,6 +196,7 @@ internal fun SettingScreen(
             onClearPasswordClick = onClearPasswordClick,
             onDarkModeSelected = onDarkModeSelected,
             onDynamicColorSelected = onDynamicColorSelected,
+            onBackupAndRecoveryClick = onBackupAndRecoveryClick,
         )
     }
 }
@@ -224,6 +228,7 @@ internal fun SettingContent(
     onDarkModeSelected: (DarkModeEnum) -> Unit,
     onDynamicColorSelected: (Boolean) -> Unit,
     onDialogDismiss: () -> Unit,
+    onBackupAndRecoveryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -310,8 +315,8 @@ internal fun SettingContent(
                 )
                 ListItem(
                     modifier = Modifier
-                        .clickable { onDarkModeClick.invoke() }
-                        .padding(top = 16.dp),
+                        .padding(top = 16.dp)
+                        .clickable { onDarkModeClick.invoke() },
                     headlineText = { Text(text = stringResource(id = R.string.dark_mode)) },
                     trailingContent = {
                         Row(
@@ -353,6 +358,22 @@ internal fun SettingContent(
                         },
                     )
                 }
+                Divider(modifier = Modifier.padding(horizontal = 8.dp))
+            }
+
+            item {
+                ListItem(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .clickable { onBackupAndRecoveryClick.invoke() },
+                    headlineText = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
+                    trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = null,
+                            )
+                    },
+                )
             }
         }
     }

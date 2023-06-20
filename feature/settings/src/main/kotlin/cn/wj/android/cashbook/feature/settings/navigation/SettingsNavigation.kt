@@ -79,12 +79,14 @@ fun NavGraphBuilder.aboutUsScreen(
 
 fun NavGraphBuilder.settingScreen(
     onBackClick: () -> Unit,
+    onBackupAndRecoveryClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 
 ) {
     composable(route = ROUTE_SETTINGS_SETTING) {
         SettingRoute(
             onBackClick = onBackClick,
+            onBackupAndRecoveryClick = onBackupAndRecoveryClick,
             onShowSnackbar = onShowSnackbar,
         )
     }
