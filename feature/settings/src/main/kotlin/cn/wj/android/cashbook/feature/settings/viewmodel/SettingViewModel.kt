@@ -5,18 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.KEY_ALIAS_FINGERPRINT
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_PASSWORD
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.feature.settings.enums.SettingBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
+import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import cn.wj.android.cashbook.feature.settings.security.hexToBytes
 import cn.wj.android.cashbook.feature.settings.security.loadDecryptCipher
 import cn.wj.android.cashbook.feature.settings.security.loadEncryptCipher
 import cn.wj.android.cashbook.feature.settings.security.shaEncode
 import cn.wj.android.cashbook.feature.settings.security.toHexString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.crypto.Cipher
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -38,7 +40,10 @@ class SettingViewModel @Inject constructor(
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
 
     /** 是否需要显示提示 */
-    var shouldDisplayBookmark by mutableStateOf(SettingBookmarkEnum.NONE)
+    var shouldDisplayBookmark by mutableStateOf("")
+
+    /** 是否需要显示指纹认证弹窗 */
+    var shouldDisplayFingerprintVerification by mutableStateOf<Cipher?>(null)
 
     /** 是否允许流量下载 */
     val mobileNetworkDownloadEnable = settingRepository.appDataMode
@@ -104,8 +109,13 @@ class SettingViewModel @Inject constructor(
 
     fun onEnableFingerprintVerificationChanged(enable: Boolean) {
         viewModelScope.launch {
-            settingRepository.updateEnableFingerprintVerification(enable)
-            // TODO
+            if (enable) {
+                // 开启指纹识别，需要先认证密码
+                dialogState = DialogState.Shown(SettingDialogEnum.VERIFY_PASSWORD)
+            } else {
+                // 关闭指纹识别
+                settingRepository.updateEnableFingerprintVerification(false)
+            }
         }
     }
 
@@ -119,10 +129,9 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun onCreateConfirm(pwd: String): SettingBookmarkEnum {
+    fun onCreateConfirm(pwd: String): SettingPasswordStateEnum {
         // 使用 AndroidKeyStore 进行保存
         val cipher = loadEncryptCipher(KEY_ALIAS_PASSWORD)
-            ?: return SettingBookmarkEnum.PASSWORD_ENCODE_FAILED
         val passwordInfo = cipher.doFinal(pwd.shaEncode().toByteArray()).toHexString()
         val passwordIv = cipher.iv.toHexString()
         logger().i("onCreateConfirm(pwd), passwordInfo = <$passwordInfo>, passwordIv = <$passwordIv>")
@@ -134,54 +143,122 @@ class SettingViewModel @Inject constructor(
             // 隐藏弹窗
             dismissDialog()
         }
-        return SettingBookmarkEnum.NONE
+        return SettingPasswordStateEnum.SUCCESS
     }
 
-    fun onModifyConfirm(oldPwd: String, newPwd: String, callback: (SettingBookmarkEnum) -> Unit) {
+    fun onModifyConfirm(
+        oldPwd: String,
+        newPwd: String,
+        callback: (SettingPasswordStateEnum) -> Unit
+    ) {
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
             val passwordIv = passwordIv.first()
             this@SettingViewModel.logger()
                 .i("onModifyConfirm(oldPwd = <$oldPwd>, newPwd = <$newPwd>), passwordIv = <$passwordIv>")
-            val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, passwordIv.hexToBytes())
-            if (null == cipher) {
-                callback.invoke(SettingBookmarkEnum.PASSWORD_DECODE_FAILED)
+            val bytes = passwordIv.hexToBytes()
+            if (null == bytes) {
+                callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
                 return@launch
             }
+            val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, bytes)
             val pwdSha = cipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
             if (oldPwd.shaEncode() == pwdSha) {
                 // 密码正确，保存新密码
-                callback.invoke(onCreateConfirm(newPwd))
+                val stateEnum = onCreateConfirm(newPwd)
+                if (stateEnum == SettingPasswordStateEnum.SUCCESS) {
+                    // 保存成功，清除指纹信息
+                    settingRepository.updateFingerprintIv("")
+                    settingRepository.updateFingerprintPasswordInfo("")
+                    settingRepository.updateEnableFingerprintVerification(false)
+                }
+                callback.invoke(stateEnum)
             } else {
                 // 密码错误，提示
-                callback.invoke(SettingBookmarkEnum.PASSWORD_WRONG)
+                callback.invoke(SettingPasswordStateEnum.PASSWORD_WRONG)
             }
         }
     }
 
-    fun onClearConfirm(pwd: String, callback: (SettingBookmarkEnum) -> Unit) {
+    /** 指纹验证密码信息 */
+    private var printFingerprintPwdSha = ""
+
+    fun onVerityConfirm(pwd: String, callback: (SettingPasswordStateEnum) -> Unit) {
+        viewModelScope.launch {
+            // 使用 AndroidKeyStore 解密密码信息
+            val passwordIv = passwordIv.first()
+            this@SettingViewModel.logger()
+                .i("onVerityConfirm(pwd = <$pwd>), passwordIv = <$passwordIv>")
+            val bytes = passwordIv.hexToBytes()
+            if (null == bytes) {
+                callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
+                return@launch
+            }
+            val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, bytes)
+            val pwdSha = cipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
+            if (pwd.shaEncode() != pwdSha) {
+                // 密码错误，提示
+                callback.invoke(SettingPasswordStateEnum.PASSWORD_WRONG)
+                return@launch
+            }
+
+            // 密码正确，隐藏弹窗
+            printFingerprintPwdSha = pwdSha
+            dismissDialog()
+            // 调用指纹加密
+            shouldDisplayFingerprintVerification = loadEncryptCipher(KEY_ALIAS_FINGERPRINT)
+        }
+    }
+
+    fun onClearConfirm(pwd: String, callback: (SettingPasswordStateEnum) -> Unit) {
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
             val passwordIv = passwordIv.first()
             this@SettingViewModel.logger()
                 .i("onClearConfirm(pwd = <$pwd>), passwordIv = <$passwordIv>")
-            val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, passwordIv.hexToBytes())
-            if (null == cipher) {
-                callback.invoke(SettingBookmarkEnum.PASSWORD_DECODE_FAILED)
+            val bytes = passwordIv.hexToBytes()
+            if (null == bytes) {
+                callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
                 return@launch
             }
+            val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, bytes)
             val pwdSha = cipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
-            if (pwd.shaEncode() == pwdSha) {
-                // 密码正确，清除密码
-                settingRepository.updatePasswordInfo("")
-                // 隐藏弹窗
-                dismissDialog()
-                callback.invoke(SettingBookmarkEnum.NONE)
-            } else {
+            if (pwd.shaEncode() != pwdSha) {
                 // 密码错误，提示
-                callback.invoke(SettingBookmarkEnum.PASSWORD_WRONG)
+                callback.invoke(SettingPasswordStateEnum.PASSWORD_WRONG)
+                return@launch
             }
+
+            // 密码正确，清除密码
+            settingRepository.updatePasswordInfo("")
+            // 隐藏弹窗
+            dismissDialog()
+            callback.invoke(SettingPasswordStateEnum.SUCCESS)
         }
+    }
+
+    fun onFingerprintVerifySuccess(cipher: Cipher) {
+        shouldDisplayFingerprintVerification = null
+        val fingerprintPasswordInfo =
+            cipher.doFinal(printFingerprintPwdSha.toByteArray()).toHexString()
+        val fingerprintPasswordIv = cipher.iv.toHexString()
+        logger().i("onFingerprintVerifySuccess(cipher), fingerprintPasswordInfo = <$fingerprintPasswordInfo>, fingerprintPasswordIv = <$fingerprintPasswordIv>")
+        viewModelScope.launch {
+            // 保存密码信息
+            settingRepository.updateFingerprintPasswordInfo(fingerprintPasswordInfo)
+            // 保存密码向量信息
+            settingRepository.updateFingerprintIv(fingerprintPasswordIv)
+            // 打开开关
+            settingRepository.updateEnableFingerprintVerification(true)
+            printFingerprintPwdSha = ""
+        }
+    }
+
+    fun onFingerprintVerifyError(code: Int, msg: String) {
+        logger().i("onFingerprintVerifyError(code = <$code>, msg = <$msg>)")
+        shouldDisplayFingerprintVerification = null
+        printFingerprintPwdSha = ""
+        shouldDisplayBookmark = msg
     }
 
     fun onClearPasswordClick() {
@@ -193,6 +270,6 @@ class SettingViewModel @Inject constructor(
     }
 
     fun dismissBookmark() {
-        shouldDisplayBookmark = SettingBookmarkEnum.NONE
+        shouldDisplayBookmark = ""
     }
 }

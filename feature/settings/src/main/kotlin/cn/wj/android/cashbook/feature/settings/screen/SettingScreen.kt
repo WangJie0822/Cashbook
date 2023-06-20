@@ -44,9 +44,13 @@ import cn.wj.android.cashbook.core.design.component.CommonTopBar
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.settings.enums.SettingBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
+import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
+import cn.wj.android.cashbook.feature.settings.security.biometric.BiometricAuthenticate
+import cn.wj.android.cashbook.feature.settings.security.biometric.HW_AVAILABLE
+import cn.wj.android.cashbook.feature.settings.security.biometric.checkBiometric
 import cn.wj.android.cashbook.feature.settings.viewmodel.SettingViewModel
+import javax.crypto.Cipher
 
 /**
  * 设置页路由
@@ -58,7 +62,7 @@ internal fun SettingRoute(
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
-    hasFingerprint: Boolean = false,// TODO
+    hasFingerprint: Boolean = checkBiometric() == HW_AVAILABLE,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
 
@@ -75,6 +79,7 @@ internal fun SettingRoute(
         enableFingerprintVerification = enableFingerprintVerification,
         hasPassword = hasPassword,
         hasFingerprint = hasFingerprint,
+        shouldDisplayFingerprintVerification = viewModel.shouldDisplayFingerprintVerification,
         onMobileNetworkDownloadEnableChanged = viewModel::onMobileNetworkDownloadEnableChanged,
         onNeedSecurityVerificationWhenLaunchChanged = viewModel::onNeedSecurityVerificationWhenLaunchChanged,
         onEnableFingerprintVerificationChanged = viewModel::onEnableFingerprintVerificationChanged,
@@ -82,7 +87,10 @@ internal fun SettingRoute(
         onClearPasswordClick = viewModel::onClearPasswordClick,
         onCreateConfirm = viewModel::onCreateConfirm,
         onModifyConfirm = viewModel::onModifyConfirm,
+        onVerityConfirm = viewModel::onVerityConfirm,
         onClearConfirm = viewModel::onClearConfirm,
+        onFingerprintVerifySuccess = viewModel::onFingerprintVerifySuccess,
+        onFingerprintVerifyError = viewModel::onFingerprintVerifyError,
         onDialogDismiss = viewModel::dismissDialog,
         onBookmarkDismiss = viewModel::dismissBookmark,
         onBackClick = onBackClick,
@@ -95,41 +103,33 @@ internal fun SettingRoute(
 @Composable
 internal fun SettingScreen(
     dialogState: DialogState,
-    shouldDisplayBookmark: SettingBookmarkEnum,
+    shouldDisplayBookmark: String,
     mobileNetworkDownloadEnable: Boolean,
     needSecurityVerificationWhenLaunch: Boolean,
     enableFingerprintVerification: Boolean,
     hasPassword: Boolean,
     hasFingerprint: Boolean,
+    shouldDisplayFingerprintVerification: Cipher?,
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
     onPasswordClick: () -> Unit,
     onClearPasswordClick: () -> Unit,
-    onCreateConfirm: (String) -> SettingBookmarkEnum,
-    onModifyConfirm: (String, String, (SettingBookmarkEnum) -> Unit) -> Unit,
-    onClearConfirm: (String, (SettingBookmarkEnum) -> Unit) -> Unit,
+    onCreateConfirm: (String) -> SettingPasswordStateEnum,
+    onModifyConfirm: (String, String, (SettingPasswordStateEnum) -> Unit) -> Unit,
+    onVerityConfirm: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
+    onClearConfirm: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
+    onFingerprintVerifySuccess: (Cipher) -> Unit,
+    onFingerprintVerifyError: (Int, String) -> Unit,
     onDialogDismiss: () -> Unit,
     onBookmarkDismiss: () -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-    // 提示文本
-    val passwordMustNotBeBlankText = stringResource(id = R.string.password_must_not_be_blank)
-    val passwordConfirmFailedText = stringResource(id = R.string.password_confirm_failed)
-    val passwordFormatErrorText = stringResource(id = R.string.password_format_error)
-    val passwordEncodeFailedText = stringResource(id = R.string.password_encode_failed)
     LaunchedEffect(shouldDisplayBookmark) {
-        if (shouldDisplayBookmark != SettingBookmarkEnum.NONE) {
-            val tipsText = when (shouldDisplayBookmark) {
-                SettingBookmarkEnum.PASSWORD_MUST_NOT_BLANK -> passwordMustNotBeBlankText
-                SettingBookmarkEnum.PASSWORD_CONFIRM_FAILED -> passwordConfirmFailedText
-                SettingBookmarkEnum.PASSWORD_FORMAT_ERROR -> passwordFormatErrorText
-                SettingBookmarkEnum.PASSWORD_ENCODE_FAILED -> passwordEncodeFailedText
-                else -> ""
-            }
-            val showSnackbarResult = onShowSnackbar(tipsText, null)
+        if (shouldDisplayBookmark.isNotBlank()) {
+            val showSnackbarResult = onShowSnackbar(shouldDisplayBookmark, null)
             if (SnackbarResult.Dismissed == showSnackbarResult) {
                 onBookmarkDismiss.invoke()
             }
@@ -166,6 +166,14 @@ internal fun SettingScreen(
                         )
                     }
 
+                    SettingDialogEnum.VERIFY_PASSWORD -> {
+                        // 验证密码
+                        VerityPasswordDialog(
+                            onConfirmClick = onVerityConfirm,
+                            onDismissClick = onDialogDismiss,
+                        )
+                    }
+
                     SettingDialogEnum.CLEAR_PASSWORD -> {
                         // 清除密码
                         ClearPasswordDialog(
@@ -175,6 +183,18 @@ internal fun SettingScreen(
                     }
                 }
             }
+
+            if (null != shouldDisplayFingerprintVerification) {
+                BiometricAuthenticate(
+                    title = "验证指纹",
+                    subTitle = "验证指纹以开启指纹登录",
+                    hint = "请按压指纹感应区验证指纹",
+                    cryptoCipher = shouldDisplayFingerprintVerification,
+                    onSuccess = onFingerprintVerifySuccess,
+                    onError = onFingerprintVerifyError,
+                )
+            }
+
             LazyColumn {
                 item {
                     ListItem(
@@ -200,7 +220,7 @@ internal fun SettingScreen(
                             )
                         },
                     )
-                    if (hasFingerprint) {
+                    if (needSecurityVerificationWhenLaunch && hasFingerprint) {
                         ListItem(
                             headlineText = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
                             trailingContent = {
@@ -235,7 +255,7 @@ internal fun SettingScreen(
 
 @Composable
 internal fun CreatePasswordDialog(
-    onConfirmClick: (String) -> SettingBookmarkEnum,
+    onConfirmClick: (String) -> SettingPasswordStateEnum,
     onDismissClick: () -> Unit,
 ) {
     // 提示文本
@@ -320,7 +340,7 @@ internal fun CreatePasswordDialog(
 
                         else -> {
                             val result = onConfirmClick.invoke(pwd1)
-                            if (result == SettingBookmarkEnum.PASSWORD_ENCODE_FAILED) {
+                            if (result == SettingPasswordStateEnum.PASSWORD_ENCODE_FAILED) {
                                 pwd2Error = true
                                 pwd2SupportText = passwordEncodeFailedText
                             }
@@ -342,7 +362,7 @@ internal fun CreatePasswordDialog(
 
 @Composable
 internal fun ModifyPasswordDialog(
-    onConfirmClick: (String, String, (SettingBookmarkEnum) -> Unit) -> Unit,
+    onConfirmClick: (String, String, (SettingPasswordStateEnum) -> Unit) -> Unit,
     onDismissClick: () -> Unit,
 ) {
     // 提示文本
@@ -429,19 +449,32 @@ internal fun ModifyPasswordDialog(
 
                         else -> {
                             onConfirmClick.invoke(pwd1, pwd2) { result ->
-                                if (result == SettingBookmarkEnum.PASSWORD_ENCODE_FAILED) {
-                                    pwd2Error = true
-                                    pwd2SupportText = passwordEncodeFailedText
-                                } else if (result == SettingBookmarkEnum.PASSWORD_DECODE_FAILED) {
-                                    pwd2Error = false
-                                    pwd2SupportText = ""
-                                    pwd1Error = true
-                                    pwd1SupportText = passwordDecodeFailedText
-                                } else if (result == SettingBookmarkEnum.PASSWORD_WRONG) {
-                                    pwd2Error = false
-                                    pwd2SupportText = ""
-                                    pwd1Error = true
-                                    pwd1SupportText = passwordWrongText
+                                when (result) {
+                                    SettingPasswordStateEnum.PASSWORD_ENCODE_FAILED -> {
+                                        pwd2Error = true
+                                        pwd2SupportText = passwordEncodeFailedText
+                                    }
+
+                                    SettingPasswordStateEnum.PASSWORD_DECODE_FAILED -> {
+                                        pwd2Error = false
+                                        pwd2SupportText = ""
+                                        pwd1Error = true
+                                        pwd1SupportText = passwordDecodeFailedText
+                                    }
+
+                                    SettingPasswordStateEnum.PASSWORD_WRONG -> {
+                                        pwd2Error = false
+                                        pwd2SupportText = ""
+                                        pwd1Error = true
+                                        pwd1SupportText = passwordWrongText
+                                    }
+
+                                    else -> {
+                                        pwd1Error = false
+                                        pwd1SupportText = ""
+                                        pwd2Error = false
+                                        pwd2SupportText = ""
+                                    }
                                 }
                             }
                         }
@@ -459,10 +492,86 @@ internal fun ModifyPasswordDialog(
     )
 }
 
+@Composable
+internal fun VerityPasswordDialog(
+    onConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    // 提示文本
+    val passwordMustNotBeBlankText = stringResource(id = R.string.password_must_not_be_blank)
+    val passwordWrongText = stringResource(id = R.string.password_wrong)
+    val passwordFormatErrorText = stringResource(id = R.string.password_format_error)
+    val passwordDecodeFailedText = stringResource(id = R.string.password_decode_failed)
+
+    var pwd by remember {
+        mutableStateOf("")
+    }
+    var pwdError by remember {
+        mutableStateOf(false)
+    }
+    var pwdSupportText by remember {
+        mutableStateOf("")
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismissClick,
+        title = { Text(text = stringResource(id = R.string.verity_password)) },
+        text = {
+            Column {
+                PasswordTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    initializedText = pwd,
+                    label = stringResource(id = R.string.please_enter_password),
+                    isError = pwdError,
+                    supportingText = pwdSupportText,
+                    onValueChange = { pwd = it },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                when {
+                    pwd.isBlank() -> {
+                        pwdError = true
+                        pwdSupportText = passwordMustNotBeBlankText
+                    }
+
+                    !pwd.isMatch(PASSWORD_REGEX) -> {
+                        pwdError = true
+                        pwdSupportText = passwordFormatErrorText
+                    }
+
+                    else -> {
+                        onConfirmClick.invoke(pwd) { result ->
+                            if (result == SettingPasswordStateEnum.PASSWORD_WRONG) {
+                                // 密码错误
+                                pwdError = true
+                                pwdSupportText = passwordWrongText
+                            } else if (result == SettingPasswordStateEnum.PASSWORD_DECODE_FAILED) {
+                                pwdError = true
+                                pwdSupportText = passwordDecodeFailedText
+                            }
+                        }
+                    }
+                }
+            }) {
+                Text(text = stringResource(id = R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissClick) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+    )
+}
 
 @Composable
 internal fun ClearPasswordDialog(
-    onConfirmClick: (String, (SettingBookmarkEnum) -> Unit) -> Unit,
+    onConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
     onDismissClick: () -> Unit,
 ) {
     // 提示文本
@@ -514,11 +623,11 @@ internal fun ClearPasswordDialog(
 
                     else -> {
                         onConfirmClick.invoke(pwd) { result ->
-                            if (result == SettingBookmarkEnum.PASSWORD_WRONG) {
+                            if (result == SettingPasswordStateEnum.PASSWORD_WRONG) {
                                 // 密码错误
                                 pwdError = true
                                 pwdSupportText = passwordWrongText
-                            } else if (result == SettingBookmarkEnum.PASSWORD_DECODE_FAILED) {
+                            } else if (result == SettingPasswordStateEnum.PASSWORD_DECODE_FAILED) {
                                 pwdError = true
                                 pwdSupportText = passwordDecodeFailedText
                             }

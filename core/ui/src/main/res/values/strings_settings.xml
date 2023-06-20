@@ -42,6 +42,7 @@
     <string name="enable_fingerprint_verification">允许指纹验证</string>
     <string name="create_password">创建密码</string>
     <string name="modify_password">修改密码</string>
+    <string name="verity_password">验证密码</string>
     <string name="clear_password">清除密码</string>
     <string name="new_password">新密码</string>
     <string name="old_password">旧密码</string>
@@ -55,6 +56,10 @@
     <string name="password_encode_failed">密码加密失败</string>
     <string name="password_decode_failed">密码解密失败</string>
     <string name="password_cannot_be_same">新旧密码不能相同</string>
+    <string name="device_not_support_fingerprint">当前设备不支持指纹识别</string>
+    <string name="please_add_at_least_one_fingerprint">请添加至少一个有效指纹</string>
+    <string name="please_set_device_credential_first">请先设置锁屏</string>
+    <string name="fingerprint_verification_failed">指纹验证失败</string>
 
     <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

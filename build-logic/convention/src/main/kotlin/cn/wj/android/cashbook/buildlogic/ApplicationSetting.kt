@@ -12,7 +12,7 @@ object ApplicationSetting {
 
     object Config {
         const val compileSdk = 33
-        const val minSdk = 21
+        const val minSdk = 23
         const val targetSdk = 30
         val versionCode = generateVersionCode()
         val versionName = "v0.5.7_$versionCode"
