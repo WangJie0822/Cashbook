@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_PASSWORD
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.SettingBookmarkEnum
@@ -18,6 +19,7 @@ import cn.wj.android.cashbook.feature.settings.security.toHexString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -37,9 +39,6 @@ class SettingViewModel @Inject constructor(
 
     /** 是否需要显示提示 */
     var shouldDisplayBookmark by mutableStateOf(SettingBookmarkEnum.NONE)
-
-    /** 是否显示密码错误 */
-    var shouldDisplayPasswordWrong by mutableStateOf(false)
 
     /** 是否允许流量下载 */
     val mobileNetworkDownloadEnable = settingRepository.appDataMode
@@ -71,20 +70,10 @@ class SettingViewModel @Inject constructor(
     /** 密码加密向量信息 */
     private val passwordIv = settingRepository.appDataMode
         .mapLatest { it.passwordIv }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
 
     /** 密码信息 */
     private val passwordInfo = settingRepository.appDataMode
         .mapLatest { it.passwordInfo }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
 
     /** 是否有密码 */
     val hasPassword = passwordInfo
@@ -103,8 +92,13 @@ class SettingViewModel @Inject constructor(
 
     fun onNeedSecurityVerificationWhenLaunchChanged(need: Boolean) {
         viewModelScope.launch {
-            settingRepository.updateNeedSecurityVerificationWhenLaunch(need)
-            // TODO
+            if (need && !hasPassword.value) {
+                // 开启验证但是没有密码，显示创建密码弹窗
+                onPasswordClick()
+            } else {
+                // 有密码，更新开关
+                settingRepository.updateNeedSecurityVerificationWhenLaunch(need)
+            }
         }
     }
 
@@ -125,46 +119,48 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun onCreateConfirm(pwd: String) {
+    fun onCreateConfirm(pwd: String): SettingBookmarkEnum {
         // 使用 AndroidKeyStore 进行保存
         val cipher = loadEncryptCipher(KEY_ALIAS_PASSWORD)
-        if (null == cipher) {
-            shouldDisplayBookmark = SettingBookmarkEnum.PASSWORD_ENCODE_FAILED
-            return
-        }
+            ?: return SettingBookmarkEnum.PASSWORD_ENCODE_FAILED
         val passwordInfo = cipher.doFinal(pwd.shaEncode().toByteArray()).toHexString()
+        val passwordIv = cipher.iv.toHexString()
+        logger().i("onCreateConfirm(pwd), passwordInfo = <$passwordInfo>, passwordIv = <$passwordIv>")
         viewModelScope.launch {
             // 保存密码信息
             settingRepository.updatePasswordInfo(passwordInfo)
             // 保存密码向量信息
-            settingRepository.updatePasswordIv(cipher.iv.toHexString())
+            settingRepository.updatePasswordIv(passwordIv)
             // 隐藏弹窗
             dismissDialog()
         }
+        return SettingBookmarkEnum.NONE
     }
 
-    fun onClearConfirm(pwd: String) {
-        shouldDisplayPasswordWrong = false
-        // 使用 AndroidKeyStore 解密密码信息
-        val value = passwordIv.value
-        val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, value.hexToBytes())
-        if (null == cipher) {
-            shouldDisplayBookmark = SettingBookmarkEnum.PASSWORD_ENCODE_FAILED
-            return
-        }
-        val pwdInfo = cipher.doFinal(passwordInfo.value.hexToBytes()).decodeToString()
-        if (pwd.shaEncode() == pwdInfo) {
-            // 密码正确，清除密码
-            viewModelScope.launch {
+    fun onClearConfirm(pwd: String, callback: (SettingBookmarkEnum) -> Unit) {
+        viewModelScope.launch {
+            // 使用 AndroidKeyStore 解密密码信息
+            val passwordIv = passwordIv.first()
+            this@SettingViewModel.logger()
+                .i("onClearConfirm(pwd = <$pwd>), passwordIv = <$passwordIv>")
+            val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, passwordIv.hexToBytes())
+            if (null == cipher) {
+                callback.invoke(SettingBookmarkEnum.PASSWORD_ENCODE_FAILED)
+                return@launch
+            }
+            val pwdSha = cipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
+            if (pwd.shaEncode() == pwdSha) {
+                // 密码正确，清除密码
                 settingRepository.updatePasswordInfo("")
                 // 隐藏弹窗
                 dismissDialog()
-
+                callback.invoke(SettingBookmarkEnum.NONE)
+            } else {
+                // 密码错误，提示
+                callback.invoke(SettingBookmarkEnum.PASSWORD_WRONG)
             }
-        } else {
-            // 密码错误，提示
-            shouldDisplayPasswordWrong = true
         }
+
     }
 
     fun onClearPasswordClick() {

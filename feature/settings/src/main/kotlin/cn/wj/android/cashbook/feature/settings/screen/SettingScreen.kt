@@ -32,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -77,7 +76,6 @@ internal fun SettingRoute(
         enableFingerprintVerification = enableFingerprintVerification,
         hasPassword = hasPassword,
         hasFingerprint = hasFingerprint,
-        shouldDisplayPasswordWrong = viewModel.shouldDisplayPasswordWrong,
         onMobileNetworkDownloadEnableChanged = viewModel::onMobileNetworkDownloadEnableChanged,
         onNeedSecurityVerificationWhenLaunchChanged = viewModel::onNeedSecurityVerificationWhenLaunchChanged,
         onEnableFingerprintVerificationChanged = viewModel::onEnableFingerprintVerificationChanged,
@@ -103,14 +101,13 @@ internal fun SettingScreen(
     enableFingerprintVerification: Boolean,
     hasPassword: Boolean,
     hasFingerprint: Boolean,
-    shouldDisplayPasswordWrong: Boolean,
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
     onPasswordClick: () -> Unit,
     onClearPasswordClick: () -> Unit,
-    onCreateConfirm: (String) -> Unit,
-    onClearConfirm: (String) -> Unit,
+    onCreateConfirm: (String) -> SettingBookmarkEnum,
+    onClearConfirm: (String, (SettingBookmarkEnum) -> Unit) -> Unit,
     onDialogDismiss: () -> Unit,
     onBookmarkDismiss: () -> Unit,
     onBackClick: () -> Unit,
@@ -163,7 +160,6 @@ internal fun SettingScreen(
                     SettingDialogEnum.CLEAR_PASSWORD -> {
                         // 清除密码
                         ClearPasswordDialog(
-                            shouldDisplayPasswordWrong = shouldDisplayPasswordWrong,
                             onConfirmClick = onClearConfirm,
                             onDismissClick = onDialogDismiss,
                         )
@@ -231,13 +227,14 @@ internal fun SettingScreen(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CreatePasswordDialog(
-    onConfirmClick: (String) -> Unit,
+    onConfirmClick: (String) -> SettingBookmarkEnum,
     onDismissClick: () -> Unit,
 ) {
     // 提示文本
     val passwordMustNotBeBlankText = stringResource(id = R.string.password_must_not_be_blank)
     val passwordConfirmFailedText = stringResource(id = R.string.password_confirm_failed)
     val passwordFormatErrorText = stringResource(id = R.string.password_format_error)
+    val passwordEncodeFailedText = stringResource(id = R.string.password_encode_failed)
 
     var pwd1 by remember {
         mutableStateOf("")
@@ -257,8 +254,6 @@ internal fun CreatePasswordDialog(
     var pwd2SupportText by remember {
         mutableStateOf("")
     }
-
-    val softwareKeyboardController = LocalSoftwareKeyboardController.current
 
     AlertDialog(
         onDismissRequest = onDismissClick,
@@ -316,10 +311,11 @@ internal fun CreatePasswordDialog(
                         }
 
                         else -> {
-                            pwd2Error = false
-                            pwd2SupportText = ""
-                            softwareKeyboardController?.hide()
-                            onConfirmClick.invoke(pwd1)
+                            val result = onConfirmClick.invoke(pwd1)
+                            if (result == SettingBookmarkEnum.PASSWORD_ENCODE_FAILED) {
+                                pwd2Error = true
+                                pwd2SupportText = passwordEncodeFailedText
+                            }
                         }
                     }
                 }
@@ -338,14 +334,14 @@ internal fun CreatePasswordDialog(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ClearPasswordDialog(
-    shouldDisplayPasswordWrong: Boolean,
-    onConfirmClick: (String) -> Unit,
+    onConfirmClick: (String, (SettingBookmarkEnum) -> Unit) -> Unit,
     onDismissClick: () -> Unit,
 ) {
     // 提示文本
     val passwordMustNotBeBlankText = stringResource(id = R.string.password_must_not_be_blank)
     val passwordWrongText = stringResource(id = R.string.password_wrong)
     val passwordFormatErrorText = stringResource(id = R.string.password_format_error)
+    val passwordDecodeFailedText = stringResource(id = R.string.password_decode_failed)
 
     var pwd by remember {
         mutableStateOf("")
@@ -356,13 +352,6 @@ internal fun ClearPasswordDialog(
     var pwdSupportText by remember {
         mutableStateOf("")
     }
-
-    if (shouldDisplayPasswordWrong) {
-        pwdError = true
-        pwdSupportText = passwordWrongText
-    }
-
-    val softwareKeyboardController = LocalSoftwareKeyboardController.current
 
     AlertDialog(
         onDismissRequest = onDismissClick,
@@ -396,10 +385,16 @@ internal fun ClearPasswordDialog(
                     }
 
                     else -> {
-                        pwdError = false
-                        pwdSupportText = ""
-                        softwareKeyboardController?.hide()
-                        onConfirmClick.invoke(pwd)
+                        onConfirmClick.invoke(pwd) { result ->
+                            if (result == SettingBookmarkEnum.PASSWORD_WRONG) {
+                                // 密码错误
+                                pwdError = true
+                                pwdSupportText = passwordWrongText
+                            } else if (result == SettingBookmarkEnum.PASSWORD_ENCODE_FAILED) {
+                                pwdError = true
+                                pwdSupportText = passwordDecodeFailedText
+                            }
+                        }
                     }
                 }
             }) {
