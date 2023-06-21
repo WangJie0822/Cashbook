@@ -22,7 +22,7 @@
     <!-- 启动页主题 -->
     <style name="Theme.Cashbook.Splash" parent="NightAdjusted.Theme.Splash">
         <!-- 启动页背景 -->
-        <item name="windowSplashScreenBackground">@color/color_primary</item>
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
         <!-- 启动页显示的图标 -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/layer_splash_background</item>
         <!-- 显示时长，上限 1000ms -->

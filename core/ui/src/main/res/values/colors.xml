@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 应用主色调 -->
-    <color name="color_primary">#FF00696F</color>
     <color name="ic_launcher_background">#FF2196F3</color>
 </resources>
