@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blue_200">#90CAF9</color>
-    <color name="blue_500">#2196F3</color>
-    <color name="blue_600">#1E88E5</color>
-    <color name="blue_700">#1976D2</color>
-    <color name="teal_200">#512DA8</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="read_700">#D32F2F</color>
-
     <!-- 应用主色调 -->
-    <color name="color_primary">@color/blue_500</color>
-
+    <color name="color_primary">#FF00696F</color>
+    <color name="ic_launcher_background">#FF2196F3</color>
 </resources>

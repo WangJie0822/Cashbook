@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用主色调 -->
+    <color name="color_primary">#FF44D9E4</color>
+</resources>

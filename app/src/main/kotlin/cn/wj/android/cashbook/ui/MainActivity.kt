@@ -72,12 +72,12 @@ class MainActivity : FragmentActivity() {
                 onDispose {}
             }
 
-            CashbookTheme(
-                darkTheme = darkTheme,
-                disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
+            CompositionLocalProvider(
+                LocalBackPressedDispatcher provides this.onBackPressedDispatcher
             ) {
-                CompositionLocalProvider(
-                    LocalBackPressedDispatcher provides this.onBackPressedDispatcher
+                CashbookTheme(
+                    darkTheme = darkTheme,
+                    disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
                 ) {
                     MainApp(
                         viewModel = verifyViewModel,
