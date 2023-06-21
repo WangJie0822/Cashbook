@@ -4,6 +4,7 @@ import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.network.datasource.NetworkDataSource
 import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
@@ -105,6 +106,13 @@ class SettingRepositoryImpl @Inject constructor(
         coroutineContext: CoroutineContext
     ) = withContext(coroutineContext) {
         appPreferencesDataSource.updateDynamicColor(dynamicColor)
+    }
+
+    override suspend fun updateVerificationMode(
+        verificationMode: VerificationModeEnum,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateVerificationMode(verificationMode)
     }
 
     override suspend fun checkUpdate(

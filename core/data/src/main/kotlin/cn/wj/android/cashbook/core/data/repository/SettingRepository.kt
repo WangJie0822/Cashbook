@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.core.data.repository
 
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
@@ -82,6 +83,11 @@ interface SettingRepository {
 
     suspend fun updateDynamicColor(
         dynamicColor: Boolean,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
+    suspend fun updateVerificationMode(
+        verificationMode: VerificationModeEnum,
         coroutineContext: CoroutineContext = Dispatchers.IO
     )
 

@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.ui.LocalBackPressedDispatcher
@@ -30,10 +31,13 @@ import kotlinx.coroutines.launch
 class MainActivity : FragmentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+    private val verifyViewModel: VerifyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        logger().i("onCreate(savedInstanceState)")
 
         var uiState: MainActivityUiState by mutableStateOf(MainActivityUiState.Loading)
 
@@ -75,10 +79,18 @@ class MainActivity : FragmentActivity() {
                 CompositionLocalProvider(
                     LocalBackPressedDispatcher provides this.onBackPressedDispatcher
                 ) {
-                    MainApp()
+                    MainApp(
+                        viewModel = verifyViewModel,
+                    )
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        logger().i("onStop()")
+        verifyViewModel.onActivityStop()
     }
 }
 

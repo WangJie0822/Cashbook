@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.core.model.model
 
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 
 /**
  * 应用配置数据
@@ -24,5 +25,6 @@ data class AppDataModel(
     val passwordInfo: String,
     val fingerprintPasswordInfo: String,
     val darkMode: DarkModeEnum,
-    val dynamicColor: Boolean
+    val dynamicColor: Boolean,
+    val verificationModel: VerificationModeEnum,
 )

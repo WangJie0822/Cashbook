@@ -89,8 +89,9 @@ internal fun BiometricAuthenticateQ(
     onError: (Int, String) -> Unit,
 ) {
     val cancellationSignal = android.os.CancellationSignal()
+    val userCancelText = stringResource(id = R.string.user_cancel)
     cancellationSignal.setOnCancelListener {
-        onError.invoke(5, "用户取消")
+        onError.invoke(5, userCancelText)
     }
     val context = LocalContext.current
     val prompt = with(BiometricPrompt.Builder(context)) {

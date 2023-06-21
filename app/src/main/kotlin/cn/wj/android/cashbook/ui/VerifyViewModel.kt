@@ -12,6 +12,7 @@ import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.design.security.hexToBytes
 import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
+import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.enums.MainBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
@@ -78,6 +79,10 @@ class VerifyViewModel @Inject constructor(
     /** 密码信息 */
     private val fingerprintPasswordInfo = settingRepository.appDataMode
         .mapLatest { it.fingerprintPasswordInfo }
+
+    /** 验证模式 */
+    private val verificationMode = settingRepository.appDataMode
+        .mapLatest { it.verificationModel }
 
     fun onVerityConfirm(pwd: String, callback: (SettingPasswordStateEnum) -> Unit) {
         viewModelScope.launch {
@@ -159,7 +164,16 @@ class VerifyViewModel @Inject constructor(
         shouldDisplayBookmark = MainBookmarkEnum.NONE
     }
 
-    fun dismissDialog() {
+    fun onActivityStop() {
+        viewModelScope.launch {
+            if (verificationMode.first() == VerificationModeEnum.WHEN_FOREGROUND) {
+                veritied.tryEmit(false)
+                firstOpen = true
+            }
+        }
+    }
+
+    private fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
 }

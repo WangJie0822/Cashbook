@@ -22,4 +22,5 @@ message AppPreferences {
   string fingerprintPasswordInfo = 15; // 指纹密码信息
   int32 darkMode = 16; // 黑夜模式
   bool dynamicColor = 17; // 动态配色
+  int32 verificationMode = 18; // 安全验证类型
 }

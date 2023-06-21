@@ -24,4 +24,7 @@ enum class SettingDialogEnum {
 
     /** 动态配色 */
     DYNAMIC_COLOR,
+
+    /** 安全验证模式 */
+    VERIFICATION_MODE,
 }

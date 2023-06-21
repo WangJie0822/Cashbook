@@ -61,11 +61,15 @@
     <string name="please_set_device_credential_first">请先设置锁屏</string>
     <string name="fingerprint_verification_failed">指纹验证失败</string>
     <string name="verity_fingerprint">验证指纹</string>
+    <string name="user_cancel">用户取消</string>
     <string name="verity_fingerprint_to_open_fingerprint_login">验证指纹以开启指纹登录</string>
     <string name="verity_fingerprint_to_use">验证指纹以使用</string>
     <string name="press_sensing_to_verity_fingerprint">请按压指纹感应区验证指纹</string>
     <string name="launch_verity_hint">您设置了启动安全验证，请输入密码或使用指纹验证</string>
 
+    <string name="verification_mode">验证模式</string>
+    <string name="each_launch">每次启动</string>
+    <string name="each_foreground">每次前台</string>
     <string name="dark_mode">黑夜模式</string>
     <string name="follow_system">跟随系统</string>
     <string name="light_mode">白天模式</string>

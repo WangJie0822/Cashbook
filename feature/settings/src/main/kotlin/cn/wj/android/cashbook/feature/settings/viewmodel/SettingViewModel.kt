@@ -15,6 +15,7 @@ import cn.wj.android.cashbook.core.design.security.loadEncryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.design.security.toHexString
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
@@ -59,6 +60,15 @@ class SettingViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = false,
+        )
+
+    /** 安全验证类型 */
+    val verificationMode = settingRepository.appDataMode
+        .mapLatest { it.verificationModel }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = VerificationModeEnum.WHEN_LAUNCH,
         )
 
     /** 是否允许指纹认证 */
@@ -296,6 +306,12 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    fun onVerificationModeSelected(verificationMode: VerificationModeEnum) {
+        viewModelScope.launch {
+            settingRepository.updateVerificationMode(verificationMode)
+        }
+    }
+
     fun onClearPasswordClick() {
         dialogState = DialogState.Shown(SettingDialogEnum.CLEAR_PASSWORD)
     }
@@ -306,6 +322,10 @@ class SettingViewModel @Inject constructor(
 
     fun onDynamicColorClick() {
         dialogState = DialogState.Shown(SettingDialogEnum.DYNAMIC_COLOR)
+    }
+
+    fun onVerificationModeClick() {
+        dialogState = DialogState.Shown(SettingDialogEnum.VERIFICATION_MODE)
     }
 
     fun dismissDialog() {

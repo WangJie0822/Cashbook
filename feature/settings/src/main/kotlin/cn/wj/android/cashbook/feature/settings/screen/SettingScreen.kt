@@ -47,6 +47,7 @@ import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
 import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
@@ -71,6 +72,7 @@ internal fun SettingRoute(
 
     val mobileNetworkDownloadEnable by viewModel.mobileNetworkDownloadEnable.collectAsStateWithLifecycle()
     val needSecurityVerificationWhenLaunch by viewModel.needSecurityVerificationWhenLaunch.collectAsStateWithLifecycle()
+    val verificationMode by viewModel.verificationMode.collectAsStateWithLifecycle()
     val enableFingerprintVerification by viewModel.enableFingerprintVerification.collectAsStateWithLifecycle()
     val hasPassword by viewModel.hasPassword.collectAsStateWithLifecycle()
     val darkMode by viewModel.darkMode.collectAsStateWithLifecycle()
@@ -81,6 +83,7 @@ internal fun SettingRoute(
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         mobileNetworkDownloadEnable = mobileNetworkDownloadEnable,
         needSecurityVerificationWhenLaunch = needSecurityVerificationWhenLaunch,
+        verificationMode = verificationMode,
         enableFingerprintVerification = enableFingerprintVerification,
         hasPassword = hasPassword,
         hasFingerprint = hasFingerprint,
@@ -93,6 +96,7 @@ internal fun SettingRoute(
         onClearPasswordClick = viewModel::onClearPasswordClick,
         onDarkModeClick = viewModel::onDarkModeClick,
         onDynamicColorClick = viewModel::onDynamicColorClick,
+        onVerificationModeClick = viewModel::onVerificationModeClick,
         onCreateConfirm = viewModel::onCreateConfirm,
         onModifyConfirm = viewModel::onModifyConfirm,
         onVerityConfirm = viewModel::onVerityConfirm,
@@ -101,6 +105,7 @@ internal fun SettingRoute(
         onFingerprintVerifyError = viewModel::onFingerprintVerifyError,
         onDarkModeSelected = viewModel::onDarkModeSelected,
         onDynamicColorSelected = viewModel::onDynamicColorSelected,
+        onVerificationModeSelected = viewModel::onVerificationModeSelected,
         onDialogDismiss = viewModel::dismissDialog,
         onBookmarkDismiss = viewModel::dismissBookmark,
         onBackClick = onBackClick,
@@ -117,6 +122,7 @@ internal fun SettingScreen(
     shouldDisplayBookmark: String,
     mobileNetworkDownloadEnable: Boolean,
     needSecurityVerificationWhenLaunch: Boolean,
+    verificationMode: VerificationModeEnum,
     enableFingerprintVerification: Boolean,
     hasPassword: Boolean,
     hasFingerprint: Boolean,
@@ -129,6 +135,7 @@ internal fun SettingScreen(
     onClearPasswordClick: () -> Unit,
     onDarkModeClick: () -> Unit,
     onDynamicColorClick: () -> Unit,
+    onVerificationModeClick: () -> Unit,
     onCreateConfirm: (String) -> SettingPasswordStateEnum,
     onModifyConfirm: (String, String, (SettingPasswordStateEnum) -> Unit) -> Unit,
     onVerityConfirm: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
@@ -139,6 +146,7 @@ internal fun SettingScreen(
     onBookmarkDismiss: () -> Unit,
     onDarkModeSelected: (DarkModeEnum) -> Unit,
     onDynamicColorSelected: (Boolean) -> Unit,
+    onVerificationModeSelected: (VerificationModeEnum) -> Unit,
     onBackClick: () -> Unit,
     onBackupAndRecoveryClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
@@ -177,6 +185,7 @@ internal fun SettingScreen(
             mobileNetworkDownloadEnable = mobileNetworkDownloadEnable,
             onMobileNetworkDownloadEnableChanged = onMobileNetworkDownloadEnableChanged,
             needSecurityVerificationWhenLaunch = needSecurityVerificationWhenLaunch,
+            verificationMode = verificationMode,
             onNeedSecurityVerificationWhenLaunchChanged = onNeedSecurityVerificationWhenLaunchChanged,
             hasFingerprint = hasFingerprint,
             enableFingerprintVerification = enableFingerprintVerification,
@@ -184,10 +193,12 @@ internal fun SettingScreen(
             onPasswordClick = onPasswordClick,
             onDarkModeClick = onDarkModeClick,
             onDynamicColorClick = onDynamicColorClick,
+            onVerificationModeClick = onVerificationModeClick,
             hasPassword = hasPassword,
             onClearPasswordClick = onClearPasswordClick,
             onDarkModeSelected = onDarkModeSelected,
             onDynamicColorSelected = onDynamicColorSelected,
+            onVerificationModeSelected = onVerificationModeSelected,
             onBackupAndRecoveryClick = onBackupAndRecoveryClick,
         )
     }
@@ -200,6 +211,7 @@ internal fun SettingContent(
     mobileNetworkDownloadEnable: Boolean,
     hasPassword: Boolean,
     needSecurityVerificationWhenLaunch: Boolean,
+    verificationMode: VerificationModeEnum,
     hasFingerprint: Boolean,
     enableFingerprintVerification: Boolean,
     darkMode: DarkModeEnum,
@@ -211,6 +223,7 @@ internal fun SettingContent(
     onClearPasswordClick: () -> Unit,
     onDarkModeClick: () -> Unit,
     onDynamicColorClick: () -> Unit,
+    onVerificationModeClick: () -> Unit,
     onCreateConfirm: (String) -> SettingPasswordStateEnum,
     onModifyConfirm: (String, String, (SettingPasswordStateEnum) -> Unit) -> Unit,
     onVerityConfirm: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
@@ -219,6 +232,7 @@ internal fun SettingContent(
     onFingerprintVerifyError: (Int, String) -> Unit,
     onDarkModeSelected: (DarkModeEnum) -> Unit,
     onDynamicColorSelected: (Boolean) -> Unit,
+    onVerificationModeSelected: (VerificationModeEnum) -> Unit,
     onDialogDismiss: () -> Unit,
     onBackupAndRecoveryClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -229,6 +243,7 @@ internal fun SettingContent(
 
         DialogContent(
             dialogState = dialogState,
+            verificationMode = verificationMode,
             darkMode = darkMode,
             dynamicColor = dynamicColor,
             onCreateConfirm = onCreateConfirm,
@@ -240,6 +255,7 @@ internal fun SettingContent(
             onFingerprintVerifyError = onFingerprintVerifyError,
             onDarkModeSelected = onDarkModeSelected,
             onDynamicColorSelected = onDynamicColorSelected,
+            onVerificationModeSelected = onVerificationModeSelected,
         )
 
         LazyColumn {
@@ -267,6 +283,35 @@ internal fun SettingContent(
                         )
                     },
                 )
+                if (needSecurityVerificationWhenLaunch) {
+                    val verificationModeText = stringResource(
+                        id = when (verificationMode) {
+                            VerificationModeEnum.WHEN_LAUNCH -> R.string.each_launch
+                            VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
+                        }
+                    )
+                    ListItem(
+                        modifier = Modifier
+                            .clickable { onVerificationModeClick.invoke() },
+                        headlineText = { Text(text = stringResource(id = R.string.verification_mode)) },
+                        trailingContent = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(end = 8.dp),
+                                    text = verificationModeText,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowRight,
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                    )
+                }
                 if (needSecurityVerificationWhenLaunch && hasFingerprint) {
                     ListItem(
                         headlineText = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
@@ -374,6 +419,7 @@ internal fun SettingContent(
 @Composable
 internal fun DialogContent(
     dialogState: DialogState,
+    verificationMode: VerificationModeEnum,
     darkMode: DarkModeEnum,
     dynamicColor: Boolean,
     onCreateConfirm: (String) -> SettingPasswordStateEnum,
@@ -385,6 +431,7 @@ internal fun DialogContent(
     onFingerprintVerifyError: (Int, String) -> Unit,
     onDarkModeSelected: (DarkModeEnum) -> Unit,
     onDynamicColorSelected: (Boolean) -> Unit,
+    onVerificationModeSelected: (VerificationModeEnum) -> Unit,
 ) {
     (dialogState as? DialogState.Shown<*>)?.let {
         when (it.data) {
@@ -434,6 +481,15 @@ internal fun DialogContent(
                 DynamicColorDialog(
                     dynamicColor = dynamicColor,
                     onDynamicColorSelected = onDynamicColorSelected,
+                    onDismissClick = onDialogDismiss,
+                )
+            }
+
+            SettingDialogEnum.VERIFICATION_MODE -> {
+                // 验证模式
+                VerificationModeDialog(
+                    verificationMode = verificationMode,
+                    onVerificationModeSelected = onVerificationModeSelected,
                     onDismissClick = onDialogDismiss,
                 )
             }
@@ -850,6 +906,73 @@ internal fun ClearPasswordDialog(
 }
 
 @Composable
+internal fun VerificationModeDialog(
+    verificationMode: VerificationModeEnum,
+    onVerificationModeSelected: (VerificationModeEnum) -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismissClick,
+        title = { Text(text = stringResource(id = R.string.verification_mode)) },
+        text = {
+            Column(
+                modifier = Modifier.selectableGroup(),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (VerificationModeEnum.WHEN_LAUNCH == verificationMode),
+                            onClick = { onVerificationModeSelected.invoke(VerificationModeEnum.WHEN_LAUNCH) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = VerificationModeEnum.WHEN_LAUNCH == verificationMode,
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.each_launch),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (VerificationModeEnum.WHEN_FOREGROUND == verificationMode),
+                            onClick = { onVerificationModeSelected.invoke(VerificationModeEnum.WHEN_FOREGROUND) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = VerificationModeEnum.WHEN_FOREGROUND == verificationMode,
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.each_foreground),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissClick) {
+                Text(text = stringResource(id = R.string.close))
+            }
+        },
+    )
+}
+
+@Composable
 internal fun DarkModeDialog(
     darkMode: DarkModeEnum,
     onDarkModeSelected: (DarkModeEnum) -> Unit,
@@ -900,7 +1023,6 @@ internal fun DarkModeDialog(
                         modifier = Modifier.padding(start = 16.dp),
                     )
                 }
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
