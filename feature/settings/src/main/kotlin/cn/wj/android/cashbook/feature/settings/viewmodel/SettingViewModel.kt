@@ -123,12 +123,18 @@ class SettingViewModel @Inject constructor(
 
     fun onNeedSecurityVerificationWhenLaunchChanged(need: Boolean) {
         viewModelScope.launch {
-            if (need && !hasPassword.value) {
-                // 开启验证但是没有密码，显示创建密码弹窗
-                onPasswordClick()
+            if (!need) {
+                // 关闭验证开关，同时关闭指纹验证开关
+                settingRepository.apply {
+                    updateNeedSecurityVerificationWhenLaunch(false)
+                    updateEnableFingerprintVerification(false)
+                }
+            } else if (hasPassword.first()) {
+                // 有密码，直接开启开关
+                settingRepository.updateNeedSecurityVerificationWhenLaunch(true)
             } else {
-                // 有密码，更新开关
-                settingRepository.updateNeedSecurityVerificationWhenLaunch(need)
+                // 没有密码，显示创建密码弹窗
+                onPasswordClick()
             }
         }
     }
