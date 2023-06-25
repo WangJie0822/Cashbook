@@ -175,9 +175,9 @@ internal fun LauncherContentScreen(
                 scaffoldState = scaffoldState,
                 appBar = { /* 使用上层 topBar 处理 */ },
                 peekHeight = paddingValues.calculateTopPadding(),
-                frontLayerScrimColor = Color.Unspecified,
+                backLayerBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
                 backLayerContent = {
-                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimary) {
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onTertiaryContainer) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -202,6 +202,7 @@ internal fun LauncherContentScreen(
                         }
                     }
                 },
+                frontLayerScrimColor = Color.Unspecified,
                 frontLayerContent = {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -328,9 +329,6 @@ internal fun LauncherTopBar(
     TopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = Color.Transparent,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         title = {
             if (backdropScaffoldState.isConcealed) {
