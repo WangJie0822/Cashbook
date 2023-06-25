@@ -2,7 +2,6 @@ package cn.wj.android.cashbook.feature.records.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -84,7 +83,6 @@ fun NavGraphBuilder.selectRelatedRecordScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LauncherContent(
     onAddClick: () -> Unit,

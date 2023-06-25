@@ -1,16 +1,12 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package cn.wj.android.cashbook.feature.records.preview
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.feature.records.screen.Amount
-import cn.wj.android.cashbook.feature.records.screen.EditRecordScreen
 import cn.wj.android.cashbook.feature.records.screen.EditRecordTopBar
 
 @DevicePreviews

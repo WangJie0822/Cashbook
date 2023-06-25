@@ -2,11 +2,10 @@ package cn.wj.android.cashbook.feature.records.preview
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.BackdropValue
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.rememberBackdropScaffoldState
+import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
@@ -15,7 +14,6 @@ import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
 import cn.wj.android.cashbook.feature.records.screen.LauncherTopBar
 
 /** 首页标题固定部分预览 */
-@OptIn(ExperimentalMaterialApi::class)
 @DevicePreviews
 @Composable
 internal fun LauncherTopTitleBarPreview() {
@@ -42,7 +40,6 @@ internal fun LauncherTopTitleBarPreview() {
 }
 
 /** 首页内容部分预览 */
-@OptIn(ExperimentalMaterialApi::class)
 @DevicePreviews
 @Composable
 internal fun LauncherContentScreenPreview() {
