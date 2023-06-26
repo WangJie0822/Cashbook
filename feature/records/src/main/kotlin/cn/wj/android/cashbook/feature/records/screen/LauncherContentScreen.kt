@@ -27,13 +27,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetLayout
 import androidx.compose.material3.ModalBottomSheetState
 import androidx.compose.material3.ModalBottomSheetValue
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,10 +57,12 @@ import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.TopAppBar
 import cn.wj.android.cashbook.core.design.component.TopAppBarDefaults
+import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
@@ -150,7 +150,7 @@ internal fun LauncherContentScreen(
             }
         },
     ) {
-        Scaffold(
+        CashbookScaffold(
             topBar = {
                 LauncherTopBar(
                     booksName = booksName,
@@ -230,7 +230,7 @@ internal fun LauncherContentScreen(
 
                         if (recordMap.isEmpty()) {
                             Empty(
-                                imageResId = cn.wj.android.cashbook.core.common.R.drawable.vector_no_data_200,
+                                imageResId = R.drawable.vector_no_data_200,
                                 hintResId = R.string.launcher_no_data_hint,
                                 buttonResId = R.string.launcher_no_data_button,
                                 onButtonClick = onCalendarClick,
@@ -368,7 +368,7 @@ internal fun RecordListItem(
     recordViewsEntity: RecordViewsEntity,
     onRecordItemClick: () -> Unit
 ) {
-    ListItem(
+    TranparentListItem(
         modifier = Modifier.clickable {
             onRecordItemClick()
         },
@@ -513,7 +513,7 @@ internal fun RecordDetailsSheet(
         CommonDivider()
 
         // 金额
-        ListItem(
+        TranparentListItem(
             headlineText = { Text(text = stringResource(id = R.string.amount)) },
             trailingContent = {
                 Row(
@@ -549,7 +549,7 @@ internal fun RecordDetailsSheet(
 
         if (recordEntity.charges.toDoubleOrZero() > 0.0) {
             // 手续费
-            ListItem(
+            TranparentListItem(
                 headlineText = { Text(text = stringResource(id = R.string.charges)) },
                 trailingContent = {
                     Text(
@@ -563,7 +563,7 @@ internal fun RecordDetailsSheet(
 
         if (recordEntity.typeCategory != RecordTypeCategoryEnum.INCOME && recordEntity.concessions.toDoubleOrZero() > 0.0) {
             // 优惠
-            ListItem(
+            TranparentListItem(
                 headlineText = { Text(text = stringResource(id = R.string.concessions)) },
                 trailingContent = {
                     Text(
@@ -576,7 +576,7 @@ internal fun RecordDetailsSheet(
         }
 
         // 类型
-        ListItem(
+        TranparentListItem(
             headlineText = { Text(text = stringResource(id = R.string.type)) },
             trailingContent = {
                 Row(
@@ -599,7 +599,7 @@ internal fun RecordDetailsSheet(
 
         recordEntity.assetName?.let { assetName ->
             // 资产
-            ListItem(
+            TranparentListItem(
                 headlineText = { Text(text = stringResource(id = R.string.asset)) },
                 trailingContent = {
                     Row(
@@ -640,7 +640,7 @@ internal fun RecordDetailsSheet(
 
         if (recordEntity.relatedTags.isNotEmpty()) {
             // 标签
-            ListItem(
+            TranparentListItem(
                 headlineText = { Text(text = stringResource(id = R.string.tags)) },
                 trailingContent = {
                     val tagsText = with(StringBuilder()) {
@@ -673,7 +673,7 @@ internal fun RecordDetailsSheet(
 
         if (recordEntity.remark.isNotBlank()) {
             // 备注
-            ListItem(
+            TranparentListItem(
                 headlineText = { Text(text = stringResource(id = R.string.remark)) },
                 trailingContent = {
                     Text(
@@ -685,7 +685,7 @@ internal fun RecordDetailsSheet(
         }
 
         // 时间
-        ListItem(
+        TranparentListItem(
             headlineText = { Text(text = stringResource(id = R.string.time)) },
             trailingContent = {
                 Text(

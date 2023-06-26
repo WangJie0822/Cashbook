@@ -111,26 +111,6 @@ val DarkExtendedColors = ExtendedColors(
 )
 
 /**
- * 白色 Android 主题渐变色
- */
-val LightAndroidGradientColors = GradientColors(container = md_theme_dark_inverseOnSurface)
-
-/**
- * 黑色 Android 主题渐变色
- */
-val DarkAndroidGradientColors = GradientColors(container = Color.Black)
-
-/**
- * 白色 Android 主题背景
- */
-val LightAndroidBackgroundTheme = BackgroundTheme(color = md_theme_dark_inverseOnSurface)
-
-/**
- * 黑色 Android 主题背景
- */
-val DarkAndroidBackgroundTheme = BackgroundTheme(color = Color.Black)
-
-/**
  * 应用主题
  *
  * @param darkTheme 是否使用深色方案，默认跟随系统
@@ -155,12 +135,20 @@ fun CashbookTheme(
     val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors
     // 渐变色
     val emptyGradientColors = GradientColors(container = colorScheme.surfaceColorAtElevation(2.dp))
+    val defaultGradientColors = GradientColors(
+        top = colorScheme.inverseOnSurface,
+        bottom = colorScheme.primaryContainer,
+        container = colorScheme.surface,
+    )
     val gradientColors = when {
         !disableDynamicTheming && supportsDynamicTheming() -> emptyGradientColors
-        else -> if (darkTheme) DarkAndroidGradientColors else LightAndroidGradientColors
+        else -> defaultGradientColors
     }
     // 背景
-    val backgroundTheme = if (darkTheme) DarkAndroidBackgroundTheme else LightAndroidBackgroundTheme
+    val backgroundTheme = BackgroundTheme(
+        color = colorScheme.surface,
+        tonalElevation = 2.dp,
+    )
 
     // 色彩
     val tintTheme = when {

@@ -1,6 +1,5 @@
 package cn.wj.android.cashbook.ui
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,12 +16,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,17 +31,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.tools.isMatch
-import cn.wj.android.cashbook.core.design.component.CashbookBackground
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.PasswordTextField
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -70,17 +68,13 @@ import cn.wj.android.cashbook.feature.tags.navigation.SelectTagsBottomSheet
 import cn.wj.android.cashbook.feature.tags.navigation.myTagsScreen
 import cn.wj.android.cashbook.feature.tags.navigation.naviToMyTags
 import cn.wj.android.cashbook.feature.types.navigation.SelectRecordTypeList
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import javax.crypto.Cipher
 
 /** 开始默认显示路径 */
 private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 
 /** 应用入口 */
-@OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalAnimationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainApp(
     viewModel: VerifyViewModel = viewModel()
@@ -91,7 +85,7 @@ fun MainApp(
     val shouldDisplayBookmark = viewModel.shouldDisplayBookmark
 
     CashbookGradientBackground {
-        val navController = rememberAnimatedNavController()
+        val navController = rememberNavController()
         val snackbarHostState = remember { SnackbarHostState() }
 
         // 提示文本
@@ -114,9 +108,7 @@ fun MainApp(
         }
 
         CompositionLocalProvider(LocalNavController provides navController) {
-            Scaffold(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onBackground,
+            CashbookScaffold(
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 snackbarHost = { SnackbarHost(snackbarHostState) },
             ) { paddingValues ->
@@ -165,134 +157,131 @@ internal fun Verification(
     onFingerprintVerifyError: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    Box(
         modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.primary,
     ) {
-        Box {
 
-            (dialogState as? DialogState.Shown<*>)?.let {
-                if (it.data is Cipher) {
-                    val data = it.data as Cipher
-                    BiometricAuthenticate(
-                        title = stringResource(id = R.string.verity_fingerprint),
-                        subTitle = stringResource(id = R.string.verity_fingerprint_to_use),
-                        hint = stringResource(id = R.string.press_sensing_to_verity_fingerprint),
-                        cryptoCipher = data,
-                        onSuccess = onFingerprintVerifySuccess,
-                        onError = onFingerprintVerifyError,
-                    )
-                }
+        (dialogState as? DialogState.Shown<*>)?.let {
+            if (it.data is Cipher) {
+                val data = it.data as Cipher
+                BiometricAuthenticate(
+                    title = stringResource(id = R.string.verity_fingerprint),
+                    subTitle = stringResource(id = R.string.verity_fingerprint_to_use),
+                    hint = stringResource(id = R.string.press_sensing_to_verity_fingerprint),
+                    cryptoCipher = data,
+                    onSuccess = onFingerprintVerifySuccess,
+                    onError = onFingerprintVerifyError,
+                )
             }
+        }
 
-            Text(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp),
-                text = stringResource(id = R.string.launch_verity_hint),
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-            )
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+        Text(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(16.dp),
+            text = stringResource(id = R.string.launch_verity_hint),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+        )
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // 提示文本
-                    val passwordMustNotBeBlankText =
-                        stringResource(id = R.string.password_must_not_be_blank)
-                    val passwordWrongText = stringResource(id = R.string.password_wrong)
-                    val passwordFormatErrorText =
-                        stringResource(id = R.string.password_format_error)
-                    val passwordDecodeFailedText =
-                        stringResource(id = R.string.password_decode_failed)
+                // 提示文本
+                val passwordMustNotBeBlankText =
+                    stringResource(id = R.string.password_must_not_be_blank)
+                val passwordWrongText = stringResource(id = R.string.password_wrong)
+                val passwordFormatErrorText =
+                    stringResource(id = R.string.password_format_error)
+                val passwordDecodeFailedText =
+                    stringResource(id = R.string.password_decode_failed)
 
-                    var pwd by remember {
-                        mutableStateOf("")
-                    }
-                    var pwdError by remember {
-                        mutableStateOf(false)
-                    }
-                    var pwdSupportText by remember {
-                        mutableStateOf("")
-                    }
+                var pwd by remember {
+                    mutableStateOf("")
+                }
+                var pwdError by remember {
+                    mutableStateOf(false)
+                }
+                var pwdSupportText by remember {
+                    mutableStateOf("")
+                }
 
-                    PasswordTextField(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .weight(1f),
-                        initializedText = pwd,
-                        label = stringResource(id = R.string.please_enter_password),
-                        isError = pwdError,
-                        supportingText = pwdSupportText,
-                        onValueChange = { pwd = it },
-                    )
+                PasswordTextField(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .weight(1f),
+                    initializedText = pwd,
+                    label = stringResource(id = R.string.please_enter_password),
+                    isError = pwdError,
+                    supportingText = pwdSupportText,
+                    onValueChange = { pwd = it },
+                )
 
-                    TextButton(
-                        onClick = {
-                            when {
-                                pwd.isBlank() -> {
-                                    pwdError = true
-                                    pwdSupportText = passwordMustNotBeBlankText
-                                }
+                TextButton(
+                    onClick = {
+                        when {
+                            pwd.isBlank() -> {
+                                pwdError = true
+                                pwdSupportText = passwordMustNotBeBlankText
+                            }
 
-                                !pwd.isMatch(PASSWORD_REGEX) -> {
-                                    pwdError = true
-                                    pwdSupportText = passwordFormatErrorText
-                                }
+                            !pwd.isMatch(PASSWORD_REGEX) -> {
+                                pwdError = true
+                                pwdSupportText = passwordFormatErrorText
+                            }
 
-                                else -> {
-                                    onConfirmClick.invoke(pwd) { result ->
-                                        if (result == SettingPasswordStateEnum.PASSWORD_WRONG) {
-                                            // 密码错误
-                                            pwdError = true
-                                            pwdSupportText = passwordWrongText
-                                        } else if (result == SettingPasswordStateEnum.PASSWORD_DECODE_FAILED) {
-                                            pwdError = true
-                                            pwdSupportText = passwordDecodeFailedText
-                                        }
+                            else -> {
+                                onConfirmClick.invoke(pwd) { result ->
+                                    if (result == SettingPasswordStateEnum.PASSWORD_WRONG) {
+                                        // 密码错误
+                                        pwdError = true
+                                        pwdSupportText = passwordWrongText
+                                    } else if (result == SettingPasswordStateEnum.PASSWORD_DECODE_FAILED) {
+                                        pwdError = true
+                                        pwdSupportText = passwordDecodeFailedText
                                     }
                                 }
                             }
-                        },
-                        content = {
-                            Text(text = stringResource(id = R.string.confirm))
-                        },
+                        }
+                    },
+                    content = {
+                        Text(text = stringResource(id = R.string.confirm))
+                    },
+                )
+            }
+            if (supportFingerprint) {
+                IconButton(onClick = { onFingerprintClick.invoke() }) {
+                    Icon(
+                        imageVector = Icons.Default.Fingerprint,
+                        tint = MaterialTheme.colorScheme.primary,
+                        contentDescription = null,
                     )
                 }
-                if (supportFingerprint) {
-                    IconButton(onClick = { onFingerprintClick.invoke() }) {
-                        Icon(
-                            imageVector = Icons.Default.Fingerprint,
-                            tint = MaterialTheme.colorScheme.primary,
-                            contentDescription = null,
-                        )
-                    }
-                    if (firstOpen) {
-                        onFingerprintClick.invoke()
-                    }
+                if (firstOpen) {
+                    onFingerprintClick.invoke()
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CashbookNavHost(
     navController: NavHostController,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-    AnimatedNavHost(
+    // FIXME 使用 AnimatedNavHost 从二级界面返回时快速点击左上角菜单会导致 Navigation 不显示，后续添加界面动画时需修复此问题
+    NavHost(
         navController = navController,
         startDestination = START_DESTINATION,
         modifier = modifier,
@@ -345,6 +334,7 @@ fun CashbookNavHost(
         editRecordScreen(
             onBackClick = navController::popBackStack,
             onSelectRelatedRecordClick = navController::naviToSelectRelatedRecord,
+            onShowSnackbar = onShowSnackbar,
             selectTypeList = { typeCategory, selectedType, overTypeList, underTypeList, onTypeSelected ->
                 SelectRecordTypeList(
                     typeCategory = typeCategory,

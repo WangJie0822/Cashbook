@@ -30,7 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CommonTopBar
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.ui.R
@@ -60,9 +61,9 @@ internal fun MyTagsScreen(
     // 标签列表
     val tagList by viewModel.tagListData.collectAsStateWithLifecycle()
 
-    Scaffold(
+    CashbookScaffold(
         topBar = {
-            CommonTopBar(
+            CashbookTopAppBar(
                 text = stringResource(id = R.string.my_tags),
                 onBackClick = onBackClick,
                 actions = {
@@ -83,7 +84,7 @@ internal fun MyTagsScreen(
             if (tagList.isEmpty()) {
                 Empty(
                     modifier = Modifier.fillMaxSize(),
-                    imageResId = cn.wj.android.cashbook.core.common.R.drawable.vector_no_data_200,
+                    imageResId = R.drawable.vector_no_data_200,
                     hintResId = R.string.tags_empty_hint
                 )
             } else {

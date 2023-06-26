@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetLayout
 import androidx.compose.material3.ModalBottomSheetState
 import androidx.compose.material3.ModalBottomSheetValue
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -46,8 +45,9 @@ import cn.wj.android.cashbook.core.common.PATTERN_SIGN_MONEY
 import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CommonDivider
-import cn.wj.android.cashbook.core.design.component.CommonTopBar
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
@@ -142,9 +142,9 @@ internal fun EditAssetScreen(
                 }
             }
         }) {
-        Scaffold(
+        CashbookScaffold(
             topBar = {
-                CommonTopBar(
+                CashbookTopAppBar(
                     text = stringResource(id = if (assetId == -1L) R.string.new_asset else R.string.edit_asset),
                     onBackClick = onBackClick
                 )

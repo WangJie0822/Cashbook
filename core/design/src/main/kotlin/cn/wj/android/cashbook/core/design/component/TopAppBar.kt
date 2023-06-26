@@ -5,6 +5,7 @@ package cn.wj.android.cashbook.core.design.component
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -15,7 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 
@@ -28,14 +32,18 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
  * @param colors 标题控件颜色
  */
 @Composable
-fun CommonTopBar(
-    text: String? = null,
+fun CashbookTopAppBar(
     onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    text: String? = null,
     actions: @Composable RowScope.() -> Unit = {},
-    colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(),
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
         title = { text?.let { Text(text = it) } },
+        modifier = modifier,
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
@@ -45,7 +53,9 @@ fun CommonTopBar(
             }
         },
         actions = actions,
+        windowInsets = windowInsets,
         colors = colors,
+        scrollBehavior = scrollBehavior,
     )
 }
 
@@ -55,9 +65,9 @@ fun CommonTopBar(
 fun CommonTopBarPreview() {
     CashbookTheme {
         Column {
-            CommonTopBar(onBackClick = { })
-            CommonTopBar(text = "标题", onBackClick = { })
-            CommonTopBar(onBackClick = { }, actions = {
+            CashbookTopAppBar(onBackClick = { })
+            CashbookTopAppBar(text = "标题", onBackClick = { })
+            CashbookTopAppBar(onBackClick = { }, actions = {
                 IconButton(onClick = { }) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = null)
                 }

@@ -1,6 +1,5 @@
 package cn.wj.android.cashbook.feature.records.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -9,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
+import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
@@ -19,7 +19,6 @@ import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
-import com.google.accompanist.navigation.animation.composable
 
 private const val ROUTE_EDIT_RECORD_KEY = "recordId"
 private const val ROUTE_EDIT_RECORD =
@@ -38,10 +37,10 @@ fun NavController.naviToSelectRelatedRecord() {
 /**
  * 编辑记录
  */
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.editRecordScreen(
     onBackClick: () -> Unit,
     onSelectRelatedRecordClick: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     selectTypeList: @Composable (RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
@@ -57,6 +56,7 @@ fun NavGraphBuilder.editRecordScreen(
             recordId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY) ?: -1L,
             onBackClick = onBackClick,
             selectTypeList = selectTypeList,
+            onShowSnackbar = onShowSnackbar,
             selectAssetBottomSheet = selectAssetBottomSheet,
             selectTagBottomSheet = selectTagBottomSheet,
             onSelectRelatedRecordClick = onSelectRelatedRecordClick,
@@ -64,7 +64,6 @@ fun NavGraphBuilder.editRecordScreen(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.selectRelatedRecordScreen(
     onBackClick: () -> Unit,
 ) {

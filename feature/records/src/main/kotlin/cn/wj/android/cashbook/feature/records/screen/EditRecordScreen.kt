@@ -25,8 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetScaffold
 import androidx.compose.material3.ModalBottomSheetState
 import androidx.compose.material3.ModalBottomSheetValue
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -37,8 +36,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +50,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.completeZero
-import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.common.ext.toIntOrZero
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_TIME
@@ -64,8 +62,8 @@ import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmark
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.TabItem
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
@@ -80,19 +78,23 @@ import kotlinx.coroutines.launch
 internal fun EditRecordRoute(
     recordId: Long,
     onBackClick: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     selectTypeList: @Composable (RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
     onSelectRelatedRecordClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
 
     EditRecordScreen(
         recordId = recordId,
         onBackClick = onBackClick,
         selectTypeList = selectTypeList,
+        onShowSnackbar = onShowSnackbar,
         selectAssetBottomSheet = selectAssetBottomSheet,
         selectTagBottomSheet = selectTagBottomSheet,
         onSelectRelatedRecordClick = onSelectRelatedRecordClick,
+        modifier = modifier,
     )
 }
 
@@ -106,10 +108,12 @@ internal fun EditRecordRoute(
 internal fun EditRecordScreen(
     recordId: Long,
     onBackClick: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     selectTypeList: @Composable (RecordTypeCategoryEnum, RecordTypeEntity?, @Composable LazyGridItemScope.() -> Unit, @Composable LazyGridItemScope.() -> Unit, (RecordTypeEntity?) -> Unit) -> Unit,
     selectAssetBottomSheet: @Composable (RecordTypeEntity?, Boolean, (AssetEntity?) -> Unit) -> Unit,
     selectTagBottomSheet: @Composable (List<Long>, (TagEntity) -> Unit) -> Unit,
     onSelectRelatedRecordClick: () -> Unit,
+    modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
@@ -153,11 +157,28 @@ internal fun EditRecordScreen(
         RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
     }
 
-    val snackbarHostState = remember {
-        SnackbarHostState()
+    // 提示文本
+    val amountMustNotBeNullText = stringResource(id = R.string.amount_must_not_be_zero)
+    val typeErrorText = stringResource(id = R.string.please_select_type)
+    val saveFailedText = stringResource(id = R.string.save_failure)
+
+    LaunchedEffect(viewModel.shouldDisplayBookmark) {
+        if (viewModel.shouldDisplayBookmark != EditRecordBookmark.NONE) {
+            val tipText = when (viewModel.shouldDisplayBookmark) {
+                EditRecordBookmark.AMOUNT_MUST_NOT_BE_ZERO -> amountMustNotBeNullText
+                EditRecordBookmark.TYPE_NOT_MATCH_CATEGORY, EditRecordBookmark.TYPE_MUST_NOT_BE_NULL -> typeErrorText
+                EditRecordBookmark.SAVE_FAILED -> saveFailedText
+                else -> ""
+            }
+            val showSnackbarResult = onShowSnackbar(tipText, null)
+            if (SnackbarResult.Dismissed == showSnackbarResult) {
+                viewModel.onBookmarkDismiss()
+            }
+        }
     }
 
     ModalBottomSheetScaffold(
+        modifier = modifier,
         topBar = {
             EditRecordTopBar(
                 selectedTabIndex = selectedTypeCategory.position,
@@ -165,37 +186,10 @@ internal fun EditRecordScreen(
                 onBackClick = onBackClick,
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 coroutineScope.launch {
-                    val result = viewModel.trySaveRecord()
-                    if (result is ResultModel.Failure<*>) {
-                        when (result.code) {
-                            ResultModel.Failure.FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO -> {
-                                // 金额不能为 0
-                                snackbarHostState.showSnackbar(R.string.amount_must_not_be_zero.string)
-                            }
-
-                            ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL,
-                            ResultModel.Failure.FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY -> {
-                                // 未选择类型或类型与支出分类不匹配
-                                snackbarHostState.showSnackbar(R.string.please_select_type.string)
-                            }
-
-                            else -> {
-                                // 保存失败
-                                snackbarHostState.showSnackbar(
-                                    R.string.save_failure_format.string.format(
-                                        result.code
-                                    )
-                                )
-                            }
-                        }
-                    } else {
-                        // 保存成功，关闭当前界面
-                        onBackClick()
-                    }
+                    viewModel.saveRecord(onSaveSuccess = onBackClick)
                 }
             }) {
                 Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
@@ -246,7 +240,9 @@ internal fun EditRecordScreen(
                             )
                         }
 
-                        else -> {}
+                        else -> {
+                            // 无用逻辑
+                        }
                     }
                 }
 

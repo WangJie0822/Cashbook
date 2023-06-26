@@ -16,9 +16,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -46,7 +44,9 @@ import cn.wj.android.cashbook.core.common.GITEE_HOMEPAGE
 import cn.wj.android.cashbook.core.common.GITHUB_HOMEPAGE
 import cn.wj.android.cashbook.core.common.tools.jumpBrowser
 import cn.wj.android.cashbook.core.common.tools.jumpSendEmail
-import cn.wj.android.cashbook.core.design.component.CommonTopBar
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.core.ui.R
@@ -145,9 +145,9 @@ internal fun AboutUsScreen(
         }
     }
 
-    Scaffold(
+    CashbookScaffold(
         topBar = {
-            CommonTopBar(
+            CashbookTopAppBar(
                 text = stringResource(id = R.string.about_us),
                 onBackClick = onBackClick,
             )
@@ -260,7 +260,7 @@ internal fun AboutUsScreen(
                             .fillMaxWidth(),
                     )
                     // 数据源
-                    ListItem(
+                    TranparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.switch_data_source)) },
                         supportingText = { Text(text = stringResource(id = R.string.data_source_hint)) },
                         trailingContent = {
@@ -285,7 +285,7 @@ internal fun AboutUsScreen(
                         },
                     )
                     // 自动检查更新
-                    ListItem(
+                    TranparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.auto_check_update)) },
                         trailingContent = {
                             Switch(
@@ -306,7 +306,7 @@ internal fun AboutUsScreen(
                     } else {
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     }
-                    ListItem(
+                    TranparentListItem(
                         modifier = checkUpdateModifier,
                         headlineText = {
                             Text(
@@ -316,7 +316,7 @@ internal fun AboutUsScreen(
                         },
                     )
                     // 版本信息
-                    ListItem(
+                    TranparentListItem(
                         modifier = Modifier.clickable { onVersionInfoClick.invoke() },
                         headlineText = {
                             Text(text = stringResource(id = R.string.version_info))
@@ -339,7 +339,7 @@ internal fun AboutUsScreen(
                         },
                     )
                     // 用户协议和隐私政策
-                    ListItem(
+                    TranparentListItem(
                         modifier = Modifier.clickable { onUserAgreementAndPrivacyPolicyClick.invoke() },
                         headlineText = {
                             Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy))

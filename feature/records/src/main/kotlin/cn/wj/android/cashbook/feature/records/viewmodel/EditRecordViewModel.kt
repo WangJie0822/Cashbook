@@ -2,10 +2,14 @@
 
 package cn.wj.android.cashbook.feature.records.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
@@ -16,15 +20,12 @@ import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.ResultModel
-import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO
-import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL
-import cn.wj.android.cashbook.core.model.model.ResultModel.Failure.Companion.FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRelatedRecordListUseCase
 import cn.wj.android.cashbook.domain.usecase.GetDefaultTagListUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
+import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmark
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -48,6 +49,8 @@ class EditRecordViewModel @Inject constructor(
     getDefaultRelatedRecordListUseCase: GetDefaultRelatedRecordListUseCase,
     private val saveRecordUseCase: SaveRecordUseCase,
 ) : ViewModel() {
+
+    var shouldDisplayBookmark by mutableStateOf(EditRecordBookmark.NONE)
 
     /** 显示底部弹窗数据 */
     private val _bottomSheetData: MutableStateFlow<EditRecordBottomSheetEnum> =
@@ -371,39 +374,49 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
-    /** 尝试保存记录 */
-    suspend fun trySaveRecord(): ResultModel {
-        val recordEntity = recordData.first()
-        if (recordEntity.amount.toDoubleOrZero() == 0.0) {
-            // 记录金额不能为 0
-            return ResultModel.failure(FAILURE_EDIT_RECORD_AMOUNT_MUST_NOT_BE_ZERO)
+    fun saveRecord(onSaveSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val recordEntity = recordData.first()
+            if (recordEntity.amount.toDoubleOrZero() == 0.0) {
+                // 记录金额不能为 0
+                shouldDisplayBookmark = EditRecordBookmark.AMOUNT_MUST_NOT_BE_ZERO
+                return@launch
+            }
+            // 检查类型数据
+            val typeEntity = selectedTypeData.first()
+            if (null == typeEntity) {
+                // 类型不能为空
+                shouldDisplayBookmark = EditRecordBookmark.TYPE_MUST_NOT_BE_NULL
+                return@launch
+            }
+            // 支出分类
+            val typeCategory = typeCategory.first()
+            if (typeEntity.typeCategory != typeCategory) {
+                // 类型与支出类型不匹配
+                shouldDisplayBookmark = EditRecordBookmark.TYPE_NOT_MATCH_CATEGORY
+                return@launch
+            }
+            // TODO 关联记录
+            try {
+                saveRecordUseCase(
+                    recordEntity.copy(
+                        relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
+                        concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) "" else recordEntity.concessions,
+                        reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
+                    ),
+                    tagsData.first(),
+                )
+                onSaveSuccess.invoke()
+            } catch (throwable: Throwable) {
+                // 保存失败
+                this@EditRecordViewModel.logger().e(throwable, "saveRecord()")
+                shouldDisplayBookmark = EditRecordBookmark.TYPE_NOT_MATCH_CATEGORY
+            }
         }
-        // 检查类型数据，类型不能为空
-        val typeEntity =
-            selectedTypeData.value ?: return ResultModel.failure(
-                FAILURE_EDIT_RECORD_TYPE_MUST_NOT_BE_NULL
-            )
-        // 支出分类
-        val typeCategory = typeCategory.value
-        if (typeEntity.typeCategory != typeCategory) {
-            // 类型与支出类型不匹配
-            return ResultModel.failure(FAILURE_EDIT_RECORD_TYPE_NOT_MATCH_CATEGORY)
-        }
+    }
 
-        // TODO 关联记录
-        return try {
-            saveRecordUseCase(
-                recordEntity.copy(
-                    relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
-                    concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) "" else recordEntity.concessions,
-                    reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
-                ),
-                tagsData.value,
-            )
-            ResultModel.success()
-        } catch (throwable: Throwable) {
-            ResultModel.failure(throwable)
-        }
+    fun onBookmarkDismiss() {
+        shouldDisplayBookmark = EditRecordBookmark.NONE
     }
 }
 

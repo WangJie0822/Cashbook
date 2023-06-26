@@ -1,16 +1,15 @@
 package cn.wj.android.cashbook.feature.assets.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
+import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.SelectAssetBottomSheetScreen
-import com.google.accompanist.navigation.animation.composable
 
 @Composable
 fun SelectAssetBottomSheet(
@@ -33,7 +32,6 @@ fun NavController.naviToEditAsset(assetId: Long = -1L) {
     this.navigate(ROUTE_EDIT_ASSET.replace("{$ROUTE_EDIT_ASSET_KEY}", assetId.toString()))
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.editAssetScreen(
     onBackClick: () -> Unit,
 ) {

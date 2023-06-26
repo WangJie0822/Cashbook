@@ -17,10 +17,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -40,8 +38,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.tools.isMatch
-import cn.wj.android.cashbook.core.design.component.CommonTopBar
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.PasswordTextField
+import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
 import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
@@ -161,9 +161,9 @@ internal fun SettingScreen(
         }
     }
 
-    Scaffold(
+    CashbookScaffold(
         topBar = {
-            CommonTopBar(
+            CashbookTopAppBar(
                 text = stringResource(id = R.string.settings),
                 onBackClick = onBackClick,
             )
@@ -260,7 +260,7 @@ internal fun SettingContent(
 
         LazyColumn {
             item {
-                ListItem(
+                TranparentListItem(
                     modifier = Modifier.padding(top = 16.dp),
                     headlineText = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
                     trailingContent = {
@@ -273,7 +273,7 @@ internal fun SettingContent(
                 Divider(modifier = Modifier.padding(horizontal = 8.dp))
             }
             item {
-                ListItem(
+                TranparentListItem(
                     modifier = Modifier.padding(top = 16.dp),
                     headlineText = { Text(text = stringResource(id = R.string.need_security_verification_when_launch)) },
                     trailingContent = {
@@ -290,7 +290,7 @@ internal fun SettingContent(
                             VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
                         }
                     )
-                    ListItem(
+                    TranparentListItem(
                         modifier = Modifier
                             .clickable { onVerificationModeClick.invoke() },
                         headlineText = { Text(text = stringResource(id = R.string.verification_mode)) },
@@ -313,7 +313,7 @@ internal fun SettingContent(
                     )
                 }
                 if (needSecurityVerificationWhenLaunch && hasFingerprint) {
-                    ListItem(
+                    TranparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
                         trailingContent = {
                             Switch(
@@ -323,7 +323,7 @@ internal fun SettingContent(
                         },
                     )
                 }
-                ListItem(
+                TranparentListItem(
                     modifier = Modifier.clickable { onPasswordClick.invoke() },
                     headlineText = {
                         if (hasPassword) {
@@ -334,7 +334,7 @@ internal fun SettingContent(
                     },
                 )
                 if (hasPassword) {
-                    ListItem(
+                    TranparentListItem(
                         modifier = Modifier.clickable { onClearPasswordClick.invoke() },
                         headlineText = { Text(text = stringResource(id = R.string.clear_password)) },
                     )
@@ -350,7 +350,7 @@ internal fun SettingContent(
                         DarkModeEnum.DARK -> R.string.dark_mode
                     }
                 )
-                ListItem(
+                TranparentListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onDarkModeClick.invoke() },
@@ -373,7 +373,7 @@ internal fun SettingContent(
                     },
                 )
                 if (supportsDynamicTheming()) {
-                    ListItem(
+                    TranparentListItem(
                         modifier = Modifier.clickable { onDynamicColorClick.invoke() },
                         headlineText = { Text(text = stringResource(id = R.string.dynamic_color)) },
                         supportingText = { Text(text = stringResource(id = R.string.dynamic_color_hint)) },
@@ -399,7 +399,7 @@ internal fun SettingContent(
             }
 
             item {
-                ListItem(
+                TranparentListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onBackupAndRecoveryClick.invoke() },

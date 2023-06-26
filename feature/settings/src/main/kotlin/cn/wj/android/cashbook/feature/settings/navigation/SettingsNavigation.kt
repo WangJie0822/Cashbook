@@ -1,16 +1,13 @@
-@file:OptIn(ExperimentalAnimationApi::class)
-
 package cn.wj.android.cashbook.feature.settings.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import cn.wj.android.cashbook.feature.settings.screen.AboutUsRoute
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
 import cn.wj.android.cashbook.feature.settings.screen.SettingRoute
-import com.google.accompanist.navigation.animation.composable
 
 /** 设置 - 启动页路由 */
 const val ROUTE_SETTINGS_LAUNCHER = "settings/launcher"
@@ -77,12 +74,15 @@ fun NavGraphBuilder.aboutUsScreen(
     }
 }
 
+/**
+ * 设置
+ */
 fun NavGraphBuilder.settingScreen(
     onBackClick: () -> Unit,
     onBackupAndRecoveryClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 
-) {
+    ) {
     composable(route = ROUTE_SETTINGS_SETTING) {
         SettingRoute(
             onBackClick = onBackClick,
