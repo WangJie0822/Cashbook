@@ -2,7 +2,6 @@ package cn.wj.android.cashbook.core.model.entity
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 
-
 /**
  * 记录数据实体类
  *

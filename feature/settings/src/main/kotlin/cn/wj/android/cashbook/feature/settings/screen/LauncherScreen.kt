@@ -22,19 +22,16 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import cn.wj.android.cashbook.core.ui.BackPressHandler
+import androidx.hilt.navigation.compose.hiltViewModel
 import cn.wj.android.cashbook.core.ui.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModel
 
 /**
  * 首页显示
- *
- * @param content 内容区
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,89 +43,91 @@ internal fun LauncherRoute(
     onSettingClick: () -> Unit,
     onAboutUsClick: () -> Unit,
     content: @Composable (() -> Unit) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: LauncherViewModel = hiltViewModel(),
 ) {
     LauncherScreen(
-        onMyAssetClick = onMyAssetClick,
-        onMyBookClick = onMyBookClick,
-        onMyCategoryClick = onMyCategoryClick,
-        onMyTagClick = onMyTagClick,
-        onSettingClick = onSettingClick,
-        onAboutUsClick = onAboutUsClick,
-        content = content,
+        shouldDisplayDrawerSheet = viewModel.shouldDisplayDrawerSheet,
+        onMyAssetClick = {
+            onMyAssetClick.invoke()
+            viewModel.dismissDrawerSheet()
+        },
+        onMyBookClick = {
+            onMyBookClick.invoke()
+            viewModel.dismissDrawerSheet()
+        },
+        onMyCategoryClick = {
+            onMyCategoryClick.invoke()
+            viewModel.dismissDrawerSheet()
+        },
+        onMyTagClick = {
+            onMyTagClick.invoke()
+            viewModel.dismissDrawerSheet()
+        },
+        onSettingClick = {
+            onSettingClick.invoke()
+            viewModel.dismissDrawerSheet()
+        },
+        onAboutUsClick = {
+            onAboutUsClick.invoke()
+            viewModel.dismissDrawerSheet()
+        },
+        content = { content { viewModel.displayDrawerSheet() } },
+        modifier = modifier,
+        drawerState = rememberDrawerState(
+            initialValue = DrawerValue.Closed,
+            confirmStateChange = {
+                if (it == DrawerValue.Closed) {
+                    viewModel.dismissDrawerSheet()
+                }
+                true
+            },
+        )
     )
 }
 
 /**
  * 首页显示
- *
- * @param content 内容区
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherScreen(
+    shouldDisplayDrawerSheet: Boolean,
     onMyAssetClick: () -> Unit,
     onMyBookClick: () -> Unit,
     onMyCategoryClick: () -> Unit,
     onMyTagClick: () -> Unit,
     onSettingClick: () -> Unit,
     onAboutUsClick: () -> Unit,
-    content: @Composable (() -> Unit) -> Unit,
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
 
-    if (drawerState.isOpen) {
-        BackPressHandler {
-            coroutineScope.launch {
-                drawerState.close()
-            }
-        }
-    }
-
-    // 关闭抽屉
-    val closeDrawer = {
-        coroutineScope.launch {
+    // 抽屉菜单显示状态
+    LaunchedEffect(shouldDisplayDrawerSheet) {
+        if (shouldDisplayDrawerSheet) {
+            drawerState.open()
+        } else {
             drawerState.close()
         }
     }
 
     ModalNavigationDrawer(
+        modifier = modifier,
         drawerState = drawerState,
         drawerContent = {
             LauncherSheet(
-                onMyAssetClick = {
-                    onMyAssetClick.invoke()
-                    closeDrawer.invoke()
-                },
-                onMyBookClick = {
-                    onMyBookClick.invoke()
-                    closeDrawer.invoke()
-                },
-                onMyCategoryClick = {
-                    onMyCategoryClick.invoke()
-                    closeDrawer.invoke()
-                },
-                onMyTagClick = {
-                    onMyTagClick.invoke()
-                    closeDrawer.invoke()
-                },
-                onSettingClick = {
-                    onSettingClick.invoke()
-                    closeDrawer.invoke()
-                },
-                onAboutUsClick = {
-                    onAboutUsClick.invoke()
-                    closeDrawer.invoke()
-                },
+                onMyAssetClick = onMyAssetClick,
+                onMyBookClick = onMyBookClick,
+                onMyCategoryClick = onMyCategoryClick,
+                onMyTagClick = onMyTagClick,
+                onSettingClick = onSettingClick,
+                onAboutUsClick = onAboutUsClick,
             )
         },
-    ) {
-        content {
-            coroutineScope.launch {
-                drawerState.open()
-            }
-        }
-    }
+        content = content,
+    )
 }
 
 /**

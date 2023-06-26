@@ -297,12 +297,11 @@ fun CashbookNavHost(
             onAboutUsClick = navController::naviToAboutUs,
             content = { openDrawer ->
                 LauncherContent(
+                    onEditRecordClick = navController::naviToEditRecord,
                     onMenuClick = openDrawer,
-                    onAddClick = navController::naviToEditRecord,
                     onSearchClick = { /* TODO */ },
                     onCalendarClick = { /* TODO */ },
                     onMyAssetClick = { /* TODO */ },
-                    onRecordItemEditClick = navController::naviToEditRecord,
                     onShowSnackbar = onShowSnackbar,
                 )
             },

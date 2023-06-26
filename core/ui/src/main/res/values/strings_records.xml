@@ -4,6 +4,10 @@
     <string name="current_month_income">本月收入</string>
     <string name="current_month_expend">本月支出</string>
     <string name="current_month_balance">本月结余</string>
+    <string name="month_income">月收入</string>
+    <string name="month_expend">月支出</string>
+    <string name="month_balance">月结余</string>
+    <string name="day">日</string>
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
     <string name="before_yesterday">前天</string>
@@ -11,6 +15,7 @@
     <string name="expend_with_colon">支：</string>
     <string name="launcher_no_data_hint">当前页仅显示本月数据</string>
     <string name="launcher_no_data_button">点击查看其它月份</string>
+    <string name="no_record_data">无记录数据</string>
     <string name="record_type">记录类型</string>
     <string name="remark">备注</string>
     <string name="target_asset">目标资产</string>

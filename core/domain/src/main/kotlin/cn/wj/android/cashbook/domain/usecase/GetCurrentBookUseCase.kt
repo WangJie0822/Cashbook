@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.combine
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/22
  */
-class GetCurrentBooksUseCase @Inject constructor(
+class GetCurrentBookUseCase @Inject constructor(
     private val booksRepository: BooksRepository,
     private val appPreferencesDataSource: AppPreferencesDataSource,
 ) {

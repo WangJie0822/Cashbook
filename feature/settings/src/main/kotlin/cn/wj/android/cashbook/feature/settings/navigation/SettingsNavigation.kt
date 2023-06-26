@@ -30,8 +30,6 @@ fun NavController.naviToSetting() {
 
 /**
  * 首页显示
- *
- * @param content 内容区
  */
 fun NavGraphBuilder.settingsLauncherScreen(
     onMyAssetClick: () -> Unit,

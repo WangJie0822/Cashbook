@@ -16,7 +16,7 @@ import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
-import cn.wj.android.cashbook.feature.records.screen.LauncherContentScreen
+import cn.wj.android.cashbook.feature.records.screen.LauncherContentRoute
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 
@@ -84,21 +84,19 @@ fun NavGraphBuilder.selectRelatedRecordScreen(
 
 @Composable
 fun LauncherContent(
-    onAddClick: () -> Unit,
+    onEditRecordClick: (Long) -> Unit,
     onMenuClick: () -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onMyAssetClick: () -> Unit,
-    onRecordItemEditClick: (Long) -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
-    LauncherContentScreen(
+    LauncherContentRoute(
+        onEditRecordClick = onEditRecordClick,
         onMenuClick = onMenuClick,
-        onAddClick = onAddClick,
         onSearchClick = onSearchClick,
         onCalendarClick = onCalendarClick,
         onMyAssetClick = onMyAssetClick,
-        onRecordItemEditClick = onRecordItemEditClick,
         onShowSnackbar = onShowSnackbar,
     )
 }

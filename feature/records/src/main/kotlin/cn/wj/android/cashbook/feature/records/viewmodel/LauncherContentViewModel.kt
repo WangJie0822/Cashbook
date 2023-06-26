@@ -5,52 +5,46 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCase
-import cn.wj.android.cashbook.domain.usecase.GetCurrentBooksUseCase
+import cn.wj.android.cashbook.domain.usecase.GetCurrentBookUseCase
 import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCase
-import cn.wj.android.cashbook.feature.records.model.RecordDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
 import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/**
- * 启动页内容 ViewModel
- *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/15
- */
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class LauncherContentViewModel @Inject constructor(
-    getCurrentBooksUseCase: GetCurrentBooksUseCase,
+    getCurrentBookUseCase: GetCurrentBookUseCase,
     getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
     private val deleteRecordUseCase: DeleteRecordUseCase,
 ) : ViewModel() {
 
-    /** 标记 - 是否显示删除失败提示 */
-    var shouldDisplayDeleteFailedBookmark by mutableStateOf(-1)
+    /** 删除记录失败错误信息 */
+    var shouldDisplayDeleteFailedBookmark by mutableStateOf(0)
 
-    /** 弹窗状态数据 */
-    private val _dialogState: MutableStateFlow<RecordDialogState> =
-        MutableStateFlow(RecordDialogState.Dismiss)
-    val dialogState: StateFlow<RecordDialogState> = _dialogState
+    /** 弹窗状态 */
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
 
-    /** 当前账本名称 */
-    val bookName: StateFlow<String> = getCurrentBooksUseCase()
+    /** 记录详情数据 */
+    var viewRecord by mutableStateOf<RecordViewsEntity?>(null)
+
+    /** 账本名 */
+    val currentBookName = getCurrentBookUseCase()
         .mapLatest { it.name }
         .stateIn(
             scope = viewModelScope,
@@ -59,11 +53,11 @@ class LauncherContentViewModel @Inject constructor(
         )
 
     /** 当前月记录数据 */
-    val currentMonthRecordListMapData: StateFlow<Map<String, List<RecordViewsEntity>>> =
+    val currentMonthRecordListMapData: StateFlow<Map<RecordDayEntity, List<RecordViewsEntity>>> =
         getCurrentMonthRecordViewsUseCase()
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
+                started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = mapOf(),
             )
 
@@ -77,94 +71,59 @@ class LauncherContentViewModel @Inject constructor(
                 result
             }
 
-    val monthIncome: StateFlow<String> = currentMonthRecordListData
-        .mapLatest { recordList ->
-            var totalIncome = BigDecimal.ZERO
-            recordList.forEach { record ->
-                when (record.typeCategory) {
-                    RecordTypeCategoryEnum.EXPENDITURE -> {
-                        // 支出
-                    }
-
-                    RecordTypeCategoryEnum.INCOME -> {
-                        // 收入
-                        totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
-                    }
-
-                    RecordTypeCategoryEnum.TRANSFER -> {
-                        // 转账
-                        totalIncome += record.concessions.toBigDecimalOrZero()
-                    }
-                }
-            }
-            totalIncome.decimalFormat()
+    val monthIncomeText: StateFlow<String> = currentMonthRecordListData
+        .mapLatest {
+            it.calculateIncome().withSymbol()
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "0",
+            initialValue = "${Symbol.rmb}0",
         )
 
-    val monthExpand: StateFlow<String> = currentMonthRecordListData
-        .mapLatest { recordList ->
-            var totalExpenditure = BigDecimal.ZERO
-            recordList.forEach { record ->
-                when (record.typeCategory) {
-                    RecordTypeCategoryEnum.EXPENDITURE -> {
-                        // 支出
-                        totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
-                    }
-
-                    RecordTypeCategoryEnum.INCOME -> {
-                        // 收入
-                    }
-
-                    RecordTypeCategoryEnum.TRANSFER -> {
-                        // 转账
-                        totalExpenditure += record.charges.toBigDecimalOrZero()
-                    }
-                }
-            }
-            totalExpenditure.decimalFormat()
+    val monthExpandText: StateFlow<String> = currentMonthRecordListData
+        .mapLatest {
+            it.calculateExpand().withSymbol()
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "0",
+            initialValue = "${Symbol.rmb}0",
         )
 
-    val monthBalance: StateFlow<String> =
-        combine(monthIncome, monthExpand) { income, expand ->
-            (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
+    val monthBalanceText: StateFlow<String> = currentMonthRecordListData
+        .mapLatest {
+            it.calculateBalance().withSymbol()
         }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = "0",
-            )
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = "${Symbol.rmb}0",
+        )
 
-    /** 选中的记录数据 */
-    private val _selectedRecordData: MutableStateFlow<RecordViewsEntity?> = MutableStateFlow(null)
-    val selectedRecordData: StateFlow<RecordViewsEntity?> = _selectedRecordData
-
-    fun onRecordItemClick(recordViewsEntity: RecordViewsEntity) {
-        _selectedRecordData.value = recordViewsEntity
+    fun onBookmarkDismiss() {
+        shouldDisplayDeleteFailedBookmark = 0
     }
 
-    fun onRecordDeleteClick(recordId: Long) {
-        _dialogState.value = RecordDialogState.Show(recordId)
+    fun onRecordDetailsSheetDismiss() {
+        viewRecord = null
     }
 
-    fun onDismiss() {
-        _dialogState.value = RecordDialogState.Dismiss
+    fun onRecordItemClick(record: RecordViewsEntity) {
+        viewRecord = record
     }
 
-    fun tryDeleteRecord(recordId: Long) {
+    fun onRecordItemDeleteClick(recordId: Long) {
+        viewRecord = null
+        dialogState = DialogState.Shown(recordId)
+    }
+
+    fun onDeleteRecordConfirm(recordId: Long) {
         viewModelScope.launch {
             try {
                 deleteRecordUseCase(recordId)
                 // 删除成功，隐藏弹窗
-                onDismiss()
+                onDialogDismiss()
             } catch (throwable: Throwable) {
                 this@LauncherContentViewModel.logger()
                     .e(throwable, "tryDeleteRecord(recordId = <$recordId>) failed")
@@ -172,5 +131,52 @@ class LauncherContentViewModel @Inject constructor(
                 shouldDisplayDeleteFailedBookmark = ResultModel.Failure.FAILURE_THROWABLE
             }
         }
+    }
+
+    fun onDialogDismiss() {
+        dialogState = DialogState.Dismiss
+    }
+}
+
+private fun List<RecordViewsEntity>.calculateIncome(): String {
+    var totalIncome = BigDecimal.ZERO
+    this.forEach { record ->
+        if (record.typeCategory == RecordTypeCategoryEnum.INCOME) {
+            // 收入
+            totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
+        } else if (record.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+            // 转账
+            totalIncome += record.concessions.toBigDecimalOrZero()
+        }
+    }
+    return totalIncome.decimalFormat()
+}
+
+private fun List<RecordViewsEntity>.calculateExpand(): String {
+    var totalExpenditure = BigDecimal.ZERO
+    this.forEach { record ->
+        if (record.typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+            // 支出
+            totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
+        } else if (record.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+            // 转账
+            totalExpenditure += record.charges.toBigDecimalOrZero()
+        }
+    }
+    return totalExpenditure.decimalFormat()
+}
+
+private fun List<RecordViewsEntity>.calculateBalance(): String {
+    val income = this.calculateIncome()
+    val expand = this.calculateExpand()
+    return (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
+}
+
+private fun String.withSymbol(): String {
+    val negative = this.startsWith("-")
+    return if (negative) {
+        "-${Symbol.rmb}${this.replace("-", "")}"
+    } else {
+        "${Symbol.rmb}$this"
     }
 }
