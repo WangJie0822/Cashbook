@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -57,8 +58,9 @@ fun rememberModalBottomSheetState(
     confirmValueChange: (ModalBottomSheetValue) -> Boolean = { true },
     skipHalfExpanded: Boolean = false,
 ): ModalBottomSheetState {
-    val sheetState =
+    val sheetState = remember {
         ModalBottomSheetState(initialValue, animationSpec, confirmValueChange, skipHalfExpanded)
+    }
     sheetState.InitProxy()
     return sheetState
 }

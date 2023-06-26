@@ -9,6 +9,7 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -162,11 +163,13 @@ fun rememberBackdropScaffoldState(
     animationSpec: AnimationSpec<Float> = SpringSpec(),
     confirmStateChange: (BackdropValue) -> Boolean = { true },
 ): BackdropScaffoldState {
-    val state = BackdropScaffoldState(
-        initialValue = initialValue,
-        animationSpec = animationSpec,
-        confirmStateChange = confirmStateChange,
-    )
+    val state = remember {
+        BackdropScaffoldState(
+            initialValue = initialValue,
+            animationSpec = animationSpec,
+            confirmStateChange = confirmStateChange,
+        )
+    }
     state.InitProxy()
     return state
 }

@@ -44,6 +44,7 @@ import androidx.navigation.NavHostController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
+import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.PasswordTextField
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -89,7 +90,7 @@ fun MainApp(
     val supportFingerprint by viewModel.supportFingerprint.collectAsStateWithLifecycle()
     val shouldDisplayBookmark = viewModel.shouldDisplayBookmark
 
-    CashbookBackground {
+    CashbookGradientBackground {
         val navController = rememberAnimatedNavController()
         val snackbarHostState = remember { SnackbarHostState() }
 
