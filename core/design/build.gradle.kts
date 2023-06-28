@@ -17,13 +17,14 @@ dependencies {
 
     debugApi(libs.androidx.compose.ui.tooling)
     api(libs.androidx.compose.ui.tooling.preview)
+    api(libs.androidx.compose.ui.graphics)
+    api(libs.androidx.compose.ui.util)
     api(libs.androidx.compose.foundation)
     api(libs.androidx.compose.foundation.layout)
-    implementation(libs.androidx.compose.material)
-    api(libs.androidx.compose.material.icons.extended)
-    api(libs.androidx.compose.material3)
-    api(libs.androidx.compose.ui.util)
     api(libs.androidx.compose.runtime)
+    api(libs.androidx.compose.material3)
+    api(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.material)
 
     api(libs.google.material)
 }

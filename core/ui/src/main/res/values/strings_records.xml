@@ -26,6 +26,7 @@
     <string name="charges">手续费</string>
     <string name="concessions">优惠</string>
     <string name="used_with_colon">已用：</string>
+    <string name="usable_with_colon">可用：</string>
     <string name="amount_must_not_be_zero">金额不能为0</string>
     <string name="please_select_type">请选择类型</string>
     <string name="save_failure">保存失败</string>

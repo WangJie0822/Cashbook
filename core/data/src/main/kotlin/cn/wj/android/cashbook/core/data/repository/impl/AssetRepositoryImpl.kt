@@ -1,5 +1,7 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
+import cn.wj.android.cashbook.core.common.ext.decimalFormat
+import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
@@ -8,12 +10,16 @@ import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
+import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
+import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.model.transfer.asModel
+import java.math.BigDecimal
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
 /**
@@ -31,24 +37,54 @@ class AssetRepositoryImpl @Inject constructor(
             getVisibleAssetsByBookId(appData.currentBookId)
         }
 
-    override suspend fun getAssetById(assetId: Long): AssetModel? = withContext(Dispatchers.IO) {
+    override val currentVisibleAssetTypeData: Flow<List<AssetTypeViewsModel>> =
+        currentVisibleAssetListData.mapLatest { list ->
+            val result = mutableListOf<AssetTypeViewsModel>()
+            ClassificationTypeEnum.values().forEach { type ->
+                val assetList = list.filter { it.type == type }
+                if (assetList.isNotEmpty()) {
+                    var totalAmount = BigDecimal.ZERO
+                    assetList.forEach { asset ->
+                        totalAmount += asset.balance.toBigDecimalOrZero()
+                    }
+                    result.add(
+                        AssetTypeViewsModel(
+                            name = type.name,
+                            totalAmount = totalAmount.decimalFormat(),
+                            assetList = assetList
+                        )
+                    )
+                }
+            }
+            result
+        }
+
+    override suspend fun getAssetById(
+        assetId: Long,
+        coroutineContext: CoroutineContext
+    ): AssetModel? = withContext(coroutineContext) {
         assetDao.queryAssetById(assetId)?.asModel()
     }
 
-    override suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel> {
-        return assetDao.queryVisibleAssetByBookId(bookId)
+    override suspend fun getVisibleAssetsByBookId(
+        bookId: Long,
+        coroutineContext: CoroutineContext
+    ): List<AssetModel> = withContext(coroutineContext) {
+        assetDao.queryVisibleAssetByBookId(bookId)
             .map { it.asModel() }
     }
 
-    override suspend fun updateAsset(asset: AssetEntity) {
-        withContext(Dispatchers.IO) {
-            val table = asset.asModel().asTable()
-            if (null == table.id) {
-                assetDao.insert(table)
-            } else {
-                assetDao.update(table)
-            }
-            assetDataVersion.updateVersion()
+    override suspend fun updateAsset(
+        asset: AssetEntity,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        val table = asset.asModel().asTable()
+        if (null == table.id) {
+            assetDao.insert(table)
+        } else {
+            assetDao.update(table)
         }
+        assetDataVersion.updateVersion()
+
     }
 }

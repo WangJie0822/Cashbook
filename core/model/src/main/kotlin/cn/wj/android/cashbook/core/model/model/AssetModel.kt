@@ -41,5 +41,24 @@ data class AssetModel(
     val remark: String,
     val sort: Int,
     val modifyTime: String,
-    val balance: String
+    val balance: String,
+)
+
+val assetModelTestObject = AssetModel(
+    id = -1L,
+    booksId = -1L,
+    name = "默认资产",
+    iconResId = -1,
+    totalAmount = "1000",
+    billingDate = "",
+    repaymentDate = "",
+    type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
+    classification = AssetClassificationEnum.CASH,
+    invisible = false,
+    openBank = "",
+    cardNo = "",
+    remark = "",
+    sort = -1,
+    modifyTime = "",
+    balance = "200",
 )

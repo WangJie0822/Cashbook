@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.withSymbol
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -170,13 +171,4 @@ private fun List<RecordViewsEntity>.calculateBalance(): String {
     val income = this.calculateIncome()
     val expand = this.calculateExpand()
     return (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
-}
-
-private fun String.withSymbol(): String {
-    val negative = this.startsWith("-")
-    return if (negative) {
-        "-${Symbol.rmb}${this.replace("-", "")}"
-    } else {
-        "${Symbol.rmb}$this"
-    }
 }

@@ -51,7 +51,9 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.enums.MainBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.navigation.SelectAssetBottomSheet
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
+import cn.wj.android.cashbook.feature.assets.navigation.myAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
+import cn.wj.android.cashbook.feature.assets.navigation.naviToMyAsset
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
@@ -289,7 +291,7 @@ fun CashbookNavHost(
 
         // 启动页
         settingsLauncherScreen(
-            onMyAssetClick = { /* TODO */ },
+            onMyAssetClick = navController::naviToMyAsset,
             onMyBookClick = {/* TODO */ },
             onMyCategoryClick = {/* TODO */ },
             onMyTagClick = navController::naviToMyTags,
@@ -301,7 +303,7 @@ fun CashbookNavHost(
                     onMenuClick = openDrawer,
                     onSearchClick = { /* TODO */ },
                     onCalendarClick = { /* TODO */ },
-                    onMyAssetClick = { /* TODO */ },
+                    onMyAssetClick = navController::naviToMyAsset,
                     onShowSnackbar = onShowSnackbar,
                 )
             },
@@ -360,6 +362,11 @@ fun CashbookNavHost(
         )
         // 选择关联记录
         selectRelatedRecordScreen(
+            onBackClick = navController::popBackStack,
+        )
+
+        // 我的资产
+        myAssetScreen(
             onBackClick = navController::popBackStack,
         )
         // 编辑资产

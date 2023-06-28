@@ -9,7 +9,24 @@ import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
+import cn.wj.android.cashbook.feature.assets.screen.MyAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.SelectAssetBottomSheetScreen
+
+/** 我的资产 */
+private const val ROUTE_MY_ASSET = "asset/my"
+
+/** 编辑资产 */
+private const val ROUTE_EDIT_ASSET_KEY = "assetId"
+private const val ROUTE_EDIT_ASSET =
+    "asset/edit_asset?$ROUTE_EDIT_ASSET_KEY={$ROUTE_EDIT_ASSET_KEY}"
+
+fun NavController.naviToMyAsset() {
+    this.navigate(ROUTE_MY_ASSET)
+}
+
+fun NavController.naviToEditAsset(assetId: Long = -1L) {
+    this.navigate(ROUTE_EDIT_ASSET.replace("{$ROUTE_EDIT_ASSET_KEY}", assetId.toString()))
+}
 
 @Composable
 fun SelectAssetBottomSheet(
@@ -24,12 +41,16 @@ fun SelectAssetBottomSheet(
     )
 }
 
-private const val ROUTE_EDIT_ASSET_KEY = "assetId"
-private const val ROUTE_EDIT_ASSET =
-    "asset/edit_asset?$ROUTE_EDIT_ASSET_KEY={$ROUTE_EDIT_ASSET_KEY}"
-
-fun NavController.naviToEditAsset(assetId: Long = -1L) {
-    this.navigate(ROUTE_EDIT_ASSET.replace("{$ROUTE_EDIT_ASSET_KEY}", assetId.toString()))
+fun NavGraphBuilder.myAssetScreen(
+    onBackClick: () -> Unit,
+) {
+    composable(
+        route = ROUTE_MY_ASSET,
+    ) {
+        MyAssetRoute(
+            onBackClick = onBackClick,
+        )
+    }
 }
 
 fun NavGraphBuilder.editAssetScreen(

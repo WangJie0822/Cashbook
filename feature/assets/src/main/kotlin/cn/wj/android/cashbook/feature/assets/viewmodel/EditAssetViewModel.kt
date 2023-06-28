@@ -14,8 +14,8 @@ import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.ext.hasBankInfo
 import cn.wj.android.cashbook.core.model.ext.isCreditCard
+import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.domain.usecase.GetDefaultAssetUseCase
-import cn.wj.android.cashbook.feature.assets.R
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

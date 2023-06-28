@@ -36,6 +36,8 @@ import androidx.compose.material3.ModalBottomSheetValue
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBackdropScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -62,8 +64,6 @@ import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
-import cn.wj.android.cashbook.core.design.component.TopAppBar
-import cn.wj.android.cashbook.core.design.component.TopAppBarDefaults
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
@@ -331,11 +331,11 @@ internal fun LauncherLayoutBackdropScaffold(
                     Row {
                         Text(
                             modifier = Modifier.weight(1f),
-                            text = "${stringResource(id = R.string.current_month_expend)} $monthExpand",
+                            text = "${stringResource(id = R.string.month_expend)} $monthExpand",
                         )
                         Text(
                             modifier = Modifier.weight(1f),
-                            text = "${stringResource(id = R.string.current_month_balance)} $monthBalance",
+                            text = "${stringResource(id = R.string.month_balance)} $monthBalance",
                         )
                     }
                 }
@@ -377,9 +377,9 @@ internal fun LauncherLayoutBackdropScaffold(
 
                 if (recordMap.isEmpty()) {
                     Empty(
-                        imageResId = R.drawable.vector_no_data_200,
-                        hintResId = R.string.launcher_no_data_hint,
-                        buttonResId = R.string.launcher_no_data_button,
+                        imagePainter = painterResource(id = R.drawable.vector_no_data_200),
+                        hintText = stringResource(id = R.string.launcher_no_data_hint),
+                        buttonText = stringResource(id = R.string.launcher_no_data_button),
                         onButtonClick = onCalendarClick,
                     )
                 } else {
@@ -625,8 +625,8 @@ internal fun RecordDetailsSheet(
             if (null == recordEntity) {
                 // 无数据
                 Empty(
-                    imageResId = R.drawable.vector_no_data_200,
-                    hintResId = R.string.no_record_data,
+                    imagePainter = painterResource(id = R.drawable.vector_no_data_200),
+                    hintText = stringResource(id = R.string.no_record_data),
                 )
             } else {
                 Column {

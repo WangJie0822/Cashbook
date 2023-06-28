@@ -51,7 +51,7 @@ import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.feature.assets.R
+import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
 import cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetViewModel
 import kotlinx.coroutines.CoroutineScope

@@ -16,17 +16,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.common.Symbol
+import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
+import cn.wj.android.cashbook.core.common.ext.withSymbol
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.feature.assets.R
+import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.enums.BottomAssetListTypeEnum
 import cn.wj.android.cashbook.feature.assets.viewmodel.SelectAssetViewModel
 
@@ -88,7 +90,7 @@ internal fun SelectAssetBottomSheetScreen(
                 AssetItem(
                     type = BottomAssetListTypeEnum.NO_SELECT,
                     name = stringResource(id = R.string.unselect_asset),
-                    iconResId = R.drawable.vector_baseline_not_select_24,
+                    iconPainter = painterResource(id = R.drawable.vector_baseline_not_select_24),
                     balance = "",
                     totalAmount = "",
                     onAssetItemClick = { onAssetItemClick(null) },
@@ -103,7 +105,7 @@ internal fun SelectAssetBottomSheetScreen(
                 AssetItem(
                     type = type,
                     name = it.name,
-                    iconResId = it.iconResId,
+                    iconPainter = painterResource(id = it.iconResId),
                     balance = it.balance,
                     totalAmount = it.totalAmount,
                     onAssetItemClick = { onAssetItemClick(it) },
@@ -117,7 +119,7 @@ internal fun SelectAssetBottomSheetScreen(
 internal fun AssetItem(
     type: BottomAssetListTypeEnum,
     name: String,
-    iconResId: Int,
+    iconPainter: Painter,
     balance: String,
     totalAmount: String,
     onAssetItemClick: () -> Unit
@@ -129,7 +131,7 @@ internal fun AssetItem(
             .clickable {
                 onAssetItemClick()
             }
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         val isNoSelect = type == BottomAssetListTypeEnum.NO_SELECT
         val isCreditCard = type == BottomAssetListTypeEnum.CREDIT_CARD
@@ -137,7 +139,7 @@ internal fun AssetItem(
         val (iconRef, nameRef, balanceRef, progressRef, usedRef) = createRefs()
 
         Icon(
-            painter = painterResource(id = iconResId),
+            painter = iconPainter,
             contentDescription = null,
             tint = if (isNoSelect) LocalContentColor.current else Color.Unspecified,
             modifier = Modifier.constrainAs(iconRef) {
@@ -163,7 +165,7 @@ internal fun AssetItem(
 
         if (!isNoSelect) {
             Text(
-                text = Symbol.rmb + if (isCreditCard) totalAmount else balance,
+                text = (if (isCreditCard) totalAmount else balance).withSymbol(),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.constrainAs(balanceRef) {
@@ -176,11 +178,11 @@ internal fun AssetItem(
 
         if (isCreditCard) {
             // 信用卡类型
-            var floatTotalAmount = totalAmount.toFloatOrNull() ?: 1f
-            if (floatTotalAmount == 0f) {
-                floatTotalAmount = 1f
+            var floatTotalAmount = totalAmount.toDoubleOrNull() ?: 1.0
+            if (floatTotalAmount == 0.0) {
+                floatTotalAmount = 1.0
             }
-            val progress = (balance.toFloatOrNull() ?: 0f) / floatTotalAmount
+            val progress = (balance.toDoubleOrZero() / floatTotalAmount).toFloat()
             LinearProgressIndicator(
                 progress = progress,
                 modifier = Modifier.constrainAs(progressRef) {
@@ -190,7 +192,7 @@ internal fun AssetItem(
                 },
             )
             Text(
-                text = stringResource(id = R.string.used_with_colon) + Symbol.rmb + balance,
+                text = stringResource(id = R.string.usable_with_colon) + balance.withSymbol(),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.constrainAs(usedRef) {
