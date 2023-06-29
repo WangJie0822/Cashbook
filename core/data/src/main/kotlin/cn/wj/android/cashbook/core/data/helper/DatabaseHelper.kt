@@ -2,7 +2,7 @@ package cn.wj.android.cashbook.core.data.helper
 
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.ext.string
-import cn.wj.android.cashbook.core.data.R
+import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import cn.wj.android.cashbook.core.database.table.TypeTable
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum

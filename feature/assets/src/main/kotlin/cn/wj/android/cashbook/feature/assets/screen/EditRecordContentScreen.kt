@@ -1,35 +1,26 @@
 package cn.wj.android.cashbook.feature.assets.screen
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
-import cn.wj.android.cashbook.core.common.ext.withSymbol
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
-import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.assets.enums.BottomAssetListTypeEnum
+import cn.wj.android.cashbook.feature.assets.component.AssetListItem
+import cn.wj.android.cashbook.feature.assets.component.NotAssociatedAssetListItem
 import cn.wj.android.cashbook.feature.assets.viewmodel.SelectAssetViewModel
 
 /**
@@ -87,119 +78,20 @@ internal fun SelectAssetBottomSheetScreen(
                 CommonDivider()
             }
             item {
-                AssetItem(
-                    type = BottomAssetListTypeEnum.NO_SELECT,
-                    name = stringResource(id = R.string.unselect_asset),
-                    iconPainter = painterResource(id = R.drawable.vector_baseline_not_select_24),
-                    balance = "",
-                    totalAmount = "",
-                    onAssetItemClick = { onAssetItemClick(null) },
+                NotAssociatedAssetListItem(
+                    onNotAssociatedAssetClick = { onAssetItemClick(null) },
                 )
             }
             items(assetList) {
-                val type = if (it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
-                    BottomAssetListTypeEnum.CREDIT_CARD
-                } else {
-                    BottomAssetListTypeEnum.CAPITAL
-                }
-                AssetItem(
-                    type = type,
+                AssetListItem(
+                    type = it.type,
                     name = it.name,
                     iconPainter = painterResource(id = it.iconResId),
                     balance = it.balance,
                     totalAmount = it.totalAmount,
-                    onAssetItemClick = { onAssetItemClick(it) },
+                    onItemClick = { onAssetItemClick(it) },
                 )
             }
         },
     )
-}
-
-@Composable
-internal fun AssetItem(
-    type: BottomAssetListTypeEnum,
-    name: String,
-    iconPainter: Painter,
-    balance: String,
-    totalAmount: String,
-    onAssetItemClick: () -> Unit
-) {
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 70.dp)
-            .clickable {
-                onAssetItemClick()
-            }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        val isNoSelect = type == BottomAssetListTypeEnum.NO_SELECT
-        val isCreditCard = type == BottomAssetListTypeEnum.CREDIT_CARD
-
-        val (iconRef, nameRef, balanceRef, progressRef, usedRef) = createRefs()
-
-        Icon(
-            painter = iconPainter,
-            contentDescription = null,
-            tint = if (isNoSelect) LocalContentColor.current else Color.Unspecified,
-            modifier = Modifier.constrainAs(iconRef) {
-                start.linkTo(parent.start)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-            },
-        )
-        Text(
-            text = name,
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.constrainAs(nameRef) {
-                start.linkTo(iconRef.end, 8.dp)
-                top.linkTo(parent.top)
-                if (!isCreditCard) {
-                    bottom.linkTo(parent.bottom)
-                } else {
-                    bottom.linkTo(progressRef.top)
-                }
-            },
-        )
-
-        if (!isNoSelect) {
-            Text(
-                text = (if (isCreditCard) totalAmount else balance).withSymbol(),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.constrainAs(balanceRef) {
-                    end.linkTo(parent.end)
-                    top.linkTo(nameRef.top)
-                    bottom.linkTo(nameRef.bottom)
-                },
-            )
-        }
-
-        if (isCreditCard) {
-            // 信用卡类型
-            var floatTotalAmount = totalAmount.toDoubleOrNull() ?: 1.0
-            if (floatTotalAmount == 0.0) {
-                floatTotalAmount = 1.0
-            }
-            val progress = (balance.toDoubleOrZero() / floatTotalAmount).toFloat()
-            LinearProgressIndicator(
-                progress = progress,
-                modifier = Modifier.constrainAs(progressRef) {
-                    start.linkTo(nameRef.start)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                },
-            )
-            Text(
-                text = stringResource(id = R.string.usable_with_colon) + balance.withSymbol(),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.constrainAs(usedRef) {
-                    start.linkTo(progressRef.start)
-                    top.linkTo(progressRef.bottom)
-                },
-            )
-        }
-    }
 }

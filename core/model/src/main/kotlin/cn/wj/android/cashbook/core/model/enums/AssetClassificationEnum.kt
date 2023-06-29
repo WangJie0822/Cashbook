@@ -58,4 +58,8 @@ enum class AssetClassificationEnum {
     BANK_CARD_GF/*(R.drawable.vector_bank_gf_24, R.string.asset_classifications_bank_gf)*/,
     BANK_CARD_PF/*(R.drawable.vector_bank_pf_24, R.string.asset_classifications_bank_pf)*/,
     BANK_CARD_XY/*(R.drawable.vector_bank_xy_24, R.string.asset_classifications_bank_xy)*/;
+
+    fun isDebt(): Boolean {
+        return this in ClassificationTypeEnum.DEBT_ACCOUNT.array
+    }
 }

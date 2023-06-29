@@ -42,12 +42,16 @@ fun SelectAssetBottomSheet(
 }
 
 fun NavGraphBuilder.myAssetScreen(
+    onAssetItemClick: (Long) -> Unit,
+    onAddAssetClick: () -> Unit,
+    onInvisibleAssetClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_MY_ASSET,
-    ) {
+    composable(route = ROUTE_MY_ASSET) {
         MyAssetRoute(
+            onAssetItemClick = onAssetItemClick,
+            onAddAssetClick = onAddAssetClick,
+            onInvisibleAssetClick = onInvisibleAssetClick,
             onBackClick = onBackClick,
         )
     }

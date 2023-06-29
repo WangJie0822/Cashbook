@@ -427,7 +427,7 @@ internal fun EditRecordScreen(
                                         sheetState.show()
                                     }
                                 },
-                                label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${Symbol.rmb}$charges" else "") },
+                                label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${Symbol.CNY}$charges" else "") },
                             )
 
                             if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
@@ -441,7 +441,7 @@ internal fun EditRecordScreen(
                                             sheetState.show()
                                         }
                                     },
-                                    label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.rmb}$concessions" else "") },
+                                    label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.CNY}$concessions" else "") },
                                 )
                             }
 
@@ -565,7 +565,7 @@ internal fun Amount(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = Symbol.rmb,
+            text = Symbol.CNY,
             color = primaryColor,
             style = MaterialTheme.typography.titleMedium,
         )

@@ -367,6 +367,9 @@ fun CashbookNavHost(
 
         // 我的资产
         myAssetScreen(
+            onAssetItemClick = {/*TODO*/ },
+            onAddAssetClick = navController::naviToEditAsset,
+            onInvisibleAssetClick = {/*TODO*/ },
             onBackClick = navController::popBackStack,
         )
         // 编辑资产

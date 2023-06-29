@@ -10,6 +10,10 @@ fun Number?.toBigDecimalOrZero(): BigDecimal {
     return this?.toString().toBigDecimalOrZero()
 }
 
+fun String?.toFloatOrZero(): Float {
+    return this?.toFloatOrNull() ?: 0f
+}
+
 fun String?.toDoubleOrZero(): Double {
     return this?.toDoubleOrNull() ?: 0.0
 }

@@ -5,11 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.common.ext.withSymbol
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -24,6 +22,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -72,34 +71,33 @@ class LauncherContentViewModel @Inject constructor(
                 result
             }
 
-    val monthIncomeText: StateFlow<String> = currentMonthRecordListData
+    val monthIncome: StateFlow<String> = currentMonthRecordListData
         .mapLatest {
-            it.calculateIncome().withSymbol()
+            it.calculateIncome()
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "${Symbol.rmb}0",
+            initialValue = "0",
         )
 
-    val monthExpandText: StateFlow<String> = currentMonthRecordListData
+    val monthExpand: StateFlow<String> = currentMonthRecordListData
         .mapLatest {
-            it.calculateExpand().withSymbol()
+            it.calculateExpand()
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "${Symbol.rmb}0",
+            initialValue = "0",
         )
 
-    val monthBalanceText: StateFlow<String> = currentMonthRecordListData
-        .mapLatest {
-            it.calculateBalance().withSymbol()
-        }
+    val monthBalance: StateFlow<String> = combine(monthIncome, monthExpand) { income, expand ->
+        (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "${Symbol.rmb}0",
+            initialValue = "0",
         )
 
     fun onBookmarkDismiss() {
@@ -165,10 +163,4 @@ private fun List<RecordViewsEntity>.calculateExpand(): String {
         }
     }
     return totalExpenditure.decimalFormat()
-}
-
-private fun List<RecordViewsEntity>.calculateBalance(): String {
-    val income = this.calculateIncome()
-    val expand = this.calculateExpand()
-    return (income.toBigDecimalOrZero() - expand.toBigDecimalOrZero()).decimalFormat()
 }

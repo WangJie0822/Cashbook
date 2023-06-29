@@ -127,7 +127,7 @@ class EditRecordViewModel @Inject constructor(
             if (null == asset) {
                 ""
             } else {
-                "${asset.name}(${Symbol.rmb} ${asset.displayBalance})"
+                "${asset.name}(${Symbol.CNY} ${asset.displayBalance})"
             }
         }
         .stateIn(
@@ -143,7 +143,7 @@ class EditRecordViewModel @Inject constructor(
             if (null == asset) {
                 ""
             } else {
-                "${asset.name}(${Symbol.rmb} ${asset.displayBalance})"
+                "${asset.name}(${Symbol.CNY} ${asset.displayBalance})"
             }
         }
         .stateIn(
@@ -271,7 +271,7 @@ class EditRecordViewModel @Inject constructor(
             val map = hashMapOf<Long, String>()
             list.forEach {
                 val type = typeRepository.getNoNullRecordTypeById(it.typeId)
-                map[it.id] = "${type.name}(${Symbol.rmb}${it.amount})"
+                map[it.id] = "${type.name}(${Symbol.CNY}${it.amount})"
             }
             map
         }

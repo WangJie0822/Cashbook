@@ -64,7 +64,7 @@ internal fun SelectRelatedRecordScreen(
                 },
                 trailingContent = {
                     Text(
-                        text = "${Symbol.rmb}$amount",
+                        text = "${Symbol.CNY}$amount",
                         color = LocalExtendedColors.current.income,
                         style = MaterialTheme.typography.labelMedium,
                     )

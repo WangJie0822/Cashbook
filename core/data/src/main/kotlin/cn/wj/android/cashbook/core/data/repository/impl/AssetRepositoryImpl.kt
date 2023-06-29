@@ -4,6 +4,7 @@ import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
+import cn.wj.android.cashbook.core.data.helper.AssetHelper
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
@@ -49,7 +50,7 @@ class AssetRepositoryImpl @Inject constructor(
                     }
                     result.add(
                         AssetTypeViewsModel(
-                            name = type.name,
+                            nameResId = AssetHelper.getNameResIdByType(type),
                             totalAmount = totalAmount.decimalFormat(),
                             assetList = assetList
                         )

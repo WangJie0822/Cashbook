@@ -11,6 +11,7 @@
     <string name="asset_name">资产名称</string>
     <string name="please_enter_asset_name">请输入资产名称</string>
     <string name="total_amount">总额度</string>
+    <string name="total_amount_with_colon">总额度：</string>
     <string name="please_enter_total_amount">请输入总额度</string>
     <string name="balance">余额</string>
     <string name="arrears">欠款</string>
@@ -23,7 +24,9 @@
     <string name="invisible_asset">隐藏资产</string>
     <string name="invisible_asset_hint">隐藏不使用的资产，将不会在资产列表显示</string>
     <string name="net_asset">净资产</string>
+    <string name="total_asset">总资产</string>
     <string name="total_income">总收入</string>
     <string name="total_liabilities">总负债</string>
     <string name="asset_no_data">暂无资产数据，点击右下角按钮添加</string>
+    <string name="add_asset">添加资产</string>
 </resources>
