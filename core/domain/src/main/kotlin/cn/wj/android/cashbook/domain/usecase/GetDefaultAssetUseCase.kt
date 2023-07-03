@@ -12,8 +12,7 @@ import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 
 /**
  * 获取默认记录数据用例
@@ -25,27 +24,26 @@ class GetDefaultAssetUseCase @Inject constructor(
     private val appPreferencesDataSource: AppPreferencesDataSource
 ) {
 
-    operator fun invoke(assetId: Long): Flow<AssetEntity> {
+    suspend operator fun invoke(assetId: Long): AssetEntity {
         // appData 获取默认参数
-        return appPreferencesDataSource.appData.map { appDataModel ->
-            assetRepository.getAssetById(assetId)?.asEntity() ?: AssetEntity(
-                id = assetId,
-                booksId = appDataModel.currentBookId,
-                name = AssetClassificationEnum.CASH.nameResId.string,
-                iconResId = AssetClassificationEnum.CASH.iconResId,
-                totalAmount = "",
-                billingDate = "",
-                repaymentDate = "",
-                type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
-                classification = AssetClassificationEnum.CASH,
-                invisible = false,
-                openBank = "",
-                cardNo = "",
-                remark = "",
-                sort = 0,
-                modifyTime = Date().dateFormat(),
-                balance = "",
-            )
-        }
+        val appDataModel = appPreferencesDataSource.appData.first()
+        return assetRepository.getAssetById(assetId)?.asEntity() ?: AssetEntity(
+            id = assetId,
+            booksId = appDataModel.currentBookId,
+            name = AssetClassificationEnum.CASH.nameResId.string,
+            iconResId = AssetClassificationEnum.CASH.iconResId,
+            totalAmount = "",
+            billingDate = "",
+            repaymentDate = "",
+            type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
+            classification = AssetClassificationEnum.CASH,
+            invisible = false,
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            sort = 0,
+            modifyTime = Date().dateFormat(),
+            balance = "",
+        )
     }
 }

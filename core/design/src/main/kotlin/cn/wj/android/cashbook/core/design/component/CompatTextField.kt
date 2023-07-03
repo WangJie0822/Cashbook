@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -137,3 +138,59 @@ fun PasswordTextField(
         keyboardActions = keyboardActions,
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CompatTextField(
+    textFieldState: TextFieldState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = false,
+    maxLines: Int = Int.MAX_VALUE,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = TextFieldDefaults.filledShape,
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+) {
+    TextField(
+        value = textFieldState.text,
+        onValueChange = {
+            textFieldState.onTextChange(it)
+            textFieldState.enableShowErrors()
+        },
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        isError = textFieldState.showErrors(),
+        supportingText = {
+            textFieldState.getError()?.let { error -> Text(text = error) }
+        },
+        colors = colors,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        interactionSource = interactionSource,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        shape = shape,
+        modifier = modifier.onFocusChanged { focusState ->
+            textFieldState.onFocusChange(focusState.isFocused)
+            if (!focusState.isFocused) {
+                textFieldState.enableShowErrors()
+            }
+        },
+    )
+}
+

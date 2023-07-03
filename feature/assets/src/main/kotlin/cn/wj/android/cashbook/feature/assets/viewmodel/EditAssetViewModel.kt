@@ -2,31 +2,28 @@
 
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.ext.string
-import cn.wj.android.cashbook.core.data.helper.nameResId
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.core.model.ext.hasBankInfo
-import cn.wj.android.cashbook.core.model.ext.isCreditCard
-import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.domain.usecase.GetDefaultAssetUseCase
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
+import cn.wj.android.cashbook.feature.assets.enums.SelectDayEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -37,231 +34,205 @@ class EditAssetViewModel @Inject constructor(
     getDefaultAssetUseCase: GetDefaultAssetUseCase,
 ) : ViewModel() {
 
-    /** 底部菜单类型数据 */
-    val bottomSheetData: MutableStateFlow<EditAssetBottomSheetEnum> =
-        MutableStateFlow(EditAssetBottomSheetEnum.CLASSIFICATION_TYPE)
-
+    /** 资产 id */
     private val assetIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
 
-    private val defaultAssetData: Flow<AssetEntity> = assetIdData.flatMapLatest {
-        getDefaultAssetUseCase(it)
-    }
-
-    private val mutableAssetData: MutableStateFlow<AssetEntity?> = MutableStateFlow(null)
-
-    private val assetData: Flow<AssetEntity> =
-        combine(defaultAssetData, mutableAssetData) { default, mutable ->
+    /** 显示的资产信息 */
+    private val _mutableAssetInfo = MutableStateFlow<AssetEntity?>(null)
+    private val defaultAssetInfo = assetIdData.mapLatest { getDefaultAssetUseCase(it) }
+    private val displayAssetInfo =
+        combine(_mutableAssetInfo, defaultAssetInfo) { mutable, default ->
             mutable ?: default
         }
 
-    val type: StateFlow<ClassificationTypeEnum> = assetData
-        .mapLatest { it.type }
+    /** 底部 Sheet 类型 */
+    var bottomSheetData by mutableStateOf(EditAssetBottomSheetEnum.DISMISS)
+
+    /** 弹窗状态 */
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+
+    val isCreditCard = displayAssetInfo
+        .mapLatest { it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ClassificationTypeEnum.CAPITAL_ACCOUNT
+            initialValue = false,
         )
 
-    val creditCard: StateFlow<Boolean> = assetData
-        .mapLatest { it.isCreditCard }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false
-        )
-
-    val classification: StateFlow<AssetClassificationEnum> = assetData
+    val classification = displayAssetInfo
         .mapLatest { it.classification }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = AssetClassificationEnum.CASH
+            initialValue = AssetClassificationEnum.CASH,
         )
 
-    val hasBankInfo: StateFlow<Boolean> = assetData
-        .mapLatest { it.hasBankInfo }
+    val assetName = displayAssetInfo
+        .mapLatest { it.name }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = false
+            initialValue = "",
         )
 
-    val assetName: MutableState<String> =
-        mutableStateOf(AssetClassificationEnum.CASH.nameResId.string)
-
-    val assetHint: MutableStateFlow<String?> = MutableStateFlow(null)
-
-    val totalAmount: StateFlow<String> = assetData
+    val totalAmount = displayAssetInfo
         .mapLatest { it.totalAmount }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
-    val totalAmountHint: MutableStateFlow<String?> = MutableStateFlow(null)
-
-    val balance: StateFlow<String> = assetData
+    val balance = displayAssetInfo
         .mapLatest { it.balance }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
-    val openBank: StateFlow<String> = assetData
+    val openBank = displayAssetInfo
         .mapLatest { it.openBank }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
-    val cardNo: StateFlow<String> = assetData
+    val cardNo = displayAssetInfo
         .mapLatest { it.cardNo }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
-    val remark: StateFlow<String> = assetData
+    val remark = displayAssetInfo
         .mapLatest { it.remark }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
-    val billingDate: StateFlow<String> = assetData
+    val billingDate = displayAssetInfo
         .mapLatest { it.billingDate }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
-    val repaymentDate: StateFlow<String> = assetData
+    val repaymentDate = displayAssetInfo
         .mapLatest { it.repaymentDate }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
-    val invisible: StateFlow<Boolean> = assetData
+    val invisible: StateFlow<Boolean> = displayAssetInfo
         .mapLatest { it.invisible }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = false
+            initialValue = false,
         )
+
+    fun updateAssetId(id: Long) {
+        assetIdData.tryEmit(id)
+    }
 
     private var typeTemp: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT
 
-    fun onTypeChanged(type: ClassificationTypeEnum) {
-        viewModelScope.launch {
+    fun showSelectClassificationSheet() {
+        bottomSheetData = EditAssetBottomSheetEnum.CLASSIFICATION_TYPE
+    }
+
+    fun onClassificationChange(
+        type: ClassificationTypeEnum?,
+        classification: AssetClassificationEnum
+    ) {
+        if (null != type) {
             typeTemp = type
         }
-    }
-
-    fun onClassificationChanged(classification: AssetClassificationEnum) {
-        viewModelScope.launch {
-            val name = classification.nameResId.string
-            assetName.value = name
-            assetHint.value = null
-            mutableAssetData.value =
-                assetData.first()
-                    .copy(name = name, type = typeTemp, classification = classification)
-        }
-    }
-
-    fun onSelectBankCard() {
-        bottomSheetData.value = EditAssetBottomSheetEnum.ASSET_CLASSIFICATION
-    }
-
-    fun onSelectTypeClick() {
-        bottomSheetData.value = EditAssetBottomSheetEnum.CLASSIFICATION_TYPE
-    }
-
-    fun onAssetNameChanged(name: String) {
-        viewModelScope.launch {
-            assetHint.value = null
-            mutableAssetData.value = assetData.first().copy(name = name)
-        }
-    }
-
-    fun onTotalAmountChanged(totalAmount: String) {
-        viewModelScope.launch {
-            totalAmountHint.value = null
-            mutableAssetData.value = assetData.first().copy(totalAmount = totalAmount)
-        }
-    }
-
-    fun onBalanceChanged(balance: String) {
-        viewModelScope.launch {
-            mutableAssetData.value = assetData.first().copy(balance = balance)
-        }
-    }
-
-    fun onOpenBankChanged(openBank: String) {
-        viewModelScope.launch {
-            mutableAssetData.value = assetData.first().copy(openBank = openBank)
-        }
-    }
-
-    fun onCardNoChanged(cardNo: String) {
-        viewModelScope.launch {
-            mutableAssetData.value = assetData.first().copy(cardNo = cardNo)
-        }
-    }
-
-    fun onRemarkChanged(remark: String) {
-        viewModelScope.launch {
-            mutableAssetData.value = assetData.first().copy(remark = remark)
-        }
-    }
-
-    fun onBillingDateChanged(billingDate: String) {
-        viewModelScope.launch {
-            mutableAssetData.value = assetData.first().copy(billingDate = billingDate)
-        }
-    }
-
-    fun onRepaymentDateChanged(repaymentDate: String) {
-        viewModelScope.launch {
-            mutableAssetData.value = assetData.first().copy(repaymentDate = repaymentDate)
-        }
-    }
-
-    fun trySaveAsset(afterSave: () -> Unit) {
-        viewModelScope.launch {
-            var asset = assetData.first()
-            var needFix = false
-            if (asset.name.isBlank()) {
-                assetHint.value = R.string.please_enter_asset_name.string
-                needFix = true
+        if (classification.isBankCard) {
+            // 银行卡、信用卡类型，继续选择银行
+            bottomSheetData = EditAssetBottomSheetEnum.ASSET_CLASSIFICATION
+        } else {
+            // 其它类型，保存
+            viewModelScope.launch {
+                _mutableAssetInfo.tryEmit(
+                    displayAssetInfo.first().copy(type = typeTemp, classification = classification)
+                )
             }
-            if (asset.isCreditCard && asset.totalAmount.isBlank()) {
-                totalAmountHint.value = R.string.please_enter_total_amount.string
-                needFix = true
-            }
-            if (needFix) {
-                return@launch
-            }
+            dismissBottomSheet()
+        }
+    }
 
-            if (!asset.isCreditCard) {
-                // 非信用卡，清空信用卡相关信息
-                asset = asset.copy(totalAmount = "", billingDate = "", repaymentDate = "")
-                if (!asset.hasBankInfo) {
-                    // 非银行卡，清空银行卡信息
-                    asset = asset.copy(openBank = "", cardNo = "")
+    fun onBillingDateClick() {
+        dialogState = DialogState.Shown(SelectDayEnum.BILLING_DATE)
+    }
+
+    fun onRepaymentDateClick() {
+        dialogState = DialogState.Shown(SelectDayEnum.REPAYMENT_DATE)
+    }
+
+    fun onDaySelect(day: String) {
+        viewModelScope.launch {
+            (dialogState as? DialogState.Shown<*>)?.let { state ->
+                val assetEntity = if (state.data == SelectDayEnum.BILLING_DATE) {
+                    displayAssetInfo.first().copy(billingDate = day)
+                } else {
+                    displayAssetInfo.first().copy(repaymentDate = day)
                 }
+                _mutableAssetInfo.tryEmit(assetEntity)
             }
+            dismissDialog()
+        }
 
-            // 更新
-            assetRepository.updateAsset(asset)
-            afterSave()
+    }
+
+    fun onInvisibleChange(invisible: Boolean) {
+        viewModelScope.launch {
+            _mutableAssetInfo.tryEmit(displayAssetInfo.first().copy(invisible = invisible))
+        }
+    }
+
+    fun dismissBottomSheet() {
+        bottomSheetData = EditAssetBottomSheetEnum.DISMISS
+    }
+
+    fun dismissDialog() {
+        dialogState = DialogState.Dismiss
+    }
+
+    fun save(
+        assetName: String,
+        totalAmount: String,
+        balance: String,
+        openBank: String,
+        cardNo: String,
+        remark: String,
+        onSuccess: () -> Unit,
+    ) {
+        viewModelScope.launch {
+            try {
+                val assetInfo = displayAssetInfo.first().copy(
+                    name = assetName,
+                    totalAmount = totalAmount,
+                    balance = balance,
+                    openBank = openBank,
+                    cardNo = cardNo,
+                    remark = remark,
+                )
+                assetRepository.updateAsset(
+                    assetInfo
+                )
+                onSuccess.invoke()
+            } catch (throwable: Throwable) {
+                this@EditAssetViewModel.logger().e(throwable, "save()")
+            }
         }
     }
 }

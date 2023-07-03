@@ -12,7 +12,6 @@ internal object AssetHelper {
         ClassificationTypeEnum.TOP_UP_ACCOUNT -> R.string.asset_classifications_top_up_account
         ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT -> R.string.asset_classifications_investment_financial_account
         ClassificationTypeEnum.DEBT_ACCOUNT -> R.string.asset_classifications_debt_account
-        ClassificationTypeEnum.NOT_ASSOCIATED -> R.string.not_associated_asset
     }
 
     fun getIconResIdByType(type: AssetClassificationEnum): Int = when (type) {

@@ -13,7 +13,7 @@ val AssetEntity.hasBankInfo: Boolean
         AssetClassificationEnum.CASH,
         AssetClassificationEnum.WECHAT,
         AssetClassificationEnum.JD_IOUS,
-        AssetClassificationEnum.ANT_CREDIT_PAY
+        AssetClassificationEnum.ANT_CREDIT_PAY,
     )
 
 val AssetEntity.isCreditCard: Boolean

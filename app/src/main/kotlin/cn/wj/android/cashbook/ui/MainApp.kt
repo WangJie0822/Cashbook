@@ -50,8 +50,10 @@ import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.enums.MainBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.navigation.SelectAssetBottomSheet
+import cn.wj.android.cashbook.feature.assets.navigation.assetInfoScreen
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.myAssetScreen
+import cn.wj.android.cashbook.feature.assets.navigation.naviToAssetInfo
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
 import cn.wj.android.cashbook.feature.assets.navigation.naviToMyAsset
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
@@ -367,9 +369,15 @@ fun CashbookNavHost(
 
         // 我的资产
         myAssetScreen(
-            onAssetItemClick = {/*TODO*/ },
+            onAssetItemClick = navController::naviToAssetInfo,
             onAddAssetClick = navController::naviToEditAsset,
             onInvisibleAssetClick = {/*TODO*/ },
+            onBackClick = navController::popBackStack,
+        )
+        // 资产信息
+        assetInfoScreen(
+            assetRecordListContent = {/*TODO*/ },
+            onEditAssetClick = navController::naviToEditAsset,
             onBackClick = navController::popBackStack,
         )
         // 编辑资产

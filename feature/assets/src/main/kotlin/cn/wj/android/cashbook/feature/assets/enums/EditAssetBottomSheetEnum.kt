@@ -7,6 +7,9 @@ package cn.wj.android.cashbook.feature.assets.enums
  */
 enum class EditAssetBottomSheetEnum {
 
+    /** 隐藏 */
+    DISMISS,
+
     /** 资产大类 */
     CLASSIFICATION_TYPE,
 

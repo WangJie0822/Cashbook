@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
@@ -20,7 +21,11 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.ui.DevicePreviews
+import cn.wj.android.cashbook.core.ui.R
 
 @Composable
 fun Empty(
@@ -44,7 +49,7 @@ fun Empty(
                 .fillMaxWidth()
                 .height(16.dp),
         )
-        Text(text = hintText)
+        Text(text = hintText, color = LocalContentColor.current.copy(0.5f))
         if (null != buttonText) {
             Spacer(
                 modifier = Modifier
@@ -90,3 +95,17 @@ fun Empty(
     buttonText = buttonText,
     onButtonClick = onButtonClick
 )
+
+@DevicePreviews
+@Composable
+private fun EmptyPreview() {
+    CashbookTheme {
+        CashbookGradientBackground {
+            Empty(
+                imagePainter = painterResource(id = R.drawable.vector_no_data_200),
+                hintText = "无数据提示文本",
+                buttonText = "按钮文本"
+            )
+        }
+    }
+}

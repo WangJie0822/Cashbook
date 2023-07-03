@@ -59,7 +59,24 @@ enum class AssetClassificationEnum {
     BANK_CARD_PF/*(R.drawable.vector_bank_pf_24, R.string.asset_classifications_bank_pf)*/,
     BANK_CARD_XY/*(R.drawable.vector_bank_xy_24, R.string.asset_classifications_bank_xy)*/;
 
-    fun isDebt(): Boolean {
-        return this in ClassificationTypeEnum.DEBT_ACCOUNT.array
-    }
+    val isDebt: Boolean
+        get() = this in ClassificationTypeEnum.DEBT_ACCOUNT.array
+
+    val isCreditCard: Boolean
+        get() = this in ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.array
+
+    val isInvestmentFinancialAccount: Boolean
+        get() = this in ClassificationTypeEnum.INVESTMENT_FINANCIAL_ACCOUNT.array
+
+    val hasBankInfo: Boolean
+        get() = !isDebt && !isInvestmentFinancialAccount && this !in arrayOf(
+            ALIPAY,
+            CASH,
+            WECHAT,
+            JD_IOUS,
+            ANT_CREDIT_PAY,
+        )
+
+    val isBankCard: Boolean
+        get() = this == AssetClassificationEnum.BANK_CARD || this == AssetClassificationEnum.CREDIT_CARD
 }

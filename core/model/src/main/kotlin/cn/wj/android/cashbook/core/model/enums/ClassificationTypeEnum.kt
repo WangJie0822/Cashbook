@@ -9,9 +9,6 @@ package cn.wj.android.cashbook.core.model.enums
  */
 enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
 
-    /** 不关联 */
-    NOT_ASSOCIATED(arrayOf()),
-
     /** 资金账户 */
     CAPITAL_ACCOUNT(
         arrayOf(
@@ -63,10 +60,6 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
             AssetClassificationEnum.LEND
         )
     );
-
-    fun isNotAssociated(): Boolean {
-        return this == NOT_ASSOCIATED
-    }
 
     fun isCreditCard(): Boolean {
         return this == CREDIT_CARD_ACCOUNT
