@@ -10,6 +10,8 @@ import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
@@ -30,6 +32,13 @@ interface RecordRepository {
     ): List<RecordModel>
 
     suspend fun queryExpenditureRecordByAmountOrRemark(keyword: String): List<RecordViewsEntity>
+
+    suspend fun queryPagingRecordListByAssetId(
+        assetId: Long,
+        page: Int,
+        pageSize: Int,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    ): List<RecordModel>
 }
 
 internal fun RecordTable.asModel(): RecordModel {

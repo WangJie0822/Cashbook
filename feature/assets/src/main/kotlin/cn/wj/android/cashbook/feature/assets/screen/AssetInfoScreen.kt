@@ -1,12 +1,12 @@
 package cn.wj.android.cashbook.feature.assets.screen
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
@@ -15,31 +15,44 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheetState
+import androidx.compose.material3.ModalBottomSheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
 
 @Composable
 internal fun AssetInfoRoute(
     assetId: Long,
-    assetRecordListContent: LazyListScope.() -> Unit,
+    assetRecordListContent: @Composable (topContent: @Composable () -> Unit, onRecordItemClick: (RecordViewsEntity) -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
+    confirmDeleteRecordDialogContent: @Composable (recordId: Long, onResult: (ResultModel) -> Unit, onDialogDismiss: () -> Unit) -> Unit,
     onEditAssetClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,8 +75,32 @@ internal fun AssetInfoRoute(
         totalAmount = totalAmount,
         billingDate = billingDate,
         repaymentDate = repaymentDate,
-        assetRecordListContent = assetRecordListContent,
+        viewRecord = viewModel.viewRecordData,
+        assetRecordListContent = { topContent ->
+            assetRecordListContent(
+                topContent = topContent,
+                onRecordItemClick = viewModel::onRecordItemClick,
+            )
+        },
+        recordDetailSheetContent = { record ->
+            recordDetailSheetContent(
+                recordInfo = record,
+                onRecordDeleteClick = viewModel::onDeleteRecordClick,
+                dismissBottomSheet = viewModel::dismissRecordDetailSheet,
+            )
+        },
+        dialogState = viewModel.dialogState,
+        confirmDeleteRecordDialogContent = { recordId ->
+            confirmDeleteRecordDialogContent(
+                recordId = recordId,
+                onResult = viewModel::onDeleteRecordResult,
+                onDialogDismiss = viewModel::dismissDeleteConfirmDialog,
+            )
+        },
         onEditAssetClick = onEditAssetClick,
+        dismissBottomSheet = viewModel::dismissRecordDetailSheet,
+        shouldDisplayBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
+        onBookmarkDismiss = viewModel::dismissBookmark,
         onBackClick = onBackClick,
         modifier = modifier,
     )
@@ -78,13 +115,52 @@ internal fun AssetInfoScreen(
     totalAmount: String,
     billingDate: String,
     repaymentDate: String,
-    assetRecordListContent: LazyListScope.() -> Unit,
+    viewRecord: RecordViewsEntity?,
+    dialogState: DialogState,
+    assetRecordListContent: @Composable (topContent: @Composable () -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
+    confirmDeleteRecordDialogContent: @Composable (recordId: Long) -> Unit,
     onEditAssetClick: () -> Unit,
+    dismissBottomSheet: () -> Unit,
+    shouldDisplayBookmark: Boolean,
+    onBookmarkDismiss: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+    snackbarHostState: SnackbarHostState = remember {
+        SnackbarHostState()
+    }
 ) {
 
-    CashbookScaffold(
+    if (sheetState.isVisible) {
+        // sheet 显示时，返回隐藏 sheet
+        BackPressHandler {
+            dismissBottomSheet.invoke()
+        }
+    }
+
+    // 显示数据不为空时，显示详情 sheet
+    LaunchedEffect(viewRecord) {
+        if (null != viewRecord) {
+            // 显示详情弹窗
+            sheetState.show()
+        } else {
+            sheetState.hide()
+        }
+    }
+
+    // 提示
+    val deleteFailedText = stringResource(id = R.string.delete_failed)
+    LaunchedEffect(key1 = shouldDisplayBookmark, block = {
+        if (shouldDisplayBookmark) {
+            val result = snackbarHostState.showSnackbar(deleteFailedText)
+            if (result == SnackbarResult.Dismissed) {
+                onBookmarkDismiss()
+            }
+        }
+    })
+
+    CashbookBottomSheetScaffold(
         modifier = modifier,
         topBar = {
             CashbookTopAppBar(
@@ -99,12 +175,36 @@ internal fun AssetInfoScreen(
                     }
                 },
             )
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(paddingValues),
-            content = {
-                item {
+        },
+        floatingActionButton = {
+            CashbookFloatingActionButton(onClick = { /*TODO*/ }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
+        sheetState = sheetState,
+        sheetContent = {
+            recordDetailSheetContent.invoke(viewRecord)
+        },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier.padding(paddingValues),
+            ) {
+                (dialogState as? DialogState.Shown<*>)?.let {
+                    val recordId = it.data
+                    if (recordId is Long) {
+                        // 显示删除确认弹窗
+                        dismissBottomSheet.invoke()
+
+                        confirmDeleteRecordDialogContent(
+                            recordId = recordId,
+                        )
+                    }
+                }
+
+                assetRecordListContent.invoke {
                     AssetInfoContent(
                         isCreditCard = isCreditCard,
                         balance = balance,
@@ -113,11 +213,9 @@ internal fun AssetInfoScreen(
                         repaymentDate = repaymentDate,
                     )
                 }
-
-                assetRecordListContent()
-            },
-        )
-    }
+            }
+        },
+    )
 }
 
 @Composable
@@ -227,23 +325,36 @@ private fun AssetInfoContent(
 private fun AssetInfoScreenPreview() {
     CashbookTheme {
         CashbookGradientBackground {
+            val isCreditCard = false
+            val balance = "200"
+            val totalAmount = "2000"
+            val billingDate = "20"
+            val repaymentDate = ""
             AssetInfoScreen(
                 assetName = "现金",
-                isCreditCard = false,
-                balance = "200",
-                totalAmount = "0",
-                billingDate = "",
-                repaymentDate = "",
+                isCreditCard = isCreditCard,
+                balance = balance,
+                totalAmount = totalAmount,
+                billingDate = billingDate,
+                repaymentDate = repaymentDate,
+                viewRecord = null,
                 assetRecordListContent = {
-                    item {
-                        Empty(
-                            imagePainter = painterResource(id = R.drawable.vector_no_data_200),
-                            hintText = "当前资产还没有记录数据"
-                        )
-                    }
+                    AssetInfoContent(
+                        isCreditCard = isCreditCard,
+                        balance = balance,
+                        totalAmount = totalAmount,
+                        billingDate = billingDate,
+                        repaymentDate = repaymentDate,
+                    )
                 },
+                recordDetailSheetContent = {},
+                dialogState = DialogState.Dismiss,
+                confirmDeleteRecordDialogContent = {},
                 onEditAssetClick = {},
-                onBackClick = { },
+                dismissBottomSheet = {},
+                shouldDisplayBookmark = false,
+                onBookmarkDismiss = {},
+                onBackClick = {},
                 modifier = Modifier,
             )
         }
@@ -255,23 +366,36 @@ private fun AssetInfoScreenPreview() {
 private fun CreditAssetInfoScreenPreview() {
     CashbookTheme {
         CashbookGradientBackground {
+            val isCreditCard = true
+            val balance = "200"
+            val totalAmount = "2000"
+            val billingDate = "20"
+            val repaymentDate = ""
             AssetInfoScreen(
                 assetName = "招商银行",
-                isCreditCard = true,
-                balance = "200",
-                totalAmount = "2000",
-                billingDate = "20",
-                repaymentDate = "",
+                isCreditCard = isCreditCard,
+                balance = balance,
+                totalAmount = totalAmount,
+                billingDate = billingDate,
+                repaymentDate = repaymentDate,
+                viewRecord = null,
                 assetRecordListContent = {
-                    item {
-                        Empty(
-                            imagePainter = painterResource(id = R.drawable.vector_no_data_200),
-                            hintText = "当前资产还没有记录数据"
-                        )
-                    }
+                    AssetInfoContent(
+                        isCreditCard = isCreditCard,
+                        balance = balance,
+                        totalAmount = totalAmount,
+                        billingDate = billingDate,
+                        repaymentDate = repaymentDate,
+                    )
                 },
+                recordDetailSheetContent = {},
+                dialogState = DialogState.Dismiss,
+                confirmDeleteRecordDialogContent = {},
                 onEditAssetClick = {},
-                onBackClick = { },
+                dismissBottomSheet = {},
+                shouldDisplayBookmark = false,
+                onBookmarkDismiss = {},
+                onBackClick = {},
                 modifier = Modifier,
             )
         }

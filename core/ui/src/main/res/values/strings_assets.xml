@@ -32,4 +32,5 @@
     <string name="current_debt">当前欠款</string>
     <string name="un_set">未设置</string>
     <string name="clear">清除</string>
+    <string name="asset_no_record_data_hint">当前资产暂无记录数据</string>
 </resources>

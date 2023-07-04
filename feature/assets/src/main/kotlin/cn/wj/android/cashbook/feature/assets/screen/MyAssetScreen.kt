@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -27,12 +25,10 @@ import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBackdropScaffoldState
@@ -52,10 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookSmallFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
+import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
@@ -138,7 +137,7 @@ internal fun MyAssetScreen(
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = displayShowMoreDialog) {
+                CashbookFloatingActionButton(onClick = displayShowMoreDialog) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = null,
@@ -196,7 +195,7 @@ private fun ShowMoreContent(
                     modifier = Modifier
                         .padding(end = 8.dp),
                     shape = FloatingActionButtonDefaults.smallShape,
-                    color = FloatingActionButtonDefaults.containerColor,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
                     tonalElevation = 6.dp,
                     shadowElevation = 6.dp,
                 ) {
@@ -207,7 +206,7 @@ private fun ShowMoreContent(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                SmallFloatingActionButton(
+                CashbookSmallFloatingActionButton(
                     onClick = {
                         onAddAssetClick.invoke()
                         onCloseClick.invoke()
@@ -226,7 +225,7 @@ private fun ShowMoreContent(
                     modifier = Modifier
                         .padding(end = 8.dp),
                     shape = FloatingActionButtonDefaults.smallShape,
-                    color = FloatingActionButtonDefaults.containerColor,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
                     tonalElevation = 6.dp,
                     shadowElevation = 6.dp,
                 ) {
@@ -237,7 +236,7 @@ private fun ShowMoreContent(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                SmallFloatingActionButton(
+                CashbookSmallFloatingActionButton(
                     onClick = {
                         onInvisibleAssetClick.invoke()
                         onCloseClick.invoke()
@@ -250,7 +249,7 @@ private fun ShowMoreContent(
                 }
             }
 
-            FloatingActionButton(
+            CashbookFloatingActionButton(
                 onClick = onCloseClick,
             ) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = null)
@@ -304,11 +303,7 @@ internal fun MyAssetBackdropScaffold(
                                     onAssetItemClick = onAssetItemClick,
                                 )
                             }
-                            Spacer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(85.dp)
-                            )
+                            Footer(hintText = stringResource(id = R.string.footer_hint_default))
                         }
                     }
                 }

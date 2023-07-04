@@ -32,4 +32,6 @@ data class RecordViewsEntity(
     val relatedTags: List<TagEntity>,
     val relatedRecord: List<RecordViewsEntity>,
     val recordTime: String,
-)
+) : RecordViews
+
+interface RecordViews

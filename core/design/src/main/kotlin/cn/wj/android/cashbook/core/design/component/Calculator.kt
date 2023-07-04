@@ -67,8 +67,8 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "5") }) {
-                    Text(text = "5")
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "7") }) {
+                    Text(text = "7")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),

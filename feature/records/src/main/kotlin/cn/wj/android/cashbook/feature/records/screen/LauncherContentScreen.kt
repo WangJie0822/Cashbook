@@ -20,14 +20,12 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.WebAsset
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -63,10 +61,12 @@ import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.toIntOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
+import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
@@ -78,6 +78,7 @@ import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialog
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import java.util.Calendar
 import kotlinx.coroutines.CoroutineScope
@@ -274,7 +275,7 @@ internal fun LauncherLayoutContent(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
+            CashbookFloatingActionButton(onClick = onAddClick) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         },
@@ -366,26 +367,12 @@ private fun FrontLayerContent(
                     coroutineScope.launch {
                         sheetState.hide()
                     }
-                    AlertDialog(
-                        onDismissRequest = onDialogDismiss,
-                        text = {
-                            Text(text = stringResource(id = R.string.record_delete_hint))
-                        },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                onDeleteRecordConfirm.invoke(recordId)
-                            }) {
-                                Text(text = stringResource(id = R.string.confirm))
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = onDialogDismiss) {
-                                Text(text = stringResource(id = R.string.cancel))
-                            }
-                        },
+                    ConfirmDeleteRecordDialog(
+                        recordId = recordId,
+                        onDeleteRecordConfirm = onDeleteRecordConfirm,
+                        onDialogDismiss = onDialogDismiss,
                     )
                 }
-
             }
 
             if (recordMap.isEmpty()) {
@@ -403,8 +390,10 @@ private fun FrontLayerContent(
                         stickyHeader {
                             Row(
                                 modifier = Modifier
+                                    .background(color = MaterialTheme.colorScheme.surface)
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
                                     modifier = Modifier.weight(1f),
@@ -415,20 +404,23 @@ private fun FrontLayerContent(
                                         else -> key.day + stringResource(id = R.string.day)
                                     }
                                 )
-                                Text(text = buildString {
-                                    val totalIncome = key.dayIncome.toDoubleOrZero()
-                                    val totalExpenditure = key.dayExpand.toDoubleOrZero()
-                                    val hasIncome = totalIncome != 0.0
-                                    if (hasIncome) {
-                                        append(stringResource(id = R.string.income_with_colon) + Symbol.CNY + totalIncome.decimalFormat())
-                                    }
-                                    if (totalExpenditure != 0.0) {
+                                Text(
+                                    text = buildString {
+                                        val totalIncome = key.dayIncome.toDoubleOrZero()
+                                        val totalExpenditure = key.dayExpand.toDoubleOrZero()
+                                        val hasIncome = totalIncome != 0.0
                                         if (hasIncome) {
-                                            append(", ")
+                                            append(stringResource(id = R.string.income_with_colon) + Symbol.CNY + totalIncome.decimalFormat())
                                         }
-                                        append(stringResource(id = R.string.expend_with_colon) + Symbol.CNY + totalExpenditure.decimalFormat())
-                                    }
-                                })
+                                        if (totalExpenditure != 0.0) {
+                                            if (hasIncome) {
+                                                append(", ")
+                                            }
+                                            append(stringResource(id = R.string.expend_with_colon) + Symbol.CNY + totalExpenditure.decimalFormat())
+                                        }
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
                             }
                             Divider(
                                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -436,19 +428,27 @@ private fun FrontLayerContent(
                             )
                         }
                         items(recordList, key = { it.id }) {
-                            RecordListItem(recordViewsEntity = it, onRecordItemClick = {
-                                onRecordItemClick.invoke(it)
-                                coroutineScope.launch {
-                                    sheetState.show()
-                                }
-                            })
+                            RecordListItem(
+                                recordViewsEntity = it,
+                                onRecordItemClick = {
+                                    onRecordItemClick.invoke(it)
+                                    coroutineScope.launch {
+                                        sheetState.show()
+                                    }
+                                },
+                            )
                         }
+                    }
+
+                    item {
+                        Footer(hintText = stringResource(id = R.string.footer_hint_default))
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun BackLayerContent(
@@ -548,7 +548,8 @@ internal fun LauncherTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RecordListItem(
-    recordViewsEntity: RecordViewsEntity, onRecordItemClick: () -> Unit
+    recordViewsEntity: RecordViewsEntity,
+    onRecordItemClick: () -> Unit,
 ) {
     TranparentListItem(
         modifier = Modifier.clickable {

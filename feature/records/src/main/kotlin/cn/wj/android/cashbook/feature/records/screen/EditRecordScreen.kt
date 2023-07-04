@@ -56,6 +56,7 @@ import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_TIME
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.design.component.Calculator
+import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
@@ -187,7 +188,7 @@ internal fun EditRecordScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
+            CashbookFloatingActionButton(onClick = {
                 coroutineScope.launch {
                     viewModel.saveRecord(onSaveSuccess = onBackClick)
                 }

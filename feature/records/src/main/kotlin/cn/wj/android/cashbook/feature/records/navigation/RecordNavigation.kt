@@ -12,11 +12,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.LocalNavController
+import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
+import cn.wj.android.cashbook.feature.records.screen.AssetInfoContentRoute
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentRoute
+import cn.wj.android.cashbook.feature.records.screen.RecordDetailsSheet
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 
@@ -98,5 +103,44 @@ fun LauncherContent(
         onCalendarClick = onCalendarClick,
         onMyAssetClick = onMyAssetClick,
         onShowSnackbar = onShowSnackbar,
+    )
+}
+
+@Composable
+fun AssetInfoContent(
+    assetId: Long,
+    topContent: @Composable () -> Unit,
+    onRecordItemClick: (RecordViewsEntity) -> Unit,
+) {
+    AssetInfoContentRoute(
+        assetId = assetId,
+        topContent = topContent,
+        onRecordItemClick = onRecordItemClick,
+    )
+}
+
+@Composable
+fun RecordDetailSheetContent(
+    recordEntity: RecordViewsEntity?,
+    onRecordItemEditClick: (Long) -> Unit,
+    onRecordItemDeleteClick: (Long) -> Unit,
+) {
+    RecordDetailsSheet(
+        recordEntity = recordEntity,
+        onRecordItemEditClick = onRecordItemEditClick,
+        onRecordItemDeleteClick = onRecordItemDeleteClick,
+    )
+}
+
+@Composable
+fun ConfirmDeleteRecordDialogContent(
+    recordId: Long,
+    onResult: (ResultModel) -> Unit,
+    onDialogDismiss: () -> Unit,
+) {
+    ConfirmDeleteRecordDialogRoute(
+        recordId = recordId,
+        onResult = onResult,
+        onDialogDismiss = onDialogDismiss,
     )
 }

@@ -1,6 +1,5 @@
 package cn.wj.android.cashbook.feature.assets.navigation
 
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -9,6 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.feature.assets.screen.AssetInfoRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.MyAssetRoute
@@ -68,7 +69,9 @@ fun NavGraphBuilder.myAssetScreen(
 }
 
 fun NavGraphBuilder.assetInfoScreen(
-    assetRecordListContent: LazyListScope.() -> Unit,
+    assetRecordListContent: @Composable (Long, @Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
+    confirmDeleteRecordDialogContent: @Composable (recordId: Long, onResult: (ResultModel) -> Unit, onDialogDismiss: () -> Unit) -> Unit,
     onEditAssetClick: (Long) -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -82,7 +85,22 @@ fun NavGraphBuilder.assetInfoScreen(
         val assetId = it.arguments?.getLong(ROUTE_KEY_ASSET_ID) ?: -1L
         AssetInfoRoute(
             assetId = assetId,
-            assetRecordListContent = assetRecordListContent,
+            assetRecordListContent = { topContent, onRecordItemClick ->
+                assetRecordListContent.invoke(
+                    assetId,
+                    topContent,
+                    onRecordItemClick,
+                )
+            },
+            recordDetailSheetContent = { recordInfo, onRecordDeleteClick, dismissBottomSheet ->
+                recordDetailSheetContent(
+                    recordInfo = recordInfo,
+                    onRecordDeleteClick = onRecordDeleteClick,
+                    dismissBottomSheet = dismissBottomSheet,
+                )
+
+            },
+            confirmDeleteRecordDialogContent = confirmDeleteRecordDialogContent,
             onEditAssetClick = { onEditAssetClick.invoke(assetId) },
             onBackClick = onBackClick,
         )

@@ -56,7 +56,10 @@ import cn.wj.android.cashbook.feature.assets.navigation.myAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.naviToAssetInfo
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
 import cn.wj.android.cashbook.feature.assets.navigation.naviToMyAsset
+import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
+import cn.wj.android.cashbook.feature.records.navigation.ConfirmDeleteRecordDialogContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
+import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.records.navigation.naviToSelectRelatedRecord
@@ -376,7 +379,30 @@ fun CashbookNavHost(
         )
         // 资产信息
         assetInfoScreen(
-            assetRecordListContent = {/*TODO*/ },
+            assetRecordListContent = { assetId, topContent, onRecordItemClick ->
+                AssetInfoContent(
+                    assetId = assetId,
+                    topContent = topContent,
+                    onRecordItemClick = onRecordItemClick,
+                )
+            },
+            recordDetailSheetContent = { recordEntity, onRecordItemDeleteClick, dismissBottomSheet ->
+                RecordDetailSheetContent(
+                    recordEntity = recordEntity,
+                    onRecordItemEditClick = { recordId ->
+                        navController.naviToEditRecord(recordId)
+                        dismissBottomSheet()
+                    },
+                    onRecordItemDeleteClick = onRecordItemDeleteClick,
+                )
+            },
+            confirmDeleteRecordDialogContent = { recordId, onResult, onDialogDismiss ->
+                ConfirmDeleteRecordDialogContent(
+                    recordId = recordId,
+                    onResult = onResult,
+                    onDialogDismiss = onDialogDismiss,
+                )
+            },
             onEditAssetClick = navController::naviToEditAsset,
             onBackClick = navController::popBackStack,
         )

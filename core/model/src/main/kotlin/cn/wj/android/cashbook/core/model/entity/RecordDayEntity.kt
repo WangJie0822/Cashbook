@@ -4,4 +4,4 @@ data class RecordDayEntity(
     val day: String,
     val dayIncome: String,
     val dayExpand: String,
-)
+) : RecordViews

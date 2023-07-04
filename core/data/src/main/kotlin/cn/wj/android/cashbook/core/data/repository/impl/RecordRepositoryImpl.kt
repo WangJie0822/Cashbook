@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import java.util.Calendar
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -117,4 +118,20 @@ class RecordRepositoryImpl @Inject constructor(
                 )
             }
         }
+
+    override suspend fun queryPagingRecordListByAssetId(
+        assetId: Long,
+        page: Int,
+        pageSize: Int,
+        coroutineContext: CoroutineContext
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryRecordByAssetId(
+            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            assetId = assetId,
+            pageNum = page * pageSize,
+            pageSize = pageSize,
+        ).map {
+            it.asModel()
+        }
+    }
 }

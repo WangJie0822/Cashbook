@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetLayout
@@ -50,6 +49,7 @@ import cn.wj.android.cashbook.core.common.PATTERN_SIGN_MONEY
 import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
+import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
@@ -287,7 +287,7 @@ private fun EditAssetScafold(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
+            CashbookFloatingActionButton(onClick = {
                 if (!assetNameTextState.isValid || !(isCreditCard && totalAmountTextState.isValid)) {
                     // 不满足必要条件
                 } else {

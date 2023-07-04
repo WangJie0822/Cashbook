@@ -71,8 +71,7 @@ androidx-lifecycle = "2.6.1"
 # Room 数据库相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/room?hl=zh-cn)
 androidx-room = "2.5.1"
 # Paging 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/paging?hl=zh-cn)
-androidx-paging = "3.1.1"
-androidx-paging-compose = "1.0.0-alpha18"
+androidx-paging = "3.2.0-rc01"
 # Navigation 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
 androidx-navigation = "2.6.0"
 # WorkManager 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/work?hl=zh-cn)
@@ -325,7 +324,7 @@ androidx-paging-rxjava2 = { group = "androidx.paging", name = "paging-rxjava2", 
 androidx-paging-rxjava-2-ktx = { group = "androidx.paging", name = "paging-rxjava2-ktx", version.ref = "androidx-paging" }
 androidx-paging-guava = { group = "androidx.paging", name = "paging-guava", version.ref = "androidx-paging" }
 androidx-paging-rxjava3 = { group = "androidx.paging", name = "paging-rxjava3", version.ref = "androidx-paging" }
-androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging-compose" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
 # Navigation 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
 androidx-navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "androidx-navigation" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "androidx-navigation" }
