@@ -9,31 +9,32 @@ import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.core.model.transfer.asModel
-import cn.wj.android.cashbook.feature.tags.model.TagDialogState
+import cn.wj.android.cashbook.core.ui.DialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class SelectTagViewModel @Inject constructor(
+class EditRecordSelectTagBottomSheetViewModel @Inject constructor(
     private val tagRepository: TagRepository,
 ) : ViewModel() {
 
     /** 弹窗状态 */
-    var dialogState by mutableStateOf<TagDialogState>(TagDialogState.Dismiss)
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
     /** 已选择标签 id 列表数据 */
-    val selectedTagIds: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
+    private val selectedTagIdListData: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
 
     /** 标签数据列表 */
     val tagListData: StateFlow<List<TagEntity>> =
-        combine(selectedTagIds, tagRepository.tagListData) { ids, list ->
+        combine(selectedTagIdListData, tagRepository.tagListData) { ids, list ->
             list.map {
                 it.asEntity(selected = it.id in ids)
             }
@@ -44,12 +45,30 @@ class SelectTagViewModel @Inject constructor(
                 initialValue = listOf()
             )
 
+    fun updateSelectedTags(tagIdList: List<Long>) {
+        selectedTagIdListData.tryEmit(tagIdList)
+    }
+
+    fun onTagItemClick(tag: TagEntity, onResult: (List<Long>) -> Unit) {
+        viewModelScope.launch {
+            val newList = selectedTagIdListData.first().toMutableList()
+            val tagId = tag.id
+            if (newList.contains(tagId)) {
+                newList.remove(tagId)
+            } else {
+                newList.add(tagId)
+            }
+            selectedTagIdListData.tryEmit(newList)
+            onResult(newList)
+        }
+    }
+
     fun onAddClick() {
-        dialogState = TagDialogState.Edit(null)
+        dialogState = DialogState.Shown(0)
     }
 
     fun dismissDialog() {
-        dialogState = TagDialogState.Dismiss
+        dialogState = DialogState.Dismiss
     }
 
     fun addTag(tag: TagEntity) {

@@ -6,14 +6,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import cn.wj.android.cashbook.core.model.entity.AssetEntity
-import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.feature.assets.screen.AssetInfoRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
+import cn.wj.android.cashbook.feature.assets.screen.EditRecordSelectAssetBottomSheetRoute
 import cn.wj.android.cashbook.feature.assets.screen.MyAssetRoute
-import cn.wj.android.cashbook.feature.assets.screen.SelectAssetBottomSheetScreen
 
 private const val ROUTE_KEY_ASSET_ID = "assetId"
 
@@ -40,15 +38,17 @@ fun NavController.naviToEditAsset(assetId: Long = -1L) {
 }
 
 @Composable
-fun SelectAssetBottomSheet(
-    selectedType: RecordTypeEntity?, // TODO 根据当前类型显示资产列表
-    related: Boolean,
+fun EditRecordSelectAssetBottomSheetContent(
+    currentTypeId: Long,
+    isRelated: Boolean,
+    onAssetChange: (Long) -> Unit,
     onAddAssetClick: () -> Unit,
-    onAssetItemClick: (AssetEntity?) -> Unit,
 ) {
-    SelectAssetBottomSheetScreen(
+    EditRecordSelectAssetBottomSheetRoute(
+        currentTypeId = currentTypeId,
+        isRelated = isRelated,
+        onAssetChange = onAssetChange,
         onAddAssetClick = onAddAssetClick,
-        onAssetItemClick = onAssetItemClick,
     )
 }
 

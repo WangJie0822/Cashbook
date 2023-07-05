@@ -19,7 +19,6 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
-import cn.wj.android.cashbook.core.model.model.TagModel
 import java.util.Calendar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -71,12 +70,12 @@ class RecordRepositoryImpl @Inject constructor(
         }
 
     override suspend fun updateRecord(
-        record: RecordModel, tags: List<TagModel>,
+        record: RecordModel, tagIdList: List<Long>,
         coroutineContext: CoroutineContext
     ) =
         withContext(coroutineContext) {
-            logger().i("updateRecord(record = <$record>, tags = <$tags>")
-            transactionDao.updateRecordTransaction(record.asTable(), tags.map { it.id })
+            logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
+            transactionDao.updateRecordTransaction(record.asTable(), tagIdList)
             recordDataVersion.updateVersion()
         }
 

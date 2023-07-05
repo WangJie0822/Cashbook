@@ -49,7 +49,7 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.enums.MainBookmarkEnum
-import cn.wj.android.cashbook.feature.assets.navigation.SelectAssetBottomSheet
+import cn.wj.android.cashbook.feature.assets.navigation.EditRecordSelectAssetBottomSheetContent
 import cn.wj.android.cashbook.feature.assets.navigation.assetInfoScreen
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.myAssetScreen
@@ -62,7 +62,6 @@ import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
-import cn.wj.android.cashbook.feature.records.navigation.naviToSelectRelatedRecord
 import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
@@ -71,10 +70,10 @@ import cn.wj.android.cashbook.feature.settings.navigation.naviToAboutUs
 import cn.wj.android.cashbook.feature.settings.navigation.naviToSetting
 import cn.wj.android.cashbook.feature.settings.navigation.settingScreen
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
-import cn.wj.android.cashbook.feature.tags.navigation.SelectTagsBottomSheet
+import cn.wj.android.cashbook.feature.tags.navigation.EditRecordSelectTagBottomSheetContent
 import cn.wj.android.cashbook.feature.tags.navigation.myTagsScreen
 import cn.wj.android.cashbook.feature.tags.navigation.naviToMyTags
-import cn.wj.android.cashbook.feature.types.navigation.SelectRecordTypeList
+import cn.wj.android.cashbook.feature.types.navigation.EditRecordTypeListContent
 import javax.crypto.Cipher
 
 /** 开始默认显示路径 */
@@ -338,32 +337,32 @@ fun CashbookNavHost(
         )
         // 编辑记录
         editRecordScreen(
-            onBackClick = navController::popBackStack,
-            onSelectRelatedRecordClick = navController::naviToSelectRelatedRecord,
-            onShowSnackbar = onShowSnackbar,
-            selectTypeList = { typeCategory, selectedType, overTypeList, underTypeList, onTypeSelected ->
-                SelectRecordTypeList(
+            typeListContent = { modifier, typeCategory, selectedTypeId, onTypeSelect, headerContent, footerContent ->
+                EditRecordTypeListContent(
                     typeCategory = typeCategory,
-                    selectedType = selectedType,
-                    overTypeList = overTypeList,
-                    underTypeList = underTypeList,
-                    onTypeSelected = onTypeSelected,
+                    selectedTypeId = selectedTypeId,
+                    onTypeSelect = onTypeSelect,
+                    headerContent = headerContent,
+                    footerContent = footerContent,
                     onTypeSettingClick = { /*TODO*/ },
+                    modifier = modifier,
                 )
             },
-            selectAssetBottomSheet = { selectedType, related, onAssetItemClick ->
-                SelectAssetBottomSheet(
-                    selectedType = selectedType,
-                    related = related,
+            selectAssetBottomSheetContent = { currentTypeId, isRelated, onAssetChange ->
+                EditRecordSelectAssetBottomSheetContent(
+                    currentTypeId = currentTypeId,
+                    isRelated = isRelated,
+                    onAssetChange = onAssetChange,
                     onAddAssetClick = navController::naviToEditAsset,
-                    onAssetItemClick = onAssetItemClick
                 )
             },
-            selectTagBottomSheet = { list, onTagItemClick ->
-                SelectTagsBottomSheet(
-                    selectedTagIds = list, onTagItemClick = onTagItemClick
+            selectTagBottomSheetContent = { selectedTagIdList, onTagIdListChange ->
+                EditRecordSelectTagBottomSheetContent(
+                    selectedTagIdList = selectedTagIdList,
+                    onTagIdListChange = onTagIdListChange,
                 )
             },
+            onBackClick = navController::popBackStack,
         )
         // 选择关联记录
         selectRelatedRecordScreen(

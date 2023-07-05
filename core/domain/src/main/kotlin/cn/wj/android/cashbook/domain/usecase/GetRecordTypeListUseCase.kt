@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -26,8 +27,9 @@ class GetRecordTypeListUseCase @Inject constructor(
 
     suspend operator fun invoke(
         typeCategory: RecordTypeCategoryEnum,
-        selectedType: RecordTypeEntity?
-    ): List<RecordTypeEntity> = withContext(Dispatchers.IO) {
+        selectedTypeId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO,
+    ): List<RecordTypeEntity> = withContext(coroutineContext) {
         when (typeCategory) {
             RecordTypeCategoryEnum.EXPENDITURE -> typeRepository.firstExpenditureTypeListData
             RecordTypeCategoryEnum.INCOME -> typeRepository.firstIncomeTypeListData
@@ -44,6 +46,7 @@ class GetRecordTypeListUseCase @Inject constructor(
                     .sortedBy { it.sort }
             }
             .map { list ->
+                val selectedType = typeRepository.getRecordTypeById(selectedTypeId)?.asEntity()
                 val selectedEntity = selectedType ?: list.first()
                 // 最终输出结果
                 val result = arrayListOf<RecordTypeEntity>()

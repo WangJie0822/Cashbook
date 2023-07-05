@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
-class SelectAssetViewModel @Inject constructor(
-    private val assetRepository: AssetRepository,
+class EditRecordSelectAssetBottomSheetViewModel @Inject constructor(
+    assetRepository: AssetRepository,
 ) : ViewModel() {
 
     val assetListData = assetRepository.currentVisibleAssetListData
@@ -24,4 +24,11 @@ class SelectAssetViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = listOf()
         )
+
+    fun update(
+        currentTypeId: Long,
+        isRelated: Boolean
+    ) {
+        // TODO 根据当前类型和是否关联获取资产列表
+    }
 }

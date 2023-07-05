@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -45,23 +46,37 @@ class TypeRepositoryImpl @Inject constructor(
             list.filter { it.typeCategory == RecordTypeCategoryEnum.TRANSFER }
         }
 
-    override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel =
-        withContext(Dispatchers.IO) {
+    override suspend fun getRecordTypeById(
+        typeId: Long,
+        coroutineContext: CoroutineContext
+    ): RecordTypeModel? =
+        withContext(coroutineContext) {
             typeDao.queryById(typeId)?.asModel(appPreferencesDataSource.needRelated(typeId))
+        }
+
+    override suspend fun getNoNullRecordTypeById(
+        typeId: Long,
+        coroutineContext: CoroutineContext
+    ): RecordTypeModel =
+        withContext(coroutineContext) {
+            getRecordTypeById(typeId, coroutineContext)
                 ?: getFirstRecordTypeListByCategory(RecordTypeCategoryEnum.EXPENDITURE)
                     .first()
         }
 
-    override suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel> =
-        withContext(Dispatchers.IO) {
+    override suspend fun getFirstRecordTypeListByCategory(
+        typeCategory: RecordTypeCategoryEnum,
+        coroutineContext: CoroutineContext
+    ): List<RecordTypeModel> =
+        withContext(coroutineContext) {
             typeDao.queryByLevelAndTypeCategory(TypeLevelEnum.FIRST.name, typeCategory.name)
                 .map {
                     it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
                 }
         }
 
-    private suspend fun getFirstRecordTypeList(): List<RecordTypeModel> =
-        withContext(Dispatchers.IO) {
+    private suspend fun getFirstRecordTypeList(coroutineContext: CoroutineContext = Dispatchers.IO): List<RecordTypeModel> =
+        withContext(coroutineContext) {
             val result = typeDao.queryByLevel(TypeLevelEnum.FIRST.name)
                 .map {
                     it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
@@ -69,8 +84,11 @@ class TypeRepositoryImpl @Inject constructor(
             result
         }
 
-    override suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel> =
-        withContext(Dispatchers.IO) {
+    override suspend fun getSecondRecordTypeListByParentId(
+        parentId: Long,
+        coroutineContext: CoroutineContext
+    ): List<RecordTypeModel> =
+        withContext(coroutineContext) {
             typeDao.queryByParentId(parentId)
                 .map {
                     it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))

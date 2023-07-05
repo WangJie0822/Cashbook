@@ -2,30 +2,28 @@ package cn.wj.android.cashbook.feature.types.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.domain.usecase.GetRecordTypeListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
-class SelectTypeViewModel @Inject constructor(
+class EditRecordTypeListViewModel @Inject constructor(
     getRecordTypeListUseCase: GetRecordTypeListUseCase
 ) : ViewModel() {
 
-    val typeCategoryData: MutableStateFlow<RecordTypeCategoryEnum> =
+    private val typeCategoryData: MutableStateFlow<RecordTypeCategoryEnum> =
         MutableStateFlow(RecordTypeCategoryEnum.EXPENDITURE)
 
-    val selectedTypeData: MutableStateFlow<RecordTypeEntity?> = MutableStateFlow(null)
+    private val selectedTypeIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
 
-    val typeListData: StateFlow<List<RecordTypeEntity>> =
-        combine(typeCategoryData, selectedTypeData) { typeCategory, selectedType ->
-            getRecordTypeListUseCase(typeCategory, selectedType)
+    val typeListData =
+        combine(typeCategoryData, selectedTypeIdData) { typeCategory, selectedTypeId ->
+            getRecordTypeListUseCase(typeCategory, selectedTypeId)
         }
             .stateIn(
                 scope = viewModelScope,
@@ -33,8 +31,8 @@ class SelectTypeViewModel @Inject constructor(
                 initialValue = listOf()
             )
 
-    fun update(typeCategory: RecordTypeCategoryEnum, selectedType: RecordTypeEntity?) {
-        typeCategoryData.value = typeCategory
-        selectedTypeData.value = selectedType
+    fun update(typeCategory: RecordTypeCategoryEnum, selectedTypeId: Long) {
+        typeCategoryData.tryEmit(typeCategory)
+        selectedTypeIdData.tryEmit(selectedTypeId)
     }
 }

@@ -2,17 +2,27 @@ package cn.wj.android.cashbook.core.data.repository
 
 import cn.wj.android.cashbook.core.database.table.TagTable
 import cn.wj.android.cashbook.core.model.model.TagModel
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 interface TagRepository {
 
     val tagListData: Flow<List<TagModel>>
 
-    suspend fun updateTag(tag: TagModel)
+    suspend fun updateTag(tag: TagModel, coroutineContext: CoroutineContext = Dispatchers.IO)
 
-    suspend fun deleteTag(tag: TagModel)
+    suspend fun deleteTag(tag: TagModel, coroutineContext: CoroutineContext = Dispatchers.IO)
 
-    suspend fun getRelatedTag(recordId: Long): List<TagModel>
+    suspend fun getRelatedTag(
+        recordId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    ): List<TagModel>
+
+    suspend fun getTagById(
+        tagId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    ): TagModel?
 }
 
 internal fun TagTable.asModel(): TagModel {

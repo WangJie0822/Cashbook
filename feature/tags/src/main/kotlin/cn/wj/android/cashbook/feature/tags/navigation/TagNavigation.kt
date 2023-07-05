@@ -5,8 +5,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.feature.tags.screen.EditRecordSelectTagBottomSheetRoute
 import cn.wj.android.cashbook.feature.tags.screen.MyTagsRoute
-import cn.wj.android.cashbook.feature.tags.screen.SelectTagBottomSheetScreen
 
 private const val ROUTE_MY_TAGS = "tag/my_tag"
 
@@ -27,12 +27,12 @@ fun NavGraphBuilder.myTagsScreen(
 }
 
 @Composable
-fun SelectTagsBottomSheet(
-    selectedTagIds: List<Long>,
-    onTagItemClick: (TagEntity) -> Unit,
+fun EditRecordSelectTagBottomSheetContent(
+    selectedTagIdList: List<Long>,
+    onTagIdListChange: (List<Long>) -> Unit,
 ) {
-    SelectTagBottomSheetScreen(
-        selectedTagIds = selectedTagIds,
-        onTagItemClick = onTagItemClick,
+    EditRecordSelectTagBottomSheetRoute(
+        selectedTagIdList = selectedTagIdList,
+        onTagIdListChange = onTagIdListChange,
     )
 }

@@ -21,20 +21,38 @@ import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
 import cn.wj.android.cashbook.feature.assets.component.NotAssociatedAssetListItem
-import cn.wj.android.cashbook.feature.assets.viewmodel.SelectAssetViewModel
+import cn.wj.android.cashbook.feature.assets.viewmodel.EditRecordSelectAssetBottomSheetViewModel
 
-/**
- * 选择资产菜单
- */
 @Composable
-internal fun SelectAssetBottomSheetScreen(
+internal fun EditRecordSelectAssetBottomSheetRoute(
+    currentTypeId: Long,
+    isRelated: Boolean,
+    onAssetChange: (Long) -> Unit,
     onAddAssetClick: () -> Unit,
-    onAssetItemClick: (AssetEntity?) -> Unit,
-    viewModel: SelectAssetViewModel = hiltViewModel()
+    modifier: Modifier = Modifier,
+    viewModel: EditRecordSelectAssetBottomSheetViewModel = hiltViewModel<EditRecordSelectAssetBottomSheetViewModel>().apply {
+        update(currentTypeId, isRelated)
+    },
 ) {
     val assetList by viewModel.assetListData.collectAsStateWithLifecycle()
+
+    EditRecordSelectAssetBottomSheetScreen(
+        assetList = assetList,
+        onAssetChange = onAssetChange,
+        onAddAssetClick = onAddAssetClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun EditRecordSelectAssetBottomSheetScreen(
+    assetList: List<AssetEntity>,
+    onAssetChange: (Long) -> Unit,
+    onAddAssetClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         content = {
             item {
                 ConstraintLayout(
@@ -79,7 +97,7 @@ internal fun SelectAssetBottomSheetScreen(
             }
             item {
                 NotAssociatedAssetListItem(
-                    onNotAssociatedAssetClick = { onAssetItemClick(null) },
+                    onNotAssociatedAssetClick = { onAssetChange(-1L) },
                 )
             }
             items(assetList) {
@@ -89,7 +107,7 @@ internal fun SelectAssetBottomSheetScreen(
                     iconPainter = painterResource(id = it.iconResId),
                     balance = it.balance,
                     totalAmount = it.totalAmount,
-                    onItemClick = { onAssetItemClick(it) },
+                    onItemClick = { onAssetChange(it.id) },
                 )
             }
         },

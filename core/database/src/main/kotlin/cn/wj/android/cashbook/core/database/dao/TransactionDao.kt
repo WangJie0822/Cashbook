@@ -70,7 +70,7 @@ interface TransactionDao {
 
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun updateRecordTransaction(recordTable: RecordTable, tags: List<Long>) {
+    suspend fun updateRecordTransaction(recordTable: RecordTable, tagIdList: List<Long>) {
         if (null != recordTable.id) {
             // 修改记录，获取之前记录信息
             val oldRecord = queryRecordById(recordTable.id)
@@ -177,7 +177,7 @@ interface TransactionDao {
         }
         // 插入新的关联标签
         val insertTags = arrayListOf<TagWithRecordTable>()
-        tags.forEach {
+        tagIdList.forEach {
             insertTags.add(TagWithRecordTable(id = null, recordId = id, tagId = it))
         }
         insertRelatedTags(insertTags)

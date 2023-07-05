@@ -20,24 +20,54 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.tags.model.TagDialogState
-import cn.wj.android.cashbook.feature.tags.viewmodel.SelectTagViewModel
+import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModel
 import com.google.accompanist.flowlayout.FlowRow
+
+@Composable
+internal fun EditRecordSelectTagBottomSheetRoute(
+    selectedTagIdList: List<Long>,
+    onTagIdListChange: (List<Long>) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: EditRecordSelectTagBottomSheetViewModel = hiltViewModel<EditRecordSelectTagBottomSheetViewModel>().apply {
+        updateSelectedTags(selectedTagIdList)
+    },
+) {
+
+    // 显示列表数据
+    val tagList by viewModel.tagListData.collectAsStateWithLifecycle()
+
+    EditRecordSelectTagBottomSheetScreen(
+        tagList = tagList,
+        onAddTagClick = viewModel::onAddClick,
+        onAddTagConfirm = viewModel::addTag,
+        onTagItemClick = { tagEntity ->
+            viewModel.onTagItemClick(
+                tag = tagEntity,
+                onResult = { selectedList ->
+                    onTagIdListChange(selectedList)
+                },
+            )
+        },
+        dialogState = viewModel.dialogState,
+        dismissDialog = viewModel::dismissDialog,
+        modifier = modifier,
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun SelectTagBottomSheetScreen(
-    selectedTagIds: List<Long>,
+internal fun EditRecordSelectTagBottomSheetScreen(
+    tagList: List<TagEntity>,
+    onAddTagClick: () -> Unit,
+    onAddTagConfirm: (TagEntity) -> Unit,
     onTagItemClick: (TagEntity) -> Unit,
-    viewModel: SelectTagViewModel = hiltViewModel<SelectTagViewModel>().apply {
-        this.selectedTagIds.value = selectedTagIds
-    },
+    dialogState: DialogState,
+    dismissDialog: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    // 显示列表数据
-    val tagList: List<TagEntity> by viewModel.tagListData.collectAsStateWithLifecycle()
-
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             content = {
@@ -71,7 +101,7 @@ internal fun SelectTagBottomSheetScreen(
                             end.linkTo(parent.end)
                             bottom.linkTo(parent.bottom)
                         },
-                        onClick = viewModel::onAddClick,
+                        onClick = onAddTagClick,
                     ) {
                         Text(
                             text = stringResource(id = R.string.add),
@@ -99,11 +129,11 @@ internal fun SelectTagBottomSheetScreen(
                 }
             },
         )
-        if (viewModel.dialogState is TagDialogState.Edit) {
+        if (dialogState is DialogState.Shown<*>) {
             EditTagDialog(
                 tagEntity = null,
-                onConfirm = viewModel::addTag,
-                onDismiss = viewModel::dismissDialog,
+                onConfirm = onAddTagConfirm,
+                onDismiss = dismissDialog,
             )
         }
     }

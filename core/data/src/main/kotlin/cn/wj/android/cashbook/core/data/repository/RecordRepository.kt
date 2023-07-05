@@ -9,7 +9,6 @@ import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordModel
-import cn.wj.android.cashbook.core.model.model.TagModel
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +28,8 @@ interface RecordRepository {
     ): List<RecordModel>
 
     suspend fun updateRecord(
-        record: RecordModel, tags: List<TagModel>,
+        record: RecordModel,
+        tagIdList: List<Long>,
         coroutineContext: CoroutineContext = Dispatchers.IO
     )
 

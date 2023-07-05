@@ -398,14 +398,14 @@ class EditRecordViewModel @Inject constructor(
             }
             // TODO 关联记录
             try {
-                saveRecordUseCase(
-                    recordEntity.copy(
-                        relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
-                        concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) "" else recordEntity.concessions,
-                        reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
-                    ),
-                    tagsData.first(),
-                )
+//                saveRecordUseCase(
+//                    recordEntity.copy(
+//                        relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
+//                        concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) "" else recordEntity.concessions,
+//                        reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
+//                    ),
+//                    tagsData.first(),
+//                )
                 onSaveSuccess.invoke()
             } catch (throwable: Throwable) {
                 // 保存失败
