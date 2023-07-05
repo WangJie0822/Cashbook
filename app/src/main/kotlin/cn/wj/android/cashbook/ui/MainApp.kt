@@ -364,10 +364,10 @@ fun CashbookNavHost(
             },
             onBackClick = navController::popBackStack,
         )
-        // 选择关联记录
-        selectRelatedRecordScreen(
-            onBackClick = navController::popBackStack,
-        )
+        // TODO 选择关联记录
+//        selectRelatedRecordScreen(
+//            onBackClick = navController::popBackStack,
+//        )
 
         // 我的资产
         myAssetScreen(

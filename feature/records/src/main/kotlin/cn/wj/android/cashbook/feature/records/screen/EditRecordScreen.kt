@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.toIntOrZero
+import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_TIME
 import cn.wj.android.cashbook.core.common.tools.dateFormat
@@ -56,6 +59,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
@@ -64,10 +68,12 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.UiState
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
+import cn.wj.android.cashbook.feature.records.model.EditRecordUiData
 import cn.wj.android.cashbook.feature.records.model.TabItem
-import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordNewViewModel
+import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -96,26 +102,22 @@ internal fun EditRecordRoute(
     ) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EditRecordNewViewModel = hiltViewModel<EditRecordNewViewModel>().apply {
+    viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
         updateRecordId(recordId)
         onTypeSelect(typeId)
     },
 ) {
 
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selectedTypeCategory by viewModel.selectedTypeCategoryData.collectAsStateWithLifecycle()
-    val amount by viewModel.amountData.collectAsStateWithLifecycle()
-    val charges by viewModel.chargesData.collectAsStateWithLifecycle()
-    val concessions by viewModel.concessionsData.collectAsStateWithLifecycle()
-    val selectedTypeId by viewModel.selectedTypeIdData.collectAsStateWithLifecycle()
-    val remark by viewModel.remarkData.collectAsStateWithLifecycle()
-    val assetName by viewModel.assetNameData.collectAsStateWithLifecycle()
-    val relatedAssetName by viewModel.relatedAssetNameData.collectAsStateWithLifecycle()
-    val dateTime by viewModel.dateTimeData.collectAsStateWithLifecycle()
     val tagText by viewModel.tagTextData.collectAsStateWithLifecycle()
     val selectedTagIdList by viewModel.displayTagIdListData.collectAsStateWithLifecycle()
-    val reimbursable by viewModel.reimbursableData.collectAsStateWithLifecycle()
+
+    val selectedTypeId =
+        ((uiState as? UiState.Success<*>)?.data as? EditRecordUiData)?.selectedTypeId ?: -1L
 
     EditRecordScreen(
+        uiState = uiState,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         dismissBookmark = viewModel::dismissBookmark,
         onBackClick = onBackClick,
@@ -123,26 +125,17 @@ internal fun EditRecordRoute(
         onTypeCategorySelect = viewModel::onTypeCategorySelect,
         bottomSheetType = viewModel.bottomSheetType,
         dismissBottomSheet = viewModel::dismissBottomSheet,
-        amount = amount,
         onAmountClick = viewModel::onAmountClick,
         onAmountChange = viewModel::onAmountChange,
-        charges = charges,
         onChargesClick = viewModel::onChargesClick,
         onChargesChange = viewModel::onChargeChange,
-        concessions = concessions,
         onConcessionsClick = viewModel::onConcessionsClick,
         onConcessionsChange = viewModel::onConcessionsChange,
         typeListContent = typeListContent,
-        selectedTypeId = selectedTypeId,
         onTypeSelect = viewModel::onTypeSelect,
-        remark = remark,
         onRemarkChange = viewModel::onRemarkChange,
-        assetName = assetName,
         onAssetClick = viewModel::onAssetClick,
-        onAssetChange = viewModel::onAssetChange,
-        relatedAssetName = relatedAssetName,
         onRelatedAssetClick = viewModel::onRelatedAssetClick,
-        onRelatedAssetChange = viewModel::onRelatedAssetChange,
         selectAssetBottomSheetContent = {
             selectAssetBottomSheetContent(
                 currentTypeId = selectedTypeId,
@@ -157,18 +150,15 @@ internal fun EditRecordRoute(
                 onAssetChange = viewModel::onRelatedAssetChange,
             )
         },
-        dateTime = dateTime,
         onDateTimeChange = viewModel::onDateTimeChange,
         tagText = tagText,
         onTagClick = viewModel::onTagClick,
-        onTagChange = viewModel::onTagChange,
         selectTagBottomSheetContent = {
             selectTagBottomSheetContent(
                 selectedTagIdList = selectedTagIdList,
                 onTagIdListChange = viewModel::onTagChange,
             )
         },
-        reimbursable = reimbursable,
         onReimbursableClick = viewModel::onReimbursableClick,
         onSaveClick = { viewModel.onSaveClick(onSuccess = onBackClick) },
         modifier = modifier,
@@ -178,6 +168,7 @@ internal fun EditRecordRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordScreen(
+    uiState: UiState,
     // Snackbar 提示
     shouldDisplayBookmark: EditRecordBookmarkEnum,
     dismissBookmark: () -> Unit,
@@ -189,15 +180,12 @@ internal fun EditRecordScreen(
     bottomSheetType: EditRecordBottomSheetEnum,
     dismissBottomSheet: () -> Unit,
     // 金额
-    amount: String,
     onAmountClick: () -> Unit,
     onAmountChange: (String) -> Unit,
     // 手续费
-    charges: String,
     onChargesClick: () -> Unit,
     onChargesChange: (String) -> Unit,
     // 优惠
-    concessions: String,
     onConcessionsClick: () -> Unit,
     onConcessionsChange: (String) -> Unit,
     // 类型列表
@@ -209,31 +197,22 @@ internal fun EditRecordScreen(
         headerContent: @Composable (modifier: Modifier) -> Unit,
         footerContent: @Composable (modifier: Modifier) -> Unit,
     ) -> Unit,
-    selectedTypeId: Long,
     onTypeSelect: (Long) -> Unit,
     // 备注
-    remark: String,
     onRemarkChange: (String) -> Unit,
     // 资产
-    assetName: String,
     onAssetClick: () -> Unit,
-    onAssetChange: (Long) -> Unit,
     // 关联资产
-    relatedAssetName: String,
     onRelatedAssetClick: () -> Unit,
-    onRelatedAssetChange: (Long) -> Unit,
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
     // 时间
-    dateTime: String,
     onDateTimeChange: (String) -> Unit,
     // 标签
     tagText: String,
     onTagClick: () -> Unit,
-    onTagChange: (List<Long>) -> Unit,
     selectTagBottomSheetContent: @Composable () -> Unit,
     // 报销
-    reimbursable: Boolean,
     onReimbursableClick: () -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -289,17 +268,6 @@ internal fun EditRecordScreen(
         RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
     }
 
-    // 备注文本
-    val remarkTextState = remember {
-        TextFieldState(
-            defaultText = remark,
-            filter = { text ->
-                onRemarkChange(text)
-                true
-            },
-        )
-    }
-
     CashbookBottomSheetScaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -322,27 +290,33 @@ internal fun EditRecordScreen(
             when (bottomSheetType) {
 
                 EditRecordBottomSheetEnum.AMOUNT -> {
-                    Calculator(
-                        defaultText = amount,
-                        primaryColor = primaryColor,
-                        onConfirmClick = onAmountChange,
-                    )
+                    ((uiState as? UiState.Success<*>)?.data as? EditRecordUiData)?.let { data ->
+                        Calculator(
+                            defaultText = data.amountText,
+                            primaryColor = primaryColor,
+                            onConfirmClick = onAmountChange,
+                        )
+                    }
                 }
 
                 EditRecordBottomSheetEnum.CHARGES -> {
-                    Calculator(
-                        defaultText = charges,
-                        primaryColor = primaryColor,
-                        onConfirmClick = onChargesChange,
-                    )
+                    ((uiState as? UiState.Success<*>)?.data as? EditRecordUiData)?.let { data ->
+                        Calculator(
+                            defaultText = data.chargesText,
+                            primaryColor = primaryColor,
+                            onConfirmClick = onChargesChange,
+                        )
+                    }
                 }
 
                 EditRecordBottomSheetEnum.CONCESSIONS -> {
-                    Calculator(
-                        defaultText = concessions,
-                        primaryColor = primaryColor,
-                        onConfirmClick = onConcessionsChange,
-                    )
+                    ((uiState as? UiState.Success<*>)?.data as? EditRecordUiData)?.let { data ->
+                        Calculator(
+                            defaultText = data.concessionsText,
+                            primaryColor = primaryColor,
+                            onConfirmClick = onConcessionsChange,
+                        )
+                    }
                 }
 
                 EditRecordBottomSheetEnum.ASSETS -> {
@@ -365,158 +339,195 @@ internal fun EditRecordScreen(
                 }
             }
         },
-        content = {
-            typeListContent(
-                modifier = Modifier.padding(it),
-                typeCategory = selectedTypeCategory,
-                selectedTypeId = selectedTypeId,
-                onTypeSelect = onTypeSelect,
-                headerContent = { modifier ->
-                    Column(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                    ) {
-                        // 金额显示
-                        Amount(
-                            amount = amount,
-                            primaryColor = primaryColor,
-                            onAmountClick = onAmountClick,
-                        )
-                        Divider()
-                        Text(
-                            text = stringResource(id = R.string.record_type),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        )
-                    }
-                },
-                footerContent = { modifier ->
-                    Column(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                    ) {
-                        Divider()
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier.padding(paddingValues),
+            ) {
+                if (uiState == UiState.Loading) {
+                    Empty(
+                        imagePainter = painterResource(id = R.drawable.vector_no_data_200),
+                        hintText = stringResource(id = R.string.data_in_loading),
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                } else {
+                    ((uiState as? UiState.Success<*>)?.data as? EditRecordUiData)?.let { data ->
+                        typeListContent(
+                            modifier = Modifier.fillMaxSize(),
+                            typeCategory = selectedTypeCategory,
+                            selectedTypeId = data.selectedTypeId,
+                            onTypeSelect = onTypeSelect,
+                            headerContent = { modifier ->
+                                Column(
+                                    modifier = modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp)
+                                ) {
+                                    // 金额显示
+                                    Amount(
+                                        amount = data.amountText,
+                                        primaryColor = primaryColor,
+                                        onAmountClick = onAmountClick,
+                                    )
+                                    Divider()
+                                    Text(
+                                        text = stringResource(id = R.string.record_type),
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                                    )
+                                }
+                            },
+                            footerContent = { modifier ->
+                                Column(
+                                    modifier = modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp)
+                                ) {
+                                    Divider()
 
-                        // 备注信息
-                        CompatTextField(
-                            textFieldState = remarkTextState,
-                            label = { Text(text = stringResource(id = R.string.remark)) },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                        )
-
-                        // 其他选项
-                        FlowRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            mainAxisSpacing = 8.dp,
-                            crossAxisSpacing = 4.dp,
-                        ) {
-                            // 目标资产
-                            val hasAsset = assetName.isNotBlank()
-                            FilterChip(
-                                selected = hasAsset,
-                                onClick = onAssetClick,
-                                label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":$assetName" else "") },
-                            )
-
-                            if (selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                                // 只有转账类型显示关联资产
-                                val hasRelatedAsset = relatedAssetName.isNotBlank()
-                                FilterChip(
-                                    selected = hasRelatedAsset,
-                                    onClick = onRelatedAssetClick,
-                                    label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":$relatedAssetName" else "") },
-                                )
-                            }
-
-                            // 记录时间
-                            (LocalContext.current as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                                FilterChip(
-                                    selected = true,
-                                    onClick = {
-                                        var date = dateTime.parseDateLong().dateFormat(
-                                            DATE_FORMAT_DATE
+                                    // 备注文本
+                                    val remarkTextState = remember {
+                                        TextFieldState(
+                                            defaultText = data.remarkText,
+                                            filter = { text ->
+                                                onRemarkChange(text)
+                                                true
+                                            },
                                         )
-                                        var time = dateTime.parseDateLong().dateFormat(
-                                            DATE_FORMAT_TIME
+                                    }
+
+                                    // 备注信息
+                                    CompatTextField(
+                                        textFieldState = remarkTextState,
+                                        label = { Text(text = stringResource(id = R.string.remark)) },
+                                        colors = TextFieldDefaults.outlinedTextFieldColors(),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                    )
+
+                                    // 其他选项
+                                    FlowRow(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        mainAxisSpacing = 8.dp,
+                                        crossAxisSpacing = 4.dp,
+                                    ) {
+                                        // 目标资产
+                                        val hasAsset = data.assetText.isNotBlank()
+                                        FilterChip(
+                                            selected = hasAsset,
+                                            onClick = onAssetClick,
+                                            label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":${data.assetText}" else "") },
                                         )
-                                        val datePicker = MaterialDatePicker.Builder.datePicker()
-                                            .setSelection(dateTime.parseDateLong())
-                                            .build()
-                                        val timePicker = MaterialTimePicker.Builder()
-                                            .setTimeFormat(CLOCK_24H)
-                                            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-                                            .setHour(time.split(":").first().toIntOrZero())
-                                            .setMinute(time.split(":").last().toIntOrZero())
-                                            .build()
-                                        timePicker.addOnPositiveButtonClickListener {
-                                            time =
-                                                (timePicker.hour.completeZero() + ":" + timePicker.minute.completeZero())
-                                            onDateTimeChange("$date $time")
-                                        }
-                                        datePicker.addOnPositiveButtonClickListener { timeMs ->
-                                            date = timeMs.dateFormat(DATE_FORMAT_DATE)
-                                            timePicker.show(fm, "timePicker")
-                                        }
-                                        datePicker.show(fm, "datePicker")
-                                    },
-                                    label = { Text(text = dateTime) },
-                                )
-                            }
 
-
-                            // 标签
-                            val hasTag = tagText.isNotBlank()
-                            FilterChip(
-                                selected = hasTag,
-                                onClick = onTagClick,
-                                label = { Text(text = stringResource(id = R.string.tags) + if (hasTag) ":$tagText" else "") },
-                            )
-
-                            if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                                // 只有支出类型显示是否可报销
-                                FilterChip(
-                                    selected = reimbursable,
-                                    onClick = onReimbursableClick,
-                                    leadingIcon = {
-                                        if (reimbursable) {
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = null,
+                                        if (selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                                            // 只有转账类型显示关联资产
+                                            val hasRelatedAsset =
+                                                data.relatedAssetText.isNotBlank()
+                                            FilterChip(
+                                                selected = hasRelatedAsset,
+                                                onClick = onRelatedAssetClick,
+                                                label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":${data.relatedAssetText}" else "") },
                                             )
                                         }
-                                    },
-                                    label = { Text(text = stringResource(id = R.string.reimbursable)) },
-                                )
-                            }
 
-                            // 手续费
-                            val hasCharges = charges.isNotBlank()
-                            FilterChip(
-                                selected = hasCharges,
-                                onClick = onChargesClick,
-                                label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${Symbol.CNY}$charges" else "") },
-                            )
+                                        // 记录时间
+                                        (LocalContext.current as? FragmentActivity)?.supportFragmentManager?.let { fm ->
+                                            val dateTime = data.dateTimeText
+                                            FilterChip(
+                                                selected = true,
+                                                onClick = {
+                                                    var date =
+                                                        dateTime.parseDateLong().dateFormat(
+                                                            DATE_FORMAT_DATE
+                                                        )
+                                                    var time =
+                                                        dateTime.parseDateLong().dateFormat(
+                                                            DATE_FORMAT_TIME
+                                                        )
+                                                    val datePicker =
+                                                        MaterialDatePicker.Builder.datePicker()
+                                                            .setSelection(dateTime.parseDateLong())
+                                                            .build()
+                                                    val timePicker =
+                                                        MaterialTimePicker.Builder()
+                                                            .setTimeFormat(CLOCK_24H)
+                                                            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                                                            .setHour(
+                                                                time.split(":").first()
+                                                                    .toIntOrZero()
+                                                            )
+                                                            .setMinute(
+                                                                time.split(":").last()
+                                                                    .toIntOrZero()
+                                                            )
+                                                            .build()
+                                                    timePicker.addOnPositiveButtonClickListener {
+                                                        time =
+                                                            (timePicker.hour.completeZero() + ":" + timePicker.minute.completeZero())
+                                                        onDateTimeChange("$date $time")
+                                                    }
+                                                    datePicker.addOnPositiveButtonClickListener { timeMs ->
+                                                        date =
+                                                            timeMs.dateFormat(DATE_FORMAT_DATE)
+                                                        timePicker.show(fm, "timePicker")
+                                                    }
+                                                    datePicker.show(fm, "datePicker")
+                                                },
+                                                label = { Text(text = dateTime) },
+                                            )
+                                        }
 
-                            if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
-                                // 非收入类型才有优惠
-                                val hasConcessions = concessions.isNotBlank()
-                                FilterChip(
-                                    selected = hasConcessions,
-                                    onClick = onConcessionsClick,
-                                    label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${Symbol.CNY}$concessions" else "") },
-                                )
-                            }
 
-                            // TODO 关联的支出记录
-                            if (selectedTypeCategory == RecordTypeCategoryEnum.INCOME/* FIXME && selectedType?.needRelated == true*/) {
+                                        // 标签
+                                        val hasTag = tagText.isNotBlank()
+                                        FilterChip(
+                                            selected = hasTag,
+                                            onClick = onTagClick,
+                                            label = { Text(text = stringResource(id = R.string.tags) + if (hasTag) ":$tagText" else "") },
+                                        )
+
+                                        if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+                                            // 只有支出类型显示是否可报销
+                                            val reimbursable = data.reimbursable
+                                            FilterChip(
+                                                selected = reimbursable,
+                                                onClick = onReimbursableClick,
+                                                leadingIcon = {
+                                                    if (reimbursable) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Check,
+                                                            contentDescription = null,
+                                                        )
+                                                    }
+                                                },
+                                                label = { Text(text = stringResource(id = R.string.reimbursable)) },
+                                            )
+                                        }
+
+                                        // 手续费
+                                        val hasCharges = data.chargesText.isNotBlank()
+                                        FilterChip(
+                                            selected = hasCharges,
+                                            onClick = onChargesClick,
+                                            label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${data.chargesText.withCNY()}" else "") },
+                                        )
+
+                                        if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
+                                            // 非收入类型才有优惠
+                                            val hasConcessions =
+                                                data.concessionsText.isNotBlank()
+                                            FilterChip(
+                                                selected = hasConcessions,
+                                                onClick = onConcessionsClick,
+                                                label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${data.concessionsText.withCNY()}" else "") },
+                                            )
+                                        }
+
+                                        // TODO 关联的支出记录
+                                        if (selectedTypeCategory == RecordTypeCategoryEnum.INCOME/* FIXME && selectedType?.needRelated == true*/) {
 //                                if (relatedRecordList.isEmpty()) {
 //                                    FilterChip(
 //                                        selected = false,
@@ -532,11 +543,14 @@ internal fun EditRecordScreen(
 //                                        )
 //                                    }
 //                                }
-                            }
-                        }
+                                        }
+                                    }
+                                }
+                            },
+                        )
                     }
-                },
-            )
+                }
+            }
         },
     )
 }
@@ -636,6 +650,19 @@ private fun EditRecordScreenPreview() {
     CashbookTheme {
         CashbookGradientBackground {
             EditRecordScreen(
+                uiState = UiState.Success(
+                    EditRecordUiData(
+                        amountText = "100",
+                        chargesText = "10",
+                        concessionsText = "",
+                        remarkText = "备注",
+                        assetText = "微信(￥1000)",
+                        relatedAssetText = "",
+                        dateTimeText = "2023-07-01 11:30",
+                        reimbursable = false,
+                        selectedTypeId = -1L,
+                    )
+                ),
                 shouldDisplayBookmark = EditRecordBookmarkEnum.NONE,
                 dismissBookmark = {},
                 selectedTypeCategory = RecordTypeCategoryEnum.EXPENDITURE,
@@ -643,18 +670,15 @@ private fun EditRecordScreenPreview() {
                 onBackClick = {},
                 bottomSheetType = EditRecordBottomSheetEnum.NONE,
                 dismissBottomSheet = {},
-                amount = "100",
                 onAmountClick = {},
                 onAmountChange = {},
-                charges = "10",
                 onChargesClick = {},
                 onChargesChange = {},
-                concessions = "13",
                 onConcessionsClick = {},
                 onConcessionsChange = {},
                 typeListContent = { modifier, _, _, _, headerContent, footerContent ->
                     Column(
-                        modifier = modifier,
+                        modifier = modifier.padding(horizontal = 16.dp),
                     ) {
                         headerContent(Modifier)
                         Text(
@@ -667,25 +691,16 @@ private fun EditRecordScreenPreview() {
                         footerContent(Modifier)
                     }
                 },
-                selectedTypeId = -1L,
                 onTypeSelect = {},
-                assetName = "微信",
                 onAssetClick = {},
-                onAssetChange = {},
-                relatedAssetName = "",
                 onRelatedAssetClick = {},
-                onRelatedAssetChange = {},
                 selectAssetBottomSheetContent = {},
                 selectRelatedAssetBottomSheetContent = {},
-                dateTime = "2023-07-01 11:30",
                 onDateTimeChange = {},
                 tagText = "",
                 onTagClick = {},
-                onTagChange = {},
                 selectTagBottomSheetContent = { },
-                remark = "",
                 onRemarkChange = {},
-                reimbursable = false,
                 onReimbursableClick = {},
                 onSaveClick = {},
             )

@@ -410,13 +410,19 @@ private fun FrontLayerContent(
                                         val totalExpenditure = key.dayExpand.toDoubleOrZero()
                                         val hasIncome = totalIncome != 0.0
                                         if (hasIncome) {
-                                            append(stringResource(id = R.string.income_with_colon) + Symbol.CNY + totalIncome.decimalFormat())
+                                            append(
+                                                stringResource(id = R.string.income_with_colon) + totalIncome.decimalFormat()
+                                                    .withCNY()
+                                            )
                                         }
                                         if (totalExpenditure != 0.0) {
                                             if (hasIncome) {
                                                 append(", ")
                                             }
-                                            append(stringResource(id = R.string.expend_with_colon) + Symbol.CNY + totalExpenditure.decimalFormat())
+                                            append(
+                                                stringResource(id = R.string.expend_with_colon) + totalExpenditure.decimalFormat()
+                                                    .withCNY()
+                                            )
                                         }
                                     },
                                     style = MaterialTheme.typography.bodySmall,
@@ -596,9 +602,7 @@ internal fun RecordListItem(
         },
         supportingText = {
             Text(
-                text = "${
-                    recordViewsEntity.recordTime.split(" ").first()
-                } ${recordViewsEntity.remark}"
+                text = "${recordViewsEntity.recordTime.split(" ").first()} ${recordViewsEntity.remark}"
             )
         },
         trailingContent = {
@@ -608,7 +612,7 @@ internal fun RecordListItem(
                 // TODO 关联记录
                 Text(
                     text = buildAnnotatedString {
-                        append("${Symbol.CNY}${recordViewsEntity.amount}")
+                        append(recordViewsEntity.amount.withCNY())
                     },
                     color = when (recordViewsEntity.typeCategory) {
                         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
@@ -628,7 +632,7 @@ internal fun RecordListItem(
                             }
                             if (hasCharges) {
                                 withStyle(style = SpanStyle(color = LocalExtendedColors.current.expenditure)) {
-                                    append("-${Symbol.CNY}${recordViewsEntity.charges}")
+                                    append("-${recordViewsEntity.charges}".withCNY())
                                 }
                             }
                             if (hasConcessions) {
@@ -636,7 +640,7 @@ internal fun RecordListItem(
                                     append(" ")
                                 }
                                 withStyle(style = SpanStyle(color = LocalExtendedColors.current.income)) {
-                                    append("+${Symbol.CNY}${recordViewsEntity.concessions}")
+                                    append("+${recordViewsEntity.concessions.withCNY()}")
                                 }
                             }
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
@@ -728,7 +732,7 @@ internal fun RecordDetailsSheet(
                                     )
                                 }
                                 Text(
-                                    text = "${Symbol.CNY}${recordEntity.amount}",
+                                    text = recordEntity.amount.withCNY(),
                                     color = when (recordEntity.typeCategory) {
                                         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
                                         RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
@@ -746,7 +750,7 @@ internal fun RecordDetailsSheet(
                             headlineText = { Text(text = stringResource(id = R.string.charges)) },
                             trailingContent = {
                                 Text(
-                                    text = "-${Symbol.CNY}${recordEntity.charges}",
+                                    text = "-${recordEntity.charges}".withCNY(),
                                     color = LocalExtendedColors.current.expenditure,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
@@ -760,7 +764,7 @@ internal fun RecordDetailsSheet(
                             headlineText = { Text(text = stringResource(id = R.string.concessions)) },
                             trailingContent = {
                                 Text(
-                                    text = "+${Symbol.CNY}${recordEntity.concessions}",
+                                    text = "+${recordEntity.concessions.withCNY()}",
                                     color = LocalExtendedColors.current.income,
                                     style = MaterialTheme.typography.labelLarge,
                                 )

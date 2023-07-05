@@ -4,13 +4,15 @@ import cn.wj.android.cashbook.core.common.Symbol
 
 /** 给字符串添加上 CNY 符号 */
 fun String.withCNY(): String {
-    if (this.contains(Symbol.CNY)) {
-        return this
-    }
-    val negative = this.startsWith("-")
-    return if (negative) {
-        "-${Symbol.CNY}${this.replace("-", "")}"
+    val source = if (this.contains(Symbol.CNY)) {
+        this.replace(Symbol.CNY, "")
     } else {
-        "${Symbol.CNY}$this"
+        this
+    }
+    val negative = source.startsWith("-")
+    return if (negative) {
+        "-${Symbol.CNY}${source.replace("-", "")}"
+    } else {
+        "${Symbol.CNY}$source"
     }
 }
