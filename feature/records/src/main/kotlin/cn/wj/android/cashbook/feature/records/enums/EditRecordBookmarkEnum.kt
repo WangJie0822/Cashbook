@@ -5,7 +5,7 @@ package cn.wj.android.cashbook.feature.records.enums
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/26
  */
-enum class EditRecordBookmark {
+enum class EditRecordBookmarkEnum {
 
     /** 无提示 */
     NONE,

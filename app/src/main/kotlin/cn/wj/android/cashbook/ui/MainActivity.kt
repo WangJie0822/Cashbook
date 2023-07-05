@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Window
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -13,7 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -28,13 +28,18 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : FragmentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private val verifyViewModel: VerifyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
 
         logger().i("onCreate(savedInstanceState)")
@@ -58,9 +63,6 @@ class MainActivity : FragmentActivity() {
                 is MainActivityUiState.Success -> false
             }
         }
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             val systemUiController = rememberSystemUiController()

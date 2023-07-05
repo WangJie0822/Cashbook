@@ -25,7 +25,7 @@ import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRelatedRecordListUseCase
 import cn.wj.android.cashbook.domain.usecase.GetDefaultTagListUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
-import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmark
+import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -50,7 +50,7 @@ class EditRecordViewModel @Inject constructor(
     private val saveRecordUseCase: SaveRecordUseCase,
 ) : ViewModel() {
 
-    var shouldDisplayBookmark by mutableStateOf(EditRecordBookmark.NONE)
+    var shouldDisplayBookmark by mutableStateOf(EditRecordBookmarkEnum.NONE)
 
     /** 显示底部弹窗数据 */
     private val _bottomSheetData: MutableStateFlow<EditRecordBottomSheetEnum> =
@@ -62,7 +62,7 @@ class EditRecordViewModel @Inject constructor(
 
     /** 默认记录数据 */
     private val defaultRecordData: Flow<RecordEntity> = recordIdData.mapLatest {
-        getDefaultRecordUseCase(it)
+        getDefaultRecordUseCase(it).asEntity()
     }
 
     /** 经过修改的记录数据 */
@@ -379,21 +379,21 @@ class EditRecordViewModel @Inject constructor(
             val recordEntity = recordData.first()
             if (recordEntity.amount.toDoubleOrZero() == 0.0) {
                 // 记录金额不能为 0
-                shouldDisplayBookmark = EditRecordBookmark.AMOUNT_MUST_NOT_BE_ZERO
+                shouldDisplayBookmark = EditRecordBookmarkEnum.AMOUNT_MUST_NOT_BE_ZERO
                 return@launch
             }
             // 检查类型数据
             val typeEntity = selectedTypeData.first()
             if (null == typeEntity) {
                 // 类型不能为空
-                shouldDisplayBookmark = EditRecordBookmark.TYPE_MUST_NOT_BE_NULL
+                shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_MUST_NOT_BE_NULL
                 return@launch
             }
             // 支出分类
             val typeCategory = typeCategory.first()
             if (typeEntity.typeCategory != typeCategory) {
                 // 类型与支出类型不匹配
-                shouldDisplayBookmark = EditRecordBookmark.TYPE_NOT_MATCH_CATEGORY
+                shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_NOT_MATCH_CATEGORY
                 return@launch
             }
             // TODO 关联记录
@@ -410,13 +410,13 @@ class EditRecordViewModel @Inject constructor(
             } catch (throwable: Throwable) {
                 // 保存失败
                 this@EditRecordViewModel.logger().e(throwable, "saveRecord()")
-                shouldDisplayBookmark = EditRecordBookmark.TYPE_NOT_MATCH_CATEGORY
+                shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_NOT_MATCH_CATEGORY
             }
         }
     }
 
     fun onBookmarkDismiss() {
-        shouldDisplayBookmark = EditRecordBookmark.NONE
+        shouldDisplayBookmark = EditRecordBookmarkEnum.NONE
     }
 }
 

@@ -18,20 +18,36 @@ interface RecordRepository {
 
     val currentMonthRecordListData: Flow<List<RecordModel>>
 
-    suspend fun queryById(recordId: Long): RecordModel?
+    suspend fun queryById(
+        recordId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    ): RecordModel?
 
-    suspend fun queryRelatedById(recordId: Long): List<RecordModel>
+    suspend fun queryRelatedById(
+        recordId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    ): List<RecordModel>
 
-    suspend fun updateRecord(record: RecordModel, tags: List<TagModel>)
+    suspend fun updateRecord(
+        record: RecordModel, tags: List<TagModel>,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
 
-    suspend fun deleteRecord(recordId: Long)
+    suspend fun deleteRecord(
+        recordId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
 
     suspend fun queryExpenditureRecordAfterDate(
         reimburse: Boolean,
-        dataTime: Long
+        dataTime: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO
     ): List<RecordModel>
 
-    suspend fun queryExpenditureRecordByAmountOrRemark(keyword: String): List<RecordViewsEntity>
+    suspend fun queryExpenditureRecordByAmountOrRemark(
+        keyword: String,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    ): List<RecordViewsEntity>
 
     suspend fun queryPagingRecordListByAssetId(
         assetId: Long,

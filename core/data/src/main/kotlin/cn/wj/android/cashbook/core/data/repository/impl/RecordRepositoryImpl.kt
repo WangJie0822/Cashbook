@@ -41,18 +41,27 @@ class RecordRepositoryImpl @Inject constructor(
             queryCurrentMonthRecordByBooksId(appData.currentBookId)
         }
 
-    override suspend fun queryById(recordId: Long): RecordModel? = withContext(Dispatchers.IO) {
+    override suspend fun queryById(
+        recordId: Long,
+        coroutineContext: CoroutineContext
+    ): RecordModel? = withContext(coroutineContext) {
         recordDao.queryById(recordId)?.asModel()
     }
 
-    override suspend fun queryRelatedById(recordId: Long): List<RecordModel> =
-        withContext(Dispatchers.IO) {
+    override suspend fun queryRelatedById(
+        recordId: Long,
+        coroutineContext: CoroutineContext
+    ): List<RecordModel> =
+        withContext(coroutineContext) {
             recordDao.queryRelatedById(recordId)
                 .map { it.asModel() }
         }
 
-    private suspend fun queryCurrentMonthRecordByBooksId(booksId: Long): List<RecordModel> =
-        withContext(Dispatchers.IO) {
+    private suspend fun queryCurrentMonthRecordByBooksId(
+        booksId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    ): List<RecordModel> =
+        withContext(coroutineContext) {
             val monthFirst =
                 "${Calendar.getInstance().timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00"
             val result = recordDao.queryByBooksIdAfterDate(booksId, monthFirst.parseDateLong())
@@ -61,22 +70,29 @@ class RecordRepositoryImpl @Inject constructor(
             result
         }
 
-    override suspend fun updateRecord(record: RecordModel, tags: List<TagModel>) =
-        withContext(Dispatchers.IO) {
+    override suspend fun updateRecord(
+        record: RecordModel, tags: List<TagModel>,
+        coroutineContext: CoroutineContext
+    ) =
+        withContext(coroutineContext) {
             logger().i("updateRecord(record = <$record>, tags = <$tags>")
             transactionDao.updateRecordTransaction(record.asTable(), tags.map { it.id })
             recordDataVersion.updateVersion()
         }
 
-    override suspend fun deleteRecord(recordId: Long) = withContext(Dispatchers.IO) {
+    override suspend fun deleteRecord(
+        recordId: Long,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
         transactionDao.deleteRecordTransaction(recordId)
         recordDataVersion.updateVersion()
     }
 
     override suspend fun queryExpenditureRecordAfterDate(
         reimburse: Boolean,
-        dataTime: Long
-    ): List<RecordModel> = withContext(Dispatchers.IO) {
+        dataTime: Long,
+        coroutineContext: CoroutineContext
+    ): List<RecordModel> = withContext(coroutineContext) {
         val currentBookId = appPreferencesDataSource.appData.first().currentBookId
         if (reimburse) {
             recordDao.queryReimburseByBooksIdAfterDate(currentBookId, dataTime)
@@ -86,8 +102,11 @@ class RecordRepositoryImpl @Inject constructor(
             .map { it.asModel() }
     }
 
-    override suspend fun queryExpenditureRecordByAmountOrRemark(keyword: String): List<RecordViewsEntity> =
-        withContext(Dispatchers.IO) {
+    override suspend fun queryExpenditureRecordByAmountOrRemark(
+        keyword: String,
+        coroutineContext: CoroutineContext
+    ): List<RecordViewsEntity> =
+        withContext(coroutineContext) {
             val currentBookId = appPreferencesDataSource.appData.first().currentBookId
             recordDao.query(currentBookId).map {
                 RecordViewsEntity(

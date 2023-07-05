@@ -5,12 +5,9 @@ import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
-import cn.wj.android.cashbook.core.model.entity.RecordEntity
-import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordModel
-import cn.wj.android.cashbook.core.model.model.RecordViewsModel
-import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -26,15 +23,18 @@ class GetDefaultRecordUseCase @Inject constructor(
     private val appPreferencesDataSource: AppPreferencesDataSource
 ) {
 
-    suspend operator fun invoke(recordId: Long): RecordEntity = withContext(Dispatchers.IO) {
-        val result = recordRepository.queryById(recordId)?.asEntity()
+    suspend operator fun invoke(
+        recordId: Long,
+        coroutineContext: CoroutineContext = Dispatchers.IO,
+    ): RecordModel = withContext(coroutineContext) {
+        val result = recordRepository.queryById(recordId)
         if (null != result) {
             return@withContext result
         }
         // 没有查到对应记录，新建，创建默认记录数据
         val appDataModel = appPreferencesDataSource.appData.first()
         val recordTypeById = typeRepository.getNoNullRecordTypeById(appDataModel.defaultTypeId)
-        RecordEntity(
+        RecordModel(
             id = -1L,
             booksId = appDataModel.currentBookId,
             typeId = recordTypeById.id,
