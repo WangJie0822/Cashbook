@@ -26,77 +26,40 @@ class AssetInfoViewModel @Inject constructor(
     assetRepository: AssetRepository,
 ) : ViewModel() {
 
-    /** 当前资产 id */
-    private val assetId = MutableStateFlow(-1L)
-
-    /** 当前资产信息 */
-    private val currentAssetInfo = assetId.mapLatest { assetRepository.getAssetById(it) }
-
     /** 需显示详情的记录数据 */
     var viewRecordData by mutableStateOf<RecordViewsEntity?>(null)
+        private set
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+        private set
 
     /** 是否显示失败提示 */
     var shouldDisplayDeleteFailedBookmark by mutableStateOf(false)
+        private set
 
-    /** 标记 - 是否是信用卡 */
-    val isCreditCard = currentAssetInfo.mapLatest {
-        it?.type?.isCreditCard() ?: false
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = false,
-    )
+    /** 当前资产 id */
+    private val assetIdData = MutableStateFlow(-1L)
 
-    /** 资产名 */
-    val assetName = currentAssetInfo.mapLatest {
-        it?.name.orEmpty()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = "",
-    )
-
-    /** 资产余额或已使用额度 */
-    val balance = currentAssetInfo.mapLatest {
-        it?.balance ?: "0"
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = "0",
-    )
-
-    /** 总额度 */
-    val totalAmount = currentAssetInfo.mapLatest {
-        it?.totalAmount ?: "0"
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = "0",
-    )
-
-    /** 账单日 */
-    val billingDate = currentAssetInfo.mapLatest {
-        it?.billingDate.orEmpty()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = "",
-    )
-
-    /** 还款日 */
-    val repaymentDate = currentAssetInfo.mapLatest {
-        it?.repaymentDate.orEmpty()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = "",
-    )
+    val uiState = assetIdData.mapLatest {
+        val assetInfo = assetRepository.getAssetById(it)
+        AssetInfoUiState.Success(
+            assetName = assetInfo?.name.orEmpty(),
+            isCreditCard = assetInfo?.type?.isCreditCard() ?: false,
+            balance = assetInfo?.balance ?: "0",
+            totalAmount = assetInfo?.totalAmount ?: "0",
+            billingDate = assetInfo?.billingDate.orEmpty(),
+            repaymentDate = assetInfo?.repaymentDate.orEmpty(),
+        )
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = AssetInfoUiState.Loading,
+        )
 
     fun updateAssetId(id: Long) {
-        assetId.tryEmit(id)
+        assetIdData.tryEmit(id)
     }
 
     fun onDeleteRecordClick(recordId: Long) {
@@ -107,7 +70,6 @@ class AssetInfoViewModel @Inject constructor(
         if (result.isSuccess) {
             // 删除成功，隐藏弹窗
             dismissDeleteConfirmDialog()
-            shouldDisplayDeleteFailedBookmark = true
         } else {
             // 提示
             shouldDisplayDeleteFailedBookmark = true
@@ -129,4 +91,17 @@ class AssetInfoViewModel @Inject constructor(
     fun dismissBookmark() {
         shouldDisplayDeleteFailedBookmark = false
     }
+}
+
+sealed class AssetInfoUiState(val title: String) {
+    object Loading : AssetInfoUiState(title = "")
+
+    data class Success(
+        private val assetName: String,
+        val isCreditCard: Boolean,
+        val balance: String,
+        val totalAmount: String,
+        val billingDate: String,
+        val repaymentDate: String,
+    ) : AssetInfoUiState(title = assetName)
 }

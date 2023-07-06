@@ -36,12 +36,15 @@ class LauncherContentViewModel @Inject constructor(
 
     /** 删除记录失败错误信息 */
     var shouldDisplayDeleteFailedBookmark by mutableStateOf(0)
+        private set
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+        private set
 
     /** 记录详情数据 */
     var viewRecord by mutableStateOf<RecordViewsEntity?>(null)
+        private set
 
     /** 账本名 */
     val currentBookName = getCurrentBookUseCase()

@@ -16,12 +16,10 @@ import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
-import cn.wj.android.cashbook.core.ui.UiState
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
-import cn.wj.android.cashbook.feature.records.model.EditRecordUiData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,24 +84,23 @@ class EditRecordViewModel @Inject constructor(
                 }.withCNY()
             })"
         }.orEmpty()
-        UiState.Success(
-            EditRecordUiData(
-                amountText = record.amount.ifBlank { "0" },
-                chargesText = record.charges.clearZero(),
-                concessionsText = record.concessions.clearZero(),
-                remarkText = record.remark,
-                assetText = assetText,
-                relatedAssetText = relatedAssetText,
-                dateTimeText = record.recordTime,
-                reimbursable = record.reimbursable,
-                selectedTypeId = record.typeId,
-            )
+        EditRecordUiState.Success(
+            amountText = record.amount.ifBlank { "0" },
+            chargesText = record.charges.clearZero(),
+            concessionsText = record.concessions.clearZero(),
+            remarkText = record.remark,
+            assetText = assetText,
+            relatedAssetText = relatedAssetText,
+            dateTimeText = record.recordTime,
+            reimbursable = record.reimbursable,
+            selectedTypeId = record.typeId,
         )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = UiState.Loading,
-    )
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = EditRecordUiState.Loading,
+        )
 
     /** 类型数据 */
     private val mutableTypeCategoryData = MutableStateFlow<RecordTypeCategoryEnum?>(null)
@@ -310,6 +307,22 @@ class EditRecordViewModel @Inject constructor(
             }
         }
     }
+}
+
+sealed class EditRecordUiState(open val selectedTypeId: Long) {
+    object Loading : EditRecordUiState(selectedTypeId = -1L)
+
+    data class Success(
+        val amountText: String,
+        val chargesText: String,
+        val concessionsText: String,
+        val remarkText: String,
+        val assetText: String,
+        val relatedAssetText: String,
+        val dateTimeText: String,
+        val reimbursable: Boolean,
+        override val selectedTypeId: Long,
+    ) : EditRecordUiState(selectedTypeId = selectedTypeId)
 }
 
 private fun String.clearZero(): String {

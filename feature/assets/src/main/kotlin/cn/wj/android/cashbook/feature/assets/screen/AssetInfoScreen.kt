@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +39,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.ResultModel
@@ -45,6 +47,7 @@ import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
 
 @Composable
@@ -61,20 +64,10 @@ internal fun AssetInfoRoute(
     },
 ) {
 
-    val assetName by viewModel.assetName.collectAsStateWithLifecycle()
-    val isCreditCard by viewModel.isCreditCard.collectAsStateWithLifecycle()
-    val balance by viewModel.balance.collectAsStateWithLifecycle()
-    val totalAmount by viewModel.totalAmount.collectAsStateWithLifecycle()
-    val billingDate by viewModel.billingDate.collectAsStateWithLifecycle()
-    val repaymentDate by viewModel.repaymentDate.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AssetInfoScreen(
-        assetName = assetName,
-        isCreditCard = isCreditCard,
-        balance = balance,
-        totalAmount = totalAmount,
-        billingDate = billingDate,
-        repaymentDate = repaymentDate,
+        uiState = uiState,
         viewRecord = viewModel.viewRecordData,
         assetRecordListContent = { topContent ->
             assetRecordListContent(
@@ -109,12 +102,7 @@ internal fun AssetInfoRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AssetInfoScreen(
-    assetName: String,
-    isCreditCard: Boolean,
-    balance: String,
-    totalAmount: String,
-    billingDate: String,
-    repaymentDate: String,
+    uiState: AssetInfoUiState,
     viewRecord: RecordViewsEntity?,
     dialogState: DialogState,
     assetRecordListContent: @Composable (topContent: @Composable () -> Unit) -> Unit,
@@ -164,7 +152,7 @@ internal fun AssetInfoScreen(
         modifier = modifier,
         topBar = {
             CashbookTopAppBar(
-                text = assetName,
+                text = uiState.title,
                 onBackClick = onBackClick,
                 actions = {
                     IconButton(onClick = onEditAssetClick) {
@@ -204,14 +192,28 @@ internal fun AssetInfoScreen(
                     }
                 }
 
-                assetRecordListContent.invoke {
-                    AssetInfoContent(
-                        isCreditCard = isCreditCard,
-                        balance = balance,
-                        totalAmount = totalAmount,
-                        billingDate = billingDate,
-                        repaymentDate = repaymentDate,
-                    )
+                when (uiState) {
+                    is AssetInfoUiState.Loading -> {
+                        Empty(
+                            imagePainter = painterResource(id = R.drawable.vector_no_data_200),
+                            hintText = stringResource(id = R.string.data_in_loading),
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    }
+
+                    is AssetInfoUiState.Success -> {
+                        assetRecordListContent(
+                            topContent = {
+                                AssetInfoContent(
+                                    isCreditCard = uiState.isCreditCard,
+                                    balance = uiState.balance,
+                                    totalAmount = uiState.totalAmount,
+                                    billingDate = uiState.billingDate,
+                                    repaymentDate = uiState.repaymentDate,
+                                )
+                            },
+                        )
+                    }
                 }
             }
         },
@@ -331,12 +333,14 @@ private fun AssetInfoScreenPreview() {
             val billingDate = "20"
             val repaymentDate = ""
             AssetInfoScreen(
-                assetName = "现金",
-                isCreditCard = isCreditCard,
-                balance = balance,
-                totalAmount = totalAmount,
-                billingDate = billingDate,
-                repaymentDate = repaymentDate,
+                uiState = AssetInfoUiState.Success(
+                    assetName = "现金",
+                    isCreditCard = isCreditCard,
+                    balance = balance,
+                    totalAmount = totalAmount,
+                    billingDate = billingDate,
+                    repaymentDate = repaymentDate,
+                ),
                 viewRecord = null,
                 assetRecordListContent = {
                     AssetInfoContent(
@@ -372,12 +376,14 @@ private fun CreditAssetInfoScreenPreview() {
             val billingDate = "20"
             val repaymentDate = ""
             AssetInfoScreen(
-                assetName = "招商银行",
-                isCreditCard = isCreditCard,
-                balance = balance,
-                totalAmount = totalAmount,
-                billingDate = billingDate,
-                repaymentDate = repaymentDate,
+                uiState = AssetInfoUiState.Success(
+                    assetName = "招商银行",
+                    isCreditCard = isCreditCard,
+                    balance = balance,
+                    totalAmount = totalAmount,
+                    billingDate = billingDate,
+                    repaymentDate = repaymentDate,
+                ),
                 viewRecord = null,
                 assetRecordListContent = {
                     AssetInfoContent(
@@ -388,6 +394,29 @@ private fun CreditAssetInfoScreenPreview() {
                         repaymentDate = repaymentDate,
                     )
                 },
+                recordDetailSheetContent = {},
+                dialogState = DialogState.Dismiss,
+                confirmDeleteRecordDialogContent = {},
+                onEditAssetClick = {},
+                dismissBottomSheet = {},
+                shouldDisplayBookmark = false,
+                onBookmarkDismiss = {},
+                onBackClick = {},
+                modifier = Modifier,
+            )
+        }
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun AssetInfoScreenLoadingPreview() {
+    CashbookTheme {
+        CashbookGradientBackground {
+            AssetInfoScreen(
+                uiState = AssetInfoUiState.Loading,
+                viewRecord = null,
+                assetRecordListContent = {},
                 recordDetailSheetContent = {},
                 dialogState = DialogState.Dismiss,
                 confirmDeleteRecordDialogContent = {},
