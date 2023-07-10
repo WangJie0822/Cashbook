@@ -52,17 +52,19 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
+import cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetViewModel
 
 @Composable
@@ -75,31 +77,11 @@ internal fun EditAssetRoute(
     },
 ) {
 
-    val isCreditCard by viewModel.isCreditCard.collectAsStateWithLifecycle()
-    val classification by viewModel.classification.collectAsStateWithLifecycle()
-    val assetName by viewModel.assetName.collectAsStateWithLifecycle()
-    val totalAmount by viewModel.totalAmount.collectAsStateWithLifecycle()
-    val balance by viewModel.balance.collectAsStateWithLifecycle()
-    val openBank by viewModel.openBank.collectAsStateWithLifecycle()
-    val cardNo by viewModel.cardNo.collectAsStateWithLifecycle()
-    val remark by viewModel.remark.collectAsStateWithLifecycle()
-    val billingDate by viewModel.billingDate.collectAsStateWithLifecycle()
-    val repaymentDate by viewModel.repaymentDate.collectAsStateWithLifecycle()
-    val invisible by viewModel.invisible.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     EditAssetScreen(
         isCreate = assetId == -1L,
-        isCreditCard = isCreditCard,
-        classification = classification,
-        assetName = assetName,
-        totalAmount = totalAmount,
-        balance = balance,
-        openBank = openBank,
-        cardNo = cardNo,
-        remark = remark,
-        billingDate = billingDate,
-        repaymentDate = repaymentDate,
-        invisible = invisible,
+        uiState = uiState,
         onSelectClassificationClick = viewModel::showSelectClassificationSheet,
         onClassificationChange = viewModel::onClassificationChange,
         onBillingDateClick = viewModel::onBillingDateClick,
@@ -119,17 +101,7 @@ internal fun EditAssetRoute(
 @Composable
 internal fun EditAssetScreen(
     isCreate: Boolean,
-    isCreditCard: Boolean,
-    classification: AssetClassificationEnum,
-    assetName: String,
-    totalAmount: String,
-    balance: String,
-    openBank: String,
-    cardNo: String,
-    remark: String,
-    billingDate: String,
-    repaymentDate: String,
-    invisible: Boolean,
+    uiState: EditAssetUiState,
     onSelectClassificationClick: () -> Unit,
     onClassificationChange: (ClassificationTypeEnum?, AssetClassificationEnum) -> Unit,
     onBillingDateClick: () -> Unit,
@@ -169,50 +141,7 @@ internal fun EditAssetScreen(
         }
     }
 
-    // 标记 - 是否有银行信息
-    val hasBankInfo = classification.hasBankInfo
 
-    // 提示文本
-    val assetErrorText = stringResource(id = R.string.please_enter_asset_name)
-    val totalAmountErrorText = stringResource(id = R.string.please_enter_total_amount)
-
-    // 资产名
-    val assetNameTextState = remember(assetName) {
-        TextFieldState(defaultText = assetName,
-            validator = { it.isNotBlank() },
-            errorFor = { assetErrorText })
-    }
-    // 信用卡 - 总额度
-    val totalAmountTextState = remember(totalAmount) {
-        TextFieldState(defaultText = totalAmount,
-            validator = { it.isNotBlank() },
-            filter = { it.matches(Regex(PATTERN_SIGN_MONEY)) },
-            errorFor = { totalAmountErrorText })
-    }
-    // 余额 or 信用卡 - 已用额度
-    val balanceTextState = remember(balance) {
-        TextFieldState(defaultText = balance,
-            filter = { it.matches(Regex(PATTERN_SIGN_MONEY)) },
-            errorFor = { totalAmountErrorText })
-    }
-    // 开户行
-    val openBankTextState = remember(openBank) {
-        TextFieldState(
-            defaultText = openBank,
-        )
-    }
-    // 卡号
-    val cardNoTextState = remember(cardNo) {
-        TextFieldState(
-            defaultText = cardNo,
-        )
-    }
-    // 备注
-    val remarkTextState = remember(remark) {
-        TextFieldState(
-            defaultText = remark,
-        )
-    }
     ModalBottomSheetLayout(
         modifier = modifier,
         sheetState = sheetState,
@@ -224,28 +153,17 @@ internal fun EditAssetScreen(
         },
         content = {
             EditAssetScafold(
-                isCreate,
-                onBackClick,
-                assetNameTextState,
-                isCreditCard,
-                totalAmountTextState,
-                onSaveClick,
-                balanceTextState,
-                openBankTextState,
-                cardNoTextState,
-                remarkTextState,
-                dialogState,
-                onDialogDismiss,
-                onDaySelect,
-                onSelectClassificationClick,
-                classification,
-                hasBankInfo,
-                onBillingDateClick,
-                billingDate,
-                onRepaymentDateClick,
-                repaymentDate,
-                invisible,
-                onInvisibleChange
+                isCreate = isCreate,
+                uiState = uiState,
+                onBackClick = onBackClick,
+                onSaveClick = onSaveClick,
+                dialogState = dialogState,
+                onDialogDismiss = onDialogDismiss,
+                onDaySelect = onDaySelect,
+                onSelectClassificationClick = onSelectClassificationClick,
+                onBillingDateClick = onBillingDateClick,
+                onRepaymentDateClick = onRepaymentDateClick,
+                onInvisibleChange = onInvisibleChange,
             )
         },
     )
@@ -255,28 +173,63 @@ internal fun EditAssetScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun EditAssetScafold(
     isCreate: Boolean,
+    uiState: EditAssetUiState,
     onBackClick: () -> Unit,
-    assetNameTextState: TextFieldState,
-    isCreditCard: Boolean,
-    totalAmountTextState: TextFieldState,
     onSaveClick: (String, String, String, String, String, String, () -> Unit) -> Unit,
-    balanceTextState: TextFieldState,
-    openBankTextState: TextFieldState,
-    cardNoTextState: TextFieldState,
-    remarkTextState: TextFieldState,
     dialogState: DialogState,
     onDialogDismiss: () -> Unit,
     onDaySelect: (String) -> Unit,
     onSelectClassificationClick: () -> Unit,
-    classification: AssetClassificationEnum,
-    hasBankInfo: Boolean,
     onBillingDateClick: () -> Unit,
-    billingDate: String,
     onRepaymentDateClick: () -> Unit,
-    repaymentDate: String,
-    invisible: Boolean,
     onInvisibleChange: (Boolean) -> Unit
 ) {
+
+    // 标记 - 是否有银行信息
+    val hasBankInfo = uiState.classification.hasBankInfo
+
+    // 提示文本
+    val assetErrorText = stringResource(id = R.string.please_enter_asset_name)
+    val totalAmountErrorText = stringResource(id = R.string.please_enter_total_amount)
+
+    // 资产名
+    val assetNameTextState = remember(uiState.assetName) {
+        TextFieldState(defaultText = uiState.assetName,
+            validator = { it.isNotBlank() },
+            errorFor = { assetErrorText })
+    }
+    // 信用卡 - 总额度
+    val totalAmountTextState = remember(uiState.totalAmount) {
+        TextFieldState(defaultText = uiState.totalAmount,
+            validator = { it.isNotBlank() },
+            filter = { it.matches(Regex(PATTERN_SIGN_MONEY)) },
+            errorFor = { totalAmountErrorText })
+    }
+    // 余额 or 信用卡 - 已用额度
+    val balanceTextState = remember(uiState.balance) {
+        TextFieldState(defaultText = uiState.balance,
+            filter = { it.matches(Regex(PATTERN_SIGN_MONEY)) },
+            errorFor = { totalAmountErrorText })
+    }
+    // 开户行
+    val openBankTextState = remember(uiState.openBank) {
+        TextFieldState(
+            defaultText = uiState.openBank,
+        )
+    }
+    // 卡号
+    val cardNoTextState = remember(uiState.cardNo) {
+        TextFieldState(
+            defaultText = uiState.cardNo,
+        )
+    }
+    // 备注
+    val remarkTextState = remember(uiState.remark) {
+        TextFieldState(
+            defaultText = uiState.remark,
+        )
+    }
+
     CashbookScaffold(
         topBar = {
             CashbookTopAppBar(
@@ -285,22 +238,24 @@ private fun EditAssetScafold(
             )
         },
         floatingActionButton = {
-            CashbookFloatingActionButton(onClick = {
-                if (!assetNameTextState.isValid || !(isCreditCard && totalAmountTextState.isValid)) {
-                    // 不满足必要条件
-                } else {
-                    onSaveClick.invoke(
-                        assetNameTextState.text,
-                        totalAmountTextState.text,
-                        balanceTextState.text,
-                        openBankTextState.text,
-                        cardNoTextState.text,
-                        remarkTextState.text,
-                        onBackClick,
-                    )
+            if (uiState is EditAssetUiState.Success) {
+                CashbookFloatingActionButton(onClick = {
+                    if (!assetNameTextState.isValid || !(uiState.isCreditCard && totalAmountTextState.isValid)) {
+                        // 不满足必要条件
+                    } else {
+                        onSaveClick.invoke(
+                            assetNameTextState.text,
+                            totalAmountTextState.text,
+                            balanceTextState.text,
+                            openBankTextState.text,
+                            cardNoTextState.text,
+                            remarkTextState.text,
+                            onBackClick,
+                        )
+                    }
+                }) {
+                    Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
                 }
-            }) {
-                Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
             }
         },
     ) { paddingValues ->
@@ -314,198 +269,207 @@ private fun EditAssetScafold(
                 )
             }
 
-            Column(
-                modifier = Modifier.verticalScroll(state = rememberScrollState()),
-            ) {
-                TranparentListItem(
-                    modifier = Modifier.clickable(onClick = onSelectClassificationClick),
-                    headlineText = {
-                        Text(
-                            text = stringResource(id = R.string.asset_classification),
-                            modifier = Modifier.padding(start = 16.dp)
+            when (uiState) {
+                is EditAssetUiState.Loading -> {
+                    Loading()
+                }
+
+                is EditAssetUiState.Success -> {
+                    Column(
+                        modifier = Modifier.verticalScroll(state = rememberScrollState()),
+                    ) {
+                        TranparentListItem(
+                            modifier = Modifier.clickable(onClick = onSelectClassificationClick),
+                            headlineText = {
+                                Text(
+                                    text = stringResource(id = R.string.asset_classification),
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            },
+                            trailingContent = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = uiState.classification.iconResId),
+                                        contentDescription = null,
+                                        tint = Color.Unspecified,
+                                    )
+                                    Text(
+                                        text = stringResource(id = uiState.classification.nameResId),
+                                        modifier = Modifier.padding(horizontal = 8.dp)
+                                    )
+                                    Icon(
+                                        imageVector = CashbookIcons.KeyboardArrowRight,
+                                        contentDescription = null,
+                                    )
+                                }
+                            },
                         )
-                    },
-                    trailingContent = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                painter = painterResource(id = classification.iconResId),
-                                contentDescription = null,
-                                tint = Color.Unspecified,
-                            )
-                            Text(
-                                text = stringResource(id = classification.nameResId),
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            )
-                            Icon(
-                                imageVector = CashbookIcons.KeyboardArrowRight,
-                                contentDescription = null,
+
+                        CommonDivider(
+                            modifier = Modifier.height(8.dp),
+                            color = DividerDefaults.color.copy(alpha = 0.1f)
+                        )
+
+                        CompatTextField(
+                            textFieldState = assetNameTextState,
+                            label = { Text(text = stringResource(id = R.string.asset_name)) },
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                                .padding(horizontal = 16.dp),
+                        )
+
+                        if (uiState.isCreditCard) {
+                            // 信用卡账号，显示总额度
+                            CompatTextField(
+                                textFieldState = totalAmountTextState,
+                                label = { Text(text = stringResource(id = R.string.total_amount)) },
+                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                                    .padding(horizontal = 16.dp),
                             )
                         }
-                    },
-                )
 
-                CommonDivider(
-                    modifier = Modifier.height(8.dp),
-                    color = DividerDefaults.color.copy(alpha = 0.1f)
-                )
+                        // 余额 or 信用卡-已用额度
+                        CompatTextField(
+                            textFieldState = balanceTextState,
+                            label = { Text(text = stringResource(id = if (uiState.isCreditCard) R.string.arrears else R.string.balance)) },
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                                .padding(horizontal = 16.dp),
+                        )
 
-                CompatTextField(
-                    textFieldState = assetNameTextState,
-                    label = { Text(text = stringResource(id = R.string.asset_name)) },
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .padding(horizontal = 16.dp),
-                )
-
-                if (isCreditCard) {
-                    // 信用卡账号，显示总额度
-                    CompatTextField(
-                        textFieldState = totalAmountTextState,
-                        label = { Text(text = stringResource(id = R.string.total_amount)) },
-                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .padding(horizontal = 16.dp),
-                    )
-                }
-
-                // 余额 or 信用卡-已用额度
-                CompatTextField(
-                    textFieldState = balanceTextState,
-                    label = { Text(text = stringResource(id = if (isCreditCard) R.string.arrears else R.string.balance)) },
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .padding(horizontal = 16.dp),
-                )
-
-                if (hasBankInfo) {
-                    // 开户行
-                    CompatTextField(
-                        textFieldState = openBankTextState,
-                        label = { Text(text = stringResource(id = R.string.open_bank)) },
-                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .padding(horizontal = 16.dp),
-                    )
-                    // 卡号
-                    CompatTextField(
-                        textFieldState = cardNoTextState,
-                        label = { Text(text = stringResource(id = R.string.card_no)) },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Next, keyboardType = KeyboardType.Number
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .padding(horizontal = 16.dp),
-                    )
-                }
-
-                // 备注
-                CompatTextField(
-                    textFieldState = remarkTextState,
-                    label = { Text(text = stringResource(id = R.string.remark)) },
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .padding(horizontal = 16.dp),
-                )
-
-                CommonDivider(
-                    modifier = Modifier.height(8.dp),
-                    color = DividerDefaults.color.copy(alpha = 0.1f)
-                )
-
-                if (isCreditCard) {
-                    TranparentListItem(
-                        modifier = Modifier.clickable(onClick = onBillingDateClick),
-                        headlineText = {
-                            Text(
-                                text = stringResource(id = R.string.billing_date),
-                                modifier = Modifier.padding(start = 16.dp)
+                        if (hasBankInfo) {
+                            // 开户行
+                            CompatTextField(
+                                textFieldState = openBankTextState,
+                                label = { Text(text = stringResource(id = R.string.open_bank)) },
+                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                                    .padding(horizontal = 16.dp),
                             )
-                        },
-                        trailingContent = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                val billingDateText = if (billingDate.isBlank()) {
-                                    stringResource(id = R.string.un_set)
-                                } else {
-                                    billingDate + stringResource(id = R.string.day)
-                                }
-                                Text(
-                                    text = billingDateText,
-                                    modifier = Modifier.padding(horizontal = 8.dp)
-                                )
-                                Icon(
-                                    imageVector = CashbookIcons.KeyboardArrowRight,
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                    )
-
-                    TranparentListItem(
-                        modifier = Modifier.clickable(onClick = onRepaymentDateClick),
-                        headlineText = {
-                            Text(
-                                text = stringResource(id = R.string.repayment_date),
-                                modifier = Modifier.padding(start = 16.dp)
+                            // 卡号
+                            CompatTextField(
+                                textFieldState = cardNoTextState,
+                                label = { Text(text = stringResource(id = R.string.card_no)) },
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Next, keyboardType = KeyboardType.Number
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                                    .padding(horizontal = 16.dp),
                             )
-                        },
-                        trailingContent = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                val repaymentDateText = if (repaymentDate.isBlank()) {
-                                    stringResource(id = R.string.un_set)
-                                } else {
-                                    repaymentDate + stringResource(id = R.string.day)
-                                }
-                                Text(
-                                    text = repaymentDateText,
-                                    modifier = Modifier.padding(horizontal = 8.dp)
-                                )
-                                Icon(
-                                    imageVector = CashbookIcons.KeyboardArrowRight,
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                    )
-                }
+                        }
 
-                TranparentListItem(
-                    headlineText = {
-                        Text(
-                            text = stringResource(id = R.string.invisible_asset),
-                            modifier = Modifier.padding(start = 16.dp)
+                        // 备注
+                        CompatTextField(
+                            textFieldState = remarkTextState,
+                            label = { Text(text = stringResource(id = R.string.remark)) },
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                                .padding(horizontal = 16.dp),
                         )
-                    },
-                    supportingText = {
-                        Text(
-                            text = stringResource(id = R.string.invisible_asset_hint),
-                            modifier = Modifier.padding(start = 16.dp)
+
+                        CommonDivider(
+                            modifier = Modifier.height(8.dp),
+                            color = DividerDefaults.color.copy(alpha = 0.1f)
                         )
-                    },
-                    trailingContent = {
-                        Switch(
-                            checked = invisible,
-                            onCheckedChange = onInvisibleChange,
+
+                        if (uiState.isCreditCard) {
+                            TranparentListItem(
+                                modifier = Modifier.clickable(onClick = onBillingDateClick),
+                                headlineText = {
+                                    Text(
+                                        text = stringResource(id = R.string.billing_date),
+                                        modifier = Modifier.padding(start = 16.dp)
+                                    )
+                                },
+                                trailingContent = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        val billingDateText = if (uiState.billingDate.isBlank()) {
+                                            stringResource(id = R.string.un_set)
+                                        } else {
+                                            uiState.billingDate + stringResource(id = R.string.day)
+                                        }
+                                        Text(
+                                            text = billingDateText,
+                                            modifier = Modifier.padding(horizontal = 8.dp)
+                                        )
+                                        Icon(
+                                            imageVector = CashbookIcons.KeyboardArrowRight,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
+                            )
+
+                            TranparentListItem(
+                                modifier = Modifier.clickable(onClick = onRepaymentDateClick),
+                                headlineText = {
+                                    Text(
+                                        text = stringResource(id = R.string.repayment_date),
+                                        modifier = Modifier.padding(start = 16.dp)
+                                    )
+                                },
+                                trailingContent = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        val repaymentDateText =
+                                            if (uiState.repaymentDate.isBlank()) {
+                                                stringResource(id = R.string.un_set)
+                                            } else {
+                                                uiState.repaymentDate + stringResource(id = R.string.day)
+                                            }
+                                        Text(
+                                            text = repaymentDateText,
+                                            modifier = Modifier.padding(horizontal = 8.dp)
+                                        )
+                                        Icon(
+                                            imageVector = CashbookIcons.KeyboardArrowRight,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
+                            )
+                        }
+
+                        TranparentListItem(
+                            headlineText = {
+                                Text(
+                                    text = stringResource(id = R.string.invisible_asset),
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            },
+                            supportingText = {
+                                Text(
+                                    text = stringResource(id = R.string.invisible_asset_hint),
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            },
+                            trailingContent = {
+                                Switch(
+                                    checked = uiState.invisible,
+                                    onCheckedChange = onInvisibleChange,
+                                )
+                            },
                         )
-                    },
-                )
+                    }
+                }
             }
         }
     }
@@ -675,17 +639,19 @@ private fun EditAssetScreenPreview() {
         CashbookGradientBackground {
             EditAssetScreen(
                 isCreate = true,
-                isCreditCard = true,
-                classification = AssetClassificationEnum.ALIPAY,
-                assetName = "支付宝",
-                totalAmount = "10000",
-                balance = "1000",
-                openBank = "",
-                cardNo = "",
-                remark = "",
-                billingDate = "1",
-                repaymentDate = "6",
-                invisible = false,
+                uiState = EditAssetUiState.Success(
+                    isCreditCard = true,
+                    classification = AssetClassificationEnum.ALIPAY,
+                    assetName = "支付宝",
+                    totalAmount = "10000",
+                    balance = "1000",
+                    openBank = "",
+                    cardNo = "",
+                    remark = "",
+                    billingDate = "1",
+                    repaymentDate = "6",
+                    invisible = false,
+                ),
                 onInvisibleChange = {},
                 onBillingDateClick = {},
                 onRepaymentDateClick = {},

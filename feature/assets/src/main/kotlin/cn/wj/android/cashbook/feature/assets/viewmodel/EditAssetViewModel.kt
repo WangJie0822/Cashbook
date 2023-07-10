@@ -21,7 +21,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
@@ -34,6 +33,14 @@ class EditAssetViewModel @Inject constructor(
     getDefaultAssetUseCase: GetDefaultAssetUseCase,
 ) : ViewModel() {
 
+    /** 底部 Sheet 类型 */
+    var bottomSheetData by mutableStateOf(EditAssetBottomSheetEnum.DISMISS)
+        private set
+
+    /** 弹窗状态 */
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+        private set
+
     /** 资产 id */
     private val assetIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
 
@@ -45,98 +52,26 @@ class EditAssetViewModel @Inject constructor(
             mutable ?: default
         }
 
-    /** 底部 Sheet 类型 */
-    var bottomSheetData by mutableStateOf(EditAssetBottomSheetEnum.DISMISS)
-
-    /** 弹窗状态 */
-    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
-
-    val isCreditCard = displayAssetInfo
-        .mapLatest { it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT }
+    val uiState = displayAssetInfo
+        .mapLatest {
+            EditAssetUiState.Success(
+                isCreditCard = it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
+                classification = it.classification,
+                assetName = it.name,
+                totalAmount = it.totalAmount,
+                balance = it.balance,
+                openBank = it.openBank,
+                cardNo = it.cardNo,
+                remark = it.remark,
+                billingDate = it.billingDate,
+                repaymentDate = it.repaymentDate,
+                invisible = it.invisible,
+            )
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = false,
-        )
-
-    val classification = displayAssetInfo
-        .mapLatest { it.classification }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = AssetClassificationEnum.CASH,
-        )
-
-    val assetName = displayAssetInfo
-        .mapLatest { it.name }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val totalAmount = displayAssetInfo
-        .mapLatest { it.totalAmount }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val balance = displayAssetInfo
-        .mapLatest { it.balance }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val openBank = displayAssetInfo
-        .mapLatest { it.openBank }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val cardNo = displayAssetInfo
-        .mapLatest { it.cardNo }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val remark = displayAssetInfo
-        .mapLatest { it.remark }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val billingDate = displayAssetInfo
-        .mapLatest { it.billingDate }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val repaymentDate = displayAssetInfo
-        .mapLatest { it.repaymentDate }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    val invisible: StateFlow<Boolean> = displayAssetInfo
-        .mapLatest { it.invisible }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false,
+            initialValue = EditAssetUiState.Loading,
         )
 
     fun updateAssetId(id: Long) {
@@ -236,4 +171,52 @@ class EditAssetViewModel @Inject constructor(
             }
         }
     }
+}
+
+sealed class EditAssetUiState(
+    open val classification: AssetClassificationEnum,
+    open val assetName: String,
+    open val totalAmount: String,
+    open val balance: String,
+    open val openBank: String,
+    open val cardNo: String,
+    open val remark: String,
+    open val billingDate: String,
+    open val repaymentDate: String,
+) {
+    object Loading : EditAssetUiState(
+        classification = AssetClassificationEnum.CASH,
+        assetName = "",
+        totalAmount = "",
+        balance = "",
+        openBank = "",
+        cardNo = "",
+        remark = "",
+        billingDate = "",
+        repaymentDate = "",
+    )
+
+    data class Success(
+        val isCreditCard: Boolean,
+        override val classification: AssetClassificationEnum,
+        override val assetName: String,
+        override val totalAmount: String,
+        override val balance: String,
+        override val openBank: String,
+        override val cardNo: String,
+        override val remark: String,
+        override val billingDate: String,
+        override val repaymentDate: String,
+        val invisible: Boolean,
+    ) : EditAssetUiState(
+        classification = classification,
+        assetName = assetName,
+        totalAmount = totalAmount,
+        balance = balance,
+        openBank = openBank,
+        cardNo = cardNo,
+        remark = remark,
+        billingDate = billingDate,
+        repaymentDate = repaymentDate,
+    )
 }

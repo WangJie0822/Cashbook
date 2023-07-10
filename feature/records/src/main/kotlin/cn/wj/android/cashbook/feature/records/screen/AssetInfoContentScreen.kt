@@ -48,7 +48,6 @@ internal fun AssetInfoContentScreen(
         if (recordList.itemCount <= 0) {
             item {
                 Empty(
-                    imagePainter = painterResource(id = R.drawable.vector_no_data_200),
                     hintText = stringResource(id = R.string.asset_no_record_data_hint),
                 )
             }

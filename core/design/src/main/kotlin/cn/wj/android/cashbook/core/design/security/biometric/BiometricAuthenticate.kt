@@ -10,10 +10,11 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocal
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
-import cn.wj.android.cashbook.core.ui.R
 import javax.crypto.Cipher
 
 @SuppressLint("InlinedApi")
@@ -27,26 +28,21 @@ fun BiometricAuthenticate(
     onSuccess: (Cipher) -> Unit,
     onError: (Int, String) -> Unit,
 ) {
+    val hintData = LocalBiometricAuthenticateHintData.current
     when (val resultCode = checkBiometric()) {
         ERROR_HW_UNAVAILABLE -> {
             // 不支持
-            onError.invoke(resultCode, stringResource(id = R.string.device_not_support_fingerprint))
+            onError.invoke(resultCode, hintData.unSupportHint)
         }
 
         ERROR_NO_BIOMETRICS -> {
             // 没有有效指纹
-            onError.invoke(
-                resultCode,
-                stringResource(id = R.string.please_add_at_least_one_fingerprint)
-            )
+            onError.invoke(resultCode, hintData.noFingerprintHint)
         }
 
         ERROR_NO_DEVICE_CREDENTIAL -> {
             // 没有设置锁屏
-            onError.invoke(
-                resultCode,
-                stringResource(id = R.string.please_set_device_credential_first)
-            )
+            onError.invoke(resultCode, hintData.noDeviceCredentialHint)
         }
 
         else -> {
@@ -88,10 +84,10 @@ internal fun BiometricAuthenticateQ(
     onSuccess: (Cipher) -> Unit,
     onError: (Int, String) -> Unit,
 ) {
+    val hintData = LocalBiometricAuthenticateHintData.current
     val cancellationSignal = android.os.CancellationSignal()
-    val userCancelText = stringResource(id = R.string.user_cancel)
     cancellationSignal.setOnCancelListener {
-        onError.invoke(5, userCancelText)
+        onError.invoke(5, hintData.userCancelHint)
     }
     val context = LocalContext.current
     val prompt = with(BiometricPrompt.Builder(context)) {
@@ -104,13 +100,12 @@ internal fun BiometricAuthenticateQ(
         if (hint.isNotBlank()) {
             setDescription(hint)
         }
-        setNegativeButton(stringResource(id = R.string.cancel), context.mainExecutor) { dialog, _ ->
+        setNegativeButton(hintData.cancelHint, context.mainExecutor) { dialog, _ ->
             dialog?.dismiss()
             cancellationSignal.cancel()
         }
         build()
     }
-    val verifyFailedText = stringResource(id = R.string.fingerprint_verification_failed)
     prompt.authenticate(
         BiometricPrompt.CryptoObject(cryptoCipher),
         cancellationSignal,
@@ -122,7 +117,7 @@ internal fun BiometricAuthenticateQ(
                         ?: throw RuntimeException("cipher is null!")
                     onSuccess.invoke(cipher)
                 } catch (throwable: Throwable) {
-                    onError.invoke(ERROR_FAILED, verifyFailedText)
+                    onError.invoke(ERROR_FAILED, hintData.verificationFailedHint)
                 }
             }
 
@@ -131,7 +126,7 @@ internal fun BiometricAuthenticateQ(
             }
 
             override fun onAuthenticationFailed() {
-                onError.invoke(ERROR_FAILED, verifyFailedText)
+                onError.invoke(ERROR_FAILED, hintData.verificationFailedHint)
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
@@ -185,6 +180,41 @@ private fun checkBiometricUpM(context: Context): Int {
         }
     }
 }
+
+data class BiometricAuthenticateHintData(
+    val unSupportHint: String,
+    val noFingerprintHint: String,
+    val noDeviceCredentialHint: String,
+    val cancelHint: String,
+    val userCancelHint: String,
+    val verificationFailedHint: String,
+)
+
+/**
+ * 这个 [CompositionLocal] 用于提供一个 [BiometricAuthenticateHintData]
+ *
+ * ```
+ * CompositionLocalProvider(
+ *     LocalEmptyImagePainter provides painterResource(id = R.drawable.xxxx)
+ * ) { }
+ * ```
+ *
+ * 再使用 [BiometricAuthenticateHintData] 显示错误提示
+ */
+val LocalBiometricAuthenticateHintData =
+    staticCompositionLocalOf<BiometricAuthenticateHintData> { error("No Hint data provided") }
+
+@Composable
+fun ProvideBiometricAuthenticateHintData(
+    hintData: BiometricAuthenticateHintData,
+    content: @Composable () -> Unit
+) {
+    CompositionLocalProvider(
+        LocalBiometricAuthenticateHintData provides hintData,
+        content = content
+    )
+}
+
 
 /** 硬件可用 */
 const val HW_AVAILABLE = 0

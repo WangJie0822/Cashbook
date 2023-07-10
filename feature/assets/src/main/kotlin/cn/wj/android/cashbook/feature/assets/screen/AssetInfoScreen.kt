@@ -25,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,12 +34,12 @@ import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.Empty
+import cn.wj.android.cashbook.core.design.component.Loading
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -111,7 +110,14 @@ internal fun AssetInfoScreen(
     onBookmarkDismiss: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = {
+            if (it == ModalBottomSheetValue.Hidden) {
+                dismissBottomSheet()
+            }
+            true
+        }),
     snackbarHostState: SnackbarHostState = remember {
         SnackbarHostState()
     }
@@ -191,11 +197,7 @@ internal fun AssetInfoScreen(
 
                 when (uiState) {
                     is AssetInfoUiState.Loading -> {
-                        Empty(
-                            imagePainter = painterResource(id = R.drawable.vector_no_data_200),
-                            hintText = stringResource(id = R.string.data_in_loading),
-                            modifier = Modifier.align(Alignment.Center),
-                        )
+                        Loading()
                     }
 
                     is AssetInfoUiState.Success -> {

@@ -23,7 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import cn.wj.android.cashbook.core.ui.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

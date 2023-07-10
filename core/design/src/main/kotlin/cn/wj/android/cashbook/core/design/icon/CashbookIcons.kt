@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.core.ui
+package cn.wj.android.cashbook.core.design.icon
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add

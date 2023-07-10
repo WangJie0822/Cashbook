@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.ui
 
 import android.os.Bundle
 import android.view.Window
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,15 +13,20 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainter
+import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHintPainter
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.ui.LocalBackPressedDispatcher
+import cn.wj.android.cashbook.core.ui.R
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -74,12 +80,12 @@ class MainActivity : AppCompatActivity() {
                 onDispose {}
             }
 
-            CompositionLocalProvider(
-                LocalBackPressedDispatcher provides this.onBackPressedDispatcher
+            CashbookTheme(
+                darkTheme = darkTheme,
+                disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
             ) {
-                CashbookTheme(
-                    darkTheme = darkTheme,
-                    disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
+                ProvideLocalState(
+                    onBackPressedDispatcher = this.onBackPressedDispatcher,
                 ) {
                     MainApp(
                         viewModel = verifyViewModel,
@@ -94,6 +100,19 @@ class MainActivity : AppCompatActivity() {
         logger().i("onStop()")
         verifyViewModel.onActivityStop()
     }
+}
+
+@Composable
+private fun ProvideLocalState(
+    onBackPressedDispatcher: OnBackPressedDispatcher,
+    content: @Composable () -> Unit
+) {
+    CompositionLocalProvider(
+        LocalBackPressedDispatcher provides onBackPressedDispatcher,
+        LocalDefaultEmptyImagePainter provides painterResource(id = R.drawable.vector_no_data_200),
+        LocalDefaultLoadingHintPainter provides stringResource(id = R.string.data_in_loading),
+        content = content
+    )
 }
 
 @Composable

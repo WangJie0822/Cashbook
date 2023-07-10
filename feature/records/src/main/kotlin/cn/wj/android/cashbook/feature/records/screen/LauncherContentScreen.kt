@@ -68,7 +68,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -371,7 +371,6 @@ private fun FrontLayerContent(
 
             if (recordMap.isEmpty()) {
                 Empty(
-                    imagePainter = painterResource(id = R.drawable.vector_no_data_200),
                     hintText = stringResource(id = R.string.launcher_no_data_hint),
                     buttonText = stringResource(id = R.string.launcher_no_data_button),
                     onButtonClick = onCalendarClick,
@@ -669,7 +668,6 @@ internal fun RecordDetailsSheet(
             if (null == recordEntity) {
                 // 无数据
                 Empty(
-                    imagePainter = painterResource(id = R.drawable.vector_no_data_200),
                     hintText = stringResource(id = R.string.no_record_data),
                 )
             } else {

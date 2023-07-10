@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,7 +31,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.entity.TagEntity
-import cn.wj.android.cashbook.core.ui.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import cn.wj.android.cashbook.feature.tags.viewmodel.MyTagsViewModel
@@ -83,7 +82,6 @@ internal fun MyTagsScreen(
             if (tagList.isEmpty()) {
                 Empty(
                     modifier = Modifier.fillMaxSize(),
-                    imagePainter = painterResource(id = R.drawable.vector_no_data_200),
                     hintText = stringResource(id = R.string.tags_empty_hint),
                 )
             } else {

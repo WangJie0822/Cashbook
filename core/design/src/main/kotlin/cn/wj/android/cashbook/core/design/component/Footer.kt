@@ -1,5 +1,7 @@
 package cn.wj.android.cashbook.core.design.component
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,9 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 
 @Composable
 fun Footer(
@@ -35,7 +37,8 @@ fun Footer(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@DevicePreviews
+@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Preview(uiMode = UI_MODE_NIGHT_NO)
 @Composable
 private fun FooterPreview() {
     CashbookTheme {

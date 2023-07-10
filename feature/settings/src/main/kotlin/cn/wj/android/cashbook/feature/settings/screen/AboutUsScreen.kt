@@ -47,7 +47,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
-import cn.wj.android.cashbook.core.ui.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.AboutUsBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsViewModel

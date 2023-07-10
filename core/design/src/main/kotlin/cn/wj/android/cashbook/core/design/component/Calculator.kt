@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.core.design.component
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,9 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.util.CalculatorUtils
-import cn.wj.android.cashbook.core.ui.CashbookIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -174,14 +175,17 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
     }
 }
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun CalculatorPreview() {
     CashbookTheme {
-        Calculator(
-            defaultText = "120",
-            primaryColor = Color.Red,
-            onConfirmClick = {},
-        )
+        CashbookGradientBackground {
+            Calculator(
+                defaultText = "120",
+                primaryColor = Color.Red,
+                onConfirmClick = {},
+            )
+        }
     }
 }

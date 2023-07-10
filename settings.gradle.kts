@@ -46,7 +46,10 @@ dependencyResolutionManagement {
 // 项目名称
 rootProject.name = "Cashbook"
 // 项目包含的 Module
-include(":app")
+include(
+    ":app",
+    ":app-catalog",
+)
 include(
     ":feature:tags",
     ":feature:types",

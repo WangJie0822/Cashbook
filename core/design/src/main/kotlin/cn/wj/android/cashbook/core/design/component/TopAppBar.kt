@@ -2,6 +2,7 @@
 
 package cn.wj.android.cashbook.core.design.component
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
@@ -16,9 +17,9 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
-import cn.wj.android.cashbook.core.ui.CashbookIcons
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 
 /**
  * 通用顶部标题栏
@@ -56,18 +57,21 @@ fun CashbookTopAppBar(
     )
 }
 
-@DevicePreviews
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun CommonTopBarPreview() {
     CashbookTheme {
-        Column {
-            CashbookTopAppBar(onBackClick = { })
-            CashbookTopAppBar(text = "标题", onBackClick = { })
-            CashbookTopAppBar(onBackClick = { }, actions = {
-                IconButton(onClick = { }) {
-                    Icon(imageVector = CashbookIcons.Menu, contentDescription = null)
-                }
-            })
+        CashbookGradientBackground {
+            Column {
+                CashbookTopAppBar(onBackClick = { })
+                CashbookTopAppBar(text = "标题", onBackClick = { })
+                CashbookTopAppBar(onBackClick = { }, actions = {
+                    IconButton(onClick = { }) {
+                        Icon(imageVector = CashbookIcons.Menu, contentDescription = null)
+                    }
+                })
+            }
         }
     }
 }

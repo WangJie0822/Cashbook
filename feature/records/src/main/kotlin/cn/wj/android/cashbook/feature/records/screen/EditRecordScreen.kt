@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,14 +54,14 @@ import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CompatTextField
-import cn.wj.android.cashbook.core.design.component.Empty
+import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
@@ -349,11 +348,7 @@ private fun EditRecordScaffoldContent(
     ) {
         when (uiState) {
             is EditRecordUiState.Loading -> {
-                Empty(
-                    imagePainter = painterResource(id = R.drawable.vector_no_data_200),
-                    hintText = stringResource(id = R.string.data_in_loading),
-                    modifier = Modifier.align(Alignment.Center),
-                )
+                Loading()
             }
 
             is EditRecordUiState.Success -> {

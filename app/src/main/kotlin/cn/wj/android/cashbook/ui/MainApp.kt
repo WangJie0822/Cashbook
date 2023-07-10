@@ -42,8 +42,10 @@ import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.PasswordTextField
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
-import cn.wj.android.cashbook.core.ui.CashbookIcons
+import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
+import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
@@ -168,14 +170,25 @@ internal fun Verification(
         (dialogState as? DialogState.Shown<*>)?.let {
             if (it.data is Cipher) {
                 val data = it.data as Cipher
-                BiometricAuthenticate(
-                    title = stringResource(id = R.string.verity_fingerprint),
-                    subTitle = stringResource(id = R.string.verity_fingerprint_to_use),
-                    hint = stringResource(id = R.string.press_sensing_to_verity_fingerprint),
-                    cryptoCipher = data,
-                    onSuccess = onFingerprintVerifySuccess,
-                    onError = onFingerprintVerifyError,
-                )
+                ProvideBiometricAuthenticateHintData(
+                    hintData = BiometricAuthenticateHintData(
+                        unSupportHint = stringResource(id = R.string.device_not_support_fingerprint),
+                        noFingerprintHint = stringResource(id = R.string.please_add_at_least_one_fingerprint),
+                        noDeviceCredentialHint = stringResource(id = R.string.please_set_device_credential_first),
+                        cancelHint = stringResource(id = R.string.cancel),
+                        userCancelHint = stringResource(id = R.string.user_cancel),
+                        verificationFailedHint = stringResource(id = R.string.fingerprint_verification_failed),
+                    )
+                ) {
+                    BiometricAuthenticate(
+                        title = stringResource(id = R.string.verity_fingerprint),
+                        subTitle = stringResource(id = R.string.verity_fingerprint_to_use),
+                        hint = stringResource(id = R.string.press_sensing_to_verity_fingerprint),
+                        cryptoCipher = data,
+                        onSuccess = onFingerprintVerifySuccess,
+                        onError = onFingerprintVerifyError,
+                    )
+                }
             }
         }
 

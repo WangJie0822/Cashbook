@@ -53,7 +53,7 @@ import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.model.model.assetModelTestObject
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
@@ -284,7 +284,6 @@ internal fun MyAssetBackdropScaffold(
                     if (assetTypedListData.isEmpty()) {
                         // 无数据
                         Empty(
-                            imagePainter = painterResource(id = R.drawable.vector_no_data_200),
                             hintText = stringResource(id = R.string.asset_no_data),
                         )
                     } else {

@@ -9,8 +9,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:ui"))
-
     implementation(libs.androidx.core.ktx)
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -24,6 +22,7 @@ dependencies {
     api(libs.androidx.compose.runtime)
     api(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.material.icons.extended)
 
     api(libs.google.material)
 }
