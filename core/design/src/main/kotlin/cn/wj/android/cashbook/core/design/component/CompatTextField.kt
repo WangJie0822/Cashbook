@@ -3,9 +3,6 @@ package cn.wj.android.cashbook.core.design.component
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,7 +125,7 @@ fun PasswordTextField(
         trailingIcon = {
             IconButton(onClick = { visible = !visible }) {
                 Icon(
-                    imageVector = if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    imageVector = if (visible) CashbookIcons.VisibilityOff else CashbookIcons.Visibility,
                     contentDescription = null
                 )
             }

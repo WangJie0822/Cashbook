@@ -2,13 +2,9 @@
 
 package cn.wj.android.cashbook.core.design.component
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,8 +16,9 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.ui.CashbookIcons
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 
 /**
  * 通用顶部标题栏
@@ -47,7 +44,7 @@ fun CashbookTopAppBar(
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = CashbookIcons.ArrowBack,
                     contentDescription = null,
                 )
             }
@@ -59,8 +56,7 @@ fun CashbookTopAppBar(
     )
 }
 
-@Preview(showBackground = true, name = "light", uiMode = Configuration.UI_MODE_NIGHT_NO)
-@Preview(showBackground = true, name = "night", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@DevicePreviews
 @Composable
 fun CommonTopBarPreview() {
     CashbookTheme {
@@ -69,7 +65,7 @@ fun CommonTopBarPreview() {
             CashbookTopAppBar(text = "标题", onBackClick = { })
             CashbookTopAppBar(onBackClick = { }, actions = {
                 IconButton(onClick = { }) {
-                    Icon(imageVector = Icons.Default.Menu, contentDescription = null)
+                    Icon(imageVector = CashbookIcons.Menu, contentDescription = null)
                 }
             })
         }

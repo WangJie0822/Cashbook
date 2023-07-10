@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.util.CalculatorUtils
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -140,7 +139,7 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                 IconButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { text = CalculatorUtils.onBackPressed(text) }) {
-                    Icon(imageVector = Icons.Default.Backspace, contentDescription = null)
+                    Icon(imageVector = CashbookIcons.Backspace, contentDescription = null)
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),

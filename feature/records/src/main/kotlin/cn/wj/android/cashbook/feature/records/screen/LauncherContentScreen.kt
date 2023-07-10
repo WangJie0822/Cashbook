@@ -14,12 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
@@ -56,7 +50,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.toIntOrZero
@@ -75,6 +68,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -276,7 +270,7 @@ internal fun LauncherLayoutContent(
         },
         floatingActionButton = {
             CashbookFloatingActionButton(onClick = onAddClick) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                Icon(imageVector = CashbookIcons.Add, contentDescription = null)
             }
         },
     ) { paddingValues ->
@@ -523,7 +517,7 @@ internal fun LauncherTopBar(
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
                 Icon(
-                    imageVector = Icons.Default.Menu,
+                    imageVector = CashbookIcons.Menu,
                     contentDescription = null,
                 )
             }
@@ -531,19 +525,19 @@ internal fun LauncherTopBar(
         actions = {
             IconButton(onClick = onSearchClick) {
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    imageVector = CashbookIcons.Search,
                     contentDescription = null,
                 )
             }
             IconButton(onClick = onCalendarClick) {
                 Icon(
-                    imageVector = Icons.Default.CalendarMonth,
+                    imageVector = CashbookIcons.CalendarMonth,
                     contentDescription = null,
                 )
             }
             IconButton(onClick = onMyAssetClick) {
                 Icon(
-                    imageVector = Icons.Default.WebAsset,
+                    imageVector = CashbookIcons.WebAsset,
                     contentDescription = null,
                 )
             }
@@ -602,7 +596,9 @@ internal fun RecordListItem(
         },
         supportingText = {
             Text(
-                text = "${recordViewsEntity.recordTime.split(" ").first()} ${recordViewsEntity.remark}"
+                text = "${
+                    recordViewsEntity.recordTime.split(" ").first()
+                } ${recordViewsEntity.remark}"
             )
         },
         trailingContent = {

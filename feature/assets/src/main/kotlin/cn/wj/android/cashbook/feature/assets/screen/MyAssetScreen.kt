@@ -12,13 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
@@ -60,6 +53,7 @@ import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.model.model.assetModelTestObject
 import cn.wj.android.cashbook.core.ui.BackPressHandler
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
@@ -139,7 +133,7 @@ internal fun MyAssetScreen(
             floatingActionButton = {
                 CashbookFloatingActionButton(onClick = displayShowMoreDialog) {
                     Icon(
-                        imageVector = Icons.Default.MoreVert,
+                        imageVector = CashbookIcons.MoreVert,
                         contentDescription = null,
                     )
                 }
@@ -212,7 +206,7 @@ private fun ShowMoreContent(
                         onCloseClick.invoke()
                     },
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                    Icon(imageVector = CashbookIcons.Add, contentDescription = null)
                 }
             }
 
@@ -243,7 +237,7 @@ private fun ShowMoreContent(
                     },
                 ) {
                     Icon(
-                        imageVector = Icons.Default.VisibilityOff,
+                        imageVector = CashbookIcons.VisibilityOff,
                         contentDescription = null
                     )
                 }
@@ -252,7 +246,7 @@ private fun ShowMoreContent(
             CashbookFloatingActionButton(
                 onClick = onCloseClick,
             ) {
-                Icon(imageVector = Icons.Default.Close, contentDescription = null)
+                Icon(imageVector = CashbookIcons.Close, contentDescription = null)
             }
         }
     }
@@ -339,7 +333,7 @@ internal fun AssetTypedInfoItem(
             style = MaterialTheme.typography.titleMedium,
         )
         Icon(
-            imageVector = if (expand) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight,
+            imageVector = if (expand) CashbookIcons.KeyboardArrowDown else CashbookIcons.KeyboardArrowRight,
             contentDescription = null,
         )
     }

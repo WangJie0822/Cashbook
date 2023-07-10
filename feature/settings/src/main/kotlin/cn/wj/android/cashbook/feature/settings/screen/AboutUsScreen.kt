@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
@@ -49,6 +47,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.AboutUsBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsViewModel
@@ -332,7 +331,7 @@ internal fun AboutUsScreen(
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                                 Icon(
-                                    imageVector = Icons.Default.KeyboardArrowRight,
+                                    imageVector = CashbookIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }
@@ -346,7 +345,7 @@ internal fun AboutUsScreen(
                         },
                         trailingContent = {
                             Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
+                                imageVector = CashbookIcons.KeyboardArrowRight,
                                 contentDescription = null,
                             )
                         },

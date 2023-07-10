@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -66,6 +62,7 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
@@ -280,7 +277,7 @@ internal fun EditRecordScreen(
             CashbookFloatingActionButton(onClick = {
                 onSaveClick()
             }) {
-                Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
+                Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
             }
         },
         sheetState = sheetState,
@@ -507,7 +504,7 @@ private fun EditRecordScaffoldContent(
                                         leadingIcon = {
                                             if (reimbursable) {
                                                 Icon(
-                                                    imageVector = Icons.Default.Check,
+                                                    imageVector = CashbookIcons.Check,
                                                     contentDescription = null,
                                                 )
                                             }
@@ -653,7 +650,7 @@ internal fun EditRecordTopBarNew(
         ),
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                Icon(imageVector = CashbookIcons.ArrowBack, contentDescription = null)
             }
         },
         title = {

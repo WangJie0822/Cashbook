@@ -15,9 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,6 +58,7 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -302,7 +300,7 @@ private fun EditAssetScafold(
                     )
                 }
             }) {
-                Icon(imageVector = Icons.Default.SaveAs, contentDescription = null)
+                Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
             }
         },
     ) { paddingValues ->
@@ -341,7 +339,7 @@ private fun EditAssetScafold(
                                 modifier = Modifier.padding(horizontal = 8.dp)
                             )
                             Icon(
-                                imageVector = Icons.Default.ArrowRight,
+                                imageVector = CashbookIcons.KeyboardArrowRight,
                                 contentDescription = null,
                             )
                         }
@@ -451,7 +449,7 @@ private fun EditAssetScafold(
                                     modifier = Modifier.padding(horizontal = 8.dp)
                                 )
                                 Icon(
-                                    imageVector = Icons.Default.ArrowRight,
+                                    imageVector = CashbookIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }
@@ -480,7 +478,7 @@ private fun EditAssetScafold(
                                     modifier = Modifier.padding(horizontal = 8.dp)
                                 )
                                 Icon(
-                                    imageVector = Icons.Default.ArrowRight,
+                                    imageVector = CashbookIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }

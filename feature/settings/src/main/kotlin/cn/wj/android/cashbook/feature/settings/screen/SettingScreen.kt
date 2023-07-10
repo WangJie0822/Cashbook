@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +46,7 @@ import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
@@ -305,7 +304,7 @@ internal fun SettingContent(
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                                 Icon(
-                                    imageVector = Icons.Default.KeyboardArrowRight,
+                                    imageVector = CashbookIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }
@@ -366,7 +365,7 @@ internal fun SettingContent(
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                             Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
+                                imageVector = CashbookIcons.KeyboardArrowRight,
                                 contentDescription = null,
                             )
                         }
@@ -388,7 +387,7 @@ internal fun SettingContent(
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                                 Icon(
-                                    imageVector = Icons.Default.KeyboardArrowRight,
+                                    imageVector = CashbookIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }
@@ -406,7 +405,7 @@ internal fun SettingContent(
                     headlineText = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
                     trailingContent = {
                         Icon(
-                            imageVector = Icons.Default.KeyboardArrowRight,
+                            imageVector = CashbookIcons.KeyboardArrowRight,
                             contentDescription = null,
                         )
                     },

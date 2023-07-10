@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,6 +32,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import cn.wj.android.cashbook.feature.tags.viewmodel.MyTagsViewModel
@@ -68,7 +67,7 @@ internal fun MyTagsScreen(
                 onBackClick = onBackClick,
                 actions = {
                     IconButton(onClick = { viewModel.showEditTagDialog() }) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                        Icon(imageVector = CashbookIcons.Add, contentDescription = null)
                     }
                 },
             )

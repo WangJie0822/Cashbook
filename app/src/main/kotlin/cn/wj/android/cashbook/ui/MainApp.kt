@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +43,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.PasswordTextField
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
@@ -62,7 +61,6 @@ import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
-import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
@@ -267,7 +265,7 @@ internal fun Verification(
             if (supportFingerprint) {
                 IconButton(onClick = { onFingerprintClick.invoke() }) {
                     Icon(
-                        imageVector = Icons.Default.Fingerprint,
+                        imageVector = CashbookIcons.Fingerprint,
                         tint = MaterialTheme.colorScheme.primary,
                         contentDescription = null,
                     )

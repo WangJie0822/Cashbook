@@ -13,8 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,6 +35,7 @@ import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.types.viewmodel.EditRecordTypeListViewModel
 
@@ -65,6 +64,7 @@ internal fun EditRecordTypeListRoute(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun EditRecordTypeListScreen(
     typeList: List<RecordTypeEntity>,
@@ -95,7 +95,7 @@ internal fun EditRecordTypeListScreen(
                         modifier = Modifier.animateItemPlacement(),
                         first = true,
                         shapeType = type.shapeType,
-                        iconPainter = painterResource(id = cn.wj.android.cashbook.core.ui.R.drawable.vector_baseline_settings_24),
+                        iconPainter = painterResource(id = R.drawable.vector_baseline_settings_24),
                         showMore = false,
                         title = stringResource(id = R.string.settings),
                         selected = true,
@@ -207,7 +207,7 @@ internal fun TypeItem(
                         bottom.linkTo(iconBg.bottom)
                         end.linkTo(iconBg.end)
                     },
-                imageVector = Icons.Default.MoreHoriz,
+                imageVector = CashbookIcons.MoreHoriz,
                 contentDescription = null,
                 tint = backgroundColor
             )

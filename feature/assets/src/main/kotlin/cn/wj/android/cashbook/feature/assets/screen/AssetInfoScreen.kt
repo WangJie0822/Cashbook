@@ -5,10 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,6 +40,7 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
+import cn.wj.android.cashbook.core.ui.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -156,17 +153,17 @@ internal fun AssetInfoScreen(
                 onBackClick = onBackClick,
                 actions = {
                     IconButton(onClick = onEditAssetClick) {
-                        Icon(imageVector = Icons.Default.EditNote, contentDescription = null)
+                        Icon(imageVector = CashbookIcons.EditNote, contentDescription = null)
                     }
                     IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
+                        Icon(imageVector = CashbookIcons.MoreVert, contentDescription = null)
                     }
                 },
             )
         },
         floatingActionButton = {
             CashbookFloatingActionButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                Icon(imageVector = CashbookIcons.Add, contentDescription = null)
             }
         },
         snackbarHost = {
