@@ -45,11 +45,14 @@ import cn.wj.android.cashbook.core.common.tools.jumpSendEmail
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
-import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
+import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.AboutUsBookmarkEnum
+import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsViewModel
 import io.noties.markwon.Markwon
 
@@ -68,22 +71,19 @@ internal fun AboutUsRoute(
     viewModel: AboutUsViewModel = hiltViewModel(),
 ) {
 
-    val useGitee by viewModel.useGitee.collectAsStateWithLifecycle()
-    val autoCheckUpdate by viewModel.autoCheckUpdate.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val shouldDisplayUpdateDialog by viewModel.updateInfoData.collectAsStateWithLifecycle()
     val shouldDisplayNoWifiUpdateDialog by viewModel.confirmUpdateInfoData.collectAsStateWithLifecycle()
-    val ignoreUpdateVersion by viewModel.ignoreUpdateVersion.collectAsStateWithLifecycle()
 
     AboutUsScreen(
         onBackClick = onBackClick,
         onShowSnackbar = onShowSnackbar,
-        useGitee = useGitee,
-        autoCheckUpdate = autoCheckUpdate,
+        uiState = uiState,
         inRequestUpdateData = viewModel.inRequestUpdateData,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         shouldDisplayUpdateDialog = shouldDisplayUpdateDialog,
         shouldDisplayNoWifiUpdateDialog = shouldDisplayNoWifiUpdateDialog,
-        ignoreUpdateVersion = ignoreUpdateVersion,
         onUseGiteeSwitch = viewModel::updateUseGitee,
         onAutoCheckUpdateSwitch = viewModel::updateAutoCheckUpdate,
         onCheckUpdate = viewModel::checkUpdate,
@@ -103,13 +103,11 @@ internal fun AboutUsRoute(
 internal fun AboutUsScreen(
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
-    useGitee: Boolean,
-    autoCheckUpdate: Boolean,
+    uiState: AboutUsUiState,
     inRequestUpdateData: Boolean,
     shouldDisplayBookmark: AboutUsBookmarkEnum,
     shouldDisplayUpdateDialog: UpdateInfoEntity?,
     shouldDisplayNoWifiUpdateDialog: UpdateInfoEntity?,
-    ignoreUpdateVersion: Boolean,
     onUseGiteeSwitch: (Boolean) -> Unit,
     onAutoCheckUpdateSwitch: (Boolean) -> Unit,
     onCheckUpdate: () -> Unit,
@@ -164,7 +162,7 @@ internal fun AboutUsScreen(
                     .toMarkdown(shouldDisplayUpdateDialog.versionInfo)
                 UpdateHintDialog(
                     content = content,
-                    ignoreUpdateVersion = ignoreUpdateVersion,
+                    ignoreUpdateVersion = uiState.ignoreUpdateVersion,
                     onConfirmClick = onConfirmUpdate,
                     onDismissClick = onDismissUpdate,
                 )
@@ -266,6 +264,7 @@ internal fun AboutUsScreen(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
+                                val useGitee = uiState.useGitee
                                 Text(
                                     modifier = Modifier.padding(end = 8.dp),
                                     text = stringResource(id = if (useGitee) R.string.gitee else R.string.github),
@@ -288,7 +287,7 @@ internal fun AboutUsScreen(
                         headlineText = { Text(text = stringResource(id = R.string.auto_check_update)) },
                         trailingContent = {
                             Switch(
-                                checked = autoCheckUpdate,
+                                checked = uiState.autoCheckUpdate,
                                 onCheckedChange = onAutoCheckUpdateSwitch,
                             )
                         },
@@ -436,4 +435,34 @@ internal fun NoWifiUpdateHintDialog(
             }
         },
     )
+}
+
+@DevicePreviews
+@Composable
+private fun AboutUsScreenPreview() {
+    PreviewTheme {
+        AboutUsScreen(
+            onBackClick = {},
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+            uiState = AboutUsUiState.Success(
+                useGitee = true,
+                autoCheckUpdate = false,
+                ignoreUpdateVersion = false,
+            ),
+            inRequestUpdateData = false,
+            shouldDisplayBookmark = AboutUsBookmarkEnum.NONE,
+            shouldDisplayUpdateDialog = null,
+            shouldDisplayNoWifiUpdateDialog = null,
+            onUseGiteeSwitch = {},
+            onAutoCheckUpdateSwitch = {},
+            onCheckUpdate = {},
+            onClearBookmarkState = {},
+            onConfirmUpdate = {},
+            onDismissUpdate = {},
+            onConfirmDownload = {},
+            onDismissDownload = {},
+            onVersionInfoClick = {},
+            onUserAgreementAndPrivacyPolicyClick = {},
+        )
+    }
 }

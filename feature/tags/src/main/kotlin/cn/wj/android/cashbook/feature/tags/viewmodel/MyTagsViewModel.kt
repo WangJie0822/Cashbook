@@ -9,6 +9,7 @@ import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.core.model.transfer.asModel
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -22,7 +23,7 @@ class MyTagsViewModel @Inject constructor(
     private val tagRepository: TagRepository
 ) : ViewModel() {
 
-    var dialogState by mutableStateOf<TagDialogState>(TagDialogState.Dismiss)
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
     /** 标签数据列表 */
@@ -37,15 +38,15 @@ class MyTagsViewModel @Inject constructor(
         )
 
     fun showEditTagDialog(tag: TagEntity? = null) {
-        dialogState = TagDialogState.Edit(tag)
+        dialogState = DialogState.Shown(TagDialogState.Edit(tag))
     }
 
     fun showDeleteTagDialog(tag: TagEntity) {
-        dialogState = TagDialogState.Delete(tag)
+        dialogState = DialogState.Shown(TagDialogState.Delete(tag))
     }
 
     fun dismissDialog() {
-        dialogState = TagDialogState.Dismiss
+        dialogState = DialogState.Dismiss
     }
 
     fun modifyTag(tag: TagEntity) {

@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,11 +33,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
@@ -324,24 +325,26 @@ private fun AssetInfoContent(
 @DevicePreviews
 @Composable
 private fun AssetInfoScreenPreview() {
-    CashbookTheme {
-        CashbookGradientBackground {
-            val isCreditCard = false
-            val balance = "200"
-            val totalAmount = "2000"
-            val billingDate = "20"
-            val repaymentDate = ""
-            AssetInfoScreen(
-                uiState = AssetInfoUiState.Success(
-                    assetName = "现金",
-                    isCreditCard = isCreditCard,
-                    balance = balance,
-                    totalAmount = totalAmount,
-                    billingDate = billingDate,
-                    repaymentDate = repaymentDate,
-                ),
-                viewRecord = null,
-                assetRecordListContent = {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        val isCreditCard = false
+        val balance = "200"
+        val totalAmount = "2000"
+        val billingDate = "20"
+        val repaymentDate = ""
+        AssetInfoScreen(
+            uiState = AssetInfoUiState.Success(
+                assetName = "现金",
+                isCreditCard = isCreditCard,
+                balance = balance,
+                totalAmount = totalAmount,
+                billingDate = billingDate,
+                repaymentDate = repaymentDate,
+            ),
+            viewRecord = null,
+            assetRecordListContent = {
+                Column {
                     AssetInfoContent(
                         isCreditCard = isCreditCard,
                         balance = balance,
@@ -349,42 +352,46 @@ private fun AssetInfoScreenPreview() {
                         billingDate = billingDate,
                         repaymentDate = repaymentDate,
                     )
-                },
-                recordDetailSheetContent = {},
-                dialogState = DialogState.Dismiss,
-                confirmDeleteRecordDialogContent = {},
-                onEditAssetClick = {},
-                dismissBottomSheet = {},
-                shouldDisplayBookmark = false,
-                onBookmarkDismiss = {},
-                onBackClick = {},
-                modifier = Modifier,
-            )
-        }
+
+                    Empty(hintText = "无数据")
+                }
+            },
+            recordDetailSheetContent = {},
+            dialogState = DialogState.Dismiss,
+            confirmDeleteRecordDialogContent = {},
+            onEditAssetClick = {},
+            dismissBottomSheet = {},
+            shouldDisplayBookmark = false,
+            onBookmarkDismiss = {},
+            onBackClick = {},
+            modifier = Modifier,
+        )
     }
 }
 
 @DevicePreviews
 @Composable
 private fun CreditAssetInfoScreenPreview() {
-    CashbookTheme {
-        CashbookGradientBackground {
-            val isCreditCard = true
-            val balance = "200"
-            val totalAmount = "2000"
-            val billingDate = "20"
-            val repaymentDate = ""
-            AssetInfoScreen(
-                uiState = AssetInfoUiState.Success(
-                    assetName = "招商银行",
-                    isCreditCard = isCreditCard,
-                    balance = balance,
-                    totalAmount = totalAmount,
-                    billingDate = billingDate,
-                    repaymentDate = repaymentDate,
-                ),
-                viewRecord = null,
-                assetRecordListContent = {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        val isCreditCard = true
+        val balance = "200"
+        val totalAmount = "2000"
+        val billingDate = "20"
+        val repaymentDate = ""
+        AssetInfoScreen(
+            uiState = AssetInfoUiState.Success(
+                assetName = "招商银行",
+                isCreditCard = isCreditCard,
+                balance = balance,
+                totalAmount = totalAmount,
+                billingDate = billingDate,
+                repaymentDate = repaymentDate,
+            ),
+            viewRecord = null,
+            assetRecordListContent = {
+                Column {
                     AssetInfoContent(
                         isCreditCard = isCreditCard,
                         balance = balance,
@@ -392,40 +399,42 @@ private fun CreditAssetInfoScreenPreview() {
                         billingDate = billingDate,
                         repaymentDate = repaymentDate,
                     )
-                },
-                recordDetailSheetContent = {},
-                dialogState = DialogState.Dismiss,
-                confirmDeleteRecordDialogContent = {},
-                onEditAssetClick = {},
-                dismissBottomSheet = {},
-                shouldDisplayBookmark = false,
-                onBookmarkDismiss = {},
-                onBackClick = {},
-                modifier = Modifier,
-            )
-        }
+
+                    Empty(hintText = "无数据")
+                }
+            },
+            recordDetailSheetContent = {},
+            dialogState = DialogState.Dismiss,
+            confirmDeleteRecordDialogContent = {},
+            onEditAssetClick = {},
+            dismissBottomSheet = {},
+            shouldDisplayBookmark = false,
+            onBookmarkDismiss = {},
+            onBackClick = {},
+            modifier = Modifier,
+        )
     }
 }
 
 @DevicePreviews
 @Composable
 private fun AssetInfoScreenLoadingPreview() {
-    CashbookTheme {
-        CashbookGradientBackground {
-            AssetInfoScreen(
-                uiState = AssetInfoUiState.Loading,
-                viewRecord = null,
-                assetRecordListContent = {},
-                recordDetailSheetContent = {},
-                dialogState = DialogState.Dismiss,
-                confirmDeleteRecordDialogContent = {},
-                onEditAssetClick = {},
-                dismissBottomSheet = {},
-                shouldDisplayBookmark = false,
-                onBookmarkDismiss = {},
-                onBackClick = {},
-                modifier = Modifier,
-            )
-        }
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        AssetInfoScreen(
+            uiState = AssetInfoUiState.Loading,
+            viewRecord = null,
+            assetRecordListContent = {},
+            recordDetailSheetContent = {},
+            dialogState = DialogState.Dismiss,
+            confirmDeleteRecordDialogContent = {},
+            onEditAssetClick = {},
+            dismissBottomSheet = {},
+            shouldDisplayBookmark = false,
+            onBookmarkDismiss = {},
+            onBackClick = {},
+            modifier = Modifier,
+        )
     }
 }

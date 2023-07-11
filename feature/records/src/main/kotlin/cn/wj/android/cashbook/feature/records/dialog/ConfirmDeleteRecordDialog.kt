@@ -6,7 +6,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.viewmodel.ConfirmDeleteRecordDialogViewModel
 
@@ -50,4 +52,16 @@ internal fun ConfirmDeleteRecordDialog(
             }
         },
     )
+}
+
+@DevicePreviews
+@Composable
+private fun ConfirmDeleteRecordDialogPreview() {
+    PreviewTheme {
+        ConfirmDeleteRecordDialog(
+            recordId = -1L,
+            onDeleteRecordConfirm = {},
+            onDialogDismiss = {},
+        )
+    }
 }

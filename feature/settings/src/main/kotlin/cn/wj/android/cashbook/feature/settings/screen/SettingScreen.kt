@@ -46,13 +46,16 @@ import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthentica
 import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
+import cn.wj.android.cashbook.feature.settings.viewmodel.SettingUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.SettingViewModel
 import javax.crypto.Cipher
 
@@ -71,25 +74,13 @@ internal fun SettingRoute(
     viewModel: SettingViewModel = hiltViewModel()
 ) {
 
-    val mobileNetworkDownloadEnable by viewModel.mobileNetworkDownloadEnable.collectAsStateWithLifecycle()
-    val needSecurityVerificationWhenLaunch by viewModel.needSecurityVerificationWhenLaunch.collectAsStateWithLifecycle()
-    val verificationMode by viewModel.verificationMode.collectAsStateWithLifecycle()
-    val enableFingerprintVerification by viewModel.enableFingerprintVerification.collectAsStateWithLifecycle()
-    val hasPassword by viewModel.hasPassword.collectAsStateWithLifecycle()
-    val darkMode by viewModel.darkMode.collectAsStateWithLifecycle()
-    val dynamicColor by viewModel.dynamicColor.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingScreen(
         dialogState = viewModel.dialogState,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
-        mobileNetworkDownloadEnable = mobileNetworkDownloadEnable,
-        needSecurityVerificationWhenLaunch = needSecurityVerificationWhenLaunch,
-        verificationMode = verificationMode,
-        enableFingerprintVerification = enableFingerprintVerification,
-        hasPassword = hasPassword,
+        uiState = uiState,
         hasFingerprint = hasFingerprint,
-        darkMode = darkMode,
-        dynamicColor = dynamicColor,
         onMobileNetworkDownloadEnableChanged = viewModel::onMobileNetworkDownloadEnableChanged,
         onNeedSecurityVerificationWhenLaunchChanged = viewModel::onNeedSecurityVerificationWhenLaunchChanged,
         onEnableFingerprintVerificationChanged = viewModel::onEnableFingerprintVerificationChanged,
@@ -121,14 +112,8 @@ internal fun SettingRoute(
 internal fun SettingScreen(
     dialogState: DialogState,
     shouldDisplayBookmark: String,
-    mobileNetworkDownloadEnable: Boolean,
-    needSecurityVerificationWhenLaunch: Boolean,
-    verificationMode: VerificationModeEnum,
-    enableFingerprintVerification: Boolean,
-    hasPassword: Boolean,
+    uiState: SettingUiState,
     hasFingerprint: Boolean,
-    darkMode: DarkModeEnum,
-    dynamicColor: Boolean,
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -179,23 +164,17 @@ internal fun SettingScreen(
             onModifyConfirm = onModifyConfirm,
             onVerityConfirm = onVerityConfirm,
             onClearConfirm = onClearConfirm,
-            darkMode = darkMode,
-            dynamicColor = dynamicColor,
+            uiState = uiState,
             onFingerprintVerifySuccess = onFingerprintVerifySuccess,
             onFingerprintVerifyError = onFingerprintVerifyError,
-            mobileNetworkDownloadEnable = mobileNetworkDownloadEnable,
             onMobileNetworkDownloadEnableChanged = onMobileNetworkDownloadEnableChanged,
-            needSecurityVerificationWhenLaunch = needSecurityVerificationWhenLaunch,
-            verificationMode = verificationMode,
             onNeedSecurityVerificationWhenLaunchChanged = onNeedSecurityVerificationWhenLaunchChanged,
             hasFingerprint = hasFingerprint,
-            enableFingerprintVerification = enableFingerprintVerification,
             onEnableFingerprintVerificationChanged = onEnableFingerprintVerificationChanged,
             onPasswordClick = onPasswordClick,
             onDarkModeClick = onDarkModeClick,
             onDynamicColorClick = onDynamicColorClick,
             onVerificationModeClick = onVerificationModeClick,
-            hasPassword = hasPassword,
             onClearPasswordClick = onClearPasswordClick,
             onDarkModeSelected = onDarkModeSelected,
             onDynamicColorSelected = onDynamicColorSelected,
@@ -209,14 +188,8 @@ internal fun SettingScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun SettingContent(
     dialogState: DialogState,
-    mobileNetworkDownloadEnable: Boolean,
-    hasPassword: Boolean,
-    needSecurityVerificationWhenLaunch: Boolean,
-    verificationMode: VerificationModeEnum,
     hasFingerprint: Boolean,
-    enableFingerprintVerification: Boolean,
-    darkMode: DarkModeEnum,
-    dynamicColor: Boolean,
+    uiState: SettingUiState,
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
@@ -244,9 +217,9 @@ internal fun SettingContent(
 
         DialogContent(
             dialogState = dialogState,
-            verificationMode = verificationMode,
-            darkMode = darkMode,
-            dynamicColor = dynamicColor,
+            verificationMode = uiState.verificationMode,
+            darkMode = uiState.darkMode,
+            dynamicColor = uiState.dynamicColor,
             onCreateConfirm = onCreateConfirm,
             onDialogDismiss = onDialogDismiss,
             onModifyConfirm = onModifyConfirm,
@@ -266,7 +239,7 @@ internal fun SettingContent(
                     headlineText = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
                     trailingContent = {
                         Switch(
-                            checked = mobileNetworkDownloadEnable,
+                            checked = uiState.mobileNetworkDownloadEnable,
                             onCheckedChange = onMobileNetworkDownloadEnableChanged,
                         )
                     },
@@ -279,14 +252,14 @@ internal fun SettingContent(
                     headlineText = { Text(text = stringResource(id = R.string.need_security_verification_when_launch)) },
                     trailingContent = {
                         Switch(
-                            checked = needSecurityVerificationWhenLaunch,
+                            checked = uiState.needSecurityVerificationWhenLaunch,
                             onCheckedChange = onNeedSecurityVerificationWhenLaunchChanged,
                         )
                     },
                 )
-                if (needSecurityVerificationWhenLaunch) {
+                if (uiState.needSecurityVerificationWhenLaunch) {
                     val verificationModeText = stringResource(
-                        id = when (verificationMode) {
+                        id = when (uiState.verificationMode) {
                             VerificationModeEnum.WHEN_LAUNCH -> R.string.each_launch
                             VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
                         }
@@ -313,12 +286,12 @@ internal fun SettingContent(
                         },
                     )
                 }
-                if (needSecurityVerificationWhenLaunch && hasFingerprint) {
+                if (uiState.needSecurityVerificationWhenLaunch && hasFingerprint) {
                     TranparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
                         trailingContent = {
                             Switch(
-                                checked = enableFingerprintVerification,
+                                checked = uiState.enableFingerprintVerification,
                                 onCheckedChange = onEnableFingerprintVerificationChanged,
                             )
                         },
@@ -327,14 +300,14 @@ internal fun SettingContent(
                 TranparentListItem(
                     modifier = Modifier.clickable { onPasswordClick.invoke() },
                     headlineText = {
-                        if (hasPassword) {
+                        if (uiState.hasPassword) {
                             Text(text = stringResource(id = R.string.modify_password))
                         } else {
                             Text(text = stringResource(id = R.string.create_password))
                         }
                     },
                 )
-                if (hasPassword) {
+                if (uiState.hasPassword) {
                     TranparentListItem(
                         modifier = Modifier.clickable { onClearPasswordClick.invoke() },
                         headlineText = { Text(text = stringResource(id = R.string.clear_password)) },
@@ -345,7 +318,7 @@ internal fun SettingContent(
 
             item {
                 val darkModeText = stringResource(
-                    id = when (darkMode) {
+                    id = when (uiState.darkMode) {
                         DarkModeEnum.FOLLOW_SYSTEM -> R.string.follow_system
                         DarkModeEnum.LIGHT -> R.string.light_mode
                         DarkModeEnum.DARK -> R.string.dark_mode
@@ -384,7 +357,7 @@ internal fun SettingContent(
                             ) {
                                 Text(
                                     modifier = Modifier.padding(end = 8.dp),
-                                    text = stringResource(id = if (dynamicColor) R.string.switch_on else R.string.switch_off),
+                                    text = stringResource(id = if (uiState.dynamicColor) R.string.switch_on else R.string.switch_off),
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
@@ -1123,4 +1096,39 @@ internal fun DynamicColorDialog(
             }
         },
     )
+}
+
+@DevicePreviews
+@Composable
+private fun SettingScreenPreview() {
+    PreviewTheme {
+        SettingScreen(
+            dialogState = DialogState.Dismiss,
+            shouldDisplayBookmark = "",
+            uiState = SettingUiState.Loading,
+            hasFingerprint = true,
+            onMobileNetworkDownloadEnableChanged = {},
+            onNeedSecurityVerificationWhenLaunchChanged = {},
+            onEnableFingerprintVerificationChanged = {},
+            onPasswordClick = {},
+            onClearPasswordClick = {},
+            onDarkModeClick = {},
+            onDynamicColorClick = {},
+            onVerificationModeClick = {},
+            onCreateConfirm = { SettingPasswordStateEnum.SUCCESS },
+            onModifyConfirm = { _, _, _ -> },
+            onVerityConfirm = { _, _ -> },
+            onClearConfirm = { _, _ -> },
+            onFingerprintVerifySuccess = {},
+            onFingerprintVerifyError = { _, _ -> },
+            onDialogDismiss = {},
+            onBookmarkDismiss = {},
+            onDarkModeSelected = {},
+            onDynamicColorSelected = {},
+            onVerificationModeSelected = {},
+            onBackClick = {},
+            onBackupAndRecoveryClick = {},
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+        )
+    }
 }

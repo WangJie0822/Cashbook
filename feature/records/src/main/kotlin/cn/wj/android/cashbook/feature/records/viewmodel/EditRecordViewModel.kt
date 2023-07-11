@@ -309,8 +309,8 @@ class EditRecordViewModel @Inject constructor(
     }
 }
 
-sealed class EditRecordUiState(open val selectedTypeId: Long) {
-    object Loading : EditRecordUiState(selectedTypeId = -1L)
+sealed class EditRecordUiState(open val selectedTypeId: Long = -1L) {
+    object Loading : EditRecordUiState()
 
     data class Success(
         val amountText: String,
@@ -322,7 +322,7 @@ sealed class EditRecordUiState(open val selectedTypeId: Long) {
         val dateTimeText: String,
         val reimbursable: Boolean,
         override val selectedTypeId: Long,
-    ) : EditRecordUiState(selectedTypeId = selectedTypeId)
+    ) : EditRecordUiState()
 }
 
 private fun String.clearZero(): String {

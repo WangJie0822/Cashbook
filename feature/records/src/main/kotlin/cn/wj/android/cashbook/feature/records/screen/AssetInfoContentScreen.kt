@@ -2,7 +2,6 @@ package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
@@ -39,32 +38,34 @@ internal fun AssetInfoContentScreen(
     onRecordItemClick: (RecordViewsEntity) -> Unit,
 ) {
 
-    LazyColumn(content = {
+    LazyColumn(
+        content = {
 
-        item {
-            topContent.invoke()
-        }
-
-        if (recordList.itemCount <= 0) {
             item {
-                Empty(
-                    hintText = stringResource(id = R.string.asset_no_record_data_hint),
-                )
+                topContent.invoke()
             }
-        } else {
-            items(count = recordList.itemCount) { index ->
-                recordList[index]?.let { item ->
-                    RecordListItem(
-                        recordViewsEntity = item,
-                        onRecordItemClick = {
-                            onRecordItemClick.invoke(item)
-                        },
+
+            if (recordList.itemCount <= 0) {
+                item {
+                    Empty(
+                        hintText = stringResource(id = R.string.asset_no_record_data_hint),
                     )
                 }
+            } else {
+                items(count = recordList.itemCount) { index ->
+                    recordList[index]?.let { item ->
+                        RecordListItem(
+                            recordViewsEntity = item,
+                            onRecordItemClick = {
+                                onRecordItemClick.invoke(item)
+                            },
+                        )
+                    }
+                }
+                item {
+                    Footer(hintText = stringResource(id = R.string.footer_hint_default))
+                }
             }
-            item {
-                Footer(hintText = stringResource(id = R.string.footer_hint_default))
-            }
-        }
-    })
+        },
+    )
 }

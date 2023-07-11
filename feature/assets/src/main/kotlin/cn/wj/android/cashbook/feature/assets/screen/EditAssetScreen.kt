@@ -47,7 +47,6 @@ import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CommonDivider
@@ -56,7 +55,7 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
@@ -152,7 +151,7 @@ internal fun EditAssetScreen(
             )
         },
         content = {
-            EditAssetScafold(
+            EditAssetScaffold(
                 isCreate = isCreate,
                 uiState = uiState,
                 onBackClick = onBackClick,
@@ -171,7 +170,7 @@ internal fun EditAssetScreen(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun EditAssetScafold(
+private fun EditAssetScaffold(
     isCreate: Boolean,
     uiState: EditAssetUiState,
     onBackClick: () -> Unit,
@@ -635,36 +634,57 @@ internal fun SingleLineListItem(iconResId: Int, nameResId: Int, onItemClick: () 
 @DevicePreviews
 @Composable
 private fun EditAssetScreenPreview() {
-    CashbookTheme {
-        CashbookGradientBackground {
-            EditAssetScreen(
-                isCreate = true,
-                uiState = EditAssetUiState.Success(
-                    isCreditCard = true,
-                    classification = AssetClassificationEnum.ALIPAY,
-                    assetName = "支付宝",
-                    totalAmount = "10000",
-                    balance = "1000",
-                    openBank = "",
-                    cardNo = "",
-                    remark = "",
-                    billingDate = "1",
-                    repaymentDate = "6",
-                    invisible = false,
-                ),
-                onInvisibleChange = {},
-                onBillingDateClick = {},
-                onRepaymentDateClick = {},
-                dialogState = DialogState.Dismiss,
-                onDialogDismiss = {},
-                onDaySelect = {},
-                onSelectClassificationClick = { },
-                onClassificationChange = { _, _ -> },
-                bottomSheet = EditAssetBottomSheetEnum.DISMISS,
-                onBottomSheetDismiss = { },
-                onSaveClick = { _, _, _, _, _, _, _ -> },
-                onBackClick = { },
-            )
-        }
+    PreviewTheme {
+        EditAssetScreen(
+            isCreate = true,
+            uiState = EditAssetUiState.Success(
+                isCreditCard = true,
+                classification = AssetClassificationEnum.ALIPAY,
+                assetName = "支付宝",
+                totalAmount = "10000",
+                balance = "1000",
+                openBank = "",
+                cardNo = "",
+                remark = "",
+                billingDate = "1",
+                repaymentDate = "6",
+                invisible = false,
+            ),
+            onInvisibleChange = {},
+            onBillingDateClick = {},
+            onRepaymentDateClick = {},
+            dialogState = DialogState.Dismiss,
+            onDialogDismiss = {},
+            onDaySelect = {},
+            onSelectClassificationClick = { },
+            onClassificationChange = { _, _ -> },
+            bottomSheet = EditAssetBottomSheetEnum.DISMISS,
+            onBottomSheetDismiss = { },
+            onSaveClick = { _, _, _, _, _, _, _ -> },
+            onBackClick = { },
+        )
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun EditAssetLoadingScreenPreview() {
+    PreviewTheme {
+        EditAssetScreen(
+            isCreate = true,
+            uiState = EditAssetUiState.Loading,
+            onInvisibleChange = {},
+            onBillingDateClick = {},
+            onRepaymentDateClick = {},
+            dialogState = DialogState.Dismiss,
+            onDialogDismiss = {},
+            onDaySelect = {},
+            onSelectClassificationClick = { },
+            onClassificationChange = { _, _ -> },
+            bottomSheet = EditAssetBottomSheetEnum.DISMISS,
+            onBottomSheetDismiss = { },
+            onSaveClick = { _, _, _, _, _, _, _ -> },
+            onBackClick = { },
+        )
     }
 }

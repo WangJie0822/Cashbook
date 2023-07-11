@@ -17,7 +17,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.AssetEntity
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
 import cn.wj.android.cashbook.feature.assets.component.NotAssociatedAssetListItem
@@ -112,4 +114,16 @@ internal fun EditRecordSelectAssetBottomSheetScreen(
             }
         },
     )
+}
+
+@DevicePreviews
+@Composable
+private fun EditRecordSelectAssetBottomSheetScreenPreview() {
+    PreviewTheme {
+        EditRecordSelectAssetBottomSheetScreen(
+            assetList = listOf(),
+            onAssetChange = {},
+            onAddAssetClick = {},
+        )
+    }
 }

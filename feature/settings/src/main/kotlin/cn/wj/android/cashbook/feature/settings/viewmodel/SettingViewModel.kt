@@ -40,44 +40,28 @@ class SettingViewModel @Inject constructor(
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+        private set
 
     /** 是否需要显示提示 */
     var shouldDisplayBookmark by mutableStateOf("")
+        private set
 
-    /** 是否允许流量下载 */
-    val mobileNetworkDownloadEnable = settingRepository.appDataMode
-        .mapLatest { it.mobileNetworkDownloadEnable }
+    val uiState = settingRepository.appDataMode
+        .mapLatest {
+            SettingUiState.Success(
+                mobileNetworkDownloadEnable = it.mobileNetworkDownloadEnable,
+                needSecurityVerificationWhenLaunch = it.needSecurityVerificationWhenLaunch,
+                verificationMode = it.verificationModel,
+                enableFingerprintVerification = it.enableFingerprintVerification,
+                hasPassword = it.passwordInfo.isNotBlank(),
+                darkMode = it.darkMode,
+                dynamicColor = it.dynamicColor,
+            )
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = false,
-        )
-
-    /** 启动时是否需要安全验证 */
-    val needSecurityVerificationWhenLaunch = settingRepository.appDataMode
-        .mapLatest { it.needSecurityVerificationWhenLaunch }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false,
-        )
-
-    /** 安全验证类型 */
-    val verificationMode = settingRepository.appDataMode
-        .mapLatest { it.verificationModel }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = VerificationModeEnum.WHEN_LAUNCH,
-        )
-
-    /** 是否允许指纹认证 */
-    val enableFingerprintVerification = settingRepository.appDataMode
-        .mapLatest { it.enableFingerprintVerification }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false,
+            initialValue = SettingUiState.Loading,
         )
 
     /** 密码加密向量信息 */
@@ -89,31 +73,8 @@ class SettingViewModel @Inject constructor(
         .mapLatest { it.passwordInfo }
 
     /** 是否有密码 */
-    val hasPassword = passwordInfo
+    private val hasPassword = passwordInfo
         .mapLatest { it.isNotBlank() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false,
-        )
-
-    /** 黑夜模式 */
-    val darkMode = settingRepository.appDataMode
-        .mapLatest { it.darkMode }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = DarkModeEnum.FOLLOW_SYSTEM,
-        )
-
-    /** 动态配色 */
-    val dynamicColor = settingRepository.appDataMode
-        .mapLatest { it.dynamicColor }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false,
-        )
 
     fun onMobileNetworkDownloadEnableChanged(enable: Boolean) {
         viewModelScope.launch {
@@ -152,12 +113,14 @@ class SettingViewModel @Inject constructor(
     }
 
     fun onPasswordClick() {
-        dialogState = if (hasPassword.value) {
-            // 当前有密码，修改密码
-            DialogState.Shown(SettingDialogEnum.MODIFY_PASSWORD)
-        } else {
-            // 当前没有密码，创建密码
-            DialogState.Shown(SettingDialogEnum.CREATE_PASSWORD)
+        viewModelScope.launch {
+            dialogState = if (hasPassword.first()) {
+                // 当前有密码，修改密码
+                DialogState.Shown(SettingDialogEnum.MODIFY_PASSWORD)
+            } else {
+                // 当前没有密码，创建密码
+                DialogState.Shown(SettingDialogEnum.CREATE_PASSWORD)
+            }
         }
     }
 
@@ -341,4 +304,26 @@ class SettingViewModel @Inject constructor(
     fun dismissBookmark() {
         shouldDisplayBookmark = ""
     }
+}
+
+sealed class SettingUiState(
+    open val mobileNetworkDownloadEnable: Boolean = false,
+    open val needSecurityVerificationWhenLaunch: Boolean = false,
+    open val verificationMode: VerificationModeEnum = VerificationModeEnum.WHEN_LAUNCH,
+    open val enableFingerprintVerification: Boolean = false,
+    open val hasPassword: Boolean = false,
+    open val darkMode: DarkModeEnum = DarkModeEnum.FOLLOW_SYSTEM,
+    open val dynamicColor: Boolean = false,
+) {
+    object Loading : SettingUiState()
+
+    data class Success(
+        override val mobileNetworkDownloadEnable: Boolean,
+        override val needSecurityVerificationWhenLaunch: Boolean,
+        override val verificationMode: VerificationModeEnum,
+        override val enableFingerprintVerification: Boolean,
+        override val hasPassword: Boolean,
+        override val darkMode: DarkModeEnum,
+        override val dynamicColor: Boolean,
+    ) : SettingUiState()
 }

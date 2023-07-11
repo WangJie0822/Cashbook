@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,8 +31,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
-import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
+import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.core.ui.DevicePreviews
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import cn.wj.android.cashbook.feature.tags.viewmodel.MyTagsViewModel
@@ -41,31 +45,50 @@ import com.google.accompanist.flowlayout.FlowRow
 internal fun MyTagsRoute(
     onBackClick: () -> Unit,
     onTagStatisticClick: (TagEntity) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MyTagsViewModel = hiltViewModel(),
 ) {
 
+    // 标签列表
+    val tagList by viewModel.tagListData.collectAsStateWithLifecycle()
+
     MyTagsScreen(
+        tagList = tagList,
+        dialogState = viewModel.dialogState,
+        showEditTagDialog = viewModel::showEditTagDialog,
+        showDeleteTagDialog = viewModel::showDeleteTagDialog,
+        dismissDialog = viewModel::dismissDialog,
+        modifyTag = viewModel::modifyTag,
+        deleteTag = viewModel::deleteTag,
         onBackClick = onBackClick,
         onTagStatisticClick = onTagStatisticClick,
+        modifier = modifier,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyTagsScreen(
+    tagList: List<TagEntity>,
+    dialogState: DialogState,
+    showEditTagDialog: (TagEntity?) -> Unit,
+    showDeleteTagDialog: (TagEntity) -> Unit,
+    dismissDialog: () -> Unit,
+    modifyTag: (TagEntity) -> Unit,
+    deleteTag: (TagEntity) -> Unit,
     onBackClick: () -> Unit,
     onTagStatisticClick: (TagEntity) -> Unit,
-    viewModel: MyTagsViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier,
 ) {
-    // 标签列表
-    val tagList by viewModel.tagListData.collectAsStateWithLifecycle()
 
     CashbookScaffold(
+        modifier = modifier,
         topBar = {
             CashbookTopAppBar(
                 text = stringResource(id = R.string.my_tags),
                 onBackClick = onBackClick,
                 actions = {
-                    IconButton(onClick = { viewModel.showEditTagDialog() }) {
+                    IconButton(onClick = { showEditTagDialog(null) }) {
                         Icon(imageVector = CashbookIcons.Add, contentDescription = null)
                     }
                 },
@@ -78,6 +101,27 @@ internal fun MyTagsScreen(
                 .padding(paddingValues)
                 .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         ) {
+            // 编辑标签弹窗
+            if (dialogState is DialogState.Shown<*>) {
+                when (val data = dialogState.data) {
+                    is TagDialogState.Edit -> {
+                        EditTagDialog(
+                            tagEntity = data.tag,
+                            onConfirm = modifyTag,
+                            onDismiss = dismissDialog,
+                        )
+                    }
+
+                    is TagDialogState.Delete -> {
+                        DeleteTagDialog(
+                            tagEntity = data.tag,
+                            onConfirm = deleteTag,
+                            onDismiss = dismissDialog,
+                        )
+                    }
+                }
+            }
+
             // 空布局
             if (tagList.isEmpty()) {
                 Empty(
@@ -107,14 +151,14 @@ internal fun MyTagsScreen(
                                     text = { Text(text = stringResource(id = R.string.modify)) },
                                     onClick = {
                                         expanded = false
-                                        viewModel.showEditTagDialog(it)
+                                        showEditTagDialog(it)
                                     },
                                 )
                                 DropdownMenuItem(
                                     text = { Text(text = stringResource(id = R.string.delete)) },
                                     onClick = {
                                         expanded = false
-                                        viewModel.showDeleteTagDialog(it)
+                                        showDeleteTagDialog(it)
                                     },
                                 )
                                 DropdownMenuItem(
@@ -128,25 +172,6 @@ internal fun MyTagsScreen(
                         }
                     }
                 }
-            }
-
-            // 编辑标签弹窗
-            val dialogState = viewModel.dialogState
-            if (dialogState is TagDialogState.Edit) {
-                EditTagDialog(
-                    tagEntity = dialogState.tag,
-                    onConfirm = viewModel::modifyTag,
-                    onDismiss = viewModel::dismissDialog,
-                )
-            }
-
-            // 删除弹窗
-            if (dialogState is TagDialogState.Delete) {
-                DeleteTagDialog(
-                    tagEntity = dialogState.tag,
-                    onConfirm = viewModel::deleteTag,
-                    onDismiss = viewModel::dismissDialog,
-                )
             }
         }
     }
@@ -229,5 +254,53 @@ fun DeleteTagDialog(
             }
         },
     )
+}
+
+@DevicePreviews
+@Composable
+private fun MyTagsScreenPreview() {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        MyTagsScreen(
+            tagList = listOf(
+                TagEntity(id = 1L, name = "标签1", selected = false),
+                TagEntity(id = 2L, name = "标签1标签1", selected = false),
+                TagEntity(id = 3L, name = "标签1标签1标签1", selected = false),
+                TagEntity(id = 4L, name = "标签1标签1标签1标签1", selected = false),
+                TagEntity(id = 5L, name = "标签1标签1标签1标签1标签1", selected = false),
+                TagEntity(id = 6L, name = "标签1标签1标签1标签1标签1标签1", selected = false),
+                TagEntity(id = 7L, name = "标签2", selected = false),
+            ),
+            dialogState = DialogState.Dismiss,
+            showEditTagDialog = {},
+            showDeleteTagDialog = {},
+            dismissDialog = {},
+            modifyTag = {},
+            deleteTag = {},
+            onBackClick = {},
+            onTagStatisticClick = {}
+        )
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun MyTagsScreenEmptyPreview() {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        MyTagsScreen(
+            tagList = listOf(),
+            dialogState = DialogState.Dismiss,
+            showEditTagDialog = {},
+            showDeleteTagDialog = {},
+            dismissDialog = {},
+            modifyTag = {},
+            deleteTag = {},
+            onBackClick = {},
+            onTagStatisticClick = {}
+        )
+    }
 }
 

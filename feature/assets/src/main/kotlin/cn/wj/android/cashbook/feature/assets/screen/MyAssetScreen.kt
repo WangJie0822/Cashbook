@@ -48,15 +48,18 @@ import cn.wj.android.cashbook.core.design.component.CashbookSmallFloatingActionB
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
+import cn.wj.android.cashbook.core.design.component.Loading
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.model.model.assetModelTestObject
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
+import cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetViewModel
 
 /**
@@ -75,9 +78,7 @@ internal fun MyAssetRoute(
 ) {
 
     val assetTypedListData by viewModel.assetTypedListData.collectAsStateWithLifecycle()
-    val netAsset by viewModel.netAsset.collectAsStateWithLifecycle()
-    val totalAsset by viewModel.totalAsset.collectAsStateWithLifecycle()
-    val totalLiabilities by viewModel.totalLiabilities.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val showMoreDialog = viewModel.showMoreDialog
 
@@ -91,10 +92,8 @@ internal fun MyAssetRoute(
         showMoreDialog = showMoreDialog,
         displayShowMoreDialog = viewModel::displayShowMoreDialog,
         dismissShowMoreDialog = viewModel::dismissShowMoreDialog,
-        netAsset = netAsset,
-        totalAsset = totalAsset,
-        totalLiabilities = totalLiabilities,
         assetTypedListData = assetTypedListData,
+        uiState = uiState,
         onAssetItemClick = onAssetItemClick,
         onAddAssetClick = onAddAssetClick,
         onInvisibleAssetClick = onInvisibleAssetClick,
@@ -109,10 +108,8 @@ internal fun MyAssetScreen(
     showMoreDialog: Boolean,
     displayShowMoreDialog: () -> Unit,
     dismissShowMoreDialog: () -> Unit,
-    netAsset: String,
-    totalAsset: String,
-    totalLiabilities: String,
     assetTypedListData: List<AssetTypeViewsModel>,
+    uiState: MyAssetUiState,
     onAssetItemClick: (Long) -> Unit,
     onAddAssetClick: () -> Unit,
     onInvisibleAssetClick: () -> Unit,
@@ -140,9 +137,7 @@ internal fun MyAssetScreen(
             },
         ) { paddingValues ->
             MyAssetBackdropScaffold(
-                netAsset = netAsset,
-                totalAsset = totalAsset,
-                totalLiabilities = totalLiabilities,
+                uiState = uiState,
                 assetTypedListData = assetTypedListData,
                 onAssetItemClick = onAssetItemClick,
                 paddingValues = paddingValues,
@@ -254,9 +249,7 @@ private fun ShowMoreContent(
 
 @Composable
 internal fun MyAssetBackdropScaffold(
-    netAsset: String,
-    totalAsset: String,
-    totalLiabilities: String,
+    uiState: MyAssetUiState,
     assetTypedListData: List<AssetTypeViewsModel>,
     onAssetItemClick: (Long) -> Unit,
     paddingValues: PaddingValues,
@@ -270,9 +263,7 @@ internal fun MyAssetBackdropScaffold(
         backLayerContent = {
             BackLayerContent(
                 paddingValues = paddingValues,
-                netAsset = netAsset,
-                totalAsset = totalAsset,
-                totalLiabilities = totalLiabilities,
+                uiState = uiState,
             )
         },
         frontLayerScrimColor = Color.Unspecified,
@@ -357,9 +348,7 @@ internal fun AssetTypedInfoItem(
 @Composable
 internal fun BackLayerContent(
     paddingValues: PaddingValues,
-    netAsset: String,
-    totalAsset: String,
-    totalLiabilities: String,
+    uiState: MyAssetUiState,
 ) {
     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onTertiaryContainer) {
         Column(
@@ -369,44 +358,55 @@ internal fun BackLayerContent(
                 .padding(bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = stringResource(id = R.string.net_asset),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
-            )
-            Text(text = netAsset.withCNY(), style = MaterialTheme.typography.titleLarge)
-            Row(
-                modifier = Modifier.padding(top = 8.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.total_asset),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
-                    )
-                    Text(
-                        text = totalAsset.withCNY(),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+            when (uiState) {
+                is MyAssetUiState.Loading -> {
+                    Loading()
                 }
-                Column(
-                    modifier = Modifier
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+
+                is MyAssetUiState.Success -> {
                     Text(
-                        text = stringResource(id = R.string.total_liabilities),
+                        text = stringResource(id = R.string.net_asset),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
                     )
                     Text(
-                        text = totalLiabilities.withCNY(),
-                        style = MaterialTheme.typography.bodyLarge,
+                        text = uiState.netAsset.withCNY(),
+                        style = MaterialTheme.typography.titleLarge
                     )
+                    Row(
+                        modifier = Modifier.padding(top = 8.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.total_asset),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
+                            )
+                            Text(
+                                text = uiState.totalAsset.withCNY(),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.total_liabilities),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
+                            )
+                            Text(
+                                text = uiState.totalLiabilities.withCNY(),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -420,14 +420,10 @@ private fun MyAssetScreenPreview() {
         CashbookGradientBackground {
             val totalIncome = 2000
             val totalLiabilities = 3000
-            val netAsset = totalIncome - totalLiabilities
             MyAssetScreen(
                 showMoreDialog = false,
                 displayShowMoreDialog = {},
                 dismissShowMoreDialog = {},
-                netAsset = "$netAsset".withCNY(),
-                totalAsset = "$totalIncome".withCNY(),
-                totalLiabilities = "$totalLiabilities".withCNY(),
                 assetTypedListData = listOf(
                     AssetTypeViewsModel(
                         R.string.asset_classifications_capital_account, "2000", listOf(
@@ -460,11 +456,36 @@ private fun MyAssetScreenPreview() {
                         )
                     ),
                 ),
+                uiState = MyAssetUiState.Success(
+                    netAsset = "${totalIncome - totalLiabilities}".withCNY(),
+                    totalAsset = "$totalIncome".withCNY(),
+                    totalLiabilities = "$totalLiabilities".withCNY(),
+                ),
                 onAssetItemClick = {},
                 onAddAssetClick = {},
                 onInvisibleAssetClick = {},
                 onBackClick = {},
             )
         }
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun MyAssetScreenLoadingPreview() {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        MyAssetScreen(
+            showMoreDialog = false,
+            displayShowMoreDialog = {},
+            dismissShowMoreDialog = {},
+            assetTypedListData = listOf(),
+            uiState = MyAssetUiState.Loading,
+            onAssetItemClick = {},
+            onAddAssetClick = {},
+            onInvisibleAssetClick = {},
+            onBackClick = {},
+        )
     }
 }

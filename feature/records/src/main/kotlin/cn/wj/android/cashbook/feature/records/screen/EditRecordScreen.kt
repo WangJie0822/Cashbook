@@ -52,14 +52,13 @@ import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.design.component.Calculator
 import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
@@ -712,61 +711,109 @@ internal fun Amount(
 @DevicePreviews
 @Composable
 private fun EditRecordScreenPreview() {
-    CashbookTheme {
-        CashbookGradientBackground {
-            EditRecordScreen(
-                uiState = EditRecordUiState.Success(
-                    amountText = "100",
-                    chargesText = "10",
-                    concessionsText = "",
-                    remarkText = "备注",
-                    assetText = "微信(￥1000)",
-                    relatedAssetText = "",
-                    dateTimeText = "2023-07-01 11:30",
-                    reimbursable = false,
-                    selectedTypeId = -1L,
-                ),
-                shouldDisplayBookmark = EditRecordBookmarkEnum.NONE,
-                dismissBookmark = {},
-                selectedTypeCategory = RecordTypeCategoryEnum.EXPENDITURE,
-                onTypeCategorySelect = {},
-                onBackClick = {},
-                bottomSheetType = EditRecordBottomSheetEnum.NONE,
-                dismissBottomSheet = {},
-                onAmountClick = {},
-                onAmountChange = {},
-                onChargesClick = {},
-                onChargesChange = {},
-                onConcessionsClick = {},
-                onConcessionsChange = {},
-                typeListContent = { modifier, _, _, _, headerContent, footerContent ->
-                    Column(
-                        modifier = modifier.padding(horizontal = 16.dp),
-                    ) {
-                        headerContent(Modifier)
-                        Text(
-                            text = "分类列表",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 50.dp),
-                        )
-                        footerContent(Modifier)
-                    }
-                },
-                onTypeSelect = {},
-                onAssetClick = {},
-                onRelatedAssetClick = {},
-                selectAssetBottomSheetContent = {},
-                selectRelatedAssetBottomSheetContent = {},
-                onDateTimeChange = {},
-                tagText = "",
-                onTagClick = {},
-                selectTagBottomSheetContent = { },
-                onRemarkChange = {},
-                onReimbursableClick = {},
-                onSaveClick = {},
-            )
-        }
+    PreviewTheme {
+        EditRecordScreen(
+            uiState = EditRecordUiState.Success(
+                amountText = "100",
+                chargesText = "10",
+                concessionsText = "",
+                remarkText = "备注",
+                assetText = "微信(￥1000)",
+                relatedAssetText = "",
+                dateTimeText = "2023-07-01 11:30",
+                reimbursable = false,
+                selectedTypeId = -1L,
+            ),
+            shouldDisplayBookmark = EditRecordBookmarkEnum.NONE,
+            dismissBookmark = {},
+            selectedTypeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+            onTypeCategorySelect = {},
+            onBackClick = {},
+            bottomSheetType = EditRecordBottomSheetEnum.NONE,
+            dismissBottomSheet = {},
+            onAmountClick = {},
+            onAmountChange = {},
+            onChargesClick = {},
+            onChargesChange = {},
+            onConcessionsClick = {},
+            onConcessionsChange = {},
+            typeListContent = { modifier, _, _, _, headerContent, footerContent ->
+                Column(
+                    modifier = modifier.padding(horizontal = 16.dp),
+                ) {
+                    headerContent(Modifier)
+                    Text(
+                        text = "分类列表",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 50.dp),
+                    )
+                    footerContent(Modifier)
+                }
+            },
+            onTypeSelect = {},
+            onAssetClick = {},
+            onRelatedAssetClick = {},
+            selectAssetBottomSheetContent = {},
+            selectRelatedAssetBottomSheetContent = {},
+            onDateTimeChange = {},
+            tagText = "",
+            onTagClick = {},
+            selectTagBottomSheetContent = { },
+            onRemarkChange = {},
+            onReimbursableClick = {},
+            onSaveClick = {},
+        )
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun EditRecordLoadingScreenPreview() {
+    PreviewTheme {
+        EditRecordScreen(
+            uiState = EditRecordUiState.Loading,
+            shouldDisplayBookmark = EditRecordBookmarkEnum.NONE,
+            dismissBookmark = {},
+            selectedTypeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+            onTypeCategorySelect = {},
+            onBackClick = {},
+            bottomSheetType = EditRecordBottomSheetEnum.NONE,
+            dismissBottomSheet = {},
+            onAmountClick = {},
+            onAmountChange = {},
+            onChargesClick = {},
+            onChargesChange = {},
+            onConcessionsClick = {},
+            onConcessionsChange = {},
+            typeListContent = { modifier, _, _, _, headerContent, footerContent ->
+                Column(
+                    modifier = modifier.padding(horizontal = 16.dp),
+                ) {
+                    headerContent(Modifier)
+                    Text(
+                        text = "分类列表",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 50.dp),
+                    )
+                    footerContent(Modifier)
+                }
+            },
+            onTypeSelect = {},
+            onAssetClick = {},
+            onRelatedAssetClick = {},
+            selectAssetBottomSheetContent = {},
+            selectRelatedAssetBottomSheetContent = {},
+            onDateTimeChange = {},
+            tagText = "",
+            onTagClick = {},
+            selectTagBottomSheetContent = { },
+            onRemarkChange = {},
+            onReimbursableClick = {},
+            onSaveClick = {},
+        )
     }
 }

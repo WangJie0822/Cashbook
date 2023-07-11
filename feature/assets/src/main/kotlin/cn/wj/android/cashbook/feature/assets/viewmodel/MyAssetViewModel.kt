@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 
@@ -29,66 +28,7 @@ class MyAssetViewModel @Inject constructor(
 
     /** 标记 - 是否显示更多弹窗 */
     var showMoreDialog by mutableStateOf(false)
-
-    /**
-     * 总资产
-     * - 资金账户 + 充值账户 + 投资理财 + 账务借出
-     */
-    val totalAsset = assetRepository.currentVisibleAssetListData
-        .mapLatest { list ->
-            var total = BigDecimal.ZERO
-            list.filterNot { assetModel ->
-                // 排除信用卡和账务借入
-                assetModel.type.isCreditCard() || assetModel.classification == AssetClassificationEnum.BORROW
-            }.forEach { assetModel ->
-                total += assetModel.balance.toBigDecimalOrZero()
-            }
-            total.decimalFormat()
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
-            initialValue = "0",
-        )
-
-    /**
-     * 总负债
-     * - 信用卡已用 + 债务借入
-     */
-    val totalLiabilities = assetRepository.currentVisibleAssetListData
-        .mapLatest { list ->
-            var total = BigDecimal.ZERO
-            list.filter { assetModel ->
-                // 只计算信用卡和债务借入
-                assetModel.type.isCreditCard() || assetModel.classification == AssetClassificationEnum.BORROW
-            }.forEach { assetModel ->
-                total += if (assetModel.type.isCreditCard()) {
-                    // 信用卡，总额度 - 可用
-                    (assetModel.totalAmount.toBigDecimalOrZero() - assetModel.balance.toBigDecimalOrZero())
-                } else {
-                    assetModel.balance.toBigDecimalOrZero()
-                }
-            }
-            total.decimalFormat()
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
-            initialValue = "0",
-        )
-
-    /**
-     * 净资产
-     * - 总资产 - 总负债
-     */
-    val netAsset = combine(totalAsset, totalLiabilities) { totalAsset, totalLiabilities ->
-        (totalAsset.toBigDecimalOrZero() - totalLiabilities.toBigDecimalOrZero()).decimalFormat()
-    }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
-            initialValue = "0",
-        )
+        private set
 
     /**
      * 资产数据列表
@@ -101,6 +41,36 @@ class MyAssetViewModel @Inject constructor(
             initialValue = listOf(),
         )
 
+    val uiState = assetRepository.currentVisibleAssetListData
+        .mapLatest { list ->
+            var totalLiabilities = BigDecimal.ZERO
+            var totalAsset = BigDecimal.ZERO
+            list.forEach { assetModel ->
+                if (assetModel.type.isCreditCard() || assetModel.classification == AssetClassificationEnum.BORROW) {
+                    // 信用卡和债务借入
+                    totalLiabilities += if (assetModel.type.isCreditCard()) {
+                        // 信用卡，总额度 - 可用
+                        (assetModel.totalAmount.toBigDecimalOrZero() - assetModel.balance.toBigDecimalOrZero())
+                    } else {
+                        assetModel.balance.toBigDecimalOrZero()
+                    }
+                } else {
+                    totalAsset += assetModel.balance.toBigDecimalOrZero()
+                }
+
+            }
+            MyAssetUiState.Success(
+                totalAsset = totalAsset.decimalFormat(),
+                totalLiabilities = totalLiabilities.decimalFormat(),
+                netAsset = (totalAsset - totalLiabilities).decimalFormat(),
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
+            initialValue = MyAssetUiState.Loading,
+        )
+
     fun displayShowMoreDialog() {
         showMoreDialog = true
     }
@@ -108,4 +78,13 @@ class MyAssetViewModel @Inject constructor(
     fun dismissShowMoreDialog() {
         showMoreDialog = false
     }
+}
+
+sealed class MyAssetUiState {
+    object Loading : MyAssetUiState()
+    data class Success(
+        val totalAsset: String,
+        val totalLiabilities: String,
+        val netAsset: String,
+    ) : MyAssetUiState()
 }

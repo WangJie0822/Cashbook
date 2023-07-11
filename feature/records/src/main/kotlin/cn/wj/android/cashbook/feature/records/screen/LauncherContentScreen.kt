@@ -60,19 +60,21 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
+import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TranparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
-import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialog
+import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import java.util.Calendar
 import kotlinx.coroutines.CoroutineScope
@@ -91,10 +93,7 @@ internal fun LauncherContentRoute(
 ) {
 
     val currentBookName by viewModel.currentBookName.collectAsStateWithLifecycle()
-    val monthIncome by viewModel.monthIncome.collectAsStateWithLifecycle()
-    val monthExpand by viewModel.monthExpand.collectAsStateWithLifecycle()
-    val monthBalance by viewModel.monthBalance.collectAsStateWithLifecycle()
-    val recordMap by viewModel.currentMonthRecordListMapData.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LauncherContentScreen(
         shouldDisplayDeleteFailedBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
@@ -112,10 +111,7 @@ internal fun LauncherContentRoute(
         onCalendarClick = onCalendarClick,
         onMyAssetClick = onMyAssetClick,
         onAddClick = { onEditRecordClick.invoke(-1L) },
-        monthIncome = monthIncome,
-        monthExpand = monthExpand,
-        monthBalance = monthBalance,
-        recordMap = recordMap,
+        uiState = uiState,
         onRecordItemClick = viewModel::onRecordItemClick,
         dialogState = viewModel.dialogState,
         onDeleteRecordConfirm = viewModel::onDeleteRecordConfirm,
@@ -153,11 +149,7 @@ internal fun LauncherContentScreen(
     // 添加按钮
     onAddClick: () -> Unit,
     // 月收支信息
-    monthIncome: String,
-    monthExpand: String,
-    monthBalance: String,
-    // 记录列表
-    recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
+    uiState: LauncherContentUiState,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
     // 弹窗信息
     dialogState: DialogState,
@@ -212,10 +204,7 @@ internal fun LauncherContentScreen(
                 onCalendarClick = onCalendarClick,
                 onMyAssetClick = onMyAssetClick,
                 onAddClick = onAddClick,
-                monthIncome = monthIncome,
-                monthExpand = monthExpand,
-                monthBalance = monthBalance,
-                recordMap = recordMap,
+                uiState = uiState,
                 onRecordItemClick = onRecordItemClick,
                 dialogState = dialogState,
                 onDeleteRecordConfirm = onDeleteRecordConfirm,
@@ -245,11 +234,7 @@ internal fun LauncherLayoutContent(
     // 添加按钮
     onAddClick: () -> Unit,
     // 月收支信息
-    monthIncome: String,
-    monthExpand: String,
-    monthBalance: String,
-    // 记录列表
-    recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
+    uiState: LauncherContentUiState,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
     // 弹窗信息
     dialogState: DialogState,
@@ -276,10 +261,7 @@ internal fun LauncherLayoutContent(
     ) { paddingValues ->
         LauncherLayoutBackdropScaffold(
             paddingValues = paddingValues,
-            monthIncome = monthIncome,
-            monthExpand = monthExpand,
-            monthBalance = monthBalance,
-            recordMap = recordMap,
+            uiState = uiState,
             onCalendarClick = onCalendarClick,
             onRecordItemClick = onRecordItemClick,
             dialogState = dialogState,
@@ -294,11 +276,7 @@ internal fun LauncherLayoutContent(
 internal fun LauncherLayoutBackdropScaffold(
     paddingValues: PaddingValues,
     // 月收支信息
-    monthIncome: String,
-    monthExpand: String,
-    monthBalance: String,
-    // 记录列表
-    recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
+    uiState: LauncherContentUiState,
     onCalendarClick: () -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
     // 弹窗信息
@@ -309,33 +287,45 @@ internal fun LauncherLayoutBackdropScaffold(
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
-    BackdropScaffold(
-        scaffoldState = scaffoldState,
-        appBar = { /* 使用上层 topBar 处理 */ },
-        peekHeight = paddingValues.calculateTopPadding(),
-        backLayerBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
-        backLayerContent = {
-            BackLayerContent(
-                paddingValues = paddingValues,
-                monthIncome = monthIncome,
-                monthExpand = monthExpand,
-                monthBalance = monthBalance,
-            )
-        },
-        frontLayerScrimColor = Color.Unspecified,
-        frontLayerContent = {
-            FrontLayerContent(
-                dialogState = dialogState,
-                coroutineScope = coroutineScope,
-                sheetState = sheetState,
-                onDialogDismiss = onDialogDismiss,
-                onDeleteRecordConfirm = onDeleteRecordConfirm,
-                recordMap = recordMap,
-                onCalendarClick = onCalendarClick,
-                onRecordItemClick = onRecordItemClick,
-            )
-        },
-    )
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        when (uiState) {
+            is LauncherContentUiState.Loading -> {
+                Loading(modifier = Modifier.align(Alignment.Center))
+            }
+
+            is LauncherContentUiState.Success -> {
+                BackdropScaffold(
+                    scaffoldState = scaffoldState,
+                    appBar = { /* 使用上层 topBar 处理 */ },
+                    peekHeight = paddingValues.calculateTopPadding(),
+                    backLayerBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    backLayerContent = {
+                        BackLayerContent(
+                            paddingValues = paddingValues,
+                            monthIncome = uiState.monthIncome,
+                            monthExpand = uiState.monthExpand,
+                            monthBalance = uiState.monthBalance,
+                        )
+                    },
+                    frontLayerScrimColor = Color.Unspecified,
+                    frontLayerContent = {
+                        FrontLayerContent(
+                            dialogState = dialogState,
+                            coroutineScope = coroutineScope,
+                            sheetState = sheetState,
+                            onDialogDismiss = onDialogDismiss,
+                            onDeleteRecordConfirm = onDeleteRecordConfirm,
+                            recordMap = uiState.recordMap,
+                            onCalendarClick = onCalendarClick,
+                            onRecordItemClick = onRecordItemClick,
+                        )
+                    },
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -891,33 +881,63 @@ internal fun RecordDetailsSheet(
     }
 }
 
-
 @DevicePreviews
 @Composable
 internal fun LauncherContentScreenPreview() {
-    CashbookTheme {
-        CashbookGradientBackground {
-            LauncherContentScreen(
-                shouldDisplayDeleteFailedBookmark = 0,
-                onBookmarkDismiss = { },
-                onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-                viewRecord = null,
-                onRecordItemEditClick = {},
-                onRecordItemDeleteClick = {},
-                bookName = "默认账本",
-                onMenuClick = { },
-                onSearchClick = { },
-                onCalendarClick = { },
-                onMyAssetClick = { },
-                onAddClick = { },
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        LauncherContentScreen(
+            shouldDisplayDeleteFailedBookmark = 0,
+            onBookmarkDismiss = { },
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+            viewRecord = null,
+            onRecordItemEditClick = {},
+            onRecordItemDeleteClick = {},
+            bookName = "默认账本",
+            onMenuClick = { },
+            onSearchClick = { },
+            onCalendarClick = { },
+            onMyAssetClick = { },
+            onAddClick = { },
+            uiState = LauncherContentUiState.Success(
                 monthIncome = "0",
                 monthExpand = "0",
                 monthBalance = "0",
                 recordMap = mapOf(),
-                onRecordItemClick = {},
-                dialogState = DialogState.Dismiss,
-                onDeleteRecordConfirm = {},
-                onDialogDismiss = { })
-        }
+            ),
+            onRecordItemClick = {},
+            dialogState = DialogState.Dismiss,
+            onDeleteRecordConfirm = {},
+            onDialogDismiss = { },
+        )
+    }
+}
+
+@DevicePreviews
+@Composable
+internal fun LauncherContentLoadingScreenPreview() {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        LauncherContentScreen(
+            shouldDisplayDeleteFailedBookmark = 0,
+            onBookmarkDismiss = { },
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+            viewRecord = null,
+            onRecordItemEditClick = {},
+            onRecordItemDeleteClick = {},
+            bookName = "默认账本",
+            onMenuClick = { },
+            onSearchClick = { },
+            onCalendarClick = { },
+            onMyAssetClick = { },
+            onAddClick = { },
+            uiState = LauncherContentUiState.Loading,
+            onRecordItemClick = {},
+            dialogState = DialogState.Dismiss,
+            onDeleteRecordConfirm = {},
+            onDialogDismiss = { },
+        )
     }
 }

@@ -1,18 +1,12 @@
 package cn.wj.android.cashbook.domain.usecase
 
-import android.util.ArrayMap
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
-import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
-import java.math.BigDecimal
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -31,62 +25,24 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
     private val tagRepository: TagRepository,
 ) {
 
-    operator fun invoke(): Flow<Map<RecordDayEntity, List<RecordViewsEntity>>> =
+    operator fun invoke(): Flow<List<RecordViewsEntity>> =
         recordRepository.currentMonthRecordListData.mapLatest { list ->
-            val map = ArrayMap<String, ArrayList<RecordViewsEntity>>()
-            list.sortedBy { it.recordTime }
-                .reversed()
-                .forEach {
-                    val key = it.recordTime.split(" ").firstOrNull()?.split("-")?.lastOrNull()
-                        ?.toIntOrNull()?.toString()
-                    val model = RecordViewsModel(
-                        it.id,
-                        it.booksId,
-                        typeRepository.getNoNullRecordTypeById(it.typeId),
-                        assetRepository.getAssetById(it.assetId),
-                        assetRepository.getAssetById(it.relatedAssetId),
-                        it.amount,
-                        it.charges,
-                        it.concessions,
-                        it.remark,
-                        it.reimbursable,
-                        tagRepository.getRelatedTag(it.id),
-                        listOf(), // TODO
-                        it.recordTime,
-                    ).asEntity()
-                    if (map.containsKey(key)) {
-                        map[key]?.add(model)
-                    } else {
-                        map[key] = arrayListOf(model)
-                    }
-                }
-            map.mapKeys {
-                var totalExpenditure = BigDecimal.ZERO
-                var totalIncome = BigDecimal.ZERO
-                it.value.forEach { record ->
-                    when (record.typeCategory) {
-                        RecordTypeCategoryEnum.EXPENDITURE -> {
-                            // 支出
-                            totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
-                        }
-
-                        RecordTypeCategoryEnum.INCOME -> {
-                            // 收入
-                            totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
-                        }
-
-                        RecordTypeCategoryEnum.TRANSFER -> {
-                            // 转账
-                            totalExpenditure += record.charges.toBigDecimalOrZero()
-                            totalIncome += record.concessions.toBigDecimalOrZero()
-                        }
-                    }
-                }
-                RecordDayEntity(
-                    day = it.key,
-                    dayIncome = totalIncome.decimalFormat(),
-                    dayExpand = totalExpenditure.decimalFormat(),
-                )
+            list.map {
+                RecordViewsModel(
+                    it.id,
+                    it.booksId,
+                    typeRepository.getNoNullRecordTypeById(it.typeId),
+                    assetRepository.getAssetById(it.assetId),
+                    assetRepository.getAssetById(it.relatedAssetId),
+                    it.amount,
+                    it.charges,
+                    it.concessions,
+                    it.remark,
+                    it.reimbursable,
+                    tagRepository.getRelatedTag(it.id),
+                    listOf(), // TODO
+                    it.recordTime,
+                ).asEntity()
             }
         }
 

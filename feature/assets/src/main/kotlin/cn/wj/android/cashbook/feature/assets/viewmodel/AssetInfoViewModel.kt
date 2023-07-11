@@ -93,8 +93,8 @@ class AssetInfoViewModel @Inject constructor(
     }
 }
 
-sealed class AssetInfoUiState(val title: String) {
-    object Loading : AssetInfoUiState(title = "")
+sealed class AssetInfoUiState(val title: String = "") {
+    object Loading : AssetInfoUiState()
 
     data class Success(
         private val assetName: String,

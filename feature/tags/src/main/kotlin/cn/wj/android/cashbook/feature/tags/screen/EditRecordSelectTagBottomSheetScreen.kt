@@ -13,13 +13,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
+import cn.wj.android.cashbook.core.design.component.Empty
+import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModel
@@ -112,19 +116,23 @@ internal fun EditRecordSelectTagBottomSheetScreen(
 
                 CommonDivider()
 
-                FlowRow(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .defaultMinSize(minHeight = 200.dp),
-                    mainAxisSpacing = 8.dp,
-                    crossAxisSpacing = 4.dp,
-                ) {
-                    tagList.forEach {
-                        FilterChip(
-                            selected = it.selected,
-                            onClick = { onTagItemClick(it) },
-                            label = { Text(text = it.name) },
-                        )
+                if (tagList.isEmpty()) {
+                    Empty(hintText = stringResource(id = R.string.tags_empty_hint))
+                } else {
+                    FlowRow(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .defaultMinSize(minHeight = 200.dp),
+                        mainAxisSpacing = 8.dp,
+                        crossAxisSpacing = 4.dp,
+                    ) {
+                        tagList.forEach {
+                            FilterChip(
+                                selected = it.selected,
+                                onClick = { onTagItemClick(it) },
+                                label = { Text(text = it.name) },
+                            )
+                        }
                     }
                 }
             },
@@ -136,5 +144,47 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                 onDismiss = dismissDialog,
             )
         }
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun EditRecordSelectTagBottomSheetScreenPreview() {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        EditRecordSelectTagBottomSheetScreen(
+            tagList = listOf(
+                TagEntity(id = 1L, name = "标签1", selected = false),
+                TagEntity(id = 2L, name = "标签1标签1", selected = false),
+                TagEntity(id = 3L, name = "标签1标签1标签1", selected = false),
+                TagEntity(id = 4L, name = "标签1标签1标签1标签1", selected = false),
+                TagEntity(id = 5L, name = "标签1标签1标签1标签1标签1", selected = false),
+                TagEntity(id = 6L, name = "标签1标签1标签1标签1标签1标签1", selected = false),
+                TagEntity(id = 7L, name = "标签2", selected = false),
+            ),
+            onAddTagClick = {},
+            onAddTagConfirm = {},
+            onTagItemClick = {},
+            dialogState = DialogState.Dismiss,
+            dismissDialog = {},
+        )
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun EditRecordSelectTagBottomSheetScreenEmptyPreview() {
+    PreviewTheme(
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+    ) {
+        EditRecordSelectTagBottomSheetScreen(
+            tagList = listOf(),
+            onAddTagClick = {},
+            onAddTagConfirm = {},
+            onTagItemClick = {},
+            dialogState = DialogState.Dismiss,
+            dismissDialog = {},
+        )
     }
 }

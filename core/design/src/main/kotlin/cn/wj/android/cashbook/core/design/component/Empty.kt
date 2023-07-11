@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
@@ -39,7 +40,7 @@ fun Empty(
     onButtonClick: () -> Unit = {},
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.defaultMinSize(minHeight = 250.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -113,8 +114,8 @@ fun Empty(
 val LocalDefaultEmptyImagePainter =
     staticCompositionLocalOf<Painter> { error("No Empty Image Painter provided") }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun EmptyPreview() {
     CashbookTheme {

@@ -22,7 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainter
-import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHintPainter
+import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHint
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.ui.LocalBackPressedDispatcher
@@ -110,7 +110,7 @@ private fun ProvideLocalState(
     CompositionLocalProvider(
         LocalBackPressedDispatcher provides onBackPressedDispatcher,
         LocalDefaultEmptyImagePainter provides painterResource(id = R.drawable.vector_no_data_200),
-        LocalDefaultLoadingHintPainter provides stringResource(id = R.string.data_in_loading),
+        LocalDefaultLoadingHint provides stringResource(id = R.string.data_in_loading),
         content = content
     )
 }

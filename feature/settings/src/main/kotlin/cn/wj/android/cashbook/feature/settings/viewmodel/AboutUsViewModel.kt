@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -35,46 +34,33 @@ class AboutUsViewModel @Inject constructor(
 
     /** 是否需要显示提示 */
     var shouldDisplayBookmark by mutableStateOf(AboutUsBookmarkEnum.NONE)
-
-    /** 标记 - 是否使用 gitee 源 */
-    val useGitee = settingRepository.appDataMode
-        .mapLatest { !it.useGithub }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false
-        )
-
-    /** 标记 - 是否自动检查更新 */
-    val autoCheckUpdate = settingRepository.appDataMode
-        .mapLatest { it.autoCheckUpdate }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false
-        )
+        private set
 
     /** 标记 - 是否正在获取更新数据 */
     var inRequestUpdateData by mutableStateOf(false)
+        private set
 
     /** 更新数据 */
     private val _updateInfoData = MutableStateFlow<UpdateInfoEntity?>(null)
     val updateInfoData: StateFlow<UpdateInfoEntity?> = _updateInfoData
 
-    /** 是否忽略当前版本 */
-    val ignoreUpdateVersion =
+    /** 下载确认数据 */
+    private val _confirmUpdateInfoData = MutableStateFlow<UpdateInfoEntity?>(null)
+    val confirmUpdateInfoData: StateFlow<UpdateInfoEntity?> = _confirmUpdateInfoData
+
+    val uiState =
         combine(settingRepository.appDataMode, _updateInfoData) { appDataModel, updateInfoEntity ->
-            !appDataModel.ignoreUpdateVersion.isNullOrBlank() && appDataModel.ignoreUpdateVersion == updateInfoEntity?.versionName
+            AboutUsUiState.Success(
+                useGitee = !appDataModel.useGithub,
+                autoCheckUpdate = appDataModel.autoCheckUpdate,
+                ignoreUpdateVersion = appDataModel.ignoreUpdateVersion.isNotBlank() && appDataModel.ignoreUpdateVersion == updateInfoEntity?.versionName
+            )
         }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
-                initialValue = false
+                initialValue = AboutUsUiState.Loading
             )
-
-    /** 下载确认数据 */
-    private val _confirmUpdateInfoData = MutableStateFlow<UpdateInfoEntity?>(null)
-    val confirmUpdateInfoData: StateFlow<UpdateInfoEntity?> = _confirmUpdateInfoData
 
     /**
      * 是否允许下载
@@ -166,4 +152,18 @@ class AboutUsViewModel @Inject constructor(
     fun clearBookmarkState() {
         shouldDisplayBookmark = AboutUsBookmarkEnum.NONE
     }
+}
+
+sealed class AboutUsUiState(
+    open val useGitee: Boolean = false,
+    open val autoCheckUpdate: Boolean = false,
+    open val ignoreUpdateVersion: Boolean = false,
+) {
+    object Loading : AboutUsUiState()
+
+    data class Success(
+        override val useGitee: Boolean,
+        override val autoCheckUpdate: Boolean,
+        override val ignoreUpdateVersion: Boolean,
+    ) : AboutUsUiState()
 }

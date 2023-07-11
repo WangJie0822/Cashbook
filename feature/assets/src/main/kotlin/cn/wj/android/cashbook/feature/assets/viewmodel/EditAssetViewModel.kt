@@ -174,27 +174,17 @@ class EditAssetViewModel @Inject constructor(
 }
 
 sealed class EditAssetUiState(
-    open val classification: AssetClassificationEnum,
-    open val assetName: String,
-    open val totalAmount: String,
-    open val balance: String,
-    open val openBank: String,
-    open val cardNo: String,
-    open val remark: String,
-    open val billingDate: String,
-    open val repaymentDate: String,
+    open val classification: AssetClassificationEnum = AssetClassificationEnum.CASH,
+    open val assetName: String = "",
+    open val totalAmount: String = "",
+    open val balance: String = "",
+    open val openBank: String = "",
+    open val cardNo: String = "",
+    open val remark: String = "",
+    open val billingDate: String = "",
+    open val repaymentDate: String = "",
 ) {
-    object Loading : EditAssetUiState(
-        classification = AssetClassificationEnum.CASH,
-        assetName = "",
-        totalAmount = "",
-        balance = "",
-        openBank = "",
-        cardNo = "",
-        remark = "",
-        billingDate = "",
-        repaymentDate = "",
-    )
+    object Loading : EditAssetUiState()
 
     data class Success(
         val isCreditCard: Boolean,
@@ -208,15 +198,5 @@ sealed class EditAssetUiState(
         override val billingDate: String,
         override val repaymentDate: String,
         val invisible: Boolean,
-    ) : EditAssetUiState(
-        classification = classification,
-        assetName = assetName,
-        totalAmount = totalAmount,
-        balance = balance,
-        openBank = openBank,
-        cardNo = cardNo,
-        remark = remark,
-        billingDate = billingDate,
-        repaymentDate = repaymentDate,
-    )
+    ) : EditAssetUiState()
 }

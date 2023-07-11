@@ -7,7 +7,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
-import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase
@@ -56,7 +55,6 @@ private class AssetRecordPagingSource(
             val page = params.key ?: 0
             val pageSize = params.loadSize
             val items = getAssetRecordViewsUseCase(assetId, page, pageSize)
-            logger().d("load() $page $pageSize $items")
             val prevKey = if (page > 0) page - 1 else null
             val nextKey = if (items.isNotEmpty()) page + 1 else null
             LoadResult.Page(items, prevKey, nextKey)
