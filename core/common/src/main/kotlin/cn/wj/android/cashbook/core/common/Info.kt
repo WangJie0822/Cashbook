@@ -23,3 +23,9 @@ const val GITHUB_OWNER = "WangJie0822"
 
 /** 项目仓库名 */
 const val REPO_NAME = "Cashbook"
+
+/** 更新日志文件路径 */
+const val CHANGELOG_FILE_PATH = "CHANGELOG.md"
+
+/** 用户协议及隐私政策文件路径 */
+const val PRIVACY_POLICY_FILE_PATH = "PRIVACY_POLICY.md"

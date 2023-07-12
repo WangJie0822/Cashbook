@@ -181,7 +181,7 @@ internal fun AboutUsScreen(
                 item {
                     Icon(
                         modifier = Modifier.padding(top = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_launcher),
+                        painter = painterResource(id = R.drawable.ic_notification),
                         contentDescription = null,
                         tint = Color.Unspecified,
                     )

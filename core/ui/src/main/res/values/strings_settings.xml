@@ -25,6 +25,9 @@
     <string name="update">更新</string>
     <string name="version_info">版本信息</string>
     <string name="user_agreement_and_privacy_policy">用户协议和隐私政策</string>
+    <string name="user_agreement_and_privacy_policy_hint_start">欢迎使用记账本APP！我们非常尊重并保护所有使用服务用户的个人隐私权，在使用记账本各项服务前，请您务必仔细阅读、透彻理解并同意接受</string>
+    <string name="user_agreement_and_privacy_policy_hint_end">后，再开始使用我们的服务。</string>
+    <string name="user_agreement_and_privacy_policy_with_chevron">《用户协议和隐私政策》</string>
 
     <string name="show_notification">显示通知</string>
     <string name="update_progress_title">下载进度</string>

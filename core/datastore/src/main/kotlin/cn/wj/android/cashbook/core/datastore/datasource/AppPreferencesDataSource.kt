@@ -42,7 +42,8 @@ class AppPreferencesDataSource @Inject constructor(
                 fingerprintPasswordInfo = it.fingerprintPasswordInfo,
                 darkMode = DarkModeEnum.typeOf(it.darkMode),
                 dynamicColor = it.dynamicColor,
-                verificationModel = VerificationModeEnum.typeOf(it.verificationMode)
+                verificationModel = VerificationModeEnum.typeOf(it.verificationMode),
+                agreedProtocol = it.agreedProtocol,
             )
         }
 
@@ -124,6 +125,10 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateVerificationMode(verificationMode: VerificationModeEnum) {
         appPreferences.updateData { it.copy { this.verificationMode = verificationMode.type } }
+    }
+
+    suspend fun updateAgreedProtocol(agreedProtocol: Boolean) {
+        appPreferences.updateData { it.copy { this.agreedProtocol = agreedProtocol } }
     }
 
     suspend fun needRelated(typeId: Long): Boolean {

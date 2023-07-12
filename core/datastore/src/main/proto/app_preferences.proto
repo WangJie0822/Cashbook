@@ -23,4 +23,5 @@ message AppPreferences {
   int32 darkMode = 16; // 黑夜模式
   bool dynamicColor = 17; // 动态配色
   int32 verificationMode = 18; // 安全验证类型
+  bool agreedProtocol = 19; // 已同意用户协议及隐私政策
 }

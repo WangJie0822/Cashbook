@@ -16,6 +16,7 @@ import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.sync.initializers.Sync
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.HiltAndroidApp
@@ -56,6 +57,9 @@ class MyApplication : Application() {
             logger("UncaughtException").e(throwable, "UncaughtException $thread")
             AppManager.finishAllActivity()
         }
+
+        // 初始化同步服务
+        Sync.initialize(this)
 
         // 初始化通知渠道
         initNotificationChannel()

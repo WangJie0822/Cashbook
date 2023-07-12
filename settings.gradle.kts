@@ -71,3 +71,6 @@ include(
     ":core:testing",
     ":core:MPChart",
 )
+include(
+    ":sync:work",
+)

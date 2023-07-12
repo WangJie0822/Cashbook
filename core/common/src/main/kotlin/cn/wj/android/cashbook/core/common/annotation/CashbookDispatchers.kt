@@ -9,4 +9,5 @@ annotation class Dispatcher(val dispatcher: CashbookDispatchers)
 
 enum class CashbookDispatchers {
     IO,
+    ;
 }

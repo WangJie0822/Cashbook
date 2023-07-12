@@ -1,7 +1,9 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
+import cn.wj.android.cashbook.core.datastore.datasource.GitInfosDataSource
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
@@ -21,6 +23,7 @@ import kotlinx.coroutines.withContext
  */
 class SettingRepositoryImpl @Inject constructor(
     private val appPreferencesDataSource: AppPreferencesDataSource,
+    private val gitInfosDataSource: GitInfosDataSource,
     private val networkDataSource: NetworkDataSource,
 ) : SettingRepository {
 
@@ -115,11 +118,68 @@ class SettingRepositoryImpl @Inject constructor(
         appPreferencesDataSource.updateVerificationMode(verificationMode)
     }
 
+    override suspend fun updateAgreedProtocol(
+        agreedProtocol: Boolean,
+        coroutineContext: CoroutineContext
+    ) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateAgreedProtocol(agreedProtocol)
+    }
+
     override suspend fun checkUpdate(
         coroutineContext: CoroutineContext
     ): UpdateInfoEntity = withContext(coroutineContext) {
         networkDataSource.checkUpdate(!appPreferencesDataSource.appData.first().useGithub)
             .toUpdateInfoEntity()
+    }
+
+    override suspend fun syncChangelog(
+        coroutineContext: CoroutineContext
+    ): Boolean = withContext(coroutineContext) {
+        try {
+            val content =
+                networkDataSource.getChangelog(!appPreferencesDataSource.appData.first().useGithub)
+            gitInfosDataSource.updateChangelogData(content.content)
+            true
+        } catch (throwable: Throwable) {
+            this@SettingRepositoryImpl.logger().e(throwable, "syncChangelog()")
+            false
+        }
+    }
+
+    override suspend fun syncPrivacyPolicy(
+        coroutineContext: CoroutineContext
+    ): Boolean = withContext(coroutineContext) {
+        try {
+            val content =
+                networkDataSource.getPrivacyPolicy(!appPreferencesDataSource.appData.first().useGithub)
+            gitInfosDataSource.updatePrivacyPolicyData(content.content)
+            true
+        } catch (throwable: Throwable) {
+            this@SettingRepositoryImpl.logger().e(throwable, "syncPrivacyPolicy()")
+            false
+        }
+    }
+
+    override suspend fun syncLatestVersion(
+        coroutineContext: CoroutineContext
+    ): Boolean = withContext(coroutineContext) {
+        try {
+            val release =
+                networkDataSource.checkUpdate(!appPreferencesDataSource.appData.first().useGithub)
+            val asset = release.assets?.firstOrNull {
+                it.name?.endsWith(".apk") ?: false
+            }
+            gitInfosDataSource.updateLatestVersionData(
+                release.name.orEmpty(),
+                release.body.orEmpty(),
+                asset?.name.orEmpty(),
+                asset?.downloadUrl.orEmpty()
+            )
+            true
+        } catch (throwable: Throwable) {
+            this@SettingRepositoryImpl.logger().e(throwable, "syncLatestVersion()")
+            false
+        }
     }
 }
 

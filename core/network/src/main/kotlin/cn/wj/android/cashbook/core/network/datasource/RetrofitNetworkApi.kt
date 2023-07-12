@@ -1,7 +1,7 @@
 package cn.wj.android.cashbook.core.network.datasource
 
+import cn.wj.android.cashbook.core.network.entity.GitContentsEntity
 import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
-import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -21,12 +21,12 @@ interface RetrofitNetworkApi {
     ): GitReleaseEntity
 
     /** 从 Gitee 中根据用户名 [owner] 仓库名 [repo] 获取 [path] 文件数据 */
-    @GET(UrlDefinition.GITEE_RAW)
-    suspend fun giteeRaw(
+    @GET(UrlDefinition.GITEE_FILE_CONTENTS)
+    suspend fun giteeContents(
         @Path("owner") owner: String,
         @Path("repo") repo: String,
         @Path("path") path: String
-    ): ResponseBody
+    ): GitContentsEntity
 
     /** 从 Github 中根据用户名 [owner] 仓库名 [repo] 以及 Release id [id] 查询相关 Release 信息 */
     @GET(UrlDefinition.GITHUB_QUERY_RELEASE)
@@ -37,10 +37,10 @@ interface RetrofitNetworkApi {
     ): GitReleaseEntity
 
     /** 从 Github 中根据用户名 [owner] 仓库名 [repo] 获取 [path] 文件数据 */
-    @GET(UrlDefinition.GITHUB_RAW)
-    suspend fun githubRaw(
+    @GET(UrlDefinition.GITHUB_FILE_CONTENTS)
+    suspend fun githubContents(
         @Path("owner") owner: String,
         @Path("repo") repo: String,
         @Path("path") path: String
-    ): ResponseBody
+    ): GitContentsEntity
 }

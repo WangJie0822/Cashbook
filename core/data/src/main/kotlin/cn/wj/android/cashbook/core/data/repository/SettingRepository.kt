@@ -91,8 +91,19 @@ interface SettingRepository {
         coroutineContext: CoroutineContext = Dispatchers.IO
     )
 
+    suspend fun updateAgreedProtocol(
+        agreedProtocol: Boolean,
+        coroutineContext: CoroutineContext = Dispatchers.IO
+    )
+
     /** 检查更新 */
     suspend fun checkUpdate(
         coroutineContext: CoroutineContext = Dispatchers.IO
     ): UpdateInfoEntity
+
+    suspend fun syncChangelog(coroutineContext: CoroutineContext = Dispatchers.IO): Boolean
+
+    suspend fun syncPrivacyPolicy(coroutineContext: CoroutineContext = Dispatchers.IO): Boolean
+
+    suspend fun syncLatestVersion(coroutineContext: CoroutineContext = Dispatchers.IO): Boolean
 }

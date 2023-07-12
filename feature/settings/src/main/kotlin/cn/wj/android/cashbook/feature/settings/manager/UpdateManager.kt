@@ -159,7 +159,7 @@ object UpdateManager {
                     Intent(EventReceiver.ACTION).apply {
                         putExtra(INTENT_KEY_CANCEL_DOWNLOAD, "")
                     },
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_CANCEL_CURRENT
+                    PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             )
             .setSmallIcon(R.mipmap.ic_launcher)

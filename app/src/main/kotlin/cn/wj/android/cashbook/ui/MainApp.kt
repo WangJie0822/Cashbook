@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,7 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,6 +43,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
+import cn.wj.android.cashbook.core.common.PRIVACY_POLICY_FILE_PATH
+import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
@@ -86,7 +94,8 @@ fun MainApp(
     viewModel: VerifyViewModel = viewModel()
 ) {
 
-    val needVerity by viewModel.needVerity.collectAsStateWithLifecycle()
+    val needRequestProtocol by viewModel.needRequestProtocol.collectAsStateWithLifecycle()
+    val needVerity by viewModel.needVerify.collectAsStateWithLifecycle()
     val supportFingerprint by viewModel.supportFingerprint.collectAsStateWithLifecycle()
     val shouldDisplayBookmark = viewModel.shouldDisplayBookmark
 
@@ -124,7 +133,51 @@ fun MainApp(
                         .padding(paddingValues)
                         .consumeWindowInsets(paddingValues),
                 ) {
-                    if (needVerity) {
+                    if (needRequestProtocol) {
+                        AlertDialog(
+                            onDismissRequest = { AppManager.finishAllActivity() },
+                            title = { Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy)) },
+                            text = {
+                                val tag = "TAG_URL"
+                                val annotatedString = buildAnnotatedString {
+                                    append(stringResource(id = R.string.user_agreement_and_privacy_policy_hint_start))
+                                    pushStringAnnotation(tag, PRIVACY_POLICY_FILE_PATH)
+                                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                                        append(stringResource(id = R.string.user_agreement_and_privacy_policy_with_chevron))
+                                    }
+                                    pop()
+                                    append(stringResource(id = R.string.user_agreement_and_privacy_policy_hint_end))
+                                }
+                                ClickableText(
+                                    text = annotatedString,
+                                    onClick = { offset ->
+                                        val annotations =
+                                            annotatedString.getStringAnnotations(
+                                                tag,
+                                                offset,
+                                                offset
+                                            )
+                                        annotations.firstOrNull()?.let {
+                                            if (it.item == PRIVACY_POLICY_FILE_PATH) {
+                                                // TODO
+                                                logger().i("jump to privacy policy")
+                                            }
+                                        }
+                                    }
+                                )
+                            },
+                            confirmButton = {
+                                TextButton(onClick = viewModel::agreeProtocol) {
+                                    Text(text = stringResource(id = R.string.confirm))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { AppManager.finishAllActivity() }) {
+                                    Text(text = stringResource(id = R.string.cancel))
+                                }
+                            },
+                        )
+                    } else if (needVerity) {
                         Verification(
                             firstOpen = viewModel.firstOpen,
                             supportFingerprint = supportFingerprint,

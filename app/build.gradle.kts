@@ -105,6 +105,9 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))
 
+    // 数据同步
+    implementation(project(":sync:work"))
+
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 

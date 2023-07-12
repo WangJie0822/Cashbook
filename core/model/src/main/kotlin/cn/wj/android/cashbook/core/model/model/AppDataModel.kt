@@ -27,4 +27,5 @@ data class AppDataModel(
     val darkMode: DarkModeEnum,
     val dynamicColor: Boolean,
     val verificationModel: VerificationModeEnum,
+    val agreedProtocol: Boolean,
 )

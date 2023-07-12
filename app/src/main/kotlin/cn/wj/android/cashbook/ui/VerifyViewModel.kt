@@ -34,18 +34,29 @@ import kotlinx.coroutines.launch
  */
 @HiltViewModel
 class VerifyViewModel @Inject constructor(
-    settingRepository: SettingRepository,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
 
-    private val veritied = MutableStateFlow(false)
+    private val verified = MutableStateFlow(false)
 
     var firstOpen by mutableStateOf(true)
+        private set
 
     var shouldDisplayBookmark by mutableStateOf(MainBookmarkEnum.NONE)
+        private set
 
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+        private set
 
-    val needVerity = combine(settingRepository.appDataMode, veritied) { appData, veritied ->
+    val needRequestProtocol = settingRepository.appDataMode
+        .mapLatest { !it.agreedProtocol }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = true,
+        )
+
+    val needVerify = combine(settingRepository.appDataMode, verified) { appData, veritied ->
         appData.needSecurityVerificationWhenLaunch && !veritied
     }
         .stateIn(
@@ -104,7 +115,7 @@ class VerifyViewModel @Inject constructor(
             }
 
             // 密码正确，进入首页
-            veritied.tryEmit(true)
+            verified.tryEmit(true)
         }
     }
 
@@ -147,7 +158,7 @@ class VerifyViewModel @Inject constructor(
             }
 
             // 密码正确，进入首页
-            veritied.tryEmit(true)
+            verified.tryEmit(true)
         }
     }
 
@@ -167,9 +178,15 @@ class VerifyViewModel @Inject constructor(
     fun onActivityStop() {
         viewModelScope.launch {
             if (verificationMode.first() == VerificationModeEnum.WHEN_FOREGROUND) {
-                veritied.tryEmit(false)
+                verified.tryEmit(false)
                 firstOpen = true
             }
+        }
+    }
+
+    fun agreeProtocol() {
+        viewModelScope.launch {
+            settingRepository.updateAgreedProtocol(true)
         }
     }
 
