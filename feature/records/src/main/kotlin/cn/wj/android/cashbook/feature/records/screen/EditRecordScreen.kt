@@ -34,27 +34,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
-import cn.wj.android.cashbook.core.common.ext.completeZero
-import cn.wj.android.cashbook.core.common.ext.toIntOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
-import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_TIME
-import cn.wj.android.cashbook.core.common.tools.dateFormat
-import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.design.component.Calculator
 import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.DatePickerDialog
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
+import cn.wj.android.cashbook.core.design.component.TimePickerDialog
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
@@ -62,16 +56,15 @@ import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
+import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import cn.wj.android.cashbook.feature.records.model.TabItem
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 import com.google.accompanist.flowlayout.FlowRow
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
 
 @Composable
 internal fun EditRecordRoute(
@@ -110,6 +103,11 @@ internal fun EditRecordRoute(
     val selectedTypeId = uiState.selectedTypeId
 
     EditRecordScreen(
+        dialogState = viewModel.dialogState,
+        showDatePicker = viewModel::showDatePickerDialog,
+        datePickerConfirm = viewModel::datePickerConfirm,
+        timePickerConfirm = viewModel::timePickerConfirm,
+        dismissDialog = viewModel::dismissDialog,
         uiState = uiState,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         dismissBookmark = viewModel::dismissBookmark,
@@ -143,7 +141,6 @@ internal fun EditRecordRoute(
                 onAssetChange = viewModel::onRelatedAssetChange,
             )
         },
-        onDateTimeChange = viewModel::onDateTimeChange,
         tagText = tagText,
         onTagClick = viewModel::onTagClick,
         selectTagBottomSheetContent = {
@@ -161,6 +158,11 @@ internal fun EditRecordRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordScreen(
+    dialogState: DialogState,
+    showDatePicker: () -> Unit,
+    datePickerConfirm: (String) -> Unit,
+    timePickerConfirm: (String) -> Unit,
+    dismissDialog: () -> Unit,
     uiState: EditRecordUiState,
     // Snackbar 提示
     shouldDisplayBookmark: EditRecordBookmarkEnum,
@@ -199,8 +201,6 @@ internal fun EditRecordScreen(
     onRelatedAssetClick: () -> Unit,
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
-    // 时间
-    onDateTimeChange: (String) -> Unit,
     // 标签
     tagText: String,
     onTagClick: () -> Unit,
@@ -293,24 +293,49 @@ internal fun EditRecordScreen(
             )
         },
         content = { paddingValues ->
-            EditRecordScaffoldContent(
-                uiState = uiState,
-                typeListContent = typeListContent,
-                selectedTypeCategory = selectedTypeCategory,
-                onTypeSelect = onTypeSelect,
-                primaryColor = primaryColor,
-                onAmountClick = onAmountClick,
-                onRemarkChange = onRemarkChange,
-                onAssetClick = onAssetClick,
-                onRelatedAssetClick = onRelatedAssetClick,
-                onDateTimeChange = onDateTimeChange,
-                tagText = tagText,
-                onTagClick = onTagClick,
-                onReimbursableClick = onReimbursableClick,
-                onChargesClick = onChargesClick,
-                onConcessionsClick = onConcessionsClick,
-                modifier = modifier.padding(paddingValues),
-            )
+            Box(
+                modifier = Modifier.padding(paddingValues),
+            ) {
+                ((dialogState as? DialogState.Shown<*>)?.data as? DateTimePickerModel)?.let { model ->
+                    when (model) {
+                        is DateTimePickerModel.DatePicker -> {
+                            DatePickerDialog(
+                                onDismissRequest = dismissDialog,
+                                onPositiveButtonClick = datePickerConfirm,
+                                onNegativeButtonClick = dismissDialog,
+                                selection = model.dateMs,
+                            )
+                        }
+
+                        is DateTimePickerModel.TimePicker -> {
+                            TimePickerDialog(
+                                onDismissRequest = dismissDialog,
+                                onPositiveButtonClick = timePickerConfirm,
+                                onNegativeButtonClick = dismissDialog,
+                                selection = model.timeMs,
+                            )
+                        }
+                    }
+                }
+
+                EditRecordScaffoldContent(
+                    uiState = uiState,
+                    typeListContent = typeListContent,
+                    selectedTypeCategory = selectedTypeCategory,
+                    onTypeSelect = onTypeSelect,
+                    primaryColor = primaryColor,
+                    onAmountClick = onAmountClick,
+                    onRemarkChange = onRemarkChange,
+                    onAssetClick = onAssetClick,
+                    onRelatedAssetClick = onRelatedAssetClick,
+                    tagText = tagText,
+                    onTagClick = onTagClick,
+                    onReimbursableClick = onReimbursableClick,
+                    onChargesClick = onChargesClick,
+                    onConcessionsClick = onConcessionsClick,
+                    showDatePicker = showDatePicker,
+                )
+            }
         },
     )
 }
@@ -334,12 +359,12 @@ private fun EditRecordScaffoldContent(
     onRemarkChange: (String) -> Unit,
     onAssetClick: () -> Unit,
     onRelatedAssetClick: () -> Unit,
-    onDateTimeChange: (String) -> Unit,
     tagText: String,
     onTagClick: () -> Unit,
     onReimbursableClick: () -> Unit,
     onChargesClick: () -> Unit,
     onConcessionsClick: () -> Unit,
+    showDatePicker: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -434,52 +459,12 @@ private fun EditRecordScaffoldContent(
                                 }
 
                                 // 记录时间
-                                (LocalContext.current as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                                    val dateTime = uiState.dateTimeText
-                                    FilterChip(
-                                        selected = true,
-                                        onClick = {
-                                            var date =
-                                                dateTime.parseDateLong().dateFormat(
-                                                    DATE_FORMAT_DATE
-                                                )
-                                            var time =
-                                                dateTime.parseDateLong().dateFormat(
-                                                    DATE_FORMAT_TIME
-                                                )
-                                            val datePicker =
-                                                MaterialDatePicker.Builder.datePicker()
-                                                    .setSelection(dateTime.parseDateLong())
-                                                    .build()
-                                            val timePicker =
-                                                MaterialTimePicker.Builder()
-                                                    .setTimeFormat(CLOCK_24H)
-                                                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-                                                    .setHour(
-                                                        time.split(":").first()
-                                                            .toIntOrZero()
-                                                    )
-                                                    .setMinute(
-                                                        time.split(":").last()
-                                                            .toIntOrZero()
-                                                    )
-                                                    .build()
-                                            timePicker.addOnPositiveButtonClickListener {
-                                                time =
-                                                    (timePicker.hour.completeZero() + ":" + timePicker.minute.completeZero())
-                                                onDateTimeChange("$date $time")
-                                            }
-                                            datePicker.addOnPositiveButtonClickListener { timeMs ->
-                                                date =
-                                                    timeMs.dateFormat(DATE_FORMAT_DATE)
-                                                timePicker.show(fm, "timePicker")
-                                            }
-                                            datePicker.show(fm, "datePicker")
-                                        },
-                                        label = { Text(text = dateTime) },
-                                    )
-                                }
-
+                                val dateTime = uiState.dateTimeText
+                                FilterChip(
+                                    selected = true,
+                                    onClick = showDatePicker,
+                                    label = { Text(text = dateTime) },
+                                )
 
                                 // 标签
                                 val hasTag = tagText.isNotBlank()
@@ -527,7 +512,7 @@ private fun EditRecordScaffoldContent(
                                 }
 
                                 // TODO 关联的支出记录
-                                if (selectedTypeCategory == RecordTypeCategoryEnum.INCOME/* FIXME && selectedType?.needRelated == true*/) {
+//                                if (selectedTypeCategory == RecordTypeCategoryEnum.INCOME/* FIXME && selectedType?.needRelated == true*/) {
 //                                if (relatedRecordList.isEmpty()) {
 //                                    FilterChip(
 //                                        selected = false,
@@ -543,7 +528,7 @@ private fun EditRecordScaffoldContent(
 //                                        )
 //                                    }
 //                                }
-                                }
+//                                }
                             }
                         }
                     },
@@ -713,6 +698,11 @@ internal fun Amount(
 private fun EditRecordScreenPreview() {
     PreviewTheme {
         EditRecordScreen(
+            dialogState = DialogState.Dismiss,
+            showDatePicker = {},
+            datePickerConfirm = {},
+            timePickerConfirm = {},
+            dismissDialog = {},
             uiState = EditRecordUiState.Success(
                 amountText = "100",
                 chargesText = "10",
@@ -757,7 +747,6 @@ private fun EditRecordScreenPreview() {
             onRelatedAssetClick = {},
             selectAssetBottomSheetContent = {},
             selectRelatedAssetBottomSheetContent = {},
-            onDateTimeChange = {},
             tagText = "",
             onTagClick = {},
             selectTagBottomSheetContent = { },
@@ -773,6 +762,11 @@ private fun EditRecordScreenPreview() {
 private fun EditRecordLoadingScreenPreview() {
     PreviewTheme {
         EditRecordScreen(
+            dialogState = DialogState.Dismiss,
+            showDatePicker = {},
+            datePickerConfirm = {},
+            timePickerConfirm = {},
+            dismissDialog = {},
             uiState = EditRecordUiState.Loading,
             shouldDisplayBookmark = EditRecordBookmarkEnum.NONE,
             dismissBookmark = {},
@@ -807,7 +801,6 @@ private fun EditRecordLoadingScreenPreview() {
             onRelatedAssetClick = {},
             selectAssetBottomSheetContent = {},
             selectRelatedAssetBottomSheetContent = {},
-            onDateTimeChange = {},
             tagText = "",
             onTagClick = {},
             selectTagBottomSheetContent = { },

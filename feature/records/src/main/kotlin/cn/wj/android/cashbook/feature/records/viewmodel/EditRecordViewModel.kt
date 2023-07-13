@@ -10,16 +10,20 @@ import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
+import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
+import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +54,10 @@ class EditRecordViewModel @Inject constructor(
 
     /** 底部 sheet 类型 */
     var bottomSheetType by mutableStateOf(EditRecordBottomSheetEnum.NONE)
+        private set
+
+    /** 弹窗状态 */
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
     /** 记录 id */
@@ -244,13 +252,6 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
-    fun onDateTimeChange(dateTime: String) {
-        viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(recordTime = dateTime))
-            dismissBottomSheet()
-        }
-    }
-
     fun onTagClick() {
         bottomSheetType = EditRecordBottomSheetEnum.TAGS
     }
@@ -306,6 +307,58 @@ class EditRecordViewModel @Inject constructor(
                 shouldDisplayBookmark = EditRecordBookmarkEnum.SAVE_FAILED
             }
         }
+    }
+
+    fun showDatePickerDialog() {
+        viewModelScope.launch {
+            val currentState = uiState.first()
+            if (currentState is EditRecordUiState.Success) {
+                dialogState =
+                    DialogState.Shown(
+                        DateTimePickerModel.DatePicker(
+                            currentState.dateTimeText.parseDateLong(
+                                format = DATE_FORMAT_NO_SECONDS
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    private var dateTemp = ""
+
+    fun datePickerConfirm(date: String) {
+        dateTemp = date
+        showTimePickerDialog()
+    }
+
+    fun timePickerConfirm(time: String) {
+        dismissDialog()
+        viewModelScope.launch {
+            mutableRecordData.tryEmit(
+                displayRecordData.first().copy(recordTime = "$dateTemp $time")
+            )
+        }
+    }
+
+    private fun showTimePickerDialog() {
+        viewModelScope.launch {
+            val currentState = uiState.first()
+            if (currentState is EditRecordUiState.Success) {
+                dialogState =
+                    DialogState.Shown(
+                        DateTimePickerModel.TimePicker(
+                            currentState.dateTimeText.parseDateLong(
+                                format = DATE_FORMAT_NO_SECONDS
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    fun dismissDialog() {
+        dialogState = DialogState.Dismiss
     }
 }
 
