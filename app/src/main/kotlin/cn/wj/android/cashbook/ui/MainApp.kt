@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -44,7 +45,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.PRIVACY_POLICY_FILE_PATH
-import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
@@ -58,6 +58,7 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.enums.MainBookmarkEnum
+import cn.wj.android.cashbook.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.feature.assets.navigation.EditRecordSelectAssetBottomSheetContent
 import cn.wj.android.cashbook.feature.assets.navigation.assetInfoScreen
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
@@ -148,6 +149,7 @@ fun MainApp(
                                     pop()
                                     append(stringResource(id = R.string.user_agreement_and_privacy_policy_hint_end))
                                 }
+                                val currentContext = LocalContext.current
                                 ClickableText(
                                     text = annotatedString,
                                     onClick = { offset ->
@@ -159,8 +161,10 @@ fun MainApp(
                                             )
                                         annotations.firstOrNull()?.let {
                                             if (it.item == PRIVACY_POLICY_FILE_PATH) {
-                                                // TODO
-                                                logger().i("jump to privacy policy")
+                                                MarkdownActivity.actionStart(
+                                                    currentContext,
+                                                    MarkdownTypeEnum.PRIVACY_POLICY
+                                                )
                                             }
                                         }
                                     }
@@ -350,6 +354,7 @@ fun CashbookNavHost(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
+    val currentContext = LocalContext.current
     // FIXME 使用 AnimatedNavHost 从二级界面返回时快速点击左上角菜单会导致 Navigation 不显示，后续添加界面动画时需修复此问题
     NavHost(
         navController = navController,
@@ -381,10 +386,12 @@ fun CashbookNavHost(
             onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
             onVersionInfoClick = {
-                // TODO 版本信息
+                // 版本信息
+                MarkdownActivity.actionStart(currentContext, MarkdownTypeEnum.CHANGELOG)
             },
             onUserAgreementAndPrivacyPolicyClick = {
-                // TODO 用户协议及隐私政策
+                // 用户协议及隐私政策
+                MarkdownActivity.actionStart(currentContext, MarkdownTypeEnum.PRIVACY_POLICY)
             },
         )
         // 设置

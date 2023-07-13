@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -370,9 +370,9 @@ internal fun UpdateHintDialog(
         text = {
             Column {
                 Text(
-                    text = AnnotatedString.Builder()
-                        .append(content)
-                        .toAnnotatedString(),
+                    text = buildAnnotatedString {
+                        append(content)
+                    },
                 )
                 Row(
                     modifier = Modifier

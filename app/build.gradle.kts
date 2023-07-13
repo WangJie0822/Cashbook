@@ -108,6 +108,9 @@ dependencies {
     // 数据同步
     implementation(project(":sync:work"))
 
+    // Markdown 解析
+    implementation(libs.noties.markwon)
+
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 

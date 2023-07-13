@@ -4,6 +4,7 @@ import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
+import cn.wj.android.cashbook.core.model.model.GitDataModel
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,9 @@ interface SettingRepository {
 
     /** 应用配置信息数据源 */
     val appDataMode: Flow<AppDataModel>
+
+    /** 远程仓库数据源 */
+    val gitDataModel: Flow<GitDataModel>
 
     /** 更新使用 github 配置 */
     suspend fun updateUseGithub(

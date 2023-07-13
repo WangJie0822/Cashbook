@@ -25,18 +25,23 @@
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Cashbook.Splash"
+        android:theme="@style/Theme.Cashbook"
         tools:targetApi="o">
 
         <activity
             android:name=".ui.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Cashbook.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.MarkdownActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

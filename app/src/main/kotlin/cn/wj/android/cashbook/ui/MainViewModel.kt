@@ -3,7 +3,6 @@ package cn.wj.android.cashbook.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
-import cn.wj.android.cashbook.core.model.model.AppDataModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,16 +15,10 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState = settingRepository.appDataMode
-        .mapLatest { MainActivityUiState.Success(it) }
+        .mapLatest { ActivityUiState.Success(it) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = MainActivityUiState.Loading,
+            initialValue = ActivityUiState.Loading,
         )
-}
-
-sealed interface MainActivityUiState {
-    object Loading : MainActivityUiState
-
-    data class Success(val appDataModel: AppDataModel) : MainActivityUiState
 }

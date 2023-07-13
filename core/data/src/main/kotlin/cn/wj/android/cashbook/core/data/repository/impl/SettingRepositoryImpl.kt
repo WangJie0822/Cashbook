@@ -8,6 +8,7 @@ import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
+import cn.wj.android.cashbook.core.model.model.GitDataModel
 import cn.wj.android.cashbook.core.network.datasource.NetworkDataSource
 import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
 import javax.inject.Inject
@@ -28,6 +29,8 @@ class SettingRepositoryImpl @Inject constructor(
 ) : SettingRepository {
 
     override val appDataMode: Flow<AppDataModel> = appPreferencesDataSource.appData
+
+    override val gitDataModel: Flow<GitDataModel> = gitInfosDataSource.gitData
 
     override suspend fun updateUseGithub(
         useGithub: Boolean,
