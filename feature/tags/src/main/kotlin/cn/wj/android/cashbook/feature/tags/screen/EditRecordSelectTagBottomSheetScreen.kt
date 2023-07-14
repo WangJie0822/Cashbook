@@ -117,7 +117,10 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                 CommonDivider()
 
                 if (tagList.isEmpty()) {
-                    Empty(hintText = stringResource(id = R.string.tags_empty_hint))
+                    Empty(
+                        hintText = stringResource(id = R.string.tags_empty_hint),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 } else {
                     FlowRow(
                         modifier = Modifier

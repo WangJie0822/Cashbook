@@ -151,6 +151,8 @@ tencent-mmkv = "1.2.16"
 # 滴滴相关
 # 开发工具 [Github](https://github.com/Android-MI/DoraemonKit)
 didi-doraemonkit = "1.1.2"
+# 开发工具 [Github](https://github.com/didi/DoKit)
+didi-dokit = "3.7.1"
 
 # Markdown 解析 [Github](https://github.com/noties/Markwon) [指南](https://noties.io/Markwon/)
 noties-markwon = "4.6.2"
@@ -465,6 +467,12 @@ tencent-mmkv = { group = "com.tencent", name = "mmkv", version.ref = "tencent-mm
 # 开发工具 [Github](https://github.com/Android-MI/DoraemonKit)
 didi-doraemonkit-debug = { group = "com.didichuxing.doraemonkit", name = "doraemonkit", version.ref = "didi-doraemonkit" }
 didi-doraemonkit-release = { group = "com.didichuxing.doraemonkit", name = "doraemonkit-no-op", version.ref = "didi-doraemonkit" }
+# 开发工具 [Github](https://github.com/didi/DoKit)
+didi-dokit-core = { group = "io.github.didi.dokit", name = "dokitx", version.ref = "didi-dokit" }
+didi-dokit-ft = { group = "io.github.didi.dokit", name = "dokitx-ft", version.ref = "didi-dokit" }
+didi-dokit-mc = { group = "io.github.didi.dokit", name = "dokitx-mc", version.ref = "didi-dokit" }
+didi-dokit-weex = { group = "io.github.didi.dokit", name = "dokitx-weex", version.ref = "didi-dokit" }
+didi-dokit-noop = { group = "io.github.didi.dokit", name = "dokitx-no-op", version.ref = "didi-dokit" }
 
 # Markdown 解析 [Github](https://github.com/noties/Markwon) [指南](https://noties.io/Markwon/)
 noties-markwon = { group = "io.noties.markwon", name = "core", version.ref = "noties-markwon" }

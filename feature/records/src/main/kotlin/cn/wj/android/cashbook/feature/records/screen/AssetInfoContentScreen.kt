@@ -1,7 +1,9 @@
 package cn.wj.android.cashbook.feature.records.screen
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
@@ -49,6 +51,7 @@ internal fun AssetInfoContentScreen(
                 item {
                     Empty(
                         hintText = stringResource(id = R.string.asset_no_record_data_hint),
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             } else {

@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.feature.assets.screen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -159,18 +160,22 @@ internal fun AssetInfoScreen(
                 text = uiState.title,
                 onBackClick = onBackClick,
                 actions = {
-                    IconButton(onClick = onEditAssetClick) {
-                        Icon(imageVector = CashbookIcons.EditNote, contentDescription = null)
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = CashbookIcons.MoreVert, contentDescription = null)
+                    if (uiState is AssetInfoUiState.Success) {
+                        IconButton(onClick = onEditAssetClick) {
+                            Icon(imageVector = CashbookIcons.EditNote, contentDescription = null)
+                        }
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(imageVector = CashbookIcons.MoreVert, contentDescription = null)
+                        }
                     }
                 },
             )
         },
         floatingActionButton = {
-            CashbookFloatingActionButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+            if (uiState is AssetInfoUiState.Success) {
+                CashbookFloatingActionButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+                }
             }
         },
         snackbarHost = {
@@ -178,11 +183,15 @@ internal fun AssetInfoScreen(
         },
         sheetState = sheetState,
         sheetContent = {
-            recordDetailSheetContent.invoke(viewRecord)
+            if (uiState is AssetInfoUiState.Success) {
+                recordDetailSheetContent.invoke(viewRecord)
+            }
         },
         content = { paddingValues ->
             Box(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
             ) {
                 (dialogState as? DialogState.Shown<*>)?.let {
                     val recordId = it.data
@@ -197,8 +206,8 @@ internal fun AssetInfoScreen(
                 }
 
                 when (uiState) {
-                    is AssetInfoUiState.Loading -> {
-                        Loading()
+                    AssetInfoUiState.Loading -> {
+                        Loading(modifier = Modifier.align(Alignment.Center))
                     }
 
                     is AssetInfoUiState.Success -> {

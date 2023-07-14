@@ -265,17 +265,21 @@ internal fun EditRecordScreen(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            EditRecordTopBarNew(
+            EditRecordTopBar(
+                uiState = uiState,
                 selectedTab = selectedTypeCategory,
                 onTabSelected = onTypeCategorySelect,
                 onBackClick = onBackClick,
             )
         },
         floatingActionButton = {
-            CashbookFloatingActionButton(onClick = {
-                onSaveClick()
-            }) {
-                Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
+            if (uiState is EditRecordUiState.Success) {
+                CashbookFloatingActionButton(
+                    onClick = onSaveClick,
+                    content = {
+                        Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
+                    },
+                )
             }
         },
         sheetState = sheetState,
@@ -368,11 +372,11 @@ private fun EditRecordScaffoldContent(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
     ) {
         when (uiState) {
-            is EditRecordUiState.Loading -> {
-                Loading()
+            EditRecordUiState.Loading -> {
+                Loading(modifier = Modifier.align(Alignment.Center))
             }
 
             is EditRecordUiState.Success -> {
@@ -606,7 +610,8 @@ private fun EditRecordBottomSheetContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun EditRecordTopBarNew(
+internal fun EditRecordTopBar(
+    uiState: EditRecordUiState,
     onBackClick: () -> Unit,
     selectedTab: RecordTypeCategoryEnum,
     onTabSelected: (RecordTypeCategoryEnum) -> Unit,
@@ -633,27 +638,29 @@ internal fun EditRecordTopBarNew(
             }
         },
         title = {
-            TabRow(
-                modifier = Modifier.fillMaxSize(),
-                selectedTabIndex = selectedTab.position,
-                containerColor = Color.Unspecified,
-                contentColor = Color.Unspecified,
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.position]),
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
-                },
-                divider = {},
-            ) {
-                tabs.forEach { tabItem ->
-                    Tab(
-                        selected = selectedTab == tabItem.type,
-                        onClick = { onTabSelected(tabItem.type) },
-                        text = { Text(text = tabItem.title) },
-                        selectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        unselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
+            if (uiState is EditRecordUiState.Success) {
+                TabRow(
+                    modifier = Modifier.fillMaxSize(),
+                    selectedTabIndex = selectedTab.position,
+                    containerColor = Color.Unspecified,
+                    contentColor = Color.Unspecified,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.position]),
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        )
+                    },
+                    divider = {},
+                ) {
+                    tabs.forEach { tabItem ->
+                        Tab(
+                            selected = selectedTab == tabItem.type,
+                            onClick = { onTabSelected(tabItem.type) },
+                            text = { Text(text = tabItem.title) },
+                            selectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            unselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        )
+                    }
                 }
             }
         },

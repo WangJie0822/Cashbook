@@ -15,7 +15,12 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState = settingRepository.appDataMode
-        .mapLatest { ActivityUiState.Success(it) }
+        .mapLatest {
+            ActivityUiState.Success(
+                darkMode = it.darkMode,
+                dynamicColor = it.dynamicColor,
+            )
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -259,7 +260,9 @@ private fun EditAssetScaffold(
         },
     ) { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
         ) {
             if (dialogState != DialogState.Dismiss) {
                 SelectDayDialog(
@@ -269,8 +272,8 @@ private fun EditAssetScaffold(
             }
 
             when (uiState) {
-                is EditAssetUiState.Loading -> {
-                    Loading()
+                EditAssetUiState.Loading -> {
+                    Loading(modifier = Modifier.align(Alignment.Center))
                 }
 
                 is EditAssetUiState.Success -> {

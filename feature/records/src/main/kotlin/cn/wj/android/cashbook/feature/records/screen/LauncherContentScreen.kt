@@ -20,6 +20,7 @@ import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -291,7 +292,7 @@ internal fun LauncherLayoutBackdropScaffold(
         modifier = Modifier.fillMaxSize(),
     ) {
         when (uiState) {
-            is LauncherContentUiState.Loading -> {
+            LauncherContentUiState.Loading -> {
                 Loading(modifier = Modifier.align(Alignment.Center))
             }
 
@@ -362,8 +363,12 @@ private fun FrontLayerContent(
             if (recordMap.isEmpty()) {
                 Empty(
                     hintText = stringResource(id = R.string.launcher_no_data_hint),
-                    buttonText = stringResource(id = R.string.launcher_no_data_button),
-                    onButtonClick = onCalendarClick,
+                    button = {
+                        FilledTonalButton(onClick = onCalendarClick) {
+                            Text(text = stringResource(id = R.string.launcher_no_data_button))
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.TopCenter),
                 )
             } else {
                 val todayInt = Calendar.getInstance()[Calendar.DAY_OF_MONTH]

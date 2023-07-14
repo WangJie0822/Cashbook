@@ -125,8 +125,8 @@ internal fun MyTagsScreen(
             // 空布局
             if (tagList.isEmpty()) {
                 Empty(
-                    modifier = Modifier.fillMaxSize(),
                     hintText = stringResource(id = R.string.tags_empty_hint),
+                    modifier = Modifier.fillMaxSize(),
                 )
             } else {
                 // 标签列表

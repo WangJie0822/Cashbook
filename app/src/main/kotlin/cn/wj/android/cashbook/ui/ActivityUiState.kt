@@ -9,14 +9,16 @@ import androidx.compose.ui.res.stringResource
 import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainter
 import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHint
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
-import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.ui.LocalBackPressedDispatcher
 import cn.wj.android.cashbook.core.ui.R
 
 sealed interface ActivityUiState {
     object Loading : ActivityUiState
 
-    data class Success(val appDataModel: AppDataModel) : ActivityUiState
+    data class Success(
+        val darkMode: DarkModeEnum,
+        val dynamicColor: Boolean,
+    ) : ActivityUiState
 }
 
 @Composable
@@ -37,7 +39,7 @@ internal fun shouldDisableDynamicTheming(
     uiState: ActivityUiState,
 ): Boolean = when (uiState) {
     ActivityUiState.Loading -> false
-    is ActivityUiState.Success -> !uiState.appDataModel.dynamicColor
+    is ActivityUiState.Success -> !uiState.dynamicColor
 }
 
 @Composable
@@ -45,7 +47,7 @@ internal fun shouldUseDarkTheme(
     uiState: ActivityUiState,
 ): Boolean = when (uiState) {
     ActivityUiState.Loading -> isSystemInDarkTheme()
-    is ActivityUiState.Success -> when (uiState.appDataModel.darkMode) {
+    is ActivityUiState.Success -> when (uiState.darkMode) {
         DarkModeEnum.FOLLOW_SYSTEM -> isSystemInDarkTheme()
         DarkModeEnum.LIGHT -> false
         DarkModeEnum.DARK -> true

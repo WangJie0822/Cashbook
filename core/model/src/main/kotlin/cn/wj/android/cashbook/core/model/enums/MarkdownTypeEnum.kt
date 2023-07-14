@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.enums
+package cn.wj.android.cashbook.core.model.enums
 
 enum class MarkdownTypeEnum {
 

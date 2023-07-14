@@ -276,6 +276,7 @@ internal fun MyAssetBackdropScaffold(
                         // 无数据
                         Empty(
                             hintText = stringResource(id = R.string.asset_no_data),
+                            modifier = Modifier.align(Alignment.TopCenter),
                         )
                     } else {
                         Column(
@@ -359,7 +360,7 @@ internal fun BackLayerContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (uiState) {
-                is MyAssetUiState.Loading -> {
+                MyAssetUiState.Loading -> {
                     Loading()
                 }
 

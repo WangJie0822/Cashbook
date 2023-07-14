@@ -17,6 +17,7 @@ import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.sync.initializers.Sync
+import com.didichuxing.doraemonkit.DoKit
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.HiltAndroidApp
@@ -63,6 +64,9 @@ class MyApplication : Application() {
 
         // 初始化通知渠道
         initNotificationChannel()
+
+        // 初始化 didi 开发工具
+        DoKit.Builder(this).build()
     }
 
     /** 初始化通知渠道 */

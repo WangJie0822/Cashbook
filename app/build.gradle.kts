@@ -124,4 +124,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.google.accompanist.systemuicontroller)
+
+    debugImplementation(libs.didi.dokit.core)
+    releaseImplementation(libs.didi.dokit.noop)
 }

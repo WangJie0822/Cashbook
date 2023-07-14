@@ -102,13 +102,7 @@ class SettingViewModel @Inject constructor(
 
     fun onEnableFingerprintVerificationChanged(enable: Boolean) {
         viewModelScope.launch {
-            if (enable) {
-                // 开启指纹识别，需要先认证密码
-                dialogState = DialogState.Shown(SettingDialogEnum.VERIFY_PASSWORD)
-            } else {
-                // 关闭指纹识别
-                settingRepository.updateEnableFingerprintVerification(false)
-            }
+            settingRepository.updateEnableFingerprintVerification(enable)
         }
     }
 

@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
-    private val verifyViewModel: VerifyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -73,16 +72,9 @@ class MainActivity : AppCompatActivity() {
                 ProvideLocalState(
                     onBackPressedDispatcher = this.onBackPressedDispatcher,
                 ) {
-                    MainApp(
-                        viewModel = verifyViewModel,
-                    )
+                    MainApp()
                 }
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        verifyViewModel.onActivityStop()
     }
 }
