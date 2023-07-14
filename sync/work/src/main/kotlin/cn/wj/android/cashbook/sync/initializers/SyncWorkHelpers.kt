@@ -12,11 +12,11 @@ import androidx.work.NetworkType
 import cn.wj.android.cashbook.sync.R
 
 const val SYNC_TOPIC = "sync"
-private const val SyncNotificationId = 0
-private const val SyncNotificationChannelID = "SyncNotificationChannel"
+internal  const val SyncNotificationId = 20013
+internal  const val SyncNotificationChannelID = "SyncNotificationChannel"
 
 // All sync work needs an internet connectionS
-val SyncConstraints
+internal val SyncConstraints
     get() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
@@ -25,7 +25,7 @@ val SyncConstraints
  * Foreground information for sync on lower API levels when sync workers are being
  * run with a foreground service
  */
-fun Context.syncForegroundInfo() = ForegroundInfo(
+internal fun Context.syncForegroundInfo() = ForegroundInfo(
     SyncNotificationId,
     syncWorkNotification(),
 )
@@ -34,7 +34,7 @@ fun Context.syncForegroundInfo() = ForegroundInfo(
  * Notification displayed on lower API levels when sync workers are being
  * run with a foreground service
  */
-private fun Context.syncWorkNotification(): Notification {
+internal fun Context.syncWorkNotification(): Notification {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val channel = NotificationChannel(
             SyncNotificationChannelID,

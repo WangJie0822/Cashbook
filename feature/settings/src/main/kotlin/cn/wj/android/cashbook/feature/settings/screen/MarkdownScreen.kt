@@ -1,10 +1,14 @@
 package cn.wj.android.cashbook.feature.settings.screen
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
@@ -39,10 +43,13 @@ internal fun MarkdownRoute(
     }
 ) {
 
+    val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
     val markdownData by viewModel.markdownData.collectAsStateWithLifecycle()
 
     MarkdownScreen(
+        isSyncing = isSyncing,
         markdownData = markdownData,
+        onRetryClick = viewModel::onRetryClick,
         onBackClick = onBackClick,
         modifier = modifier,
     )
@@ -51,7 +58,9 @@ internal fun MarkdownRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MarkdownScreen(
+    isSyncing: Boolean,
     markdownData: String,
+    onRetryClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -72,7 +81,14 @@ internal fun MarkdownScreen(
                 Empty(
                     hintText = stringResource(id = R.string.markdown_no_data_hint),
                     button = {
-                        FilledTonalButton(onClick = { /*TODO*/ }) {
+                        FilledTonalButton(onClick = onRetryClick) {
+                            if (isSyncing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .size(16.dp),
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
                             Text(text = stringResource(id = R.string.retry))
                         }
                     },
@@ -97,12 +113,14 @@ internal fun MarkdownScreen(
 private fun MarkdownScreenPreview() {
     PreviewTheme {
         MarkdownScreen(
+            isSyncing = false,
             markdownData = """
             # 标题一
             ## 标题二
             * 重点内容 **加粗** *斜体* `code`
             正常内容
         """.trimIndent(),
+            onRetryClick = {},
             onBackClick = {},
         )
     }
@@ -115,7 +133,9 @@ private fun MarkdownScreenEmptyPreview() {
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)
     ) {
         MarkdownScreen(
+            isSyncing = true,
             markdownData = "",
+            onRetryClick = {},
             onBackClick = {},
         )
     }
