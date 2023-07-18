@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class AboutUsViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
-    private val networkMonitor: NetworkMonitor,
+    networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     /** 是否需要显示提示 */

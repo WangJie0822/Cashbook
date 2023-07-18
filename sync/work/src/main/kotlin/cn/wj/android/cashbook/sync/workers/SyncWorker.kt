@@ -9,6 +9,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkerParameters
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.sync.initializers.SyncConstraints
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
@@ -37,8 +38,10 @@ class SyncWorker @AssistedInject constructor(
             async { settingRepository.syncLatestVersion() },
         ).all { it }
         if (syncedSuccessfully) {
+            this@SyncWorker.logger().i("doWork(), sync success")
             Result.success()
         } else {
+            this@SyncWorker.logger().i("doWork(), sync failed, retry")
             Result.retry()
         }
     }

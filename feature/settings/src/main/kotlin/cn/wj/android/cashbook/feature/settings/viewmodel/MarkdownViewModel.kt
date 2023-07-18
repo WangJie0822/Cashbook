@@ -30,18 +30,18 @@ class MarkdownViewModel @Inject constructor(
         try {
             when (type) {
                 MarkdownTypeEnum.CHANGELOG -> {
-                    Base64.decode(data.changelogData).decodeToString()
+                    Base64.Mime.decode(data.changelogData).decodeToString()
                 }
 
                 MarkdownTypeEnum.PRIVACY_POLICY -> {
-                    Base64.decode(data.privacyPolicyData).decodeToString()
+                    Base64.Mime.decode(data.privacyPolicyData).decodeToString()
                 }
 
-                else -> ""
+                else -> "No selected type"
             }
         } catch (throwable: Throwable) {
             logger().e(throwable, "markdownData")
-            ""
+            "Data decode error"
         }
     }
         .stateIn(

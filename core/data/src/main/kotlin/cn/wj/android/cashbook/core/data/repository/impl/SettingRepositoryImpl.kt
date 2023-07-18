@@ -131,8 +131,13 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun checkUpdate(
         coroutineContext: CoroutineContext
     ): UpdateInfoEntity = withContext(coroutineContext) {
-        networkDataSource.checkUpdate(!appPreferencesDataSource.appData.first().useGithub)
-            .toUpdateInfoEntity()
+        val gitDataModel = gitDataModel.first()
+        UpdateInfoEntity(
+            versionName = gitDataModel.latestVersionName,
+            versionInfo = gitDataModel.latestVersionInfo,
+            apkName = gitDataModel.latestApkName,
+            downloadUrl = gitDataModel.latestApkDownloadUrl,
+        )
     }
 
     override suspend fun syncChangelog(
