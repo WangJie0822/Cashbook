@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
  */
 @Composable
 @ExperimentalMaterial3Api
-fun TranparentListItem(
+fun TransparentListItem(
     headlineText: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     overlineText: @Composable (() -> Unit)? = null,

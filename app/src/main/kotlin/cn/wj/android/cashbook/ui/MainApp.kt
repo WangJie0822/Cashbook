@@ -33,8 +33,10 @@ import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
+import cn.wj.android.cashbook.feature.settings.navigation.backupAndRecoveryScreen
 import cn.wj.android.cashbook.feature.settings.navigation.markdownScreen
 import cn.wj.android.cashbook.feature.settings.navigation.naviToAboutUs
+import cn.wj.android.cashbook.feature.settings.navigation.naviToBackupAndRecovery
 import cn.wj.android.cashbook.feature.settings.navigation.naviToMarkdown
 import cn.wj.android.cashbook.feature.settings.navigation.naviToSetting
 import cn.wj.android.cashbook.feature.settings.navigation.settingScreen
@@ -127,11 +129,15 @@ fun CashbookNavHost(
         // 设置
         settingScreen(
             onBackClick = navController::popBackStack,
-            onBackupAndRecoveryClick = {/*TODO*/ },
+            onBackupAndRecoveryClick = navController::naviToBackupAndRecovery,
             onShowSnackbar = onShowSnackbar,
         )
         // markdown
         markdownScreen(
+            onBackClick = navController::popBackStack,
+        )
+        // 备份与恢复
+        backupAndRecoveryScreen(
             onBackClick = navController::popBackStack,
         )
 

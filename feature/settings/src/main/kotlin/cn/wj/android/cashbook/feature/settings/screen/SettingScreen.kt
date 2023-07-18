@@ -39,7 +39,7 @@ import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.PasswordTextField
-import cn.wj.android.cashbook.core.design.component.TranparentListItem
+import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
@@ -234,7 +234,7 @@ internal fun SettingContent(
 
         LazyColumn {
             item {
-                TranparentListItem(
+                TransparentListItem(
                     modifier = Modifier.padding(top = 16.dp),
                     headlineText = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
                     trailingContent = {
@@ -247,7 +247,7 @@ internal fun SettingContent(
                 Divider(modifier = Modifier.padding(horizontal = 8.dp))
             }
             item {
-                TranparentListItem(
+                TransparentListItem(
                     modifier = Modifier.padding(top = 16.dp),
                     headlineText = { Text(text = stringResource(id = R.string.need_security_verification_when_launch)) },
                     trailingContent = {
@@ -264,7 +264,7 @@ internal fun SettingContent(
                             VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
                         }
                     )
-                    TranparentListItem(
+                    TransparentListItem(
                         modifier = Modifier
                             .clickable { onVerificationModeClick.invoke() },
                         headlineText = { Text(text = stringResource(id = R.string.verification_mode)) },
@@ -287,7 +287,7 @@ internal fun SettingContent(
                     )
                 }
                 if (uiState.needSecurityVerificationWhenLaunch && hasFingerprint) {
-                    TranparentListItem(
+                    TransparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
                         trailingContent = {
                             Switch(
@@ -297,7 +297,7 @@ internal fun SettingContent(
                         },
                     )
                 }
-                TranparentListItem(
+                TransparentListItem(
                     modifier = Modifier.clickable { onPasswordClick.invoke() },
                     headlineText = {
                         if (uiState.hasPassword) {
@@ -308,7 +308,7 @@ internal fun SettingContent(
                     },
                 )
                 if (uiState.hasPassword) {
-                    TranparentListItem(
+                    TransparentListItem(
                         modifier = Modifier.clickable { onClearPasswordClick.invoke() },
                         headlineText = { Text(text = stringResource(id = R.string.clear_password)) },
                     )
@@ -324,7 +324,7 @@ internal fun SettingContent(
                         DarkModeEnum.DARK -> R.string.dark_mode
                     }
                 )
-                TranparentListItem(
+                TransparentListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onDarkModeClick.invoke() },
@@ -347,7 +347,7 @@ internal fun SettingContent(
                     },
                 )
                 if (supportsDynamicTheming()) {
-                    TranparentListItem(
+                    TransparentListItem(
                         modifier = Modifier.clickable { onDynamicColorClick.invoke() },
                         headlineText = { Text(text = stringResource(id = R.string.dynamic_color)) },
                         supportingText = { Text(text = stringResource(id = R.string.dynamic_color_hint)) },
@@ -373,7 +373,7 @@ internal fun SettingContent(
             }
 
             item {
-                TranparentListItem(
+                TransparentListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onBackupAndRecoveryClick.invoke() },

@@ -44,7 +44,7 @@ import cn.wj.android.cashbook.core.common.tools.jumpBrowser
 import cn.wj.android.cashbook.core.common.tools.jumpSendEmail
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.TranparentListItem
+import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
@@ -257,7 +257,7 @@ internal fun AboutUsScreen(
                             .fillMaxWidth(),
                     )
                     // 数据源
-                    TranparentListItem(
+                    TransparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.switch_data_source)) },
                         supportingText = { Text(text = stringResource(id = R.string.data_source_hint)) },
                         trailingContent = {
@@ -283,7 +283,7 @@ internal fun AboutUsScreen(
                         },
                     )
                     // 自动检查更新
-                    TranparentListItem(
+                    TransparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.auto_check_update)) },
                         trailingContent = {
                             Switch(
@@ -304,7 +304,7 @@ internal fun AboutUsScreen(
                     } else {
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     }
-                    TranparentListItem(
+                    TransparentListItem(
                         modifier = checkUpdateModifier,
                         headlineText = {
                             Text(
@@ -314,7 +314,7 @@ internal fun AboutUsScreen(
                         },
                     )
                     // 版本信息
-                    TranparentListItem(
+                    TransparentListItem(
                         modifier = Modifier.clickable { onVersionInfoClick.invoke() },
                         headlineText = {
                             Text(text = stringResource(id = R.string.version_info))
@@ -337,7 +337,7 @@ internal fun AboutUsScreen(
                         },
                     )
                     // 用户协议和隐私政策
-                    TranparentListItem(
+                    TransparentListItem(
                         modifier = Modifier.clickable { onUserAgreementAndPrivacyPolicyClick.invoke() },
                         headlineText = {
                             Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy))

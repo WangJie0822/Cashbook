@@ -83,6 +83,20 @@
     <string name="close">关闭</string>
 
     <string name="backup_and_recovery">备份与恢复</string>
+    <string name="text_must_not_be_blank">文本不能为空</string>
+    <string name="webdav_setting">WebDAV 设置</string>
+    <string name="webdav_domain">WebDAV 服务器地址</string>
+    <string name="webdav_account">WebDAV 账户</string>
+    <string name="webdav_password">WebDAV 密码</string>
+    <string name="backup_path">备份路径</string>
+    <string name="click_to_select_backup_path">点击选择备份路径</string>
+    <string name="backup">备份</string>
+    <string name="backup_hint">本地和 WebDAV 一起备份</string>
+    <string name="recovery">恢复</string>
+    <string name="recovery_hint">优先从 WebDAV 恢复，长按从本地恢复</string>
+    <string name="auto_backup">自动备份</string>
+    <string name="each_day">每天一次</string>
+    <string name="each_week">每周一次</string>
 
     <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

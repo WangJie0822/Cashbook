@@ -5,20 +5,21 @@ package cn.wj.android.cashbook.core.model.enums
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/20
  */
-enum class DarkModeEnum(val type: Int) {
+enum class DarkModeEnum {
 
     /** 跟随系统 */
-    FOLLOW_SYSTEM(0),
+    FOLLOW_SYSTEM,
 
     /** 白天模式 */
-    LIGHT(1),
+    LIGHT,
 
     /** 黑夜模式 */
-    DARK(2);
+    DARK,
+    ;
 
     companion object {
-        fun typeOf(type: Int): DarkModeEnum {
-            return values().first { it.type == type }
+        fun ordinalOf(ordinal: Int): DarkModeEnum {
+            return values().first { it.ordinal == ordinal }
         }
     }
 }

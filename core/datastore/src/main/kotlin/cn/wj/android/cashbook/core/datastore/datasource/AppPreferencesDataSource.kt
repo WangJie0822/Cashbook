@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.copy
+import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
@@ -40,11 +41,17 @@ class AppPreferencesDataSource @Inject constructor(
                 fingerprintIv = it.fingerprintIv,
                 passwordInfo = it.passwordInfo,
                 fingerprintPasswordInfo = it.fingerprintPasswordInfo,
-                darkMode = DarkModeEnum.typeOf(it.darkMode),
+                darkMode = DarkModeEnum.ordinalOf(it.darkMode),
                 dynamicColor = it.dynamicColor,
-                verificationModel = VerificationModeEnum.typeOf(it.verificationMode),
+                verificationModel = VerificationModeEnum.ordinalOf(it.verificationMode),
                 agreedProtocol = it.agreedProtocol,
                 syncDate = it.syncDate,
+                webDAVDomain = it.webDAVDomain,
+                webDAVAccount = it.webDAVAccount,
+                webDAVPassword = it.webDAVPassword,
+                backupPath = it.backupPath,
+                autoBackup = AutoBackupModeEnum.ordinalOf(it.autoBackup),
+                lastBackupMs = it.lastBackupMs,
             )
         }
 
@@ -117,7 +124,7 @@ class AppPreferencesDataSource @Inject constructor(
     }
 
     suspend fun updateDarkMode(darkModeEnum: DarkModeEnum) {
-        appPreferences.updateData { it.copy { this.darkMode = darkModeEnum.type } }
+        appPreferences.updateData { it.copy { this.darkMode = darkModeEnum.ordinal } }
     }
 
     suspend fun updateDynamicColor(dynamicColor: Boolean) {
@@ -125,7 +132,7 @@ class AppPreferencesDataSource @Inject constructor(
     }
 
     suspend fun updateVerificationMode(verificationMode: VerificationModeEnum) {
-        appPreferences.updateData { it.copy { this.verificationMode = verificationMode.type } }
+        appPreferences.updateData { it.copy { this.verificationMode = verificationMode.ordinal } }
     }
 
     suspend fun updateAgreedProtocol(agreedProtocol: Boolean) {

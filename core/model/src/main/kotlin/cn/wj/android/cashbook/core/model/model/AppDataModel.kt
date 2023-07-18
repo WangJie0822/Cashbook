@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.core.model.model
 
+import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 
@@ -29,4 +30,10 @@ data class AppDataModel(
     val verificationModel: VerificationModeEnum,
     val agreedProtocol: Boolean,
     val syncDate: String,
+    val webDAVDomain: String,
+    val webDAVAccount: String,
+    val webDAVPassword: String,
+    val backupPath: String,
+    val autoBackup: AutoBackupModeEnum,
+    val lastBackupMs: Long,
 )

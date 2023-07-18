@@ -11,12 +11,6 @@ enum class TypeLevelEnum {
     FIRST,
 
     /** 二级小类 */
-    SECOND;
-
-    companion object {
-
-        fun fromName(name: String?): TypeLevelEnum? {
-            return values().firstOrNull { type -> type.name == name }
-        }
-    }
+    SECOND,
+    ;
 }

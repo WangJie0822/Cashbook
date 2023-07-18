@@ -54,7 +54,7 @@ import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.component.TranparentListItem
+import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
@@ -280,7 +280,7 @@ private fun EditAssetScaffold(
                     Column(
                         modifier = Modifier.verticalScroll(state = rememberScrollState()),
                     ) {
-                        TranparentListItem(
+                        TransparentListItem(
                             modifier = Modifier.clickable(onClick = onSelectClassificationClick),
                             headlineText = {
                                 Text(
@@ -390,7 +390,7 @@ private fun EditAssetScaffold(
                         )
 
                         if (uiState.isCreditCard) {
-                            TranparentListItem(
+                            TransparentListItem(
                                 modifier = Modifier.clickable(onClick = onBillingDateClick),
                                 headlineText = {
                                     Text(
@@ -419,7 +419,7 @@ private fun EditAssetScaffold(
                                 },
                             )
 
-                            TranparentListItem(
+                            TransparentListItem(
                                 modifier = Modifier.clickable(onClick = onRepaymentDateClick),
                                 headlineText = {
                                     Text(
@@ -450,7 +450,7 @@ private fun EditAssetScaffold(
                             )
                         }
 
-                        TranparentListItem(
+                        TransparentListItem(
                             headlineText = {
                                 Text(
                                     text = stringResource(id = R.string.invisible_asset),

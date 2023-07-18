@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.feature.settings.screen.AboutUsRoute
+import cn.wj.android.cashbook.feature.settings.screen.BackupAndRecoveryRoute
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
 import cn.wj.android.cashbook.feature.settings.screen.MarkdownRoute
 import cn.wj.android.cashbook.feature.settings.screen.SettingRoute
@@ -27,6 +28,9 @@ const val ROUTE_SETTINGS_MARKDOWN_KEY_TYPE = "mdType"
 const val ROUTE_SETTINGS_MARKDOWN =
     "settings/markdown?$ROUTE_SETTINGS_MARKDOWN_KEY_TYPE={$ROUTE_SETTINGS_MARKDOWN_KEY_TYPE}"
 
+/** 设置  - 备份与恢复 */
+const val ROUTE_SETTINGS_BACKUP_AND_RECOVERY = "settings/backup_and_recovery"
+
 /** 跳转到关于我们 */
 fun NavController.naviToAboutUs() {
     this.navigate(ROUTE_SETTINGS_ABOUT_US)
@@ -37,6 +41,7 @@ fun NavController.naviToSetting() {
     this.navigate(ROUTE_SETTINGS_SETTING)
 }
 
+/** 跳转到 markdown 界面，显示对应类型 [type] 的数据 */
 fun NavController.naviToMarkdown(type: MarkdownTypeEnum) {
     this.navigate(
         ROUTE_SETTINGS_MARKDOWN
@@ -45,6 +50,11 @@ fun NavController.naviToMarkdown(type: MarkdownTypeEnum) {
                 newValue = type.ordinal.toString()
             )
     )
+}
+
+/** 跳转备份恢复界面 */
+fun NavController.naviToBackupAndRecovery() {
+    this.navigate(ROUTE_SETTINGS_BACKUP_AND_RECOVERY)
 }
 
 /**
@@ -127,6 +137,16 @@ fun NavGraphBuilder.markdownScreen(
         val mdOrdinal = it.arguments?.getInt(ROUTE_SETTINGS_MARKDOWN_KEY_TYPE) ?: -1
         MarkdownRoute(
             markdownType = MarkdownTypeEnum.ordinalOf(mdOrdinal),
+            onBackClick = onBackClick,
+        )
+    }
+}
+
+fun NavGraphBuilder.backupAndRecoveryScreen(
+    onBackClick: () -> Unit,
+) {
+    composable(route = ROUTE_SETTINGS_BACKUP_AND_RECOVERY) {
+        BackupAndRecoveryRoute(
             onBackClick = onBackClick,
         )
     }

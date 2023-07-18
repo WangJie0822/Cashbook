@@ -62,7 +62,7 @@ import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.component.TranparentListItem
+import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
@@ -545,7 +545,7 @@ internal fun RecordListItem(
     recordViewsEntity: RecordViewsEntity,
     onRecordItemClick: () -> Unit,
 ) {
-    TranparentListItem(
+    TransparentListItem(
         modifier = Modifier.clickable {
             onRecordItemClick()
         },
@@ -699,7 +699,7 @@ internal fun RecordDetailsSheet(
                     CommonDivider()
 
                     // 金额
-                    TranparentListItem(
+                    TransparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.amount)) },
                         trailingContent = {
                             Row(
@@ -735,7 +735,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordEntity.charges.toDoubleOrZero() > 0.0) {
                         // 手续费
-                        TranparentListItem(
+                        TransparentListItem(
                             headlineText = { Text(text = stringResource(id = R.string.charges)) },
                             trailingContent = {
                                 Text(
@@ -749,7 +749,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordEntity.typeCategory != RecordTypeCategoryEnum.INCOME && recordEntity.concessions.toDoubleOrZero() > 0.0) {
                         // 优惠
-                        TranparentListItem(
+                        TransparentListItem(
                             headlineText = { Text(text = stringResource(id = R.string.concessions)) },
                             trailingContent = {
                                 Text(
@@ -762,7 +762,7 @@ internal fun RecordDetailsSheet(
                     }
 
                     // 类型
-                    TranparentListItem(
+                    TransparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.type)) },
                         trailingContent = {
                             Row(
@@ -785,7 +785,7 @@ internal fun RecordDetailsSheet(
 
                     recordEntity.assetName?.let { assetName ->
                         // 资产
-                        TranparentListItem(
+                        TransparentListItem(
                             headlineText = { Text(text = stringResource(id = R.string.asset)) },
                             trailingContent = {
                                 Row(
@@ -826,7 +826,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordEntity.relatedTags.isNotEmpty()) {
                         // 标签
-                        TranparentListItem(
+                        TransparentListItem(
                             headlineText = { Text(text = stringResource(id = R.string.tags)) },
                             trailingContent = {
                                 val tagsText = with(StringBuilder()) {
@@ -859,7 +859,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordEntity.remark.isNotBlank()) {
                         // 备注
-                        TranparentListItem(
+                        TransparentListItem(
                             headlineText = { Text(text = stringResource(id = R.string.remark)) },
                             trailingContent = {
                                 Text(
@@ -871,7 +871,7 @@ internal fun RecordDetailsSheet(
                     }
 
                     // 时间
-                    TranparentListItem(
+                    TransparentListItem(
                         headlineText = { Text(text = stringResource(id = R.string.time)) },
                         trailingContent = {
                             Text(

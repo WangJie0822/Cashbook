@@ -192,3 +192,50 @@ fun CompatTextField(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PasswordTextField(
+    textFieldState: TextFieldState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = TextFieldDefaults.filledShape,
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+) {
+    var visible by remember {
+        mutableStateOf(false)
+    }
+
+    CompatTextField(
+        textFieldState = textFieldState,
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(
+                    imageVector = if (visible) CashbookIcons.VisibilityOff else CashbookIcons.Visibility,
+                    contentDescription = null
+                )
+            }
+        },
+        visualTransformation = if (!visible) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = if (!visible) KeyboardType.Password else KeyboardType.Text),
+        keyboardActions = keyboardActions,
+        singleLine = true,
+        interactionSource = interactionSource,
+        shape = shape,
+        colors = colors,
+    )
+}
+
