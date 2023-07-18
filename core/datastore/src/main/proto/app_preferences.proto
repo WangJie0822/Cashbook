@@ -24,4 +24,5 @@ message AppPreferences {
   bool dynamicColor = 17; // 动态配色
   int32 verificationMode = 18; // 安全验证类型
   bool agreedProtocol = 19; // 已同意用户协议及隐私政策
+  string syncDate = 20; // 数据同步时间
 }

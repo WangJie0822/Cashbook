@@ -44,6 +44,7 @@ class AppPreferencesDataSource @Inject constructor(
                 dynamicColor = it.dynamicColor,
                 verificationModel = VerificationModeEnum.typeOf(it.verificationMode),
                 agreedProtocol = it.agreedProtocol,
+                syncDate = it.syncDate,
             )
         }
 
@@ -129,6 +130,10 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateAgreedProtocol(agreedProtocol: Boolean) {
         appPreferences.updateData { it.copy { this.agreedProtocol = agreedProtocol } }
+    }
+
+    suspend fun updateSyncDate(syncDate: String) {
+        appPreferences.updateData { it.copy { this.syncDate = syncDate } }
     }
 
     suspend fun needRelated(typeId: Long): Boolean {

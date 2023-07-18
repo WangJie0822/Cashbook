@@ -5,8 +5,6 @@ import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -23,91 +21,49 @@ interface SettingRepository {
     val gitDataModel: Flow<GitDataModel>
 
     /** 更新使用 github 配置 */
-    suspend fun updateUseGithub(
-        useGithub: Boolean,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateUseGithub(useGithub: Boolean)
 
     /** 更新自动检查更新配置 */
-    suspend fun updateAutoCheckUpdate(
-        autoCheckUpdate: Boolean,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateAutoCheckUpdate(autoCheckUpdate: Boolean)
 
     /** 更新忽略更新版本配置 */
-    suspend fun updateIgnoreUpdateVersion(
-        ignoreUpdateVersion: String,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateIgnoreUpdateVersion(ignoreUpdateVersion: String)
 
     /** 更新是否允许流量下载配置 */
-    suspend fun updateMobileNetworkDownloadEnable(
-        mobileNetworkDownloadEnable: Boolean,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable: Boolean)
 
     /** 更新启动时是否需要安全验证配置 */
-    suspend fun updateNeedSecurityVerificationWhenLaunch(
-        needSecurityVerificationWhenLaunch: Boolean,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean)
 
     /** 更新是否允许指纹验证配置 */
-    suspend fun updateEnableFingerprintVerification(
-        enableFingerprintVerification: Boolean,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateEnableFingerprintVerification(enableFingerprintVerification: Boolean)
 
     /** 更新密码加密向量 */
-    suspend fun updatePasswordIv(
-        iv: String,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updatePasswordIv(iv: String)
 
     /** 更新指纹加密向量 */
-    suspend fun updateFingerprintIv(
-        iv: String,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateFingerprintIv(iv: String)
 
-    suspend fun updatePasswordInfo(
-        passwordInfo: String,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updatePasswordInfo(passwordInfo: String)
 
-    suspend fun updateFingerprintPasswordInfo(
-        fingerprintPasswordInfo: String,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateFingerprintPasswordInfo(fingerprintPasswordInfo: String)
 
-    suspend fun updateDarkMode(
-        darkModeEnum: DarkModeEnum,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateDarkMode(darkModeEnum: DarkModeEnum)
 
-    suspend fun updateDynamicColor(
-        dynamicColor: Boolean,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateDynamicColor(dynamicColor: Boolean)
 
-    suspend fun updateVerificationMode(
-        verificationMode: VerificationModeEnum,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateVerificationMode(verificationMode: VerificationModeEnum)
 
-    suspend fun updateAgreedProtocol(
-        agreedProtocol: Boolean,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateAgreedProtocol(agreedProtocol: Boolean)
 
     /** 检查更新 */
-    suspend fun checkUpdate(
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): UpdateInfoEntity
+    suspend fun checkUpdate(): UpdateInfoEntity
 
-    suspend fun syncChangelog(coroutineContext: CoroutineContext = Dispatchers.IO): Boolean
+    suspend fun syncChangelog(): Boolean
 
-    suspend fun syncPrivacyPolicy(coroutineContext: CoroutineContext = Dispatchers.IO): Boolean
+    suspend fun syncPrivacyPolicy(): Boolean
 
-    suspend fun syncLatestVersion(coroutineContext: CoroutineContext = Dispatchers.IO): Boolean
+    suspend fun syncLatestVersion(): Boolean
+
+    suspend fun updateSyncDate(syncDate: String)
 }

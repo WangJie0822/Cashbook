@@ -6,8 +6,6 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -23,25 +21,13 @@ interface TypeRepository {
 
     val firstTransferTypeListData: Flow<List<RecordTypeModel>>
 
-    suspend fun getRecordTypeById(
-        typeId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): RecordTypeModel?
+    suspend fun getRecordTypeById(typeId: Long): RecordTypeModel?
 
-    suspend fun getNoNullRecordTypeById(
-        typeId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): RecordTypeModel
+    suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel
 
-    suspend fun getFirstRecordTypeListByCategory(
-        typeCategory: RecordTypeCategoryEnum,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): List<RecordTypeModel>
+    suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel>
 
-    suspend fun getSecondRecordTypeListByParentId(
-        parentId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): List<RecordTypeModel>
+    suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel>
 }
 
 internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {

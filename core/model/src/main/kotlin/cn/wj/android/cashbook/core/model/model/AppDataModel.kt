@@ -28,4 +28,5 @@ data class AppDataModel(
     val dynamicColor: Boolean,
     val verificationModel: VerificationModeEnum,
     val agreedProtocol: Boolean,
+    val syncDate: String,
 )

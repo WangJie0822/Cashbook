@@ -16,7 +16,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
@@ -28,7 +28,7 @@ object DataStoreModule {
     @Singleton
     fun providesAppPreferencesDataStore(
         @ApplicationContext context: Context,
-        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineDispatcher,
+        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineContext,
         appPreferencesSerializer: AppPreferencesSerializer,
     ): DataStore<AppPreferences> =
         DataStoreFactory.create(
@@ -42,7 +42,7 @@ object DataStoreModule {
     @Singleton
     fun providesGitInfosDataStore(
         @ApplicationContext context: Context,
-        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineDispatcher,
+        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineContext,
         gitInfosSerializer: GitInfosSerializer,
     ): DataStore<GitInfos> =
         DataStoreFactory.create(

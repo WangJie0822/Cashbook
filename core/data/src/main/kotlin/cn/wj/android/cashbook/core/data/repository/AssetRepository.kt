@@ -12,8 +12,6 @@ import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -29,17 +27,11 @@ interface AssetRepository {
     /** 当前可见资产大类数据 */
     val currentVisibleAssetTypeData: Flow<List<AssetTypeViewsModel>>
 
-    suspend fun getAssetById(
-        assetId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): AssetModel?
+    suspend fun getAssetById(assetId: Long): AssetModel?
 
-    suspend fun getVisibleAssetsByBookId(
-        bookId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): List<AssetModel>
+    suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel>
 
-    suspend fun updateAsset(asset: AssetEntity, coroutineContext: CoroutineContext = Dispatchers.IO)
+    suspend fun updateAsset(asset: AssetEntity)
 }
 
 internal fun AssetTable.asModel(): AssetModel {

@@ -1,6 +1,8 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
+import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
+import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
@@ -22,7 +24,6 @@ import cn.wj.android.cashbook.core.model.model.RecordModel
 import java.util.Calendar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -31,7 +32,8 @@ import kotlinx.coroutines.withContext
 class RecordRepositoryImpl @Inject constructor(
     private val recordDao: RecordDao,
     private val transactionDao: TransactionDao,
-    private val appPreferencesDataSource: AppPreferencesDataSource
+    private val appPreferencesDataSource: AppPreferencesDataSource,
+    @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : RecordRepository {
 
     override val currentMonthRecordListData: Flow<List<RecordModel>> =
@@ -40,26 +42,17 @@ class RecordRepositoryImpl @Inject constructor(
             queryCurrentMonthRecordByBooksId(appData.currentBookId)
         }
 
-    override suspend fun queryById(
-        recordId: Long,
-        coroutineContext: CoroutineContext
-    ): RecordModel? = withContext(coroutineContext) {
+    override suspend fun queryById(recordId: Long): RecordModel? = withContext(coroutineContext) {
         recordDao.queryById(recordId)?.asModel()
     }
 
-    override suspend fun queryRelatedById(
-        recordId: Long,
-        coroutineContext: CoroutineContext
-    ): List<RecordModel> =
+    override suspend fun queryRelatedById(recordId: Long): List<RecordModel> =
         withContext(coroutineContext) {
             recordDao.queryRelatedById(recordId)
                 .map { it.asModel() }
         }
 
-    private suspend fun queryCurrentMonthRecordByBooksId(
-        booksId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): List<RecordModel> =
+    private suspend fun queryCurrentMonthRecordByBooksId(booksId: Long): List<RecordModel> =
         withContext(coroutineContext) {
             val monthFirst =
                 "${Calendar.getInstance().timeInMillis.dateFormat(DATE_FORMAT_YEAR_MONTH)}-01 00:00:00"
@@ -69,28 +62,20 @@ class RecordRepositoryImpl @Inject constructor(
             result
         }
 
-    override suspend fun updateRecord(
-        record: RecordModel, tagIdList: List<Long>,
-        coroutineContext: CoroutineContext
-    ) =
-        withContext(coroutineContext) {
+    override suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>) = withContext(coroutineContext) {
             logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
             transactionDao.updateRecordTransaction(record.asTable(), tagIdList)
             recordDataVersion.updateVersion()
         }
 
-    override suspend fun deleteRecord(
-        recordId: Long,
-        coroutineContext: CoroutineContext
-    ) = withContext(coroutineContext) {
+    override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
         transactionDao.deleteRecordTransaction(recordId)
         recordDataVersion.updateVersion()
     }
 
     override suspend fun queryExpenditureRecordAfterDate(
         reimburse: Boolean,
-        dataTime: Long,
-        coroutineContext: CoroutineContext
+        dataTime: Long
     ): List<RecordModel> = withContext(coroutineContext) {
         val currentBookId = appPreferencesDataSource.appData.first().currentBookId
         if (reimburse) {
@@ -101,10 +86,7 @@ class RecordRepositoryImpl @Inject constructor(
             .map { it.asModel() }
     }
 
-    override suspend fun queryExpenditureRecordByAmountOrRemark(
-        keyword: String,
-        coroutineContext: CoroutineContext
-    ): List<RecordViewsEntity> =
+    override suspend fun queryExpenditureRecordByAmountOrRemark(keyword: String): List<RecordViewsEntity> =
         withContext(coroutineContext) {
             val currentBookId = appPreferencesDataSource.appData.first().currentBookId
             recordDao.query(currentBookId).map {
@@ -140,8 +122,7 @@ class RecordRepositoryImpl @Inject constructor(
     override suspend fun queryPagingRecordListByAssetId(
         assetId: Long,
         page: Int,
-        pageSize: Int,
-        coroutineContext: CoroutineContext
+        pageSize: Int
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByAssetId(
             booksId = appPreferencesDataSource.appData.first().currentBookId,

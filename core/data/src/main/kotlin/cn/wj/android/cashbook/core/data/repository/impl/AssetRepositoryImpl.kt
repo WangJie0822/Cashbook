@@ -1,5 +1,7 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
+import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
+import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.model.assetDataVersion
@@ -31,6 +33,7 @@ import kotlinx.coroutines.withContext
 class AssetRepositoryImpl @Inject constructor(
     private val assetDao: AssetDao,
     appPreferencesDataSource: AppPreferencesDataSource,
+    @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : AssetRepository {
 
     override val currentVisibleAssetListData: Flow<List<AssetModel>> =
@@ -60,25 +63,16 @@ class AssetRepositoryImpl @Inject constructor(
             result
         }
 
-    override suspend fun getAssetById(
-        assetId: Long,
-        coroutineContext: CoroutineContext
-    ): AssetModel? = withContext(coroutineContext) {
+    override suspend fun getAssetById(assetId: Long): AssetModel? = withContext(coroutineContext) {
         assetDao.queryAssetById(assetId)?.asModel()
     }
 
-    override suspend fun getVisibleAssetsByBookId(
-        bookId: Long,
-        coroutineContext: CoroutineContext
-    ): List<AssetModel> = withContext(coroutineContext) {
+    override suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel> = withContext(coroutineContext) {
         assetDao.queryVisibleAssetByBookId(bookId)
             .map { it.asModel() }
     }
 
-    override suspend fun updateAsset(
-        asset: AssetEntity,
-        coroutineContext: CoroutineContext
-    ) = withContext(coroutineContext) {
+    override suspend fun updateAsset(asset: AssetEntity) = withContext(coroutineContext) {
         val table = asset.asModel().asTable()
         if (null == table.id) {
             assetDao.insert(table)

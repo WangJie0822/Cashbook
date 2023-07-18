@@ -9,51 +9,31 @@ import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordModel
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
 
     val currentMonthRecordListData: Flow<List<RecordModel>>
 
-    suspend fun queryById(
-        recordId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): RecordModel?
+    suspend fun queryById(recordId: Long): RecordModel?
 
-    suspend fun queryRelatedById(
-        recordId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): List<RecordModel>
+    suspend fun queryRelatedById(recordId: Long): List<RecordModel>
 
-    suspend fun updateRecord(
-        record: RecordModel,
-        tagIdList: List<Long>,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>)
 
-    suspend fun deleteRecord(
-        recordId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    )
+    suspend fun deleteRecord(recordId: Long)
 
     suspend fun queryExpenditureRecordAfterDate(
         reimburse: Boolean,
-        dataTime: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO
+        dataTime: Long
     ): List<RecordModel>
 
-    suspend fun queryExpenditureRecordByAmountOrRemark(
-        keyword: String,
-        coroutineContext: CoroutineContext = Dispatchers.IO
-    ): List<RecordViewsEntity>
+    suspend fun queryExpenditureRecordByAmountOrRemark(keyword: String): List<RecordViewsEntity>
 
     suspend fun queryPagingRecordListByAssetId(
         assetId: Long,
         page: Int,
-        pageSize: Int,
-        coroutineContext: CoroutineContext = Dispatchers.IO
+        pageSize: Int
     ): List<RecordModel>
 }
 
