@@ -7,7 +7,6 @@ import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.data.helper.AssetHelper
 import cn.wj.android.cashbook.core.database.table.AssetTable
-import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
@@ -27,11 +26,12 @@ interface AssetRepository {
     /** 当前可见资产大类数据 */
     val currentVisibleAssetTypeData: Flow<List<AssetTypeViewsModel>>
 
+    /** 根据资产id [assetId] 获取对应资产数据并返回 */
     suspend fun getAssetById(assetId: Long): AssetModel?
 
     suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel>
 
-    suspend fun updateAsset(asset: AssetEntity)
+    suspend fun updateAsset(asset: AssetModel)
 }
 
 internal fun AssetTable.asModel(): AssetModel {

@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -84,7 +83,6 @@ fun CashbookNavHost(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-    val currentContext = LocalContext.current
     // FIXME 使用 AnimatedNavHost 从二级界面返回时快速点击左上角菜单会导致 Navigation 不显示，后续添加界面动画时需修复此问题
     NavHost(
         navController = navController,

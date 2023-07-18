@@ -6,10 +6,9 @@ import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
-import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.core.model.transfer.asEntity
+import cn.wj.android.cashbook.core.model.model.AssetModel
 import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
@@ -24,10 +23,10 @@ class GetDefaultAssetUseCase @Inject constructor(
     private val appPreferencesDataSource: AppPreferencesDataSource
 ) {
 
-    suspend operator fun invoke(assetId: Long): AssetEntity {
+    suspend operator fun invoke(assetId: Long): AssetModel {
         // appData 获取默认参数
         val appDataModel = appPreferencesDataSource.appData.first()
-        return assetRepository.getAssetById(assetId)?.asEntity() ?: AssetEntity(
+        return assetRepository.getAssetById(assetId) ?: AssetModel(
             id = assetId,
             booksId = appDataModel.currentBookId,
             name = AssetClassificationEnum.CASH.nameResId.string,

@@ -33,7 +33,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
-import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -44,7 +44,7 @@ import com.google.accompanist.flowlayout.FlowRow
 @Composable
 internal fun MyTagsRoute(
     onBackClick: () -> Unit,
-    onTagStatisticClick: (TagEntity) -> Unit,
+    onTagStatisticClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyTagsViewModel = hiltViewModel(),
 ) {
@@ -69,15 +69,15 @@ internal fun MyTagsRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyTagsScreen(
-    tagList: List<TagEntity>,
+    tagList: List<TagModel>,
     dialogState: DialogState,
-    showEditTagDialog: (TagEntity?) -> Unit,
-    showDeleteTagDialog: (TagEntity) -> Unit,
+    showEditTagDialog: (TagModel?) -> Unit,
+    showDeleteTagDialog: (TagModel) -> Unit,
     dismissDialog: () -> Unit,
-    modifyTag: (TagEntity) -> Unit,
-    deleteTag: (TagEntity) -> Unit,
+    modifyTag: (TagModel) -> Unit,
+    deleteTag: (TagModel) -> Unit,
     onBackClick: () -> Unit,
-    onTagStatisticClick: (TagEntity) -> Unit,
+    onTagStatisticClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -165,7 +165,7 @@ internal fun MyTagsScreen(
                                     text = { Text(text = stringResource(id = R.string.statistic_data)) },
                                     onClick = {
                                         expanded = false
-                                        onTagStatisticClick(it)
+                                        onTagStatisticClick(it.id)
                                     },
                                 )
                             }
@@ -180,8 +180,8 @@ internal fun MyTagsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTagDialog(
-    tagEntity: TagEntity?,
-    onConfirm: (TagEntity) -> Unit,
+    tagEntity: TagModel?,
+    onConfirm: (TagModel) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val title = stringResource(
@@ -216,7 +216,7 @@ fun EditTagDialog(
         confirmButton = {
             TextButton(onClick = {
                 onConfirm(
-                    tagEntity?.copy(name = tagName) ?: TagEntity(-1L, tagName, false)
+                    tagEntity?.copy(name = tagName) ?: TagModel(-1L, tagName)
                 )
             }) {
                 Text(text = stringResource(id = R.string.confirm))
@@ -232,8 +232,8 @@ fun EditTagDialog(
 
 @Composable
 fun DeleteTagDialog(
-    tagEntity: TagEntity,
-    onConfirm: (TagEntity) -> Unit,
+    tagEntity: TagModel,
+    onConfirm: (TagModel) -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
@@ -264,13 +264,13 @@ private fun MyTagsScreenPreview() {
     ) {
         MyTagsScreen(
             tagList = listOf(
-                TagEntity(id = 1L, name = "标签1", selected = false),
-                TagEntity(id = 2L, name = "标签1标签1", selected = false),
-                TagEntity(id = 3L, name = "标签1标签1标签1", selected = false),
-                TagEntity(id = 4L, name = "标签1标签1标签1标签1", selected = false),
-                TagEntity(id = 5L, name = "标签1标签1标签1标签1标签1", selected = false),
-                TagEntity(id = 6L, name = "标签1标签1标签1标签1标签1标签1", selected = false),
-                TagEntity(id = 7L, name = "标签2", selected = false),
+                TagModel(id = 1L, name = "标签1"),
+                TagModel(id = 2L, name = "标签1标签1"),
+                TagModel(id = 3L, name = "标签1标签1标签1"),
+                TagModel(id = 4L, name = "标签1标签1标签1标签1"),
+                TagModel(id = 5L, name = "标签1标签1标签1标签1标签1"),
+                TagModel(id = 6L, name = "标签1标签1标签1标签1标签1标签1"),
+                TagModel(id = 7L, name = "标签2"),
             ),
             dialogState = DialogState.Dismiss,
             showEditTagDialog = {},

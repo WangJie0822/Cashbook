@@ -18,7 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
-import cn.wj.android.cashbook.core.model.entity.AssetEntity
+import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
@@ -48,7 +48,7 @@ internal fun EditRecordSelectAssetBottomSheetRoute(
 
 @Composable
 internal fun EditRecordSelectAssetBottomSheetScreen(
-    assetList: List<AssetEntity>,
+    assetList: List<AssetModel>,
     onAssetChange: (Long) -> Unit,
     onAddAssetClick: () -> Unit,
     modifier: Modifier = Modifier,

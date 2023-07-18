@@ -12,11 +12,9 @@ import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
-import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
-import cn.wj.android.cashbook.core.model.transfer.asModel
 import java.math.BigDecimal
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -67,13 +65,14 @@ class AssetRepositoryImpl @Inject constructor(
         assetDao.queryAssetById(assetId)?.asModel()
     }
 
-    override suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel> = withContext(coroutineContext) {
-        assetDao.queryVisibleAssetByBookId(bookId)
-            .map { it.asModel() }
-    }
+    override suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel> =
+        withContext(coroutineContext) {
+            assetDao.queryVisibleAssetByBookId(bookId)
+                .map { it.asModel() }
+        }
 
-    override suspend fun updateAsset(asset: AssetEntity) = withContext(coroutineContext) {
-        val table = asset.asModel().asTable()
+    override suspend fun updateAsset(asset: AssetModel) = withContext(coroutineContext) {
+        val table = asset.asTable()
         if (null == table.id) {
             assetDao.insert(table)
         } else {

@@ -362,7 +362,7 @@ private fun AssetInfoScreenPreview() {
                         repaymentDate = repaymentDate,
                     )
 
-                    Empty(hintText = "无数据")
+                    Empty(hintText = "无数据", modifier = Modifier.fillMaxWidth())
                 }
             },
             recordDetailSheetContent = {},
@@ -409,7 +409,7 @@ private fun CreditAssetInfoScreenPreview() {
                         repaymentDate = repaymentDate,
                     )
 
-                    Empty(hintText = "无数据")
+                    Empty(hintText = "无数据", modifier = Modifier.fillMaxWidth())
                 }
             },
             recordDetailSheetContent = {},

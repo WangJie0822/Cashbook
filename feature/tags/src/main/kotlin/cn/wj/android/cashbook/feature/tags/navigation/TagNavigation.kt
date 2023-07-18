@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import cn.wj.android.cashbook.core.model.entity.TagEntity
 import cn.wj.android.cashbook.feature.tags.screen.EditRecordSelectTagBottomSheetRoute
 import cn.wj.android.cashbook.feature.tags.screen.MyTagsRoute
 
@@ -16,7 +15,7 @@ fun NavController.naviToMyTags() {
 
 fun NavGraphBuilder.myTagsScreen(
     onBackClick: () -> Unit,
-    onTagStatisticClick: (TagEntity) -> Unit,
+    onTagStatisticClick: (Long) -> Unit,
 ) {
     composable(ROUTE_MY_TAGS) {
         MyTagsRoute(

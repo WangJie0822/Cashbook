@@ -6,15 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.TagRepository
-import cn.wj.android.cashbook.core.model.entity.TagEntity
-import cn.wj.android.cashbook.core.model.transfer.asEntity
-import cn.wj.android.cashbook.core.model.transfer.asModel
+import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -28,20 +25,17 @@ class MyTagsViewModel @Inject constructor(
 
     /** 标签数据列表 */
     val tagListData = tagRepository.tagListData
-        .map { list ->
-            list.map { it.asEntity() }
-        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = listOf()
         )
 
-    fun showEditTagDialog(tag: TagEntity? = null) {
+    fun showEditTagDialog(tag: TagModel? = null) {
         dialogState = DialogState.Shown(TagDialogState.Edit(tag))
     }
 
-    fun showDeleteTagDialog(tag: TagEntity) {
+    fun showDeleteTagDialog(tag: TagModel) {
         dialogState = DialogState.Shown(TagDialogState.Delete(tag))
     }
 
@@ -49,18 +43,18 @@ class MyTagsViewModel @Inject constructor(
         dialogState = DialogState.Dismiss
     }
 
-    fun modifyTag(tag: TagEntity) {
+    fun modifyTag(tag: TagModel) {
         viewModelScope.launch {
             // TODO 事件校验
-            tagRepository.updateTag(tag.asModel())
+            tagRepository.updateTag(tag)
             dismissDialog()
         }
     }
 
-    fun deleteTag(tag: TagEntity) {
+    fun deleteTag(tag: TagModel) {
         viewModelScope.launch {
             // TODO 事件校验
-            tagRepository.deleteTag(tag.asModel())
+            tagRepository.deleteTag(tag)
             dismissDialog()
         }
     }

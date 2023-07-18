@@ -22,7 +22,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
-import cn.wj.android.cashbook.core.model.entity.TagEntity
+import cn.wj.android.cashbook.core.model.model.Selectable
+import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -48,7 +49,7 @@ internal fun EditRecordSelectTagBottomSheetRoute(
         onAddTagConfirm = viewModel::addTag,
         onTagItemClick = { tagEntity ->
             viewModel.onTagItemClick(
-                tag = tagEntity,
+                id = tagEntity.id,
                 onResult = { selectedList ->
                     onTagIdListChange(selectedList)
                 },
@@ -63,10 +64,10 @@ internal fun EditRecordSelectTagBottomSheetRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordSelectTagBottomSheetScreen(
-    tagList: List<TagEntity>,
+    tagList: List<Selectable<TagModel>>,
     onAddTagClick: () -> Unit,
-    onAddTagConfirm: (TagEntity) -> Unit,
-    onTagItemClick: (TagEntity) -> Unit,
+    onAddTagConfirm: (TagModel) -> Unit,
+    onTagItemClick: (TagModel) -> Unit,
     dialogState: DialogState,
     dismissDialog: () -> Unit,
     modifier: Modifier = Modifier,
@@ -132,8 +133,8 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                         tagList.forEach {
                             FilterChip(
                                 selected = it.selected,
-                                onClick = { onTagItemClick(it) },
-                                label = { Text(text = it.name) },
+                                onClick = { onTagItemClick(it.data) },
+                                label = { Text(text = it.data.name) },
                             )
                         }
                     }
@@ -158,13 +159,16 @@ private fun EditRecordSelectTagBottomSheetScreenPreview() {
     ) {
         EditRecordSelectTagBottomSheetScreen(
             tagList = listOf(
-                TagEntity(id = 1L, name = "标签1", selected = false),
-                TagEntity(id = 2L, name = "标签1标签1", selected = false),
-                TagEntity(id = 3L, name = "标签1标签1标签1", selected = false),
-                TagEntity(id = 4L, name = "标签1标签1标签1标签1", selected = false),
-                TagEntity(id = 5L, name = "标签1标签1标签1标签1标签1", selected = false),
-                TagEntity(id = 6L, name = "标签1标签1标签1标签1标签1标签1", selected = false),
-                TagEntity(id = 7L, name = "标签2", selected = false),
+                Selectable(TagModel(id = 1L, name = "标签1"), selected = false),
+                Selectable(TagModel(id = 2L, name = "标签1标签1"), selected = false),
+                Selectable(TagModel(id = 3L, name = "标签1标签1标签1"), selected = true),
+                Selectable(TagModel(id = 4L, name = "标签1标签1标签1标签1"), selected = false),
+                Selectable(TagModel(id = 5L, name = "标签1标签1标签1标签1标签1"), selected = false),
+                Selectable(
+                    TagModel(id = 6L, name = "标签1标签1标签1标签1标签1标签1"),
+                    selected = false
+                ),
+                Selectable(TagModel(id = 7L, name = "标签2"), selected = true),
             ),
             onAddTagClick = {},
             onAddTagConfirm = {},

@@ -2,8 +2,7 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
-import cn.wj.android.cashbook.core.model.entity.BooksEntity
-import cn.wj.android.cashbook.core.model.transfer.asEntity
+import cn.wj.android.cashbook.core.model.model.BooksModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -18,7 +17,7 @@ class GetCurrentBookUseCase @Inject constructor(
     private val appPreferencesDataSource: AppPreferencesDataSource,
 ) {
 
-    operator fun invoke(): Flow<BooksEntity> =
+    operator fun invoke(): Flow<BooksModel> =
         combine(booksRepository.booksListData, appPreferencesDataSource.appData) { list, appData ->
             var selected = list.firstOrNull { it.id == appData.currentBookId }
             if (null == selected) {
@@ -26,6 +25,6 @@ class GetCurrentBookUseCase @Inject constructor(
                 selected = list.first()
                 appPreferencesDataSource.updateCurrentBookId(selected.id)
             }
-            selected.asEntity()
+            selected
         }
 }

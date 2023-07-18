@@ -68,7 +68,7 @@ class GetAssetRecordViewsUseCase @Inject constructor(
             this.concessions,
             this.remark,
             this.reimbursable,
-            this.relatedTags.map { it.asEntity() },
+            this.relatedTags,
             listOf(), // TODO
             this.recordTime,
         )

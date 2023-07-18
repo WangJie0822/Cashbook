@@ -9,9 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
-import cn.wj.android.cashbook.core.model.entity.AssetEntity
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.domain.usecase.GetDefaultAssetUseCase
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
@@ -45,7 +45,7 @@ class EditAssetViewModel @Inject constructor(
     private val assetIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
 
     /** 显示的资产信息 */
-    private val _mutableAssetInfo = MutableStateFlow<AssetEntity?>(null)
+    private val _mutableAssetInfo = MutableStateFlow<AssetModel?>(null)
     private val defaultAssetInfo = assetIdData.mapLatest { getDefaultAssetUseCase(it) }
     private val displayAssetInfo =
         combine(_mutableAssetInfo, defaultAssetInfo) { mutable, default ->
@@ -162,10 +162,8 @@ class EditAssetViewModel @Inject constructor(
                     cardNo = cardNo,
                     remark = remark,
                 )
-                assetRepository.updateAsset(
-                    assetInfo
-                )
-                onSuccess.invoke()
+                assetRepository.updateAsset(assetInfo)
+                onSuccess()
             } catch (throwable: Throwable) {
                 this@EditAssetViewModel.logger().e(throwable, "save()")
             }

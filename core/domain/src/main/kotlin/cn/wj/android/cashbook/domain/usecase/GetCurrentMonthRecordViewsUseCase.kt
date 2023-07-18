@@ -6,7 +6,6 @@ import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
-import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -61,7 +60,7 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
             this.concessions,
             this.remark,
             this.reimbursable,
-            this.relatedTags.map { it.asEntity() },
+            this.relatedTags,
             listOf(), // TODO
             this.recordTime,
         )
