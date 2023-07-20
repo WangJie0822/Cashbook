@@ -172,6 +172,12 @@ jeremyliao-liveEventBus = "1.8.0"
 # 图标控件 [Github](https://github.com/PhilJay/MPAndroidChart)
 philJay-mpAndroidChart = "v3.1.0"
 
+# WebDAV 客户端 [Github](https://github.com/lookfirst/sardine)
+lookfirst-sardine = "5.12"
+
+# WebDAV 客户端 [Github](https://github.com/thegrizzlylabs/sardine-android)
+thegrizzlylabs-sardine = "0.8"
+
 [libraries]
 # junit
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -489,8 +495,11 @@ jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 # LiveEventBus [Github](https://github.com/JeremyLiao/LiveEventBus)
 jeremyliao-liveEventBus = { group = "io.github.jeremyliao", name = "live-event-bus", version.ref = "jeremyliao-liveEventBus" }
 
-# 图标控件 [Github](https://github.com/PhilJay/MPAndroidChart)
-philJay-mpAndroidChart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "philJay-mpAndroidChart" }
+# WebDAV 客户端 [Github](https://github.com/lookfirst/sardine)
+lookfirst-sardine = { group = "com.github.lookfirst", name = "sardine", version.ref = "lookfirst-sardine" }
+
+# WebDAV 客户端 [Github](https://github.com/thegrizzlylabs/sardine-android)
+thegrizzlylabs-sardine = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "thegrizzlylabs-sardine" }
 
 # 插件
 [plugins]
