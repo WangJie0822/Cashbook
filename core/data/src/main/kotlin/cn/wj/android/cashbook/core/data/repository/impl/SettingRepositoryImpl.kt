@@ -162,4 +162,13 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun updateSyncDate(syncDate: String) = withContext(coroutineContext) {
         appPreferencesDataSource.updateSyncDate(syncDate)
     }
+
+    override suspend fun updateWebDAV(domain: String, account: String, password: String) =
+        withContext(coroutineContext) {
+            appPreferencesDataSource.updateWebDAV(
+                domain = domain,
+                account = account,
+                password = password
+            )
+        }
 }

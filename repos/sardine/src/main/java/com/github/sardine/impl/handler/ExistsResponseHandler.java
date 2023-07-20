@@ -16,11 +16,10 @@
 
 package com.github.sardine.impl.handler;
 
+import com.github.sardine.impl.SardineException;
 import org.apache.http4.HttpResponse;
 import org.apache.http4.HttpStatus;
 import org.apache.http4.StatusLine;
-
-import com.github.sardine.impl.SardineException;
 import org.apache.http4.client.ResponseHandler;
 
 /**
@@ -28,21 +27,17 @@ import org.apache.http4.client.ResponseHandler;
  *
  * @author mirko
  */
-public class ExistsResponseHandler extends ValidatingResponseHandler<Boolean>
-{
-	@Override
-	public Boolean handleResponse(HttpResponse response) throws SardineException
-	{
-		StatusLine statusLine = response.getStatusLine();
-		int statusCode = statusLine.getStatusCode();
-		if (statusCode < HttpStatus.SC_MULTIPLE_CHOICES)
-		{
-			return true;
-		}
-		if (statusCode == HttpStatus.SC_NOT_FOUND)
-		{
-			return false;
-		}
-		throw new SardineException("Unexpected response", statusCode, statusLine.getReasonPhrase());
-	}
+public class ExistsResponseHandler extends ValidatingResponseHandler<Boolean> {
+    @Override
+    public Boolean handleResponse(HttpResponse response) throws SardineException {
+        StatusLine statusLine = response.getStatusLine();
+        int statusCode = statusLine.getStatusCode();
+        if (statusCode < HttpStatus.SC_MULTIPLE_CHOICES) {
+            return true;
+        }
+        if (statusCode == HttpStatus.SC_NOT_FOUND || statusCode == HttpStatus.SC_FORBIDDEN) {
+            return false;
+        }
+        throw new SardineException("Unexpected response", statusCode, statusLine.getReasonPhrase());
+    }
 }

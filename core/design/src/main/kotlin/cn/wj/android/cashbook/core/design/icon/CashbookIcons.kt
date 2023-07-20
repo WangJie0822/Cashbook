@@ -7,8 +7,10 @@ import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -55,4 +57,6 @@ object CashbookIcons {
     val Search = Icons.Filled.Search
     val CalendarMonth = Icons.Filled.CalendarMonth
     val Check = Icons.Filled.Check
+    val CheckCircle = Icons.Filled.CheckCircle
+    val Error = Icons.Filled.Error
 }

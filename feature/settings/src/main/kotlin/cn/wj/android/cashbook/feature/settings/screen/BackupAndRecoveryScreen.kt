@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -19,9 +22,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CompatPasswordTextField
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.ui.DevicePreviews
@@ -37,9 +42,12 @@ internal fun BackupAndRecoveryRoute(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
 
     BackupAndRecoveryScreen(
         uiState = uiState,
+        isConnected = isConnected,
+        onSaveWebDAV = viewModel::saveWebDAV,
         onBackClick = onBackClick,
         modifier = modifier,
     )
@@ -49,6 +57,8 @@ internal fun BackupAndRecoveryRoute(
 @Composable
 internal fun BackupAndRecoveryScreen(
     uiState: BackupAndRecoveryUiState,
+    isConnected: Boolean,
+    onSaveWebDAV: (String, String, String) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -63,6 +73,8 @@ internal fun BackupAndRecoveryScreen(
         content = { paddingValues ->
             BackupAndRecoveryScaffoldContent(
                 uiState = uiState,
+                isConnected = isConnected,
+                onSaveWebDAV = onSaveWebDAV,
                 modifier = Modifier.padding(paddingValues),
             )
         },
@@ -73,6 +85,8 @@ internal fun BackupAndRecoveryScreen(
 @Composable
 internal fun BackupAndRecoveryScaffoldContent(
     uiState: BackupAndRecoveryUiState,
+    isConnected: Boolean,
+    onSaveWebDAV: (String, String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // 提示文本
@@ -126,13 +140,37 @@ internal fun BackupAndRecoveryScaffoldContent(
                 .padding(top = 8.dp)
                 .padding(horizontal = 16.dp),
         )
-        CompatTextField(
+        CompatPasswordTextField(
             textFieldState = webDAVPasswordTextFieldState,
             label = { Text(text = stringResource(id = R.string.webdav_password)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp)
                 .padding(horizontal = 16.dp),
+        )
+
+        FilledTonalButton(
+            onClick = {
+                if (webDAVDomainTextFieldState.isValid && webDAVAccountTextFieldState.isValid && webDAVPasswordTextFieldState.isValid) {
+                    // 参数可用
+                    onSaveWebDAV(
+                        webDAVDomainTextFieldState.text,
+                        webDAVAccountTextFieldState.text,
+                        webDAVPasswordTextFieldState.text
+                    )
+                }
+            },
+            content = {
+                Icon(
+                    imageVector = if (isConnected) CashbookIcons.CheckCircle else CashbookIcons.Error,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+                Text(text = if (isConnected) "已连接" else "未连接")
+            },
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(top = 8.dp, end = 16.dp),
         )
 
         Text(
@@ -177,6 +215,8 @@ private fun BackupAndRecoveryScreenPreview() {
     PreviewTheme {
         BackupAndRecoveryScreen(
             uiState = BackupAndRecoveryUiState(),
+            isConnected = false,
+            onSaveWebDAV = { _, _, _ -> },
             onBackClick = {},
         )
     }

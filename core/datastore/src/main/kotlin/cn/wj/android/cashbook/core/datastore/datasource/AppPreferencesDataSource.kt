@@ -143,6 +143,17 @@ class AppPreferencesDataSource @Inject constructor(
         appPreferences.updateData { it.copy { this.syncDate = syncDate } }
     }
 
+    suspend fun updateWebDAV(domain: String, account: String, password: String) {
+        appPreferences.updateData {
+            it.copy {
+                this.webDAVDomain = domain
+                this.webDAVAccount = account
+                this.webDAVPassword = password
+            }
+        }
+    }
+
+
     suspend fun needRelated(typeId: Long): Boolean {
         val appDataModel = appData.first()
         return typeId == appDataModel.reimburseTypeId || typeId == appDataModel.refundTypeId

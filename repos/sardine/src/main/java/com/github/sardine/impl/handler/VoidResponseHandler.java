@@ -17,8 +17,9 @@
 package com.github.sardine.impl.handler;
 
 import java.io.IOException;
-
 import org.apache.http4.HttpResponse;
+import org.apache.http4.HttpStatus;
+import org.apache.http4.StatusLine;
 import org.apache.http4.client.ResponseHandler;
 
 /**
@@ -27,12 +28,11 @@ import org.apache.http4.client.ResponseHandler;
  *
  * @author mirko
  */
-public class VoidResponseHandler extends ValidatingResponseHandler<Void>
-{
-	@Override
-	public Void handleResponse(HttpResponse response) throws IOException
-	{
-		this.validateResponse(response);
-		return null;
-	}
+public class VoidResponseHandler extends ValidatingResponseHandler<Boolean> {
+    @Override
+    public Boolean handleResponse(HttpResponse response) throws IOException {
+        StatusLine statusLine = response.getStatusLine();
+        int statusCode = statusLine.getStatusCode();
+        return statusCode < HttpStatus.SC_MULTIPLE_CHOICES;
+    }
 }

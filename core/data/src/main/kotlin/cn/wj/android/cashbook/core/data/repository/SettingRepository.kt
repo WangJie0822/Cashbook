@@ -66,4 +66,6 @@ interface SettingRepository {
     suspend fun syncLatestVersion(): Boolean
 
     suspend fun updateSyncDate(syncDate: String)
+
+    suspend fun updateWebDAV(domain: String, account: String, password: String)
 }

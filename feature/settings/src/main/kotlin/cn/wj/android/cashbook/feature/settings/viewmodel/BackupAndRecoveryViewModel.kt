@@ -3,12 +3,17 @@ package cn.wj.android.cashbook.feature.settings.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
+import cn.wj.android.cashbook.core.data.uitl.WebDAVManager
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * 备份与恢复 ViewModel
@@ -17,7 +22,9 @@ import kotlinx.coroutines.flow.stateIn
  */
 @HiltViewModel
 class BackupAndRecoveryViewModel @Inject constructor(
-    settingRepository: SettingRepository,
+    private val settingRepository: SettingRepository,
+    networkMonitor: NetworkMonitor,
+    private val webDAVManager: WebDAVManager,
 ) : ViewModel() {
 
     val uiState = settingRepository.appDataMode
@@ -36,6 +43,32 @@ class BackupAndRecoveryViewModel @Inject constructor(
             initialValue = BackupAndRecoveryUiState(),
         )
 
+    val isConnected =
+        combine(networkMonitor.isOnline, webDAVManager.isConnected) { isOnline, isConnected ->
+            isOnline && isConnected
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
+                initialValue = false,
+            )
+
+    fun saveWebDAV(domain: String, account: String, password: String) {
+        viewModelScope.launch {
+            val state = uiState.first()
+            if (state.webDAVDomain == domain && state.webDAVAccount == account && state.webDAVPassword == password) {
+                // 未做修改，尝试重连
+                webDAVManager.requestConnected()
+            } else {
+                // 更新配置数据
+                settingRepository.updateWebDAV(
+                    domain = domain,
+                    account = account,
+                    password = password,
+                )
+            }
+        }
+    }
 
 }
 

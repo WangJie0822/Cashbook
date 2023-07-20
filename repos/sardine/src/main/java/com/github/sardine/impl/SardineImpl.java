@@ -1039,10 +1039,10 @@ public class SardineImpl implements Sardine
 	}
 
 	@Override
-	public void createDirectory(String url) throws IOException
+	public boolean createDirectory(String url) throws IOException
 	{
 		HttpMkCol mkcol = new HttpMkCol(url);
-		this.execute(mkcol, new VoidResponseHandler());
+		return this.execute(mkcol, new VoidResponseHandler());
 	}
 
 	@Override

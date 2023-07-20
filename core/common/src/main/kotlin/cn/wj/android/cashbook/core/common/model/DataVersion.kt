@@ -15,7 +15,7 @@ fun StateFlow<Int>.updateVersion() {
     }
 }
 
-private fun dataVersion(): MutableStateFlow<Int> = MutableStateFlow(0)
+fun dataVersion(): MutableStateFlow<Int> = MutableStateFlow(0)
 
 val recordDataVersion: StateFlow<Int> = dataVersion()
 val assetDataVersion: StateFlow<Int> = dataVersion()

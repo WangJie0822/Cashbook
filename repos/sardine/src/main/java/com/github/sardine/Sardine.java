@@ -314,7 +314,7 @@ public interface Sardine
 	 * @param url Path to the resource including protocol and hostname
 	 * @throws IOException I/O error or HTTP response validation failure
 	 */
-	void createDirectory(String url) throws IOException;
+	boolean createDirectory(String url) throws IOException;
 
 	/**
 	 * Move a url to from source to destination using WebDAV <code>MOVE</code>. Assumes overwrite.
