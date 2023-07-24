@@ -153,6 +153,13 @@ class AppPreferencesDataSource @Inject constructor(
         }
     }
 
+    suspend fun updateBackupPath(path: String) {
+        appPreferences.updateData { it.copy { this.backupPath = path } }
+    }
+
+    suspend fun updateBackupMs(ms: Long) {
+        appPreferences.updateData { it.copy { this.lastBackupMs = ms } }
+    }
 
     suspend fun needRelated(typeId: Long): Boolean {
         val appDataModel = appData.first()

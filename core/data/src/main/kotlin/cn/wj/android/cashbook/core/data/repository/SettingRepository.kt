@@ -68,4 +68,8 @@ interface SettingRepository {
     suspend fun updateSyncDate(syncDate: String)
 
     suspend fun updateWebDAV(domain: String, account: String, password: String)
+
+    suspend fun updateBackupPath(path: String)
+
+    suspend fun updateBackupMs(ms: Long)
 }

@@ -80,6 +80,8 @@ androidx-work = "2.8.1"
 androidx-datastore = "1.0.0"
 # Annotation [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/annotation?hl=zh-cn)
 androidx-annotation = "1.6.0"
+# DocumentFile [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
+androidx-documentfile = "1.0.1"
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/test?hl=zh-cn)
 androidx-test-annotation = "1.0.1"
 androidx-test-core = "1.5.0"
@@ -360,6 +362,8 @@ androidx-datastore-preferences-rxjava2 = { group = "androidx.datastore", name = 
 androidx-datastore-preferences-rxjava3 = { group = "androidx.datastore", name = "datastore-preferences-rxjava3", version.ref = "androidx-datastore" }
 # Annotation [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/annotation?hl=zh-cn)
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidx-annotation" }
+# DocumentFile [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
+androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "androidx-documentfile" }
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/test?hl=zh-cn)
 androidx-test-annotation = { group = "androidx.test", name = "annotation", version.ref = "androidx-test-annotation" }
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test-core" }

@@ -11,7 +11,7 @@ object ApplicationInfo {
 
     private var _flavor: CashbookFlavor? = null
 
-    val flavor: CashbookFlavor
+    private val flavor: CashbookFlavor
         get() = _flavor ?: CashbookFlavor.Dev
 
     var versionName = ""
@@ -20,6 +20,10 @@ object ApplicationInfo {
 
     val isDev: Boolean
         get() = flavor == CashbookFlavor.Dev
+
+    val infos: String
+        get() = "${flavor.name},$isDev,$applicationId,$versionName"
+
 
     fun setFlavor(flavorName: String) {
         _flavor = CashbookFlavor.values().firstOrNull { it.name == flavorName }

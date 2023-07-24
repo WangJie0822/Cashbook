@@ -13,14 +13,13 @@ import cn.wj.android.cashbook.core.data.repository.impl.SettingRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TagRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TypeRepositoryImpl
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
-import cn.wj.android.cashbook.core.data.uitl.WebDAVManager
 import cn.wj.android.cashbook.core.data.uitl.impl.ConnectivityManagerNetworkMonitor
-import cn.wj.android.cashbook.core.data.uitl.impl.WebDAVManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+@Suppress("unused")
 @Module
 @InstallIn(SingletonComponent::class)
 interface DataModule {
@@ -29,11 +28,6 @@ interface DataModule {
     fun bindNetworkMonitor(
         networkMonitor: ConnectivityManagerNetworkMonitor
     ): NetworkMonitor
-
-    @Binds
-    fun bindWebDAVManager(
-        webDAVManager: WebDAVManagerImpl
-    ): WebDAVManager
 
     @Binds
     fun bindTypeRepository(

@@ -144,10 +144,12 @@ fun NavGraphBuilder.markdownScreen(
 
 fun NavGraphBuilder.backupAndRecoveryScreen(
     onBackClick: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     composable(route = ROUTE_SETTINGS_BACKUP_AND_RECOVERY) {
         BackupAndRecoveryRoute(
             onBackClick = onBackClick,
+            onShowSnackbar = onShowSnackbar,
         )
     }
 }

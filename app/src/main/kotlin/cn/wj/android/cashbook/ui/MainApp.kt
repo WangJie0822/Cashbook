@@ -139,6 +139,7 @@ fun CashbookNavHost(
         // 备份与恢复
         backupAndRecoveryScreen(
             onBackClick = navController::popBackStack,
+            onShowSnackbar = onShowSnackbar,
         )
 
         // 我的标签

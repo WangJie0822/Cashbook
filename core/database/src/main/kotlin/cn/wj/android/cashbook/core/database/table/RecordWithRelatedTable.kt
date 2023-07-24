@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 class RecordWithRelatedTable(
     @PrimaryKey(autoGenerate = true) val id: Long?,
     @ColumnInfo(name = "record_id") val recordId: Long,
-    @ColumnInfo(name = "related_record_id") val tagId: Long,
+    @ColumnInfo(name = "related_record_id") val relatedRecordId: Long,
 )

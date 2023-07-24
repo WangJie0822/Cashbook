@@ -72,8 +72,6 @@ include(
 )
 include(
     ":repos:MPChartLib",
-    ":repos:sardine",
-    ":repos:httpclient4",
 )
 include(
     ":sync:work",

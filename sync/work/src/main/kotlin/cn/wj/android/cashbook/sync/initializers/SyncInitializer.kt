@@ -26,3 +26,5 @@ object Sync {
 }
 
 internal const val SyncWorkName = "SyncWorkName"
+
+internal const val BackupWorkName = "BackupWorkName"

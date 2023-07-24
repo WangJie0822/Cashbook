@@ -17,7 +17,5 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:ui"))
 
-    implementation(project(":repos:sardine"))
-
     implementation(libs.kotlinx.coroutines.android)
 }

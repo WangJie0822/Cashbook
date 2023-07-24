@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -27,10 +28,14 @@ private const val WORKER_CLASS_NAME = "RouterWorkerDelegateClassName"
 /**
  * 添加 [DelegatingWorker] 需要代理的 [CoroutineWorker] 元数据
  */
-internal fun KClass<out CoroutineWorker>.delegatedData() =
-    Data.Builder()
+internal fun KClass<out CoroutineWorker>.delegatedData(data: Data? = null): Data {
+    val builder = Data.Builder()
         .putString(WORKER_CLASS_NAME, qualifiedName)
-        .build()
+    if (null != data) {
+        builder.putAll(data)
+    }
+    return builder.build()
+}
 
 /**
  * 一个通过 [HiltWorkerFactory] 构建 [CoroutineWorker] 的代理 Worker

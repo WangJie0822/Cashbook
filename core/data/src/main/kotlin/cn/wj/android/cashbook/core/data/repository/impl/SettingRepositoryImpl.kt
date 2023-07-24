@@ -171,4 +171,12 @@ class SettingRepositoryImpl @Inject constructor(
                 password = password
             )
         }
+
+    override suspend fun updateBackupPath(path: String) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateBackupPath(path)
+    }
+
+    override suspend fun updateBackupMs(ms: Long) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateBackupMs(ms)
+    }
 }
