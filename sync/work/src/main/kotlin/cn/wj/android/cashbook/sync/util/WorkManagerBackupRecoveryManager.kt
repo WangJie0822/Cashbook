@@ -37,6 +37,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
@@ -62,9 +63,9 @@ class WorkManagerBackupRecoveryManager @Inject constructor(
             refreshConnectedStatus()
         }
 
-    override val backupState: MutableStateFlow<BackupRecoveryState> = MutableStateFlow(None)
+    override val backupState: StateFlow<BackupRecoveryState> = _backupState
 
-    override val recoveryState: MutableStateFlow<BackupRecoveryState> = MutableStateFlow(None)
+    override val recoveryState: StateFlow<BackupRecoveryState> = _recoveryState
 
     override val onlineBackupListData = combine(connectedDataVersion, backupDataVersion) { _, _ ->
         val appDataMode = settingRepository.appDataMode.first()
@@ -128,7 +129,7 @@ class WorkManagerBackupRecoveryManager @Inject constructor(
     }
 
     override fun updateBackupState(state: BackupRecoveryState) {
-        backupState.tryEmit(state)
+        _backupState.tryEmit(state)
     }
 
     override fun refreshLocalPath(localPath: String) {
@@ -138,34 +139,31 @@ class WorkManagerBackupRecoveryManager @Inject constructor(
     override suspend fun requestRecovery(path: String): Unit = withContext(coroutineContext) {
         updateRecoveryState(BackupRecoveryState.InProgress)
         logger().i("requestRecovery(), path = <$path>")
-        if (path.isBlank()) {
-            logger().i("requestRecovery(), blank path")
-            updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BLANK_BACKUP_PATH))
-        } else if (path.startsWith("https://") || path.startsWith("http://")) {
-            logger().i("requestRecovery(), startBackup")
-            val workManager = WorkManager.getInstance(context)
-            workManager.enqueueUniqueWork(
-                BackupWorkName,
-                ExistingWorkPolicy.KEEP,
-                RecoveryWorker.startUpBackupWork(path),
-            )
-        } else if (grantedPermissions(path)) {
-            // 有权限，开始恢复
-            logger().i("requestRecovery(), startBackup")
-            val workManager = WorkManager.getInstance(context)
-            workManager.enqueueUniqueWork(
-                BackupWorkName,
-                ExistingWorkPolicy.KEEP,
-                RecoveryWorker.startUpBackupWork(path),
-            )
-        } else {
-            logger().i("requestRecovery(), unauthorized")
-            updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED))
+        when {
+            path.isBlank() -> {
+                logger().i("requestRecovery(), blank path")
+                updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BLANK_BACKUP_PATH))
+            }
+
+            path.startsWith("https://") || path.startsWith("http://") || grantedPermissions(path) -> {
+                logger().i("requestRecovery(), startBackup")
+                val workManager = WorkManager.getInstance(context)
+                workManager.enqueueUniqueWork(
+                    BackupWorkName,
+                    ExistingWorkPolicy.KEEP,
+                    RecoveryWorker.startUpBackupWork(path),
+                )
+            }
+
+            else -> {
+                logger().i("requestRecovery(), unauthorized")
+                updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED))
+            }
         }
     }
 
     override fun updateRecoveryState(state: BackupRecoveryState) {
-        recoveryState.tryEmit(state)
+        _recoveryState.tryEmit(state)
     }
 
     override suspend fun getWebFile(url: String): String = withContext(coroutineContext) {
@@ -267,3 +265,6 @@ class WorkManagerBackupRecoveryManager @Inject constructor(
         okHttpWebDAVHandler.block(appDataMode.webDAVDomain.backupPath)
     }
 }
+
+private val _backupState: MutableStateFlow<BackupRecoveryState> = MutableStateFlow(None)
+private val _recoveryState: MutableStateFlow<BackupRecoveryState> = MutableStateFlow(None)

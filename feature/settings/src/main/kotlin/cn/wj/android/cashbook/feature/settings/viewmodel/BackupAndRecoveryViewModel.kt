@@ -165,6 +165,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
     fun tryRecovery(backupPath: String) {
         viewModelScope.launch {
             backupRecoveryManager.requestRecovery(backupPath)
+            dismissDialog()
         }
     }
 
@@ -173,10 +174,8 @@ class BackupAndRecoveryViewModel @Inject constructor(
     }
 
     fun dismissBookmark() {
-        viewModelScope.launch {
-            backupRecoveryManager.updateBackupState(BackupRecoveryState.None)
-            backupRecoveryManager.updateRecoveryState(BackupRecoveryState.None)
-        }
+        backupRecoveryManager.updateBackupState(BackupRecoveryState.None)
+        backupRecoveryManager.updateRecoveryState(BackupRecoveryState.None)
     }
 
     fun dismissDialog() {

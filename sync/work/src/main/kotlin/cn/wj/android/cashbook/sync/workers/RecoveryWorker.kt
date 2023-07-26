@@ -69,6 +69,11 @@ class RecoveryWorker @AssistedInject constructor(
             return@withContext Result.failure()
         }
 
+        // 恢复缓存路径
+        val cacheDir = File(appContext.cacheDir, BACKUP_CACHE_FILE_NAME)
+        cacheDir.deleteAllFiles()
+        cacheDir.mkdirs()
+
         val result = runCatching {
             val localPath = if (path.startsWith("https://") || path.startsWith("http://")) {
                 // 云端备份，下载
@@ -79,10 +84,6 @@ class RecoveryWorker @AssistedInject constructor(
 
             this@RecoveryWorker.logger().i("doWork(), localPath = <$localPath>")
 
-            val cacheDir = File(appContext.cacheDir, BACKUP_CACHE_FILE_NAME)
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs()
-            }
             val backupZippedCacheFile: File
             if (localPath.startsWith("content://")) {
                 DocumentFile.fromSingleUri(appContext, Uri.parse(localPath))!!.let { df ->
@@ -170,6 +171,9 @@ class RecoveryWorker @AssistedInject constructor(
         }
 
         this@RecoveryWorker.logger().i("doWork(), result = <$result>")
+
+        // 删除缓存路径
+        cacheDir.deleteAllFiles()
 
         if (result == SUCCESS_RECOVERY) {
             backupRecoveryManager.updateRecoveryState(BackupRecoveryState.Success(SUCCESS_RECOVERY))

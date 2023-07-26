@@ -74,6 +74,11 @@ class BackupWorker @AssistedInject constructor(
             return@withContext Result.failure()
         }
 
+        // 备份缓存目录
+        val backupCacheDir = File(appContext.cacheDir, BACKUP_CACHE_FILE_NAME)
+        backupCacheDir.deleteAllFiles()
+        backupCacheDir.mkdirs()
+
         // 备份到本地
         val result = runCatching {
             val databaseFile = appContext.getDatabasePath(DB_FILE_NAME)
@@ -81,10 +86,7 @@ class BackupWorker @AssistedInject constructor(
             val dateFormat = currentMs.dateFormat(DATE_FORMAT_BACKUP)
             this@BackupWorker.logger()
                 .i("doWork(), backupPath = <$backupPath>, databaseFile = <$databaseFile>, dateFormat = <$dateFormat>")
-            // 备份缓存目录
-            val backupCacheDir = File(appContext.cacheDir, BACKUP_CACHE_FILE_NAME)
-            backupCacheDir.deleteAllFiles()
-            backupCacheDir.mkdirs()
+
             // 备份缓存文件
             val databaseCacheFile = File(backupCacheDir, DB_FILE_NAME)
             databaseFile.copyTo(databaseCacheFile)
@@ -145,14 +147,15 @@ class BackupWorker @AssistedInject constructor(
                 SUCCESS_BACKUP
             }
 
-            // 删除缓存文件
-            backupCacheDir.deleteAllFiles()
-
             innerResult
         }.getOrElse { throwable ->
             this@BackupWorker.logger().e(throwable, "doWork(), backup")
             FAILED_BACKUP_PATH_UNAUTHORIZED
         }
+
+        // 删除缓存文件
+        backupCacheDir.deleteAllFiles()
+
         val state = if (result == SUCCESS_BACKUP) {
             BackupRecoveryState.Success(SUCCESS_BACKUP)
         } else {

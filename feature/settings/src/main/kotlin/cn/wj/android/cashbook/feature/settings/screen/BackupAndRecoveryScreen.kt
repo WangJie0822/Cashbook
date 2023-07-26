@@ -41,6 +41,7 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILE
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_WEBDAV
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BLANK_BACKUP_PATH
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_BACKUP
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_RECOVERY
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CompatPasswordTextField
@@ -84,7 +85,10 @@ internal fun BackupAndRecoveryRoute(
         onBackupClick = viewModel::backup,
         onRecoveryClick = viewModel::getRecoveryList,
         onAutoBackupClick = viewModel::showSelectAutoBackupDialog,
-        onBackClick = onBackClick,
+        onBackClick = {
+            viewModel.dismissBookmark()
+            onBackClick()
+        },
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
     )
@@ -119,6 +123,7 @@ internal fun BackupAndRecoveryScreen(
                 FAILED_BACKUP_PATH_UNAUTHORIZED -> "未授权路径"
                 FAILED_BACKUP_WEBDAV -> "仅本地备份成功"
                 SUCCESS_BACKUP -> "备份成功"
+                SUCCESS_RECOVERY -> "恢复成功"
                 else -> ""
             }
             val snackbarResult = onShowSnackbar(tipText, null)

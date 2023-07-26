@@ -240,7 +240,7 @@ private fun EditAssetScaffold(
         floatingActionButton = {
             if (uiState is EditAssetUiState.Success) {
                 CashbookFloatingActionButton(onClick = {
-                    if (!assetNameTextState.isValid || !(uiState.isCreditCard && totalAmountTextState.isValid)) {
+                    if (!assetNameTextState.isValid || (uiState.isCreditCard && totalAmountTextState.isValid)) {
                         // 不满足必要条件
                     } else {
                         onSaveClick.invoke(
