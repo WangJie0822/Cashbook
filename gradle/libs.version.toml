@@ -227,8 +227,8 @@ google-hilt-android = { group = "com.google.dagger", name = "hilt-android", vers
 google-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "google-hilt" }
 google-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "google-hilt" }
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
-androidx-hilt-ext-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt" }
-androidx-hilt-ext-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidx-hilt" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt" }
+androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidx-hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidx-hilt" }
 
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android-desugarJdkLibs" }
