@@ -4,9 +4,14 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "db_record_with_related")
+/**
+ * 记录关联关系表
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/3/6
+ */
+@Entity(tableName = TABLE_RECORD_RELATED)
 class RecordWithRelatedTable(
-    @PrimaryKey(autoGenerate = true) val id: Long?,
-    @ColumnInfo(name = "record_id") val recordId: Long,
-    @ColumnInfo(name = "related_record_id") val relatedRecordId: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = TABLE_RECORD_RELATED_ID) val id: Long?,
+    @ColumnInfo(name = TABLE_RECORD_RELATED_RECORD_ID) val recordId: Long,
+    @ColumnInfo(name = TABLE_RECORD_RELATED_RELATED_RECORD_ID) val relatedRecordId: Long,
 )

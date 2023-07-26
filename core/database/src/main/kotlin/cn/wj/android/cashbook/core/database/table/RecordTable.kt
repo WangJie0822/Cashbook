@@ -21,17 +21,17 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
-@Entity(tableName = "db_record")
+@Entity(tableName = TABLE_RECORD)
 data class RecordTable(
-    @PrimaryKey(autoGenerate = true) val id: Long?,
-    @ColumnInfo(name = "type_id") val typeId: Long,
-    @ColumnInfo(name = "asset_id") val assetId: Long,
-    @ColumnInfo(name = "into_asset_id") val intoAssetId: Long,
-    @ColumnInfo(name = "books_id") val booksId: Long,
-    @ColumnInfo(name = "amount") val amount: Double,
-    @ColumnInfo(name = "concessions") val concessions: Double,
-    @ColumnInfo(name = "charge") val charge: Double,
-    val remark: String,
-    val reimbursable: Int,
-    @ColumnInfo(name = "record_time") val recordTime: Long
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = TABLE_RECORD_ID) val id: Long?,
+    @ColumnInfo(name = TABLE_RECORD_TYPE_ID) val typeId: Long,
+    @ColumnInfo(name = TABLE_RECORD_ASSET_ID) val assetId: Long,
+    @ColumnInfo(name = TABLE_RECORD_INTO_ASSET_ID) val intoAssetId: Long,
+    @ColumnInfo(name = TABLE_RECORD_BOOKS_ID) val booksId: Long,
+    @ColumnInfo(name = TABLE_RECORD_AMOUNT) val amount: Double,
+    @ColumnInfo(name = TABLE_RECORD_CONCESSIONS) val concessions: Double,
+    @ColumnInfo(name = TABLE_RECORD_CHARGE) val charge: Double,
+    @ColumnInfo(name = TABLE_RECORD_REMARK) val remark: String,
+    @ColumnInfo(name = TABLE_RECORD_REIMBURSABLE) val reimbursable: Int,
+    @ColumnInfo(name = TABLE_RECORD_RECORD_TIME) val recordTime: Long
 )

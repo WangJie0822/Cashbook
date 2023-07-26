@@ -1,6 +1,8 @@
 package cn.wj.android.cashbook.core.data.uitl
 
 import android.net.Uri
+import cn.wj.android.cashbook.core.model.model.BackupModel
+import java.io.File
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -19,6 +21,15 @@ interface BackupRecoveryManager {
     /** 恢复状态 */
     val recoveryState: Flow<BackupRecoveryState>
 
+    /** 在线备份数据列表 */
+    val onlineBackupListData: Flow<List<BackupModel>>
+
+    /** 本地备份数据列表 */
+    val localBackupListData: Flow<List<BackupModel>>
+
+    /** 本地自定义路径下数据列表 */
+    val localCustomBackupListData: Flow<List<BackupModel>>
+
     /** 刷新 WebDAV 连接状态 */
     fun refreshWebDAVConnected()
 
@@ -31,9 +42,13 @@ interface BackupRecoveryManager {
     /** 更新备份状态 */
     fun updateBackupState(state: BackupRecoveryState)
 
-    suspend fun requestRecovery(onlyLocal: Boolean = false)
+    fun refreshLocalPath(localPath: String)
+
+    suspend fun requestRecovery(path: String)
 
     fun updateRecoveryState(state: BackupRecoveryState)
+
+    suspend fun getWebFile(url: String): String
 }
 
 sealed class BackupRecoveryState(open val code: Int = 0) {
@@ -42,8 +57,10 @@ sealed class BackupRecoveryState(open val code: Int = 0) {
         const val FAILED_BLANK_BACKUP_PATH = -3012
         const val FAILED_BACKUP_PATH_UNAUTHORIZED = -3013
         const val FAILED_BACKUP_WEBDAV = -3014
+        const val FAILED_FILE_FORMAT_ERROR = -3015
 
         const val SUCCESS_BACKUP = 2001
+        const val SUCCESS_RECOVERY = 2002
     }
 
     object None : BackupRecoveryState()

@@ -9,6 +9,8 @@ import cn.wj.android.cashbook.core.common.buildlogic.CashbookFlavor
  */
 object ApplicationInfo {
 
+    const val dbVersion = 7
+
     private var _flavor: CashbookFlavor? = null
 
     private val flavor: CashbookFlavor
@@ -22,7 +24,7 @@ object ApplicationInfo {
         get() = flavor == CashbookFlavor.Dev
 
     val infos: String
-        get() = "${flavor.name},$isDev,$applicationId,$versionName"
+        get() = "${flavor.name},$isDev,$applicationId,$versionName,$dbVersion"
 
 
     fun setFlavor(flavorName: String) {

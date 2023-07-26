@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:datastore"))
+    implementation(project(":core:database"))
     implementation(project(":core:network"))
     implementation(project(":core:model"))
 
@@ -21,6 +22,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.ext.work)
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.kotlinx.coroutines.android)
 
     kapt(libs.androidx.hilt.ext.compiler)

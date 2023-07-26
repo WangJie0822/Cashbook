@@ -13,9 +13,9 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/23
  */
-@Entity(tableName = "db_tag")
+@Entity(tableName = TABLE_TAG)
 data class TagTable(
-    @PrimaryKey(autoGenerate = true) val id: Long?,
-    val name: String,
-    @ColumnInfo(name = "books_id") val booksId: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = TABLE_TAG_ID) val id: Long?,
+    @ColumnInfo(name = TABLE_TAG_NAME) val name: String,
+    @ColumnInfo(name = TABLE_TAG_BOOKS_ID) val booksId: Long,
 )

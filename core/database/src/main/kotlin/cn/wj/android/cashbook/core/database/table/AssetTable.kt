@@ -25,21 +25,21 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/3
  */
-@Entity(tableName = "db_asset")
+@Entity(tableName = TABLE_ASSET)
 data class AssetTable(
-    @PrimaryKey(autoGenerate = true) val id: Long?,
-    @ColumnInfo(name = "books_id") val booksId: Long,
-    val name: String,
-    val balance: Double,
-    @ColumnInfo(name = "total_amount") val totalAmount: Double,
-    @ColumnInfo(name = "billing_date") val billingDate: String,
-    @ColumnInfo(name = "repayment_date") val repaymentDate: String,
-    val type: String,
-    val classification: String,
-    val invisible: Int,
-    @ColumnInfo(name = "open_bank") val openBank: String,
-    @ColumnInfo(name = "card_no") val cardNo: String,
-    val remark: String,
-    val sort: Int,
-    @ColumnInfo(name = "modify_time") val modifyTime: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = TABLE_ASSET_ID) val id: Long?,
+    @ColumnInfo(name = TABLE_ASSET_BOOKS_ID) val booksId: Long,
+    @ColumnInfo(name = TABLE_ASSET_NAME) val name: String,
+    @ColumnInfo(name = TABLE_ASSET_BALANCE) val balance: Double,
+    @ColumnInfo(name = TABLE_ASSET_TOTAL_AMOUNT) val totalAmount: Double,
+    @ColumnInfo(name = TABLE_ASSET_BILLING_DATE) val billingDate: String,
+    @ColumnInfo(name = TABLE_ASSET_REPAYMENT_DATE) val repaymentDate: String,
+    @ColumnInfo(name = TABLE_ASSET_TYPE) val type: String,
+    @ColumnInfo(name = TABLE_ASSET_CLASSIFICATION) val classification: String,
+    @ColumnInfo(name = TABLE_ASSET_INVISIBLE) val invisible: Int,
+    @ColumnInfo(name = TABLE_ASSET_OPEN_BANK) val openBank: String,
+    @ColumnInfo(name = TABLE_ASSET_CARD_NO) val cardNo: String,
+    @ColumnInfo(name = TABLE_ASSET_REMARK) val remark: String,
+    @ColumnInfo(name = TABLE_ASSET_SORT) val sort: Int,
+    @ColumnInfo(name = TABLE_ASSET_MODIFY_TIME) val modifyTime: Long,
 )

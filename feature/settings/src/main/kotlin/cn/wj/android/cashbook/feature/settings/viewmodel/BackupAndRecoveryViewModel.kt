@@ -1,5 +1,8 @@
 package cn.wj.android.cashbook.feature.settings.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
@@ -7,11 +10,17 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
+import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.feature.settings.enums.BackupListEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -27,6 +36,9 @@ class BackupAndRecoveryViewModel @Inject constructor(
     private val backupRecoveryManager: BackupRecoveryManager,
     networkMonitor: NetworkMonitor,
 ) : ViewModel() {
+
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+        private set
 
     val uiState = settingRepository.appDataMode
         .mapLatest {
@@ -75,6 +87,33 @@ class BackupAndRecoveryViewModel @Inject constructor(
                 initialValue = 0,
             )
 
+    private val backupListType = MutableStateFlow(BackupListEnum.NONE)
+    private val webBackupListData = backupRecoveryManager.onlineBackupListData.mapLatest { list ->
+        val webDAVDomain = settingRepository.appDataMode.first().webDAVDomain
+        list.map {
+            if (!it.path.startsWith(webDAVDomain)) {
+                it.copy(path = webDAVDomain + it.path)
+            } else {
+                it
+            }
+        }
+    }
+    private val localBackupListData = backupRecoveryManager.localBackupListData
+    private val localCustomBackupList = backupRecoveryManager.localCustomBackupListData
+    val backupListData = backupListType.flatMapLatest {
+        when (it) {
+            BackupListEnum.WEB -> webBackupListData
+            BackupListEnum.LOCAL -> localBackupListData
+            BackupListEnum.CUSTOM -> localCustomBackupList
+            BackupListEnum.NONE -> flowOf(emptyList())
+        }
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
+            initialValue = emptyList(),
+        )
+
     fun saveWebDAV(domain: String, account: String, password: String) {
         viewModelScope.launch {
             val state = uiState.first()
@@ -104,14 +143,33 @@ class BackupAndRecoveryViewModel @Inject constructor(
         }
     }
 
-    fun recovery(onlyLocal: Boolean) {
+    fun getRecoveryList(onlyLocal: Boolean, localPath: String) {
         viewModelScope.launch {
-            backupRecoveryManager.requestRecovery(onlyLocal)
+            if (!onlyLocal && isConnected.first()) {
+                // 使用云端数据
+                backupListType.tryEmit(BackupListEnum.WEB)
+            } else {
+                if (localPath.isNotBlank()) {
+                    backupRecoveryManager.refreshLocalPath(localPath)
+                    backupListType.tryEmit(BackupListEnum.CUSTOM)
+                } else {
+                    backupListType.tryEmit(BackupListEnum.LOCAL)
+                }
+            }
+            backupListData.first()
+            delay(500L)
+            dialogState = DialogState.Shown(0)
+        }
+    }
+
+    fun tryRecovery(backupPath: String) {
+        viewModelScope.launch {
+            backupRecoveryManager.requestRecovery(backupPath)
         }
     }
 
     fun showSelectAutoBackupDialog() {
-
+        // TODO
     }
 
     fun dismissBookmark() {
@@ -119,6 +177,10 @@ class BackupAndRecoveryViewModel @Inject constructor(
             backupRecoveryManager.updateBackupState(BackupRecoveryState.None)
             backupRecoveryManager.updateRecoveryState(BackupRecoveryState.None)
         }
+    }
+
+    fun dismissDialog() {
+        dialogState = DialogState.Dismiss
     }
 }
 

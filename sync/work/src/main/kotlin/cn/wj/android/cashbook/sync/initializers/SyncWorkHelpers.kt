@@ -21,6 +21,10 @@ internal val SyncConstraints
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
+internal val BackupRecoveryConstraints
+    get() = Constraints.Builder()
+        .build()
+
 /**
  * Foreground information for sync on lower API levels when sync workers are being
  * run with a foreground service

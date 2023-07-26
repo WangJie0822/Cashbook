@@ -6,12 +6,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -21,7 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,7 +50,9 @@ import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
+import cn.wj.android.cashbook.core.model.model.BackupModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewModel
@@ -56,18 +66,23 @@ internal fun BackupAndRecoveryRoute(
 ) {
 
     val shouldDisplayBookmark by viewModel.shouldDisplayBookmark.collectAsStateWithLifecycle()
+    val backupList by viewModel.backupListData.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
 
     BackupAndRecoveryScreen(
         shouldDisplayBookmark,
         dismissBookmark = viewModel::dismissBookmark,
+        dialogState = viewModel.dialogState,
+        backupList = backupList,
+        tryRecovery = viewModel::tryRecovery,
+        dismissDialog = viewModel::dismissDialog,
         uiState = uiState,
         isConnected = isConnected,
         onSaveWebDAV = viewModel::saveWebDAV,
         onSaveBackupPath = viewModel::saveBackupPath,
         onBackupClick = viewModel::backup,
-        onRecoveryClick = viewModel::recovery,
+        onRecoveryClick = viewModel::getRecoveryList,
         onAutoBackupClick = viewModel::showSelectAutoBackupDialog,
         onBackClick = onBackClick,
         onShowSnackbar = onShowSnackbar,
@@ -80,12 +95,16 @@ internal fun BackupAndRecoveryRoute(
 internal fun BackupAndRecoveryScreen(
     shouldDisplayBookmark: Int,
     dismissBookmark: () -> Unit,
+    dialogState: DialogState,
+    backupList: List<BackupModel>,
+    tryRecovery: (String) -> Unit,
+    dismissDialog: () -> Unit,
     uiState: BackupAndRecoveryUiState,
     isConnected: Boolean,
     onSaveWebDAV: (String, String, String) -> Unit,
     onSaveBackupPath: (String) -> Unit,
     onBackupClick: () -> Unit,
-    onRecoveryClick: (Boolean) -> Unit,
+    onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
@@ -118,16 +137,44 @@ internal fun BackupAndRecoveryScreen(
             )
         },
         content = { paddingValues ->
-            BackupAndRecoveryScaffoldContent(
-                uiState = uiState,
-                isConnected = isConnected,
-                onSaveWebDAV = onSaveWebDAV,
-                onSaveBackupPath = onSaveBackupPath,
-                onBackupClick = onBackupClick,
-                onRecoveryClick = onRecoveryClick,
-                onAutoBackupClick = onAutoBackupClick,
-                modifier = Modifier.padding(paddingValues),
-            )
+            Box(modifier = Modifier.padding(paddingValues)) {
+
+                if (dialogState is DialogState.Shown<*>) {
+                    AlertDialog(
+                        onDismissRequest = dismissDialog,
+                        confirmButton = {
+                            Text(
+                                text = stringResource(id = R.string.cancel),
+                                modifier = Modifier.clickable { dismissDialog() },
+                            )
+                        },
+                        text = {
+                            LazyColumn(
+                                content = {
+                                    items(backupList) {
+                                        Text(
+                                            text = it.name,
+                                            modifier = Modifier
+                                                .clickable { tryRecovery(it.path) }
+                                                .padding(vertical = 4.dp),
+                                        )
+                                    }
+                                },
+                            )
+                        },
+                    )
+                }
+
+                BackupAndRecoveryScaffoldContent(
+                    uiState = uiState,
+                    isConnected = isConnected,
+                    onSaveWebDAV = onSaveWebDAV,
+                    onSaveBackupPath = onSaveBackupPath,
+                    onBackupClick = onBackupClick,
+                    onRecoveryClick = onRecoveryClick,
+                    onAutoBackupClick = onAutoBackupClick,
+                )
+            }
         },
     )
 }
@@ -140,7 +187,7 @@ internal fun BackupAndRecoveryScaffoldContent(
     onSaveWebDAV: (String, String, String) -> Unit,
     onSaveBackupPath: (String) -> Unit,
     onBackupClick: () -> Unit,
-    onRecoveryClick: (Boolean) -> Unit,
+    onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -235,6 +282,7 @@ internal fun BackupAndRecoveryScaffoldContent(
         )
 
         val context = LocalContext.current
+        var onSelectDirCallback: ((String) -> Unit)? = null
         val selectDirLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocumentTree(),
             onResult = {
@@ -249,24 +297,16 @@ internal fun BackupAndRecoveryScaffoldContent(
                     } else {
                         uri.path
                     }.orEmpty()
-                    onSaveBackupPath(path)
+                    onSelectDirCallback?.invoke(path)
                 }
             }
         )
-
-        fun ifPathNotBlank(block: () -> Unit) {
-            if (uiState.backupPath.isBlank()) {
-                // 未设置备份路径
-                selectDirLauncher.launch(null)
-            } else {
-                block()
-            }
-        }
 
         TransparentListItem(
             headlineText = { Text(text = stringResource(id = R.string.backup_path)) },
             supportingText = { Text(text = uiState.backupPath.ifBlank { stringResource(id = R.string.click_to_select_backup_path) }) },
             modifier = Modifier.clickable {
+                onSelectDirCallback = onSaveBackupPath
                 selectDirLauncher.launch(null)
             },
         )
@@ -274,22 +314,62 @@ internal fun BackupAndRecoveryScaffoldContent(
             headlineText = { Text(text = stringResource(id = R.string.backup)) },
             supportingText = { Text(text = stringResource(id = R.string.backup_hint)) },
             modifier = Modifier.clickable {
-                ifPathNotBlank(onBackupClick)
+                if (uiState.backupPath.isBlank()) {
+                    // 未设置备份路径，选择备份路径后进行备份
+                    onSelectDirCallback = { path ->
+                        onSaveBackupPath(path)
+                        onBackupClick()
+                    }
+                    selectDirLauncher.launch(null)
+                } else {
+                    onBackupClick()
+                }
             },
         )
-        TransparentListItem(
-            headlineText = { Text(text = stringResource(id = R.string.recovery)) },
-            supportingText = { Text(text = stringResource(id = R.string.recovery_hint)) },
-            modifier = Modifier.combinedClickable(onClick = {
-                ifPathNotBlank {
-                    onRecoveryClick(false)
-                }
-            }, onLongClick = {
-                ifPathNotBlank {
-                    onRecoveryClick(true)
-                }
-            }),
-        )
+        Box {
+            var expended by remember {
+                mutableStateOf(false)
+            }
+            TransparentListItem(
+                headlineText = { Text(text = stringResource(id = R.string.recovery)) },
+                supportingText = { Text(text = stringResource(id = R.string.recovery_hint)) },
+                modifier = Modifier.combinedClickable(onClick = {
+                    onRecoveryClick(false, "")
+                }, onLongClick = {
+                    expended = true
+                }),
+            )
+            DropdownMenu(expanded = expended, onDismissRequest = { expended = false }) {
+                DropdownMenuItem(
+                    text = { Text(text = "从备份路径恢复") },
+                    onClick = {
+                        expended = false
+                        if (uiState.backupPath.isBlank()) {
+                            // 未设置备份路径，选择后进行恢复
+                            onSelectDirCallback = { path ->
+                                onSaveBackupPath(path)
+                                onRecoveryClick(true, "")
+                            }
+                            selectDirLauncher.launch(null)
+                        } else {
+                            onRecoveryClick(true, "")
+                        }
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(text = "从自定义路径恢复") },
+                    onClick = {
+                        expended = false
+                        // 选择自定义路径后恢复
+                        onSelectDirCallback = { path ->
+                            onRecoveryClick(true, path)
+                        }
+                        selectDirLauncher.launch(null)
+                    },
+                )
+            }
+        }
+
         TransparentListItem(
             headlineText = { Text(text = stringResource(id = R.string.auto_backup)) },
             supportingText = {
@@ -316,12 +396,16 @@ private fun BackupAndRecoveryScreenPreview() {
         BackupAndRecoveryScreen(
             shouldDisplayBookmark = 0,
             dismissBookmark = {},
+            dialogState = DialogState.Dismiss,
+            backupList = emptyList(),
+            tryRecovery = {},
+            dismissDialog = {},
             uiState = BackupAndRecoveryUiState(),
             isConnected = false,
             onSaveWebDAV = { _, _, _ -> },
             onSaveBackupPath = {},
             onBackupClick = {},
-            onRecoveryClick = {},
+            onRecoveryClick = { _, _ -> },
             onAutoBackupClick = {},
             onBackClick = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },

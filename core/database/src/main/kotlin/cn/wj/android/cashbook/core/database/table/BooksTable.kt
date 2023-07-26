@@ -14,11 +14,10 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/15
  */
-@Entity(tableName = "db_books")
+@Entity(tableName = TABLE_BOOKS)
 data class BooksTable(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long?,
-    val name: String,
-    val description: String,
-    @ColumnInfo(name = "modify_time") val modifyTime: Long
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = TABLE_BOOKS_ID) val id: Long?,
+    @ColumnInfo(name = TABLE_BOOKS_NAME) val name: String,
+    @ColumnInfo(name = TABLE_BOOKS_DESCRIPTION) val description: String,
+    @ColumnInfo(name = TABLE_BOOKS_MODIFY_TIME) val modifyTime: Long
 )

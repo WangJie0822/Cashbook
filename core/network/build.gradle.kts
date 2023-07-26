@@ -27,4 +27,7 @@ dependencies {
     // Retrofit
     implementation(libs.squareup.retrofit2)
     implementation(libs.jakewharton.retrofit2.converter.kotlin)
+
+    // HTML 解析
+    implementation(libs.jsoup)
 }

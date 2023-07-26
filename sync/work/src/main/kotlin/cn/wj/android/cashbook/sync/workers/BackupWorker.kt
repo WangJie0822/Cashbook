@@ -18,6 +18,7 @@ import cn.wj.android.cashbook.core.common.BACKUP_FILE_NAME
 import cn.wj.android.cashbook.core.common.DB_FILE_NAME
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
+import cn.wj.android.cashbook.core.common.ext.deleteAllFiles
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_BACKUP
 import cn.wj.android.cashbook.core.common.tools.dateFormat
@@ -28,7 +29,7 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILE
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_WEBDAV
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BLANK_BACKUP_PATH
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_BACKUP
-import cn.wj.android.cashbook.sync.initializers.SyncConstraints
+import cn.wj.android.cashbook.sync.initializers.BackupRecoveryConstraints
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -44,7 +45,6 @@ import kotlinx.coroutines.withContext
 
 /**
  * 数据备份 Worker
- * - 有网络时每天执行一次数据同步
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/18
  */
@@ -93,7 +93,7 @@ class BackupWorker @AssistedInject constructor(
                 backupCacheDir.absolutePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT
             ZipOutputStream(FileOutputStream(zippedPath)).use { zos ->
                 BufferedInputStream(FileInputStream(databaseCacheFile)).use { bis ->
-                    val entry = ZipEntry("")
+                    val entry = ZipEntry(databaseCacheFile.name)
                     entry.comment = ApplicationInfo.infos
                     zos.putNextEntry(entry)
                     zos.write(bis.readBytes())
@@ -167,18 +167,6 @@ class BackupWorker @AssistedInject constructor(
         }
     }
 
-    private fun File.deleteAllFiles() {
-        if (!exists()) {
-            return
-        }
-        if (isDirectory) {
-            listFiles()?.forEach { childFile ->
-                childFile.deleteAllFiles()
-            }
-        }
-        delete()
-    }
-
     companion object {
 
         private const val DATA_KEY_PATH = "data_key_path"
@@ -186,7 +174,7 @@ class BackupWorker @AssistedInject constructor(
         /** 使用代理任务启动同步任务，以支持依赖注入 */
         fun startUpBackupWork(path: String) = OneTimeWorkRequestBuilder<DelegatingWorker>()
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setConstraints(SyncConstraints)
+            .setConstraints(BackupRecoveryConstraints)
             .setInputData(
                 BackupWorker::class.delegatedData(
                     data = Data.Builder().putString(DATA_KEY_PATH, path).build()

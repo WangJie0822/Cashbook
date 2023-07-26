@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
@@ -26,7 +27,7 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
         BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class,
         TagWithRecordTable::class, RecordWithRelatedTable::class,
     ],
-    version = 7
+    version = ApplicationInfo.dbVersion
 )
 abstract class CashbookDatabase : RoomDatabase() {
 

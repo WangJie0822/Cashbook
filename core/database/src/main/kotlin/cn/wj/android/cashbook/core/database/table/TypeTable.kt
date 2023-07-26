@@ -18,14 +18,14 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
  */
-@Entity(tableName = "db_type")
+@Entity(tableName = TABLE_TYPE)
 data class TypeTable(
-    @PrimaryKey(autoGenerate = true) val id: Long?,
-    @ColumnInfo(name = "parent_id") val parentId: Long,
-    val name: String,
-    @ColumnInfo(name = "icon_name") val iconName: String,
-    @ColumnInfo(name = "type_level") val typeLevel: String,
-    @ColumnInfo(name = "type_category") val typeCategory: String,
-    val protected: Int,
-    val sort: Int
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = TABLE_TYPE_ID) val id: Long?,
+    @ColumnInfo(name = TABLE_TYPE_PARENT_ID) val parentId: Long,
+    @ColumnInfo(name = TABLE_TYPE_NAME) val name: String,
+    @ColumnInfo(name = TABLE_TYPE_ICON_NAME) val iconName: String,
+    @ColumnInfo(name = TABLE_TYPE_TYPE_LEVEL) val typeLevel: String,
+    @ColumnInfo(name = TABLE_TYPE_TYPE_CATEGORY) val typeCategory: String,
+    @ColumnInfo(name = TABLE_TYPE_PROTECTED) val protected: Int,
+    @ColumnInfo(name = TABLE_TYPE_SORT) val sort: Int
 )
