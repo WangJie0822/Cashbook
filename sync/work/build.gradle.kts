@@ -19,11 +19,10 @@ dependencies {
     implementation(project(":core:model"))
 
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.kotlinx.coroutines.android)
+
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
-    implementation(libs.androidx.documentfile)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.kotlinx.coroutines.android)
 
     kapt(libs.androidx.hilt.compiler)
 }

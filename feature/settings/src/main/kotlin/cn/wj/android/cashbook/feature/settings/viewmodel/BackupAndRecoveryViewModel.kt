@@ -69,7 +69,6 @@ class BackupAndRecoveryViewModel @Inject constructor(
                 initialValue = false,
             )
 
-    // FIXME 数据变化无法触发
     val shouldDisplayBookmark =
         combine(
             backupRecoveryManager.backupState,

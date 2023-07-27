@@ -18,4 +18,6 @@ dependencies {
     implementation(project(":core:ui"))
 
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.room.ktx)
 }
