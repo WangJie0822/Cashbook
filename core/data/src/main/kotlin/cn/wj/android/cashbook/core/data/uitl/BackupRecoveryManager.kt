@@ -29,6 +29,7 @@ import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_BACKUP
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
 import cn.wj.android.cashbook.core.model.model.BackupModel
@@ -62,6 +63,7 @@ import kotlinx.coroutines.withContext
 class BackupRecoveryManager @Inject constructor(
     private val settingRepository: SettingRepository,
     private val okHttpWebDAVHandler: OkHttpWebDAVHandler,
+    private val database: CashbookDatabase,
     @ApplicationContext private val context: Context,
     @Dispatcher(CashbookDispatchers.IO) private val ioCoroutineContext: CoroutineContext,
 ) {
@@ -291,12 +293,28 @@ class BackupRecoveryManager @Inject constructor(
             val databaseFile = context.getDatabasePath(DB_FILE_NAME)
             val currentMs = System.currentTimeMillis()
             val dateFormat = currentMs.dateFormat(DATE_FORMAT_BACKUP)
-            this@BackupRecoveryManager.logger()
-                .i("startBackup(), backupPath = <$backupPath>, databaseFile = <$databaseFile>, dateFormat = <$dateFormat>")
 
             // 备份缓存文件
             val databaseCacheFile = File(backupCacheDir, DB_FILE_NAME)
+
+            this@BackupRecoveryManager.logger()
+                .i("startBackup(), backupPath = <$backupPath>, databaseFile = <$databaseFile>, databaseCacheFile = <$databaseCacheFile>, dateFormat = <$dateFormat>")
+
+            // 复制数据库文件到缓存路径
             databaseFile.copyTo(databaseCacheFile)
+            val from = database.openHelper.readableDatabase
+            // 创建数据库文件
+            val to = DelegateSQLiteDatabase(
+                context.openOrCreateDatabase(
+                    databaseCacheFile.absolutePath,
+                    Context.MODE_PRIVATE,
+                    null
+                )
+            )
+            // 复制最新数据到缓存文件
+            if (!DatabaseMigrations.backupFromDb(from, to)) {
+                throw RuntimeException("Database backup failed")
+            }
             // 压缩备份文件
             val zippedPath =
                 backupCacheDir.absolutePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT
@@ -475,13 +493,7 @@ class BackupRecoveryManager @Inject constructor(
                     null
                 )
             )
-            val currentDatabase = DelegateSQLiteDatabase(
-                context.openOrCreateDatabase(
-                    DB_FILE_NAME,
-                    Context.MODE_PRIVATE,
-                    null
-                )
-            )
+            val currentDatabase = database.openHelper.writableDatabase
             if (DatabaseMigrations.recoveryFromDb(backupDatabase, currentDatabase)) {
                 BackupRecoveryState.SUCCESS_RECOVERY
             } else {

@@ -199,6 +199,14 @@ object DatabaseMigrations {
     @Language("SQL")
     internal const val SQL_QUERY_ALL_FROM_TYPE = "SELECT * FROM `$TABLE_TYPE`"
 
+    fun backupFromDb(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase): Boolean {
+        if (from.version != to.version) {
+            return false
+        }
+        copyData(from, to)
+        return true
+    }
+
     @WorkerThread
     fun recoveryFromDb(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase): Boolean {
         val targetVersion = ApplicationInfo.dbVersion
@@ -216,8 +224,15 @@ object DatabaseMigrations {
             logger().e("recoveryFromDb(), Database migration not found")
             return false
         }
-        // 数据等级一致，恢复数据
-        // 恢复资产数据
+        // 数据版本一致，复制数据
+        copyData(from, to)
+
+        return true
+    }
+
+    @WorkerThread
+    fun copyData(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase) {
+        // 资产数据
         from.query(SQL_QUERY_ALL_FROM_ASSET).use {
             while (it.moveToNext()) {
                 to.insert(
@@ -285,7 +300,7 @@ object DatabaseMigrations {
                 )
             }
         }
-        // 恢复账本数据
+        // 账本数据
         from.query(SQL_QUERY_ALL_FROM_BOOKS).use {
             while (it.moveToNext()) {
                 to.insert(
@@ -312,7 +327,7 @@ object DatabaseMigrations {
                 )
             }
         }
-        // 恢复记录数据
+        // 记录数据
         from.query(SQL_QUERY_ALL_FROM_RECORD).use {
             while (it.moveToNext()) {
                 to.insert(
@@ -478,8 +493,5 @@ object DatabaseMigrations {
                 )
             }
         }
-
-        return true
     }
-
 }
