@@ -1,9 +1,14 @@
 package cn.wj.android.cashbook.core.data.helper
 
-import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.core.ui.R
 
+/**
+ * 从类型枚举中获取对应信息的工具类
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/3/3
+ */
 internal object AssetHelper {
 
     fun getNameResIdByType(type: ClassificationTypeEnum): Int = when (type) {

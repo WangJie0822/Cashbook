@@ -14,6 +14,8 @@ import cn.wj.android.cashbook.core.model.model.RecordTypeModel
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/9
  */
+@Suppress("unused")
+@Deprecated("This class only use to generate init database with version 7, don't use it in domain")
 internal object DatabaseHelper {
 
     private var initialized = false

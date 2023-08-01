@@ -308,19 +308,6 @@ class BackupRecoveryManager @Inject constructor(
             // 复制数据库文件到缓存路径
             database.close()
             databaseFile.copyTo(databaseCacheFile)
-//            val from = database.openHelper.readableDatabase
-//            // 创建数据库文件
-//            val to = DelegateSQLiteDatabase(
-//                context.openOrCreateDatabase(
-//                    databaseCacheFile.absolutePath,
-//                    Context.MODE_PRIVATE,
-//                    null
-//                )
-//            )
-//            // 复制最新数据到缓存文件
-//            if (!DatabaseMigrations.backupFromDb(from, to)) {
-//                throw RuntimeException("Database backup failed")
-//            }
             // 压缩备份文件
             val zippedPath =
                 backupCacheDir.absolutePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT
