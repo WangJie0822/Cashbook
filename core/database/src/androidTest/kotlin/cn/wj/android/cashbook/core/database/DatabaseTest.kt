@@ -7,14 +7,20 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
-import cn.wj.android.cashbook.core.database.DatabaseMigrations.SQL_QUERY_ALL_FROM_RECORD
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ID
+import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
+import cn.wj.android.cashbook.core.database.migration.Migration1To2
+import cn.wj.android.cashbook.core.database.migration.Migration2To3
+import cn.wj.android.cashbook.core.database.migration.Migration3To4
+import cn.wj.android.cashbook.core.database.migration.Migration4To5
+import cn.wj.android.cashbook.core.database.migration.Migration5To6
+import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_RECORD
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_AMOUNT
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ASSET_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_BOOKS_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_CHARGE
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_CONCESSIONS
+import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_INTO_ASSET_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_RECORD_TIME
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REIMBURSABLE
@@ -159,7 +165,7 @@ class DatabaseTest {
             }
         }
         Assert.assertEquals(false, hasTagTable)
-        helper.runMigrationsAndValidate(testDbName, 2, true, DatabaseMigrations.MIGRATION_1_2)
+        helper.runMigrationsAndValidate(testDbName, 2, true, Migration1To2)
             .use { db ->
                 db.query(
                     "SELECT * FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
@@ -243,7 +249,7 @@ class DatabaseTest {
 
         val typeEnum: String
         val typeId: Long
-        helper.runMigrationsAndValidate(testDbName, 3, true, DatabaseMigrations.MIGRATION_2_3)
+        helper.runMigrationsAndValidate(testDbName, 3, true, Migration2To3)
             .use { db ->
                 db.query(
                     "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
@@ -310,7 +316,7 @@ class DatabaseTest {
         Assert.assertEquals(false, hasBooksId)
         Assert.assertEquals(false, hasShared)
 
-        helper.runMigrationsAndValidate(testDbName, 4, true, DatabaseMigrations.MIGRATION_3_4)
+        helper.runMigrationsAndValidate(testDbName, 4, true, Migration3To4)
             .use { db ->
                 db.query(
                     "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
@@ -354,7 +360,7 @@ class DatabaseTest {
         Assert.assertEquals(false, hasCardNo)
         Assert.assertEquals(false, hasRemark)
 
-        helper.runMigrationsAndValidate(testDbName, 5, true, DatabaseMigrations.MIGRATION_4_5)
+        helper.runMigrationsAndValidate(testDbName, 5, true, Migration4To5)
             .use { db ->
                 db.query(
                     "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
@@ -406,7 +412,7 @@ class DatabaseTest {
         }
 
         var doubleStr: String
-        helper.runMigrationsAndValidate(testDbName, 6, true, DatabaseMigrations.MIGRATION_5_6)
+        helper.runMigrationsAndValidate(testDbName, 6, true, Migration5To6)
             .use { db ->
                 db.query("SELECT * FROM `db_asset`").use { cursor ->
                     cursor.moveToFirst()

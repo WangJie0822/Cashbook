@@ -30,7 +30,7 @@ import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_BACKUP
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.database.CashbookDatabase
-import cn.wj.android.cashbook.core.database.DatabaseMigrations
+import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
 import cn.wj.android.cashbook.core.model.model.BackupModel
 import cn.wj.android.cashbook.core.network.util.OkHttpWebDAVHandler

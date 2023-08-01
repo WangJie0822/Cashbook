@@ -5,7 +5,7 @@ import androidx.room.Room
 import cn.wj.android.cashbook.core.common.DB_FILE_NAME
 import cn.wj.android.cashbook.core.common.DB_INIT_FILE_NAME
 import cn.wj.android.cashbook.core.database.CashbookDatabase
-import cn.wj.android.cashbook.core.database.DatabaseMigrations
+import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
