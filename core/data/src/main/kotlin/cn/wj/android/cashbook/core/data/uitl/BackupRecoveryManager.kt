@@ -176,7 +176,7 @@ class BackupRecoveryManager @Inject constructor(
         _recoveryState.tryEmit(state)
     }
 
-    suspend fun getWebFile(url: String): String = withContext(ioCoroutineContext) {
+    private suspend fun getWebFile(url: String): String = withContext(ioCoroutineContext) {
         // 获取文件名
         val fileName = url.split("/").last()
         if (!fileName.startsWith(BACKUP_FILE_NAME) || !fileName.endsWith(BACKUP_FILE_EXT)) {
@@ -258,15 +258,20 @@ class BackupRecoveryManager @Inject constructor(
     }
 
     private val String.backupPath: String
-        get() {
+        get() = runCatching {
             val url = URL("$this${if (this.endsWith("/")) "" else "/"}$BACKUP_DIR_NAME/")
             val raw =
                 url.toString().replace(SCHEME_DAVS, SCHEME_HTTPS).replace(SCHEME_DAV, SCHEME_HTTP)
-            return URLEncoder.encode(raw, "UTF-8")
+            URLEncoder.encode(raw, "UTF-8")
                 .replace("\\+".toRegex(), "%20")
                 .replace("%3A".toRegex(), ":")
                 .replace("%2F".toRegex(), "/")
         }
+            .getOrElse { throwable ->
+                this@BackupRecoveryManager.logger().e(throwable, "backupPath")
+                ""
+            }
+
 
     private suspend fun <T> withCredentials(
         block: suspend OkHttpWebDAVHandler.(String) -> T
@@ -301,20 +306,21 @@ class BackupRecoveryManager @Inject constructor(
                 .i("startBackup(), backupPath = <$backupPath>, databaseFile = <$databaseFile>, databaseCacheFile = <$databaseCacheFile>, dateFormat = <$dateFormat>")
 
             // 复制数据库文件到缓存路径
+            database.close()
             databaseFile.copyTo(databaseCacheFile)
-            val from = database.openHelper.readableDatabase
-            // 创建数据库文件
-            val to = DelegateSQLiteDatabase(
-                context.openOrCreateDatabase(
-                    databaseCacheFile.absolutePath,
-                    Context.MODE_PRIVATE,
-                    null
-                )
-            )
-            // 复制最新数据到缓存文件
-            if (!DatabaseMigrations.backupFromDb(from, to)) {
-                throw RuntimeException("Database backup failed")
-            }
+//            val from = database.openHelper.readableDatabase
+//            // 创建数据库文件
+//            val to = DelegateSQLiteDatabase(
+//                context.openOrCreateDatabase(
+//                    databaseCacheFile.absolutePath,
+//                    Context.MODE_PRIVATE,
+//                    null
+//                )
+//            )
+//            // 复制最新数据到缓存文件
+//            if (!DatabaseMigrations.backupFromDb(from, to)) {
+//                throw RuntimeException("Database backup failed")
+//            }
             // 压缩备份文件
             val zippedPath =
                 backupCacheDir.absolutePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT

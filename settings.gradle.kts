@@ -32,7 +32,7 @@ dependencyResolutionManagement {
     }
     // 配置 Version Catalogs
     versionCatalogs {
-        // mavenCentral 中的依赖仓库
+        // 依赖版本
         create("libs") {
             from(files("./gradle/libs.version.toml"))
         }

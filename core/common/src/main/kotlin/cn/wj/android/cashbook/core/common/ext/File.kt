@@ -2,14 +2,17 @@ package cn.wj.android.cashbook.core.common.ext
 
 import java.io.File
 
-fun File.deleteAllFiles() {
+fun File.deleteAllFiles(): Boolean {
     if (!exists()) {
-        return
+        return true
     }
+    var result = true
     if (isDirectory) {
         listFiles()?.forEach { childFile ->
-            childFile.deleteAllFiles()
+            if (!childFile.deleteAllFiles()) {
+                result = false
+            }
         }
     }
-    delete()
+    return result && delete()
 }

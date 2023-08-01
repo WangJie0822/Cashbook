@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package cn.wj.android.cashbook.core.database
 
 import android.content.ContentValues
@@ -66,6 +68,11 @@ import cn.wj.android.cashbook.core.database.table.TABLE_TYPE_TYPE_CATEGORY
 import cn.wj.android.cashbook.core.database.table.TABLE_TYPE_TYPE_LEVEL
 import org.intellij.lang.annotations.Language
 
+/**
+ * 数据库迁移工具类
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/9
+ */
 object DatabaseMigrations {
 
     /**
@@ -171,34 +178,19 @@ object DatabaseMigrations {
             MIGRATION_6_7,
         )
 
-    private fun migrate(db: SupportSQLiteDatabase, current: Int): Int {
+
+    /** 在数据库升级列表中找到开始版本为 [db] 版本号的迁移类，对数据库进行升级后返回升级后的版本 */
+    private fun migrate(db: SupportSQLiteDatabase): Int {
+        val current = db.version
         val migration = MIGRATION_LIST.firstOrNull { it.startVersion == current } ?: return -1
         logger().i("migrate(db = <$db>, current = <$current>), migrate to ${migration.endVersion}")
         migration.migrate(db)
+        db.version = migration.endVersion
         return migration.endVersion
     }
 
-    @Language("SQL")
-    internal const val SQL_QUERY_ALL_FROM_ASSET = "SELECT * FROM `$TABLE_ASSET`"
-
-    @Language("SQL")
-    internal const val SQL_QUERY_ALL_FROM_BOOKS = "SELECT * FROM `$TABLE_BOOKS`"
-
-    @Language("SQL")
-    internal const val SQL_QUERY_ALL_FROM_RECORD = "SELECT * FROM `$TABLE_RECORD`"
-
-    @Language("SQL")
-    internal const val SQL_QUERY_ALL_FROM_RECORD_RELATED = "SELECT * FROM `$TABLE_RECORD_RELATED`"
-
-    @Language("SQL")
-    internal const val SQL_QUERY_ALL_FROM_TAG = "SELECT * FROM `$TABLE_TAG`"
-
-    @Language("SQL")
-    internal const val SQL_QUERY_ALL_FROM_TAG_RELATED = "SELECT * FROM `$TABLE_TAG_RELATED`"
-
-    @Language("SQL")
-    internal const val SQL_QUERY_ALL_FROM_TYPE = "SELECT * FROM `$TABLE_TYPE`"
-
+    /** 从 [from] 数据库备份数据到 [to] 数据库，要求数据库版本一致 */
+    @WorkerThread
     fun backupFromDb(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase): Boolean {
         if (from.version != to.version) {
             return false
@@ -207,6 +199,7 @@ object DatabaseMigrations {
         return true
     }
 
+    /** 从 [from] 数据库恢复数据到 [to] 数据库，恢复前会将数据库版本升级到一致 */
     @WorkerThread
     fun recoveryFromDb(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase): Boolean {
         val targetVersion = ApplicationInfo.dbVersion
@@ -218,7 +211,7 @@ object DatabaseMigrations {
             return false
         }
         while (currentVersion != -1 && targetVersion != currentVersion) {
-            currentVersion = migrate(from, currentVersion)
+            currentVersion = migrate(from)
         }
         if (currentVersion != targetVersion) {
             logger().e("recoveryFromDb(), Database migration not found")
@@ -230,6 +223,28 @@ object DatabaseMigrations {
         return true
     }
 
+    @Language("SQL")
+    private const val SQL_QUERY_ALL_FROM_ASSET = "SELECT * FROM `$TABLE_ASSET`"
+
+    @Language("SQL")
+    private const val SQL_QUERY_ALL_FROM_BOOKS = "SELECT * FROM `$TABLE_BOOKS`"
+
+    @Language("SQL")
+    private const val SQL_QUERY_ALL_FROM_RECORD = "SELECT * FROM `$TABLE_RECORD`"
+
+    @Language("SQL")
+    private const val SQL_QUERY_ALL_FROM_RECORD_RELATED = "SELECT * FROM `$TABLE_RECORD_RELATED`"
+
+    @Language("SQL")
+    private const val SQL_QUERY_ALL_FROM_TAG = "SELECT * FROM `$TABLE_TAG`"
+
+    @Language("SQL")
+    private const val SQL_QUERY_ALL_FROM_TAG_RELATED = "SELECT * FROM `$TABLE_TAG_RELATED`"
+
+    @Language("SQL")
+    private const val SQL_QUERY_ALL_FROM_TYPE = "SELECT * FROM `$TABLE_TYPE`"
+
+    /** 从 [from] 数据库复制数据到 [to] 数据库，主键重复时覆盖 */
     @WorkerThread
     fun copyData(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase) {
         // 资产数据

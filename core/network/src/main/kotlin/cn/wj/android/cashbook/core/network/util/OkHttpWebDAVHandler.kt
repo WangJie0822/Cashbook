@@ -42,6 +42,9 @@ class OkHttpWebDAVHandler @Inject constructor(
 
     @WorkerThread
     fun exists(url: String): Boolean {
+        if (url.isBlank()) {
+            return false
+        }
         val response = callFactory.newCall(
             Request.Builder()
                 .url(url)
@@ -55,6 +58,9 @@ class OkHttpWebDAVHandler @Inject constructor(
 
     @WorkerThread
     fun createDirectory(url: String): Boolean {
+        if (url.isBlank()) {
+            return false
+        }
         val response = callFactory.newCall(
             Request.Builder()
                 .url(url)
@@ -68,6 +74,9 @@ class OkHttpWebDAVHandler @Inject constructor(
 
     @WorkerThread
     fun put(url: String, dataStream: InputStream, contentType: String): Boolean {
+        if (url.isBlank()) {
+            return false
+        }
         val requestBody = RequestBody.create(MediaType.parse(contentType), dataStream.readBytes())
         val response = callFactory.newCall(
             Request.Builder()
@@ -82,6 +91,9 @@ class OkHttpWebDAVHandler @Inject constructor(
 
     @WorkerThread
     fun put(url: String, file: File, contentType: String): Boolean {
+        if (url.isBlank()) {
+            return false
+        }
         val response = callFactory.newCall(
             Request.Builder()
                 .url(url)
@@ -98,6 +110,9 @@ class OkHttpWebDAVHandler @Inject constructor(
         url: String,
         propsList: List<String> = emptyList()
     ): List<BackupModel> = withContext(ioCoroutineContext) {
+        if (url.isBlank()) {
+            return@withContext emptyList()
+        }
         val requestPropText = if (propsList.isEmpty()) {
             DAV_PROP.replace("%s", "")
         } else {
@@ -137,6 +152,9 @@ class OkHttpWebDAVHandler @Inject constructor(
 
     @WorkerThread
     suspend fun get(url: String): InputStream? = withContext(ioCoroutineContext) {
+        if (url.isBlank()) {
+            return@withContext null
+        }
         val response = callFactory.newCall(
             Request.Builder()
                 .url(url)
