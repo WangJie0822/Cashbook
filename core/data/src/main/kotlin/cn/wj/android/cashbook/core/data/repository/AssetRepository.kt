@@ -35,7 +35,7 @@ interface AssetRepository {
 }
 
 internal fun AssetTable.asModel(): AssetModel {
-    val classification = AssetClassificationEnum.valueOf(this.classification)
+    val classification = AssetClassificationEnum.ordinalOf(this.classification)
     return AssetModel(
         id = this.id ?: -1L,
         booksId = this.booksId,
@@ -44,7 +44,7 @@ internal fun AssetTable.asModel(): AssetModel {
         totalAmount = this.totalAmount.toString(),
         billingDate = this.billingDate,
         repaymentDate = this.repaymentDate,
-        type = ClassificationTypeEnum.valueOf(this.type),
+        type = ClassificationTypeEnum.ordinalOf(this.type),
         classification = classification,
         invisible = this.invisible == SWITCH_INT_ON,
         openBank = this.openBank,
@@ -64,8 +64,8 @@ internal fun AssetModel.asTable(): AssetTable {
         totalAmount = this.totalAmount.toDoubleOrZero(),
         billingDate = this.billingDate,
         repaymentDate = this.repaymentDate,
-        type = this.type.name,
-        classification = this.classification.name,
+        type = this.type.ordinal,
+        classification = this.classification.ordinal,
         invisible = if (this.invisible) SWITCH_INT_ON else SWITCH_INT_OFF,
         openBank = this.openBank,
         cardNo = this.cardNo,

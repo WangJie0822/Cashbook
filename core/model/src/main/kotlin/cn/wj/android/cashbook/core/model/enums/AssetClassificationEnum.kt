@@ -78,5 +78,11 @@ enum class AssetClassificationEnum {
         )
 
     val isBankCard: Boolean
-        get() = this == AssetClassificationEnum.BANK_CARD || this == AssetClassificationEnum.CREDIT_CARD
+        get() = this == BANK_CARD || this == CREDIT_CARD
+
+    companion object {
+        fun ordinalOf(ordinal: Int): AssetClassificationEnum {
+            return values().first { it.ordinal == ordinal }
+        }
+    }
 }

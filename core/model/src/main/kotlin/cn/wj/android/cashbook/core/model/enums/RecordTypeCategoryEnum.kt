@@ -3,20 +3,23 @@ package cn.wj.android.cashbook.core.model.enums
 /**
  * 收支类型
  *
- * @param position 类型对于下标
- *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/17
  */
-enum class RecordTypeCategoryEnum(
-    val position: Int
-) {
+enum class RecordTypeCategoryEnum {
 
     /** 支出 */
-    EXPENDITURE(0),
+    EXPENDITURE,
 
     /** 收入 */
-    INCOME(1),
+    INCOME,
 
     /** 转账 */
-    TRANSFER(2),
+    TRANSFER,
+    ;
+
+    companion object {
+        fun ordinalOf(ordinal: Int): RecordTypeCategoryEnum {
+            return values().first { it.ordinal == ordinal }
+        }
+    }
 }

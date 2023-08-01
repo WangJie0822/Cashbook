@@ -641,12 +641,12 @@ internal fun EditRecordTopBar(
             if (uiState is EditRecordUiState.Success) {
                 TabRow(
                     modifier = Modifier.fillMaxSize(),
-                    selectedTabIndex = selectedTab.position,
+                    selectedTabIndex = selectedTab.ordinal,
                     containerColor = Color.Unspecified,
                     contentColor = Color.Unspecified,
                     indicator = { tabPositions ->
                         TabRowDefaults.Indicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.position]),
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.ordinal]),
                             color = MaterialTheme.colorScheme.onTertiaryContainer,
                         )
                     },

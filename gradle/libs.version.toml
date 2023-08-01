@@ -314,11 +314,12 @@ androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-savedstate = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
-# Room 数据库相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/versions?hl=zh-cn)
+# Room 数据库相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/room?hl=zh-cn)
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
 androidx-room-compiler-processing = { group = "androidx.room", name = "room-compiler-processing", version.ref = "androidx-room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "androidx-room" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "androidx-room" }
 androidx-room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "androidx-room" }
 androidx-room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "androidx-room" }
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "androidx-room" }

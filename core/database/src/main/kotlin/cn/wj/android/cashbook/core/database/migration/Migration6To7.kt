@@ -14,7 +14,9 @@ import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_RELATED
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG_RELATED
 import cn.wj.android.cashbook.core.database.table.TABLE_TYPE
+import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import java.math.BigDecimal
 import org.intellij.lang.annotations.Language
 
@@ -31,6 +33,16 @@ import org.intellij.lang.annotations.Language
  */
 object Migration6To7 : Migration(6, 7) {
 
+    override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+        migrateAsset()
+        migrateBooks()
+        migrateTag()
+        migrateTagRelated()
+        migrateType()
+        migrateRecordRelated()
+        migrateRecord()
+    }
+
     /** 创建资产表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_ASSET_7 = """
@@ -43,8 +55,8 @@ object Migration6To7 : Migration(6, 7) {
             `total_amount` REAL NOT NULL, 
             `billing_date` TEXT NOT NULL, 
             `repayment_date` TEXT NOT NULL, 
-            `type` TEXT NOT NULL, 
-            `classification` TEXT NOT NULL, 
+            `type` INTEGER NOT NULL, 
+            `classification` INTEGER NOT NULL, 
             `invisible` INTEGER NOT NULL, 
             `open_bank` TEXT NOT NULL, 
             `card_no` TEXT NOT NULL, 
@@ -53,16 +65,6 @@ object Migration6To7 : Migration(6, 7) {
             `modify_time` INTEGER NOT NULL
         )
     """
-
-    override fun migrate(database: SupportSQLiteDatabase) = with(database) {
-        migrateAsset()
-        migrateBooks()
-        migrateTag()
-        migrateTagRelated()
-        migrateType()
-        migrateRecordRelated()
-        migrateRecord()
-    }
 
     /** 查询指定资产 id 的最后一条修改余额记录 */
     @Language("SQL")
@@ -108,8 +110,9 @@ object Migration6To7 : Migration(6, 7) {
             while (it.moveToNext()) {
                 // 计算余额
                 val assetId = it.getLong(it.getColumnIndexOrThrow("id"))
-                val type = it.getString(it.getColumnIndexOrThrow("type"))
-                val isCreditCard = type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.name
+                val type =
+                    ClassificationTypeEnum.valueOf(it.getString(it.getColumnIndexOrThrow("type")))
+                val isCreditCard = type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
                 // 查询最后一条修改记录
                 var balance = BigDecimal.ZERO
                 var lastModifyRecordTime = 0L
@@ -200,10 +203,10 @@ object Migration6To7 : Migration(6, 7) {
                             "repayment_date",
                             it.getString(it.getColumnIndexOrThrow("repayment_date"))
                         )
-                        put("type", type)
+                        put("type", type.ordinal)
                         put(
                             "classification",
-                            it.getString(it.getColumnIndexOrThrow("classification"))
+                            AssetClassificationEnum.valueOf(it.getString(it.getColumnIndexOrThrow("classification"))).ordinal
                         )
                         put("invisible", it.getInt(it.getColumnIndexOrThrow("invisible")))
                         put("open_bank", it.getString(it.getColumnIndexOrThrow("open_bank")))
@@ -370,8 +373,15 @@ object Migration6To7 : Migration(6, 7) {
                         put("id", it.getLong(it.getColumnIndexOrThrow("id")))
                         put("parent_id", it.getLong(it.getColumnIndexOrThrow("parent_id")))
                         put("name", it.getString(it.getColumnIndexOrThrow("name")))
-                        put("icon_name", it.getString(it.getColumnIndexOrThrow("icon_res_name")))
-                        put("type_level", it.getString(it.getColumnIndexOrThrow("type")))
+                        put(
+                            "icon_name",
+                            it.getString(it.getColumnIndexOrThrow("icon_res_name"))
+                                .replace("@drawable/", "")
+                        )
+                        put(
+                            "type_level",
+                            TypeLevelEnum.valueOf(it.getString(it.getColumnIndexOrThrow("type"))).ordinal
+                        )
                         put("type_category", it.getInt(it.getColumnIndexOrThrow("record_type")))
                         val refund = it.getInt(it.getColumnIndexOrThrow("refund"))
                         val reimburse = it.getInt(it.getColumnIndexOrThrow("reimburse"))

@@ -30,6 +30,9 @@ class GetAssetRecordViewsUseCase @Inject constructor(
         pageSize: Int,
         coroutineContext: CoroutineContext = Dispatchers.IO
     ): List<RecordViewsEntity> = withContext(coroutineContext) {
+        if (assetId == -1L) {
+            return@withContext emptyList()
+        }
         recordRepository.queryPagingRecordListByAssetId(assetId, pageNum, pageSize)
             .sortedBy { it.recordTime }
             .reversed()

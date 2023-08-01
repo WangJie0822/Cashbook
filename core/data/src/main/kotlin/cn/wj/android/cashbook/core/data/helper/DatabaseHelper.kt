@@ -882,8 +882,8 @@ internal object DatabaseHelper {
             parentId = this.parentId,
             name = this.name,
             iconName = this.iconName,
-            typeLevel = this.typeLevel.name,
-            typeCategory = this.typeCategory.name,
+            typeLevel = this.typeLevel.ordinal,
+            typeCategory = this.typeCategory.ordinal,
             protected = if (this.protected) SWITCH_INT_OFF else SWITCH_INT_OFF,
             sort = this.sort
         )

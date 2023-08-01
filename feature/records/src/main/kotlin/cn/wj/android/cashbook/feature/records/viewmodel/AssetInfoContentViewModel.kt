@@ -7,6 +7,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
+import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase
@@ -30,14 +32,19 @@ class AssetInfoContentViewModel @Inject constructor(
 
     val recordList = combine(assetIdData, recordDataVersion) { assetId, _ ->
         assetId
-    }.flatMapLatest {
-        Pager(
-            config = PagingConfig(pageSize = 20, initialLoadSize = 20),
-            pagingSourceFactory = {
-                AssetRecordPagingSource(it, getAssetRecordViewsUseCase)
-            },
-        ).flow.cachedIn(viewModelScope)
     }
+        .flatMapLatest {
+            Pager(
+                config = PagingConfig(
+                    pageSize = DEFAULT_PAGE_SIZE,
+                    initialLoadSize = DEFAULT_PAGE_SIZE
+                ),
+                pagingSourceFactory = {
+                    AssetRecordPagingSource(it, getAssetRecordViewsUseCase)
+                },
+            ).flow
+        }
+        .cachedIn(viewModelScope)
 
     fun updateAssetId(id: Long) {
         assetIdData.tryEmit(id)
@@ -51,14 +58,15 @@ private class AssetRecordPagingSource(
     override fun getRefreshKey(state: PagingState<Int, RecordViewsEntity>): Int? = null
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RecordViewsEntity> {
-        return try {
+        return runCatching {
             val page = params.key ?: 0
             val pageSize = params.loadSize
             val items = getAssetRecordViewsUseCase(assetId, page, pageSize)
             val prevKey = if (page > 0) page - 1 else null
             val nextKey = if (items.isNotEmpty()) page + 1 else null
             LoadResult.Page(items, prevKey, nextKey)
-        } catch (throwable: Throwable) {
+        }.getOrElse { throwable ->
+            logger().e(throwable, "load()")
             LoadResult.Error(throwable)
         }
     }

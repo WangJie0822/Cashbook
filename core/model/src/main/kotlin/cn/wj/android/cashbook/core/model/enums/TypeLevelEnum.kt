@@ -13,4 +13,10 @@ enum class TypeLevelEnum {
     /** 二级小类 */
     SECOND,
     ;
+
+    companion object {
+        fun ordinalOf(ordinal: Int): TypeLevelEnum {
+            return values().first { it.ordinal == ordinal }
+        }
+    }
 }

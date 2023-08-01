@@ -77,7 +77,7 @@ interface TransactionDao {
                 ?: throw DataTransactionException("Record id not found")
             val oldType = queryTypeById(oldRecord.typeId)
                 ?: throw DataTransactionException("Type must not be null")
-            val oldCategory = RecordTypeCategoryEnum.valueOf(oldType.typeCategory)
+            val oldCategory = RecordTypeCategoryEnum.ordinalOf(oldType.typeCategory)
             // 计算之前记录涉及金额
             val oldRecordAmount = if (oldCategory == RecordTypeCategoryEnum.INCOME) {
                 // 收入，金额 - 手续费
@@ -89,7 +89,7 @@ interface TransactionDao {
             queryAssetById(oldRecord.assetId)?.let { asset ->
                 // 计算回退已用额度 or 余额
                 val balance =
-                    if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                    if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 - 记录金额
                         asset.balance.toBigDecimalOrZero() - oldRecordAmount
                     } else {
@@ -104,7 +104,7 @@ interface TransactionDao {
                 queryAssetById(oldRecord.intoAssetId)?.let { asset ->
                     // 计算回退已用额度 or 余额
                     val balance =
-                        if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                        if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                             // 信用卡账户，已用额度 + 记录金额
                             asset.balance.toBigDecimalOrZero() + oldRecordAmount
                         } else {
@@ -128,7 +128,7 @@ interface TransactionDao {
         // 获取类型信息
         val type = queryTypeById(recordTable.typeId)
             ?: throw DataTransactionException("Type must not be null")
-        val category = RecordTypeCategoryEnum.valueOf(type.typeCategory)
+        val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
 
         // 计算此次记录涉及金额
         val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
@@ -143,7 +143,7 @@ interface TransactionDao {
         queryAssetById(recordTable.assetId)?.let { asset ->
             // 计算已用额度 or 余额
             val balance =
-                if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                     // 信用卡账户，已用额度 + 记录金额
                     asset.balance.toBigDecimalOrZero() + recordAmount
                 } else {
@@ -159,7 +159,7 @@ interface TransactionDao {
             queryAssetById(recordTable.intoAssetId)?.let { asset ->
                 // 计算已用额度 or 余额
                 val balance =
-                    if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                    if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 - 记录金额
                         asset.balance.toBigDecimalOrZero() - recordAmount
                     } else {
@@ -193,7 +193,7 @@ interface TransactionDao {
             queryRecordById(recordId) ?: throw DataTransactionException("Record id not found")
         val type = queryTypeById(record.typeId)
             ?: throw DataTransactionException("Type must not be null")
-        val category = RecordTypeCategoryEnum.valueOf(type.typeCategory)
+        val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
         // 计算之前记录涉及金额
         val oldRecordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
             // 收入，金额 - 手续费
@@ -205,7 +205,7 @@ interface TransactionDao {
         queryAssetById(record.assetId)?.let { asset ->
             // 计算回退已用额度 or 余额
             val balance =
-                if (ClassificationTypeEnum.valueOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
+                if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                     // 信用卡账户，已用额度 - 记录金额
                     asset.balance.toBigDecimalOrZero() - oldRecordAmount
                 } else {

@@ -24,8 +24,8 @@ data class TypeTable(
     @ColumnInfo(name = TABLE_TYPE_PARENT_ID) val parentId: Long,
     @ColumnInfo(name = TABLE_TYPE_NAME) val name: String,
     @ColumnInfo(name = TABLE_TYPE_ICON_NAME) val iconName: String,
-    @ColumnInfo(name = TABLE_TYPE_TYPE_LEVEL) val typeLevel: String,
-    @ColumnInfo(name = TABLE_TYPE_TYPE_CATEGORY) val typeCategory: String,
+    @ColumnInfo(name = TABLE_TYPE_TYPE_LEVEL) val typeLevel: Int,
+    @ColumnInfo(name = TABLE_TYPE_TYPE_CATEGORY) val typeCategory: Int,
     @ColumnInfo(name = TABLE_TYPE_PROTECTED) val protected: Int,
     @ColumnInfo(name = TABLE_TYPE_SORT) val sort: Int
 )

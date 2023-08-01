@@ -68,4 +68,10 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
     fun isDebt(): Boolean {
         return this == DEBT_ACCOUNT
     }
+
+    companion object {
+        fun ordinalOf(ordinal: Int): ClassificationTypeEnum {
+            return values().first { it.ordinal == ordinal }
+        }
+    }
 }

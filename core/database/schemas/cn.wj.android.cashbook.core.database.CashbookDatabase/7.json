@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "ad76d43925cd3ecedb62ec63e44d8bd1",
+    "identityHash": "5074bd21753526eeb884ddfbd26a418d",
     "entities": [
       {
         "tableName": "db_books",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "db_asset",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `books_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `balance` REAL NOT NULL, `total_amount` REAL NOT NULL, `billing_date` TEXT NOT NULL, `repayment_date` TEXT NOT NULL, `type` TEXT NOT NULL, `classification` TEXT NOT NULL, `invisible` INTEGER NOT NULL, `open_bank` TEXT NOT NULL, `card_no` TEXT NOT NULL, `remark` TEXT NOT NULL, `sort` INTEGER NOT NULL, `modify_time` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `books_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `balance` REAL NOT NULL, `total_amount` REAL NOT NULL, `billing_date` TEXT NOT NULL, `repayment_date` TEXT NOT NULL, `type` INTEGER NOT NULL, `classification` INTEGER NOT NULL, `invisible` INTEGER NOT NULL, `open_bank` TEXT NOT NULL, `card_no` TEXT NOT NULL, `remark` TEXT NOT NULL, `sort` INTEGER NOT NULL, `modify_time` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -91,13 +91,13 @@
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "classification",
             "columnName": "classification",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -148,7 +148,7 @@
       },
       {
         "tableName": "db_type",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `icon_name` TEXT NOT NULL, `type_level` TEXT NOT NULL, `type_category` TEXT NOT NULL, `protected` INTEGER NOT NULL, `sort` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `icon_name` TEXT NOT NULL, `type_level` INTEGER NOT NULL, `type_category` INTEGER NOT NULL, `protected` INTEGER NOT NULL, `sort` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -177,13 +177,13 @@
           {
             "fieldPath": "typeLevel",
             "columnName": "type_level",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "typeCategory",
             "columnName": "type_category",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -369,7 +369,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "tagId",
+            "fieldPath": "relatedRecordId",
             "columnName": "related_record_id",
             "affinity": "INTEGER",
             "notNull": true
@@ -388,7 +388,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ad76d43925cd3ecedb62ec63e44d8bd1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5074bd21753526eeb884ddfbd26a418d')"
     ]
   }
 }
