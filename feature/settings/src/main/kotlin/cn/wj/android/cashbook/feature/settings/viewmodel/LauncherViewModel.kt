@@ -14,6 +14,7 @@ import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.domain.usecase.GetCurrentBookUseCase
 import cn.wj.android.cashbook.feature.settings.enums.LauncherBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class LauncherViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
+    getCurrentBookUseCase: GetCurrentBookUseCase,
 ) : ViewModel() {
 
     private val verified = MutableStateFlow(false)
@@ -57,6 +59,7 @@ class LauncherViewModel @Inject constructor(
             needRequestProtocol = !appData.agreedProtocol,
             needVerity = appData.needSecurityVerificationWhenLaunch && !verified,
             supportFingerprint = appData.enableFingerprintVerification,
+            currentBookName = getCurrentBookUseCase().first().name
         )
     }
         .stateIn(
@@ -196,5 +199,6 @@ sealed interface LauncherUiState {
         val needRequestProtocol: Boolean,
         val needVerity: Boolean,
         val supportFingerprint: Boolean,
+        val currentBookName: String,
     ) : LauncherUiState
 }

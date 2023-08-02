@@ -16,6 +16,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -272,6 +273,7 @@ internal fun LauncherScreen(
                             drawerState = drawerState,
                             drawerContent = {
                                 LauncherSheet(
+                                    currentBookName = uiState.currentBookName,
                                     onMyAssetClick = onMyAssetClick,
                                     onMyBookClick = onMyBookClick,
                                     onMyCategoryClick = onMyCategoryClick,
@@ -295,6 +297,7 @@ internal fun LauncherScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherSheet(
+    currentBookName: String,
     onMyAssetClick: () -> Unit,
     onMyBookClick: () -> Unit,
     onMyCategoryClick: () -> Unit,
@@ -315,6 +318,13 @@ internal fun LauncherSheet(
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_books)) },
             icon = { Icon(imageVector = CashbookIcons.LibraryBooks, contentDescription = null) },
+            badge = {
+                Text(
+                    text = currentBookName,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = LocalContentColor.current.copy(alpha = 0.5f),
+                )
+            },
             selected = false,
             onClick = onMyBookClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
@@ -515,6 +525,7 @@ private fun LauncherScreenPreview() {
                 needRequestProtocol = false,
                 needVerity = false,
                 supportFingerprint = false,
+                currentBookName = "默认账本1",
             ),
             agreeProtocol = {},
             firstOpen = true,
@@ -551,6 +562,7 @@ private fun LauncherScreenSheetPreview() {
                 needRequestProtocol = false,
                 needVerity = false,
                 supportFingerprint = false,
+                currentBookName = "默认账本2",
             ),
             agreeProtocol = {},
             firstOpen = true,
@@ -588,6 +600,7 @@ private fun LauncherScreenVerifyPreview() {
                 needRequestProtocol = false,
                 needVerity = true,
                 supportFingerprint = true,
+                currentBookName = "默认账本3",
             ),
             agreeProtocol = {},
             firstOpen = true,
@@ -624,6 +637,7 @@ private fun LauncherScreenProtocolPreview() {
                 needRequestProtocol = true,
                 needVerity = false,
                 supportFingerprint = false,
+                currentBookName = "默认账本4",
             ),
             agreeProtocol = {},
             firstOpen = true,
