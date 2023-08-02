@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
@@ -29,6 +32,7 @@ import androidx.compose.material3.ModalBottomSheetLayout
 import androidx.compose.material3.ModalBottomSheetState
 import androidx.compose.material3.ModalBottomSheetValue
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -39,7 +43,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,13 +54,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
-import cn.wj.android.cashbook.core.common.ext.toIntOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
@@ -75,6 +84,7 @@ import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialog
+import cn.wj.android.cashbook.feature.records.viewmodel.DialogType
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import java.util.Calendar
@@ -93,7 +103,6 @@ internal fun LauncherContentRoute(
     viewModel: LauncherContentViewModel = hiltViewModel(),
 ) {
 
-    val currentBookName by viewModel.currentBookName.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LauncherContentScreen(
@@ -102,12 +111,13 @@ internal fun LauncherContentRoute(
         onShowSnackbar = onShowSnackbar,
         viewRecord = viewModel.viewRecord,
         onRecordItemEditClick = {
-            viewModel.onRecordDetailsSheetDismiss()
+            viewModel.onSheetDismiss()
             onEditRecordClick.invoke(it)
         },
         onRecordItemDeleteClick = viewModel::onRecordItemDeleteClick,
-        bookName = currentBookName,
         onMenuClick = onMenuClick,
+        onDateClick = viewModel::showDateSelectDialog,
+        onDateSelected = viewModel::onDateSelected,
         onSearchClick = onSearchClick,
         onCalendarClick = onCalendarClick,
         onMyAssetClick = onMyAssetClick,
@@ -117,16 +127,7 @@ internal fun LauncherContentRoute(
         dialogState = viewModel.dialogState,
         onDeleteRecordConfirm = viewModel::onDeleteRecordConfirm,
         onDialogDismiss = viewModel::onDialogDismiss,
-        sheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            confirmValueChange = {
-                if (it == ModalBottomSheetValue.Hidden) {
-                    // sheet 隐藏
-                    viewModel.onRecordDetailsSheetDismiss()
-                }
-                true
-            },
-        ),
+        onSheetDismiss = viewModel::onSheetDismiss,
         modifier = modifier,
     )
 }
@@ -142,8 +143,9 @@ internal fun LauncherContentScreen(
     onRecordItemEditClick: (Long) -> Unit,
     onRecordItemDeleteClick: (Long) -> Unit,
     // 标题栏
-    bookName: String,
     onMenuClick: () -> Unit,
+    onDateClick: () -> Unit,
+    onDateSelected: (String) -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onMyAssetClick: () -> Unit,
@@ -156,8 +158,16 @@ internal fun LauncherContentScreen(
     dialogState: DialogState,
     onDeleteRecordConfirm: (Long) -> Unit,
     onDialogDismiss: () -> Unit,
+    onSheetDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = { value ->
+            if (value == ModalBottomSheetValue.Hidden) {
+                onSheetDismiss()
+            }
+            true
+        }),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
 
@@ -199,8 +209,9 @@ internal fun LauncherContentScreen(
         sheetState = sheetState,
         content = {
             LauncherLayoutContent(
-                bookName = bookName,
                 onMenuClick = onMenuClick,
+                onDateClick = onDateClick,
+                onDateSelected = onDateSelected,
                 onSearchClick = onSearchClick,
                 onCalendarClick = onCalendarClick,
                 onMyAssetClick = onMyAssetClick,
@@ -210,7 +221,7 @@ internal fun LauncherContentScreen(
                 dialogState = dialogState,
                 onDeleteRecordConfirm = onDeleteRecordConfirm,
                 onDialogDismiss = onDialogDismiss,
-                sheetState = sheetState,
+                onSheetDismiss = onSheetDismiss,
             )
         },
         sheetContent = {
@@ -227,8 +238,9 @@ internal fun LauncherContentScreen(
 @Composable
 internal fun LauncherLayoutContent(
     // 标题栏
-    bookName: String,
     onMenuClick: () -> Unit,
+    onDateClick: () -> Unit,
+    onDateSelected: (String) -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onMyAssetClick: () -> Unit,
@@ -241,14 +253,14 @@ internal fun LauncherLayoutContent(
     dialogState: DialogState,
     onDeleteRecordConfirm: (Long) -> Unit,
     onDialogDismiss: () -> Unit,
-    // sheet 状态
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+    onSheetDismiss: () -> Unit,
 ) {
     CashbookScaffold(
         topBar = {
             LauncherTopBar(
-                bookName = bookName,
+                dateStr = (uiState as? LauncherContentUiState.Success)?.dateStr.orEmpty(),
                 onMenuClick = onMenuClick,
+                onDateClick = onDateClick,
                 onSearchClick = onSearchClick,
                 onCalendarClick = onCalendarClick,
                 onMyAssetClick = onMyAssetClick,
@@ -263,12 +275,13 @@ internal fun LauncherLayoutContent(
         LauncherLayoutBackdropScaffold(
             paddingValues = paddingValues,
             uiState = uiState,
-            onCalendarClick = onCalendarClick,
+            onDateClick = onDateClick,
+            onDateSelected = onDateSelected,
             onRecordItemClick = onRecordItemClick,
             dialogState = dialogState,
             onDeleteRecordConfirm = onDeleteRecordConfirm,
             onDialogDismiss = onDialogDismiss,
-            sheetState = sheetState,
+            onSheetDismiss = onSheetDismiss,
         )
     }
 }
@@ -278,16 +291,17 @@ internal fun LauncherLayoutBackdropScaffold(
     paddingValues: PaddingValues,
     // 月收支信息
     uiState: LauncherContentUiState,
-    onCalendarClick: () -> Unit,
+    onDateClick: () -> Unit,
+    onDateSelected: (String) -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
     // 弹窗信息
     dialogState: DialogState,
     onDeleteRecordConfirm: (Long) -> Unit,
     onDialogDismiss: () -> Unit,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+    onSheetDismiss: () -> Unit,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -313,13 +327,14 @@ internal fun LauncherLayoutBackdropScaffold(
                     frontLayerScrimColor = Color.Unspecified,
                     frontLayerContent = {
                         FrontLayerContent(
+                            dateStr = uiState.dateStr,
+                            onDateSelected = onDateSelected,
                             dialogState = dialogState,
-                            coroutineScope = coroutineScope,
-                            sheetState = sheetState,
                             onDialogDismiss = onDialogDismiss,
+                            onSheetDismiss = onSheetDismiss,
                             onDeleteRecordConfirm = onDeleteRecordConfirm,
                             recordMap = uiState.recordMap,
-                            onCalendarClick = onCalendarClick,
+                            onDateClick = onDateClick,
                             onRecordItemClick = onRecordItemClick,
                         )
                     },
@@ -332,13 +347,14 @@ internal fun LauncherLayoutBackdropScaffold(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun FrontLayerContent(
+    dateStr: String,
+    onDateSelected: (String) -> Unit,
     dialogState: DialogState,
-    coroutineScope: CoroutineScope,
-    sheetState: ModalBottomSheetState,
     onDialogDismiss: () -> Unit,
+    onSheetDismiss: () -> Unit,
     onDeleteRecordConfirm: (Long) -> Unit,
     recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
-    onCalendarClick: () -> Unit,
+    onDateClick: () -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit
 ) {
     CashbookGradientBackground {
@@ -346,17 +362,28 @@ private fun FrontLayerContent(
             modifier = Modifier.fillMaxSize(),
         ) {
             (dialogState as? DialogState.Shown<*>)?.let {
-                val recordId = it.data
-                if (recordId is Long) {
-                    // 显示删除确认弹窗
-                    coroutineScope.launch {
-                        sheetState.hide()
+                when (val dialogType = it.data as? DialogType) {
+                    is DialogType.DeleteRecord -> {
+                        // 显示删除确认弹窗
+                        onSheetDismiss()
+                        ConfirmDeleteRecordDialog(
+                            recordId = dialogType.recordId,
+                            onDeleteRecordConfirm = onDeleteRecordConfirm,
+                            onDialogDismiss = onDialogDismiss,
+                        )
                     }
-                    ConfirmDeleteRecordDialog(
-                        recordId = recordId,
-                        onDeleteRecordConfirm = onDeleteRecordConfirm,
-                        onDialogDismiss = onDialogDismiss,
-                    )
+
+                    is DialogType.SelectDate -> {
+                        SelectDateDialog(
+                            onDialogDismiss = onDialogDismiss,
+                            dateStr = dateStr,
+                            onDateSelected = onDateSelected,
+                        )
+                    }
+
+                    null -> {
+                        // empty block
+                    }
                 }
             }
 
@@ -364,14 +391,13 @@ private fun FrontLayerContent(
                 Empty(
                     hintText = stringResource(id = R.string.launcher_no_data_hint),
                     button = {
-                        FilledTonalButton(onClick = onCalendarClick) {
+                        FilledTonalButton(onClick = onDateClick) {
                             Text(text = stringResource(id = R.string.launcher_no_data_button))
                         }
                     },
                     modifier = Modifier.align(Alignment.TopCenter),
                 )
             } else {
-                val todayInt = Calendar.getInstance()[Calendar.DAY_OF_MONTH]
                 LazyColumn {
                     recordMap.keys.reversed().forEach { key ->
                         val recordList = recordMap[key] ?: listOf()
@@ -385,10 +411,10 @@ private fun FrontLayerContent(
                             ) {
                                 Text(
                                     modifier = Modifier.weight(1f),
-                                    text = when (key.day.toIntOrZero()) {
-                                        todayInt -> stringResource(id = R.string.today)
-                                        todayInt - 1 -> stringResource(id = R.string.yesterday)
-                                        todayInt - 2 -> stringResource(id = R.string.before_yesterday)
+                                    text = when (key.day.toInt()) {
+                                        0 -> stringResource(id = R.string.today)
+                                        -1 -> stringResource(id = R.string.yesterday)
+                                        -2 -> stringResource(id = R.string.before_yesterday)
                                         else -> key.day + stringResource(id = R.string.day)
                                     }
                                 )
@@ -425,10 +451,7 @@ private fun FrontLayerContent(
                             RecordListItem(
                                 recordViewsEntity = it,
                                 onRecordItemClick = {
-                                    onRecordItemClick.invoke(it)
-                                    coroutineScope.launch {
-                                        sheetState.show()
-                                    }
+                                    onRecordItemClick(it)
                                 },
                             )
                         }
@@ -438,6 +461,91 @@ private fun FrontLayerContent(
                         Footer(hintText = stringResource(id = R.string.footer_hint_default))
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SelectDateDialog(
+    onDialogDismiss: () -> Unit,
+    dateStr: String,
+    onDateSelected: (String) -> Unit
+) {
+    Dialog(onDismissRequest = onDialogDismiss) {
+        Surface(
+            shape = AlertDialogDefaults.shape,
+            color = AlertDialogDefaults.containerColor,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+        ) {
+            Column(
+                modifier = Modifier
+                    .sizeIn(minWidth = 280.dp, maxWidth = 560.dp),
+            ) {
+                val dataStrings = dateStr.split("-")
+                val currentYear = dataStrings.first()
+                val currentMonth = dataStrings.last()
+                var selectedYear by remember(dateStr) {
+                    mutableStateOf(currentYear)
+                }
+                val startYear = Calendar.getInstance()[Calendar.YEAR] + 1
+                val yearList = mutableListOf<Int>()
+                for (i in startYear downTo 2000) {
+                    yearList.add(i)
+                }
+                LazyRow(
+                    modifier = Modifier,
+                    content = {
+                        items(yearList) { year ->
+                            Text(
+                                text = "$year${stringResource(id = R.string.year)}",
+                                color = if (year.toString() == selectedYear) {
+                                    LocalExtendedColors.current.selected
+                                } else {
+                                    LocalExtendedColors.current.unselected
+                                },
+                                modifier = Modifier
+                                    .clickable {
+                                        selectedYear = year.toString()
+                                    }
+                                    .padding(
+                                        horizontal = 16.dp,
+                                        vertical = 8.dp
+                                    )
+                            )
+                        }
+                    },
+                )
+                CommonDivider(modifier = Modifier.fillMaxWidth())
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    content = {
+                        for (c in 0 until 4) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                content = {
+                                    for (r in 0 until 3) {
+                                        val month = c * 3 + r + 1
+                                        Text(
+                                            text = "$month${stringResource(id = R.string.month)}",
+                                            textAlign = TextAlign.Center,
+                                            color = if (selectedYear == currentYear && month.completeZero() == currentMonth) {
+                                                LocalExtendedColors.current.selected
+                                            } else {
+                                                LocalExtendedColors.current.unselected
+                                            },
+                                            modifier = Modifier
+                                                .clickable { onDateSelected("${selectedYear}-${month.completeZero()}") }
+                                                .weight(1f)
+                                                .padding(vertical = 8.dp),
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    },
+                )
             }
         }
     }
@@ -495,8 +603,9 @@ internal fun LauncherLayoutSheetContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherTopBar(
-    bookName: String,
+    dateStr: String,
     onMenuClick: () -> Unit,
+    onDateClick: () -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onMyAssetClick: () -> Unit,
@@ -506,7 +615,13 @@ internal fun LauncherTopBar(
             containerColor = Color.Transparent,
         ),
         title = {
-            Text(text = bookName)
+            Text(
+                text = dateStr,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .clickable(onClick = onDateClick)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+            )
         },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
@@ -894,18 +1009,20 @@ internal fun LauncherContentScreenPreview() {
     ) {
         LauncherContentScreen(
             shouldDisplayDeleteFailedBookmark = 0,
-            onBookmarkDismiss = { },
+            onBookmarkDismiss = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             viewRecord = null,
             onRecordItemEditClick = {},
             onRecordItemDeleteClick = {},
-            bookName = "默认账本",
-            onMenuClick = { },
-            onSearchClick = { },
-            onCalendarClick = { },
-            onMyAssetClick = { },
-            onAddClick = { },
+            onMenuClick = {},
+            onDateClick = {},
+            onDateSelected = {},
+            onSearchClick = {},
+            onCalendarClick = {},
+            onMyAssetClick = {},
+            onAddClick = {},
             uiState = LauncherContentUiState.Success(
+                dateStr = "2023-07",
                 monthIncome = "0",
                 monthExpand = "0",
                 monthBalance = "0",
@@ -914,7 +1031,8 @@ internal fun LauncherContentScreenPreview() {
             onRecordItemClick = {},
             dialogState = DialogState.Dismiss,
             onDeleteRecordConfirm = {},
-            onDialogDismiss = { },
+            onDialogDismiss = {},
+            onSheetDismiss = {},
         )
     }
 }
@@ -927,22 +1045,24 @@ internal fun LauncherContentLoadingScreenPreview() {
     ) {
         LauncherContentScreen(
             shouldDisplayDeleteFailedBookmark = 0,
-            onBookmarkDismiss = { },
+            onBookmarkDismiss = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             viewRecord = null,
             onRecordItemEditClick = {},
             onRecordItemDeleteClick = {},
-            bookName = "默认账本",
-            onMenuClick = { },
-            onSearchClick = { },
-            onCalendarClick = { },
-            onMyAssetClick = { },
-            onAddClick = { },
+            onMenuClick = {},
+            onDateClick = {},
+            onDateSelected = {},
+            onSearchClick = {},
+            onCalendarClick = {},
+            onMyAssetClick = {},
+            onAddClick = {},
             uiState = LauncherContentUiState.Loading,
             onRecordItemClick = {},
             dialogState = DialogState.Dismiss,
             onDeleteRecordConfirm = {},
-            onDialogDismiss = { },
+            onDialogDismiss = {},
+            onSheetDismiss = {},
         )
     }
 }

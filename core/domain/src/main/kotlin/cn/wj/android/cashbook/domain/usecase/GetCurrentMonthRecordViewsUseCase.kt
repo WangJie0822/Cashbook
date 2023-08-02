@@ -24,8 +24,8 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
     private val tagRepository: TagRepository,
 ) {
 
-    operator fun invoke(): Flow<List<RecordViewsEntity>> =
-        recordRepository.currentMonthRecordListData.mapLatest { list ->
+    operator fun invoke(year: String, month: String): Flow<List<RecordViewsEntity>> =
+        recordRepository.queryRecordByYearMonth(year, month).mapLatest { list ->
             list.map {
                 RecordViewsModel(
                     it.id,

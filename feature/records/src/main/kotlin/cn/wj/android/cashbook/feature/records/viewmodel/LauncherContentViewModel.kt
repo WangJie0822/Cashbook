@@ -8,26 +8,29 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_YEAR_MONTH
+import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCase
-import cn.wj.android.cashbook.domain.usecase.GetCurrentBookUseCase
 import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsMapUseCase
 import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LauncherContentViewModel @Inject constructor(
-    getCurrentBookUseCase: GetCurrentBookUseCase,
     getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
     getCurrentMonthRecordViewsMapUseCase: GetCurrentMonthRecordViewsMapUseCase,
     private val deleteRecordUseCase: DeleteRecordUseCase,
@@ -45,17 +48,14 @@ class LauncherContentViewModel @Inject constructor(
     var viewRecord by mutableStateOf<RecordViewsEntity?>(null)
         private set
 
-    /** 账本名 */
-    val currentBookName = getCurrentBookUseCase()
-        .mapLatest { it.name }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = "",
-        )
+    private val _dateStr =
+        MutableStateFlow(System.currentTimeMillis().dateFormat(DATE_FORMAT_YEAR_MONTH))
 
     /** 当前月记录数据 */
-    private val currentMonthRecordListData = getCurrentMonthRecordViewsUseCase()
+    private val currentMonthRecordListData = _dateStr.flatMapLatest { date ->
+        val strings = date.split("-")
+        getCurrentMonthRecordViewsUseCase(strings.first(), strings.last())
+    }
 
     val uiState = currentMonthRecordListData
         .mapLatest { list ->
@@ -82,6 +82,7 @@ class LauncherContentViewModel @Inject constructor(
                 }
             }
             LauncherContentUiState.Success(
+                dateStr = _dateStr.first(),
                 monthIncome = totalIncome.decimalFormat(),
                 monthExpand = totalExpenditure.decimalFormat(),
                 monthBalance = (totalIncome - totalExpenditure).decimalFormat(),
@@ -98,7 +99,7 @@ class LauncherContentViewModel @Inject constructor(
         shouldDisplayDeleteFailedBookmark = 0
     }
 
-    fun onRecordDetailsSheetDismiss() {
+    fun onSheetDismiss() {
         viewRecord = null
     }
 
@@ -108,7 +109,7 @@ class LauncherContentViewModel @Inject constructor(
 
     fun onRecordItemDeleteClick(recordId: Long) {
         viewRecord = null
-        dialogState = DialogState.Shown(recordId)
+        dialogState = DialogState.Shown(DialogType.DeleteRecord(recordId))
     }
 
     fun onDeleteRecordConfirm(recordId: Long) {
@@ -126,17 +127,35 @@ class LauncherContentViewModel @Inject constructor(
         }
     }
 
+    fun showDateSelectDialog() {
+        viewModelScope.launch {
+            dialogState = DialogState.Shown(DialogType.SelectDate(_dateStr.first()))
+        }
+    }
+
+    fun onDateSelected(date: String) {
+        onDialogDismiss()
+        _dateStr.tryEmit(date)
+    }
+
     fun onDialogDismiss() {
         dialogState = DialogState.Dismiss
     }
+
 }
 
-sealed class LauncherContentUiState {
-    object Loading : LauncherContentUiState()
+sealed interface LauncherContentUiState {
+    object Loading : LauncherContentUiState
     data class Success(
+        val dateStr: String,
         val monthIncome: String,
         val monthExpand: String,
         val monthBalance: String,
         val recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
-    ) : LauncherContentUiState()
+    ) : LauncherContentUiState
+}
+
+sealed interface DialogType {
+    data class DeleteRecord(val recordId: Long) : DialogType
+    data class SelectDate(val date: String) : DialogType
 }

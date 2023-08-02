@@ -24,13 +24,13 @@ interface TypeDao {
     fun queryAll(): Flow<List<TypeTable>>
 
     @Query("SELECT * FROM db_type WHERE type_category=:typeCategory")
-    fun queryByTypeCategory(typeCategory: String): Flow<List<TypeTable>>
+    fun queryByTypeCategory(typeCategory: Int): Flow<List<TypeTable>>
 
     @Query("SELECT * FROM db_type WHERE type_level=:typeLevel AND type_category=:typeCategory")
-    suspend fun queryByLevelAndTypeCategory(typeLevel: String, typeCategory: String): List<TypeTable>
+    suspend fun queryByLevelAndTypeCategory(typeLevel: Int, typeCategory: Int): List<TypeTable>
 
     @Query("SELECT * FROM db_type WHERE type_level=:typeLevel")
-    suspend fun queryByLevel(typeLevel: String): List<TypeTable>
+    suspend fun queryByLevel(typeLevel: Int): List<TypeTable>
 
     @Query("SELECT * FROM db_type WHERE parent_id=:parentId")
     suspend fun queryByParentId(parentId: Long):List<TypeTable>

@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.core.data.repository.impl
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
+import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
@@ -62,7 +63,8 @@ class RecordRepositoryImpl @Inject constructor(
             result
         }
 
-    override suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>) = withContext(coroutineContext) {
+    override suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>) =
+        withContext(coroutineContext) {
             logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
             transactionDao.updateRecordTransaction(record.asTable(), tagIdList)
             recordDataVersion.updateVersion()
@@ -92,19 +94,19 @@ class RecordRepositoryImpl @Inject constructor(
             recordDao.query(currentBookId).map {
                 RecordViewsEntity(
                     id = it.id,
-                    typeCategory = RecordTypeCategoryEnum.valueOf(it.typeCategory),
+                    typeCategory = RecordTypeCategoryEnum.ordinalOf(it.typeCategory),
                     typeName = it.typeName,
                     typeIconResName = it.typeIconResName,
                     assetName = it.assetName,
                     assetIconResId = it.assetClassification?.run {
                         AssetHelper.getIconResIdByType(
-                            AssetClassificationEnum.valueOf(this)
+                            AssetClassificationEnum.ordinalOf(this)
                         )
                     },
                     relatedAssetName = it.relatedAssetName,
                     relatedAssetIconResId = it.relatedAssetClassification?.run {
                         AssetHelper.getIconResIdByType(
-                            AssetClassificationEnum.valueOf(this)
+                            AssetClassificationEnum.ordinalOf(this)
                         )
                     },
                     amount = it.amount.toString(),
@@ -133,4 +135,31 @@ class RecordRepositoryImpl @Inject constructor(
             it.asModel()
         }
     }
+
+    override fun queryRecordByYearMonth(
+        year: String,
+        month: String
+    ): Flow<List<RecordModel>> {
+        val monthInt = month.toInt()
+        val yearInt = year.toInt()
+        var nextYearInt = yearInt
+        val nextMonthInt = if (monthInt >= 12) {
+            nextYearInt++
+            1
+        } else {
+            monthInt + 1
+        }
+        val startDate = "${yearInt.completeZero()}-${monthInt.completeZero()}-01 00:00:00"
+        val endDate = "${nextYearInt.completeZero()}-${nextMonthInt.completeZero()}-01 00:00:00"
+        return combine(recordDataVersion, appPreferencesDataSource.appData) { _, appData ->
+            recordDao.queryByBooksIdBetweenDate(
+                appData.currentBookId,
+                startDate.parseDateLong(),
+                endDate.parseDateLong()
+            ).map {
+                it.asModel()
+            }
+        }
+    }
+
 }

@@ -37,6 +37,17 @@ interface RecordDao {
 
     @Query(
         value = """
+            SELECT * FROM db_record WHERE books_id=:booksId AND record_time>=:startDate AND record_time<:endDate
+        """
+    )
+    suspend fun queryByBooksIdBetweenDate(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long
+    ): List<RecordTable>
+
+    @Query(
+        value = """
         SELECT * FROM db_record WHERE books_id=:booksId AND reimbursable=$SWITCH_INT_ON AND record_time>=:dateTime
     """
     )

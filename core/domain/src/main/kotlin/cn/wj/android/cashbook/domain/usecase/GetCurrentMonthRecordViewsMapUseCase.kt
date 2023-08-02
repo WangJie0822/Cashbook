@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import java.math.BigDecimal
+import java.util.Calendar
 import javax.inject.Inject
 
 /**
@@ -22,8 +23,7 @@ class GetCurrentMonthRecordViewsMapUseCase @Inject constructor(
         list.sortedBy { it.recordTime }
             .reversed()
             .forEach {
-                val key = it.recordTime.split(" ").firstOrNull()?.split("-")?.lastOrNull()
-                    ?.toIntOrNull()?.toString()
+                val key = it.recordTime.split(" ").first()
                 if (map.containsKey(key)) {
                     map[key]?.add(it)
                 } else {
@@ -52,8 +52,25 @@ class GetCurrentMonthRecordViewsMapUseCase @Inject constructor(
                     }
                 }
             }
+            val dateArray = it.key.split("-")
+            val calendar = Calendar.getInstance()
+            val currentYear = calendar[Calendar.YEAR]
+            val currentMonth = (calendar[Calendar.MONTH] + 1)
+            val currentDay = calendar[Calendar.DAY_OF_MONTH]
+            val dateDay = dateArray.last().toInt()
+            val day =
+                if (currentYear == dateArray[0].toIntOrNull() && currentMonth == dateArray[1].toIntOrNull()) {
+                    when (dateDay) {
+                        currentDay -> 0
+                        currentDay - 1 -> -1
+                        currentDay - 2 -> -2
+                        else -> dateDay
+                    }
+                } else {
+                    dateDay
+                }
             RecordDayEntity(
-                day = it.key,
+                day = day.toString(),
                 dayIncome = totalIncome.decimalFormat(),
                 dayExpand = totalExpenditure.decimalFormat(),
             )

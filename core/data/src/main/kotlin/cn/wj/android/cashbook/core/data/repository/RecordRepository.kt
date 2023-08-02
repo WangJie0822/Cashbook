@@ -35,6 +35,8 @@ interface RecordRepository {
         page: Int,
         pageSize: Int
     ): List<RecordModel>
+
+    fun queryRecordByYearMonth(year: String, month: String): Flow<List<RecordModel>>
 }
 
 internal fun RecordTable.asModel(): RecordModel {

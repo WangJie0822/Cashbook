@@ -62,7 +62,7 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel> =
         withContext(coroutineContext) {
-            typeDao.queryByLevelAndTypeCategory(TypeLevelEnum.FIRST.name, typeCategory.name)
+            typeDao.queryByLevelAndTypeCategory(TypeLevelEnum.FIRST.ordinal, typeCategory.ordinal)
                 .map {
                     it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
                 }
@@ -70,7 +70,7 @@ class TypeRepositoryImpl @Inject constructor(
 
     private suspend fun getFirstRecordTypeList(): List<RecordTypeModel> =
         withContext(coroutineContext) {
-            val result = typeDao.queryByLevel(TypeLevelEnum.FIRST.name)
+            val result = typeDao.queryByLevel(TypeLevelEnum.FIRST.ordinal)
                 .map {
                     it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
                 }
