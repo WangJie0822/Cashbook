@@ -8,13 +8,13 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_FINGERPRINT
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_PASSWORD
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.design.security.hexToBytes
 import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.domain.usecase.GetCurrentBookUseCase
 import cn.wj.android.cashbook.feature.settings.enums.LauncherBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class LauncherViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
-    getCurrentBookUseCase: GetCurrentBookUseCase,
+    booksRepository: BooksRepository,
 ) : ViewModel() {
 
     private val verified = MutableStateFlow(false)
@@ -59,7 +59,7 @@ class LauncherViewModel @Inject constructor(
             needRequestProtocol = !appData.agreedProtocol,
             needVerity = appData.needSecurityVerificationWhenLaunch && !verified,
             supportFingerprint = appData.enableFingerprintVerification,
-            currentBookName = getCurrentBookUseCase().first().name
+            currentBookName = booksRepository.currentBook.first().name
         )
     }
         .stateIn(

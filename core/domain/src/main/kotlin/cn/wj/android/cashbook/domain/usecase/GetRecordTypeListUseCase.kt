@@ -1,7 +1,6 @@
 package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
-import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -22,7 +21,6 @@ import kotlinx.coroutines.withContext
  */
 class GetRecordTypeListUseCase @Inject constructor(
     private val typeRepository: TypeRepository,
-    private val appPreferencesDataSource: AppPreferencesDataSource,
 ) {
 
     suspend operator fun invoke(
@@ -91,9 +89,8 @@ class GetRecordTypeListUseCase @Inject constructor(
                 result.add(RECORD_TYPE_SETTINGS)
                 if (typeCategory == RecordTypeCategoryEnum.INCOME) {
                     // 更新退款、报销类型标记
-                    val appDataModel = appPreferencesDataSource.appData.first()
                     result.map {
-                        if (it.id == appDataModel.refundTypeId || it.id == appDataModel.reimburseTypeId) {
+                        if (typeRepository.needRelated(it.id)) {
                             it.copy(needRelated = true)
                         } else {
                             it

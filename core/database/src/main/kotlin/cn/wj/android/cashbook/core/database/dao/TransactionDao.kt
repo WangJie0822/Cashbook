@@ -228,4 +228,53 @@ interface TransactionDao {
         }
     }
 
+    @Query(
+        value = """
+        SELECT * FROM db_record WHERE books_id=:bookId
+    """
+    )
+    suspend fun queryRecordListByBookId(bookId: Long): List<RecordTable>
+
+    @Query(
+        """
+        DELETE FROM db_record_with_related
+        WHERE record_id=:recordId OR related_record_id=:recordId
+    """
+    )
+    suspend fun deleteRecordRelationByRecordId(recordId: Long)
+
+    @Query(
+        value = """
+        DELETE FROM db_tag_with_record
+        WHERE record_id=:recordId
+    """
+    )
+    suspend fun deleteTagRelationByRecordId(recordId: Long)
+
+    @Query(
+        value = """
+       DELETE FROM db_books
+        WHERE id=:bookId
+    """
+    )
+    suspend fun deleteBookById(bookId: Long)
+
+    @Throws(DataTransactionException::class)
+    @Transaction
+    suspend fun deleteBookTransaction(bookId: Long) {
+        // 查询当前账本下的记录
+        val recordList = queryRecordListByBookId(bookId)
+        // 从记录关系表和标签关系表中删除对应记录
+        recordList.forEach { record ->
+            val id = record.id
+            if (null != id) {
+                deleteRecordRelationByRecordId(id)
+                deleteTagRelationByRecordId(id)
+            }
+            deleteRecord(record)
+        }
+        // 删除账本
+        deleteBookById(bookId)
+    }
+
 }

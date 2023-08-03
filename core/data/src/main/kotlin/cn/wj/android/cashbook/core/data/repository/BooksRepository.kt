@@ -7,6 +7,12 @@ import kotlinx.coroutines.flow.Flow
 interface BooksRepository {
 
     val booksListData: Flow<List<BooksModel>>
+
+    val currentBook: Flow<BooksModel>
+
+    suspend fun selectBook(id: Long)
+
+    suspend fun deleteBook(id: Long): Boolean
 }
 
 internal fun BooksTable.asModel(): BooksModel {

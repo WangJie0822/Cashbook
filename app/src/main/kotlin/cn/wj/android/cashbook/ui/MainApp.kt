@@ -25,6 +25,8 @@ import cn.wj.android.cashbook.feature.assets.navigation.myAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.naviToAssetInfo
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
 import cn.wj.android.cashbook.feature.assets.navigation.naviToMyAsset
+import cn.wj.android.cashbook.feature.books.navigation.myBooksScreen
+import cn.wj.android.cashbook.feature.books.navigation.naviToMyBooks
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
 import cn.wj.android.cashbook.feature.records.navigation.ConfirmDeleteRecordDialogContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
@@ -95,7 +97,7 @@ fun CashbookNavHost(
         // 启动页
         settingsLauncherScreen(
             onMyAssetClick = navController::naviToMyAsset,
-            onMyBookClick = {/* TODO */ },
+            onMyBookClick = navController::naviToMyBooks,
             onMyCategoryClick = {/* TODO */ },
             onMyTagClick = navController::naviToMyTags,
             onSettingClick = navController::naviToSetting,
@@ -219,6 +221,12 @@ fun CashbookNavHost(
         )
         // 编辑资产
         editAssetScreen(
+            onBackClick = navController::popBackStack,
+        )
+
+        // 我的账本
+        myBooksScreen(
+            onEditBookClick = {/*TODO*/},
             onBackClick = navController::popBackStack,
         )
     }

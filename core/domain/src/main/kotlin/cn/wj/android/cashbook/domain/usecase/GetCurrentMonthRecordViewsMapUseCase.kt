@@ -15,8 +15,7 @@ import javax.inject.Inject
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/22
  */
-class GetCurrentMonthRecordViewsMapUseCase @Inject constructor(
-) {
+class GetCurrentMonthRecordViewsMapUseCase @Inject constructor() {
 
     operator fun invoke(list: List<RecordViewsEntity>): Map<RecordDayEntity, List<RecordViewsEntity>> {
         val map = ArrayMap<String, ArrayList<RecordViewsEntity>>()

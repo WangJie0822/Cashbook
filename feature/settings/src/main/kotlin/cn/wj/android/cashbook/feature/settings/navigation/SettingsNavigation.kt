@@ -18,18 +18,18 @@ import cn.wj.android.cashbook.feature.settings.screen.SettingRoute
 const val ROUTE_SETTINGS_LAUNCHER = "settings/launcher"
 
 /** 设置 - 关于我们路由 */
-const val ROUTE_SETTINGS_ABOUT_US = "settings/about_us"
+private const val ROUTE_SETTINGS_ABOUT_US = "settings/about_us"
 
 /** 设置 - 设置路由 */
-const val ROUTE_SETTINGS_SETTING = "settings/setting"
+private const val ROUTE_SETTINGS_SETTING = "settings/setting"
 
 /** 设置 - markdown 界面 */
-const val ROUTE_SETTINGS_MARKDOWN_KEY_TYPE = "mdType"
-const val ROUTE_SETTINGS_MARKDOWN =
+private const val ROUTE_SETTINGS_MARKDOWN_KEY_TYPE = "mdType"
+private const val ROUTE_SETTINGS_MARKDOWN =
     "settings/markdown?$ROUTE_SETTINGS_MARKDOWN_KEY_TYPE={$ROUTE_SETTINGS_MARKDOWN_KEY_TYPE}"
 
 /** 设置  - 备份与恢复 */
-const val ROUTE_SETTINGS_BACKUP_AND_RECOVERY = "settings/backup_and_recovery"
+private const val ROUTE_SETTINGS_BACKUP_AND_RECOVERY = "settings/backup_and_recovery"
 
 /** 跳转到关于我们 */
 fun NavController.naviToAboutUs() {

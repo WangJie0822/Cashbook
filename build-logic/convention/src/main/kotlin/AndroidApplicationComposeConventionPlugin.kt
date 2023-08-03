@@ -1,4 +1,6 @@
-import cn.wj.android.cashbook.buildlogic.*
+import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.configureAndroidCompose
+import cn.wj.android.cashbook.buildlogic.version
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project

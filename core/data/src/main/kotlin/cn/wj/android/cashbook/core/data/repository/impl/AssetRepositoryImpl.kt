@@ -20,6 +20,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
@@ -30,7 +31,7 @@ import kotlinx.coroutines.withContext
  */
 class AssetRepositoryImpl @Inject constructor(
     private val assetDao: AssetDao,
-    appPreferencesDataSource: AppPreferencesDataSource,
+    private val appPreferencesDataSource: AppPreferencesDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : AssetRepository {
 
@@ -72,7 +73,10 @@ class AssetRepositoryImpl @Inject constructor(
         }
 
     override suspend fun updateAsset(asset: AssetModel) = withContext(coroutineContext) {
-        val table = asset.asTable()
+        var table = asset.asTable()
+        if (table.booksId <= 0) {
+            table = table.copy(booksId = appPreferencesDataSource.appData.first().currentBookId)
+        }
         if (null == table.id) {
             assetDao.insert(table)
         } else {

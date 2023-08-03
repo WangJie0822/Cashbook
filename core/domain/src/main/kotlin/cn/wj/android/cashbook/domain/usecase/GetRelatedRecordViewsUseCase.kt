@@ -4,7 +4,6 @@ import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
-import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import javax.inject.Inject
@@ -21,7 +20,6 @@ class GetRelatedRecordViewsUseCase @Inject constructor(
     private val typeRepository: TypeRepository,
     private val assetRepository: AssetRepository,
     private val tagRepository: TagRepository,
-    private val appPreferencesDataSource: AppPreferencesDataSource,
 ) {
 
     suspend operator fun invoke(

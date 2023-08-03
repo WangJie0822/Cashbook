@@ -25,9 +25,13 @@ interface TypeRepository {
 
     suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel
 
+    suspend fun getNoNullDefaultRecordType(): RecordTypeModel
+
     suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel>
 
     suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel>
+
+    suspend fun needRelated(typeId: Long): Boolean
 }
 
 internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {

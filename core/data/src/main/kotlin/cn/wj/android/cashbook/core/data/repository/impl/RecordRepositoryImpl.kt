@@ -68,6 +68,8 @@ class RecordRepositoryImpl @Inject constructor(
             logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
             transactionDao.updateRecordTransaction(record.asTable(), tagIdList)
             recordDataVersion.updateVersion()
+            // 更新上次使用的默认数据
+            appPreferencesDataSource.updateLastAssetId(record.assetId)
         }
 
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
@@ -162,4 +164,21 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getDefaultRecord(typeId: Long): RecordModel =
+        withContext(coroutineContext) {
+            val appDataModel = appPreferencesDataSource.appData.first()
+            RecordModel(
+                id = -1L,
+                booksId = appDataModel.currentBookId,
+                typeId = typeId,
+                assetId = appDataModel.lastAssetId,
+                relatedAssetId = -1L,
+                amount = "0",
+                charges = "",
+                concessions = "",
+                remark = "",
+                reimbursable = false,
+                recordTime = System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS),
+            )
+        }
 }
