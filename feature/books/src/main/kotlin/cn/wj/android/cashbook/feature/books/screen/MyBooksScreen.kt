@@ -30,17 +30,17 @@ import androidx.constraintlayout.compose.Visibility
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.tools.dateFormat
+import cn.wj.android.cashbook.core.data.repository.fake.FakeBooksRepository
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
-import cn.wj.android.cashbook.core.model.model.BooksModel
-import cn.wj.android.cashbook.core.model.model.Selectable
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.domain.usecase.GetSelectableBooksListUseCase
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksUiState
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksViewModel
 
@@ -210,6 +210,7 @@ private fun MyBooksContent(
 
                                         Text(
                                             text = stringResource(id = R.string.modify_time_with_colon) + item.data.modifyTime.dateFormat(),
+                                            style = MaterialTheme.typography.bodySmall,
                                             modifier = Modifier.constrainAs(time) {
                                                 top.linkTo(description.bottom, 16.dp)
                                                 bottom.linkTo(parent.bottom, 8.dp)
@@ -272,34 +273,13 @@ private fun MyBooksContent(
 @Composable
 private fun MyBooksScreenPreview() {
     PreviewTheme {
-        MyBooksScreen(
-            uiState = MyBooksUiState.Success(
-                booksList = listOf(
-                    Selectable(
-                        BooksModel(
-                            1L,
-                            "默认账本",
-                            "默认账本说明",
-                            System.currentTimeMillis()
-                        ), true
-                    ),
-                    Selectable(
-                        BooksModel(
-                            2L,
-                            "默认账本2",
-                            "默认账本说明2",
-                            System.currentTimeMillis()
-                        ), false
-                    )
-                )
-            ),
-            onBookSelected = {},
-            onBackClick = {},
+        MyBooksRoute(
             onEditBookClick = {},
-            onDeleteBookClick = {},
-            dialogState = DialogState.Dismiss,
-            onConfirmDelete = {},
-            onDismissDialog = {},
+            onBackClick = { FakeBooksRepository.initData() },
+            viewModel = MyBooksViewModel(
+                getSelectableBooksListUseCase = GetSelectableBooksListUseCase(booksRepository = FakeBooksRepository),
+                booksRepository = FakeBooksRepository
+            )
         )
     }
 }

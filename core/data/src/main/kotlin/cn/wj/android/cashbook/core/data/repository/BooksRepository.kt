@@ -13,6 +13,12 @@ interface BooksRepository {
     suspend fun selectBook(id: Long)
 
     suspend fun deleteBook(id: Long): Boolean
+
+    suspend fun getDefaultBook(id: Long): BooksModel
+
+    suspend fun isDuplicated(book: BooksModel): Boolean
+
+    suspend fun updateBook(book: BooksModel)
 }
 
 internal fun BooksTable.asModel(): BooksModel {
@@ -21,5 +27,14 @@ internal fun BooksTable.asModel(): BooksModel {
         name = this.name,
         description = this.description,
         modifyTime = this.modifyTime,
+    )
+}
+
+internal fun BooksModel.asTable(): BooksTable {
+    return BooksTable(
+        if (this.id == -1L) null else this.id,
+        this.name,
+        this.description,
+        this.modifyTime,
     )
 }

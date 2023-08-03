@@ -1,6 +1,8 @@
 package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import cn.wj.android.cashbook.core.database.table.BooksTable
 
@@ -18,4 +20,7 @@ interface BooksDao {
     """
     )
     suspend fun queryAll(): List<BooksTable>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(book: BooksTable)
 }

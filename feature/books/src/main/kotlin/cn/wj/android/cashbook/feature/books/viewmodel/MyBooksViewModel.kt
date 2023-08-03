@@ -53,7 +53,9 @@ class MyBooksViewModel @Inject constructor(
 
     fun confirmDeleteBook(id: Long) {
         viewModelScope.launch {
-            booksRepository.deleteBook(id)
+            if (booksRepository.deleteBook(id)) {
+                onDismissDialog()
+            }
         }
     }
 

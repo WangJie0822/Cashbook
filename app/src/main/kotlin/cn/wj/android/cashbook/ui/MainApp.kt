@@ -25,7 +25,9 @@ import cn.wj.android.cashbook.feature.assets.navigation.myAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.naviToAssetInfo
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
 import cn.wj.android.cashbook.feature.assets.navigation.naviToMyAsset
+import cn.wj.android.cashbook.feature.books.navigation.editBookScreen
 import cn.wj.android.cashbook.feature.books.navigation.myBooksScreen
+import cn.wj.android.cashbook.feature.books.navigation.naviToEditBook
 import cn.wj.android.cashbook.feature.books.navigation.naviToMyBooks
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
 import cn.wj.android.cashbook.feature.records.navigation.ConfirmDeleteRecordDialogContent
@@ -226,7 +228,11 @@ fun CashbookNavHost(
 
         // 我的账本
         myBooksScreen(
-            onEditBookClick = {/*TODO*/},
+            onEditBookClick = navController::naviToEditBook,
+            onBackClick = navController::popBackStack,
+        )
+        // 编辑账本
+        editBookScreen(
             onBackClick = navController::popBackStack,
         )
     }

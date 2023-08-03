@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.core.common.model.bookDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
+import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
@@ -15,6 +16,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
@@ -57,6 +59,24 @@ class BooksRepositoryImpl @Inject constructor(
             bookDataVersion.updateVersion()
         }
         result
+    }
+
+    override suspend fun getDefaultBook(id: Long): BooksModel = withContext(coroutineContext) {
+        booksListData.first().firstOrNull { it.id == id } ?: BooksModel(
+            id = id,
+            name = "",
+            description = "",
+            modifyTime = System.currentTimeMillis()
+        )
+    }
+
+    override suspend fun isDuplicated(book: BooksModel): Boolean = withContext(coroutineContext) {
+        booksListData.first().count { it.id != book.id && it.name == book.name } > 0
+    }
+
+    override suspend fun updateBook(book: BooksModel): Unit = withContext(coroutineContext) {
+        booksDao.insertOrReplace(book.asTable())
+        bookDataVersion.updateVersion()
     }
 
     private suspend fun getAllBooksList(): List<BooksModel> = withContext(coroutineContext) {

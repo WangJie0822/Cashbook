@@ -3,4 +3,9 @@
     <string name="modify_time_with_colon">修改时间：</string>
     <string name="delete_books">删除账本</string>
     <string name="delete_books_confirm">删除账本将同步删除账本下所有记账记录，是否确认？</string>
+    <string name="edit_book">编辑账本</string>
+    <string name="please_enter_book_name">请输入账本名</string>
+    <string name="book_name_exists">账本名已存在</string>
+    <string name="book_name">账本名</string>
+    <string name="book_description">账本说明</string>
 </resources>
