@@ -250,6 +250,8 @@
     <string name="backup_and_recovery">备份与恢复</string>
     <string name="backup_path">备份路径</string>
     <string name="backup">备份</string>
+    <string name="backup_to_new_version">备份到新版本</string>
+    <string name="backup_to_new_version_hint">新版本采用备份数据库文件方案，不兼容旧版本</string>
     <string name="backup_hint">本地和 WebDAV 一起备份</string>
     <string name="recovery">恢复</string>
     <string name="recovery_hint">优先从 WebDAV 恢复，长按从本地恢复</string>

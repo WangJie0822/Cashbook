@@ -42,6 +42,14 @@ android {
         }
     }
 
+    configurations {
+        all {
+            resolutionStrategy {
+                force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10") // 强制指定 kotlin 依赖版本
+            }
+        }
+    }
+
     // 配置 APK 输出路径
     val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
     configureOutputs(
@@ -150,5 +158,5 @@ dependencies {
     implementation(libs.haibin.calendarview)
 
     // 图表控件
-    implementation(libs.philJay.mpAndroidChart)
+    implementation(project(":repos:MPChartLib"))
 }

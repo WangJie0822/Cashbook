@@ -58,6 +58,21 @@ fun String.deleteFiles() {
     file.delete()
 }
 
+fun File.deleteAllFiles(): Boolean {
+    if (!exists()) {
+        return true
+    }
+    var result = true
+    if (isDirectory) {
+        listFiles()?.forEach { childFile ->
+            if (!childFile.deleteAllFiles()) {
+                result = false
+            }
+        }
+    }
+    return result && delete()
+}
+
 /** 将集合中的文件压缩到 [zippedFilePath] */
 fun Collection<String>?.zipToFile(zippedFilePath: String?, comment: String? = null): Boolean {
     if (this.isNullOrEmpty() || zippedFilePath.isNullOrBlank()) {

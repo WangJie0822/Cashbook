@@ -105,8 +105,24 @@ class BackupViewModel(private val repository: MainRepository) : BaseViewModel() 
         selectBackupPathEvent.value = false
     }
 
+    private var newVersion = false
+
     /** 备份点击 */
     val onBackupClick: () -> Unit = {
+        newVersion = false
+        val path = backupPathData.value.orEmpty()
+        if (path.isBlank()) {
+            // 未选择备份路径，请求备份路径
+            selectBackupPathEvent.value = true
+        } else {
+            // 开始备份
+            checkBackupPathEvent.value = path
+        }
+    }
+
+    /** 备份点击 */
+    val onBackupToNewVersionClick: () -> Unit = {
+        newVersion = true
         val path = backupPathData.value.orEmpty()
         if (path.isBlank()) {
             // 未选择备份路径，请求备份路径
@@ -138,7 +154,12 @@ class BackupViewModel(private val repository: MainRepository) : BaseViewModel() 
         viewModelScope.launch {
             try {
                 progressEvent.value = ProgressModel()
-                snackbarEvent.value = when (repository.backup().code) {
+                val resultCode = if (newVersion) {
+                    repository.backupNewVersion()
+                } else {
+                    repository.backup()
+                }.code
+                snackbarEvent.value = when (resultCode) {
                     RESULT_CODE_SUCCESS -> {
                         // 备份成功
                         R.string.backup_success

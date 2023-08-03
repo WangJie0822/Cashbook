@@ -1,6 +1,5 @@
 package cn.wj.android.cashbook.manager
 
-import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.tools.funLogger
 import cn.wj.android.cashbook.base.tools.isNetAvailable
@@ -60,7 +59,7 @@ object WebDAVManager {
         OkHttpClient.Builder()
             .retryOnConnectionFailure(true)
             .addNetworkInterceptor(
-                LoggerInterceptor(logger, if (BuildConfig.DEBUG) LoggerInterceptor.LEVEL_BODY else LoggerInterceptor.LEVEL_NONE)
+                LoggerInterceptor(logger,  LoggerInterceptor.LEVEL_BODY )
             )
             .build()
     }
