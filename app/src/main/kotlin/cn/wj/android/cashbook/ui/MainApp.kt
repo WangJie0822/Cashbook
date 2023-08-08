@@ -33,7 +33,9 @@ import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
 import cn.wj.android.cashbook.feature.records.navigation.ConfirmDeleteRecordDialogContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
+import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
+import cn.wj.android.cashbook.feature.records.navigation.naviToCalendar
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
@@ -111,7 +113,7 @@ fun CashbookNavHost(
                     onEditRecordClick = navController::naviToEditRecord,
                     onMenuClick = openDrawer,
                     onSearchClick = { /* TODO */ },
-                    onCalendarClick = { /* TODO */ },
+                    onCalendarClick = navController::naviToCalendar,
                     onMyAssetClick = navController::naviToMyAsset,
                     onShowSnackbar = onShowSnackbar,
                 )
@@ -184,6 +186,12 @@ fun CashbookNavHost(
 //        selectRelatedRecordScreen(
 //            onBackClick = navController::popBackStack,
 //        )
+        // 日历
+        calendarScreen(
+            onRecordItemEditClick = navController::naviToEditRecord,
+            onBackClick = navController::popBackStack,
+            onShowSnackbar = onShowSnackbar,
+        )
 
         // 我的资产
         myAssetScreen(

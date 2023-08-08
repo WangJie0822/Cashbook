@@ -24,8 +24,8 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 /**
  * 通用顶部标题栏
  *
- * @param text 标题文本
  * @param onBackClick 返回事件
+ * @param title 标题
  * @param actions 标题菜单
  * @param colors 标题控件颜色
  */
@@ -33,14 +33,14 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 fun CashbookTopAppBar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String? = null,
+    title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
-        title = { text?.let { Text(text = it) } },
+        title = title,
         modifier = modifier,
         navigationIcon = {
             IconButton(onClick = onBackClick) {
@@ -65,7 +65,7 @@ fun CommonTopBarPreview() {
         CashbookGradientBackground {
             Column {
                 CashbookTopAppBar(onBackClick = { })
-                CashbookTopAppBar(text = "标题", onBackClick = { })
+                CashbookTopAppBar(title = { Text(text = "标题") }, onBackClick = { })
                 CashbookTopAppBar(onBackClick = { }, actions = {
                     IconButton(onClick = { }) {
                         Icon(imageVector = CashbookIcons.Menu, contentDescription = null)

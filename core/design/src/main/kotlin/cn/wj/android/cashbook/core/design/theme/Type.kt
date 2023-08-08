@@ -122,7 +122,7 @@ private fun TypographyPreview() {
         CashbookGradientBackground {
             CashbookScaffold(
                 topBar = {
-                    CashbookTopAppBar(onBackClick = {}, text = "titleLarge")
+                    CashbookTopAppBar(onBackClick = {}, title = { Text(text = "titleLarge") })
                 }
             ) { paddingValues ->
                 Column(

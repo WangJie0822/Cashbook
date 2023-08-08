@@ -150,8 +150,8 @@ internal fun SettingScreen(
     CashbookScaffold(
         topBar = {
             CashbookTopAppBar(
-                text = stringResource(id = R.string.settings),
                 onBackClick = onBackClick,
+                title = { Text(text = stringResource(id = R.string.settings)) },
             )
         },
         modifier = modifier,

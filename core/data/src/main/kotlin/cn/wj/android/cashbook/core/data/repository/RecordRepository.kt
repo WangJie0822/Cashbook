@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
 
-    val currentMonthRecordListData: Flow<List<RecordModel>>
-
     suspend fun queryById(recordId: Long): RecordModel?
 
     suspend fun queryRelatedById(recordId: Long): List<RecordModel>
@@ -22,13 +20,6 @@ interface RecordRepository {
     suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>)
 
     suspend fun deleteRecord(recordId: Long)
-
-    suspend fun queryExpenditureRecordAfterDate(
-        reimburse: Boolean,
-        dataTime: Long
-    ): List<RecordModel>
-
-    suspend fun queryExpenditureRecordByAmountOrRemark(keyword: String): List<RecordViewsEntity>
 
     suspend fun queryPagingRecordListByAssetId(
         assetId: Long,

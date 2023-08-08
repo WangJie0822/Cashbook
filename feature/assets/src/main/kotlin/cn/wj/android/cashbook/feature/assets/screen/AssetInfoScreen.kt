@@ -157,8 +157,8 @@ internal fun AssetInfoScreen(
         modifier = modifier,
         topBar = {
             CashbookTopAppBar(
-                text = uiState.title,
                 onBackClick = onBackClick,
+                title = { Text(text = uiState.title) },
                 actions = {
                     if (uiState is AssetInfoUiState.Success) {
                         IconButton(onClick = onEditAssetClick) {
@@ -361,7 +361,6 @@ private fun AssetInfoScreenPreview() {
                         billingDate = billingDate,
                         repaymentDate = repaymentDate,
                     )
-
                     Empty(hintText = "无数据", modifier = Modifier.fillMaxWidth())
                 }
             },
@@ -408,7 +407,6 @@ private fun CreditAssetInfoScreenPreview() {
                         billingDate = billingDate,
                         repaymentDate = repaymentDate,
                     )
-
                     Empty(hintText = "无数据", modifier = Modifier.fillMaxWidth())
                 }
             },

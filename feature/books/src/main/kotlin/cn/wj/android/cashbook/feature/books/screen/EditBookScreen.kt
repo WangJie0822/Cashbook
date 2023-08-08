@@ -105,7 +105,7 @@ internal fun EditBookScreen(
         topBar = {
             CashbookTopAppBar(
                 onBackClick = onBackClick,
-                text = stringResource(id = R.string.edit_book)
+                title = { Text(text = stringResource(id = R.string.edit_book)) },
             )
         },
         snackbarHost = {

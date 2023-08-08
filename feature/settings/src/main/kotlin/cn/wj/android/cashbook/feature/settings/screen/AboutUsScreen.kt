@@ -145,8 +145,8 @@ internal fun AboutUsScreen(
     CashbookScaffold(
         topBar = {
             CashbookTopAppBar(
-                text = stringResource(id = R.string.about_us),
                 onBackClick = onBackClick,
+                title = { Text(text = stringResource(id = R.string.about_us)) },
             )
         },
         modifier = modifier,

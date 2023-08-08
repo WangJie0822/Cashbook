@@ -98,5 +98,11 @@
     <string name="each_day">每天一次</string>
     <string name="each_week">每周一次</string>
 
+    <string name="please_select_backup_path_first">请先选择备份路径</string>
+    <string name="unauthorized_path">未授权路径</string>
+    <string name="backup_success_only_local">仅本地备份成功</string>
+    <string name="backup_success">备份成功</string>
+    <string name="recovery_success">恢复成功</string>
+
     <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

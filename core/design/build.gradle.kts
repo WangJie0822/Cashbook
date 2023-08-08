@@ -25,4 +25,6 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.google.material)
+
+    implementation(project(":core:common"))
 }

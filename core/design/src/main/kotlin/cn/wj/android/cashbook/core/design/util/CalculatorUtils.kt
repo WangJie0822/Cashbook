@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.core.design.util
 
+import cn.wj.android.cashbook.core.common.ext.logger
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -126,29 +127,37 @@ internal object CalculatorUtils {
         val last = text.last().toString()
         val startCount = text.count { it.toString() == SYMBOL_BRACKET_START }
         val endCount = text.count { it.toString() == SYMBOL_BRACKET_END }
-        return if (text == SYMBOL_ZERO) {
-            // 默认 0，替换为括号
-            SYMBOL_BRACKET_START
-        } else if (last == SYMBOL_BRACKET_START || hasComputeSign(last)) {
-            // 是括号开始或是计算符号，继续添加括号开始
-            text + SYMBOL_BRACKET_START
-        } else if (last == SYMBOL_POINT) {
-            // 小数点
-            if (startCount == endCount) {
-                // 括号已完成匹配，将小数点替换为乘号并添加括号
-                text.dropLast(1) + SYMBOL_TIMES + SYMBOL_BRACKET_START
-            } else {
-                // 括号不匹配，移除小数点并添加括号
-                text.dropLast(1) + SYMBOL_BRACKET_END
+        return when {
+            text == SYMBOL_ZERO -> {
+                // 默认 0，替换为括号
+                SYMBOL_BRACKET_START
             }
-        } else {
-            // 其他情况
-            if (startCount == endCount) {
-                // 括号已完成匹配，添加乘号及括号
-                text + SYMBOL_TIMES + SYMBOL_BRACKET_START
-            } else {
-                // 括号未完成匹配，添加括号结束
-                text + SYMBOL_BRACKET_END
+
+            last == SYMBOL_BRACKET_START || hasComputeSign(last) -> {
+                // 是括号开始或是计算符号，继续添加括号开始
+                text + SYMBOL_BRACKET_START
+            }
+
+            last == SYMBOL_POINT -> {
+                // 小数点
+                if (startCount == endCount) {
+                    // 括号已完成匹配，将小数点替换为乘号并添加括号
+                    text.dropLast(1) + SYMBOL_TIMES + SYMBOL_BRACKET_START
+                } else {
+                    // 括号不匹配，移除小数点并添加括号
+                    text.dropLast(1) + SYMBOL_BRACKET_END
+                }
+            }
+
+            else -> {
+                // 其他情况
+                if (startCount == endCount) {
+                    // 括号已完成匹配，添加乘号及括号
+                    text + SYMBOL_TIMES + SYMBOL_BRACKET_START
+                } else {
+                    // 括号未完成匹配，添加括号结束
+                    text + SYMBOL_BRACKET_END
+                }
             }
         }
     }
@@ -159,10 +168,8 @@ internal object CalculatorUtils {
             return text
         }
         val result = calculatorFromString(text)
-        if (result.startsWith(SYMBOL_ERROR)) {
-            if (history.isBlank()) {
-                history = text
-            }
+        if (result.startsWith(SYMBOL_ERROR) && history.isBlank()) {
+            history = text
         }
         return result
     }
@@ -171,14 +178,14 @@ internal object CalculatorUtils {
         return try {
             calculatorCompatBracket(text)
         } catch (throwable: Throwable) {
-//            logger().e(throwable, "calculatorFromString")
+            logger().e(throwable, "calculatorFromString")
             "${SYMBOL_ERROR}格式错误"
         }
     }
 
     private fun calculatorCompatBracket(text: String): String {
-//        logger().d(text)
-        if (hasBracket(text)) {
+        logger().d(text)
+        return if (hasBracket(text)) {
             // 有括号
             val firstEndIndex = text.indexOfFirst {
                 it.toString() == SYMBOL_BRACKET_END
@@ -189,11 +196,11 @@ internal object CalculatorUtils {
             }
             val bracket = text.substring(lastStartIndex, firstEndIndex + 1)
             val bracketResult = calculatorCompatBracket(bracket.dropLast(1).drop(1))
-//            logger().d("$text bracket: $bracket result: $bracketResult")
-            return calculatorCompatBracket(text.replace(bracket, bracketResult))
+            logger().d("$text bracket: $bracket result: $bracketResult")
+            calculatorCompatBracket(text.replace(bracket, bracketResult))
         } else {
             // 没有括号，直接计算
-            return calculator(text).decimalFormat()
+            calculator(text).decimalFormat()
         }
     }
 

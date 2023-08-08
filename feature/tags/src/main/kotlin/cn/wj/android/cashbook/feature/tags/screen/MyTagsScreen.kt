@@ -85,8 +85,8 @@ internal fun MyTagsScreen(
         modifier = modifier,
         topBar = {
             CashbookTopAppBar(
-                text = stringResource(id = R.string.my_tags),
                 onBackClick = onBackClick,
+                title = { Text(text = stringResource(id = R.string.my_tags)) },
                 actions = {
                     IconButton(onClick = { showEditTagDialog(null) }) {
                         Icon(imageVector = CashbookIcons.Add, contentDescription = null)

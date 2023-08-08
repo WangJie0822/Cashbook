@@ -233,8 +233,8 @@ private fun EditAssetScaffold(
     CashbookScaffold(
         topBar = {
             CashbookTopAppBar(
-                text = stringResource(id = if (isCreate) R.string.new_asset else R.string.edit_asset),
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                title = { Text(text = stringResource(id = if (isCreate) R.string.new_asset else R.string.edit_asset)) },
             )
         },
         floatingActionButton = {

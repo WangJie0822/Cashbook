@@ -57,19 +57,20 @@ class GetCurrentMonthRecordViewsMapUseCase @Inject constructor() {
             val currentMonth = (calendar[Calendar.MONTH] + 1)
             val currentDay = calendar[Calendar.DAY_OF_MONTH]
             val dateDay = dateArray.last().toInt()
-            val day =
+            val dayType =
                 if (currentYear == dateArray[0].toIntOrNull() && currentMonth == dateArray[1].toIntOrNull()) {
                     when (dateDay) {
                         currentDay -> 0
                         currentDay - 1 -> -1
                         currentDay - 2 -> -2
-                        else -> dateDay
+                        else -> 1
                     }
                 } else {
-                    dateDay
+                    1
                 }
             RecordDayEntity(
-                day = day.toString(),
+                day = dateDay,
+                dayType = dayType,
                 dayIncome = totalIncome.decimalFormat(),
                 dayExpand = totalExpenditure.decimalFormat(),
             )

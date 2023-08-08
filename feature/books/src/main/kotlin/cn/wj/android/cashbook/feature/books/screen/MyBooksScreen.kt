@@ -86,7 +86,7 @@ internal fun MyBooksScreen(
         topBar = {
             CashbookTopAppBar(
                 onBackClick = onBackClick,
-                text = stringResource(id = R.string.my_books),
+                title = { Text(text = stringResource(id = R.string.my_books)) },
             )
         },
         floatingActionButton = {

@@ -115,20 +115,31 @@ internal fun BackupAndRecoveryScreen(
     modifier: Modifier = Modifier,
 ) {
 
+    // 提示语
+    val blankPathHint = stringResource(id = R.string.please_select_backup_path_first)
+    val unauthorizedPathHint = stringResource(id = R.string.unauthorized_path)
+    val onlyLocalHint = stringResource(id = R.string.backup_success_only_local)
+    val backupSuccessHint = stringResource(id = R.string.backup_success)
+    val recoverySuccessHint = stringResource(id = R.string.recovery_success)
+
     LaunchedEffect(shouldDisplayBookmark) {
         if (shouldDisplayBookmark != 0) {
-            // FIXME
+            // 修改为资源
             val tipText = when (shouldDisplayBookmark) {
-                FAILED_BLANK_BACKUP_PATH -> "请先选择备份路径"
-                FAILED_BACKUP_PATH_UNAUTHORIZED -> "未授权路径"
-                FAILED_BACKUP_WEBDAV -> "仅本地备份成功"
-                SUCCESS_BACKUP -> "备份成功"
-                SUCCESS_RECOVERY -> "恢复成功"
+                FAILED_BLANK_BACKUP_PATH -> blankPathHint
+                FAILED_BACKUP_PATH_UNAUTHORIZED -> unauthorizedPathHint
+                FAILED_BACKUP_WEBDAV -> onlyLocalHint
+                SUCCESS_BACKUP -> backupSuccessHint
+                SUCCESS_RECOVERY -> recoverySuccessHint
                 else -> ""
             }
-            val snackbarResult = onShowSnackbar(tipText, null)
-            if (snackbarResult == SnackbarResult.Dismissed) {
+            if (tipText.isBlank()) {
                 dismissBookmark()
+            } else {
+                val snackbarResult = onShowSnackbar(tipText, null)
+                if (snackbarResult == SnackbarResult.Dismissed) {
+                    dismissBookmark()
+                }
             }
         }
     }
@@ -138,7 +149,7 @@ internal fun BackupAndRecoveryScreen(
         topBar = {
             CashbookTopAppBar(
                 onBackClick = onBackClick,
-                text = stringResource(id = R.string.backup_and_recovery),
+                title = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
             )
         },
         content = { paddingValues ->

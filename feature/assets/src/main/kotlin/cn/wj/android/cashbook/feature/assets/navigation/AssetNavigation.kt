@@ -92,14 +92,7 @@ fun NavGraphBuilder.assetInfoScreen(
                     onRecordItemClick,
                 )
             },
-            recordDetailSheetContent = { recordInfo, onRecordDeleteClick, dismissBottomSheet ->
-                recordDetailSheetContent(
-                    recordInfo = recordInfo,
-                    onRecordDeleteClick = onRecordDeleteClick,
-                    dismissBottomSheet = dismissBottomSheet,
-                )
-
-            },
+            recordDetailSheetContent = recordDetailSheetContent,
             confirmDeleteRecordDialogContent = confirmDeleteRecordDialogContent,
             onEditAssetClick = { onEditAssetClick.invoke(assetId) },
             onBackClick = onBackClick,

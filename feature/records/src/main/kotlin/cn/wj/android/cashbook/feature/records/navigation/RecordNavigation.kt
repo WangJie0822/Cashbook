@@ -16,18 +16,25 @@ import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
 import cn.wj.android.cashbook.feature.records.screen.AssetInfoContentRoute
+import cn.wj.android.cashbook.feature.records.screen.CalendarRoute
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentRoute
-import cn.wj.android.cashbook.feature.records.screen.RecordDetailsSheet
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
+import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 
 private const val ROUTE_EDIT_RECORD_KEY_RECORD_ID = "recordId"
 private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
+
+/** 路由 - 编辑记录 */
 private const val ROUTE_EDIT_RECORD =
     "record/edit_record?$ROUTE_EDIT_RECORD_KEY_RECORD_ID={$ROUTE_EDIT_RECORD_KEY_RECORD_ID}&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}"
 
+/** 路由 - 选择关联记录 */
 private const val ROUTE_SELECT_RELATED_RECORD = "record/select_related_record"
+
+/** 路由 - 日历 */
+private const val ROUTE_RECORD_CALENDAR = "record/calendar"
 
 fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
     this.navigate(
@@ -45,6 +52,10 @@ fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
 
 fun NavController.naviToSelectRelatedRecord() {
     this.navigate(ROUTE_SELECT_RELATED_RECORD)
+}
+
+fun NavController.naviToCalendar() {
+    this.navigate(ROUTE_RECORD_CALENDAR)
 }
 
 /**
@@ -108,6 +119,20 @@ fun NavGraphBuilder.selectRelatedRecordScreen(
         SelectRelatedRecordRoute(
             onBackPressed = onBackClick,
             parentViewModel = parentViewModel,
+        )
+    }
+}
+
+fun NavGraphBuilder.calendarScreen(
+    onRecordItemEditClick: (Long) -> Unit,
+    onBackClick: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+) {
+    composable(route = ROUTE_RECORD_CALENDAR) {
+        CalendarRoute(
+            onRecordItemEditClick = onRecordItemEditClick,
+            onBackClick = onBackClick,
+            onShowSnackbar = onShowSnackbar,
         )
     }
 }

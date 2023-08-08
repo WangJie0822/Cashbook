@@ -123,8 +123,12 @@ internal fun MyAssetScreen(
             modifier = modifier,
             topBar = {
                 CashbookTopAppBar(
-                    text = if (scaffoldState.isConcealed) stringResource(id = R.string.my_assets) else null,
                     onBackClick = onBackClick,
+                    title = {
+                        if (scaffoldState.isConcealed) {
+                            Text(text = stringResource(id = R.string.my_assets))
+                        }
+                    },
                 )
             },
             floatingActionButton = {
