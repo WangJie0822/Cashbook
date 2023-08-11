@@ -103,6 +103,7 @@
     <string name="backup_success_only_local">仅本地备份成功</string>
     <string name="backup_success">备份成功</string>
     <string name="recovery_success">恢复成功</string>
+    <string name="backup_path_empty">备份路径为空</string>
 
     <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

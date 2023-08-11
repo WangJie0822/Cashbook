@@ -34,7 +34,7 @@ class WorkManagerSyncManager @Inject constructor(
         workManager.enqueueUniqueWork(
             SyncWorkName,
             ExistingWorkPolicy.KEEP,
-            SyncWorker.startUpSyncWork(),
+            SyncWorker.startUpOneTimeSyncWork(),
         )
     }
 }

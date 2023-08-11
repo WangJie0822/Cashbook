@@ -29,6 +29,7 @@ import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_BACKUP
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_EMPTY
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
@@ -61,6 +62,7 @@ import kotlinx.coroutines.withContext
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/21
  */
 class BackupRecoveryManager @Inject constructor(
+    networkMonitor: NetworkMonitor,
     private val settingRepository: SettingRepository,
     private val okHttpWebDAVHandler: OkHttpWebDAVHandler,
     private val database: CashbookDatabase,
@@ -78,28 +80,26 @@ class BackupRecoveryManager @Inject constructor(
         BackupRecoveryState.None
     )
 
-    private val customPath = MutableStateFlow("")
-
     val isWebDAVConnected: Flow<Boolean> =
-        combine(connectedDataVersion, settingRepository.appDataMode) { _, _ ->
-            refreshConnectedStatus()
+        combine(
+            networkMonitor.isOnline,
+            connectedDataVersion,
+            settingRepository.appDataMode
+        ) { isOnline, _, _ ->
+            isOnline && refreshConnectedStatus()
         }
 
     val backupState: Flow<BackupRecoveryState> = _backupState
 
     val recoveryState: Flow<BackupRecoveryState> = _recoveryState
 
-    val onlineBackupListData = combine(connectedDataVersion, backupDataVersion) { _, _ ->
+    private val onlineBackupListData = combine(connectedDataVersion, backupDataVersion) { _, _ ->
         val appDataMode = settingRepository.appDataMode.first()
         okHttpWebDAVHandler.list(appDataMode.webDAVDomain.backupPath)
     }
 
-    val localBackupListData = settingRepository.appDataMode.mapLatest { appDataModel ->
+    private val localBackupListData = settingRepository.appDataMode.mapLatest { appDataModel ->
         getLocalBackupList(appDataModel.backupPath)
-    }
-
-    val localCustomBackupListData: Flow<List<BackupModel>> = customPath.mapLatest {
-        getLocalBackupList(it)
     }
 
     fun refreshWebDAVConnected() {
@@ -145,10 +145,6 @@ class BackupRecoveryManager @Inject constructor(
 
     fun updateBackupState(state: BackupRecoveryState) {
         _backupState.tryEmit(state)
-    }
-
-    fun refreshLocalPath(localPath: String) {
-        customPath.tryEmit(localPath)
     }
 
     suspend fun requestRecovery(path: String): Unit = withContext(ioCoroutineContext) {
@@ -218,7 +214,7 @@ class BackupRecoveryManager @Inject constructor(
         }
     }
 
-    private suspend fun getLocalBackupList(
+    suspend fun getLocalBackupList(
         path: String
     ): List<BackupModel> = withContext(ioCoroutineContext) {
         if (!grantedPermissions(path)) {
@@ -255,6 +251,34 @@ class BackupRecoveryManager @Inject constructor(
             }
         }
         result
+    }
+
+    suspend fun getRecoveryList(
+        onlyLocal: Boolean,
+        localPath: String
+    ): List<BackupModel> = withContext(ioCoroutineContext) {
+        val list = if (!onlyLocal && isWebDAVConnected.first()) {
+            // 使用云端数据
+            val webDAVDomain = settingRepository.appDataMode.first().webDAVDomain
+            onlineBackupListData.first().map {
+                // 云端路径不包含服务器地址，完善地址
+                if (!it.path.startsWith(webDAVDomain)) {
+                    it.copy(path = webDAVDomain + it.path)
+                } else {
+                    it
+                }
+            }
+        } else {
+            if (localPath.isNotBlank()) {
+                getLocalBackupList(localPath)
+            } else {
+                localBackupListData.first()
+            }
+        }
+        if (list.isEmpty()) {
+            updateRecoveryState(BackupRecoveryState.Failed(FAILED_BACKUP_PATH_EMPTY))
+        }
+        list
     }
 
     private val String.backupPath: String
@@ -520,6 +544,7 @@ sealed class BackupRecoveryState(open val code: Int = 0) {
         const val FAILED_BACKUP_PATH_UNAUTHORIZED = -3013
         const val FAILED_BACKUP_WEBDAV = -3014
         const val FAILED_FILE_FORMAT_ERROR = -3015
+        const val FAILED_BACKUP_PATH_EMPTY = -3016
 
         const val SUCCESS_BACKUP = 2001
         const val SUCCESS_RECOVERY = 2002

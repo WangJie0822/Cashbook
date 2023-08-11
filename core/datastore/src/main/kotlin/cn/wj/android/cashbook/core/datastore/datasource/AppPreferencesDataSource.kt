@@ -45,7 +45,6 @@ class AppPreferencesDataSource @Inject constructor(
                 dynamicColor = it.dynamicColor,
                 verificationModel = VerificationModeEnum.ordinalOf(it.verificationMode),
                 agreedProtocol = it.agreedProtocol,
-                syncDate = it.syncDate,
                 webDAVDomain = it.webDAVDomain,
                 webDAVAccount = it.webDAVAccount,
                 webDAVPassword = it.webDAVPassword,
@@ -139,10 +138,6 @@ class AppPreferencesDataSource @Inject constructor(
         appPreferences.updateData { it.copy { this.agreedProtocol = agreedProtocol } }
     }
 
-    suspend fun updateSyncDate(syncDate: String) {
-        appPreferences.updateData { it.copy { this.syncDate = syncDate } }
-    }
-
     suspend fun updateWebDAV(domain: String, account: String, password: String) {
         appPreferences.updateData {
             it.copy {
@@ -151,6 +146,10 @@ class AppPreferencesDataSource @Inject constructor(
                 this.webDAVPassword = password
             }
         }
+    }
+
+    suspend fun updateAutoBackupMode(autoBackupMode: AutoBackupModeEnum) {
+        appPreferences.updateData { it.copy { this.autoBackup = autoBackupMode.ordinal } }
     }
 
     suspend fun updateBackupPath(path: String) {

@@ -8,19 +8,13 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
-import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.feature.settings.enums.BackupListEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -34,7 +28,6 @@ import kotlinx.coroutines.launch
 class BackupAndRecoveryViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     private val backupRecoveryManager: BackupRecoveryManager,
-    networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
@@ -56,18 +49,12 @@ class BackupAndRecoveryViewModel @Inject constructor(
             initialValue = BackupAndRecoveryUiState(),
         )
 
-    val isConnected =
-        combine(
-            networkMonitor.isOnline,
-            backupRecoveryManager.isWebDAVConnected
-        ) { isOnline, isConnected ->
-            isOnline && isConnected
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
-                initialValue = false,
-            )
+    val isConnected = backupRecoveryManager.isWebDAVConnected
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
+            initialValue = false,
+        )
 
     val shouldDisplayBookmark =
         combine(
@@ -86,33 +73,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
                 initialValue = 0,
             )
 
-    private val backupListType = MutableStateFlow(BackupListEnum.NONE)
-    private val webBackupListData = backupRecoveryManager.onlineBackupListData.mapLatest { list ->
-        val webDAVDomain = settingRepository.appDataMode.first().webDAVDomain
-        list.map {
-            if (!it.path.startsWith(webDAVDomain)) {
-                it.copy(path = webDAVDomain + it.path)
-            } else {
-                it
-            }
-        }
-    }
-    private val localBackupListData = backupRecoveryManager.localBackupListData
-    private val localCustomBackupList = backupRecoveryManager.localCustomBackupListData
-    val backupListData = backupListType.flatMapLatest {
-        when (it) {
-            BackupListEnum.WEB -> webBackupListData
-            BackupListEnum.LOCAL -> localBackupListData
-            BackupListEnum.CUSTOM -> localCustomBackupList
-            BackupListEnum.NONE -> flowOf(emptyList())
-        }
-    }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
-            initialValue = emptyList(),
-        )
-
+    /** 保存 WebDAV 配置 */
     fun saveWebDAV(domain: String, account: String, password: String) {
         viewModelScope.launch {
             val state = uiState.first()
@@ -130,37 +91,35 @@ class BackupAndRecoveryViewModel @Inject constructor(
         }
     }
 
+    /** 保持本地备份路径 [path] */
     fun saveBackupPath(path: String) {
         viewModelScope.launch {
             settingRepository.updateBackupPath(path)
         }
     }
 
+    /** 开始备份 */
     fun backup() {
         viewModelScope.launch {
             backupRecoveryManager.requestBackup()
         }
     }
 
+    /**
+     * 获取备份数据列表
+     * @param onlyLocal 仅从本地恢复
+     * @param localPath 本地自定义备份路径
+     */
     fun getRecoveryList(onlyLocal: Boolean, localPath: String) {
         viewModelScope.launch {
-            if (!onlyLocal && isConnected.first()) {
-                // 使用云端数据
-                backupListType.tryEmit(BackupListEnum.WEB)
-            } else {
-                if (localPath.isNotBlank()) {
-                    backupRecoveryManager.refreshLocalPath(localPath)
-                    backupListType.tryEmit(BackupListEnum.CUSTOM)
-                } else {
-                    backupListType.tryEmit(BackupListEnum.LOCAL)
-                }
+            val list = backupRecoveryManager.getRecoveryList(onlyLocal, localPath)
+            if (list.isNotEmpty()) {
+                dialogState = DialogState.Shown(list)
             }
-            backupListData.first()
-            delay(500L)
-            dialogState = DialogState.Shown(0)
         }
     }
 
+    /** 从 [backupPath] 路径恢复备份 */
     fun tryRecovery(backupPath: String) {
         viewModelScope.launch {
             backupRecoveryManager.requestRecovery(backupPath)
@@ -168,20 +127,39 @@ class BackupAndRecoveryViewModel @Inject constructor(
         }
     }
 
+    /** 显示选择自动备份类型弹窗 */
     fun showSelectAutoBackupDialog() {
-        // TODO
+        dialogState = DialogState.Shown(0)
     }
 
+    /** 更新自动备份类型 */
+    fun onAutoBackupModeSelected(autoBackup: AutoBackupModeEnum) {
+        viewModelScope.launch {
+            settingRepository.updateAutoBackupMode(autoBackup)
+        }
+    }
+
+    /** 隐藏提示 */
     fun dismissBookmark() {
         backupRecoveryManager.updateBackupState(BackupRecoveryState.None)
         backupRecoveryManager.updateRecoveryState(BackupRecoveryState.None)
     }
 
+    /** 隐藏弹窗 */
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
 }
 
+/**
+ * 备份恢复界面 UI 状态
+ *
+ * @param webDAVDomain webDAV 服务器地址
+ * @param webDAVAccount webDAV 账号信息
+ * @param webDAVPassword webDAV 密码数据
+ * @param backupPath 本地备份路径
+ * @param autoBackup 自动备份类型，取 [AutoBackupModeEnum]
+ */
 data class BackupAndRecoveryUiState(
     val webDAVDomain: String = "",
     val webDAVAccount: String = "",

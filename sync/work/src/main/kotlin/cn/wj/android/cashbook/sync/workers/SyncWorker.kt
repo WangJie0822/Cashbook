@@ -6,21 +6,20 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
-import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.sync.initializers.SyncConstraints
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 /**
@@ -43,43 +42,40 @@ class SyncWorker @AssistedInject constructor(
         appContext.syncForegroundInfo()
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
-        val currentDate = System.currentTimeMillis().dateFormat(DATE_FORMAT_DATE)
-        val syncDate = settingRepository.appDataMode.first().syncDate
-        if (syncDate.isNotBlank() && currentDate == syncDate) {
-            // 今天未同步
-            val syncedSuccessfully = awaitAll(
-                async { settingRepository.syncChangelog() },
-                async { settingRepository.syncPrivacyPolicy() },
-                async { settingRepository.syncLatestVersion() },
-            ).all { it }
-            if (syncedSuccessfully) {
-                settingRepository.updateSyncDate(currentDate)
-                this@SyncWorker.logger().i("doWork(), sync success")
-                Result.success()
-            } else {
-                retryCount++
-                if (retryCount >= 5) {
-                    this@SyncWorker.logger().i("doWork(), sync failed, finish")
-                    Result.failure()
-                } else {
-                    this@SyncWorker.logger().i("doWork(), sync failed, retry $retryCount")
-                    Result.retry()
-                }
-            }
-        } else {
-            // 今天已同步，返回成功
-            this@SyncWorker.logger().i("doWork(), sync already")
+        this@SyncWorker.logger().i("doWork(), sync data")
+        val syncedSuccessfully = awaitAll(
+            async { settingRepository.syncChangelog() },
+            async { settingRepository.syncPrivacyPolicy() },
+            async { settingRepository.syncLatestVersion() },
+        ).all { it }
+        if (syncedSuccessfully) {
+            this@SyncWorker.logger().i("doWork(), sync success")
             Result.success()
+        } else {
+            retryCount++
+            if (retryCount >= 5) {
+                this@SyncWorker.logger().i("doWork(), sync failed, finish")
+                Result.failure()
+            } else {
+                this@SyncWorker.logger().i("doWork(), sync failed, retry $retryCount")
+                Result.retry()
+            }
         }
     }
 
     companion object {
 
         /** 使用代理任务启动同步任务，以支持依赖注入 */
-        fun startUpSyncWork() = OneTimeWorkRequestBuilder<DelegatingWorker>()
+        fun startUpOneTimeSyncWork() = OneTimeWorkRequestBuilder<DelegatingWorker>()
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setConstraints(SyncConstraints)
             .setInputData(SyncWorker::class.delegatedData())
             .build()
+
+        fun startUpPeriodicSyncWork() =
+            PeriodicWorkRequestBuilder<DelegatingWorker>(Duration.ofDays(1))
+                .setConstraints(SyncConstraints)
+                .setInputData(SyncWorker::class.delegatedData())
+                .build()
     }
 }

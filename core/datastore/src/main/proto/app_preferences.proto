@@ -24,11 +24,10 @@ message AppPreferences {
   bool dynamicColor = 17; // 动态配色
   int32 verificationMode = 18; // 安全验证类型
   bool agreedProtocol = 19; // 已同意用户协议及隐私政策
-  string syncDate = 20; // 数据同步时间
-  string webDAVDomain = 21; // WebDAV 服务器地址
-  string webDAVAccount = 22; // WebDAV 账户
-  string webDAVPassword = 23; // WebDAV 密码
-  string backupPath = 24; // 备份路径
-  int32 autoBackup = 25; // 自动备份
-  sint64 lastBackupMs = 26; // 上次备份时间戳
+  string webDAVDomain = 20; // WebDAV 服务器地址
+  string webDAVAccount = 21; // WebDAV 账户
+  string webDAVPassword = 22; // WebDAV 密码
+  string backupPath = 23; // 备份路径
+  int32 autoBackup = 24; // 自动备份
+  sint64 lastBackupMs = 25; // 上次备份时间戳
 }

@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.core.data.repository
 
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
@@ -65,11 +66,11 @@ interface SettingRepository {
 
     suspend fun syncLatestVersion(): Boolean
 
-    suspend fun updateSyncDate(syncDate: String)
-
     suspend fun updateWebDAV(domain: String, account: String, password: String)
 
     suspend fun updateBackupPath(path: String)
 
     suspend fun updateBackupMs(ms: Long)
+
+    suspend fun updateAutoBackupMode(autoBackupMode: AutoBackupModeEnum)
 }

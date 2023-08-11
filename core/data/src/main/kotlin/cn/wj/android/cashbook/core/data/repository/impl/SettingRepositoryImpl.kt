@@ -7,6 +7,7 @@ import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.datastore.datasource.GitInfosDataSource
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
@@ -159,10 +160,6 @@ class SettingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateSyncDate(syncDate: String) = withContext(coroutineContext) {
-        appPreferencesDataSource.updateSyncDate(syncDate)
-    }
-
     override suspend fun updateWebDAV(domain: String, account: String, password: String) =
         withContext(coroutineContext) {
             appPreferencesDataSource.updateWebDAV(
@@ -179,4 +176,9 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun updateBackupMs(ms: Long) = withContext(coroutineContext) {
         appPreferencesDataSource.updateBackupMs(ms)
     }
+
+    override suspend fun updateAutoBackupMode(autoBackupMode: AutoBackupModeEnum) =
+        withContext(coroutineContext) {
+            appPreferencesDataSource.updateAutoBackupMode(autoBackupMode)
+        }
 }

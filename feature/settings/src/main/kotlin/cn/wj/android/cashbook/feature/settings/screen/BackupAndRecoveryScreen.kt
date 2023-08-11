@@ -8,12 +8,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -22,8 +26,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,9 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_EMPTY
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_UNAUTHORIZED
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_WEBDAV
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BLANK_BACKUP_PATH
@@ -67,7 +75,6 @@ internal fun BackupAndRecoveryRoute(
 ) {
 
     val shouldDisplayBookmark by viewModel.shouldDisplayBookmark.collectAsStateWithLifecycle()
-    val backupList by viewModel.backupListData.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
 
@@ -75,7 +82,6 @@ internal fun BackupAndRecoveryRoute(
         shouldDisplayBookmark,
         dismissBookmark = viewModel::dismissBookmark,
         dialogState = viewModel.dialogState,
-        backupList = backupList,
         tryRecovery = viewModel::tryRecovery,
         dismissDialog = viewModel::dismissDialog,
         uiState = uiState,
@@ -85,6 +91,7 @@ internal fun BackupAndRecoveryRoute(
         onBackupClick = viewModel::backup,
         onRecoveryClick = viewModel::getRecoveryList,
         onAutoBackupClick = viewModel::showSelectAutoBackupDialog,
+        onAutoBackupModeSelected = viewModel::onAutoBackupModeSelected,
         onBackClick = {
             viewModel.dismissBookmark()
             onBackClick()
@@ -100,7 +107,6 @@ internal fun BackupAndRecoveryScreen(
     shouldDisplayBookmark: Int,
     dismissBookmark: () -> Unit,
     dialogState: DialogState,
-    backupList: List<BackupModel>,
     tryRecovery: (String) -> Unit,
     dismissDialog: () -> Unit,
     uiState: BackupAndRecoveryUiState,
@@ -110,27 +116,29 @@ internal fun BackupAndRecoveryScreen(
     onBackupClick: () -> Unit,
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
+    onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
 
-    // 提示语
+    // 提示文本
     val blankPathHint = stringResource(id = R.string.please_select_backup_path_first)
     val unauthorizedPathHint = stringResource(id = R.string.unauthorized_path)
     val onlyLocalHint = stringResource(id = R.string.backup_success_only_local)
     val backupSuccessHint = stringResource(id = R.string.backup_success)
     val recoverySuccessHint = stringResource(id = R.string.recovery_success)
+    val backupPathEmptyHint = stringResource(id = R.string.backup_path_empty)
 
     LaunchedEffect(shouldDisplayBookmark) {
         if (shouldDisplayBookmark != 0) {
-            // 修改为资源
             val tipText = when (shouldDisplayBookmark) {
                 FAILED_BLANK_BACKUP_PATH -> blankPathHint
                 FAILED_BACKUP_PATH_UNAUTHORIZED -> unauthorizedPathHint
                 FAILED_BACKUP_WEBDAV -> onlyLocalHint
                 SUCCESS_BACKUP -> backupSuccessHint
                 SUCCESS_RECOVERY -> recoverySuccessHint
+                FAILED_BACKUP_PATH_EMPTY -> backupPathEmptyHint
                 else -> ""
             }
             if (tipText.isBlank()) {
@@ -154,31 +162,21 @@ internal fun BackupAndRecoveryScreen(
         },
         content = { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-
                 if (dialogState is DialogState.Shown<*>) {
-                    AlertDialog(
-                        onDismissRequest = dismissDialog,
-                        confirmButton = {
-                            Text(
-                                text = stringResource(id = R.string.cancel),
-                                modifier = Modifier.clickable { dismissDialog() },
+                    when (val data = dialogState.data) {
+                        is List<*> -> {
+                            val backupList = data.mapNotNull { it as? BackupModel }
+                            BackupListDialog(dismissDialog, backupList, tryRecovery)
+                        }
+
+                        is Int -> {
+                            AutoBackupModeDialog(
+                                autoBackupMode = uiState.autoBackup,
+                                onAutoBackupModeSelected = onAutoBackupModeSelected,
+                                onDismissClick = dismissDialog,
                             )
-                        },
-                        text = {
-                            LazyColumn(
-                                content = {
-                                    items(backupList) {
-                                        Text(
-                                            text = it.name,
-                                            modifier = Modifier
-                                                .clickable { tryRecovery(it.path) }
-                                                .padding(vertical = 4.dp),
-                                        )
-                                    }
-                                },
-                            )
-                        },
-                    )
+                        }
+                    }
                 }
 
                 BackupAndRecoveryScaffoldContent(
@@ -191,6 +189,37 @@ internal fun BackupAndRecoveryScreen(
                     onAutoBackupClick = onAutoBackupClick,
                 )
             }
+        },
+    )
+}
+
+@Composable
+private fun BackupListDialog(
+    dismissDialog: () -> Unit,
+    backupList: List<BackupModel>,
+    tryRecovery: (String) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = dismissDialog,
+        confirmButton = {
+            Text(
+                text = stringResource(id = R.string.cancel),
+                modifier = Modifier.clickable { dismissDialog() },
+            )
+        },
+        text = {
+            LazyColumn(
+                content = {
+                    items(backupList) {
+                        Text(
+                            text = it.name,
+                            modifier = Modifier
+                                .clickable { tryRecovery(it.path) }
+                                .padding(vertical = 4.dp),
+                        )
+                    }
+                },
+            )
         },
     )
 }
@@ -298,7 +327,9 @@ internal fun BackupAndRecoveryScaffoldContent(
         )
 
         val context = LocalContext.current
-        var onSelectDirCallback: ((String) -> Unit)? = null
+        var onSelectDirCallback: ((String) -> Unit)? by remember {
+            mutableStateOf(null)
+        }
         val selectDirLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocumentTree(),
             onResult = {
@@ -405,24 +436,122 @@ internal fun BackupAndRecoveryScaffoldContent(
     }
 }
 
+@Composable
+internal fun AutoBackupModeDialog(
+    autoBackupMode: AutoBackupModeEnum,
+    onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismissClick,
+        title = { Text(text = stringResource(id = R.string.auto_backup)) },
+        text = {
+            Column(
+                modifier = Modifier.selectableGroup(),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (AutoBackupModeEnum.CLOSE == autoBackupMode),
+                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.CLOSE) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = AutoBackupModeEnum.CLOSE == autoBackupMode,
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.close),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (AutoBackupModeEnum.WHEN_LAUNCH == autoBackupMode),
+                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.WHEN_LAUNCH) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = AutoBackupModeEnum.WHEN_LAUNCH == autoBackupMode,
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.each_launch),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (AutoBackupModeEnum.EACH_DAY == autoBackupMode),
+                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.EACH_DAY) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = AutoBackupModeEnum.EACH_DAY == autoBackupMode,
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.each_day),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (AutoBackupModeEnum.EACH_WEEK == autoBackupMode),
+                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.EACH_WEEK) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = AutoBackupModeEnum.EACH_WEEK == autoBackupMode,
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.each_week),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissClick) {
+                Text(text = stringResource(id = R.string.close))
+            }
+        },
+    )
+}
+
 @DevicePreviews
 @Composable
 private fun BackupAndRecoveryScreenPreview() {
     PreviewTheme {
-        BackupAndRecoveryScreen(
-            shouldDisplayBookmark = 0,
-            dismissBookmark = {},
-            dialogState = DialogState.Dismiss,
-            backupList = emptyList(),
-            tryRecovery = {},
-            dismissDialog = {},
-            uiState = BackupAndRecoveryUiState(),
-            isConnected = false,
-            onSaveWebDAV = { _, _, _ -> },
-            onSaveBackupPath = {},
-            onBackupClick = {},
-            onRecoveryClick = { _, _ -> },
-            onAutoBackupClick = {},
+        BackupAndRecoveryRoute(
             onBackClick = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
         )

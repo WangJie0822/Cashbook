@@ -11,32 +11,23 @@ import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import cn.wj.android.cashbook.sync.R
 
-const val SYNC_TOPIC = "sync"
-internal  const val SyncNotificationId = 20013
-internal  const val SyncNotificationChannelID = "SyncNotificationChannel"
+internal const val SyncNotificationId = 20013
+internal const val SyncNotificationChannelID = "SyncNotificationChannel"
 
-// All sync work needs an internet connectionS
+/** 同步任务需要网络连接 */
 internal val SyncConstraints
     get() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-internal val BackupRecoveryConstraints
-    get() = Constraints.Builder()
-        .build()
-
-/**
- * Foreground information for sync on lower API levels when sync workers are being
- * run with a foreground service
- */
+/** 同步任务前台信息 */
 internal fun Context.syncForegroundInfo() = ForegroundInfo(
     SyncNotificationId,
     syncWorkNotification(),
 )
 
 /**
- * Notification displayed on lower API levels when sync workers are being
- * run with a foreground service
+ * 同步任务通知
  */
 internal fun Context.syncWorkNotification(): Notification {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -47,10 +38,9 @@ internal fun Context.syncWorkNotification(): Notification {
         ).apply {
             description = getString(R.string.sync_notification_channel_description)
         }
-        // Register the channel with the system
+        // 注册通知通道
         val notificationManager: NotificationManager? =
             getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-
         notificationManager?.createNotificationChannel(channel)
     }
 
