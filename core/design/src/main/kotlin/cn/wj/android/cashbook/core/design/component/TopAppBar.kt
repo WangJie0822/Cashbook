@@ -36,7 +36,7 @@ fun CashbookTopAppBar(
     title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
-    colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(

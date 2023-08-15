@@ -24,6 +24,10 @@ import androidx.compose.ui.unit.Dp
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/27
  */
+@Deprecated(
+    message = "Material3 is support BottomSheet now, this Method is deprecated, use ModalBottomSheet instead",
+    replaceWith = ReplaceWith("ModalBottomSheet", "androidx.compose.material3.ModalBottomSheet"),
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ModalBottomSheetLayout(

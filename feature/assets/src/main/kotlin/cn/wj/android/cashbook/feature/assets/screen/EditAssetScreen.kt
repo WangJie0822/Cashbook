@@ -141,7 +141,6 @@ internal fun EditAssetScreen(
         }
     }
 
-
     ModalBottomSheetLayout(
         modifier = modifier,
         sheetState = sheetState,
@@ -282,7 +281,7 @@ private fun EditAssetScaffold(
                     ) {
                         TransparentListItem(
                             modifier = Modifier.clickable(onClick = onSelectClassificationClick),
-                            headlineText = {
+                            headlineContent = {
                                 Text(
                                     text = stringResource(id = R.string.asset_classification),
                                     modifier = Modifier.padding(start = 16.dp)
@@ -392,7 +391,7 @@ private fun EditAssetScaffold(
                         if (uiState.isCreditCard) {
                             TransparentListItem(
                                 modifier = Modifier.clickable(onClick = onBillingDateClick),
-                                headlineText = {
+                                headlineContent = {
                                     Text(
                                         text = stringResource(id = R.string.billing_date),
                                         modifier = Modifier.padding(start = 16.dp)
@@ -421,7 +420,7 @@ private fun EditAssetScaffold(
 
                             TransparentListItem(
                                 modifier = Modifier.clickable(onClick = onRepaymentDateClick),
-                                headlineText = {
+                                headlineContent = {
                                     Text(
                                         text = stringResource(id = R.string.repayment_date),
                                         modifier = Modifier.padding(start = 16.dp)
@@ -451,13 +450,13 @@ private fun EditAssetScaffold(
                         }
 
                         TransparentListItem(
-                            headlineText = {
+                            headlineContent = {
                                 Text(
                                     text = stringResource(id = R.string.invisible_asset),
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
                             },
-                            supportingText = {
+                            supportingContent = {
                                 Text(
                                     text = stringResource(id = R.string.invisible_asset_hint),
                                     modifier = Modifier.padding(start = 16.dp)

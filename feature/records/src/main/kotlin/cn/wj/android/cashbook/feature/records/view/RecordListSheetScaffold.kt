@@ -76,8 +76,6 @@ internal fun RecordListSheetScaffold(
         }
     }
 
-
-
     ModalBottomSheetLayout(
         modifier = modifier,
         sheetState = sheetState,
@@ -151,7 +149,7 @@ internal fun RecordDetailsSheet(
 
                     // 金额
                     TransparentListItem(
-                        headlineText = { Text(text = stringResource(id = R.string.amount)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.amount)) },
                         trailingContent = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -187,7 +185,7 @@ internal fun RecordDetailsSheet(
                     if (recordEntity.charges.toDoubleOrZero() > 0.0) {
                         // 手续费
                         TransparentListItem(
-                            headlineText = { Text(text = stringResource(id = R.string.charges)) },
+                            headlineContent = { Text(text = stringResource(id = R.string.charges)) },
                             trailingContent = {
                                 Text(
                                     text = "-${recordEntity.charges}".withCNY(),
@@ -201,7 +199,7 @@ internal fun RecordDetailsSheet(
                     if (recordEntity.typeCategory != RecordTypeCategoryEnum.INCOME && recordEntity.concessions.toDoubleOrZero() > 0.0) {
                         // 优惠
                         TransparentListItem(
-                            headlineText = { Text(text = stringResource(id = R.string.concessions)) },
+                            headlineContent = { Text(text = stringResource(id = R.string.concessions)) },
                             trailingContent = {
                                 Text(
                                     text = "+${recordEntity.concessions.withCNY()}",
@@ -214,7 +212,7 @@ internal fun RecordDetailsSheet(
 
                     // 类型
                     TransparentListItem(
-                        headlineText = { Text(text = stringResource(id = R.string.type)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.type)) },
                         trailingContent = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
@@ -237,7 +235,7 @@ internal fun RecordDetailsSheet(
                     recordEntity.assetName?.let { assetName ->
                         // 资产
                         TransparentListItem(
-                            headlineText = { Text(text = stringResource(id = R.string.asset)) },
+                            headlineContent = { Text(text = stringResource(id = R.string.asset)) },
                             trailingContent = {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
@@ -278,7 +276,7 @@ internal fun RecordDetailsSheet(
                     if (recordEntity.relatedTags.isNotEmpty()) {
                         // 标签
                         TransparentListItem(
-                            headlineText = { Text(text = stringResource(id = R.string.tags)) },
+                            headlineContent = { Text(text = stringResource(id = R.string.tags)) },
                             trailingContent = {
                                 val tagsText = with(StringBuilder()) {
                                     recordEntity.relatedTags.forEach { tag ->
@@ -311,7 +309,7 @@ internal fun RecordDetailsSheet(
                     if (recordEntity.remark.isNotBlank()) {
                         // 备注
                         TransparentListItem(
-                            headlineText = { Text(text = stringResource(id = R.string.remark)) },
+                            headlineContent = { Text(text = stringResource(id = R.string.remark)) },
                             trailingContent = {
                                 Text(
                                     text = recordEntity.remark,
@@ -323,7 +321,7 @@ internal fun RecordDetailsSheet(
 
                     // 时间
                     TransparentListItem(
-                        headlineText = { Text(text = stringResource(id = R.string.time)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.time)) },
                         trailingContent = {
                             Text(
                                 text = recordEntity.recordTime,

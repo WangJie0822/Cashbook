@@ -236,7 +236,7 @@ internal fun SettingContent(
             item {
                 TransparentListItem(
                     modifier = Modifier.padding(top = 16.dp),
-                    headlineText = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
+                    headlineContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
                     trailingContent = {
                         Switch(
                             checked = uiState.mobileNetworkDownloadEnable,
@@ -249,7 +249,7 @@ internal fun SettingContent(
             item {
                 TransparentListItem(
                     modifier = Modifier.padding(top = 16.dp),
-                    headlineText = { Text(text = stringResource(id = R.string.need_security_verification_when_launch)) },
+                    headlineContent = { Text(text = stringResource(id = R.string.need_security_verification_when_launch)) },
                     trailingContent = {
                         Switch(
                             checked = uiState.needSecurityVerificationWhenLaunch,
@@ -267,7 +267,7 @@ internal fun SettingContent(
                     TransparentListItem(
                         modifier = Modifier
                             .clickable { onVerificationModeClick.invoke() },
-                        headlineText = { Text(text = stringResource(id = R.string.verification_mode)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.verification_mode)) },
                         trailingContent = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -288,7 +288,7 @@ internal fun SettingContent(
                 }
                 if (uiState.needSecurityVerificationWhenLaunch && hasFingerprint) {
                     TransparentListItem(
-                        headlineText = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
                         trailingContent = {
                             Switch(
                                 checked = uiState.enableFingerprintVerification,
@@ -299,7 +299,7 @@ internal fun SettingContent(
                 }
                 TransparentListItem(
                     modifier = Modifier.clickable { onPasswordClick.invoke() },
-                    headlineText = {
+                    headlineContent = {
                         if (uiState.hasPassword) {
                             Text(text = stringResource(id = R.string.modify_password))
                         } else {
@@ -310,7 +310,7 @@ internal fun SettingContent(
                 if (uiState.hasPassword) {
                     TransparentListItem(
                         modifier = Modifier.clickable { onClearPasswordClick.invoke() },
-                        headlineText = { Text(text = stringResource(id = R.string.clear_password)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.clear_password)) },
                     )
                 }
                 Divider(modifier = Modifier.padding(horizontal = 8.dp))
@@ -328,7 +328,7 @@ internal fun SettingContent(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onDarkModeClick.invoke() },
-                    headlineText = { Text(text = stringResource(id = R.string.dark_mode)) },
+                    headlineContent = { Text(text = stringResource(id = R.string.dark_mode)) },
                     trailingContent = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -349,8 +349,8 @@ internal fun SettingContent(
                 if (supportsDynamicTheming()) {
                     TransparentListItem(
                         modifier = Modifier.clickable { onDynamicColorClick.invoke() },
-                        headlineText = { Text(text = stringResource(id = R.string.dynamic_color)) },
-                        supportingText = { Text(text = stringResource(id = R.string.dynamic_color_hint)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.dynamic_color)) },
+                        supportingContent = { Text(text = stringResource(id = R.string.dynamic_color_hint)) },
                         trailingContent = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -377,7 +377,7 @@ internal fun SettingContent(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onBackupAndRecoveryClick.invoke() },
-                    headlineText = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
+                    headlineContent = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
                     trailingContent = {
                         Icon(
                             imageVector = CashbookIcons.KeyboardArrowRight,

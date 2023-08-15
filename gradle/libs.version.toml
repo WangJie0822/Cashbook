@@ -6,7 +6,7 @@ junit = "4.13.2"
 jacoco = "0.8.10"
 
 # kotlin [指南](https://kotlinlang.org/)
-kotlin = "1.8.10"
+kotlin = "1.9.0"
 
 # Kotlinx
 # 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html) [Github](https://github.com/Kotlin/kotlinx.coroutines)
@@ -26,18 +26,19 @@ google-gson = "2.10.1"
 # accompanist 组件库 [指南](https://google.github.io/accompanist/)
 google-accompanist = "0.30.1"
 # ksp 前缀版本需要和kotlin版本兼容 [Github](https://github.com/google/ksp)
-google-devtools-ksp = "1.8.10-1.0.9"
+google-devtools-ksp = "1.9.0-1.0.13"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
-google-protobuf = "3.23.0"
-google-protobuf-plugin = "0.9.3"
+google-protobuf = "3.24.0"
+google-protobuf-plugin = "0.9.4"
 # hilt [指南](https://dagger.dev/hilt)
-google-hilt = "2.46.1"
+google-hilt = "2.47"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
 androidx-hilt = "1.0.0"
 
-android-desugarJdkLibs = "2.0.2"
+# 脱糖
+android-desugarJdkLibs = "2.0.3"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
-android-gradle-plugin = "8.0.1"
+android-gradle-plugin = "8.1.0"
 
 # Androidx
 # legacy [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/legacy?hl=zh-cn)
@@ -56,22 +57,22 @@ androidx-constraintlayout-compose = "1.0.1"
 # multidex 分包 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/multidex?hl=zh-cn)
 androidx-multidex = "2.0.1"
 # core 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/core?hl=zh-cn)
-androidx-core = "1.9.0"
+androidx-core = "1.10.1"
 androidx-core-splashscreen = "1.0.0"
 # Compose 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/compose?hl=zh-cn)
-androidx-compose-bom = "2023.04.00"
+androidx-compose-bom = "2023.08.00"
 # Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin?hl=zh-cn)
-androidx-compose-compiler = "1.4.3"
+androidx-compose-compiler = "1.5.0"
 # activity 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/activity?hl=zh-cn)
-androidx-activity = "1.7.0"
+androidx-activity = "1.7.2"
 # Fragment 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/fragment?hl=zh-cn)
-androidx-fragment = "1.5.6"
+androidx-fragment = "1.6.1"
 # 生命周期相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/lifecycle?hl=zh-cn)
 androidx-lifecycle = "2.6.1"
 # Room 数据库相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/room?hl=zh-cn)
-androidx-room = "2.5.1"
+androidx-room = "2.5.2"
 # Paging 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/paging?hl=zh-cn)
-androidx-paging = "3.2.0-rc01"
+androidx-paging = "3.2.0"
 # Navigation 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
 androidx-navigation = "2.6.0"
 # WorkManager 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/work?hl=zh-cn)

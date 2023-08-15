@@ -350,16 +350,16 @@ internal fun BackupAndRecoveryScaffoldContent(
         )
 
         TransparentListItem(
-            headlineText = { Text(text = stringResource(id = R.string.backup_path)) },
-            supportingText = { Text(text = uiState.backupPath.ifBlank { stringResource(id = R.string.click_to_select_backup_path) }) },
+            headlineContent = { Text(text = stringResource(id = R.string.backup_path)) },
+            supportingContent = { Text(text = uiState.backupPath.ifBlank { stringResource(id = R.string.click_to_select_backup_path) }) },
             modifier = Modifier.clickable {
                 onSelectDirCallback = onSaveBackupPath
                 selectDirLauncher.launch(null)
             },
         )
         TransparentListItem(
-            headlineText = { Text(text = stringResource(id = R.string.backup)) },
-            supportingText = { Text(text = stringResource(id = R.string.backup_hint)) },
+            headlineContent = { Text(text = stringResource(id = R.string.backup)) },
+            supportingContent = { Text(text = stringResource(id = R.string.backup_hint)) },
             modifier = Modifier.clickable {
                 if (uiState.backupPath.isBlank()) {
                     // 未设置备份路径，选择备份路径后进行备份
@@ -378,8 +378,8 @@ internal fun BackupAndRecoveryScaffoldContent(
                 mutableStateOf(false)
             }
             TransparentListItem(
-                headlineText = { Text(text = stringResource(id = R.string.recovery)) },
-                supportingText = { Text(text = stringResource(id = R.string.recovery_hint)) },
+                headlineContent = { Text(text = stringResource(id = R.string.recovery)) },
+                supportingContent = { Text(text = stringResource(id = R.string.recovery_hint)) },
                 modifier = Modifier.combinedClickable(onClick = {
                     onRecoveryClick(false, "")
                 }, onLongClick = {
@@ -418,8 +418,8 @@ internal fun BackupAndRecoveryScaffoldContent(
         }
 
         TransparentListItem(
-            headlineText = { Text(text = stringResource(id = R.string.auto_backup)) },
-            supportingText = {
+            headlineContent = { Text(text = stringResource(id = R.string.auto_backup)) },
+            supportingContent = {
                 Text(
                     text = stringResource(
                         id = when (uiState.autoBackup) {

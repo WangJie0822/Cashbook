@@ -258,8 +258,8 @@ internal fun AboutUsScreen(
                     )
                     // 数据源
                     TransparentListItem(
-                        headlineText = { Text(text = stringResource(id = R.string.switch_data_source)) },
-                        supportingText = { Text(text = stringResource(id = R.string.data_source_hint)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.switch_data_source)) },
+                        supportingContent = { Text(text = stringResource(id = R.string.data_source_hint)) },
                         trailingContent = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -284,7 +284,7 @@ internal fun AboutUsScreen(
                     )
                     // 自动检查更新
                     TransparentListItem(
-                        headlineText = { Text(text = stringResource(id = R.string.auto_check_update)) },
+                        headlineContent = { Text(text = stringResource(id = R.string.auto_check_update)) },
                         trailingContent = {
                             Switch(
                                 checked = uiState.autoCheckUpdate,
@@ -306,7 +306,7 @@ internal fun AboutUsScreen(
                     }
                     TransparentListItem(
                         modifier = checkUpdateModifier,
-                        headlineText = {
+                        headlineContent = {
                             Text(
                                 text = stringResource(id = R.string.check_update),
                                 color = textColor,
@@ -316,7 +316,7 @@ internal fun AboutUsScreen(
                     // 版本信息
                     TransparentListItem(
                         modifier = Modifier.clickable { onVersionInfoClick.invoke() },
-                        headlineText = {
+                        headlineContent = {
                             Text(text = stringResource(id = R.string.version_info))
                         },
                         trailingContent = {
@@ -339,7 +339,7 @@ internal fun AboutUsScreen(
                     // 用户协议和隐私政策
                     TransparentListItem(
                         modifier = Modifier.clickable { onUserAgreementAndPrivacyPolicyClick.invoke() },
-                        headlineText = {
+                        headlineContent = {
                             Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy))
                         },
                         trailingContent = {

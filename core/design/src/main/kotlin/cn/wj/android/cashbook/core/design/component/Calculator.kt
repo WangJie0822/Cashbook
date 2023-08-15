@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +27,6 @@ import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.util.CalculatorUtils
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String) -> Unit) {
     var text: String by remember { mutableStateOf(defaultText.ifBlank { "0" }) }
@@ -41,7 +39,7 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
             value = text,
             onValueChange = { text = it },
             readOnly = true,
-            colors = TextFieldDefaults.outlinedTextFieldColors(textColor = primaryColor),
+            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = primaryColor),
             modifier = Modifier.fillMaxWidth(),
         )
 

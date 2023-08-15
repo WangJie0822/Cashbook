@@ -15,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheetState
 import androidx.compose.material3.ModalBottomSheetValue
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -23,7 +24,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -155,7 +155,6 @@ internal fun EditRecordRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordScreen(
     dialogState: DialogState,
@@ -429,7 +428,7 @@ private fun EditRecordScaffoldContent(
                             CompatTextField(
                                 textFieldState = remarkTextState,
                                 label = { Text(text = stringResource(id = R.string.remark)) },
-                                colors = TextFieldDefaults.outlinedTextFieldColors(),
+                                colors = OutlinedTextFieldDefaults.colors(),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 8.dp),
@@ -516,23 +515,6 @@ private fun EditRecordScaffoldContent(
                                 }
 
                                 // TODO 关联的支出记录
-//                                if (selectedTypeCategory == RecordTypeCategoryEnum.INCOME/* FIXME && selectedType?.needRelated == true*/) {
-//                                if (relatedRecordList.isEmpty()) {
-//                                    FilterChip(
-//                                        selected = false,
-//                                        onClick = onSelectRelatedRecordClick,
-//                                        label = { Text(text = stringResource(id = R.string.related_record)) },
-//                                    )
-//                                } else {
-//                                    relatedRecordList.forEach {
-//                                        FilterChip(
-//                                            selected = true,
-//                                            onClick = { /*TODO*/ },
-//                                            label = { Text(text = it.value) },
-//                                        )
-//                                    }
-//                                }
-//                                }
                             }
                         }
                     },
@@ -628,7 +610,7 @@ internal fun EditRecordTopBar(
         ),
     )
     TopAppBar(
-        colors = TopAppBarDefaults.smallTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             navigationIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
         ),

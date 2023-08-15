@@ -116,6 +116,7 @@ internal fun LauncherContentRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherContentScreen(
     // 删除失败提示
@@ -390,7 +391,7 @@ internal fun LauncherTopBar(
     onMyAssetClick: () -> Unit,
 ) {
     TopAppBar(
-        colors = TopAppBarDefaults.smallTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
         ),
         title = {
@@ -449,7 +450,7 @@ internal fun RecordListItem(
                 contentDescription = null
             )
         },
-        headlineText = {
+        headlineContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = recordViewsEntity.typeName)
                 val tags = recordViewsEntity.relatedTags
@@ -482,7 +483,7 @@ internal fun RecordListItem(
                 }
             }
         },
-        supportingText = {
+        supportingContent = {
             Text(
                 text = "${
                     recordViewsEntity.recordTime.split(" ").first()

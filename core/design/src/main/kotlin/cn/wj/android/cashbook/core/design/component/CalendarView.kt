@@ -101,7 +101,12 @@ fun CalendarView(
         if (initialPage < 0) {
             initialPage = 0
         }
-        val pagerState = rememberPagerState(initialPage = initialPage)
+        val pagerState = rememberPagerState(
+            initialPage = initialPage,
+            initialPageOffsetFraction = 0f,
+            pageCount = {
+                yearMonthList.size
+            })
         var scrollDate: YearMonth? by remember {
             mutableStateOf(YearMonth.of(selectDate.year, selectDate.monthValue))
         }
@@ -134,7 +139,6 @@ fun CalendarView(
         HorizontalPager(
             modifier = Modifier.fillMaxWidth(),
             state = pagerState,
-            pageCount = yearMonthList.size,
         ) {
             MonthView(
                 yearMonth = yearMonthList[it],

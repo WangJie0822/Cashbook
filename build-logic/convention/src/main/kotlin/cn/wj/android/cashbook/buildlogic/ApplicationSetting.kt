@@ -11,7 +11,7 @@ import org.gradle.api.Project
 object ApplicationSetting {
 
     object Config {
-        const val compileSdk = 33
+        const val compileSdk = 34
         const val minSdk = 23
         const val targetSdk = 30
         val versionCode = generateVersionCode()

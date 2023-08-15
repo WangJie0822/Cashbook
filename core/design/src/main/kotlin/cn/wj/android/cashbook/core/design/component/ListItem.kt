@@ -17,10 +17,10 @@ import androidx.compose.ui.unit.Dp
 @Composable
 @ExperimentalMaterial3Api
 fun TransparentListItem(
-    headlineText: @Composable () -> Unit,
+    headlineContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    overlineText: @Composable (() -> Unit)? = null,
-    supportingText: @Composable (() -> Unit)? = null,
+    overlineContent: @Composable (() -> Unit)? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
     leadingContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
     colors: ListItemColors = ListItemDefaults.colors(containerColor = Color.Transparent),
@@ -28,10 +28,10 @@ fun TransparentListItem(
     shadowElevation: Dp = ListItemDefaults.Elevation,
 ) {
     ListItem(
-        headlineText = headlineText,
+        headlineContent = headlineContent,
         modifier = modifier,
-        overlineText = overlineText,
-        supportingText = supportingText,
+        overlineContent = overlineContent,
+        supportingContent = supportingContent,
         leadingContent = leadingContent,
         trailingContent = trailingContent,
         colors = colors,
