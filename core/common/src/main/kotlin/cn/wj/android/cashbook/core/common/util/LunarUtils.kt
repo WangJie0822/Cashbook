@@ -99,21 +99,6 @@ object LunarUtils {
         }?.replace(dateText, "")
     }
 
-    private val solarTerms: MutableMap<Int, Array<String?>> by lazy {
-        mutableMapOf()
-    }
-
-    private fun getSolarTerms(date: LunarDate): String? {
-        if (!solarTerms.containsKey(date.year)) {
-            solarTerms[date.year] = SolarTermUtil.getSolarTerms(date.year)
-        }
-        val solarTerm: Array<String?> = solarTerms[date.year]!!
-        val dateText = dateToString(date.year, date.month, date.day)
-        return solarTerm.firstOrNull {
-            it?.contains(dateText) == true
-        }?.replace(dateText, "")
-    }
-
     private fun getChineseDate(date: LunarDate): String {
         return if (date.day == 1) {
             if (date.leapMonth) {
@@ -198,8 +183,8 @@ object LunarUtils {
      */
     fun getLunarTextWithFestival(date: LocalDate): String {
         val lunarDate = solarToLunar(date)
-        return getTraditionFestival(lunarDate) ?: getSolarTerms(lunarDate)
-        ?: getSpecialFestival(date) ?: getGregorianFestival(date) ?: getChineseDate(lunarDate)
+        return getTraditionFestival(lunarDate) ?: getSpecialFestival(date)
+        ?: getGregorianFestival(date) ?: getChineseDate(lunarDate)
     }
 }
 
