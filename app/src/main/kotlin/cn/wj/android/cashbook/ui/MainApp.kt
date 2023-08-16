@@ -110,6 +110,16 @@ fun CashbookNavHost(
             onShowSnackbar = onShowSnackbar,
             content = { openDrawer ->
                 LauncherContent(
+                    recordDetailSheetContent = { recordEntity, onRecordItemDeleteClick, dismissBottomSheet ->
+                        RecordDetailSheetContent(
+                            recordEntity = recordEntity,
+                            onRecordItemEditClick = { recordId ->
+                                navController.naviToEditRecord(recordId)
+                                dismissBottomSheet()
+                            },
+                            onRecordItemDeleteClick = onRecordItemDeleteClick,
+                        )
+                    },
                     onEditRecordClick = navController::naviToEditRecord,
                     onMenuClick = openDrawer,
                     onSearchClick = { /* TODO */ },
@@ -188,7 +198,16 @@ fun CashbookNavHost(
 //        )
         // 日历
         calendarScreen(
-            onRecordItemEditClick = navController::naviToEditRecord,
+            recordDetailSheetContent = { recordEntity, onRecordItemDeleteClick, dismissBottomSheet ->
+                RecordDetailSheetContent(
+                    recordEntity = recordEntity,
+                    onRecordItemEditClick = { recordId ->
+                        navController.naviToEditRecord(recordId)
+                        dismissBottomSheet()
+                    },
+                    onRecordItemDeleteClick = onRecordItemDeleteClick,
+                )
+            },
             onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
         )

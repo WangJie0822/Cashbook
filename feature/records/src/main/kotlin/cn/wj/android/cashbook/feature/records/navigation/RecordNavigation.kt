@@ -124,13 +124,13 @@ fun NavGraphBuilder.selectRelatedRecordScreen(
 }
 
 fun NavGraphBuilder.calendarScreen(
-    onRecordItemEditClick: (Long) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     composable(route = ROUTE_RECORD_CALENDAR) {
         CalendarRoute(
-            onRecordItemEditClick = onRecordItemEditClick,
+            recordDetailSheetContent = recordDetailSheetContent,
             onBackClick = onBackClick,
             onShowSnackbar = onShowSnackbar,
         )
@@ -139,6 +139,7 @@ fun NavGraphBuilder.calendarScreen(
 
 @Composable
 fun LauncherContent(
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
     onEditRecordClick: (Long) -> Unit,
     onMenuClick: () -> Unit,
     onSearchClick: () -> Unit,
@@ -147,6 +148,7 @@ fun LauncherContent(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     LauncherContentRoute(
+        recordDetailSheetContent = recordDetailSheetContent,
         onEditRecordClick = onEditRecordClick,
         onMenuClick = onMenuClick,
         onSearchClick = onSearchClick,

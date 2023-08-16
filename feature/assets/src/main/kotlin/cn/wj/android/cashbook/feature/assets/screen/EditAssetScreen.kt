@@ -21,15 +21,12 @@ import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetLayout
-import androidx.compose.material3.ModalBottomSheetState
-import androidx.compose.material3.ModalBottomSheetValue
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -48,6 +45,7 @@ import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CommonDivider
@@ -59,7 +57,6 @@ import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -98,6 +95,7 @@ internal fun EditAssetRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditAssetScreen(
     isCreate: Boolean,
@@ -115,75 +113,7 @@ internal fun EditAssetScreen(
     onSaveClick: (String, String, String, String, String, String, () -> Unit) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = {
-            if (it == ModalBottomSheetValue.Hidden) {
-                onBottomSheetDismiss.invoke()
-            }
-            true
-        }),
 ) {
-
-    // Sheet 显示时返回隐藏
-    if (sheetState.isVisible) {
-        BackPressHandler {
-            onBottomSheetDismiss.invoke()
-        }
-    }
-
-    // 显示 Sheet
-    LaunchedEffect(bottomSheet) {
-        if (EditAssetBottomSheetEnum.DISMISS == bottomSheet) {
-            sheetState.hide()
-        } else {
-            sheetState.show()
-        }
-    }
-
-    ModalBottomSheetLayout(
-        modifier = modifier,
-        sheetState = sheetState,
-        sheetContent = {
-            EditAssetSheetContent(
-                bottomSheet = bottomSheet,
-                onClassificationChange = onClassificationChange,
-            )
-        },
-        content = {
-            EditAssetScaffold(
-                isCreate = isCreate,
-                uiState = uiState,
-                onBackClick = onBackClick,
-                onSaveClick = onSaveClick,
-                dialogState = dialogState,
-                onDialogDismiss = onDialogDismiss,
-                onDaySelect = onDaySelect,
-                onSelectClassificationClick = onSelectClassificationClick,
-                onBillingDateClick = onBillingDateClick,
-                onRepaymentDateClick = onRepaymentDateClick,
-                onInvisibleChange = onInvisibleChange,
-            )
-        },
-    )
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun EditAssetScaffold(
-    isCreate: Boolean,
-    uiState: EditAssetUiState,
-    onBackClick: () -> Unit,
-    onSaveClick: (String, String, String, String, String, String, () -> Unit) -> Unit,
-    dialogState: DialogState,
-    onDialogDismiss: () -> Unit,
-    onDaySelect: (String) -> Unit,
-    onSelectClassificationClick: () -> Unit,
-    onBillingDateClick: () -> Unit,
-    onRepaymentDateClick: () -> Unit,
-    onInvisibleChange: (Boolean) -> Unit
-) {
-
     // 标记 - 是否有银行信息
     val hasBankInfo = uiState.classification.hasBankInfo
 
@@ -230,6 +160,7 @@ private fun EditAssetScaffold(
     }
 
     CashbookScaffold(
+        modifier = modifier,
         topBar = {
             CashbookTopAppBar(
                 onBackClick = onBackClick,
@@ -263,6 +194,26 @@ private fun EditAssetScaffold(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
+            if (bottomSheet != EditAssetBottomSheetEnum.DISMISS) {
+                CashbookModalBottomSheet(
+                    onDismissRequest = onBottomSheetDismiss,
+                    sheetState = rememberModalBottomSheetState(
+                        confirmValueChange = {
+                            if (it == SheetValue.Hidden) {
+                                onBottomSheetDismiss()
+                            }
+                            true
+                        },
+                    ),
+                    content = {
+                        EditAssetSheetContent(
+                            bottomSheet = bottomSheet,
+                            onClassificationChange = onClassificationChange,
+                        )
+                    },
+                )
+            }
+
             if (dialogState != DialogState.Dismiss) {
                 SelectDayDialog(
                     onDismiss = onDialogDismiss,

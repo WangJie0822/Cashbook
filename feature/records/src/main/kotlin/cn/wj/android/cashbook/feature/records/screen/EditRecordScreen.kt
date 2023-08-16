@@ -7,15 +7,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetState
-import androidx.compose.material3.ModalBottomSheetValue
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -42,8 +43,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.Calculator
-import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.component.DatePickerDialog
 import cn.wj.android.cashbook.core.design.component.Loading
@@ -54,7 +56,6 @@ import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -155,6 +156,7 @@ internal fun EditRecordRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordScreen(
     dialogState: DialogState,
@@ -208,14 +210,6 @@ internal fun EditRecordScreen(
     onReimbursableClick: () -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = { value ->
-            if (value == ModalBottomSheetValue.Hidden) {
-                dismissBottomSheet()
-            }
-            true
-        }),
     snackbarHostState: SnackbarHostState = rememberSnackbarHostState(),
 ) {
 
@@ -238,21 +232,6 @@ internal fun EditRecordScreen(
         }
     }
 
-    // sheet 状态
-    if (sheetState.isVisible) {
-        // sheet 显示时，返回隐藏 sheet
-        BackPressHandler {
-            dismissBottomSheet()
-        }
-    }
-    LaunchedEffect(bottomSheetType) {
-        if (bottomSheetType == EditRecordBottomSheetEnum.NONE) {
-            sheetState.hide()
-        } else {
-            sheetState.show()
-        }
-    }
-
     // 主色调
     val primaryColor = when (selectedTypeCategory) {
         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
@@ -260,9 +239,8 @@ internal fun EditRecordScreen(
         RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
     }
 
-    CashbookBottomSheetScaffold(
+    CashbookScaffold(
         modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             EditRecordTopBar(
                 uiState = uiState,
@@ -271,6 +249,7 @@ internal fun EditRecordScreen(
                 onBackClick = onBackClick,
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (uiState is EditRecordUiState.Success) {
                 CashbookFloatingActionButton(
@@ -281,24 +260,44 @@ internal fun EditRecordScreen(
                 )
             }
         },
-        sheetState = sheetState,
-        sheetContent = {
-            EditRecordBottomSheetContent(
-                bottomSheetType,
-                uiState,
-                primaryColor,
-                onAmountChange,
-                onChargesChange,
-                onConcessionsChange,
-                selectAssetBottomSheetContent,
-                selectRelatedAssetBottomSheetContent,
-                selectTagBottomSheetContent
-            )
-        },
         content = { paddingValues ->
             Box(
                 modifier = Modifier.padding(paddingValues),
             ) {
+                if (bottomSheetType != EditRecordBottomSheetEnum.NONE) {
+                    CashbookModalBottomSheet(
+                        onDismissRequest = dismissBottomSheet,
+                        sheetState = rememberModalBottomSheetState(
+                            confirmValueChange = {
+                                if (it == SheetValue.Hidden) {
+                                    dismissBottomSheet()
+                                }
+                                true
+                            }
+                        ),
+                        dragHandle = if (bottomSheetType.isCalculator) {
+                            null
+                        } else {
+                            @Composable {
+                                BottomSheetDefaults.DragHandle(modifier = Modifier.statusBarsPadding())
+                            }
+                        },
+                        content = {
+                            EditRecordBottomSheetContent(
+                                bottomSheetType,
+                                uiState,
+                                primaryColor,
+                                onAmountChange,
+                                onChargesChange,
+                                onConcessionsChange,
+                                selectAssetBottomSheetContent,
+                                selectRelatedAssetBottomSheetContent,
+                                selectTagBottomSheetContent
+                            )
+                        },
+                    )
+                }
+
                 ((dialogState as? DialogState.Shown<*>)?.data as? DateTimePickerModel)?.let { model ->
                     when (model) {
                         is DateTimePickerModel.DatePicker -> {
@@ -537,9 +536,7 @@ private fun EditRecordBottomSheetContent(
     selectTagBottomSheetContent: @Composable () -> Unit
 ) {
     when (bottomSheetType) {
-
         EditRecordBottomSheetEnum.AMOUNT -> {
-
             (uiState as? EditRecordUiState.Success)?.let { data ->
                 Calculator(
                     defaultText = data.amountText,

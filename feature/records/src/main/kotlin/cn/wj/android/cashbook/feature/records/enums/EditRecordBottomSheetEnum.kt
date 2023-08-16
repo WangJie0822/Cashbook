@@ -27,4 +27,8 @@ enum class EditRecordBottomSheetEnum {
 
     /** 标签 */
     TAGS,
+    ;
+
+    val isCalculator: Boolean
+        get() = this == AMOUNT || this == CHARGES || this == CONCESSIONS
 }

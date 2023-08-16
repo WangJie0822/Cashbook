@@ -14,8 +14,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +36,8 @@ import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.design.component.CalendarView
+import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
@@ -44,7 +48,6 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialog
 import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
-import cn.wj.android.cashbook.feature.records.view.RecordListSheetScaffold
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.DialogType
@@ -53,7 +56,7 @@ import java.time.LocalDate
 
 @Composable
 internal fun CalendarRoute(
-    onRecordItemEditClick: (Long) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -73,10 +76,15 @@ internal fun CalendarRoute(
         onDialogDismiss = viewModel::onDialogDismiss,
         onDateSelected = viewModel::onDateSelected,
         onRecordItemClick = viewModel::onRecordItemClick,
+        recordDetailSheetContent = { record ->
+            recordDetailSheetContent(
+                recordInfo = record,
+                onRecordDeleteClick = viewModel::onRecordItemDeleteClick,
+                dismissBottomSheet = viewModel::onSheetDismiss,
+            )
+        },
         sheetViewData = viewModel.viewRecord,
         onSheetDismiss = viewModel::onSheetDismiss,
-        onRecordItemEditClick = onRecordItemEditClick,
-        onRecordItemDeleteClick = viewModel::onRecordItemDeleteClick,
         onDeleteRecordConfirm = viewModel::onDeleteRecordConfirm,
         onBackClick = onBackClick,
         onShowSnackbar = onShowSnackbar,
@@ -96,10 +104,9 @@ internal fun CalendarScreen(
     onDialogDismiss: () -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     sheetViewData: RecordViewsEntity?,
     onSheetDismiss: () -> Unit,
-    onRecordItemEditClick: (Long) -> Unit,
-    onRecordItemDeleteClick: (Long) -> Unit,
     onDeleteRecordConfirm: (Long) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
@@ -119,27 +126,37 @@ internal fun CalendarScreen(
         }
     }
 
-    RecordListSheetScaffold(
+    CashbookScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
-                onBackClick = onBackClick,
-                title = {
-                    Text(
-                        text = "${selectedDate.year}-${selectedDate.monthValue.completeZero()}",
-                        modifier = Modifier
-                            .clickable(onClick = onDateClick)
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                    )
-                }
-            )
+            CashbookTopAppBar(onBackClick = onBackClick, title = {
+                Text(
+                    text = "${selectedDate.year}-${selectedDate.monthValue.completeZero()}",
+                    modifier = Modifier
+                        .clickable(onClick = onDateClick)
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                )
+            })
         },
-        sheetViewData = sheetViewData,
-        onRecordItemEditClick = onRecordItemEditClick,
-        onRecordItemDeleteClick = onRecordItemDeleteClick,
-        onSheetDismiss = onSheetDismiss,
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
+            if (null != sheetViewData) {
+                CashbookModalBottomSheet(
+                    onDismissRequest = onSheetDismiss,
+                    sheetState = rememberModalBottomSheetState(
+                        confirmValueChange = {
+                            if (it == SheetValue.Hidden) {
+                                onSheetDismiss()
+                            }
+                            true
+                        },
+                    ),
+                    content = {
+                        recordDetailSheetContent(sheetViewData)
+                    },
+                )
+            }
+
             (dialogState as? DialogState.Shown<*>)?.let {
                 when (val dialogType = it.data as? DialogType) {
                     is DialogType.DeleteRecord -> {
@@ -188,8 +205,7 @@ internal fun CalendarScreen(
                                                     fontSize = 8.sp
                                                 ),
                                                 modifier = Modifier.padding(
-                                                    start = 4.dp,
-                                                    top = 4.dp
+                                                    start = 4.dp, top = 4.dp
                                                 ),
                                             )
                                         }
@@ -315,10 +331,8 @@ internal fun CalendarScreen(
 @Composable
 private fun CalendarPreview() {
     PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)) {
-        CalendarRoute(
-            onRecordItemEditClick = {},
+        CalendarRoute(recordDetailSheetContent = { _, _, _ -> },
             onBackClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed }
-        )
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed })
     }
 }

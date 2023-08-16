@@ -3,21 +3,15 @@ package cn.wj.android.cashbook.feature.records.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetLayout
-import androidx.compose.material3.ModalBottomSheetState
-import androidx.compose.material3.ModalBottomSheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,8 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookBackground
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
@@ -35,67 +28,7 @@ import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun RecordListSheetScaffold(
-    sheetViewData: RecordViewsEntity?,
-    onRecordItemEditClick: (Long) -> Unit,
-    onRecordItemDeleteClick: (Long) -> Unit,
-    onSheetDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit = {},
-    floatingActionButton: @Composable () -> Unit = {},
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = { value ->
-            if (value == ModalBottomSheetValue.Hidden) {
-                onSheetDismiss()
-            }
-            true
-        }),
-    content: @Composable (PaddingValues) -> Unit,
-) {
-
-    if (sheetState.isVisible) {
-        // sheet 显示时，返回隐藏 sheet
-        BackPressHandler {
-            onSheetDismiss()
-        }
-    }
-
-    // 显示数据不为空时，显示详情 sheet
-    LaunchedEffect(sheetViewData) {
-        if (null != sheetViewData) {
-            // 显示详情弹窗
-            sheetState.show()
-        } else {
-            sheetState.hide()
-        }
-    }
-
-    ModalBottomSheetLayout(
-        modifier = modifier,
-        sheetState = sheetState,
-        sheetContent = {
-            RecordDetailsSheet(
-                recordEntity = sheetViewData,
-                onRecordItemEditClick = onRecordItemEditClick,
-                onRecordItemDeleteClick = onRecordItemDeleteClick,
-            )
-        },
-        content = {
-            CashbookScaffold(
-                topBar = topBar,
-                floatingActionButton = floatingActionButton,
-                content = content,
-            )
-        },
-    )
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,13 +38,14 @@ internal fun RecordDetailsSheet(
     onRecordItemDeleteClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookGradientBackground {
+    CashbookBackground {
         Box(
             modifier = modifier.fillMaxWidth(),
         ) {
             if (null == recordEntity) {
                 // 无数据
                 Empty(
+                    modifier = Modifier.align(Alignment.TopCenter),
                     hintText = stringResource(id = R.string.no_record_data),
                 )
             } else {

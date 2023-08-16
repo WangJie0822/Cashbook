@@ -12,8 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetState
-import androidx.compose.material3.ModalBottomSheetValue
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -32,8 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.design.component.CashbookBottomSheetScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
@@ -41,7 +41,6 @@ import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.ResultModel
-import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -112,36 +111,10 @@ internal fun AssetInfoScreen(
     onBookmarkDismiss: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = {
-            if (it == ModalBottomSheetValue.Hidden) {
-                dismissBottomSheet()
-            }
-            true
-        }),
     snackbarHostState: SnackbarHostState = remember {
         SnackbarHostState()
     }
 ) {
-
-    if (sheetState.isVisible) {
-        // sheet 显示时，返回隐藏 sheet
-        BackPressHandler {
-            dismissBottomSheet.invoke()
-        }
-    }
-
-    // 显示数据不为空时，显示详情 sheet
-    LaunchedEffect(viewRecord) {
-        if (null != viewRecord) {
-            // 显示详情弹窗
-            sheetState.show()
-        } else {
-            sheetState.hide()
-        }
-    }
-
     // 提示
     val deleteFailedText = stringResource(id = R.string.delete_failed)
     LaunchedEffect(key1 = shouldDisplayBookmark, block = {
@@ -153,7 +126,7 @@ internal fun AssetInfoScreen(
         }
     })
 
-    CashbookBottomSheetScaffold(
+    CashbookScaffold(
         modifier = modifier,
         topBar = {
             CashbookTopAppBar(
@@ -181,18 +154,28 @@ internal fun AssetInfoScreen(
         snackbarHost = {
             SnackbarHost(snackbarHostState)
         },
-        sheetState = sheetState,
-        sheetContent = {
-            if (uiState is AssetInfoUiState.Success) {
-                recordDetailSheetContent.invoke(viewRecord)
-            }
-        },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize(),
             ) {
+                if (null != viewRecord) {
+                    CashbookModalBottomSheet(
+                        onDismissRequest = dismissBottomSheet,
+                        sheetState = rememberModalBottomSheetState(
+                            confirmValueChange = {
+                                if (it == SheetValue.Hidden) {
+                                    dismissBottomSheet()
+                                }
+                                true
+                            },
+                        ),
+                        content = {
+                            recordDetailSheetContent(viewRecord)
+                        },
+                    )
+                }
                 (dialogState as? DialogState.Shown<*>)?.let {
                     val recordId = it.data
                     if (recordId is Long) {

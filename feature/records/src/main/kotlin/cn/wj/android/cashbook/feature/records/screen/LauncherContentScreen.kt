@@ -25,11 +25,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBackdropScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +53,8 @@ import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
+import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
@@ -67,7 +71,6 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialog
 import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
-import cn.wj.android.cashbook.feature.records.view.RecordListSheetScaffold
 import cn.wj.android.cashbook.feature.records.viewmodel.DialogType
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
@@ -75,6 +78,7 @@ import java.time.YearMonth
 
 @Composable
 internal fun LauncherContentRoute(
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
     onEditRecordClick: (Long) -> Unit,
     onMenuClick: () -> Unit,
     onSearchClick: () -> Unit,
@@ -92,12 +96,14 @@ internal fun LauncherContentRoute(
         shouldDisplayDeleteFailedBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
         onBookmarkDismiss = viewModel::onBookmarkDismiss,
         onShowSnackbar = onShowSnackbar,
-        viewRecord = viewModel.viewRecord,
-        onRecordItemEditClick = {
-            viewModel.onSheetDismiss()
-            onEditRecordClick.invoke(it)
+        recordDetailSheetContent = { record ->
+            recordDetailSheetContent(
+                recordInfo = record,
+                onRecordDeleteClick = viewModel::onRecordItemDeleteClick,
+                dismissBottomSheet = viewModel::onSheetDismiss,
+            )
         },
-        onRecordItemDeleteClick = viewModel::onRecordItemDeleteClick,
+        viewRecord = viewModel.viewRecord,
         date = date,
         onMenuClick = onMenuClick,
         onDateClick = viewModel::showDateSelectDialog,
@@ -124,9 +130,8 @@ internal fun LauncherContentScreen(
     onBookmarkDismiss: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     // 记录详情
+    recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     viewRecord: RecordViewsEntity?,
-    onRecordItemEditClick: (Long) -> Unit,
-    onRecordItemDeleteClick: (Long) -> Unit,
     // 标题栏
     date: YearMonth,
     onMenuClick: () -> Unit,
@@ -162,7 +167,7 @@ internal fun LauncherContentScreen(
         }
     }
 
-    RecordListSheetScaffold(
+    CashbookScaffold(
         modifier = modifier,
         topBar = {
             LauncherTopBar(
@@ -179,12 +184,25 @@ internal fun LauncherContentScreen(
                 Icon(imageVector = CashbookIcons.Add, contentDescription = null)
             }
         },
-        sheetViewData = viewRecord,
-        onRecordItemEditClick = onRecordItemEditClick,
-        onRecordItemDeleteClick = onRecordItemDeleteClick,
-        onSheetDismiss = onSheetDismiss
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
+            if (null != viewRecord) {
+                CashbookModalBottomSheet(
+                    onDismissRequest = onSheetDismiss,
+                    sheetState = rememberModalBottomSheetState(
+                        confirmValueChange = {
+                            if (it == SheetValue.Hidden) {
+                                onSheetDismiss()
+                            }
+                            true
+                        },
+                    ),
+                    content = {
+                        recordDetailSheetContent(viewRecord)
+                    },
+                )
+            }
+
             when (uiState) {
                 LauncherContentUiState.Loading -> {
                     Loading(modifier = Modifier.align(Alignment.Center))
@@ -550,6 +568,7 @@ internal fun LauncherContentScreenPreview() {
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
     ) {
         LauncherContentRoute(
+            recordDetailSheetContent = { _, _, _ -> },
             onEditRecordClick = {},
             onMenuClick = {},
             onSearchClick = {},
