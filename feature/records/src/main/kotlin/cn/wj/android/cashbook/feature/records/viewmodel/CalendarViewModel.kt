@@ -6,12 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsMapUseCase
@@ -38,7 +36,6 @@ import kotlinx.coroutines.launch
 class CalendarViewModel @Inject constructor(
     getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
     getCurrentMonthRecordViewsMapUseCase: GetCurrentMonthRecordViewsMapUseCase,
-    private val deleteRecordUseCase: DeleteRecordUseCase,
 ) : ViewModel() {
 
     /** 删除记录失败错误信息 */
@@ -95,7 +92,7 @@ class CalendarViewModel @Inject constructor(
 
     fun showDateSelectDialog() {
         viewModelScope.launch {
-            dialogState = DialogState.Shown(DialogType.SelectDate(_dateData.first().yearMonth))
+            dialogState = DialogState.Shown(_dateData.first().yearMonth)
         }
     }
 
@@ -114,26 +111,6 @@ class CalendarViewModel @Inject constructor(
 
     fun onDialogDismiss() {
         dialogState = DialogState.Dismiss
-    }
-
-    fun onRecordItemDeleteClick(recordId: Long) {
-        onSheetDismiss()
-        dialogState = DialogState.Shown(DialogType.DeleteRecord(recordId))
-    }
-
-    fun onDeleteRecordConfirm(recordId: Long) {
-        viewModelScope.launch {
-            try {
-                deleteRecordUseCase(recordId)
-                // 删除成功，隐藏弹窗
-                onDialogDismiss()
-            } catch (throwable: Throwable) {
-                this@CalendarViewModel.logger()
-                    .e(throwable, "onDeleteRecordConfirm(recordId = <$recordId>) failed")
-                // 提示
-                shouldDisplayDeleteFailedBookmark = ResultModel.Failure.FAILURE_THROWABLE
-            }
-        }
     }
 
     fun onBookmarkDismiss() {

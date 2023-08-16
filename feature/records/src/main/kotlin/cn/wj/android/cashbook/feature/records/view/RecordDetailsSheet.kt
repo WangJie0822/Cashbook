@@ -12,6 +12,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,21 +32,40 @@ import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RecordDetailsSheet(
-    recordEntity: RecordViewsEntity?,
-    onRecordItemEditClick: (Long) -> Unit,
-    onRecordItemDeleteClick: (Long) -> Unit,
+    recordData: RecordViewsEntity?,
+    onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    var dialogState: DialogState by remember {
+        mutableStateOf(DialogState.Dismiss)
+    }
+
+    if (null != recordData && dialogState is DialogState.Shown<*>) {
+        ConfirmDeleteRecordDialogRoute(
+            recordId = recordData.id,
+            onResult = { result ->
+                if (result.isSuccess) {
+                    dialogState = DialogState.Dismiss
+                    onRequestDismissSheet()
+                }
+            },
+            onDialogDismiss = { dialogState = DialogState.Dismiss })
+    }
+
     CashbookBackground {
         Box(
             modifier = modifier.fillMaxWidth(),
         ) {
-            if (null == recordEntity) {
+            if (null == recordData) {
                 // 无数据
                 Empty(
                     modifier = Modifier.align(Alignment.TopCenter),
@@ -63,7 +86,10 @@ internal fun RecordDetailsSheet(
                             modifier = Modifier.weight(1f),
                         )
                         TextButton(
-                            onClick = { onRecordItemEditClick(recordEntity.id) },
+                            onClick = {
+                                onRequestNaviToEditRecord(recordData.id)
+                                onRequestDismissSheet()
+                            },
                         ) {
                             Text(
                                 text = stringResource(id = R.string.edit),
@@ -71,7 +97,7 @@ internal fun RecordDetailsSheet(
                             )
                         }
                         TextButton(
-                            onClick = { onRecordItemDeleteClick(recordEntity.id) },
+                            onClick = { dialogState = DialogState.Shown(0) },
                         ) {
                             Text(
                                 text = stringResource(id = R.string.delete),
@@ -88,9 +114,9 @@ internal fun RecordDetailsSheet(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                if (recordEntity.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && recordEntity.reimbursable) {
+                                if (recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && recordData.reimbursable) {
                                     // 支出类型，并且可报销
-                                    val text = if (recordEntity.relatedRecord.isEmpty()) {
+                                    val text = if (recordData.relatedRecord.isEmpty()) {
                                         // 未报销
                                         stringResource(id = R.string.reimbursable)
                                     } else {
@@ -104,8 +130,8 @@ internal fun RecordDetailsSheet(
                                     )
                                 }
                                 Text(
-                                    text = recordEntity.amount.withCNY(),
-                                    color = when (recordEntity.typeCategory) {
+                                    text = recordData.amount.withCNY(),
+                                    color = when (recordData.typeCategory) {
                                         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
                                         RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
                                         RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
@@ -116,13 +142,13 @@ internal fun RecordDetailsSheet(
                         },
                     )
 
-                    if (recordEntity.charges.toDoubleOrZero() > 0.0) {
+                    if (recordData.charges.toDoubleOrZero() > 0.0) {
                         // 手续费
                         TransparentListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.charges)) },
                             trailingContent = {
                                 Text(
-                                    text = "-${recordEntity.charges}".withCNY(),
+                                    text = "-${recordData.charges}".withCNY(),
                                     color = LocalExtendedColors.current.expenditure,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
@@ -130,13 +156,13 @@ internal fun RecordDetailsSheet(
                         )
                     }
 
-                    if (recordEntity.typeCategory != RecordTypeCategoryEnum.INCOME && recordEntity.concessions.toDoubleOrZero() > 0.0) {
+                    if (recordData.typeCategory != RecordTypeCategoryEnum.INCOME && recordData.concessions.toDoubleOrZero() > 0.0) {
                         // 优惠
                         TransparentListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.concessions)) },
                             trailingContent = {
                                 Text(
-                                    text = "+${recordEntity.concessions.withCNY()}",
+                                    text = "+${recordData.concessions.withCNY()}",
                                     color = LocalExtendedColors.current.income,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
@@ -152,12 +178,12 @@ internal fun RecordDetailsSheet(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    painter = painterDrawableResource(idStr = recordEntity.typeIconResName),
+                                    painter = painterDrawableResource(idStr = recordData.typeIconResName),
                                     contentDescription = null,
                                     modifier = Modifier.padding(end = 8.dp),
                                 )
                                 Text(
-                                    text = recordEntity.typeName,
+                                    text = recordData.typeName,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                             }
@@ -166,7 +192,7 @@ internal fun RecordDetailsSheet(
 
                     // TODO 关联的记录
 
-                    recordEntity.assetName?.let { assetName ->
+                    recordData.assetName?.let { assetName ->
                         // 资产
                         TransparentListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.asset)) },
@@ -175,7 +201,7 @@ internal fun RecordDetailsSheet(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = recordEntity.assetIconResId!!),
+                                        painter = painterResource(id = recordData.assetIconResId!!),
                                         contentDescription = null,
                                         tint = Color.Unspecified,
                                         modifier = Modifier.padding(end = 8.dp),
@@ -185,14 +211,14 @@ internal fun RecordDetailsSheet(
                                         style = MaterialTheme.typography.labelLarge,
                                     )
                                     // 关联资产
-                                    recordEntity.relatedAssetName?.let { relatedName ->
+                                    recordData.relatedAssetName?.let { relatedName ->
                                         Text(
                                             text = "->",
                                             style = MaterialTheme.typography.labelLarge,
                                             modifier = Modifier.padding(horizontal = 8.dp),
                                         )
                                         Icon(
-                                            painter = painterResource(id = recordEntity.relatedAssetIconResId!!),
+                                            painter = painterResource(id = recordData.relatedAssetIconResId!!),
                                             contentDescription = null,
                                             tint = Color.Unspecified,
                                             modifier = Modifier.padding(end = 8.dp),
@@ -207,13 +233,13 @@ internal fun RecordDetailsSheet(
                         )
                     }
 
-                    if (recordEntity.relatedTags.isNotEmpty()) {
+                    if (recordData.relatedTags.isNotEmpty()) {
                         // 标签
                         TransparentListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.tags)) },
                             trailingContent = {
                                 val tagsText = with(StringBuilder()) {
-                                    recordEntity.relatedTags.forEach { tag ->
+                                    recordData.relatedTags.forEach { tag ->
                                         if (!isBlank()) {
                                             append(",")
                                         }
@@ -240,13 +266,13 @@ internal fun RecordDetailsSheet(
                         )
                     }
 
-                    if (recordEntity.remark.isNotBlank()) {
+                    if (recordData.remark.isNotBlank()) {
                         // 备注
                         TransparentListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.remark)) },
                             trailingContent = {
                                 Text(
-                                    text = recordEntity.remark,
+                                    text = recordData.remark,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                             },
@@ -258,7 +284,7 @@ internal fun RecordDetailsSheet(
                         headlineContent = { Text(text = stringResource(id = R.string.time)) },
                         trailingContent = {
                             Text(
-                                text = recordEntity.recordTime,
+                                text = recordData.recordTime,
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         },

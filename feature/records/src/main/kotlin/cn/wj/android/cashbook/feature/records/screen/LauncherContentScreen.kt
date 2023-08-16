@@ -69,16 +69,14 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialog
 import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
-import cn.wj.android.cashbook.feature.records.viewmodel.DialogType
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import java.time.YearMonth
 
 @Composable
 internal fun LauncherContentRoute(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
     onEditRecordClick: (Long) -> Unit,
     onMenuClick: () -> Unit,
     onSearchClick: () -> Unit,
@@ -99,7 +97,6 @@ internal fun LauncherContentRoute(
         recordDetailSheetContent = { record ->
             recordDetailSheetContent(
                 recordInfo = record,
-                onRecordDeleteClick = viewModel::onRecordItemDeleteClick,
                 dismissBottomSheet = viewModel::onSheetDismiss,
             )
         },
@@ -115,7 +112,6 @@ internal fun LauncherContentRoute(
         uiState = uiState,
         onRecordItemClick = viewModel::onRecordItemClick,
         dialogState = viewModel.dialogState,
-        onDeleteRecordConfirm = viewModel::onDeleteRecordConfirm,
         onDialogDismiss = viewModel::onDialogDismiss,
         onSheetDismiss = viewModel::onSheetDismiss,
         modifier = modifier,
@@ -147,7 +143,6 @@ internal fun LauncherContentScreen(
     onRecordItemClick: (RecordViewsEntity) -> Unit,
     // 弹窗信息
     dialogState: DialogState,
-    onDeleteRecordConfirm: (Long) -> Unit,
     onDialogDismiss: () -> Unit,
     onSheetDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -225,12 +220,9 @@ internal fun LauncherContentScreen(
                         frontLayerScrimColor = Color.Unspecified,
                         frontLayerContent = {
                             FrontLayerContent(
-                                date = date,
                                 onDateSelected = onDateSelected,
                                 dialogState = dialogState,
                                 onDialogDismiss = onDialogDismiss,
-                                onSheetDismiss = onSheetDismiss,
-                                onDeleteRecordConfirm = onDeleteRecordConfirm,
                                 recordMap = uiState.recordMap,
                                 onDateClick = onDateClick,
                                 onRecordItemClick = onRecordItemClick,
@@ -246,12 +238,9 @@ internal fun LauncherContentScreen(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun FrontLayerContent(
-    date: YearMonth,
     onDateSelected: (YearMonth) -> Unit,
     dialogState: DialogState,
     onDialogDismiss: () -> Unit,
-    onSheetDismiss: () -> Unit,
-    onDeleteRecordConfirm: (Long) -> Unit,
     recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
     onDateClick: () -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit
@@ -260,29 +249,13 @@ private fun FrontLayerContent(
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            (dialogState as? DialogState.Shown<*>)?.let {
-                when (val dialogType = it.data as? DialogType) {
-                    is DialogType.DeleteRecord -> {
-                        // 显示删除确认弹窗
-                        onSheetDismiss()
-                        ConfirmDeleteRecordDialog(
-                            recordId = dialogType.recordId,
-                            onDeleteRecordConfirm = onDeleteRecordConfirm,
-                            onDialogDismiss = onDialogDismiss,
-                        )
-                    }
-
-                    is DialogType.SelectDate -> {
-                        SelectDateDialog(
-                            onDialogDismiss = onDialogDismiss,
-                            date = date,
-                            onDateSelected = onDateSelected,
-                        )
-                    }
-
-                    null -> {
-                        // empty block
-                    }
+            (dialogState as? DialogState.Shown<*>)?.data?.let { date ->
+                if (date is YearMonth) {
+                    SelectDateDialog(
+                        onDialogDismiss = onDialogDismiss,
+                        date = date,
+                        onDateSelected = onDateSelected,
+                    )
                 }
             }
 
@@ -568,7 +541,7 @@ internal fun LauncherContentScreenPreview() {
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
     ) {
         LauncherContentRoute(
-            recordDetailSheetContent = { _, _, _ -> },
+            recordDetailSheetContent = { _, _ -> },
             onEditRecordClick = {},
             onMenuClick = {},
             onSearchClick = {},

@@ -13,7 +13,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -54,6 +53,7 @@ import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthentica
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
+import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -66,7 +66,6 @@ import javax.crypto.Cipher
 /**
  * 首页显示
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherRoute(
     onMyAssetClick: () -> Unit,
@@ -83,9 +82,10 @@ internal fun LauncherRoute(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     LauncherScreen(
         shouldDisplayDrawerSheet = viewModel.shouldDisplayDrawerSheet,
+        onRequestDismissDrawerSheet = viewModel::dismissDrawerSheet,
+        onRequestDisplayDrawerSheet = viewModel::displayDrawerSheet,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         errorText = viewModel.errorText,
         dismissBookmark = viewModel::dismissBookmark,
@@ -126,25 +126,17 @@ internal fun LauncherRoute(
         onShowSnackbar = onShowSnackbar,
         content = { content { viewModel.displayDrawerSheet() } },
         modifier = modifier,
-        drawerState = rememberDrawerState(
-            initialValue = DrawerValue.Closed,
-            confirmStateChange = {
-                if (it == DrawerValue.Closed) {
-                    viewModel.dismissDrawerSheet()
-                }
-                true
-            },
-        )
     )
 }
 
 /**
  * 首页显示
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherScreen(
     shouldDisplayDrawerSheet: Boolean,
+    onRequestDismissDrawerSheet: () -> Unit,
+    onRequestDisplayDrawerSheet: () -> Unit,
     shouldDisplayBookmark: LauncherBookmarkEnum,
     errorText: String,
     dismissBookmark: () -> Unit,
@@ -167,7 +159,17 @@ internal fun LauncherScreen(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    drawerState: DrawerState = rememberDrawerState(
+        initialValue = DrawerValue.Closed,
+        confirmStateChange = {
+            if (it == DrawerValue.Closed) {
+                onRequestDismissDrawerSheet()
+            } else {
+                onRequestDisplayDrawerSheet()
+            }
+            true
+        },
+    ),
 ) {
 
     rememberLifecycleObserver {
@@ -201,6 +203,12 @@ internal fun LauncherScreen(
             drawerState.open()
         } else {
             drawerState.close()
+        }
+    }
+
+    if (drawerState.isOpen) {
+        BackPressHandler {
+            onRequestDismissDrawerSheet()
         }
     }
 
@@ -294,7 +302,6 @@ internal fun LauncherScreen(
 /**
  * 首页抽屉菜单
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherSheet(
     currentBookName: String,
@@ -511,30 +518,11 @@ internal fun Verification(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @DevicePreviews
 @Composable
 private fun LauncherScreenPreview() {
     PreviewTheme {
-        LauncherScreen(
-            shouldDisplayDrawerSheet = false,
-            shouldDisplayBookmark = LauncherBookmarkEnum.NONE,
-            errorText = "",
-            dismissBookmark = {},
-            uiState = LauncherUiState.Success(
-                needRequestProtocol = false,
-                needVerity = false,
-                supportFingerprint = false,
-                currentBookName = "默认账本1",
-            ),
-            agreeProtocol = {},
-            firstOpen = true,
-            dialogState = DialogState.Dismiss,
-            onConfirmClick = { _, _ -> },
-            onFingerprintClick = {},
-            onFingerprintVerifySuccess = {},
-            onFingerprintVerifyError = { _, _ -> },
-            onActivityStop = {},
+        LauncherRoute(
             onMyAssetClick = {},
             onMyBookClick = {},
             onMyCategoryClick = {},
@@ -543,151 +531,7 @@ private fun LauncherScreenPreview() {
             onAboutUsClick = {},
             onPrivacyPolicyClick = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-            content = { Text(text = "内容部分") },
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@DevicePreviews
-@Composable
-private fun LauncherScreenSheetPreview() {
-    PreviewTheme {
-        LauncherScreen(
-            shouldDisplayDrawerSheet = true,
-            shouldDisplayBookmark = LauncherBookmarkEnum.NONE,
-            errorText = "",
-            dismissBookmark = {},
-            uiState = LauncherUiState.Success(
-                needRequestProtocol = false,
-                needVerity = false,
-                supportFingerprint = false,
-                currentBookName = "默认账本2",
-            ),
-            agreeProtocol = {},
-            firstOpen = true,
-            dialogState = DialogState.Dismiss,
-            onConfirmClick = { _, _ -> },
-            onFingerprintClick = {},
-            onFingerprintVerifySuccess = {},
-            onFingerprintVerifyError = { _, _ -> },
-            onActivityStop = {},
-            onMyAssetClick = {},
-            onMyBookClick = {},
-            onMyCategoryClick = {},
-            onMyTagClick = {},
-            onSettingClick = {},
-            onAboutUsClick = {},
-            onPrivacyPolicyClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-            content = { Text(text = "内容部分") },
-            drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@DevicePreviews
-@Composable
-private fun LauncherScreenVerifyPreview() {
-    PreviewTheme {
-        LauncherScreen(
-            shouldDisplayDrawerSheet = false,
-            shouldDisplayBookmark = LauncherBookmarkEnum.PASSWORD_DECODE_FAILED,
-            errorText = "",
-            dismissBookmark = {},
-            uiState = LauncherUiState.Success(
-                needRequestProtocol = false,
-                needVerity = true,
-                supportFingerprint = true,
-                currentBookName = "默认账本3",
-            ),
-            agreeProtocol = {},
-            firstOpen = true,
-            dialogState = DialogState.Dismiss,
-            onConfirmClick = { _, _ -> },
-            onFingerprintClick = {},
-            onFingerprintVerifySuccess = {},
-            onFingerprintVerifyError = { _, _ -> },
-            onActivityStop = {},
-            onMyAssetClick = {},
-            onMyBookClick = {},
-            onMyCategoryClick = {},
-            onMyTagClick = {},
-            onSettingClick = {},
-            onAboutUsClick = {},
-            onPrivacyPolicyClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-            content = { Text(text = "内容部分") },
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@DevicePreviews
-@Composable
-private fun LauncherScreenProtocolPreview() {
-    PreviewTheme {
-        LauncherScreen(
-            shouldDisplayDrawerSheet = false,
-            shouldDisplayBookmark = LauncherBookmarkEnum.NONE,
-            errorText = "",
-            dismissBookmark = {},
-            uiState = LauncherUiState.Success(
-                needRequestProtocol = true,
-                needVerity = false,
-                supportFingerprint = false,
-                currentBookName = "默认账本4",
-            ),
-            agreeProtocol = {},
-            firstOpen = true,
-            dialogState = DialogState.Dismiss,
-            onConfirmClick = { _, _ -> },
-            onFingerprintClick = {},
-            onFingerprintVerifySuccess = {},
-            onFingerprintVerifyError = { _, _ -> },
-            onActivityStop = {},
-            onMyAssetClick = {},
-            onMyBookClick = {},
-            onMyCategoryClick = {},
-            onMyTagClick = {},
-            onSettingClick = {},
-            onAboutUsClick = {},
-            onPrivacyPolicyClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-            content = { Text(text = "内容部分") },
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@DevicePreviews
-@Composable
-private fun LauncherScreenLoadingPreview() {
-    PreviewTheme {
-        LauncherScreen(
-            shouldDisplayDrawerSheet = false,
-            shouldDisplayBookmark = LauncherBookmarkEnum.NONE,
-            errorText = "",
-            dismissBookmark = {},
-            uiState = LauncherUiState.Loading,
-            agreeProtocol = {},
-            firstOpen = true,
-            dialogState = DialogState.Dismiss,
-            onConfirmClick = { _, _ -> },
-            onFingerprintClick = {},
-            onFingerprintVerifySuccess = {},
-            onFingerprintVerifyError = { _, _ -> },
-            onActivityStop = {},
-            onMyAssetClick = {},
-            onMyBookClick = {},
-            onMyCategoryClick = {},
-            onMyTagClick = {},
-            onSettingClick = {},
-            onAboutUsClick = {},
-            onPrivacyPolicyClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-            content = { Text(text = "内容部分") },
+            content = {},
         )
     }
 }

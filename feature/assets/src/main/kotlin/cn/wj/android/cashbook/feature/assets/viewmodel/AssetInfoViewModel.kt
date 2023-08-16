@@ -7,8 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.model.model.ResultModel
-import cn.wj.android.cashbook.core.ui.DialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,14 +26,6 @@ class AssetInfoViewModel @Inject constructor(
 
     /** 需显示详情的记录数据 */
     var viewRecordData by mutableStateOf<RecordViewsEntity?>(null)
-        private set
-
-    /** 弹窗状态 */
-    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
-        private set
-
-    /** 是否显示失败提示 */
-    var shouldDisplayDeleteFailedBookmark by mutableStateOf(false)
         private set
 
     /** 当前资产 id */
@@ -62,34 +52,12 @@ class AssetInfoViewModel @Inject constructor(
         assetIdData.tryEmit(id)
     }
 
-    fun onDeleteRecordClick(recordId: Long) {
-        dialogState = DialogState.Shown(recordId)
-    }
-
-    fun onDeleteRecordResult(result: ResultModel) {
-        if (result.isSuccess) {
-            // 删除成功，隐藏弹窗
-            dismissDeleteConfirmDialog()
-        } else {
-            // 提示
-            shouldDisplayDeleteFailedBookmark = true
-        }
-    }
-
     fun onRecordItemClick(item: RecordViewsEntity) {
         viewRecordData = item
     }
 
     fun dismissRecordDetailSheet() {
         viewRecordData = null
-    }
-
-    fun dismissDeleteConfirmDialog() {
-        dialogState = DialogState.Dismiss
-    }
-
-    fun dismissBookmark() {
-        shouldDisplayDeleteFailedBookmark = false
     }
 }
 

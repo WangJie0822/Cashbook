@@ -12,9 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.LocalNavController
-import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
 import cn.wj.android.cashbook.feature.records.screen.AssetInfoContentRoute
 import cn.wj.android.cashbook.feature.records.screen.CalendarRoute
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
@@ -124,7 +122,7 @@ fun NavGraphBuilder.selectRelatedRecordScreen(
 }
 
 fun NavGraphBuilder.calendarScreen(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
@@ -139,7 +137,7 @@ fun NavGraphBuilder.calendarScreen(
 
 @Composable
 fun LauncherContent(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
     onEditRecordClick: (Long) -> Unit,
     onMenuClick: () -> Unit,
     onSearchClick: () -> Unit,
@@ -175,24 +173,11 @@ fun AssetInfoContent(
 fun RecordDetailSheetContent(
     recordEntity: RecordViewsEntity?,
     onRecordItemEditClick: (Long) -> Unit,
-    onRecordItemDeleteClick: (Long) -> Unit,
+    onRequestDismissSheet: () -> Unit,
 ) {
     RecordDetailsSheet(
-        recordEntity = recordEntity,
-        onRecordItemEditClick = onRecordItemEditClick,
-        onRecordItemDeleteClick = onRecordItemDeleteClick,
-    )
-}
-
-@Composable
-fun ConfirmDeleteRecordDialogContent(
-    recordId: Long,
-    onResult: (ResultModel) -> Unit,
-    onDialogDismiss: () -> Unit,
-) {
-    ConfirmDeleteRecordDialogRoute(
-        recordId = recordId,
-        onResult = onResult,
-        onDialogDismiss = onDialogDismiss,
+        recordData = recordEntity,
+        onRequestNaviToEditRecord = onRecordItemEditClick,
+        onRequestDismissSheet = onRequestDismissSheet,
     )
 }

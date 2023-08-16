@@ -15,12 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,14 +33,11 @@ import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
-import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
@@ -51,8 +46,7 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
 internal fun AssetInfoRoute(
     assetId: Long,
     assetRecordListContent: @Composable (topContent: @Composable () -> Unit, onRecordItemClick: (RecordViewsEntity) -> Unit) -> Unit,
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
-    confirmDeleteRecordDialogContent: @Composable (recordId: Long, onResult: (ResultModel) -> Unit, onDialogDismiss: () -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
     onEditAssetClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -75,22 +69,11 @@ internal fun AssetInfoRoute(
         recordDetailSheetContent = { record ->
             recordDetailSheetContent(
                 recordInfo = record,
-                onRecordDeleteClick = viewModel::onDeleteRecordClick,
                 dismissBottomSheet = viewModel::dismissRecordDetailSheet,
-            )
-        },
-        dialogState = viewModel.dialogState,
-        confirmDeleteRecordDialogContent = { recordId ->
-            confirmDeleteRecordDialogContent(
-                recordId = recordId,
-                onResult = viewModel::onDeleteRecordResult,
-                onDialogDismiss = viewModel::dismissDeleteConfirmDialog,
             )
         },
         onEditAssetClick = onEditAssetClick,
         dismissBottomSheet = viewModel::dismissRecordDetailSheet,
-        shouldDisplayBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
-        onBookmarkDismiss = viewModel::dismissBookmark,
         onBackClick = onBackClick,
         modifier = modifier,
     )
@@ -101,30 +84,16 @@ internal fun AssetInfoRoute(
 internal fun AssetInfoScreen(
     uiState: AssetInfoUiState,
     viewRecord: RecordViewsEntity?,
-    dialogState: DialogState,
     assetRecordListContent: @Composable (topContent: @Composable () -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
-    confirmDeleteRecordDialogContent: @Composable (recordId: Long) -> Unit,
     onEditAssetClick: () -> Unit,
     dismissBottomSheet: () -> Unit,
-    shouldDisplayBookmark: Boolean,
-    onBookmarkDismiss: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember {
         SnackbarHostState()
     }
 ) {
-    // 提示
-    val deleteFailedText = stringResource(id = R.string.delete_failed)
-    LaunchedEffect(key1 = shouldDisplayBookmark, block = {
-        if (shouldDisplayBookmark) {
-            val result = snackbarHostState.showSnackbar(deleteFailedText)
-            if (result == SnackbarResult.Dismissed) {
-                onBookmarkDismiss()
-            }
-        }
-    })
 
     CashbookScaffold(
         modifier = modifier,
@@ -175,17 +144,6 @@ internal fun AssetInfoScreen(
                             recordDetailSheetContent(viewRecord)
                         },
                     )
-                }
-                (dialogState as? DialogState.Shown<*>)?.let {
-                    val recordId = it.data
-                    if (recordId is Long) {
-                        // 显示删除确认弹窗
-                        dismissBottomSheet.invoke()
-
-                        confirmDeleteRecordDialogContent(
-                            recordId = recordId,
-                        )
-                    }
                 }
 
                 when (uiState) {
@@ -320,111 +278,12 @@ private fun AssetInfoScreenPreview() {
     PreviewTheme(
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
     ) {
-        val isCreditCard = false
-        val balance = "200"
-        val totalAmount = "2000"
-        val billingDate = "20"
-        val repaymentDate = ""
-        AssetInfoScreen(
-            uiState = AssetInfoUiState.Success(
-                assetName = "现金",
-                isCreditCard = isCreditCard,
-                balance = balance,
-                totalAmount = totalAmount,
-                billingDate = billingDate,
-                repaymentDate = repaymentDate,
-            ),
-            viewRecord = null,
-            assetRecordListContent = {
-                Column {
-                    AssetInfoContent(
-                        isCreditCard = isCreditCard,
-                        balance = balance,
-                        totalAmount = totalAmount,
-                        billingDate = billingDate,
-                        repaymentDate = repaymentDate,
-                    )
-                    Empty(hintText = "无数据", modifier = Modifier.fillMaxWidth())
-                }
-            },
-            recordDetailSheetContent = {},
-            dialogState = DialogState.Dismiss,
-            confirmDeleteRecordDialogContent = {},
+        AssetInfoRoute(
+            assetId = 0L,
+            assetRecordListContent = { _, _ -> },
+            recordDetailSheetContent = { _, _ -> },
             onEditAssetClick = {},
-            dismissBottomSheet = {},
-            shouldDisplayBookmark = false,
-            onBookmarkDismiss = {},
-            onBackClick = {},
-            modifier = Modifier,
-        )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun CreditAssetInfoScreenPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        val isCreditCard = true
-        val balance = "200"
-        val totalAmount = "2000"
-        val billingDate = "20"
-        val repaymentDate = ""
-        AssetInfoScreen(
-            uiState = AssetInfoUiState.Success(
-                assetName = "招商银行",
-                isCreditCard = isCreditCard,
-                balance = balance,
-                totalAmount = totalAmount,
-                billingDate = billingDate,
-                repaymentDate = repaymentDate,
-            ),
-            viewRecord = null,
-            assetRecordListContent = {
-                Column {
-                    AssetInfoContent(
-                        isCreditCard = isCreditCard,
-                        balance = balance,
-                        totalAmount = totalAmount,
-                        billingDate = billingDate,
-                        repaymentDate = repaymentDate,
-                    )
-                    Empty(hintText = "无数据", modifier = Modifier.fillMaxWidth())
-                }
-            },
-            recordDetailSheetContent = {},
-            dialogState = DialogState.Dismiss,
-            confirmDeleteRecordDialogContent = {},
-            onEditAssetClick = {},
-            dismissBottomSheet = {},
-            shouldDisplayBookmark = false,
-            onBookmarkDismiss = {},
-            onBackClick = {},
-            modifier = Modifier,
-        )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun AssetInfoScreenLoadingPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        AssetInfoScreen(
-            uiState = AssetInfoUiState.Loading,
-            viewRecord = null,
-            assetRecordListContent = {},
-            recordDetailSheetContent = {},
-            dialogState = DialogState.Dismiss,
-            confirmDeleteRecordDialogContent = {},
-            onEditAssetClick = {},
-            dismissBottomSheet = {},
-            shouldDisplayBookmark = false,
-            onBookmarkDismiss = {},
-            onBackClick = {},
-            modifier = Modifier,
+            onBackClick = {}
         )
     }
 }

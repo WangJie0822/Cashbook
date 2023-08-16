@@ -7,7 +7,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.feature.assets.screen.AssetInfoRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditRecordSelectAssetBottomSheetRoute
@@ -70,8 +69,7 @@ fun NavGraphBuilder.myAssetScreen(
 
 fun NavGraphBuilder.assetInfoScreen(
     assetRecordListContent: @Composable (Long, @Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
-    confirmDeleteRecordDialogContent: @Composable (recordId: Long, onResult: (ResultModel) -> Unit, onDialogDismiss: () -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
     onEditAssetClick: (Long) -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -93,7 +91,6 @@ fun NavGraphBuilder.assetInfoScreen(
                 )
             },
             recordDetailSheetContent = recordDetailSheetContent,
-            confirmDeleteRecordDialogContent = confirmDeleteRecordDialogContent,
             onEditAssetClick = { onEditAssetClick.invoke(assetId) },
             onBackClick = onBackClick,
         )

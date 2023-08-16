@@ -46,17 +46,16 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialog
 import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarViewModel
-import cn.wj.android.cashbook.feature.records.viewmodel.DialogType
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.YearMonth
 
 @Composable
 internal fun CalendarRoute(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, onRecordDeleteClick: (Long) -> Unit, dismissBottomSheet: () -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -79,13 +78,11 @@ internal fun CalendarRoute(
         recordDetailSheetContent = { record ->
             recordDetailSheetContent(
                 recordInfo = record,
-                onRecordDeleteClick = viewModel::onRecordItemDeleteClick,
                 dismissBottomSheet = viewModel::onSheetDismiss,
             )
         },
         sheetViewData = viewModel.viewRecord,
         onSheetDismiss = viewModel::onSheetDismiss,
-        onDeleteRecordConfirm = viewModel::onDeleteRecordConfirm,
         onBackClick = onBackClick,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
@@ -107,7 +104,6 @@ internal fun CalendarScreen(
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     sheetViewData: RecordViewsEntity?,
     onSheetDismiss: () -> Unit,
-    onDeleteRecordConfirm: (Long) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -157,33 +153,17 @@ internal fun CalendarScreen(
                 )
             }
 
-            (dialogState as? DialogState.Shown<*>)?.let {
-                when (val dialogType = it.data as? DialogType) {
-                    is DialogType.DeleteRecord -> {
-                        // 显示删除确认弹窗
-                        onSheetDismiss()
-                        ConfirmDeleteRecordDialog(
-                            recordId = dialogType.recordId,
-                            onDeleteRecordConfirm = onDeleteRecordConfirm,
-                            onDialogDismiss = onDialogDismiss,
-                        )
-                    }
-
-                    is DialogType.SelectDate -> {
-                        SelectDateDialog(
-                            onDialogDismiss = onDialogDismiss,
-                            date = selectedDate.yearMonth,
-                            onDateSelected = { ym ->
-                                if (selectedDate.yearMonth != ym) {
-                                    onDateSelected(ym.atDay(1))
-                                }
-                            },
-                        )
-                    }
-
-                    null -> {
-                        // empty block
-                    }
+            (dialogState as? DialogState.Shown<*>)?.data?.let { date ->
+                if (date is YearMonth) {
+                    SelectDateDialog(
+                        onDialogDismiss = onDialogDismiss,
+                        date = selectedDate.yearMonth,
+                        onDateSelected = { ym ->
+                            if (selectedDate.yearMonth != ym) {
+                                onDateSelected(ym.atDay(1))
+                            }
+                        },
+                    )
                 }
             }
 
@@ -331,7 +311,7 @@ internal fun CalendarScreen(
 @Composable
 private fun CalendarPreview() {
     PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)) {
-        CalendarRoute(recordDetailSheetContent = { _, _, _ -> },
+        CalendarRoute(recordDetailSheetContent = { _, _ -> },
             onBackClick = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed })
     }

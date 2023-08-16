@@ -30,7 +30,6 @@ import cn.wj.android.cashbook.feature.books.navigation.myBooksScreen
 import cn.wj.android.cashbook.feature.books.navigation.naviToEditBook
 import cn.wj.android.cashbook.feature.books.navigation.naviToMyBooks
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
-import cn.wj.android.cashbook.feature.records.navigation.ConfirmDeleteRecordDialogContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
@@ -110,14 +109,11 @@ fun CashbookNavHost(
             onShowSnackbar = onShowSnackbar,
             content = { openDrawer ->
                 LauncherContent(
-                    recordDetailSheetContent = { recordEntity, onRecordItemDeleteClick, dismissBottomSheet ->
+                    recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
                         RecordDetailSheetContent(
                             recordEntity = recordEntity,
-                            onRecordItemEditClick = { recordId ->
-                                navController.naviToEditRecord(recordId)
-                                dismissBottomSheet()
-                            },
-                            onRecordItemDeleteClick = onRecordItemDeleteClick,
+                            onRecordItemEditClick = navController::naviToEditRecord,
+                            onRequestDismissSheet = onRequestDismissSheet,
                         )
                     },
                     onEditRecordClick = navController::naviToEditRecord,
@@ -198,14 +194,11 @@ fun CashbookNavHost(
 //        )
         // 日历
         calendarScreen(
-            recordDetailSheetContent = { recordEntity, onRecordItemDeleteClick, dismissBottomSheet ->
+            recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
                 RecordDetailSheetContent(
                     recordEntity = recordEntity,
-                    onRecordItemEditClick = { recordId ->
-                        navController.naviToEditRecord(recordId)
-                        dismissBottomSheet()
-                    },
-                    onRecordItemDeleteClick = onRecordItemDeleteClick,
+                    onRecordItemEditClick = navController::naviToEditRecord,
+                    onRequestDismissSheet = onRequestDismissSheet,
                 )
             },
             onBackClick = navController::popBackStack,
@@ -228,21 +221,11 @@ fun CashbookNavHost(
                     onRecordItemClick = onRecordItemClick,
                 )
             },
-            recordDetailSheetContent = { recordEntity, onRecordItemDeleteClick, dismissBottomSheet ->
+            recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
                 RecordDetailSheetContent(
                     recordEntity = recordEntity,
-                    onRecordItemEditClick = { recordId ->
-                        navController.naviToEditRecord(recordId)
-                        dismissBottomSheet()
-                    },
-                    onRecordItemDeleteClick = onRecordItemDeleteClick,
-                )
-            },
-            confirmDeleteRecordDialogContent = { recordId, onResult, onDialogDismiss ->
-                ConfirmDeleteRecordDialogContent(
-                    recordId = recordId,
-                    onResult = onResult,
-                    onDialogDismiss = onDialogDismiss,
+                    onRecordItemEditClick = navController::naviToEditRecord,
+                    onRequestDismissSheet = onRequestDismissSheet,
                 )
             },
             onEditAssetClick = navController::naviToEditAsset,
