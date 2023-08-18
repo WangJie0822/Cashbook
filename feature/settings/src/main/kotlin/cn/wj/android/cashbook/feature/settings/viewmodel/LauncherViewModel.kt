@@ -31,6 +31,9 @@ import kotlinx.coroutines.launch
 /**
  * 首页 ViewModel
  *
+ * @param settingRepository 设置相关数据仓库
+ * @param booksRepository 账本相关数据仓库
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/26
  */
 @HiltViewModel
@@ -39,7 +42,8 @@ class LauncherViewModel @Inject constructor(
     booksRepository: BooksRepository,
 ) : ViewModel() {
 
-    private val verified = MutableStateFlow(false)
+    /** 标记 - 是否已认证 */
+    private val _verified = MutableStateFlow(false)
 
     var firstOpen by mutableStateOf(true)
         private set
@@ -48,13 +52,16 @@ class LauncherViewModel @Inject constructor(
     var shouldDisplayDrawerSheet by mutableStateOf(false)
         private set
 
+    /** 是否显示提示 */
     var shouldDisplayBookmark by mutableStateOf(LauncherBookmarkEnum.NONE)
         private set
 
+    /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
-    val uiState = combine(settingRepository.appDataMode, verified) { appData, verified ->
+    /** 界面 UI 状态 */
+    val uiState = combine(settingRepository.appDataMode, _verified) { appData, verified ->
         LauncherUiState.Success(
             needRequestProtocol = !appData.agreedProtocol,
             needVerity = appData.needSecurityVerificationWhenLaunch && !verified,
@@ -69,36 +76,37 @@ class LauncherViewModel @Inject constructor(
         )
 
     /** 密码加密向量信息 */
-    private val passwordIv = settingRepository.appDataMode
+    private val _passwordIv = settingRepository.appDataMode
         .mapLatest { it.passwordIv }
 
     /** 密码信息 */
-    private val passwordInfo = settingRepository.appDataMode
+    private val _passwordInfo = settingRepository.appDataMode
         .mapLatest { it.passwordInfo }
 
     /** 密码加密向量信息 */
-    private val fingerprintIv = settingRepository.appDataMode
+    private val _fingerprintIv = settingRepository.appDataMode
         .mapLatest { it.fingerprintIv }
 
     /** 密码信息 */
-    private val fingerprintPasswordInfo = settingRepository.appDataMode
+    private val _fingerprintPasswordInfo = settingRepository.appDataMode
         .mapLatest { it.fingerprintPasswordInfo }
 
     /** 验证模式 */
-    private val verificationMode = settingRepository.appDataMode
+    private val _verificationMode = settingRepository.appDataMode
         .mapLatest { it.verificationModel }
 
+    /** 确认认证，使用 [pwd] 进行认证并将认证结果回调 [callback] */
     fun onVerityConfirm(pwd: String, callback: (SettingPasswordStateEnum) -> Unit) {
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
-            val passwordIv = passwordIv.first()
+            val passwordIv = _passwordIv.first()
             val bytes = passwordIv.hexToBytes()
             if (null == bytes) {
                 callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
                 return@launch
             }
             val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, bytes)
-            val pwdSha = cipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
+            val pwdSha = cipher.doFinal(_passwordInfo.first().hexToBytes()).decodeToString()
             if (pwd.shaEncode() != pwdSha) {
                 // 密码错误，提示
                 callback.invoke(SettingPasswordStateEnum.PASSWORD_WRONG)
@@ -106,14 +114,15 @@ class LauncherViewModel @Inject constructor(
             }
 
             // 密码正确，进入首页
-            verified.tryEmit(true)
+            _verified.tryEmit(true)
         }
     }
 
-    fun onFingerprintClick() {
+    /** 显示指纹认证 */
+    fun showFingerprintVerify() {
         firstOpen = false
         viewModelScope.launch {
-            val bytes = fingerprintIv.first().hexToBytes()
+            val bytes = _fingerprintIv.first().hexToBytes()
             if (null == bytes) {
                 shouldDisplayBookmark = LauncherBookmarkEnum.PASSWORD_DECODE_FAILED
                 return@launch
@@ -123,22 +132,23 @@ class LauncherViewModel @Inject constructor(
         }
     }
 
+    /** 指纹认证成功，使用 [cipher] 进行解码认证 */
     fun onFingerprintVerifySuccess(cipher: Cipher) {
         viewModelScope.launch {
             dismissDialog()
 
             // 获取密码信息
-            val passwordIv = passwordIv.first()
+            val passwordIv = _passwordIv.first()
             val bytes = passwordIv.hexToBytes()
             if (null == bytes) {
                 shouldDisplayBookmark = LauncherBookmarkEnum.PASSWORD_DECODE_FAILED
                 return@launch
             }
             val pwdCipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, bytes)
-            val pwdSha = pwdCipher.doFinal(passwordInfo.first().hexToBytes()).decodeToString()
+            val pwdSha = pwdCipher.doFinal(_passwordInfo.first().hexToBytes()).decodeToString()
             // 获取指纹密码信息
             val fingerprintPwdSha =
-                cipher.doFinal(fingerprintPasswordInfo.first().hexToBytes()).decodeToString()
+                cipher.doFinal(_fingerprintPasswordInfo.first().hexToBytes()).decodeToString()
 
             if (pwdSha != fingerprintPwdSha) {
                 // 密码错误
@@ -147,13 +157,15 @@ class LauncherViewModel @Inject constructor(
             }
 
             // 密码正确，进入首页
-            verified.tryEmit(true)
+            _verified.tryEmit(true)
         }
     }
 
+    /** 错误文本，指纹认证失败时使用 */
     var errorText = ""
         private set
 
+    /** 指纹认证失败，使用错误码 [code]、错误信息 [msg] 处理错误提示 */
     fun onFingerprintVerifyError(code: Int, msg: String) {
         logger().i("onFingerprintVerifyError(code = <$code>, msg = <$msg>)")
         dismissDialog()
@@ -161,40 +173,59 @@ class LauncherViewModel @Inject constructor(
         shouldDisplayBookmark = LauncherBookmarkEnum.ERROR
     }
 
-    fun onActivityStop() {
+    /** 界面不可见时刷新安全认证状态 */
+    fun refreshVerifyState() {
         viewModelScope.launch {
-            if (verificationMode.first() == VerificationModeEnum.WHEN_FOREGROUND) {
-                verified.tryEmit(false)
+            if (_verificationMode.first() == VerificationModeEnum.WHEN_FOREGROUND) {
+                _verified.tryEmit(false)
                 firstOpen = true
             }
         }
     }
 
+    /** 同意用户隐私协议 */
     fun agreeProtocol() {
         viewModelScope.launch {
             settingRepository.updateAgreedProtocol(true)
         }
     }
 
+    /** 显示抽屉菜单 */
     fun displayDrawerSheet() {
         shouldDisplayDrawerSheet = true
     }
 
+    /** 隐藏抽屉菜单 */
     fun dismissDrawerSheet() {
         shouldDisplayDrawerSheet = false
     }
 
+    /** 隐藏提示 */
     fun dismissBookmark() {
         shouldDisplayBookmark = LauncherBookmarkEnum.NONE
     }
 
+    /** 隐藏弹窗 */
     private fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
 }
 
+/**
+ * 界面 UI 状态
+ */
 sealed interface LauncherUiState {
-    object Loading : LauncherUiState
+    /** 加载中 */
+    data object Loading : LauncherUiState
+
+    /**
+     * 加载完成
+     *
+     * @param needRequestProtocol 需要显示用户隐私协议确认
+     * @param needVerity 需要安全认证
+     * @param supportFingerprint 是否支持指纹识别
+     * @param currentBookName 当前账本名称
+     */
     data class Success(
         val needRequestProtocol: Boolean,
         val needVerity: Boolean,

@@ -8,16 +8,22 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
+/**
+ * 编辑记录界面选择资产抽屉 ViewModel
+ *
+ * @param assetRepository 资产数据仓库
+ */
 @HiltViewModel
 class EditRecordSelectAssetBottomSheetViewModel @Inject constructor(
     assetRepository: AssetRepository,
 ) : ViewModel() {
 
+    /** 可选择资产列表 */
     val assetListData = assetRepository.currentVisibleAssetListData
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = listOf()
+            initialValue = emptyList()
         )
 
     fun update(

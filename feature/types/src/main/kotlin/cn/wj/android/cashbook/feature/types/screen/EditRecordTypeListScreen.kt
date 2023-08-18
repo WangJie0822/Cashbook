@@ -31,20 +31,30 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.types.viewmodel.EditRecordTypeListViewModel
 
+/**
+ * 编辑记录页面标签列表
+ *
+ * @param typeCategory 记录大类
+ * @param selectedTypeId 当前选中的类型 id
+ * @param onTypeSelect 类型选中回调
+ * @param onRequestNaviToTypeManager 导航到类型管理
+ * @param headerContent 头布局
+ * @param footerContent 脚布局
+ */
 @Composable
 internal fun EditRecordTypeListRoute(
     typeCategory: RecordTypeCategoryEnum,
     selectedTypeId: Long,
     onTypeSelect: (Long) -> Unit,
-    onTypeSettingClick: () -> Unit,
+    onRequestNaviToTypeManager: () -> Unit,
     headerContent: @Composable (modifier: Modifier) -> Unit,
     footerContent: @Composable (modifier: Modifier) -> Unit,
     modifier: Modifier = Modifier,
@@ -57,13 +67,22 @@ internal fun EditRecordTypeListRoute(
     EditRecordTypeListScreen(
         typeList = typeList,
         onTypeSelect = onTypeSelect,
-        onTypeSettingClick = onTypeSettingClick,
+        onTypeSettingClick = onRequestNaviToTypeManager,
         headerContent = headerContent,
         footerContent = footerContent,
         modifier = modifier,
     )
 }
 
+/**
+ * 编辑记录页面标签列表
+ *
+ * @param typeList 类型列表
+ * @param onTypeSelect 类型选中回调
+ * @param onTypeSettingClick 类型设置点击
+ * @param headerContent 头布局
+ * @param footerContent 脚布局
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun EditRecordTypeListScreen(
@@ -74,7 +93,6 @@ internal fun EditRecordTypeListScreen(
     footerContent: @Composable (modifier: Modifier) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     LazyVerticalGrid(
         modifier = modifier.padding(horizontal = 16.dp),
         columns = GridCells.Fixed(RECORD_TYPE_COLUMNS),
@@ -142,16 +160,27 @@ internal fun EditRecordTypeListScreen(
     )
 }
 
+/**
+ * 类型列表 item
+ *
+ * @param first 是否是一级类型
+ * @param shapeType 背景 shape 类型
+ * @param iconPainter 显示图片
+ * @param showMore 是否显示更多标记
+ * @param title 类型标题
+ * @param selected 是否被选中
+ * @param onTypeClick 类型点击回调
+ */
 @Composable
 internal fun TypeItem(
-    modifier: Modifier = Modifier,
     first: Boolean,
     shapeType: Int,
     iconPainter: Painter,
     showMore: Boolean,
     title: String,
     selected: Boolean,
-    onTypeClick: () -> Unit
+    onTypeClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     // 背景颜色，用于区分一级分类、二级分类
     val backgroundColor =

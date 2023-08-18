@@ -42,14 +42,22 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
 
+/**
+ * 资产信息界面
+ *
+ * @param assetRecordListContent 资产记录列表，参数：(资产id, 列表头布局, 列表item点击回调) -> [Unit]
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param onRequestNaviToEditAsset 导航到编辑资产
+ * @param onRequestPopBackStack 导航到上一级
+ */
 @Composable
 internal fun AssetInfoRoute(
-    assetId: Long,
-    assetRecordListContent: @Composable (topContent: @Composable () -> Unit, onRecordItemClick: (RecordViewsEntity) -> Unit) -> Unit,
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
-    onEditAssetClick: () -> Unit,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    assetId: Long = -1L,
+    assetRecordListContent: @Composable (@Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit = { _, _ -> },
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit = { _, _ -> },
+    onRequestNaviToEditAsset: () -> Unit = {},
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: AssetInfoViewModel = hiltViewModel<AssetInfoViewModel>().apply {
         updateAssetId(assetId)
     },
@@ -61,24 +69,29 @@ internal fun AssetInfoRoute(
         uiState = uiState,
         viewRecord = viewModel.viewRecordData,
         assetRecordListContent = { topContent ->
-            assetRecordListContent(
-                topContent = topContent,
-                onRecordItemClick = viewModel::onRecordItemClick,
-            )
+            assetRecordListContent(topContent, viewModel::onRecordItemClick)
         },
         recordDetailSheetContent = { record ->
-            recordDetailSheetContent(
-                recordInfo = record,
-                dismissBottomSheet = viewModel::dismissRecordDetailSheet,
-            )
+            recordDetailSheetContent(record, viewModel::dismissRecordDetailSheet)
         },
-        onEditAssetClick = onEditAssetClick,
-        dismissBottomSheet = viewModel::dismissRecordDetailSheet,
-        onBackClick = onBackClick,
+        onEditAssetClick = onRequestNaviToEditAsset,
+        onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
+        onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
 }
 
+/**
+ * 资产信息界面
+ *
+ * @param uiState 界面 UI 状态
+ * @param viewRecord 显示详情数据
+ * @param assetRecordListContent 资产记录列表
+ * @param recordDetailSheetContent 记录详情
+ * @param onEditAssetClick 编辑资产点击回调
+ * @param onRequestDismissBottomSheet 隐藏底部抽屉
+ * @param onBackClick 返回点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AssetInfoScreen(
@@ -87,7 +100,7 @@ internal fun AssetInfoScreen(
     assetRecordListContent: @Composable (topContent: @Composable () -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     onEditAssetClick: () -> Unit,
-    dismissBottomSheet: () -> Unit,
+    onRequestDismissBottomSheet: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember {
@@ -131,11 +144,11 @@ internal fun AssetInfoScreen(
             ) {
                 if (null != viewRecord) {
                     CashbookModalBottomSheet(
-                        onDismissRequest = dismissBottomSheet,
+                        onDismissRequest = onRequestDismissBottomSheet,
                         sheetState = rememberModalBottomSheetState(
                             confirmValueChange = {
                                 if (it == SheetValue.Hidden) {
-                                    dismissBottomSheet()
+                                    onRequestDismissBottomSheet()
                                 }
                                 true
                             },
@@ -170,6 +183,15 @@ internal fun AssetInfoScreen(
     )
 }
 
+/**
+ * 资产信息
+ *
+ * @param isCreditCard 是否是信用卡
+ * @param balance 余额
+ * @param totalAmount 总额度
+ * @param billingDate 账单日
+ * @param repaymentDate 还款日
+ */
 @Composable
 private fun AssetInfoContent(
     isCreditCard: Boolean,
@@ -278,12 +300,6 @@ private fun AssetInfoScreenPreview() {
     PreviewTheme(
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
     ) {
-        AssetInfoRoute(
-            assetId = 0L,
-            assetRecordListContent = { _, _ -> },
-            recordDetailSheetContent = { _, _ -> },
-            onEditAssetClick = {},
-            onBackClick = {}
-        )
+        AssetInfoRoute()
     }
 }

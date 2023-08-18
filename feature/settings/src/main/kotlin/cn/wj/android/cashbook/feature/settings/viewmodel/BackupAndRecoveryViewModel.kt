@@ -22,6 +22,9 @@ import kotlinx.coroutines.launch
 /**
  * 备份与恢复 ViewModel
  *
+ * @param settingRepository 设置相关数据仓库
+ * @param backupRecoveryManager 备份与恢复管理器
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/18
  */
 @HiltViewModel
@@ -30,9 +33,11 @@ class BackupAndRecoveryViewModel @Inject constructor(
     private val backupRecoveryManager: BackupRecoveryManager,
 ) : ViewModel() {
 
+    /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
+    /** 界面 UI 状态 */
     val uiState = settingRepository.appDataMode
         .mapLatest {
             BackupAndRecoveryUiState(
@@ -49,6 +54,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
             initialValue = BackupAndRecoveryUiState(),
         )
 
+    /** WebDAV 连接状态 */
     val isConnected = backupRecoveryManager.isWebDAVConnected
         .stateIn(
             scope = viewModelScope,
@@ -56,6 +62,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
             initialValue = false,
         )
 
+    /** 显示提示数据 */
     val shouldDisplayBookmark =
         combine(
             backupRecoveryManager.backupState,
@@ -128,7 +135,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
     }
 
     /** 显示选择自动备份类型弹窗 */
-    fun showSelectAutoBackupDialog() {
+    fun displaySelectAutoBackupDialog() {
         dialogState = DialogState.Shown(0)
     }
 

@@ -28,7 +28,7 @@ class EditRecordTypeListViewModel @Inject constructor(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
-                initialValue = listOf()
+                initialValue = emptyList()
             )
 
     fun update(typeCategory: RecordTypeCategoryEnum, selectedTypeId: Long) {

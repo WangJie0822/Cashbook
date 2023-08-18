@@ -12,10 +12,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,11 +41,17 @@ import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import cn.wj.android.cashbook.feature.tags.viewmodel.MyTagsViewModel
 import com.google.accompanist.flowlayout.FlowRow
 
+/**
+ * 我的标签
+ *
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onRequestNaviToTagStatistic 导航到标签数据分析
+ */
 @Composable
 internal fun MyTagsRoute(
-    onBackClick: () -> Unit,
-    onTagStatisticClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    onRequestNaviToTagStatistic: (Long) -> Unit = {},
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: MyTagsViewModel = hiltViewModel(),
 ) {
 
@@ -55,29 +61,42 @@ internal fun MyTagsRoute(
     MyTagsScreen(
         tagList = tagList,
         dialogState = viewModel.dialogState,
-        showEditTagDialog = viewModel::showEditTagDialog,
-        showDeleteTagDialog = viewModel::showDeleteTagDialog,
-        dismissDialog = viewModel::dismissDialog,
-        modifyTag = viewModel::modifyTag,
-        deleteTag = viewModel::deleteTag,
-        onBackClick = onBackClick,
-        onTagStatisticClick = onTagStatisticClick,
+        onRequestDismissDialog = viewModel::dismissDialog,
+        onEditTagClick = viewModel::showEditTagDialog,
+        onEditTagConfirmClick = viewModel::modifyTag,
+        onDeleteTagClick = viewModel::showDeleteTagDialog,
+        onDeleteTagConfirmClick = viewModel::deleteTag,
+        onTagStatisticClick = onRequestNaviToTagStatistic,
+        onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
 }
 
+/**
+ * 我的标签
+ *
+ * @param tagList 标签列表数据
+ * @param dialogState 弹窗状态
+ * @param onRequestDismissDialog 隐藏弹窗
+ * @param onEditTagClick 编辑标签点击回调
+ * @param onEditTagConfirmClick 编辑标签确认点击回调
+ * @param onDeleteTagClick 删除标签点击回调
+ * @param onDeleteTagConfirmClick 删除标签确认点击回调
+ * @param onTagStatisticClick 统计数据点击回调
+ * @param onBackClick 返回点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyTagsScreen(
     tagList: List<TagModel>,
     dialogState: DialogState,
-    showEditTagDialog: (TagModel?) -> Unit,
-    showDeleteTagDialog: (TagModel) -> Unit,
-    dismissDialog: () -> Unit,
-    modifyTag: (TagModel) -> Unit,
-    deleteTag: (TagModel) -> Unit,
-    onBackClick: () -> Unit,
+    onRequestDismissDialog: () -> Unit,
+    onEditTagClick: (TagModel?) -> Unit,
+    onEditTagConfirmClick: (TagModel) -> Unit,
+    onDeleteTagClick: (TagModel) -> Unit,
+    onDeleteTagConfirmClick: (TagModel) -> Unit,
     onTagStatisticClick: (Long) -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -88,7 +107,7 @@ internal fun MyTagsScreen(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = R.string.my_tags)) },
                 actions = {
-                    IconButton(onClick = { showEditTagDialog(null) }) {
+                    IconButton(onClick = { onEditTagClick(null) }) {
                         Icon(imageVector = CashbookIcons.Add, contentDescription = null)
                     }
                 },
@@ -107,16 +126,16 @@ internal fun MyTagsScreen(
                     is TagDialogState.Edit -> {
                         EditTagDialog(
                             tagEntity = data.tag,
-                            onConfirm = modifyTag,
-                            onDismiss = dismissDialog,
+                            onConfirmClick = onEditTagConfirmClick,
+                            onRequestDismissDialog = onRequestDismissDialog,
                         )
                     }
 
                     is TagDialogState.Delete -> {
                         DeleteTagDialog(
                             tagEntity = data.tag,
-                            onConfirm = deleteTag,
-                            onDismiss = dismissDialog,
+                            onConfirmClick = onDeleteTagConfirmClick,
+                            onRequestDismissDialog = onRequestDismissDialog,
                         )
                     }
                 }
@@ -151,14 +170,14 @@ internal fun MyTagsScreen(
                                     text = { Text(text = stringResource(id = R.string.modify)) },
                                     onClick = {
                                         expanded = false
-                                        showEditTagDialog(it)
+                                        onEditTagClick(it)
                                     },
                                 )
                                 DropdownMenuItem(
                                     text = { Text(text = stringResource(id = R.string.delete)) },
                                     onClick = {
                                         expanded = false
-                                        showDeleteTagDialog(it)
+                                        onDeleteTagClick(it)
                                     },
                                 )
                                 DropdownMenuItem(
@@ -177,12 +196,18 @@ internal fun MyTagsScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * 编辑标签弹窗
+ *
+ * @param tagEntity 标签数据，`null` 为新建
+ * @param onConfirmClick 确认点击回调
+ * @param onRequestDismissDialog 隐藏弹窗
+ */
 @Composable
-fun EditTagDialog(
+internal fun EditTagDialog(
     tagEntity: TagModel?,
-    onConfirm: (TagModel) -> Unit,
-    onDismiss: () -> Unit,
+    onConfirmClick: (TagModel) -> Unit,
+    onRequestDismissDialog: () -> Unit,
 ) {
     val title = stringResource(
         id = if (null == tagEntity) {
@@ -196,7 +221,7 @@ fun EditTagDialog(
     }
     AlertDialog(
         modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp - 80.dp),
-        onDismissRequest = onDismiss,
+        onDismissRequest = onRequestDismissDialog,
         title = { Text(text = title) },
         text = {
             TextField(
@@ -207,7 +232,7 @@ fun EditTagDialog(
                         text = stringResource(id = R.string.tag_name),
                     )
                 },
-                colors = TextFieldDefaults.outlinedTextFieldColors(),
+                colors = OutlinedTextFieldDefaults.colors(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
@@ -215,7 +240,7 @@ fun EditTagDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                onConfirm(
+                onConfirmClick(
                     tagEntity?.copy(name = tagName) ?: TagModel(-1L, tagName)
                 )
             }) {
@@ -223,33 +248,40 @@ fun EditTagDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
     )
 }
 
+/**
+ * 删除标签弹窗
+ *
+ * @param tagEntity 标签数据
+ * @param onConfirmClick 确认点击回调
+ * @param onRequestDismissDialog 隐藏弹窗
+ */
 @Composable
-fun DeleteTagDialog(
+internal fun DeleteTagDialog(
     tagEntity: TagModel,
-    onConfirm: (TagModel) -> Unit,
-    onDismiss: () -> Unit,
+    onConfirmClick: (TagModel) -> Unit,
+    onRequestDismissDialog: () -> Unit,
 ) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onRequestDismissDialog,
         text = {
             Text(text = stringResource(id = R.string.tag_delete_hint_format).format(tagEntity.name))
         },
         confirmButton = {
             TextButton(onClick = {
-                onConfirm(tagEntity)
+                onConfirmClick(tagEntity)
             }) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -262,45 +294,6 @@ private fun MyTagsScreenPreview() {
     PreviewTheme(
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
     ) {
-        MyTagsScreen(
-            tagList = listOf(
-                TagModel(id = 1L, name = "标签1"),
-                TagModel(id = 2L, name = "标签1标签1"),
-                TagModel(id = 3L, name = "标签1标签1标签1"),
-                TagModel(id = 4L, name = "标签1标签1标签1标签1"),
-                TagModel(id = 5L, name = "标签1标签1标签1标签1标签1"),
-                TagModel(id = 6L, name = "标签1标签1标签1标签1标签1标签1"),
-                TagModel(id = 7L, name = "标签2"),
-            ),
-            dialogState = DialogState.Dismiss,
-            showEditTagDialog = {},
-            showDeleteTagDialog = {},
-            dismissDialog = {},
-            modifyTag = {},
-            deleteTag = {},
-            onBackClick = {},
-            onTagStatisticClick = {}
-        )
+        MyTagsRoute()
     }
 }
-
-@DevicePreviews
-@Composable
-private fun MyTagsScreenEmptyPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        MyTagsScreen(
-            tagList = listOf(),
-            dialogState = DialogState.Dismiss,
-            showEditTagDialog = {},
-            showDeleteTagDialog = {},
-            dismissDialog = {},
-            modifyTag = {},
-            deleteTag = {},
-            onBackClick = {},
-            onTagStatisticClick = {}
-        )
-    }
-}
-

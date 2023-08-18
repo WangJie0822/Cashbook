@@ -66,9 +66,15 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewModel
 
+/**
+ * 备份恢复界面
+ *
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @Composable
 internal fun BackupAndRecoveryRoute(
-    onBackClick: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
     viewModel: BackupAndRecoveryViewModel = hiltViewModel(),
@@ -79,40 +85,56 @@ internal fun BackupAndRecoveryRoute(
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
 
     BackupAndRecoveryScreen(
-        shouldDisplayBookmark,
-        dismissBookmark = viewModel::dismissBookmark,
-        dialogState = viewModel.dialogState,
-        tryRecovery = viewModel::tryRecovery,
-        dismissDialog = viewModel::dismissDialog,
         uiState = uiState,
+        shouldDisplayBookmark = shouldDisplayBookmark,
+        onRequestDismissBookmark = viewModel::dismissBookmark,
+        dialogState = viewModel.dialogState,
+        onBackupListItemClick = viewModel::tryRecovery,
+        onRequestDismissDialog = viewModel::dismissDialog,
         isConnected = isConnected,
-        onSaveWebDAV = viewModel::saveWebDAV,
-        onSaveBackupPath = viewModel::saveBackupPath,
+        onConnectStateClick = viewModel::saveWebDAV,
+        onBackupPathSelected = viewModel::saveBackupPath,
         onBackupClick = viewModel::backup,
         onRecoveryClick = viewModel::getRecoveryList,
-        onAutoBackupClick = viewModel::showSelectAutoBackupDialog,
+        onAutoBackupClick = viewModel::displaySelectAutoBackupDialog,
         onAutoBackupModeSelected = viewModel::onAutoBackupModeSelected,
-        onBackClick = {
-            viewModel.dismissBookmark()
-            onBackClick()
-        },
+        onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
     )
 }
 
+/**
+ * 备份恢复界面
+ *
+ * @param uiState 界面 UI 状态
+ * @param shouldDisplayBookmark 是否显示提示
+ * @param onRequestDismissBookmark 隐藏提示
+ * @param dialogState 弹窗状态
+ * @param onBackupListItemClick 备份列表 item 点击回调
+ * @param onRequestDismissDialog 隐藏弹窗
+ * @param isConnected WebDAV 连接状态
+ * @param onConnectStateClick 连接状态点击回调
+ * @param onBackupPathSelected 备份路径选择回调
+ * @param onBackupClick 备份点击回调
+ * @param onRecoveryClick 恢复点击回调
+ * @param onAutoBackupClick 自动备份点击回调
+ * @param onAutoBackupModeSelected 自动备份模式选择回调
+ * @param onBackClick 返回点击回调
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BackupAndRecoveryScreen(
-    shouldDisplayBookmark: Int,
-    dismissBookmark: () -> Unit,
-    dialogState: DialogState,
-    tryRecovery: (String) -> Unit,
-    dismissDialog: () -> Unit,
     uiState: BackupAndRecoveryUiState,
+    shouldDisplayBookmark: Int,
+    onRequestDismissBookmark: () -> Unit,
+    dialogState: DialogState,
+    onBackupListItemClick: (String) -> Unit,
+    onRequestDismissDialog: () -> Unit,
     isConnected: Boolean,
-    onSaveWebDAV: (String, String, String) -> Unit,
-    onSaveBackupPath: (String) -> Unit,
+    onConnectStateClick: (String, String, String) -> Unit,
+    onBackupPathSelected: (String) -> Unit,
     onBackupClick: () -> Unit,
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
@@ -142,11 +164,11 @@ internal fun BackupAndRecoveryScreen(
                 else -> ""
             }
             if (tipText.isBlank()) {
-                dismissBookmark()
+                onRequestDismissBookmark()
             } else {
                 val snackbarResult = onShowSnackbar(tipText, null)
                 if (snackbarResult == SnackbarResult.Dismissed) {
-                    dismissBookmark()
+                    onRequestDismissBookmark()
                 }
             }
         }
@@ -166,14 +188,18 @@ internal fun BackupAndRecoveryScreen(
                     when (val data = dialogState.data) {
                         is List<*> -> {
                             val backupList = data.mapNotNull { it as? BackupModel }
-                            BackupListDialog(dismissDialog, backupList, tryRecovery)
+                            BackupListDialog(
+                                backupList = backupList,
+                                onBackupListItemClick = onBackupListItemClick,
+                                onRequestDismissDialog = onRequestDismissDialog,
+                            )
                         }
 
                         is Int -> {
                             AutoBackupModeDialog(
                                 autoBackupMode = uiState.autoBackup,
                                 onAutoBackupModeSelected = onAutoBackupModeSelected,
-                                onDismissClick = dismissDialog,
+                                onRequestDismissDialog = onRequestDismissDialog,
                             )
                         }
                     }
@@ -182,8 +208,8 @@ internal fun BackupAndRecoveryScreen(
                 BackupAndRecoveryScaffoldContent(
                     uiState = uiState,
                     isConnected = isConnected,
-                    onSaveWebDAV = onSaveWebDAV,
-                    onSaveBackupPath = onSaveBackupPath,
+                    onConnectStateClick = onConnectStateClick,
+                    onBackupPathSelected = onBackupPathSelected,
                     onBackupClick = onBackupClick,
                     onRecoveryClick = onRecoveryClick,
                     onAutoBackupClick = onAutoBackupClick,
@@ -193,18 +219,25 @@ internal fun BackupAndRecoveryScreen(
     )
 }
 
+/**
+ * 备份列表弹窗
+ *
+ * @param backupList 备份列表数据
+ * @param onBackupListItemClick 备份列表 item 点击回调
+ * @param onRequestDismissDialog 隐藏弹窗
+ */
 @Composable
 private fun BackupListDialog(
-    dismissDialog: () -> Unit,
     backupList: List<BackupModel>,
-    tryRecovery: (String) -> Unit
+    onBackupListItemClick: (String) -> Unit,
+    onRequestDismissDialog: () -> Unit,
 ) {
     AlertDialog(
-        onDismissRequest = dismissDialog,
+        onDismissRequest = onRequestDismissDialog,
         confirmButton = {
             Text(
                 text = stringResource(id = R.string.cancel),
-                modifier = Modifier.clickable { dismissDialog() },
+                modifier = Modifier.clickable { onRequestDismissDialog() },
             )
         },
         text = {
@@ -214,7 +247,7 @@ private fun BackupListDialog(
                         Text(
                             text = it.name,
                             modifier = Modifier
-                                .clickable { tryRecovery(it.path) }
+                                .clickable { onBackupListItemClick(it.path) }
                                 .padding(vertical = 4.dp),
                         )
                     }
@@ -224,13 +257,78 @@ private fun BackupListDialog(
     )
 }
 
+/**
+ * 自动备份模式弹窗
+ *
+ * @param autoBackupMode 当前选择模式
+ * @param onAutoBackupModeSelected 模式切换回调
+ * @param onRequestDismissDialog 隐藏弹窗
+ */
+@Composable
+internal fun AutoBackupModeDialog(
+    autoBackupMode: AutoBackupModeEnum,
+    onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
+    onRequestDismissDialog: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onRequestDismissDialog,
+        title = { Text(text = stringResource(id = R.string.auto_backup)) },
+        text = {
+            Column(
+                modifier = Modifier.selectableGroup(),
+            ) {
+                AutoBackupModeEnum.values().forEach { enum ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .selectable(
+                                selected = (enum == autoBackupMode),
+                                onClick = { onAutoBackupModeSelected.invoke(enum) },
+                                role = Role.RadioButton
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = enum == autoBackupMode,
+                            onClick = null
+                        )
+                        Text(
+                            text = enum.text,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 16.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onRequestDismissDialog) {
+                Text(text = stringResource(id = R.string.close))
+            }
+        },
+    )
+}
+
+/**
+ * 备份恢复内容
+ *
+ * @param uiState 界面 UI 状态
+ * @param isConnected WebDAV 连接状态
+ * @param onConnectStateClick 连接状态点击回调
+ * @param onBackupPathSelected 备份路径选择回调
+ * @param onBackupClick 备份点击回调
+ * @param onRecoveryClick 恢复点击回调
+ * @param onAutoBackupClick 自动备份点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun BackupAndRecoveryScaffoldContent(
     uiState: BackupAndRecoveryUiState,
     isConnected: Boolean,
-    onSaveWebDAV: (String, String, String) -> Unit,
-    onSaveBackupPath: (String) -> Unit,
+    onConnectStateClick: (String, String, String) -> Unit,
+    onBackupPathSelected: (String) -> Unit,
     onBackupClick: () -> Unit,
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
@@ -300,7 +398,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             onClick = {
                 if (webDAVDomainTextFieldState.isValid && webDAVAccountTextFieldState.isValid && webDAVPasswordTextFieldState.isValid) {
                     // 参数可用
-                    onSaveWebDAV(
+                    onConnectStateClick(
                         webDAVDomainTextFieldState.text,
                         webDAVAccountTextFieldState.text,
                         webDAVPasswordTextFieldState.text
@@ -353,7 +451,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             headlineContent = { Text(text = stringResource(id = R.string.backup_path)) },
             supportingContent = { Text(text = uiState.backupPath.ifBlank { stringResource(id = R.string.click_to_select_backup_path) }) },
             modifier = Modifier.clickable {
-                onSelectDirCallback = onSaveBackupPath
+                onSelectDirCallback = onBackupPathSelected
                 selectDirLauncher.launch(null)
             },
         )
@@ -364,7 +462,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                 if (uiState.backupPath.isBlank()) {
                     // 未设置备份路径，选择备份路径后进行备份
                     onSelectDirCallback = { path ->
-                        onSaveBackupPath(path)
+                        onBackupPathSelected(path)
                         onBackupClick()
                     }
                     selectDirLauncher.launch(null)
@@ -394,7 +492,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                         if (uiState.backupPath.isBlank()) {
                             // 未设置备份路径，选择后进行恢复
                             onSelectDirCallback = { path ->
-                                onSaveBackupPath(path)
+                                onBackupPathSelected(path)
                                 onRecoveryClick(true, "")
                             }
                             selectDirLauncher.launch(null)
@@ -420,139 +518,30 @@ internal fun BackupAndRecoveryScaffoldContent(
         TransparentListItem(
             headlineContent = { Text(text = stringResource(id = R.string.auto_backup)) },
             supportingContent = {
-                Text(
-                    text = stringResource(
-                        id = when (uiState.autoBackup) {
-                            AutoBackupModeEnum.CLOSE -> R.string.close
-                            AutoBackupModeEnum.WHEN_LAUNCH -> R.string.each_launch
-                            AutoBackupModeEnum.EACH_DAY -> R.string.each_day
-                            AutoBackupModeEnum.EACH_WEEK -> R.string.each_week
-                        }
-                    )
-                )
+                Text(text = uiState.autoBackup.text)
             },
             modifier = Modifier.clickable(onClick = onAutoBackupClick),
         )
     }
 }
 
-@Composable
-internal fun AutoBackupModeDialog(
-    autoBackupMode: AutoBackupModeEnum,
-    onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
-    onDismissClick: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismissClick,
-        title = { Text(text = stringResource(id = R.string.auto_backup)) },
-        text = {
-            Column(
-                modifier = Modifier.selectableGroup(),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (AutoBackupModeEnum.CLOSE == autoBackupMode),
-                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.CLOSE) },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = AutoBackupModeEnum.CLOSE == autoBackupMode,
-                        onClick = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.close),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp),
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (AutoBackupModeEnum.WHEN_LAUNCH == autoBackupMode),
-                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.WHEN_LAUNCH) },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = AutoBackupModeEnum.WHEN_LAUNCH == autoBackupMode,
-                        onClick = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.each_launch),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp),
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (AutoBackupModeEnum.EACH_DAY == autoBackupMode),
-                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.EACH_DAY) },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = AutoBackupModeEnum.EACH_DAY == autoBackupMode,
-                        onClick = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.each_day),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp),
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (AutoBackupModeEnum.EACH_WEEK == autoBackupMode),
-                            onClick = { onAutoBackupModeSelected.invoke(AutoBackupModeEnum.EACH_WEEK) },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = AutoBackupModeEnum.EACH_WEEK == autoBackupMode,
-                        onClick = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.each_week),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp),
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismissClick) {
-                Text(text = stringResource(id = R.string.close))
-            }
-        },
+/** 枚举类型对应的文本 */
+internal val AutoBackupModeEnum.text: String
+    @Composable get() = stringResource(
+        id = when (this) {
+            AutoBackupModeEnum.CLOSE -> R.string.close
+            AutoBackupModeEnum.WHEN_LAUNCH -> R.string.each_launch
+            AutoBackupModeEnum.EACH_DAY -> R.string.each_day
+            AutoBackupModeEnum.EACH_WEEK -> R.string.each_week
+        }
     )
-}
 
 @DevicePreviews
 @Composable
 private fun BackupAndRecoveryScreenPreview() {
     PreviewTheme {
         BackupAndRecoveryRoute(
-            onBackClick = {},
+            onRequestPopBackStack = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
         )
     }

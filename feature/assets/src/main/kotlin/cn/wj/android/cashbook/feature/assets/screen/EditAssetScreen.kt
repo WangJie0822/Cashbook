@@ -64,11 +64,17 @@ import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
 import cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetViewModel
 
+/**
+ * 编辑资产界面
+ *
+ * @param assetId 资产 id
+ * @param onRequestPopBackStack 导航到上一级
+ */
 @Composable
 internal fun EditAssetRoute(
-    assetId: Long,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    assetId: Long = -1L,
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: EditAssetViewModel = hiltViewModel<EditAssetViewModel>().apply {
         updateAssetId(assetId)
     },
@@ -80,17 +86,17 @@ internal fun EditAssetRoute(
         isCreate = assetId == -1L,
         uiState = uiState,
         onSelectClassificationClick = viewModel::showSelectClassificationSheet,
-        onClassificationChange = viewModel::onClassificationChange,
-        onBillingDateClick = viewModel::onBillingDateClick,
-        onRepaymentDateClick = viewModel::onRepaymentDateClick,
-        onInvisibleChange = viewModel::onInvisibleChange,
+        onClassificationChange = viewModel::updateClassification,
+        onBillingDateClick = viewModel::showSelectBillingDateDialog,
+        onRepaymentDateClick = viewModel::showSelectRepaymentDateDialog,
+        onInvisibleChange = viewModel::updateInvisible,
         bottomSheet = viewModel.bottomSheetData,
         onBottomSheetDismiss = viewModel::dismissBottomSheet,
         dialogState = viewModel.dialogState,
         onDialogDismiss = viewModel::dismissDialog,
-        onDaySelect = viewModel::onDaySelect,
+        onDaySelect = viewModel::updateDay,
         onSaveClick = viewModel::save,
-        onBackClick = onBackClick,
+        onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
 }
@@ -588,56 +594,6 @@ internal fun SingleLineListItem(iconResId: Int, nameResId: Int, onItemClick: () 
 @Composable
 private fun EditAssetScreenPreview() {
     PreviewTheme {
-        EditAssetScreen(
-            isCreate = true,
-            uiState = EditAssetUiState.Success(
-                isCreditCard = true,
-                classification = AssetClassificationEnum.ALIPAY,
-                assetName = "支付宝",
-                totalAmount = "10000",
-                balance = "1000",
-                openBank = "",
-                cardNo = "",
-                remark = "",
-                billingDate = "1",
-                repaymentDate = "6",
-                invisible = false,
-            ),
-            onInvisibleChange = {},
-            onBillingDateClick = {},
-            onRepaymentDateClick = {},
-            dialogState = DialogState.Dismiss,
-            onDialogDismiss = {},
-            onDaySelect = {},
-            onSelectClassificationClick = { },
-            onClassificationChange = { _, _ -> },
-            bottomSheet = EditAssetBottomSheetEnum.DISMISS,
-            onBottomSheetDismiss = { },
-            onSaveClick = { _, _, _, _, _, _, _ -> },
-            onBackClick = { },
-        )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun EditAssetLoadingScreenPreview() {
-    PreviewTheme {
-        EditAssetScreen(
-            isCreate = true,
-            uiState = EditAssetUiState.Loading,
-            onInvisibleChange = {},
-            onBillingDateClick = {},
-            onRepaymentDateClick = {},
-            dialogState = DialogState.Dismiss,
-            onDialogDismiss = {},
-            onDaySelect = {},
-            onSelectClassificationClick = { },
-            onClassificationChange = { _, _ -> },
-            bottomSheet = EditAssetBottomSheetEnum.DISMISS,
-            onBottomSheetDismiss = { },
-            onSaveClick = { _, _, _, _, _, _, _ -> },
-            onBackClick = { },
-        )
+        EditAssetRoute()
     }
 }

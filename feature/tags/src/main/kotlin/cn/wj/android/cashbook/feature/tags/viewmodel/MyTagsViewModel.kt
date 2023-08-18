@@ -28,7 +28,7 @@ class MyTagsViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = listOf()
+            initialValue = emptyList(),
         )
 
     fun showEditTagDialog(tag: TagModel? = null) {

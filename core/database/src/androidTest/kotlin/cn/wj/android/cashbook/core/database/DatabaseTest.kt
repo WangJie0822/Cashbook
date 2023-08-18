@@ -48,7 +48,7 @@ class DatabaseTest {
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
         CashbookDatabase::class.java,
-        arrayListOf(),
+        emptyList(),
         FrameworkSQLiteOpenHelperFactory()
     )
 

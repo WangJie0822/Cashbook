@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,37 +61,36 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
-import cn.wj.android.cashbook.feature.records.model.TabItem
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 import com.google.accompanist.flowlayout.FlowRow
 
+/**
+ * 编辑记录
+ *
+ * @param recordId 记录id，`-1` 为新建
+ * @param typeId 类型 id，默认为 `-1`
+ * @param typeListContent 类型列表布局，参数：(类型大类, 已选择类型id, 类型选择回调, 头布局, 脚布局) -> [Unit]
+ * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 是否是关联资产, 资产选择回调) -> [Unit]
+ * @param tagBottomSheetContent 选择标签抽屉布局，参数：(已选择标签id列表, 标签id列表变化回调) -> [Unit]
+ * @param onRequestPopBackStack 导航到上一级
+ */
 @Composable
 internal fun EditRecordRoute(
-    recordId: Long,
-    typeId: Long,
-    typeListContent: @Composable (
-        modifier: Modifier,
-        typeCategory: RecordTypeCategoryEnum,
-        selectedTypeId: Long,
-        onTypeSelect: (Long) -> Unit,
-        headerContent: @Composable (modifier: Modifier) -> Unit,
-        footerContent: @Composable (modifier: Modifier) -> Unit,
-    ) -> Unit,
-    selectAssetBottomSheetContent: @Composable (
-        currentTypeId: Long,
-        isRelated: Boolean,
-        onAssetChange: (Long) -> Unit,
-    ) -> Unit,
-    selectTagBottomSheetContent: @Composable (
-        selectedTagIdList: List<Long>,
-        onTagIdListChange: (List<Long>) -> Unit,
-    ) -> Unit,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    recordId: Long = -1L,
+    typeId: Long = -1L,
+    typeListContent: @Composable (
+        RecordTypeCategoryEnum, Long, (Long) -> Unit,
+        @Composable (modifier: Modifier) -> Unit,
+        @Composable (modifier: Modifier) -> Unit,
+    ) -> Unit = { _, _, _, _, _ -> },
+    assetBottomSheetContent: @Composable (Long, Boolean, (Long) -> Unit) -> Unit = { _, _, _ -> },
+    tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit = { _, _ -> },
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
         updateRecordId(recordId)
-        onTypeSelect(typeId)
+        updateType(typeId)
     },
 ) {
 
@@ -104,111 +102,124 @@ internal fun EditRecordRoute(
     val selectedTypeId = uiState.selectedTypeId
 
     EditRecordScreen(
-        dialogState = viewModel.dialogState,
-        showDatePicker = viewModel::showDatePickerDialog,
-        datePickerConfirm = viewModel::datePickerConfirm,
-        timePickerConfirm = viewModel::timePickerConfirm,
-        dismissDialog = viewModel::dismissDialog,
         uiState = uiState,
+        dialogState = viewModel.dialogState,
+        onRequestDismissDialog = viewModel::dismissDialog,
+        onRecordTimeClick = viewModel::displayDatePickerDialog,
+        onDatePickerConfirm = viewModel::pickDate,
+        onTimePickerConfirm = viewModel::pickTime,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
-        dismissBookmark = viewModel::dismissBookmark,
-        onBackClick = onBackClick,
+        onRequestDismissBookmark = viewModel::dismissBookmark,
+        onBackClick = onRequestPopBackStack,
         selectedTypeCategory = selectedTypeCategory,
-        onTypeCategorySelect = viewModel::onTypeCategorySelect,
+        onTypeCategorySelect = viewModel::updateTypeCategory,
         bottomSheetType = viewModel.bottomSheetType,
-        dismissBottomSheet = viewModel::dismissBottomSheet,
-        onAmountClick = viewModel::onAmountClick,
-        onAmountChange = viewModel::onAmountChange,
-        onChargesClick = viewModel::onChargesClick,
-        onChargesChange = viewModel::onChargeChange,
-        onConcessionsClick = viewModel::onConcessionsClick,
-        onConcessionsChange = viewModel::onConcessionsChange,
-        typeListContent = typeListContent,
-        onTypeSelect = viewModel::onTypeSelect,
-        onRemarkChange = viewModel::onRemarkChange,
-        onAssetClick = viewModel::onAssetClick,
-        onRelatedAssetClick = viewModel::onRelatedAssetClick,
-        selectAssetBottomSheetContent = {
-            selectAssetBottomSheetContent(
-                currentTypeId = selectedTypeId,
-                isRelated = false,
-                onAssetChange = viewModel::onAssetChange,
+        onRequestDismissBottomSheet = viewModel::dismissBottomSheet,
+        onAmountClick = viewModel::displayAmountSheet,
+        onAmountChange = viewModel::updateAmount,
+        onChargesClick = viewModel::displayChargesSheet,
+        onChargesChange = viewModel::updateCharge,
+        onConcessionsClick = viewModel::displayConcessions,
+        onConcessionsChange = viewModel::updateConcessions,
+        typeListContent = { headerContent, footerContent ->
+            typeListContent(
+                selectedTypeCategory,
+                selectedTypeId,
+                viewModel::updateType,
+                headerContent,
+                footerContent
             )
+        },
+        onRemarkChange = viewModel::updateRemark,
+        onAssetClick = viewModel::displayAssetSheet,
+        onRelatedAssetClick = viewModel::displayRelatedAssetSheet,
+        selectAssetBottomSheetContent = {
+            assetBottomSheetContent(selectedTypeId, false, viewModel::updateAsset)
         },
         selectRelatedAssetBottomSheetContent = {
-            selectAssetBottomSheetContent(
-                currentTypeId = selectedTypeId,
-                isRelated = true,
-                onAssetChange = viewModel::onRelatedAssetChange,
-            )
+            assetBottomSheetContent(selectedTypeId, true, viewModel::updateRelatedAsset)
         },
         tagText = tagText,
-        onTagClick = viewModel::onTagClick,
+        onTagClick = viewModel::displayTagSheet,
         selectTagBottomSheetContent = {
-            selectTagBottomSheetContent(
-                selectedTagIdList = selectedTagIdList,
-                onTagIdListChange = viewModel::onTagChange,
-            )
+            tagBottomSheetContent(selectedTagIdList, viewModel::updateTag)
         },
-        onReimbursableClick = viewModel::onReimbursableClick,
-        onSaveClick = { viewModel.onSaveClick(onSuccess = onBackClick) },
+        onReimbursableClick = viewModel::switchReimbursable,
+        onSaveClick = { viewModel.trySave(onSuccess = onRequestPopBackStack) },
         modifier = modifier,
     )
 }
 
+/**
+ * 编辑记录
+ *
+ * @param uiState 界面 UI 状态
+ * @param shouldDisplayBookmark 显示提示数据
+ * @param onRequestDismissBookmark 隐藏提示
+ * @param dialogState 弹窗状态
+ * @param onRequestDismissDialog 隐藏弹窗
+ * @param onRecordTimeClick 记录时间点击回调
+ * @param onDatePickerConfirm 日期选择确认回调
+ * @param onTimePickerConfirm 时间选择确认回调
+ * @param selectedTypeCategory 已选择大类
+ * @param onTypeCategorySelect 记录大类修改回调
+ * @param bottomSheetType 底部抽屉类型
+ * @param onRequestDismissBottomSheet 隐藏底部抽屉
+ * @param onAmountClick 金额点击回调
+ * @param onAmountChange 金额变化回调
+ * @param onChargesClick 手续费点击回调
+ * @param onChargesChange 手续费变化回调
+ * @param onConcessionsClick 优惠点击回调
+ * @param onConcessionsChange 优惠变化回调
+ * @param typeListContent 类型列表布局，参数：(头布局, 脚布局) -> [Unit]
+ * @param onRemarkChange 备注变化回调
+ * @param onAssetClick 资产点击回调
+ * @param onRelatedAssetClick 关联资产点击回调
+ * @param selectAssetBottomSheetContent 选择资产底部抽屉
+ * @param selectRelatedAssetBottomSheetContent 选择关联资产底部抽屉
+ * @param tagText 标签显示文本
+ * @param onTagClick 标签点击回调
+ * @param selectTagBottomSheetContent 选择标签底部抽屉
+ * @param onReimbursableClick 可报销点击回调
+ * @param onSaveClick 保存点击回调
+ * @param onBackClick 返回点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordScreen(
-    dialogState: DialogState,
-    showDatePicker: () -> Unit,
-    datePickerConfirm: (String) -> Unit,
-    timePickerConfirm: (String) -> Unit,
-    dismissDialog: () -> Unit,
     uiState: EditRecordUiState,
-    // Snackbar 提示
     shouldDisplayBookmark: EditRecordBookmarkEnum,
-    dismissBookmark: () -> Unit,
-    // 标题栏
-    onBackClick: () -> Unit,
+    onRequestDismissBookmark: () -> Unit,
+    dialogState: DialogState,
+    onRequestDismissDialog: () -> Unit,
+    onRecordTimeClick: () -> Unit,
+    onDatePickerConfirm: (String) -> Unit,
+    onTimePickerConfirm: (String) -> Unit,
     selectedTypeCategory: RecordTypeCategoryEnum,
     onTypeCategorySelect: (RecordTypeCategoryEnum) -> Unit,
-    // bottom sheet
     bottomSheetType: EditRecordBottomSheetEnum,
-    dismissBottomSheet: () -> Unit,
-    // 金额
+    onRequestDismissBottomSheet: () -> Unit,
     onAmountClick: () -> Unit,
     onAmountChange: (String) -> Unit,
-    // 手续费
     onChargesClick: () -> Unit,
     onChargesChange: (String) -> Unit,
-    // 优惠
     onConcessionsClick: () -> Unit,
     onConcessionsChange: (String) -> Unit,
-    // 类型列表
     typeListContent: @Composable (
-        modifier: Modifier,
-        typeCategory: RecordTypeCategoryEnum,
-        selectedTypeId: Long,
-        onTypeSelect: (Long) -> Unit,
-        headerContent: @Composable (modifier: Modifier) -> Unit,
-        footerContent: @Composable (modifier: Modifier) -> Unit,
+        @Composable (modifier: Modifier) -> Unit,
+        @Composable (modifier: Modifier) -> Unit,
     ) -> Unit,
-    onTypeSelect: (Long) -> Unit,
-    // 备注
     onRemarkChange: (String) -> Unit,
-    // 资产
     onAssetClick: () -> Unit,
-    // 关联资产
     onRelatedAssetClick: () -> Unit,
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
-    // 标签
     tagText: String,
     onTagClick: () -> Unit,
     selectTagBottomSheetContent: @Composable () -> Unit,
-    // 报销
     onReimbursableClick: () -> Unit,
     onSaveClick: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = rememberSnackbarHostState(),
 ) {
@@ -225,14 +236,18 @@ internal fun EditRecordScreen(
                 EditRecordBookmarkEnum.SAVE_FAILED -> saveFailedText
                 else -> ""
             }
-            val showSnackbarResult = snackbarHostState.showSnackbar(tipText)
-            if (SnackbarResult.Dismissed == showSnackbarResult) {
-                dismissBookmark()
+            if (tipText.isBlank()) {
+                onRequestDismissBookmark()
+            } else {
+                val showSnackbarResult = snackbarHostState.showSnackbar(tipText)
+                if (SnackbarResult.Dismissed == showSnackbarResult) {
+                    onRequestDismissBookmark()
+                }
             }
         }
     }
 
-    // 主色调
+    // 获取不同大类主色调
     val primaryColor = when (selectedTypeCategory) {
         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
         RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
@@ -266,11 +281,11 @@ internal fun EditRecordScreen(
             ) {
                 if (bottomSheetType != EditRecordBottomSheetEnum.NONE) {
                     CashbookModalBottomSheet(
-                        onDismissRequest = dismissBottomSheet,
+                        onDismissRequest = onRequestDismissBottomSheet,
                         sheetState = rememberModalBottomSheetState(
                             confirmValueChange = {
                                 if (it == SheetValue.Hidden) {
-                                    dismissBottomSheet()
+                                    onRequestDismissBottomSheet()
                                 }
                                 true
                             }
@@ -302,18 +317,18 @@ internal fun EditRecordScreen(
                     when (model) {
                         is DateTimePickerModel.DatePicker -> {
                             DatePickerDialog(
-                                onDismissRequest = dismissDialog,
-                                onPositiveButtonClick = datePickerConfirm,
-                                onNegativeButtonClick = dismissDialog,
+                                onDismissRequest = onRequestDismissDialog,
+                                onPositiveButtonClick = onDatePickerConfirm,
+                                onNegativeButtonClick = onRequestDismissDialog,
                                 selection = model.dateMs,
                             )
                         }
 
                         is DateTimePickerModel.TimePicker -> {
                             TimePickerDialog(
-                                onDismissRequest = dismissDialog,
-                                onPositiveButtonClick = timePickerConfirm,
-                                onNegativeButtonClick = dismissDialog,
+                                onDismissRequest = onRequestDismissDialog,
+                                onPositiveButtonClick = onTimePickerConfirm,
+                                onNegativeButtonClick = onRequestDismissDialog,
                                 selection = model.timeMs,
                             )
                         }
@@ -324,7 +339,6 @@ internal fun EditRecordScreen(
                     uiState = uiState,
                     typeListContent = typeListContent,
                     selectedTypeCategory = selectedTypeCategory,
-                    onTypeSelect = onTypeSelect,
                     primaryColor = primaryColor,
                     onAmountClick = onAmountClick,
                     onRemarkChange = onRemarkChange,
@@ -335,27 +349,40 @@ internal fun EditRecordScreen(
                     onReimbursableClick = onReimbursableClick,
                     onChargesClick = onChargesClick,
                     onConcessionsClick = onConcessionsClick,
-                    showDatePicker = showDatePicker,
+                    onRecordTimeClick = onRecordTimeClick,
                 )
             }
         },
     )
 }
 
+/**
+ * 编辑记录
+ *
+ * @param uiState 界面 UI 状态
+ * @param selectedTypeCategory 已选择大类
+ * @param primaryColor 分类主色调
+ * @param onAmountClick 金额点击回调
+ * @param onChargesClick 手续费点击回调
+ * @param onConcessionsClick 优惠点击回调
+ * @param typeListContent 类型列表布局，参数：(头布局, 脚布局) -> [Unit]
+ * @param onRemarkChange 备注变化回调
+ * @param onAssetClick 资产点击回调
+ * @param onRelatedAssetClick 关联资产点击回调
+ * @param tagText 标签显示文本
+ * @param onTagClick 标签点击回调
+ * @param onReimbursableClick 可报销点击回调
+ * @param onRecordTimeClick 记录时间点击回调
+ */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun EditRecordScaffoldContent(
     uiState: EditRecordUiState,
     typeListContent: @Composable (
-        modifier: Modifier,
-        typeCategory: RecordTypeCategoryEnum,
-        selectedTypeId: Long,
-        onTypeSelect: (Long) -> Unit,
         headerContent: @Composable (modifier: Modifier) -> Unit,
         footerContent: @Composable (modifier: Modifier) -> Unit,
     ) -> Unit,
     selectedTypeCategory: RecordTypeCategoryEnum,
-    onTypeSelect: (Long) -> Unit,
     primaryColor: Color,
     onAmountClick: () -> Unit,
     onRemarkChange: (String) -> Unit,
@@ -366,7 +393,7 @@ private fun EditRecordScaffoldContent(
     onReimbursableClick: () -> Unit,
     onChargesClick: () -> Unit,
     onConcessionsClick: () -> Unit,
-    showDatePicker: () -> Unit,
+    onRecordTimeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -379,10 +406,6 @@ private fun EditRecordScaffoldContent(
 
             is EditRecordUiState.Success -> {
                 typeListContent(
-                    modifier = Modifier.fillMaxSize(),
-                    typeCategory = selectedTypeCategory,
-                    selectedTypeId = uiState.selectedTypeId,
-                    onTypeSelect = onTypeSelect,
                     headerContent = { modifier ->
                         Column(
                             modifier = modifier
@@ -464,7 +487,7 @@ private fun EditRecordScaffoldContent(
                                 val dateTime = uiState.dateTimeText
                                 FilterChip(
                                     selected = true,
-                                    onClick = showDatePicker,
+                                    onClick = onRecordTimeClick,
                                     label = { Text(text = dateTime) },
                                 )
 
@@ -523,6 +546,19 @@ private fun EditRecordScaffoldContent(
     }
 }
 
+/**
+ * 编辑记录底部抽屉
+ *
+ * @param bottomSheetType 抽屉类型
+ * @param uiState 界面 UI 状态
+ * @param primaryColor 主色调
+ * @param onAmountChange 金额变化回调
+ * @param onChargesChange 手续费变化回调
+ * @param onConcessionsChange 优惠变化回调
+ * @param selectAssetBottomSheetContent 选择资产抽屉
+ * @param selectRelatedAssetBottomSheetContent 选择关联资产抽屉
+ * @param selectTagBottomSheetContent 选择标签抽屉
+ */
 @Composable
 private fun EditRecordBottomSheetContent(
     bottomSheetType: EditRecordBottomSheetEnum,
@@ -587,25 +623,22 @@ private fun EditRecordBottomSheetContent(
     }
 }
 
+/**
+ * 编辑记录标题栏
+ *
+ * @param uiState 界面 UI 状态
+ * @param selectedTab 已选择大类
+ * @param onTabSelected 大类变化回调
+ * @param onBackClick 返回点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordTopBar(
     uiState: EditRecordUiState,
-    onBackClick: () -> Unit,
     selectedTab: RecordTypeCategoryEnum,
     onTabSelected: (RecordTypeCategoryEnum) -> Unit,
+    onBackClick: () -> Unit,
 ) {
-    // 顶部标签列表
-    val tabs = arrayListOf(
-        TabItem(
-            title = stringResource(id = R.string.expend),
-            type = RecordTypeCategoryEnum.EXPENDITURE,
-        ),
-        TabItem(title = stringResource(id = R.string.income), type = RecordTypeCategoryEnum.INCOME),
-        TabItem(
-            title = stringResource(id = R.string.transfer), type = RecordTypeCategoryEnum.TRANSFER
-        ),
-    )
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -631,11 +664,11 @@ internal fun EditRecordTopBar(
                     },
                     divider = {},
                 ) {
-                    tabs.forEach { tabItem ->
+                    RecordTypeCategoryEnum.values().forEach { enum ->
                         Tab(
-                            selected = selectedTab == tabItem.type,
-                            onClick = { onTabSelected(tabItem.type) },
-                            text = { Text(text = tabItem.title) },
+                            selected = selectedTab == enum,
+                            onClick = { onTabSelected(enum) },
+                            text = { Text(text = enum.text) },
                             selectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                             unselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                         )
@@ -645,6 +678,15 @@ internal fun EditRecordTopBar(
         },
     )
 }
+
+internal val RecordTypeCategoryEnum.text: String
+    @Composable get() = stringResource(
+        id = when (this) {
+            RecordTypeCategoryEnum.EXPENDITURE -> R.string.expend
+            RecordTypeCategoryEnum.INCOME -> R.string.income
+            RecordTypeCategoryEnum.TRANSFER -> R.string.transfer
+        }
+    )
 
 /**
  * 金额显示框
@@ -683,116 +725,6 @@ internal fun Amount(
 @Composable
 private fun EditRecordScreenPreview() {
     PreviewTheme {
-        EditRecordScreen(
-            dialogState = DialogState.Dismiss,
-            showDatePicker = {},
-            datePickerConfirm = {},
-            timePickerConfirm = {},
-            dismissDialog = {},
-            uiState = EditRecordUiState.Success(
-                amountText = "100",
-                chargesText = "10",
-                concessionsText = "",
-                remarkText = "备注",
-                assetText = "微信(￥1000)",
-                relatedAssetText = "",
-                dateTimeText = "2023-07-01 11:30",
-                reimbursable = false,
-                selectedTypeId = -1L,
-            ),
-            shouldDisplayBookmark = EditRecordBookmarkEnum.NONE,
-            dismissBookmark = {},
-            selectedTypeCategory = RecordTypeCategoryEnum.EXPENDITURE,
-            onTypeCategorySelect = {},
-            onBackClick = {},
-            bottomSheetType = EditRecordBottomSheetEnum.NONE,
-            dismissBottomSheet = {},
-            onAmountClick = {},
-            onAmountChange = {},
-            onChargesClick = {},
-            onChargesChange = {},
-            onConcessionsClick = {},
-            onConcessionsChange = {},
-            typeListContent = { modifier, _, _, _, headerContent, footerContent ->
-                Column(
-                    modifier = modifier.padding(horizontal = 16.dp),
-                ) {
-                    headerContent(Modifier)
-                    Text(
-                        text = "分类列表",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 50.dp),
-                    )
-                    footerContent(Modifier)
-                }
-            },
-            onTypeSelect = {},
-            onAssetClick = {},
-            onRelatedAssetClick = {},
-            selectAssetBottomSheetContent = {},
-            selectRelatedAssetBottomSheetContent = {},
-            tagText = "",
-            onTagClick = {},
-            selectTagBottomSheetContent = { },
-            onRemarkChange = {},
-            onReimbursableClick = {},
-            onSaveClick = {},
-        )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun EditRecordLoadingScreenPreview() {
-    PreviewTheme {
-        EditRecordScreen(
-            dialogState = DialogState.Dismiss,
-            showDatePicker = {},
-            datePickerConfirm = {},
-            timePickerConfirm = {},
-            dismissDialog = {},
-            uiState = EditRecordUiState.Loading,
-            shouldDisplayBookmark = EditRecordBookmarkEnum.NONE,
-            dismissBookmark = {},
-            selectedTypeCategory = RecordTypeCategoryEnum.EXPENDITURE,
-            onTypeCategorySelect = {},
-            onBackClick = {},
-            bottomSheetType = EditRecordBottomSheetEnum.NONE,
-            dismissBottomSheet = {},
-            onAmountClick = {},
-            onAmountChange = {},
-            onChargesClick = {},
-            onChargesChange = {},
-            onConcessionsClick = {},
-            onConcessionsChange = {},
-            typeListContent = { modifier, _, _, _, headerContent, footerContent ->
-                Column(
-                    modifier = modifier.padding(horizontal = 16.dp),
-                ) {
-                    headerContent(Modifier)
-                    Text(
-                        text = "分类列表",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 50.dp),
-                    )
-                    footerContent(Modifier)
-                }
-            },
-            onTypeSelect = {},
-            onAssetClick = {},
-            onRelatedAssetClick = {},
-            selectAssetBottomSheetContent = {},
-            selectRelatedAssetBottomSheetContent = {},
-            tagText = "",
-            onTagClick = {},
-            selectTagBottomSheetContent = { },
-            onRemarkChange = {},
-            onReimbursableClick = {},
-            onSaveClick = {},
-        )
+        EditRecordRoute()
     }
 }

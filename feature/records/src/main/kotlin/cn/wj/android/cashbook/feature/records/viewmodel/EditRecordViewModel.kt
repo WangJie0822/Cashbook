@@ -37,6 +37,12 @@ import kotlinx.coroutines.launch
 /**
  * 编辑记录 ViewModel
  *
+ * @param typeRepository 类型数据仓库
+ * @param assetRepository 资产数据仓库
+ * @param tagRepository 标签数据仓库
+ * @param getDefaultRecordUseCase 获取新建默认记录数据用例
+ * @param saveRecordUseCase 保存记录数据用例
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/5
  */
 @HiltViewModel
@@ -61,19 +67,20 @@ class EditRecordViewModel @Inject constructor(
         private set
 
     /** 记录 id */
-    private val recordIdData = MutableStateFlow(-1L)
+    private val _recordIdData = MutableStateFlow(-1L)
 
     /** 记录数据 */
-    private val mutableRecordData = MutableStateFlow<RecordModel?>(null)
-    private val defaultRecordData = recordIdData.mapLatest {
+    private val _mutableRecordData = MutableStateFlow<RecordModel?>(null)
+    private val _defaultRecordData = _recordIdData.mapLatest {
         getDefaultRecordUseCase(it)
     }
-    private val displayRecordData =
-        combine(mutableRecordData, defaultRecordData) { mutable, default ->
+    private val _displayRecordData =
+        combine(_mutableRecordData, _defaultRecordData) { mutable, default ->
             mutable ?: default
         }
 
-    val uiState = displayRecordData.mapLatest { record ->
+    /** 界面 UI 状态 */
+    val uiState = _displayRecordData.mapLatest { record ->
         val assetText = assetRepository.getAssetById(record.assetId)?.let { asset ->
             "${asset.name}(${
                 if (asset.type.isCreditCard()) {
@@ -111,9 +118,9 @@ class EditRecordViewModel @Inject constructor(
         )
 
     /** 类型数据 */
-    private val mutableTypeCategoryData = MutableStateFlow<RecordTypeCategoryEnum?>(null)
+    private val _mutableTypeCategoryData = MutableStateFlow<RecordTypeCategoryEnum?>(null)
     val selectedTypeCategoryData =
-        combine(mutableTypeCategoryData, defaultRecordData) { mutable, defaultRecord ->
+        combine(_mutableTypeCategoryData, _defaultRecordData) { mutable, defaultRecord ->
             mutable ?: typeRepository.getRecordTypeById(defaultRecord.typeId)?.typeCategory
             ?: RecordTypeCategoryEnum.EXPENDITURE
         }
@@ -125,26 +132,27 @@ class EditRecordViewModel @Inject constructor(
 
 
     /** 标签数据 */
-    private val mutableTagIdListData = MutableStateFlow<List<Long>>(listOf())
-    private val tagListData = mutableTagIdListData.mapLatest { list ->
+    private val _mutableTagIdListData = MutableStateFlow<List<Long>>(emptyList())
+    private val _tagListData = _mutableTagIdListData.mapLatest { list ->
         mutableListOf<TagModel>().apply {
             list.map { tagId ->
                 tagRepository.getTagById(tagId)?.let { tagModel -> add(tagModel) }
             }
         }
     }
-    private val defaultTagListData = recordIdData
+    private val _defaultTagListData = _recordIdData
         .mapLatest {
             tagRepository.getRelatedTag(it)
         }
-    private val displayTagListData = combine(tagListData, defaultTagListData) { mutable, default ->
-        if (mutable.isEmpty()) {
-            default
-        } else {
-            mutable
+    private val _displayTagListData =
+        combine(_tagListData, _defaultTagListData) { mutable, default ->
+            if (mutable.isEmpty()) {
+                default
+            } else {
+                mutable
+            }
         }
-    }
-    val displayTagIdListData = displayTagListData
+    val displayTagIdListData = _displayTagListData
         .mapLatest { list ->
             list.map {
                 it.id
@@ -153,10 +161,10 @@ class EditRecordViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = listOf(),
+            initialValue = emptyList(),
         )
 
-    val tagTextData = displayTagListData
+    val tagTextData = _displayTagListData
         .mapLatest { list ->
             StringBuilder().run {
                 list.forEach { tag ->
@@ -174,110 +182,130 @@ class EditRecordViewModel @Inject constructor(
             initialValue = ""
         )
 
+    /** 更新记录 [id]，刷新界面数据 */
     fun updateRecordId(id: Long) {
-        recordIdData.tryEmit(id)
+        _recordIdData.tryEmit(id)
     }
 
-    fun onTypeCategorySelect(typeCategory: RecordTypeCategoryEnum) {
-        mutableTypeCategoryData.tryEmit(typeCategory)
+    /** 更新记录大类为 [typeCategory] */
+    fun updateTypeCategory(typeCategory: RecordTypeCategoryEnum) {
+        _mutableTypeCategoryData.tryEmit(typeCategory)
     }
 
-    fun onAmountClick() {
+    /** 显示金额抽屉 */
+    fun displayAmountSheet() {
         bottomSheetType = EditRecordBottomSheetEnum.AMOUNT
     }
 
-    fun onAmountChange(amount: String) {
+    /** 更新金额 */
+    fun updateAmount(amount: String) {
         viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(amount = amount))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(amount = amount))
             dismissBottomSheet()
         }
     }
 
-    fun onChargesClick() {
+    /** 显示手续费抽屉 */
+    fun displayChargesSheet() {
         bottomSheetType = EditRecordBottomSheetEnum.CHARGES
     }
 
-    fun onChargeChange(charges: String) {
+    /** 更新手续费 */
+    fun updateCharge(charges: String) {
         viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(charges = charges))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(charges = charges))
             dismissBottomSheet()
         }
     }
 
-    fun onConcessionsClick() {
+    /** 显示优惠抽屉 */
+    fun displayConcessions() {
         bottomSheetType = EditRecordBottomSheetEnum.CONCESSIONS
     }
 
-    fun onConcessionsChange(concessions: String) {
+    /** 更新优惠 */
+    fun updateConcessions(concessions: String) {
         viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(concessions = concessions))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(concessions = concessions))
             dismissBottomSheet()
         }
     }
 
-    fun onTypeSelect(typeId: Long) {
+    /** 更新类型 */
+    fun updateType(typeId: Long) {
         if (typeId == -1L) {
             return
         }
         viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(typeId = typeId))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(typeId = typeId))
         }
     }
 
-    fun onRemarkChange(remark: String) {
+    /** 更新备注 */
+    fun updateRemark(remark: String) {
         viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(remark = remark))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(remark = remark))
         }
     }
 
-    fun onAssetClick() {
+    /** 显示资产抽屉 */
+    fun displayAssetSheet() {
         bottomSheetType = EditRecordBottomSheetEnum.ASSETS
     }
 
-    fun onAssetChange(assetId: Long) {
+    /** 更新资产 */
+    fun updateAsset(assetId: Long) {
         viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(assetId = assetId))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(assetId = assetId))
             dismissBottomSheet()
         }
     }
 
-    fun onRelatedAssetClick() {
+    /** 显示关联资产抽屉 */
+    fun displayRelatedAssetSheet() {
         bottomSheetType = EditRecordBottomSheetEnum.RELATED_ASSETS
     }
 
-    fun onRelatedAssetChange(assetId: Long) {
+    /** 更新关联资产 */
+    fun updateRelatedAsset(assetId: Long) {
         viewModelScope.launch {
-            mutableRecordData.tryEmit(displayRecordData.first().copy(relatedAssetId = assetId))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(relatedAssetId = assetId))
             dismissBottomSheet()
         }
     }
 
-    fun onTagClick() {
+    /** 显示标签抽屉 */
+    fun displayTagSheet() {
         bottomSheetType = EditRecordBottomSheetEnum.TAGS
     }
 
-    fun onTagChange(tags: List<Long>) {
-        mutableTagIdListData.tryEmit(tags)
+    /** 更新标签 */
+    fun updateTag(tags: List<Long>) {
+        _mutableTagIdListData.tryEmit(tags)
     }
 
-    fun onReimbursableClick() {
+    /** 切换可报销状态 */
+    fun switchReimbursable() {
         viewModelScope.launch {
-            val old = displayRecordData.first()
-            mutableRecordData.tryEmit(old.copy(reimbursable = !old.reimbursable))
+            val old = _displayRecordData.first()
+            _mutableRecordData.tryEmit(old.copy(reimbursable = !old.reimbursable))
         }
     }
 
+    /** 隐藏提示 */
     fun dismissBookmark() {
         shouldDisplayBookmark = EditRecordBookmarkEnum.NONE
     }
 
+    /** 隐藏底部抽屉 */
     fun dismissBottomSheet() {
         bottomSheetType = EditRecordBottomSheetEnum.NONE
     }
 
-    fun onSaveClick(onSuccess: () -> Unit) {
+    /** 保存记录 */
+    fun trySave(onSuccess: () -> Unit) {
         viewModelScope.launch {
-            val recordEntity = displayRecordData.first()
+            val recordEntity = _displayRecordData.first()
             if (recordEntity.amount.toDoubleOrZero() == 0.0) {
                 // 记录金额不能为 0
                 shouldDisplayBookmark = EditRecordBookmarkEnum.AMOUNT_MUST_NOT_BE_ZERO
@@ -309,7 +337,8 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
-    fun showDatePickerDialog() {
+    /** 显示选择日期弹窗 */
+    fun displayDatePickerDialog() {
         viewModelScope.launch {
             val currentState = uiState.first()
             if (currentState is EditRecordUiState.Success) {
@@ -325,23 +354,17 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
+    /** 日期临时保存，选择时间后才会真正保存 */
     private var dateTemp = ""
 
-    fun datePickerConfirm(date: String) {
+    /** 选择日期 */
+    fun pickDate(date: String) {
         dateTemp = date
-        showTimePickerDialog()
+        displayTimePickerDialog()
     }
 
-    fun timePickerConfirm(time: String) {
-        dismissDialog()
-        viewModelScope.launch {
-            mutableRecordData.tryEmit(
-                displayRecordData.first().copy(recordTime = "$dateTemp $time")
-            )
-        }
-    }
-
-    private fun showTimePickerDialog() {
+    /** 显示选择时间弹窗 */
+    private fun displayTimePickerDialog() {
         viewModelScope.launch {
             val currentState = uiState.first()
             if (currentState is EditRecordUiState.Success) {
@@ -357,14 +380,40 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
+    /** 选择时间 */
+    fun pickTime(time: String) {
+        dismissDialog()
+        viewModelScope.launch {
+            _mutableRecordData.tryEmit(
+                _displayRecordData.first().copy(recordTime = "$dateTemp $time")
+            )
+        }
+    }
+
+    /** 隐藏弹窗 */
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
 }
 
+/** 界面 UI 状态 */
 sealed class EditRecordUiState(open val selectedTypeId: Long = -1L) {
-    object Loading : EditRecordUiState()
+    /** 加载中 */
+    data object Loading : EditRecordUiState()
 
+    /**
+     * 加载完成
+     *
+     * @param amountText 金额
+     * @param chargesText 手续费
+     * @param concessionsText 优惠
+     * @param remarkText 备注
+     * @param assetText 资产
+     * @param relatedAssetText 关联资产
+     * @param dateTimeText 日期时间
+     * @param reimbursable 是否可报销
+     * @param selectedTypeId 当前选择类型 id
+     */
     data class Success(
         val amountText: String,
         val chargesText: String,

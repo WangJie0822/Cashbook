@@ -58,26 +58,21 @@ fun NavController.naviToCalendar() {
 
 /**
  * 编辑记录
+ *
+ * @param typeListContent 类型列表布局，参数：(类型大类, 已选择类型id, 类型选择回调, 头布局, 脚布局) -> [Unit]
+ * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 是否是关联资产, 资产选择回调) -> [Unit]
+ * @param tagBottomSheetContent 选择标签抽屉布局，参数：(已选择标签id列表, 标签id列表变化回调) -> [Unit]
+ * @param onRequestPopBackStack 导航到上一级
  */
 fun NavGraphBuilder.editRecordScreen(
     typeListContent: @Composable (
-        modifier: Modifier,
-        typeCategory: RecordTypeCategoryEnum,
-        selectedTypeId: Long,
-        onTypeSelect: (Long) -> Unit,
-        headerContent: @Composable (modifier: Modifier) -> Unit,
-        footerContent: @Composable (modifier: Modifier) -> Unit,
+        RecordTypeCategoryEnum, Long, (Long) -> Unit,
+        @Composable (modifier: Modifier) -> Unit,
+        @Composable (modifier: Modifier) -> Unit
     ) -> Unit,
-    selectAssetBottomSheetContent: @Composable (
-        currentTypeId: Long,
-        isRelated: Boolean,
-        onAssetChange: (Long) -> Unit,
-    ) -> Unit,
-    selectTagBottomSheetContent: @Composable (
-        selectedTagIdList: List<Long>,
-        onTagIdListChange: (List<Long>) -> Unit,
-    ) -> Unit,
-    onBackClick: () -> Unit,
+    assetBottomSheetContent: @Composable (Long, Boolean, (Long) -> Unit) -> Unit,
+    tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(
         route = ROUTE_EDIT_RECORD,
@@ -96,9 +91,9 @@ fun NavGraphBuilder.editRecordScreen(
             recordId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_RECORD_ID) ?: -1L,
             typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
             typeListContent = typeListContent,
-            selectAssetBottomSheetContent = selectAssetBottomSheetContent,
-            selectTagBottomSheetContent = selectTagBottomSheetContent,
-            onBackClick = onBackClick,
+            assetBottomSheetContent = assetBottomSheetContent,
+            tagBottomSheetContent = tagBottomSheetContent,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }
@@ -121,41 +116,66 @@ fun NavGraphBuilder.selectRelatedRecordScreen(
     }
 }
 
+/**
+ * 记录日历界面
+ *
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 fun NavGraphBuilder.calendarScreen(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
-    onBackClick: () -> Unit,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
+    onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     composable(route = ROUTE_RECORD_CALENDAR) {
         CalendarRoute(
             recordDetailSheetContent = recordDetailSheetContent,
-            onBackClick = onBackClick,
+            onRequestPopBackStack = onRequestPopBackStack,
             onShowSnackbar = onShowSnackbar,
         )
     }
 }
 
+/**
+ * 首页具体显示内容
+ *
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param onRequestOpenDrawer 打开抽屉菜单
+ * @param onRequestNaviToEditRecord 导航到编辑记录
+ * @param onRequestNaviToSearch 导航到搜索
+ * @param onRequestNaviToCalendar 导航到日历
+ * @param onRequestNaviToMyAsset 导航到我的资产
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @Composable
 fun LauncherContent(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
-    onEditRecordClick: (Long) -> Unit,
-    onMenuClick: () -> Unit,
-    onSearchClick: () -> Unit,
-    onCalendarClick: () -> Unit,
-    onMyAssetClick: () -> Unit,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
+    onRequestOpenDrawer: () -> Unit,
+    onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToSearch: () -> Unit,
+    onRequestNaviToCalendar: () -> Unit,
+    onRequestNaviToMyAsset: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     LauncherContentRoute(
         recordDetailSheetContent = recordDetailSheetContent,
-        onEditRecordClick = onEditRecordClick,
-        onMenuClick = onMenuClick,
-        onSearchClick = onSearchClick,
-        onCalendarClick = onCalendarClick,
-        onMyAssetClick = onMyAssetClick,
+        onRequestOpenDrawer = onRequestOpenDrawer,
+        onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+        onRequestNaviToSearch = onRequestNaviToSearch,
+        onRequestNaviToCalendar = onRequestNaviToCalendar,
+        onRequestNaviToMyAsset = onRequestNaviToMyAsset,
         onShowSnackbar = onShowSnackbar,
     )
 }
 
+/**
+ * 资产信息界面记录列表
+ *
+ * @param assetId 资产 id
+ * @param topContent 列表头布局
+ * @param onRecordItemClick 记录列表 item 点击回调
+ */
 @Composable
 fun AssetInfoContent(
     assetId: Long,
@@ -169,15 +189,22 @@ fun AssetInfoContent(
     )
 }
 
+/**
+ * 记录详情 sheet 内容
+ *
+ * @param recordEntity 显示的记录数据
+ * @param onRequestNaviToEditRecord 导航到编辑记录
+ * @param onRequestDismissSheet 隐藏 sheet
+ */
 @Composable
 fun RecordDetailSheetContent(
     recordEntity: RecordViewsEntity?,
-    onRecordItemEditClick: (Long) -> Unit,
+    onRequestNaviToEditRecord: (Long) -> Unit,
     onRequestDismissSheet: () -> Unit,
 ) {
     RecordDetailsSheet(
         recordData = recordEntity,
-        onRequestNaviToEditRecord = onRecordItemEditClick,
+        onRequestNaviToEditRecord = onRequestNaviToEditRecord,
         onRequestDismissSheet = onRequestDismissSheet,
     )
 }

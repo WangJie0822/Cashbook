@@ -59,27 +59,38 @@ fun NavController.naviToBackupAndRecovery() {
 
 /**
  * 首页显示
+ * - 首页显示主体，提供左侧抽屉菜单、用户隐私协议弹窗、安全校验功能，具体内容显示通过 [content] 参数提供
+ *
+ * @param onRequestNaviToMyAsset 导航到我的资产
+ * @param onRequestNaviToMyBooks 导航到我的账本
+ * @param onRequestNaviToMyCategory 导航到我的分类
+ * @param onRequestNaviToMyTags 导航到我的标签
+ * @param onRequestNaviToSetting 导航到设置
+ * @param onRequestNaviToAboutUs 导航到关于我们
+ * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ * @param content 显示内容，参数 (打开抽屉) -> [Unit]
  */
 fun NavGraphBuilder.settingsLauncherScreen(
-    onMyAssetClick: () -> Unit,
-    onMyBookClick: () -> Unit,
-    onMyCategoryClick: () -> Unit,
-    onMyTagClick: () -> Unit,
-    onSettingClick: () -> Unit,
-    onAboutUsClick: () -> Unit,
-    onPrivacyPolicyClick: () -> Unit,
+    onRequestNaviToMyAsset: () -> Unit,
+    onRequestNaviToMyBooks: () -> Unit,
+    onRequestNaviToMyCategory: () -> Unit,
+    onRequestNaviToMyTags: () -> Unit,
+    onRequestNaviToSetting: () -> Unit,
+    onRequestNaviToAboutUs: () -> Unit,
+    onRequestNaviToPrivacyPolicy: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     content: @Composable (() -> Unit) -> Unit,
 ) {
     composable(route = ROUTE_SETTINGS_LAUNCHER) {
         LauncherRoute(
-            onMyAssetClick = onMyAssetClick,
-            onMyBookClick = onMyBookClick,
-            onMyCategoryClick = onMyCategoryClick,
-            onMyTagClick = onMyTagClick,
-            onSettingClick = onSettingClick,
-            onAboutUsClick = onAboutUsClick,
-            onPrivacyPolicyClick = onPrivacyPolicyClick,
+            onRequestNaviToMyAsset = onRequestNaviToMyAsset,
+            onRequestNaviToMyBooks = onRequestNaviToMyBooks,
+            onRequestNaviToMyCategory = onRequestNaviToMyCategory,
+            onRequestNaviToMyTags = onRequestNaviToMyTags,
+            onRequestNaviToSetting = onRequestNaviToSetting,
+            onRequestNaviToAboutUs = onRequestNaviToAboutUs,
+            onRequestNaviToPrivacyPolicy = onRequestNaviToPrivacyPolicy,
             onShowSnackbar = onShowSnackbar,
             content = content,
         )
@@ -88,42 +99,56 @@ fun NavGraphBuilder.settingsLauncherScreen(
 
 /**
  * 关于我们
+ *
+ * @param onRequestNaviToChangelog 导航到修改日志
+ * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 fun NavGraphBuilder.aboutUsScreen(
-    onBackClick: () -> Unit,
+    onRequestNaviToChangelog: () -> Unit,
+    onRequestNaviToPrivacyPolicy: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
-    onVersionInfoClick: () -> Unit,
-    onUserAgreementAndPrivacyPolicyClick: () -> Unit,
 ) {
     composable(route = ROUTE_SETTINGS_ABOUT_US) {
         AboutUsRoute(
-            onBackClick = onBackClick,
+            onRequestNaviToChangelog = onRequestNaviToChangelog,
+            onRequestNaviToPrivacyPolicy = onRequestNaviToPrivacyPolicy,
+            onRequestPopBackStack = onRequestPopBackStack,
             onShowSnackbar = onShowSnackbar,
-            onVersionInfoClick = onVersionInfoClick,
-            onUserAgreementAndPrivacyPolicyClick = onUserAgreementAndPrivacyPolicyClick,
         )
     }
 }
 
 /**
  * 设置
+ *
+ * @param onRequestNaviToBackupAndRecovery 导航到备份与恢复
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 fun NavGraphBuilder.settingScreen(
-    onBackClick: () -> Unit,
-    onBackupAndRecoveryClick: () -> Unit,
+    onRequestNaviToBackupAndRecovery: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     composable(route = ROUTE_SETTINGS_SETTING) {
         SettingRoute(
-            onBackClick = onBackClick,
-            onBackupAndRecoveryClick = onBackupAndRecoveryClick,
+            onRequestPopBackStack = onRequestPopBackStack,
+            onRequestNaviToBackupAndRecovery = onRequestNaviToBackupAndRecovery,
             onShowSnackbar = onShowSnackbar,
         )
     }
 }
 
+/**
+ * Markdown 显示界面
+ *
+ * @param onRequestPopBackStack 导航到上一级
+ */
 fun NavGraphBuilder.markdownScreen(
-    onBackClick: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(
         route = ROUTE_SETTINGS_MARKDOWN,
@@ -137,18 +162,24 @@ fun NavGraphBuilder.markdownScreen(
         val mdOrdinal = it.arguments?.getInt(ROUTE_SETTINGS_MARKDOWN_KEY_TYPE) ?: -1
         MarkdownRoute(
             markdownType = MarkdownTypeEnum.ordinalOf(mdOrdinal),
-            onBackClick = onBackClick,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }
 
+/**
+ * 备份恢复界面
+ *
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 fun NavGraphBuilder.backupAndRecoveryScreen(
-    onBackClick: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     composable(route = ROUTE_SETTINGS_BACKUP_AND_RECOVERY) {
         BackupAndRecoveryRoute(
-            onBackClick = onBackClick,
+            onRequestPopBackStack = onRequestPopBackStack,
             onShowSnackbar = onShowSnackbar,
         )
     }

@@ -14,6 +14,13 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.viewmodel.AssetInfoContentViewModel
 
+/**
+ * 资产信息界面记录列表
+ *
+ * @param assetId 资产 id
+ * @param topContent 列表头布局
+ * @param onRecordItemClick 记录列表 item 点击回调
+ */
 @Composable
 internal fun AssetInfoContentRoute(
     assetId: Long,
@@ -33,6 +40,13 @@ internal fun AssetInfoContentRoute(
     )
 }
 
+/**
+ * 资产信息界面记录列表
+ *
+ * @param topContent 列表头布局
+ * @param recordList 记录列表数据
+ * @param onRecordItemClick 记录列表 item 点击回调
+ */
 @Composable
 internal fun AssetInfoContentScreen(
     topContent: @Composable () -> Unit,

@@ -99,118 +99,114 @@ fun CashbookNavHost(
 
         // 启动页
         settingsLauncherScreen(
-            onMyAssetClick = navController::naviToMyAsset,
-            onMyBookClick = navController::naviToMyBooks,
-            onMyCategoryClick = {/* TODO */ },
-            onMyTagClick = navController::naviToMyTags,
-            onSettingClick = navController::naviToSetting,
-            onAboutUsClick = navController::naviToAboutUs,
-            onPrivacyPolicyClick = { navController.naviToMarkdown(MarkdownTypeEnum.PRIVACY_POLICY) },
+            onRequestNaviToMyAsset = navController::naviToMyAsset,
+            onRequestNaviToMyBooks = navController::naviToMyBooks,
+            onRequestNaviToMyCategory = {/* TODO */ },
+            onRequestNaviToMyTags = navController::naviToMyTags,
+            onRequestNaviToSetting = navController::naviToSetting,
+            onRequestNaviToAboutUs = navController::naviToAboutUs,
+            onRequestNaviToPrivacyPolicy = { navController.naviToMarkdown(MarkdownTypeEnum.PRIVACY_POLICY) },
             onShowSnackbar = onShowSnackbar,
-            content = { openDrawer ->
+            content = { onRequestOpenDrawer ->
                 LauncherContent(
                     recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
                         RecordDetailSheetContent(
                             recordEntity = recordEntity,
-                            onRecordItemEditClick = navController::naviToEditRecord,
+                            onRequestNaviToEditRecord = navController::naviToEditRecord,
                             onRequestDismissSheet = onRequestDismissSheet,
                         )
                     },
-                    onEditRecordClick = navController::naviToEditRecord,
-                    onMenuClick = openDrawer,
-                    onSearchClick = { /* TODO */ },
-                    onCalendarClick = navController::naviToCalendar,
-                    onMyAssetClick = navController::naviToMyAsset,
+                    onRequestOpenDrawer = onRequestOpenDrawer,
+                    onRequestNaviToEditRecord = navController::naviToEditRecord,
+                    onRequestNaviToSearch = { /* TODO */ },
+                    onRequestNaviToCalendar = navController::naviToCalendar,
+                    onRequestNaviToMyAsset = navController::naviToMyAsset,
                     onShowSnackbar = onShowSnackbar,
                 )
             },
         )
         // 关于我们
         aboutUsScreen(
-            onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
-            onVersionInfoClick = {
+            onRequestNaviToChangelog = {
                 // 版本信息
                 navController.naviToMarkdown(MarkdownTypeEnum.CHANGELOG)
             },
-            onUserAgreementAndPrivacyPolicyClick = {
+            onRequestNaviToPrivacyPolicy = {
                 // 用户协议及隐私政策
                 navController.naviToMarkdown(MarkdownTypeEnum.PRIVACY_POLICY)
             },
+            onRequestPopBackStack = navController::popBackStack,
         )
         // 设置
         settingScreen(
-            onBackClick = navController::popBackStack,
-            onBackupAndRecoveryClick = navController::naviToBackupAndRecovery,
+            onRequestNaviToBackupAndRecovery = navController::naviToBackupAndRecovery,
+            onRequestPopBackStack = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
         )
-        // markdown
+        // Markdown 显示界面
         markdownScreen(
-            onBackClick = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStack,
         )
         // 备份与恢复
         backupAndRecoveryScreen(
-            onBackClick = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
         )
 
         // 我的标签
         myTagsScreen(
-            onBackClick = navController::popBackStack,
-            onTagStatisticClick = { /* TODO */ },
+            onRequestNaviToTagStatistic = { /* TODO */ },
+            onRequestPopBackStack = navController::popBackStack,
         )
+
         // 编辑记录
         editRecordScreen(
-            typeListContent = { modifier, typeCategory, selectedTypeId, onTypeSelect, headerContent, footerContent ->
+            typeListContent = { typeCategory, selectedTypeId, onTypeSelect, headerContent, footerContent ->
                 EditRecordTypeListContent(
                     typeCategory = typeCategory,
                     selectedTypeId = selectedTypeId,
                     onTypeSelect = onTypeSelect,
+                    onRequestNaviToTypeManager = { /*TODO*/ },
                     headerContent = headerContent,
                     footerContent = footerContent,
-                    onTypeSettingClick = { /*TODO*/ },
-                    modifier = modifier,
                 )
             },
-            selectAssetBottomSheetContent = { currentTypeId, isRelated, onAssetChange ->
+            assetBottomSheetContent = { currentTypeId, isRelated, onAssetChange ->
                 EditRecordSelectAssetBottomSheetContent(
                     currentTypeId = currentTypeId,
                     isRelated = isRelated,
                     onAssetChange = onAssetChange,
-                    onAddAssetClick = navController::naviToEditAsset,
+                    onRequestNaviToEditAsset = navController::naviToEditAsset,
                 )
             },
-            selectTagBottomSheetContent = { selectedTagIdList, onTagIdListChange ->
+            tagBottomSheetContent = { selectedTagIdList, onTagIdListChange ->
                 EditRecordSelectTagBottomSheetContent(
                     selectedTagIdList = selectedTagIdList,
                     onTagIdListChange = onTagIdListChange,
                 )
             },
-            onBackClick = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStack,
         )
-        // TODO 选择关联记录
-//        selectRelatedRecordScreen(
-//            onBackClick = navController::popBackStack,
-//        )
-        // 日历
+        // 记录日历
         calendarScreen(
             recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
                 RecordDetailSheetContent(
                     recordEntity = recordEntity,
-                    onRecordItemEditClick = navController::naviToEditRecord,
+                    onRequestNaviToEditRecord = navController::naviToEditRecord,
                     onRequestDismissSheet = onRequestDismissSheet,
                 )
             },
-            onBackClick = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
         )
 
         // 我的资产
         myAssetScreen(
-            onAssetItemClick = navController::naviToAssetInfo,
-            onAddAssetClick = navController::naviToEditAsset,
-            onInvisibleAssetClick = {/*TODO*/ },
-            onBackClick = navController::popBackStack,
+            onRequestNaviToAssetInfo = navController::naviToAssetInfo,
+            onRequestNaviToAddAsset = navController::naviToEditAsset,
+            onRequestNaviToInvisibleAsset = {/*TODO*/ },
+            onRequestPopBackStack = navController::popBackStack,
         )
         // 资产信息
         assetInfoScreen(
@@ -224,26 +220,26 @@ fun CashbookNavHost(
             recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
                 RecordDetailSheetContent(
                     recordEntity = recordEntity,
-                    onRecordItemEditClick = navController::naviToEditRecord,
+                    onRequestNaviToEditRecord = navController::naviToEditRecord,
                     onRequestDismissSheet = onRequestDismissSheet,
                 )
             },
-            onEditAssetClick = navController::naviToEditAsset,
-            onBackClick = navController::popBackStack,
+            onRequestNaviToEditAsset = navController::naviToEditAsset,
+            onRequestPopBackStack = navController::popBackStack,
         )
         // 编辑资产
         editAssetScreen(
-            onBackClick = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStack,
         )
 
         // 我的账本
         myBooksScreen(
-            onEditBookClick = navController::naviToEditBook,
-            onBackClick = navController::popBackStack,
+            onRequestNaviToEditBook = navController::naviToEditBook,
+            onRequestPopBackStack = navController::popBackStack,
         )
         // 编辑账本
         editBookScreen(
-            onBackClick = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStack,
         )
     }
 }

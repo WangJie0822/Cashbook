@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 /**
  * 资产信息页记录数据 ViewModel
  *
+ * @param getAssetRecordViewsUseCase 获取对应资产记录数据用例
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/3
  */
 @HiltViewModel
@@ -28,9 +30,11 @@ class AssetInfoContentViewModel @Inject constructor(
     getAssetRecordViewsUseCase: GetAssetRecordViewsUseCase
 ) : ViewModel() {
 
-    private val assetIdData = MutableStateFlow(-1L)
+    /** 资产 id 数据 */
+    private val _assetIdData = MutableStateFlow(-1L)
 
-    val recordList = combine(assetIdData, recordDataVersion) { assetId, _ ->
+    /** 记录列表数据 */
+    val recordList = combine(_assetIdData, recordDataVersion) { assetId, _ ->
         assetId
     }
         .flatMapLatest {
@@ -46,11 +50,15 @@ class AssetInfoContentViewModel @Inject constructor(
         }
         .cachedIn(viewModelScope)
 
+    /** 更新资产 id */
     fun updateAssetId(id: Long) {
-        assetIdData.tryEmit(id)
+        _assetIdData.tryEmit(id)
     }
 }
 
+/**
+ * Paging 数据仓库
+ */
 private class AssetRecordPagingSource(
     private val assetId: Long,
     private val getAssetRecordViewsUseCase: GetAssetRecordViewsUseCase

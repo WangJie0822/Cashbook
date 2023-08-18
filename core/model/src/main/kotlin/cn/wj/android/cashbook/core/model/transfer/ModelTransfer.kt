@@ -38,7 +38,7 @@ fun RecordEntity.asModel(): RecordModel {
 }
 
 fun RecordTypeModel.asEntity(
-    child: List<RecordTypeEntity> = listOf()
+    child: List<RecordTypeEntity> = emptyList()
 ): RecordTypeEntity {
     return RecordTypeEntity(
         id = this.id,
@@ -53,21 +53,3 @@ fun RecordTypeModel.asEntity(
         needRelated = needRelated,
     )
 }
-
-//fun RecordViewsModel.asEntity(): RecordViewsEntity {
-//    return RecordViewsEntity(
-//        this.id,
-//        this.booksId,
-//        this.type.asEntity(),
-//        this.asset?.asEntity(),
-//        this.relatedAsset?.asEntity(),
-//        this.amount,
-//        this.charges,
-//        this.concessions,
-//        this.remark,
-//        this.reimbursable,
-//        this.relatedTags.map { it.asEntity() },
-//        this.relatedRecord.map { it.asEntity() },
-//        this.recordTime,
-//    )
-//}

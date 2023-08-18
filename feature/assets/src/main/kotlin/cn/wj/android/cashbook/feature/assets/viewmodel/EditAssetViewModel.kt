@@ -27,6 +27,12 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * 编辑资产 ViewModel
+ *
+ * @param assetRepository 资产数据仓库
+ * @param getDefaultAssetUseCase 获取默认资产数据用例
+ */
 @HiltViewModel
 class EditAssetViewModel @Inject constructor(
     private val assetRepository: AssetRepository,
@@ -42,17 +48,18 @@ class EditAssetViewModel @Inject constructor(
         private set
 
     /** 资产 id */
-    private val assetIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
+    private val _assetIdData: MutableStateFlow<Long> = MutableStateFlow(-1L)
 
     /** 显示的资产信息 */
     private val _mutableAssetInfo = MutableStateFlow<AssetModel?>(null)
-    private val defaultAssetInfo = assetIdData.mapLatest { getDefaultAssetUseCase(it) }
-    private val displayAssetInfo =
-        combine(_mutableAssetInfo, defaultAssetInfo) { mutable, default ->
+    private val _defaultAssetInfo = _assetIdData.mapLatest { getDefaultAssetUseCase(it) }
+    private val _displayAssetInfo =
+        combine(_mutableAssetInfo, _defaultAssetInfo) { mutable, default ->
             mutable ?: default
         }
 
-    val uiState = displayAssetInfo
+    /** 界面 UI 状态 */
+    val uiState = _displayAssetInfo
         .mapLatest {
             EditAssetUiState.Success(
                 isCreditCard = it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
@@ -74,17 +81,21 @@ class EditAssetViewModel @Inject constructor(
             initialValue = EditAssetUiState.Loading,
         )
 
+    /** 更新资产 id */
     fun updateAssetId(id: Long) {
-        assetIdData.tryEmit(id)
+        _assetIdData.tryEmit(id)
     }
 
+    /** 银行类型的临时缓存 */
     private var typeTemp: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT
 
+    /** 显示选择类型 sheet */
     fun showSelectClassificationSheet() {
         bottomSheetData = EditAssetBottomSheetEnum.CLASSIFICATION_TYPE
     }
 
-    fun onClassificationChange(
+    /** 更新类型 */
+    fun updateClassification(
         type: ClassificationTypeEnum?,
         classification: AssetClassificationEnum
     ) {
@@ -98,28 +109,31 @@ class EditAssetViewModel @Inject constructor(
             // 其它类型，保存
             viewModelScope.launch {
                 _mutableAssetInfo.tryEmit(
-                    displayAssetInfo.first().copy(type = typeTemp, classification = classification)
+                    _displayAssetInfo.first().copy(type = typeTemp, classification = classification)
                 )
             }
             dismissBottomSheet()
         }
     }
 
-    fun onBillingDateClick() {
+    /** 显示选择账单日弹窗 */
+    fun showSelectBillingDateDialog() {
         dialogState = DialogState.Shown(SelectDayEnum.BILLING_DATE)
     }
 
-    fun onRepaymentDateClick() {
+    /** 显示选择还款日弹窗 */
+    fun showSelectRepaymentDateDialog() {
         dialogState = DialogState.Shown(SelectDayEnum.REPAYMENT_DATE)
     }
 
-    fun onDaySelect(day: String) {
+    /** 更新时间 */
+    fun updateDay(day: String) {
         viewModelScope.launch {
             (dialogState as? DialogState.Shown<*>)?.let { state ->
                 val assetEntity = if (state.data == SelectDayEnum.BILLING_DATE) {
-                    displayAssetInfo.first().copy(billingDate = day)
+                    _displayAssetInfo.first().copy(billingDate = day)
                 } else {
-                    displayAssetInfo.first().copy(repaymentDate = day)
+                    _displayAssetInfo.first().copy(repaymentDate = day)
                 }
                 _mutableAssetInfo.tryEmit(assetEntity)
             }
@@ -128,20 +142,24 @@ class EditAssetViewModel @Inject constructor(
 
     }
 
-    fun onInvisibleChange(invisible: Boolean) {
+    /** 更新隐藏状态 */
+    fun updateInvisible(invisible: Boolean) {
         viewModelScope.launch {
-            _mutableAssetInfo.tryEmit(displayAssetInfo.first().copy(invisible = invisible))
+            _mutableAssetInfo.tryEmit(_displayAssetInfo.first().copy(invisible = invisible))
         }
     }
 
+    /** 隐藏 sheet */
     fun dismissBottomSheet() {
         bottomSheetData = EditAssetBottomSheetEnum.DISMISS
     }
 
+    /** 隐藏弹窗 */
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
 
+    /** 保存资产 */
     fun save(
         assetName: String,
         totalAmount: String,
@@ -154,7 +172,7 @@ class EditAssetViewModel @Inject constructor(
         // TODO 修改余额平账功能
         viewModelScope.launch {
             try {
-                val assetInfo = displayAssetInfo.first().copy(
+                val assetInfo = _displayAssetInfo.first().copy(
                     name = assetName,
                     totalAmount = totalAmount,
                     balance = balance,

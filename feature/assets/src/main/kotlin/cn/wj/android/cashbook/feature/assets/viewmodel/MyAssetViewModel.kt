@@ -38,7 +38,7 @@ class MyAssetViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
-            initialValue = listOf(),
+            initialValue = emptyList(),
         )
 
     val uiState = assetRepository.currentVisibleAssetListData

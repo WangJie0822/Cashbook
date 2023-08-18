@@ -50,11 +50,8 @@ import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
-import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
-import cn.wj.android.cashbook.core.model.model.assetModelTestObject
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
@@ -65,15 +62,20 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetViewModel
 /**
  * 我的资产
  *
+ * @param onRequestNaviToAssetInfo 导航到资产信息
+ * @param onRequestNaviToAddAsset 导航到添加资产
+ * @param onRequestNaviToInvisibleAsset 导航到隐藏资产
+ * @param onRequestPopBackStack 导航到上一级
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/27
  */
 @Composable
 internal fun MyAssetRoute(
-    onAssetItemClick: (Long) -> Unit,
-    onAddAssetClick: () -> Unit,
-    onInvisibleAssetClick: () -> Unit,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onRequestNaviToAssetInfo: (Long) -> Unit = {},
+    onRequestNaviToAddAsset: () -> Unit = {},
+    onRequestNaviToInvisibleAsset: () -> Unit = {},
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: MyAssetViewModel = hiltViewModel(),
 ) {
 
@@ -82,6 +84,7 @@ internal fun MyAssetRoute(
 
     val showMoreDialog = viewModel.showMoreDialog
 
+    // 显示更多显示时返回隐藏弹窗
     if (showMoreDialog) {
         BackPressHandler {
             viewModel.dismissShowMoreDialog()
@@ -89,27 +92,40 @@ internal fun MyAssetRoute(
     }
 
     MyAssetScreen(
-        showMoreDialog = showMoreDialog,
-        displayShowMoreDialog = viewModel::displayShowMoreDialog,
-        dismissShowMoreDialog = viewModel::dismissShowMoreDialog,
-        assetTypedListData = assetTypedListData,
         uiState = uiState,
-        onAssetItemClick = onAssetItemClick,
-        onAddAssetClick = onAddAssetClick,
-        onInvisibleAssetClick = onInvisibleAssetClick,
-        onBackClick = onBackClick,
+        showMoreDialog = showMoreDialog,
+        onRequestDisplayShowMoreDialog = viewModel::displayShowMoreDialog,
+        onRequestDismissShowMoreDialog = viewModel::dismissShowMoreDialog,
+        assetTypedListData = assetTypedListData,
+        onAssetItemClick = onRequestNaviToAssetInfo,
+        onAddAssetClick = onRequestNaviToAddAsset,
+        onInvisibleAssetClick = onRequestNaviToInvisibleAsset,
+        onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
 }
 
+/**
+ * 我的资产界面
+ *
+ * @param uiState 界面 UI 状态
+ * @param showMoreDialog 是否显示更多弹窗
+ * @param onRequestDisplayShowMoreDialog 显示弹窗
+ * @param onRequestDismissShowMoreDialog 隐藏弹窗
+ * @param assetTypedListData 资产列表数据
+ * @param onAssetItemClick 资产列表 item 点击回调
+ * @param onAddAssetClick 添加资产点击回调
+ * @param onInvisibleAssetClick 隐藏资产点击回调
+ * @param onBackClick 返回点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyAssetScreen(
-    showMoreDialog: Boolean,
-    displayShowMoreDialog: () -> Unit,
-    dismissShowMoreDialog: () -> Unit,
-    assetTypedListData: List<AssetTypeViewsModel>,
     uiState: MyAssetUiState,
+    showMoreDialog: Boolean,
+    onRequestDisplayShowMoreDialog: () -> Unit,
+    onRequestDismissShowMoreDialog: () -> Unit,
+    assetTypedListData: List<AssetTypeViewsModel>,
     onAssetItemClick: (Long) -> Unit,
     onAddAssetClick: () -> Unit,
     onInvisibleAssetClick: () -> Unit,
@@ -132,7 +148,7 @@ internal fun MyAssetScreen(
                 )
             },
             floatingActionButton = {
-                CashbookFloatingActionButton(onClick = displayShowMoreDialog) {
+                CashbookFloatingActionButton(onClick = onRequestDisplayShowMoreDialog) {
                     Icon(
                         imageVector = CashbookIcons.MoreVert,
                         contentDescription = null,
@@ -153,12 +169,19 @@ internal fun MyAssetScreen(
             ShowMoreContent(
                 onAddAssetClick = onAddAssetClick,
                 onInvisibleAssetClick = onInvisibleAssetClick,
-                onCloseClick = dismissShowMoreDialog,
+                onCloseClick = onRequestDismissShowMoreDialog,
             )
         }
     }
 }
 
+/**
+ * 显示更多弹窗内容
+ *
+ * @param onAddAssetClick 添加资产点击回调
+ * @param onInvisibleAssetClick 隐藏资产点击回调
+ * @param onCloseClick 关闭点击回调
+ */
 @Composable
 private fun ShowMoreContent(
     onAddAssetClick: () -> Unit,
@@ -251,12 +274,20 @@ private fun ShowMoreContent(
     }
 }
 
+/**
+ * 我的资产界面
+ *
+ * @param paddingValues 界面 padding 数据
+ * @param uiState 界面 UI 状态
+ * @param assetTypedListData 资产列表数据
+ * @param onAssetItemClick 资产列表 item 点击回调
+ */
 @Composable
 internal fun MyAssetBackdropScaffold(
+    paddingValues: PaddingValues,
     uiState: MyAssetUiState,
     assetTypedListData: List<AssetTypeViewsModel>,
     onAssetItemClick: (Long) -> Unit,
-    paddingValues: PaddingValues,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
 ) {
     BackdropScaffold(
@@ -301,6 +332,13 @@ internal fun MyAssetBackdropScaffold(
     )
 }
 
+/**
+ * 资产列表 item
+ *
+ * @param assetTypedInfo 资产数据
+ * @param onAssetItemClick 资产点击回调
+ * @param expandDefault 是否默认展开
+ */
 @Composable
 internal fun AssetTypedInfoItem(
     assetTypedInfo: AssetTypeViewsModel,
@@ -350,6 +388,12 @@ internal fun AssetTypedInfoItem(
     }
 }
 
+/**
+ * 我的资产界面 - 统计数据
+ *
+ * @param paddingValues 界面 padding 数据
+ * @param uiState 界面 UI 状态
+ */
 @Composable
 internal fun BackLayerContent(
     paddingValues: PaddingValues,
@@ -421,76 +465,9 @@ internal fun BackLayerContent(
 @DevicePreviews
 @Composable
 private fun MyAssetScreenPreview() {
-    CashbookTheme {
-        CashbookGradientBackground {
-            val totalIncome = 2000
-            val totalLiabilities = 3000
-            MyAssetScreen(
-                showMoreDialog = false,
-                displayShowMoreDialog = {},
-                dismissShowMoreDialog = {},
-                assetTypedListData = listOf(
-                    AssetTypeViewsModel(
-                        R.string.asset_classifications_capital_account, "2000", listOf(
-                            assetModelTestObject.copy(
-                                id = 1L,
-                                name = "建设银行",
-                                iconResId = R.drawable.vector_bank_js_24
-                            ),
-                            assetModelTestObject.copy(
-                                id = 2L,
-                                name = "交通银行",
-                                iconResId = R.drawable.vector_bank_jt_24
-                            ),
-                        )
-                    ),
-                    AssetTypeViewsModel(
-                        R.string.asset_classifications_credit_card_account, "2000", listOf(
-                            assetModelTestObject.copy(
-                                id = 3,
-                                name = "中国银行",
-                                type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
-                                iconResId = R.drawable.vector_bank_zg_24
-                            ),
-                            assetModelTestObject.copy(
-                                id = 4,
-                                name = "花呗",
-                                type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
-                                iconResId = R.drawable.vector_ant_credit_pay_circle_24
-                            ),
-                        )
-                    ),
-                ),
-                uiState = MyAssetUiState.Success(
-                    netAsset = "${totalIncome - totalLiabilities}".withCNY(),
-                    totalAsset = "$totalIncome".withCNY(),
-                    totalLiabilities = "$totalLiabilities".withCNY(),
-                ),
-                onAssetItemClick = {},
-                onAddAssetClick = {},
-                onInvisibleAssetClick = {},
-                onBackClick = {},
-            )
-        }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun MyAssetScreenLoadingPreview() {
     PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)
     ) {
-        MyAssetScreen(
-            showMoreDialog = false,
-            displayShowMoreDialog = {},
-            dismissShowMoreDialog = {},
-            assetTypedListData = listOf(),
-            uiState = MyAssetUiState.Loading,
-            onAssetItemClick = {},
-            onAddAssetClick = {},
-            onInvisibleAssetClick = {},
-            onBackClick = {},
-        )
+        MyAssetRoute()
     }
 }

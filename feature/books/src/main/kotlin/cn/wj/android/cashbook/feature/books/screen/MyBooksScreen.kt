@@ -44,11 +44,17 @@ import cn.wj.android.cashbook.domain.usecase.GetSelectableBooksListUseCase
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksUiState
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksViewModel
 
+/**
+ * 我的账本
+ *
+ * @param onRequestNaviToEditBook 导航到编辑账本
+ * @param onRequestPopBackStack 导航上上一级
+ */
 @Composable
 internal fun MyBooksRoute(
-    onEditBookClick: (Long) -> Unit,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onRequestNaviToEditBook: (Long) -> Unit = {},
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: MyBooksViewModel = hiltViewModel(),
 ) {
 
@@ -57,12 +63,12 @@ internal fun MyBooksRoute(
     MyBooksScreen(
         uiState = uiState,
         onBookSelected = viewModel::onBookSelected,
-        onEditBookClick = onEditBookClick,
+        onEditBookClick = onRequestNaviToEditBook,
         onDeleteBookClick = viewModel::onDeleteBookClick,
         dialogState = viewModel.dialogState,
         onConfirmDelete = viewModel::confirmDeleteBook,
         onDismissDialog = viewModel::onDismissDialog,
-        onBackClick = onBackClick,
+        onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
 }
@@ -274,8 +280,6 @@ private fun MyBooksContent(
 private fun MyBooksScreenPreview() {
     PreviewTheme {
         MyBooksRoute(
-            onEditBookClick = {},
-            onBackClick = { FakeBooksRepository.initData() },
             viewModel = MyBooksViewModel(
                 getSelectableBooksListUseCase = GetSelectableBooksListUseCase(booksRepository = FakeBooksRepository),
                 booksRepository = FakeBooksRepository

@@ -33,11 +33,17 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.MarkdownViewModel
 import io.noties.markwon.Markwon
 
+/**
+ * Markdown 显示界面
+ *
+ * @param markdownType 数据类型
+ * @param onRequestPopBackStack 导航到上一级
+ */
 @Composable
 internal fun MarkdownRoute(
-    markdownType: MarkdownTypeEnum?,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    markdownType: MarkdownTypeEnum? = null,
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: MarkdownViewModel = hiltViewModel<MarkdownViewModel>().apply {
         updateMarkdownType(markdownType)
     }
@@ -50,11 +56,19 @@ internal fun MarkdownRoute(
         isSyncing = isSyncing,
         markdownData = markdownData,
         onRetryClick = viewModel::onRetryClick,
-        onBackClick = onBackClick,
+        onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
 }
 
+/**
+ * Markdown 显示界面
+ *
+ * @param isSyncing 数据是否正在同步
+ * @param markdownData Markdown 显示数据
+ * @param onRetryClick 重试点击回调
+ * @param onBackClick 返回点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MarkdownScreen(
@@ -109,32 +123,9 @@ internal fun MarkdownScreen(
 @DevicePreviews
 @Composable
 private fun MarkdownScreenPreview() {
-    PreviewTheme {
-        MarkdownScreen(
-            isSyncing = false,
-            markdownData = """
-            # 标题一
-            ## 标题二
-            * 重点内容 **加粗** *斜体* `code`
-            正常内容
-        """.trimIndent(),
-            onRetryClick = {},
-            onBackClick = {},
-        )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun MarkdownScreenEmptyPreview() {
     PreviewTheme(
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)
     ) {
-        MarkdownScreen(
-            isSyncing = true,
-            markdownData = "",
-            onRetryClick = {},
-            onBackClick = {},
-        )
+        MarkdownRoute()
     }
 }

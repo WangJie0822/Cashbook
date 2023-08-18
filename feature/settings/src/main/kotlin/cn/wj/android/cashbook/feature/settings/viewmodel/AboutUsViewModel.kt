@@ -24,6 +24,9 @@ import kotlinx.coroutines.launch
 /**
  * 关于我们
  *
+ * @param settingRepository 设置相关数据仓库
+ * @param networkMonitor 网络监控
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/14
  */
 @HiltViewModel
@@ -48,6 +51,7 @@ class AboutUsViewModel @Inject constructor(
     private val _confirmUpdateInfoData = MutableStateFlow<UpdateInfoEntity?>(null)
     val confirmUpdateInfoData: StateFlow<UpdateInfoEntity?> = _confirmUpdateInfoData
 
+    /** 界面 UI 状态 */
     val uiState =
         combine(settingRepository.appDataMode, _updateInfoData) { appDataModel, updateInfoEntity ->
             AboutUsUiState.Success(
@@ -66,7 +70,7 @@ class AboutUsViewModel @Inject constructor(
      * 是否允许下载
      * - WiFi或用户允许流量下载
      */
-    private val allowDownload =
+    private val _allowDownload =
         combine(settingRepository.appDataMode, networkMonitor.isWifi) { appDataModel, isWifi ->
             isWifi || appDataModel.mobileNetworkDownloadEnable
         }
@@ -85,6 +89,7 @@ class AboutUsViewModel @Inject constructor(
         }
     }
 
+    /** 检查更新 */
     fun checkUpdate() {
         viewModelScope.launch {
             try {
@@ -111,11 +116,12 @@ class AboutUsViewModel @Inject constructor(
         }
     }
 
+    /** 确认升级 */
     fun confirmUpdate() {
         val updateInfo = updateInfoData.value ?: return
         _updateInfoData.tryEmit(null)
         viewModelScope.launch {
-            if (allowDownload.first()) {
+            if (_allowDownload.first()) {
                 // 允许直接下载
                 UpdateManager.startDownload(updateInfo)
                 shouldDisplayBookmark = AboutUsBookmarkEnum.START_DOWNLOAD
@@ -126,13 +132,15 @@ class AboutUsViewModel @Inject constructor(
         }
     }
 
-    fun clearUpdate(ignore: Boolean) {
+    /** 隐藏升级弹窗 */
+    fun dismissUpdateDialog(ignore: Boolean) {
         viewModelScope.launch {
             settingRepository.updateIgnoreUpdateVersion(if (ignore) updateInfoData.value?.versionName.orEmpty() else "")
             _updateInfoData.tryEmit(null)
         }
     }
 
+    /** 确认下载 */
     fun confirmDownload(noMorePrompt: Boolean) {
         val updateInfo = confirmUpdateInfoData.value ?: return
         _confirmUpdateInfoData.tryEmit(null)
@@ -145,22 +153,33 @@ class AboutUsViewModel @Inject constructor(
         }
     }
 
-    fun clearDownload() {
+    /** 隐藏无 WiFi 升级提示弹窗 */
+    fun dismissNoWifiUpdateDialog() {
         _confirmUpdateInfoData.tryEmit(null)
     }
 
-    fun clearBookmarkState() {
+    /** 隐藏提示 */
+    fun dismissBookmark() {
         shouldDisplayBookmark = AboutUsBookmarkEnum.NONE
     }
 }
 
+/**
+ * 界面 UI 状态
+ *
+ * @param useGitee 是否使用 gitee 源
+ * @param autoCheckUpdate 是否自动检查更新
+ * @param ignoreUpdateVersion 是否跳过此版本
+ */
 sealed class AboutUsUiState(
     open val useGitee: Boolean = false,
     open val autoCheckUpdate: Boolean = false,
     open val ignoreUpdateVersion: Boolean = false,
 ) {
-    object Loading : AboutUsUiState()
+    /** 加载中 */
+    data object Loading : AboutUsUiState()
 
+    /** 加载完成 */
     data class Success(
         override val useGitee: Boolean,
         override val autoCheckUpdate: Boolean,

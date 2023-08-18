@@ -74,16 +74,27 @@ import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import java.time.YearMonth
 
+/**
+ * 首页内容
+ *
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param onRequestOpenDrawer 打开抽屉菜单
+ * @param onRequestNaviToEditRecord 导航到编辑记录
+ * @param onRequestNaviToSearch 导航到搜索
+ * @param onRequestNaviToCalendar 导航到日历
+ * @param onRequestNaviToMyAsset 导航到我的资产
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @Composable
 internal fun LauncherContentRoute(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
-    onEditRecordClick: (Long) -> Unit,
-    onMenuClick: () -> Unit,
-    onSearchClick: () -> Unit,
-    onCalendarClick: () -> Unit,
-    onMyAssetClick: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit = { _, _ -> },
+    onRequestOpenDrawer: () -> Unit = {},
+    onRequestNaviToEditRecord: (Long) -> Unit = {},
+    onRequestNaviToSearch: () -> Unit = {},
+    onRequestNaviToCalendar: () -> Unit = {},
+    onRequestNaviToMyAsset: () -> Unit = {},
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     viewModel: LauncherContentViewModel = hiltViewModel(),
 ) {
 
@@ -92,43 +103,58 @@ internal fun LauncherContentRoute(
 
     LauncherContentScreen(
         shouldDisplayDeleteFailedBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
-        onBookmarkDismiss = viewModel::onBookmarkDismiss,
-        onShowSnackbar = onShowSnackbar,
+        onRequestDismissBookmark = viewModel::dismissBookmark,
         recordDetailSheetContent = { record ->
-            recordDetailSheetContent(
-                recordInfo = record,
-                dismissBottomSheet = viewModel::onSheetDismiss,
-            )
+            recordDetailSheetContent(record, viewModel::dismissSheet)
         },
         viewRecord = viewModel.viewRecord,
         date = date,
-        onMenuClick = onMenuClick,
-        onDateClick = viewModel::showDateSelectDialog,
-        onDateSelected = viewModel::onDateSelected,
-        onSearchClick = onSearchClick,
-        onCalendarClick = onCalendarClick,
-        onMyAssetClick = onMyAssetClick,
-        onAddClick = { onEditRecordClick.invoke(-1L) },
+        onMenuClick = onRequestOpenDrawer,
+        onDateClick = viewModel::displayDateSelectDialog,
+        onDateSelected = viewModel::refreshSelectedDate,
+        onSearchClick = onRequestNaviToSearch,
+        onCalendarClick = onRequestNaviToCalendar,
+        onMyAssetClick = onRequestNaviToMyAsset,
+        onAddClick = { onRequestNaviToEditRecord.invoke(-1L) },
         uiState = uiState,
-        onRecordItemClick = viewModel::onRecordItemClick,
+        onRecordItemClick = viewModel::displayRecordDetailsSheet,
         dialogState = viewModel.dialogState,
-        onDialogDismiss = viewModel::onDialogDismiss,
-        onSheetDismiss = viewModel::onSheetDismiss,
+        onRequestDismissDialog = viewModel::dismissDialog,
+        onRequestDismissSheet = viewModel::dismissSheet,
+        onShowSnackbar = onShowSnackbar,
         modifier = modifier,
     )
 }
 
+/**
+ * 首页内容
+ *
+ * @param shouldDisplayDeleteFailedBookmark 删除失败提示
+ * @param onRequestDismissBookmark 隐藏提示
+ * @param viewRecord 需要显示的记录数据
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据) -> [Unit]
+ * @param date 当前选择的年月信息
+ * @param onMenuClick 菜单点击回调
+ * @param onDateClick 日期点击回调
+ * @param onDateSelected 日期选择回调
+ * @param onSearchClick 搜索点击回调
+ * @param onCalendarClick 日历点击回调
+ * @param onMyAssetClick 我的资产点击回调
+ * @param onAddClick 添加点击回调
+ * @param uiState 界面 UI 数据
+ * @param onRecordItemClick 记录列表 item 点击回调
+ * @param dialogState 弹窗状态
+ * @param onRequestDismissDialog 隐藏弹窗
+ * @param onRequestDismissSheet 隐藏 sheet
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherContentScreen(
-    // 删除失败提示
     shouldDisplayDeleteFailedBookmark: Int,
-    onBookmarkDismiss: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
-    // 记录详情
-    recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
+    onRequestDismissBookmark: () -> Unit,
     viewRecord: RecordViewsEntity?,
-    // 标题栏
+    recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     date: YearMonth,
     onMenuClick: () -> Unit,
     onDateClick: () -> Unit,
@@ -136,15 +162,13 @@ internal fun LauncherContentScreen(
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onMyAssetClick: () -> Unit,
-    // 添加按钮
     onAddClick: () -> Unit,
-    // 月收支信息
     uiState: LauncherContentUiState,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
-    // 弹窗信息
     dialogState: DialogState,
-    onDialogDismiss: () -> Unit,
-    onSheetDismiss: () -> Unit,
+    onRequestDismissDialog: () -> Unit,
+    onRequestDismissSheet: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
 ) {
@@ -157,7 +181,7 @@ internal fun LauncherContentScreen(
                 deleteFailedFormatText.format(shouldDisplayDeleteFailedBookmark), null
             )
             if (SnackbarResult.Dismissed == result) {
-                onBookmarkDismiss.invoke()
+                onRequestDismissBookmark.invoke()
             }
         }
     }
@@ -182,12 +206,13 @@ internal fun LauncherContentScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (null != viewRecord) {
+                // 显示记录详情底部抽屉
                 CashbookModalBottomSheet(
-                    onDismissRequest = onSheetDismiss,
+                    onDismissRequest = onRequestDismissSheet,
                     sheetState = rememberModalBottomSheetState(
                         confirmValueChange = {
                             if (it == SheetValue.Hidden) {
-                                onSheetDismiss()
+                                onRequestDismissSheet()
                             }
                             true
                         },
@@ -210,6 +235,7 @@ internal fun LauncherContentScreen(
                         peekHeight = paddingValues.calculateTopPadding(),
                         backLayerBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
                         backLayerContent = {
+                            // 背景布局
                             BackLayerContent(
                                 paddingValues = paddingValues,
                                 monthIncome = uiState.monthIncome,
@@ -220,11 +246,11 @@ internal fun LauncherContentScreen(
                         frontLayerScrimColor = Color.Unspecified,
                         frontLayerContent = {
                             FrontLayerContent(
-                                onDateSelected = onDateSelected,
                                 dialogState = dialogState,
-                                onDialogDismiss = onDialogDismiss,
-                                recordMap = uiState.recordMap,
                                 onDateClick = onDateClick,
+                                onDateSelected = onDateSelected,
+                                onRequestDismissDialog = onRequestDismissDialog,
+                                recordMap = uiState.recordMap,
                                 onRecordItemClick = onRecordItemClick,
                             )
                         },
@@ -235,14 +261,129 @@ internal fun LauncherContentScreen(
     }
 }
 
+/**
+ * 标题栏
+ *
+ * @param dateStr 日期文本
+ * @param onMenuClick 菜单点击回调
+ * @param onDateClick 日期点击回调
+ * @param onSearchClick 搜索点击回调
+ * @param onCalendarClick 日历点击回调
+ * @param onMyAssetClick 资产点击回调
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun LauncherTopBar(
+    dateStr: String,
+    onMenuClick: () -> Unit,
+    onDateClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    onCalendarClick: () -> Unit,
+    onMyAssetClick: () -> Unit,
+) {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
+        ),
+        title = {
+            Text(
+                text = dateStr,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .clickable(onClick = onDateClick)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    imageVector = CashbookIcons.Menu,
+                    contentDescription = null,
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onSearchClick) {
+                Icon(
+                    imageVector = CashbookIcons.Search,
+                    contentDescription = null,
+                )
+            }
+            IconButton(onClick = onCalendarClick) {
+                Icon(
+                    imageVector = CashbookIcons.CalendarMonth,
+                    contentDescription = null,
+                )
+            }
+            IconButton(onClick = onMyAssetClick) {
+                Icon(
+                    imageVector = CashbookIcons.WebAsset,
+                    contentDescription = null,
+                )
+            }
+        },
+    )
+}
+
+/**
+ * 背景布局
+ *
+ * @param paddingValues 背景 padding 数据
+ * @param monthIncome 月收入
+ * @param monthExpand 月支出
+ * @param monthBalance 月结余
+ */
+@Composable
+private fun BackLayerContent(
+    paddingValues: PaddingValues,
+    monthIncome: String,
+    monthExpand: String,
+    monthBalance: String,
+    modifier: Modifier = Modifier,
+) {
+    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onTertiaryContainer) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(paddingValues)
+                .padding(16.dp),
+        ) {
+            Text(text = stringResource(id = R.string.month_income))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = monthIncome.withCNY())
+            Spacer(modifier = Modifier.height(24.dp))
+            Row {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "${stringResource(id = R.string.month_expend)} ${monthExpand.withCNY()}",
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "${stringResource(id = R.string.month_balance)} ${monthBalance.withCNY()}",
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 内容布局
+ *
+ * @param dialogState 弹窗状态
+ * @param onDateClick 日期点击回调
+ * @param onDateSelected 日期选中回调
+ * @param onRequestDismissDialog 隐藏弹窗
+ * @param recordMap 记录列表数据
+ * @param onRecordItemClick 记录列表 item 点击回调
+ */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun FrontLayerContent(
-    onDateSelected: (YearMonth) -> Unit,
     dialogState: DialogState,
-    onDialogDismiss: () -> Unit,
-    recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
     onDateClick: () -> Unit,
+    onDateSelected: (YearMonth) -> Unit,
+    onRequestDismissDialog: () -> Unit,
+    recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
     onRecordItemClick: (RecordViewsEntity) -> Unit
 ) {
     CashbookGradientBackground {
@@ -251,8 +392,9 @@ private fun FrontLayerContent(
         ) {
             (dialogState as? DialogState.Shown<*>)?.data?.let { date ->
                 if (date is YearMonth) {
+                    // 显示选择日期弹窗
                     SelectDateDialog(
-                        onDialogDismiss = onDialogDismiss,
+                        onDialogDismiss = onRequestDismissDialog,
                         date = date,
                         onDateSelected = onDateSelected,
                     )
@@ -272,7 +414,7 @@ private fun FrontLayerContent(
             } else {
                 LazyColumn {
                     recordMap.keys.reversed().forEach { key ->
-                        val recordList = recordMap[key] ?: listOf()
+                        val recordList = recordMap[key] ?: emptyList()
                         stickyHeader {
                             Row(
                                 modifier = Modifier
@@ -338,93 +480,12 @@ private fun FrontLayerContent(
     }
 }
 
-@Composable
-private fun BackLayerContent(
-    paddingValues: PaddingValues,
-    monthIncome: String,
-    monthExpand: String,
-    monthBalance: String,
-    modifier: Modifier = Modifier,
-) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onTertiaryContainer) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(16.dp),
-        ) {
-            Text(text = stringResource(id = R.string.month_income))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = monthIncome.withCNY())
-            Spacer(modifier = Modifier.height(24.dp))
-            Row {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "${stringResource(id = R.string.month_expend)} ${monthExpand.withCNY()}",
-                )
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "${stringResource(id = R.string.month_balance)} ${monthBalance.withCNY()}",
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun LauncherTopBar(
-    dateStr: String,
-    onMenuClick: () -> Unit,
-    onDateClick: () -> Unit,
-    onSearchClick: () -> Unit,
-    onCalendarClick: () -> Unit,
-    onMyAssetClick: () -> Unit,
-) {
-    TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-        ),
-        title = {
-            Text(
-                text = dateStr,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .clickable(onClick = onDateClick)
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = CashbookIcons.Menu,
-                    contentDescription = null,
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = onSearchClick) {
-                Icon(
-                    imageVector = CashbookIcons.Search,
-                    contentDescription = null,
-                )
-            }
-            IconButton(onClick = onCalendarClick) {
-                Icon(
-                    imageVector = CashbookIcons.CalendarMonth,
-                    contentDescription = null,
-                )
-            }
-            IconButton(onClick = onMyAssetClick) {
-                Icon(
-                    imageVector = CashbookIcons.WebAsset,
-                    contentDescription = null,
-                )
-            }
-        },
-    )
-}
-
+/**
+ * 记录列表 item 布局
+ *
+ * @param recordViewsEntity 记录数据
+ * @param onRecordItemClick 点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RecordListItem(
@@ -540,14 +601,6 @@ internal fun LauncherContentScreenPreview() {
     PreviewTheme(
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
     ) {
-        LauncherContentRoute(
-            recordDetailSheetContent = { _, _ -> },
-            onEditRecordClick = {},
-            onMenuClick = {},
-            onSearchClick = {},
-            onCalendarClick = {},
-            onMyAssetClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-        )
+        LauncherContentRoute()
     }
 }

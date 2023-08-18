@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.feature.settings.screen
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -43,7 +45,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.PRIVACY_POLICY_FILE_PATH
-import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.PasswordTextField
@@ -65,64 +66,77 @@ import javax.crypto.Cipher
 
 /**
  * 首页显示
+ * - 首页显示主体，提供左侧抽屉菜单、用户隐私协议弹窗、安全校验功能，具体内容显示通过 [content] 参数提供
+ *
+ * @param onRequestNaviToMyAsset 导航到我的资产
+ * @param onRequestNaviToMyBooks 导航到我的账本
+ * @param onRequestNaviToMyCategory 导航到我的分类
+ * @param onRequestNaviToMyTags 导航到我的标签
+ * @param onRequestNaviToSetting 导航到设置
+ * @param onRequestNaviToAboutUs 导航到关于我们
+ * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ * @param content 显示内容，参数 (打开抽屉) -> [Unit]
  */
 @Composable
 internal fun LauncherRoute(
-    onMyAssetClick: () -> Unit,
-    onMyBookClick: () -> Unit,
-    onMyCategoryClick: () -> Unit,
-    onMyTagClick: () -> Unit,
-    onSettingClick: () -> Unit,
-    onAboutUsClick: () -> Unit,
-    onPrivacyPolicyClick: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
-    content: @Composable (() -> Unit) -> Unit,
     modifier: Modifier = Modifier,
+    onRequestNaviToMyAsset: () -> Unit = {},
+    onRequestNaviToMyBooks: () -> Unit = {},
+    onRequestNaviToMyCategory: () -> Unit = {},
+    onRequestNaviToMyTags: () -> Unit = {},
+    onRequestNaviToSetting: () -> Unit = {},
+    onRequestNaviToAboutUs: () -> Unit = {},
+    onRequestNaviToPrivacyPolicy: () -> Unit = {},
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     viewModel: LauncherViewModel = hiltViewModel(),
+    content: @Composable (() -> Unit) -> Unit,
 ) {
 
+    // 界面 UI 状态数据
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     LauncherScreen(
         shouldDisplayDrawerSheet = viewModel.shouldDisplayDrawerSheet,
-        onRequestDismissDrawerSheet = viewModel::dismissDrawerSheet,
         onRequestDisplayDrawerSheet = viewModel::displayDrawerSheet,
+        onRequestDismissDrawerSheet = viewModel::dismissDrawerSheet,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         errorText = viewModel.errorText,
-        dismissBookmark = viewModel::dismissBookmark,
+        onRequestDismissBookmark = viewModel::dismissBookmark,
         uiState = uiState,
-        agreeProtocol = viewModel::agreeProtocol,
+        onAgreeProtocolClick = viewModel::agreeProtocol,
         firstOpen = viewModel.firstOpen,
         dialogState = viewModel.dialogState,
-        onConfirmClick = viewModel::onVerityConfirm,
-        onFingerprintClick = viewModel::onFingerprintClick,
+        onVerifyConfirmClick = viewModel::onVerityConfirm,
+        onFingerprintClick = viewModel::showFingerprintVerify,
         onFingerprintVerifySuccess = viewModel::onFingerprintVerifySuccess,
         onFingerprintVerifyError = viewModel::onFingerprintVerifyError,
-        onActivityStop = viewModel::onActivityStop,
+        onRequestRefreshVerifyState = viewModel::refreshVerifyState,
         onMyAssetClick = {
-            onMyAssetClick.invoke()
+            onRequestNaviToMyAsset.invoke()
             viewModel.dismissDrawerSheet()
         },
         onMyBookClick = {
-            onMyBookClick.invoke()
+            onRequestNaviToMyBooks.invoke()
             viewModel.dismissDrawerSheet()
         },
         onMyCategoryClick = {
-            onMyCategoryClick.invoke()
+            onRequestNaviToMyCategory.invoke()
             viewModel.dismissDrawerSheet()
         },
         onMyTagClick = {
-            onMyTagClick.invoke()
+            onRequestNaviToMyTags.invoke()
             viewModel.dismissDrawerSheet()
         },
         onSettingClick = {
-            onSettingClick.invoke()
+            onRequestNaviToSetting.invoke()
             viewModel.dismissDrawerSheet()
         },
         onAboutUsClick = {
-            onAboutUsClick.invoke()
+            onRequestNaviToAboutUs.invoke()
             viewModel.dismissDrawerSheet()
         },
-        onPrivacyPolicyClick = onPrivacyPolicyClick,
+        onPrivacyPolicyClick = onRequestNaviToPrivacyPolicy,
         onShowSnackbar = onShowSnackbar,
         content = { content { viewModel.displayDrawerSheet() } },
         modifier = modifier,
@@ -131,24 +145,51 @@ internal fun LauncherRoute(
 
 /**
  * 首页显示
+ * - 首页显示主体，提供左侧抽屉菜单、用户隐私协议弹窗、安全校验功能，具体内容显示通过 [content] 参数提供
+ *
+ * @param shouldDisplayDrawerSheet 是否显示抽屉菜单
+ * @param onRequestDisplayDrawerSheet 显示抽屉菜单
+ * @param onRequestDismissDrawerSheet 隐藏抽屉菜单
+ * @param shouldDisplayBookmark 是否显示 [androidx.compose.material3.Snackbar]，取值 [LauncherBookmarkEnum]
+ * @param errorText 错误提示文本
+ * @param onRequestDismissBookmark 隐藏 [androidx.compose.material3.Snackbar]
+ * @param uiState UI 显示数据
+ * @param onAgreeProtocolClick 同意隐私协议点击
+ * @param firstOpen 是否是第一打开，用于支持指纹识别时自动拉起指纹认证
+ * @param dialogState 弹窗状态
+ * @param onVerifyConfirmClick 安全认证确认点击回调，参数：(密码, 认证回调(认证结果[SettingPasswordStateEnum] -> [Unit])) -> [Unit]
+ * @param onFingerprintClick 指纹识别点击回调
+ * @param onFingerprintVerifySuccess 指纹认证成功回调，参数：(数据解码对象) -> [Unit]
+ * @param onFingerprintVerifyError 指纹认证失败回调，参数：(错误码, 提示文本) -> [Unit]
+ * @param onRequestRefreshVerifyState 刷新安全认证状态
+ * @param onMyAssetClick 我的资产点击回调
+ * @param onMyBookClick 我的账本点击回调
+ * @param onMyCategoryClick 我的分类点击回调
+ * @param onMyTagClick 我的标签点击回调
+ * @param onSettingClick 设置点击回调
+ * @param onAboutUsClick 关于我们点击回调
+ * @param onPrivacyPolicyClick 用户隐私协议点击回调
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ * @param content 显示内容，参数 (打开抽屉) -> [Unit]
+ * @param drawerState 抽屉状态，默认关闭，状态变化时在回调中更新数据状态
  */
 @Composable
 internal fun LauncherScreen(
     shouldDisplayDrawerSheet: Boolean,
-    onRequestDismissDrawerSheet: () -> Unit,
     onRequestDisplayDrawerSheet: () -> Unit,
+    onRequestDismissDrawerSheet: () -> Unit,
     shouldDisplayBookmark: LauncherBookmarkEnum,
     errorText: String,
-    dismissBookmark: () -> Unit,
+    onRequestDismissBookmark: () -> Unit,
     uiState: LauncherUiState,
-    agreeProtocol: () -> Unit,
+    onAgreeProtocolClick: () -> Unit,
     firstOpen: Boolean,
     dialogState: DialogState,
-    onConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
+    onVerifyConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
     onFingerprintClick: () -> Unit,
     onFingerprintVerifySuccess: (Cipher) -> Unit,
     onFingerprintVerifyError: (Int, String) -> Unit,
-    onActivityStop: () -> Unit,
+    onRequestRefreshVerifyState: () -> Unit,
     onMyAssetClick: () -> Unit,
     onMyBookClick: () -> Unit,
     onMyCategoryClick: () -> Unit,
@@ -172,16 +213,17 @@ internal fun LauncherScreen(
     ),
 ) {
 
+    // 监听生命周期，在界面 onStop 时刷新安全认证状态
     rememberLifecycleObserver {
         onStop {
-            onActivityStop()
+            onRequestRefreshVerifyState()
         }
     }
 
     // 提示文本
     val passwordDecodeFailedText = stringResource(id = R.string.password_decode_failed)
     val passwordWrongText = stringResource(id = R.string.password_wrong)
-
+    // 显示及隐藏提示
     LaunchedEffect(shouldDisplayBookmark) {
         if (shouldDisplayBookmark != LauncherBookmarkEnum.NONE) {
             val tipText = when (shouldDisplayBookmark) {
@@ -190,14 +232,18 @@ internal fun LauncherScreen(
                 LauncherBookmarkEnum.ERROR -> errorText
                 else -> ""
             }
-            val showSnackbarResult = onShowSnackbar(tipText, null)
-            if (SnackbarResult.Dismissed == showSnackbarResult) {
-                dismissBookmark()
+            if (tipText.isNotBlank()) {
+                val showSnackbarResult = onShowSnackbar(tipText, null)
+                if (SnackbarResult.Dismissed == showSnackbarResult) {
+                    onRequestDismissBookmark()
+                }
+            } else {
+                onRequestDismissBookmark()
             }
         }
     }
 
-    // 抽屉菜单显示状态
+    // 控制抽屉菜单显示隐藏
     LaunchedEffect(shouldDisplayDrawerSheet) {
         if (shouldDisplayDrawerSheet) {
             drawerState.open()
@@ -206,6 +252,7 @@ internal fun LauncherScreen(
         }
     }
 
+    // 抽屉显示时，返回关闭抽屉
     if (drawerState.isOpen) {
         BackPressHandler {
             onRequestDismissDrawerSheet()
@@ -223,8 +270,10 @@ internal fun LauncherScreen(
             is LauncherUiState.Success -> {
                 with(uiState) {
                     if (needRequestProtocol) {
+                        // 显示用户隐私协议
+                        val currentActivity = LocalContext.current as? Activity
                         AlertDialog(
-                            onDismissRequest = { AppManager.finishAllActivity() },
+                            onDismissRequest = { currentActivity?.finish() },
                             title = { Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy)) },
                             text = {
                                 val tag = "TAG_URL"
@@ -255,27 +304,29 @@ internal fun LauncherScreen(
                                 )
                             },
                             confirmButton = {
-                                TextButton(onClick = agreeProtocol) {
+                                TextButton(onClick = onAgreeProtocolClick) {
                                     Text(text = stringResource(id = R.string.confirm))
                                 }
                             },
                             dismissButton = {
-                                TextButton(onClick = { AppManager.finishAllActivity() }) {
+                                TextButton(onClick = { currentActivity?.finish() }) {
                                     Text(text = stringResource(id = R.string.cancel))
                                 }
                             },
                         )
                     } else if (needVerity) {
+                        // 显示安全认证
                         Verification(
                             firstOpen = firstOpen,
                             supportFingerprint = supportFingerprint,
                             dialogState = dialogState,
-                            onConfirmClick = onConfirmClick,
+                            onConfirmClick = onVerifyConfirmClick,
                             onFingerprintClick = onFingerprintClick,
                             onFingerprintVerifySuccess = onFingerprintVerifySuccess,
                             onFingerprintVerifyError = onFingerprintVerifyError,
                         )
                     } else {
+                        // 显示实际内容
                         ModalNavigationDrawer(
                             modifier = modifier,
                             drawerState = drawerState,
@@ -301,6 +352,14 @@ internal fun LauncherScreen(
 
 /**
  * 首页抽屉菜单
+ *
+ * @param currentBookName 当前账本名
+ * @param onMyAssetClick 我的资产点击回调
+ * @param onMyBookClick 我的账本点击回调
+ * @param onMyCategoryClick 我的分类点击回调
+ * @param onMyTagClick 我的标签点击回调
+ * @param onSettingClick 设置点击回调
+ * @param onAboutUsClick 关于我们点击回调
  */
 @Composable
 internal fun LauncherSheet(
@@ -379,6 +438,17 @@ internal fun LauncherSheet(
     }
 }
 
+/**
+ * 安全认证界面
+ *
+ * @param firstOpen 是否是第一打开，用于支持指纹识别时自动拉起指纹认证
+ * @param supportFingerprint 是否支持指纹识别
+ * @param dialogState 弹窗状态
+ * @param onConfirmClick 安全认证确认点击回调，参数：(密码, 认证回调(认证结果[SettingPasswordStateEnum] -> [Unit])) -> [Unit]
+ * @param onFingerprintClick 指纹识别点击回调
+ * @param onFingerprintVerifySuccess 指纹认证成功回调，参数：(数据解码对象) -> [Unit]
+ * @param onFingerprintVerifyError 指纹认证失败回调，参数：(错误码, 提示文本) -> [Unit]
+ */
 @Composable
 internal fun Verification(
     firstOpen: Boolean,
@@ -393,7 +463,6 @@ internal fun Verification(
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
-
         (dialogState as? DialogState.Shown<*>)?.let {
             if (it.data is Cipher) {
                 val data = it.data as Cipher
@@ -523,14 +592,6 @@ internal fun Verification(
 private fun LauncherScreenPreview() {
     PreviewTheme {
         LauncherRoute(
-            onMyAssetClick = {},
-            onMyBookClick = {},
-            onMyCategoryClick = {},
-            onMyTagClick = {},
-            onSettingClick = {},
-            onAboutUsClick = {},
-            onPrivacyPolicyClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             content = {},
         )
     }

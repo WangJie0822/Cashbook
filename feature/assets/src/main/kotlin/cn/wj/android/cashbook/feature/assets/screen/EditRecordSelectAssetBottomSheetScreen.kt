@@ -25,13 +25,21 @@ import cn.wj.android.cashbook.feature.assets.component.AssetListItem
 import cn.wj.android.cashbook.feature.assets.component.NotAssociatedAssetListItem
 import cn.wj.android.cashbook.feature.assets.viewmodel.EditRecordSelectAssetBottomSheetViewModel
 
+/**
+ * 编辑记录界面选择资产抽屉
+ *
+ * @param currentTypeId 当前选择的类型 id
+ * @param isRelated 是否是关联资产
+ * @param onAssetChange 资产变化回调
+ * @param onRequestNaviToEditAsset 导航到编辑资产
+ */
 @Composable
 internal fun EditRecordSelectAssetBottomSheetRoute(
-    currentTypeId: Long,
-    isRelated: Boolean,
-    onAssetChange: (Long) -> Unit,
-    onAddAssetClick: () -> Unit,
     modifier: Modifier = Modifier,
+    currentTypeId: Long = -1L,
+    isRelated: Boolean = false,
+    onAssetChange: (Long) -> Unit = {},
+    onRequestNaviToEditAsset: () -> Unit = {},
     viewModel: EditRecordSelectAssetBottomSheetViewModel = hiltViewModel<EditRecordSelectAssetBottomSheetViewModel>().apply {
         update(currentTypeId, isRelated)
     },
@@ -41,11 +49,18 @@ internal fun EditRecordSelectAssetBottomSheetRoute(
     EditRecordSelectAssetBottomSheetScreen(
         assetList = assetList,
         onAssetChange = onAssetChange,
-        onAddAssetClick = onAddAssetClick,
+        onAddAssetClick = onRequestNaviToEditAsset,
         modifier = modifier,
     )
 }
 
+/**
+ * 编辑记录界面选择资产抽屉
+ *
+ * @param assetList 资产列表
+ * @param onAssetChange 资产变化回调
+ * @param onAddAssetClick 添加资产点击回调
+ */
 @Composable
 internal fun EditRecordSelectAssetBottomSheetScreen(
     assetList: List<AssetModel>,
@@ -120,10 +135,6 @@ internal fun EditRecordSelectAssetBottomSheetScreen(
 @Composable
 private fun EditRecordSelectAssetBottomSheetScreenPreview() {
     PreviewTheme {
-        EditRecordSelectAssetBottomSheetScreen(
-            assetList = listOf(),
-            onAssetChange = {},
-            onAddAssetClick = {},
-        )
+        EditRecordSelectAssetBottomSheetRoute()
     }
 }

@@ -26,7 +26,7 @@ data class RecordTypeEntity(
     val child: List<RecordTypeEntity>,
     val selected: Boolean,
     val shapeType: Int,
-    val needRelated:Boolean,
+    val needRelated: Boolean,
 )
 
 /** 固定类型 - 设置 */
@@ -37,7 +37,7 @@ val RECORD_TYPE_SETTINGS: RecordTypeEntity
         name = "",
         iconResName = "",
         sort = 0,
-        child = listOf(),
+        child = emptyList(),
         selected = true,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         shapeType = 0,

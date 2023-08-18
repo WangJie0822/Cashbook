@@ -59,15 +59,20 @@ import io.noties.markwon.Markwon
 /**
  * 关于我们界面
  *
+ * @param onRequestNaviToChangelog 导航到修改日志
+ * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/14
  */
 @Composable
 internal fun AboutUsRoute(
-    onBackClick: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
-    onVersionInfoClick: () -> Unit,
-    onUserAgreementAndPrivacyPolicyClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onRequestNaviToChangelog: () -> Unit = {},
+    onRequestNaviToPrivacyPolicy: () -> Unit = {},
+    onRequestPopBackStack: () -> Unit = {},
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     viewModel: AboutUsViewModel = hiltViewModel(),
 ) {
 
@@ -77,54 +82,73 @@ internal fun AboutUsRoute(
     val shouldDisplayNoWifiUpdateDialog by viewModel.confirmUpdateInfoData.collectAsStateWithLifecycle()
 
     AboutUsScreen(
-        onBackClick = onBackClick,
-        onShowSnackbar = onShowSnackbar,
         uiState = uiState,
         inRequestUpdateData = viewModel.inRequestUpdateData,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
-        shouldDisplayUpdateDialog = shouldDisplayUpdateDialog,
-        shouldDisplayNoWifiUpdateDialog = shouldDisplayNoWifiUpdateDialog,
+        onRequestDismissBookmark = viewModel::dismissBookmark,
         onUseGiteeSwitch = viewModel::updateUseGitee,
         onAutoCheckUpdateSwitch = viewModel::updateAutoCheckUpdate,
-        onCheckUpdate = viewModel::checkUpdate,
-        onClearBookmarkState = viewModel::clearBookmarkState,
-        onConfirmUpdate = viewModel::confirmUpdate,
-        onDismissUpdate = viewModel::clearUpdate,
-        onConfirmDownload = viewModel::confirmDownload,
-        onDismissDownload = viewModel::clearDownload,
-        onVersionInfoClick = onVersionInfoClick,
-        onUserAgreementAndPrivacyPolicyClick = onUserAgreementAndPrivacyPolicyClick,
+        onCheckUpdateClick = viewModel::checkUpdate,
+        shouldDisplayUpdateDialog = shouldDisplayUpdateDialog,
+        onConfirmUpdateClick = viewModel::confirmUpdate,
+        onRequestDismissUpdateDialog = viewModel::dismissUpdateDialog,
+        shouldDisplayNoWifiUpdateDialog = shouldDisplayNoWifiUpdateDialog,
+        onConfirmDownloadClick = viewModel::confirmDownload,
+        onRequestDismissNoWifiUpdateDialog = viewModel::dismissNoWifiUpdateDialog,
+        onVersionInfoClick = onRequestNaviToChangelog,
+        onUserAgreementAndPrivacyPolicyClick = onRequestNaviToPrivacyPolicy,
+        onBackClick = onRequestPopBackStack,
+        onShowSnackbar = onShowSnackbar,
         modifier = modifier,
     )
 }
 
+/**
+ * 关于我们界面
+ *
+ * @param uiState 界面 UI 状态
+ * @param inRequestUpdateData 标记，是否正在更新数据
+ * @param shouldDisplayBookmark 是否显示提示
+ * @param onRequestDismissBookmark 隐藏提示
+ * @param onUseGiteeSwitch 数据源切换回调
+ * @param onAutoCheckUpdateSwitch 自动检测更新开关切换回调
+ * @param onCheckUpdateClick 检查更新点击
+ * @param shouldDisplayUpdateDialog 是否显示升级弹窗
+ * @param onConfirmUpdateClick 确认升级点击回调
+ * @param onRequestDismissUpdateDialog 隐藏升级弹窗
+ * @param shouldDisplayNoWifiUpdateDialog 是否显示非 WiFi 升级提示
+ * @param onConfirmDownloadClick 确认下载点击回调
+ * @param onRequestDismissNoWifiUpdateDialog 隐藏提示弹窗
+ * @param onVersionInfoClick 版本信息点击回调
+ * @param onUserAgreementAndPrivacyPolicyClick 用户隐私协议点击回调
+ * @param onBackClick 返回点击回调
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AboutUsScreen(
-    onBackClick: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     uiState: AboutUsUiState,
     inRequestUpdateData: Boolean,
     shouldDisplayBookmark: AboutUsBookmarkEnum,
-    shouldDisplayUpdateDialog: UpdateInfoEntity?,
-    shouldDisplayNoWifiUpdateDialog: UpdateInfoEntity?,
+    onRequestDismissBookmark: () -> Unit,
     onUseGiteeSwitch: (Boolean) -> Unit,
     onAutoCheckUpdateSwitch: (Boolean) -> Unit,
-    onCheckUpdate: () -> Unit,
-    onClearBookmarkState: () -> Unit,
-    onConfirmUpdate: () -> Unit,
-    onDismissUpdate: (Boolean) -> Unit,
-    onConfirmDownload: (Boolean) -> Unit,
-    onDismissDownload: () -> Unit,
+    onCheckUpdateClick: () -> Unit,
+    shouldDisplayUpdateDialog: UpdateInfoEntity?,
+    onConfirmUpdateClick: () -> Unit,
+    onRequestDismissUpdateDialog: (Boolean) -> Unit,
+    shouldDisplayNoWifiUpdateDialog: UpdateInfoEntity?,
+    onConfirmDownloadClick: (Boolean) -> Unit,
+    onRequestDismissNoWifiUpdateDialog: () -> Unit,
     onVersionInfoClick: () -> Unit,
     onUserAgreementAndPrivacyPolicyClick: () -> Unit,
+    onBackClick: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-    // 文本 - 已经是最新版本
+    // 提示文本
     val isLatestVersionText = stringResource(id = R.string.it_is_the_latest_version)
-    // 文本 - 更新下载中
     val downloadingText = stringResource(id = R.string.update_downloading_hint)
-    // 文本 - 开始下载
     val startDownloadText = stringResource(id = R.string.start_background_download)
 
     LaunchedEffect(shouldDisplayBookmark) {
@@ -135,9 +159,13 @@ internal fun AboutUsScreen(
                 AboutUsBookmarkEnum.START_DOWNLOAD -> startDownloadText
                 else -> ""
             }
-            val showSnackbarResult = onShowSnackbar(tipsText, null)
-            if (SnackbarResult.Dismissed == showSnackbarResult) {
-                onClearBookmarkState.invoke()
+            if (tipsText.isNotBlank()) {
+                val showSnackbarResult = onShowSnackbar(tipsText, null)
+                if (SnackbarResult.Dismissed == showSnackbarResult) {
+                    onRequestDismissBookmark()
+                }
+            } else {
+                onRequestDismissBookmark()
             }
         }
     }
@@ -163,17 +191,18 @@ internal fun AboutUsScreen(
                 UpdateHintDialog(
                     content = content,
                     ignoreUpdateVersion = uiState.ignoreUpdateVersion,
-                    onConfirmClick = onConfirmUpdate,
-                    onDismissClick = onDismissUpdate,
+                    onConfirmClick = onConfirmUpdateClick,
+                    onDismissClick = onRequestDismissUpdateDialog,
                 )
             }
             // 非WiFi下载提示弹窗
             if (null != shouldDisplayNoWifiUpdateDialog) {
                 NoWifiUpdateHintDialog(
-                    onConfirmClick = onConfirmDownload,
-                    onDismissClick = onDismissDownload,
+                    onConfirmClick = onConfirmDownloadClick,
+                    onDismissClick = onRequestDismissNoWifiUpdateDialog,
                 )
             }
+            val currentContext = LocalContext.current
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -207,7 +236,9 @@ internal fun AboutUsScreen(
                             .padding(vertical = 8.dp)
                             .clickable {
                                 jumpSendEmail(
-                                    email = EMAIL_ADDRESS, chooserTitle = pleaseSelectEmailText
+                                    email = EMAIL_ADDRESS,
+                                    chooserTitle = pleaseSelectEmailText,
+                                    context = currentContext,
                                 )
                             }
                             .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -227,7 +258,8 @@ internal fun AboutUsScreen(
                                 .clickable {
                                     jumpBrowser(
                                         url = GITHUB_HOMEPAGE,
-                                        chooserTitle = pleaseSelectWebBrowserText
+                                        chooserTitle = pleaseSelectWebBrowserText,
+                                        context = currentContext,
                                     )
                                 }
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -240,7 +272,8 @@ internal fun AboutUsScreen(
                                 .clickable {
                                     jumpBrowser(
                                         url = GITEE_HOMEPAGE,
-                                        chooserTitle = pleaseSelectWebBrowserText
+                                        chooserTitle = pleaseSelectWebBrowserText,
+                                        context = currentContext,
                                     )
                                 }
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -295,7 +328,7 @@ internal fun AboutUsScreen(
                     // 检查更新
                     val checkUpdateEnable = !inRequestUpdateData
                     val checkUpdateModifier = if (checkUpdateEnable) {
-                        Modifier.clickable { onCheckUpdate.invoke() }
+                        Modifier.clickable { onCheckUpdateClick.invoke() }
                     } else {
                         Modifier
                     }
@@ -355,6 +388,14 @@ internal fun AboutUsScreen(
     }
 }
 
+/**
+ * 更新提示弹窗
+ *
+ * @param content 更新内容
+ * @param ignoreUpdateVersion 是否跳过此版本
+ * @param onConfirmClick 确认点击回调
+ * @param onDismissClick 取消点击回调，参数：(是否跳过此版本) -> [Unit]
+ */
 @Composable
 internal fun UpdateHintDialog(
     content: Spanned,
@@ -398,6 +439,12 @@ internal fun UpdateHintDialog(
     )
 }
 
+/**
+ * 未连接 WiFi 更新提示弹窗
+ *
+ * @param onConfirmClick 确认点击回调，参数：(是否不再提示) -> [Unit]
+ * @param onDismissClick 取消点击回调
+ */
 @Composable
 internal fun NoWifiUpdateHintDialog(
     onConfirmClick: (Boolean) -> Unit,
@@ -441,28 +488,6 @@ internal fun NoWifiUpdateHintDialog(
 @Composable
 private fun AboutUsScreenPreview() {
     PreviewTheme {
-        AboutUsScreen(
-            onBackClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
-            uiState = AboutUsUiState.Success(
-                useGitee = true,
-                autoCheckUpdate = false,
-                ignoreUpdateVersion = false,
-            ),
-            inRequestUpdateData = false,
-            shouldDisplayBookmark = AboutUsBookmarkEnum.NONE,
-            shouldDisplayUpdateDialog = null,
-            shouldDisplayNoWifiUpdateDialog = null,
-            onUseGiteeSwitch = {},
-            onAutoCheckUpdateSwitch = {},
-            onCheckUpdate = {},
-            onClearBookmarkState = {},
-            onConfirmUpdate = {},
-            onDismissUpdate = {},
-            onConfirmDownload = {},
-            onDismissDownload = {},
-            onVersionInfoClick = {},
-            onUserAgreementAndPrivacyPolicyClick = {},
-        )
+        AboutUsRoute()
     }
 }

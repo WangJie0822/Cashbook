@@ -36,42 +36,66 @@ fun NavController.naviToEditAsset(assetId: Long = -1L) {
     this.navigate(ROUTE_EDIT_ASSET.replace("{$ROUTE_KEY_ASSET_ID}", assetId.toString()))
 }
 
+/**
+ * 编辑记录界面选择资产抽屉
+ *
+ * @param currentTypeId 当前选择的类型 id
+ * @param isRelated 是否是关联资产
+ * @param onAssetChange 资产变化回调
+ * @param onRequestNaviToEditAsset 导航到编辑资产
+ */
 @Composable
 fun EditRecordSelectAssetBottomSheetContent(
     currentTypeId: Long,
     isRelated: Boolean,
     onAssetChange: (Long) -> Unit,
-    onAddAssetClick: () -> Unit,
+    onRequestNaviToEditAsset: () -> Unit,
 ) {
     EditRecordSelectAssetBottomSheetRoute(
         currentTypeId = currentTypeId,
         isRelated = isRelated,
         onAssetChange = onAssetChange,
-        onAddAssetClick = onAddAssetClick,
+        onRequestNaviToEditAsset = onRequestNaviToEditAsset,
     )
 }
 
+/**
+ * 我的资产界面
+ * 
+ * @param onRequestNaviToAssetInfo 导航到资产信息
+ * @param onRequestNaviToAddAsset 导航到添加资产
+ * @param onRequestNaviToInvisibleAsset 导航到隐藏资产
+ * @param onRequestPopBackStack 导航到上一级
+ */
 fun NavGraphBuilder.myAssetScreen(
-    onAssetItemClick: (Long) -> Unit,
-    onAddAssetClick: () -> Unit,
-    onInvisibleAssetClick: () -> Unit,
-    onBackClick: () -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
+    onRequestNaviToAddAsset: () -> Unit,
+    onRequestNaviToInvisibleAsset: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(route = ROUTE_MY_ASSET) {
         MyAssetRoute(
-            onAssetItemClick = onAssetItemClick,
-            onAddAssetClick = onAddAssetClick,
-            onInvisibleAssetClick = onInvisibleAssetClick,
-            onBackClick = onBackClick,
+            onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
+            onRequestNaviToAddAsset = onRequestNaviToAddAsset,
+            onRequestNaviToInvisibleAsset = onRequestNaviToInvisibleAsset,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }
 
+/**
+ * 资产信息界面
+ *
+ * @param assetRecordListContent 资产记录列表，参数：(资产id, 列表头布局, 列表item点击回调) -> [Unit]
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param onRequestNaviToEditAsset 导航到编辑资产
+ * @param onRequestPopBackStack 导航到上一级
+ */
 fun NavGraphBuilder.assetInfoScreen(
     assetRecordListContent: @Composable (Long, @Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
-    onEditAssetClick: (Long) -> Unit,
-    onBackClick: () -> Unit,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
+    onRequestNaviToEditAsset: (Long) -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(
         route = ROUTE_ASSET_INFO,
@@ -91,14 +115,19 @@ fun NavGraphBuilder.assetInfoScreen(
                 )
             },
             recordDetailSheetContent = recordDetailSheetContent,
-            onEditAssetClick = { onEditAssetClick.invoke(assetId) },
-            onBackClick = onBackClick,
+            onRequestNaviToEditAsset = { onRequestNaviToEditAsset.invoke(assetId) },
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }
 
+/**
+ * 编辑资产界面
+ *
+ * @param onRequestPopBackStack 导航到上一级
+ */
 fun NavGraphBuilder.editAssetScreen(
-    onBackClick: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(
         route = ROUTE_EDIT_ASSET,
@@ -109,7 +138,7 @@ fun NavGraphBuilder.editAssetScreen(
     ) {
         EditAssetRoute(
             assetId = it.arguments?.getLong(ROUTE_KEY_ASSET_ID) ?: -1L,
-            onBackClick = onBackClick,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }

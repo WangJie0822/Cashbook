@@ -28,24 +28,29 @@ fun NavController.naviToEditBook(bookId: Long = -1L) {
 
 /**
  * 我的账本
+ *
+ * @param onRequestNaviToEditBook 导航到编辑账本
+ * @param onRequestPopBackStack 导航上上一级
  */
 fun NavGraphBuilder.myBooksScreen(
-    onEditBookClick: (Long) -> Unit,
-    onBackClick: () -> Unit,
+    onRequestNaviToEditBook: (Long) -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(route = ROUTE_BOOKS_MY_BOOKS) {
         MyBooksRoute(
-            onEditBookClick = onEditBookClick,
-            onBackClick = onBackClick,
+            onRequestNaviToEditBook = onRequestNaviToEditBook,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }
 
 /**
  * 编辑账本
+ *
+ * @param onRequestPopBackStack 导航到上一级
  */
 fun NavGraphBuilder.editBookScreen(
-    onBackClick: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(
         route = ROUTE_BOOKS_EDIT_BOOK,
@@ -57,7 +62,7 @@ fun NavGraphBuilder.editBookScreen(
         val bookId = it.arguments?.getLong(ROUTE_KEY_BOOK_ID) ?: -1L
         EditBookRoute(
             bookId = bookId,
-            onBackClick = onBackClick,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }

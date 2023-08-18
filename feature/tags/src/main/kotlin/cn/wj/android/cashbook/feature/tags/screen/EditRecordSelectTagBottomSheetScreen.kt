@@ -30,11 +30,17 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModel
 import com.google.accompanist.flowlayout.FlowRow
 
+/**
+ * 编辑记录界面选择标签抽屉
+ *
+ * @param selectedTagIdList 已选择标签id列表
+ * @param onTagIdListChange 已选择标签id列表变化回调
+ */
 @Composable
 internal fun EditRecordSelectTagBottomSheetRoute(
-    selectedTagIdList: List<Long>,
-    onTagIdListChange: (List<Long>) -> Unit,
     modifier: Modifier = Modifier,
+    selectedTagIdList: List<Long> = emptyList(),
+    onTagIdListChange: (List<Long>) -> Unit = {},
     viewModel: EditRecordSelectTagBottomSheetViewModel = hiltViewModel<EditRecordSelectTagBottomSheetViewModel>().apply {
         updateSelectedTags(selectedTagIdList)
     },
@@ -44,32 +50,42 @@ internal fun EditRecordSelectTagBottomSheetRoute(
     val tagList by viewModel.tagListData.collectAsStateWithLifecycle()
 
     EditRecordSelectTagBottomSheetScreen(
+        dialogState = viewModel.dialogState,
+        onRequestDismissDialog = viewModel::dismissDialog,
         tagList = tagList,
-        onAddTagClick = viewModel::onAddClick,
-        onAddTagConfirm = viewModel::addTag,
+        onAddTagClick = viewModel::displayAddTagDialog,
+        onAddTagConfirmClick = viewModel::addTag,
         onTagItemClick = { tagEntity ->
-            viewModel.onTagItemClick(
+            viewModel.updateSelectedTagList(
                 id = tagEntity.id,
                 onResult = { selectedList ->
                     onTagIdListChange(selectedList)
                 },
             )
         },
-        dialogState = viewModel.dialogState,
-        dismissDialog = viewModel::dismissDialog,
         modifier = modifier,
     )
 }
 
+/**
+ * 编辑记录界面选择标签抽屉
+ *
+ * @param dialogState 弹窗状态
+ * @param onRequestDismissDialog 隐藏弹窗
+ * @param tagList 标签列表数据
+ * @param onAddTagClick 添加标签点击回调
+ * @param onAddTagConfirmClick 添加标签确认点击回调
+ * @param onTagItemClick 标签列表 item 点击回调
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditRecordSelectTagBottomSheetScreen(
+    dialogState: DialogState,
+    onRequestDismissDialog: () -> Unit,
     tagList: List<Selectable<TagModel>>,
     onAddTagClick: () -> Unit,
-    onAddTagConfirm: (TagModel) -> Unit,
+    onAddTagConfirmClick: (TagModel) -> Unit,
     onTagItemClick: (TagModel) -> Unit,
-    dialogState: DialogState,
-    dismissDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
@@ -144,8 +160,8 @@ internal fun EditRecordSelectTagBottomSheetScreen(
         if (dialogState is DialogState.Shown<*>) {
             EditTagDialog(
                 tagEntity = null,
-                onConfirm = onAddTagConfirm,
-                onDismiss = dismissDialog,
+                onConfirmClick = onAddTagConfirmClick,
+                onRequestDismissDialog = onRequestDismissDialog,
             )
         }
     }
@@ -157,41 +173,10 @@ private fun EditRecordSelectTagBottomSheetScreenPreview() {
     PreviewTheme(
         defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
     ) {
-        EditRecordSelectTagBottomSheetScreen(
-            tagList = listOf(
-                Selectable(TagModel(id = 1L, name = "标签1"), selected = false),
-                Selectable(TagModel(id = 2L, name = "标签1标签1"), selected = false),
-                Selectable(TagModel(id = 3L, name = "标签1标签1标签1"), selected = true),
-                Selectable(TagModel(id = 4L, name = "标签1标签1标签1标签1"), selected = false),
-                Selectable(TagModel(id = 5L, name = "标签1标签1标签1标签1标签1"), selected = false),
-                Selectable(
-                    TagModel(id = 6L, name = "标签1标签1标签1标签1标签1标签1"),
-                    selected = false
-                ),
-                Selectable(TagModel(id = 7L, name = "标签2"), selected = true),
-            ),
-            onAddTagClick = {},
-            onAddTagConfirm = {},
-            onTagItemClick = {},
-            dialogState = DialogState.Dismiss,
-            dismissDialog = {},
-        )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun EditRecordSelectTagBottomSheetScreenEmptyPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        EditRecordSelectTagBottomSheetScreen(
-            tagList = listOf(),
-            onAddTagClick = {},
-            onAddTagConfirm = {},
-            onTagItemClick = {},
-            dialogState = DialogState.Dismiss,
-            dismissDialog = {},
-        )
+        PreviewTheme(
+            defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
+        ) {
+            EditRecordSelectTagBottomSheetRoute()
+        }
     }
 }

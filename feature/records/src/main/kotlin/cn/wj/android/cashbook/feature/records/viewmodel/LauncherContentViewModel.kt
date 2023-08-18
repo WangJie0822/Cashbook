@@ -48,11 +48,12 @@ class LauncherContentViewModel @Inject constructor(
     val dateData: StateFlow<YearMonth> = _dateData
 
     /** 当前月记录数据 */
-    private val currentMonthRecordListData = _dateData.flatMapLatest { date ->
+    private val _currentMonthRecordListData = _dateData.flatMapLatest { date ->
         getCurrentMonthRecordViewsUseCase(date.year.toString(), date.monthValue.toString())
     }
 
-    val uiState = currentMonthRecordListData
+    /** 界面 UI 状态 */
+    val uiState = _currentMonthRecordListData
         .mapLatest { list ->
             val recordMap = getCurrentMonthRecordViewsMapUseCase(list)
             var totalIncome = BigDecimal.ZERO
@@ -74,37 +75,55 @@ class LauncherContentViewModel @Inject constructor(
             initialValue = LauncherContentUiState.Loading,
         )
 
-    fun onBookmarkDismiss() {
+    /** 隐藏提示 */
+    fun dismissBookmark() {
         shouldDisplayDeleteFailedBookmark = 0
     }
 
-    fun onSheetDismiss() {
-        viewRecord = null
-    }
-
-    fun onRecordItemClick(record: RecordViewsEntity) {
+    /** 显示记录 [record] 详情 sheet */
+    fun displayRecordDetailsSheet(record: RecordViewsEntity) {
         viewRecord = record
     }
 
-    fun showDateSelectDialog() {
+    /** 隐藏 sheet */
+    fun dismissSheet() {
+        viewRecord = null
+    }
+
+    /** 显示日期选择弹窗 */
+    fun displayDateSelectDialog() {
         viewModelScope.launch {
             dialogState = DialogState.Shown(_dateData.first())
         }
     }
 
-    fun onDateSelected(date: YearMonth) {
-        onDialogDismiss()
+    /** 刷新已选择日期 */
+    fun refreshSelectedDate(date: YearMonth) {
+        dismissDialog()
         _dateData.tryEmit(date)
     }
 
-    fun onDialogDismiss() {
+    /** 隐藏弹窗 */
+    fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
-
 }
 
+/**
+ * 界面 UI 状态
+ */
 sealed interface LauncherContentUiState {
+    /** 加载中 */
     data object Loading : LauncherContentUiState
+
+    /**
+     * 加载完成
+     *
+     * @param monthIncome 月收入
+     * @param monthExpand 月支出
+     * @param monthBalance 月结余
+     * @param recordMap 记录列表数据
+     */
     data class Success(
         val monthIncome: String,
         val monthExpand: String,

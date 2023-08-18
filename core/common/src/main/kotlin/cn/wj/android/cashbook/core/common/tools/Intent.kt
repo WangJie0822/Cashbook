@@ -8,7 +8,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import cn.wj.android.cashbook.core.common.ext.ifCondition
-import cn.wj.android.cashbook.core.common.manager.AppManager
 
 /**
  * Intent 跳转相关工具
@@ -21,7 +20,7 @@ fun jumpSendEmail(
     subject: String = "",
     text: String = "",
     chooserTitle: CharSequence? = null,
-    context: Context = AppManager.getContext()
+    context: Context
 ) {
     val emailStart = "mailto:"
     val fixedEmail =
@@ -40,7 +39,7 @@ fun jumpSendEmail(
 fun jumpBrowser(
     url: String,
     chooserTitle: CharSequence? = null,
-    context: Context = AppManager.getContext()
+    context: Context
 ) {
     context.startActivity(
         Intent.createChooser(
@@ -55,7 +54,7 @@ fun jumpBrowser(
 }
 
 /** 通过 [context] 跳转应用详情界面 */
-fun jumpAppDetails(context: Context = AppManager.getContext()) {
+fun jumpAppDetails(context: Context) {
     context.startActivity(Intent().apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS

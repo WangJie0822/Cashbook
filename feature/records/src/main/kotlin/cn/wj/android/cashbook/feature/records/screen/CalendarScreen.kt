@@ -53,12 +53,19 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
+/**
+ * 记录日历界面
+ *
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param onRequestPopBackStack 导航到上一级
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @Composable
 internal fun CalendarRoute(
-    recordDetailSheetContent: @Composable (recordInfo: RecordViewsEntity?, dismissBottomSheet: () -> Unit) -> Unit,
-    onBackClick: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit = { _, _ -> },
+    onRequestPopBackStack: () -> Unit = {},
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     viewModel: CalendarViewModel = hiltViewModel(),
 ) {
 
@@ -67,43 +74,58 @@ internal fun CalendarRoute(
 
     CalendarScreen(
         shouldDisplayDeleteFailedBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
-        onBookmarkDismiss = viewModel::onBookmarkDismiss,
+        onRequestDismissBookmark = viewModel::onBookmarkDismiss,
         selectedDate = selectedDate,
         onDateClick = viewModel::showDateSelectDialog,
         uiState = uiState,
         dialogState = viewModel.dialogState,
-        onDialogDismiss = viewModel::onDialogDismiss,
+        onRequestDismissDialog = viewModel::onDialogDismiss,
         onDateSelected = viewModel::onDateSelected,
         onRecordItemClick = viewModel::onRecordItemClick,
         recordDetailSheetContent = { record ->
-            recordDetailSheetContent(
-                recordInfo = record,
-                dismissBottomSheet = viewModel::onSheetDismiss,
-            )
+            recordDetailSheetContent(record, viewModel::onSheetDismiss)
         },
         sheetViewData = viewModel.viewRecord,
-        onSheetDismiss = viewModel::onSheetDismiss,
-        onBackClick = onBackClick,
+        onRequestDismissSheet = viewModel::onSheetDismiss,
+        onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
     )
 }
 
+/**
+ * 记录日历界面
+ *
+ * @param uiState 界面 UI 状态
+ * @param shouldDisplayDeleteFailedBookmark 显示提示数据
+ * @param onRequestDismissBookmark 隐藏提示
+ * @param dialogState 弹窗状态
+ * @param onRequestDismissDialog 隐藏弹窗
+ * @param selectedDate 当前选择时间
+ * @param onDateClick 日期点击回调
+ * @param onDateSelected 日期选择回调
+ * @param onRecordItemClick 记录列表 item 点击回调
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param sheetViewData 记录详情显示数据
+ * @param onRequestDismissSheet 隐藏 sheet
+ * @param onBackClick 返回点击回调
+ * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CalendarScreen(
     shouldDisplayDeleteFailedBookmark: Int,
-    onBookmarkDismiss: () -> Unit,
+    onRequestDismissBookmark: () -> Unit,
     selectedDate: LocalDate,
     onDateClick: () -> Unit,
     uiState: CalendarUiState,
     dialogState: DialogState,
-    onDialogDismiss: () -> Unit,
+    onRequestDismissDialog: () -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     sheetViewData: RecordViewsEntity?,
-    onSheetDismiss: () -> Unit,
+    onRequestDismissSheet: () -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -117,7 +139,7 @@ internal fun CalendarScreen(
                 deleteFailedFormatText.format(shouldDisplayDeleteFailedBookmark), null
             )
             if (SnackbarResult.Dismissed == result) {
-                onBookmarkDismiss.invoke()
+                onRequestDismissBookmark.invoke()
             }
         }
     }
@@ -138,11 +160,11 @@ internal fun CalendarScreen(
         Box(modifier = Modifier.padding(paddingValues)) {
             if (null != sheetViewData) {
                 CashbookModalBottomSheet(
-                    onDismissRequest = onSheetDismiss,
+                    onDismissRequest = onRequestDismissSheet,
                     sheetState = rememberModalBottomSheetState(
                         confirmValueChange = {
                             if (it == SheetValue.Hidden) {
-                                onSheetDismiss()
+                                onRequestDismissSheet()
                             }
                             true
                         },
@@ -156,7 +178,7 @@ internal fun CalendarScreen(
             (dialogState as? DialogState.Shown<*>)?.data?.let { date ->
                 if (date is YearMonth) {
                     SelectDateDialog(
-                        onDialogDismiss = onDialogDismiss,
+                        onDialogDismiss = onRequestDismissDialog,
                         date = selectedDate.yearMonth,
                         onDateSelected = { ym ->
                             if (selectedDate.yearMonth != ym) {
@@ -311,8 +333,6 @@ internal fun CalendarScreen(
 @Composable
 private fun CalendarPreview() {
     PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)) {
-        CalendarRoute(recordDetailSheetContent = { _, _ -> },
-            onBackClick = {},
-            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed })
+        CalendarRoute()
     }
 }

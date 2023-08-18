@@ -36,6 +36,13 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
 
+/**
+ * 记录详情 sheet 内容
+ *
+ * @param recordData 显示的记录数据
+ * @param onRequestNaviToEditRecord 导航到编辑记录
+ * @param onRequestDismissSheet 隐藏 sheet
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RecordDetailsSheet(
@@ -50,6 +57,7 @@ internal fun RecordDetailsSheet(
     }
 
     if (null != recordData && dialogState is DialogState.Shown<*>) {
+        // 删除确认弹窗
         ConfirmDeleteRecordDialogRoute(
             recordId = recordData.id,
             onResult = { result ->

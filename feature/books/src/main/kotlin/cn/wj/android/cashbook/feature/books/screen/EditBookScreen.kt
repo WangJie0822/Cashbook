@@ -40,9 +40,9 @@ import cn.wj.android.cashbook.feature.books.viewmodel.EditBookViewModel
 
 @Composable
 internal fun EditBookRoute(
-    bookId: Long,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    bookId: Long = -1L,
+    onRequestPopBackStack: () -> Unit = {},
     viewModel: EditBookViewModel = hiltViewModel<EditBookViewModel>().apply {
         updateBookId(bookId)
     },
@@ -55,9 +55,13 @@ internal fun EditBookRoute(
         onDismissBookmark = viewModel::onDismissBookmark,
         uiState = uiState,
         onSaveClick = { name, description ->
-            viewModel.onSaveClick(name = name, description = description, onSuccess = onBackClick)
+            viewModel.onSaveClick(
+                name = name,
+                description = description,
+                onSuccess = onRequestPopBackStack
+            )
         },
-        onBackClick = onBackClick,
+        onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
 
@@ -82,7 +86,8 @@ internal fun EditBookScreen(
 
     LaunchedEffect(shouldDisplayBookmark) {
         if (shouldDisplayBookmark == EditBookBookmarkEnum.NAME_DUPLICATED) {
-            if (snackbarHostState.showSnackbar(nameDuplicatedHint) == SnackbarResult.Dismissed) {
+            val result = snackbarHostState.showSnackbar(nameDuplicatedHint)
+            if (result == SnackbarResult.Dismissed) {
                 onDismissBookmark()
             }
         }
@@ -158,8 +163,6 @@ internal fun EditBookScreen(
 private fun EditBookPreview() {
     PreviewTheme {
         EditBookRoute(
-            bookId = 1L,
-            onBackClick = {},
             viewModel = EditBookViewModel(booksRepository = FakeBooksRepository).apply {
                 updateBookId(
                     1L
