@@ -20,7 +20,6 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
-                apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
             }
 
             extensions.configure<KotlinProjectExtension> {

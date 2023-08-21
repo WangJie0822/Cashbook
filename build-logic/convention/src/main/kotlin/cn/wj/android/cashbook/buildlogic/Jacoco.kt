@@ -47,6 +47,7 @@ internal fun Project.configureJacoco(
                     html.required.set(true)
                 }
 
+                val buildDir = rootProject.layout.buildDirectory.get().asFile
                 classDirectories.setFrom(
                     fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
                         exclude(coverageExclusions)

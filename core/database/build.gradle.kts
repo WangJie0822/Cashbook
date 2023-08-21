@@ -12,7 +12,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    @Suppress("UnstableApiUsage")
     sourceSets {
         getByName("androidTest") {
             assets.srcDirs("$projectDir/schemas")

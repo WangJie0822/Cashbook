@@ -31,6 +31,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
 
+                configureKotlinAndroid(this)
                 with(defaultConfig) {
                     targetSdk = ApplicationSetting.Config.targetSdk
 
@@ -39,8 +40,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     // 应用版本名
                     versionName = ApplicationSetting.Config.versionName
                 }
-
-                configureKotlinAndroid(this)
                 configureGradleManagedDevices(this)
             }
 

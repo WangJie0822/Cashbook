@@ -1,7 +1,6 @@
 package cn.wj.android.cashbook.buildlogic
 
 import com.android.build.api.dsl.CommonExtension
-import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.dependencies
@@ -14,7 +13,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/7
  */
-@Suppress("UnstableApiUsage")
 internal fun Project.configureAndroidCompose(
     commonExtension: CommonExtension<*, *, *, *, *>,
 ) {
@@ -48,9 +46,12 @@ internal fun Project.configureAndroidCompose(
 private fun Project.buildComposeMetricsParameters(): List<String> {
     val metricParameters = mutableListOf<String>()
     val enableMetricsProvider = project.providers.gradleProperty("enableComposeCompilerMetrics")
+    val relativePath = projectDir.relativeTo(rootDir)
+
     val enableMetrics = (enableMetricsProvider.orNull == "true")
+    val buildDir = rootProject.layout.buildDirectory.get().asFile
     if (enableMetrics) {
-        val metricsFolder = File(project.buildDir, "compose-metrics")
+        val metricsFolder = buildDir.resolve("compose-metrics").resolve(relativePath)
         metricParameters.add("-P")
         metricParameters.add(
             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + metricsFolder.absolutePath
@@ -60,7 +61,7 @@ private fun Project.buildComposeMetricsParameters(): List<String> {
     val enableReportsProvider = project.providers.gradleProperty("enableComposeCompilerReports")
     val enableReports = (enableReportsProvider.orNull == "true")
     if (enableReports) {
-        val reportsFolder = File(project.buildDir, "compose-reports")
+        val reportsFolder = buildDir.resolve("compose-reports").resolve(relativePath)
         metricParameters.add("-P")
         metricParameters.add(
             "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + reportsFolder.absolutePath
