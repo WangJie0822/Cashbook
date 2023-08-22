@@ -19,7 +19,7 @@ enum class RecordTypeCategoryEnum {
 
     companion object {
         fun ordinalOf(ordinal: Int): RecordTypeCategoryEnum {
-            return values().first { it.ordinal == ordinal }
+            return entries.first { it.ordinal == ordinal }
         }
     }
 }

@@ -664,7 +664,7 @@ internal fun EditRecordTopBar(
                     },
                     divider = {},
                 ) {
-                    RecordTypeCategoryEnum.values().forEach { enum ->
+                    RecordTypeCategoryEnum.entries.forEach { enum ->
                         Tab(
                             selected = selectedTab == enum,
                             onClick = { onTabSelected(enum) },

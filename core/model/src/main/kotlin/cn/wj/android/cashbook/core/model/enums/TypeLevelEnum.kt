@@ -16,7 +16,7 @@ enum class TypeLevelEnum {
 
     companion object {
         fun ordinalOf(ordinal: Int): TypeLevelEnum {
-            return values().first { it.ordinal == ordinal }
+            return entries.first { it.ordinal == ordinal }
         }
     }
 }

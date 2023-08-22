@@ -920,7 +920,7 @@ internal fun VerificationModeDialog(
             Column(
                 modifier = Modifier.selectableGroup(),
             ) {
-                VerificationModeEnum.values().forEach { enum ->
+                VerificationModeEnum.entries.forEach { enum ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -971,7 +971,7 @@ internal fun DarkModeDialog(
             Column(
                 modifier = Modifier.selectableGroup(),
             ) {
-                DarkModeEnum.values().forEach { enum ->
+                DarkModeEnum.entries.forEach { enum ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

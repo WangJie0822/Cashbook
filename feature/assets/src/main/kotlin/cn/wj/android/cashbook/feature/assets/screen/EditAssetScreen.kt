@@ -511,7 +511,7 @@ internal fun SelectAssetClassificationTypeSheet(onItemClick: (ClassificationType
 
         LazyColumn(
             content = {
-                ClassificationTypeEnum.values().forEach { type ->
+                ClassificationTypeEnum.entries.forEach { type ->
                     stickyHeader {
                         Text(
                             text = stringResource(id = type.nameResId),

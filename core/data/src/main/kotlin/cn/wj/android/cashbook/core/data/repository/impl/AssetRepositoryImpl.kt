@@ -43,7 +43,7 @@ class AssetRepositoryImpl @Inject constructor(
     override val currentVisibleAssetTypeData: Flow<List<AssetTypeViewsModel>> =
         currentVisibleAssetListData.mapLatest { list ->
             val result = mutableListOf<AssetTypeViewsModel>()
-            ClassificationTypeEnum.values().forEach { type ->
+            ClassificationTypeEnum.entries.forEach { type ->
                 val assetList = list.filter { it.type == type }
                 if (assetList.isNotEmpty()) {
                     var totalAmount = BigDecimal.ZERO

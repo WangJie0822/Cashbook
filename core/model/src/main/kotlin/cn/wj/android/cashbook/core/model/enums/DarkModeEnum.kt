@@ -19,7 +19,7 @@ enum class DarkModeEnum {
 
     companion object {
         fun ordinalOf(ordinal: Int): DarkModeEnum {
-            return values().first { it.ordinal == ordinal }
+            return entries.first { it.ordinal == ordinal }
         }
     }
 }

@@ -22,7 +22,7 @@ enum class AutoBackupModeEnum {
 
     companion object {
         fun ordinalOf(ordinal: Int): AutoBackupModeEnum {
-            return values().first { it.ordinal == ordinal }
+            return entries.first { it.ordinal == ordinal }
         }
     }
 }

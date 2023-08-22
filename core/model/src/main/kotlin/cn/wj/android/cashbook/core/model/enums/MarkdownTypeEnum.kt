@@ -12,7 +12,7 @@ enum class MarkdownTypeEnum {
     companion object {
 
         fun ordinalOf(ordinal: Int): MarkdownTypeEnum? {
-            return MarkdownTypeEnum.values().firstOrNull { it.ordinal == ordinal }
+            return entries.firstOrNull { it.ordinal == ordinal }
         }
     }
 }

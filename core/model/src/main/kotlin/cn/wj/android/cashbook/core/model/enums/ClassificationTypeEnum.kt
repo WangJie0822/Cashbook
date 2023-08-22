@@ -71,7 +71,7 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
 
     companion object {
         fun ordinalOf(ordinal: Int): ClassificationTypeEnum {
-            return values().first { it.ordinal == ordinal }
+            return entries.first { it.ordinal == ordinal }
         }
     }
 }

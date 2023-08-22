@@ -84,7 +84,7 @@ enum class AssetClassificationEnum {
 
     companion object {
         fun ordinalOf(ordinal: Int): AssetClassificationEnum {
-            return values().first { it.ordinal == ordinal }
+            return entries.first { it.ordinal == ordinal }
         }
     }
 }

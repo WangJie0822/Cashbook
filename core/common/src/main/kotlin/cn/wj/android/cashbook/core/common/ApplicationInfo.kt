@@ -28,6 +28,6 @@ object ApplicationInfo {
 
 
     fun setFlavor(flavorName: String) {
-        _flavor = CashbookFlavor.values().firstOrNull { it.name == flavorName }
+        _flavor = CashbookFlavor.entries.firstOrNull { it.name == flavorName }
     }
 }

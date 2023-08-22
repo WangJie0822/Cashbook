@@ -32,10 +32,6 @@ dependencyResolutionManagement {
     }
     // 配置 Version Catalogs
     versionCatalogs {
-        // 依赖版本
-        create("libs") {
-            from(files("./gradle/libs.version.toml"))
-        }
         // 签名配置信息
         create("signingLibs") {
             from(files("./gradle/signing.versions.toml"))

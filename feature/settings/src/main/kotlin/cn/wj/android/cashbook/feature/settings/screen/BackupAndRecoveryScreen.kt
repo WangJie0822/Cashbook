@@ -277,7 +277,7 @@ internal fun AutoBackupModeDialog(
             Column(
                 modifier = Modifier.selectableGroup(),
             ) {
-                AutoBackupModeEnum.values().forEach { enum ->
+                AutoBackupModeEnum.entries.forEach { enum ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

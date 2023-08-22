@@ -53,15 +53,15 @@ android {
     }
 
     // 配置 APK 输出路径
-//    val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
-//    configureOutputs(
-//        "${project.rootDir}${sep}outputs${sep}apk",
-//        { variant ->
-//            variant.buildType.name == "release"
-//        },
-//        { variant, _ ->
-//            "Cashbook_${variant.versionName}.apk"
-//        })
+    val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
+    configureOutputs(
+        "${project.rootDir}${sep}outputs${sep}apk",
+        { variant ->
+            variant.buildType.name == "release"
+        },
+        { variant, _ ->
+            "Cashbook_${variant.versionName}.apk"
+        })
 }
 
 dependencies {
