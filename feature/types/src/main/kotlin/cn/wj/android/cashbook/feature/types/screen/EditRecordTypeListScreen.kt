@@ -89,8 +89,8 @@ internal fun EditRecordTypeListScreen(
     typeList: List<RecordTypeEntity>,
     onTypeSelect: (Long) -> Unit,
     onTypeSettingClick: () -> Unit,
-    headerContent: @Composable (modifier: Modifier) -> Unit,
-    footerContent: @Composable (modifier: Modifier) -> Unit,
+    headerContent: @Composable (Modifier) -> Unit,
+    footerContent: @Composable (Modifier) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
@@ -102,7 +102,7 @@ internal fun EditRecordTypeListScreen(
                     GridItemSpan(maxLineSpan)
                 },
             ) {
-                headerContent(modifier = Modifier.animateItemPlacement())
+                headerContent(Modifier.animateItemPlacement())
             }
 
             // 分类列表
@@ -154,7 +154,7 @@ internal fun EditRecordTypeListScreen(
                     GridItemSpan(maxLineSpan)
                 },
             ) {
-                footerContent(modifier = Modifier.animateItemPlacement())
+                footerContent(Modifier.animateItemPlacement())
             }
         },
     )

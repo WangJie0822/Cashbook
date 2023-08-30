@@ -38,7 +38,7 @@ androidx-hilt = "1.0.0"
 # 脱糖
 android-desugarJdkLibs = "2.0.3"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
-android-gradle-plugin = "8.1.0"
+android-gradle-plugin = "8.1.1"
 
 # Androidx
 # legacy [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/legacy?hl=zh-cn)
@@ -46,7 +46,7 @@ androidx-legacy = "1.0.0"
 # appcompat [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/appcompat?hl=zh-cn)
 androidx-appcompat = "1.6.1"
 # recyclerview [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/recyclerview?hl=zh-cn)
-androidx-recyclerview = "1.3.0"
+androidx-recyclerview = "1.3.1"
 # cardview [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/cardview?hl=zh-cn)
 androidx-cardview = "1.0.0"
 # viewpager2 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/viewpager2?hl=zh-cn)
@@ -58,7 +58,7 @@ androidx-constraintlayout-compose = "1.0.1"
 androidx-multidex = "2.0.1"
 # core 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/core?hl=zh-cn)
 androidx-core = "1.10.1"
-androidx-core-splashscreen = "1.0.0"
+androidx-core-splashscreen = "1.0.1"
 # Compose 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/compose?hl=zh-cn)
 androidx-compose-bom = "2023.08.00"
 # Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin?hl=zh-cn)
@@ -74,7 +74,7 @@ androidx-room = "2.5.2"
 # Paging 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/paging?hl=zh-cn)
 androidx-paging = "3.2.0"
 # Navigation 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
-androidx-navigation = "2.6.0"
+androidx-navigation = "2.7.1"
 # WorkManager 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/work?hl=zh-cn)
 androidx-work = "2.8.1"
 # DataStore 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/datastore?hl=zh-cn)

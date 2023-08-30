@@ -158,7 +158,7 @@ internal fun MonthView(
     selectDate: LocalDate,
     modifier: Modifier = Modifier,
     weekStart: DayOfWeek = DayOfWeek.SUNDAY,
-    schemeContent: @Composable BoxScope.(date: LocalDate, selected: Boolean) -> Unit,
+    schemeContent: @Composable BoxScope.(LocalDate, Boolean) -> Unit,
 ) {
     Column(modifier = modifier) {
         val nowDate = LocalDate.now()
@@ -234,10 +234,7 @@ internal fun MonthView(
                             )
                         }
 
-                        schemeContent(
-                            date = currentDate,
-                            selected = selected,
-                        )
+                        schemeContent(currentDate, selected)
                     }
                 }
             }

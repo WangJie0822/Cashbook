@@ -24,10 +24,10 @@ internal fun Project.configureKotlinAndroid(
 
     commonExtension.apply {
 
-        compileSdk = ApplicationSetting.Config.compileSdk
+        compileSdk = ApplicationSetting.Config.COMPILE_SDK
 
         defaultConfig {
-            minSdk = ApplicationSetting.Config.minSdk
+            minSdk = ApplicationSetting.Config.MIN_SDK
         }
 
         packaging {

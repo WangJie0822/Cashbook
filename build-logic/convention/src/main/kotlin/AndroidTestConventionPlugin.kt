@@ -22,7 +22,7 @@ class AndroidTestConventionPlugin : Plugin<Project> {
 
             extensions.configure<TestExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = ApplicationSetting.Config.targetSdk
+                defaultConfig.targetSdk = ApplicationSetting.Config.TARGET_SDK
                 configureGradleManagedDevices(this)
             }
         }

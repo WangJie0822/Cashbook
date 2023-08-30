@@ -33,7 +33,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                 configureKotlinAndroid(this)
                 with(defaultConfig) {
-                    targetSdk = ApplicationSetting.Config.targetSdk
+                    targetSdk = ApplicationSetting.Config.TARGET_SDK
 
                     // 应用版本号
                     versionCode = ApplicationSetting.Config.versionCode

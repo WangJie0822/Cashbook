@@ -379,8 +379,8 @@ internal fun EditRecordScreen(
 private fun EditRecordScaffoldContent(
     uiState: EditRecordUiState,
     typeListContent: @Composable (
-        headerContent: @Composable (modifier: Modifier) -> Unit,
-        footerContent: @Composable (modifier: Modifier) -> Unit,
+        @Composable (Modifier) -> Unit,
+        @Composable (Modifier) -> Unit,
     ) -> Unit,
     selectedTypeCategory: RecordTypeCategoryEnum,
     primaryColor: Color,
@@ -406,7 +406,7 @@ private fun EditRecordScaffoldContent(
 
             is EditRecordUiState.Success -> {
                 typeListContent(
-                    headerContent = { modifier ->
+                    { modifier ->
                         Column(
                             modifier = modifier
                                 .fillMaxWidth()
@@ -427,7 +427,7 @@ private fun EditRecordScaffoldContent(
                             )
                         }
                     },
-                    footerContent = { modifier ->
+                    { modifier ->
                         Column(
                             modifier = modifier
                                 .fillMaxWidth()

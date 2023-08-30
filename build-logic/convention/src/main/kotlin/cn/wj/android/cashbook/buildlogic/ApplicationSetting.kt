@@ -11,12 +11,22 @@ import org.gradle.api.Project
 object ApplicationSetting {
 
     object Config {
-        const val compileSdk = 34
-        const val minSdk = 23
-        const val targetSdk = 30
+        /** SDK 编译版本 */
+        const val COMPILE_SDK = 34
+
+        /** SDK 最小支持版本 */
+        const val MIN_SDK = 23
+
+        /** SDK 目标版本 */
+        const val TARGET_SDK = 30
+
+        /** 版本号，动态生成 */
         val versionCode = generateVersionCode()
+
+        /** 版本名，大版本号+版本号 */
         val versionName = "v0.5.7_$versionCode"
 
+        /** 源码 jdk 版本 */
         val javaVersion = JavaVersion.VERSION_11
 
         /** 根据日期时间获取对应版本号 */

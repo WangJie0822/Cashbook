@@ -97,7 +97,7 @@ internal fun AssetInfoRoute(
 internal fun AssetInfoScreen(
     uiState: AssetInfoUiState,
     viewRecord: RecordViewsEntity?,
-    assetRecordListContent: @Composable (topContent: @Composable () -> Unit) -> Unit,
+    assetRecordListContent: @Composable (@Composable () -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     onEditAssetClick: () -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
@@ -165,17 +165,15 @@ internal fun AssetInfoScreen(
                     }
 
                     is AssetInfoUiState.Success -> {
-                        assetRecordListContent(
-                            topContent = {
-                                AssetInfoContent(
-                                    isCreditCard = uiState.isCreditCard,
-                                    balance = uiState.balance,
-                                    totalAmount = uiState.totalAmount,
-                                    billingDate = uiState.billingDate,
-                                    repaymentDate = uiState.repaymentDate,
-                                )
-                            },
-                        )
+                        assetRecordListContent {
+                            AssetInfoContent(
+                                isCreditCard = uiState.isCreditCard,
+                                balance = uiState.balance,
+                                totalAmount = uiState.totalAmount,
+                                billingDate = uiState.billingDate,
+                                repaymentDate = uiState.repaymentDate,
+                            )
+                        }
                     }
                 }
             }

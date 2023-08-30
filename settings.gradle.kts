@@ -41,34 +41,30 @@ dependencyResolutionManagement {
 
 // 项目名称
 rootProject.name = "Cashbook"
+
 // 项目包含的 Module
-include(
-    ":app",
-    ":app-catalog",
-)
-include(
-    ":feature:tags",
-    ":feature:types",
-    ":feature:books",
-    ":feature:assets",
-    ":feature:records",
-    ":feature:settings",
-)
-include(
-    ":core:data",
-    ":core:database",
-    ":core:datastore",
-    ":core:common",
-    ":core:model",
-    ":core:domain",
-    ":core:design",
-    ":core:ui",
-    ":core:network",
-    ":core:testing",
-)
-include(
-    ":repos:MPChartLib",
-)
-include(
-    ":sync:work",
-)
+include(":app")
+include(":app-catalog")
+
+include(":feature:tags")
+include(":feature:types")
+include(":feature:books")
+include(":feature:assets")
+include(":feature:records")
+include(":feature:settings")
+
+include(":sync:work")
+
+include(":core:domain")
+include(":core:data")
+include(":core:database")
+include(":core:datastore")
+include(":core:network")
+include(":core:testing")
+include(":core:design")
+
+include(":core:ui")
+include(":core:model")
+include(":core:common")
+
+include(":repos:MPChartLib")
