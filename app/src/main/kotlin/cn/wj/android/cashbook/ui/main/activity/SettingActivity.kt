@@ -109,7 +109,14 @@ class SettingActivity : BaseActivity<SettingViewModel, ActivitySettingBinding>()
 
         PasswordLiveData.observe(this) {
             // 密码变化，清除指纹验证信息
-            viewModel.verifyByFingerprint.value = false
+            if (firstChange) {
+                firstChange = false
+            } else {
+                viewModel.verifyByFingerprint.value = false
+            }
         }
     }
+
+    private var firstChange = true
+
 }
