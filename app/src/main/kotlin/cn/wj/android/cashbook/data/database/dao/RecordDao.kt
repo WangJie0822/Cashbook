@@ -86,6 +86,17 @@ interface RecordDao {
         booksId: Long = CurrentBooksLiveData.booksId
     ): List<RecordTable>
 
+    @Query(
+        value = """
+            SELECT * FROM db_record WHERE books_id=:booksId AND record_time>=:startDate AND record_time<:endDate
+        """
+    )
+    suspend fun queryByBooksIdBetweenDate(
+        startDate: Long,
+        endDate: Long,
+        booksId: Long = CurrentBooksLiveData.booksId
+    ): List<RecordTable>
+
     /** 查询记录时间在 [startTime] 与 [endTime] 之间的记录 */
     @Query("SELECT * FROM db_record WHERE record_time>=:startTime AND record_time<=:endTime AND books_id=:booksId ORDER BY record_time DESC")
     fun queryRecordBetweenTime(

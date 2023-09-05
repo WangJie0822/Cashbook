@@ -7,15 +7,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.R
-import cn.wj.android.cashbook.base.ext.base.condition
 import cn.wj.android.cashbook.base.ext.base.decimalFormat
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.moneyFormat
+import cn.wj.android.cashbook.base.ext.base.orElse
 import cn.wj.android.cashbook.base.ext.base.string
 import cn.wj.android.cashbook.base.ext.base.toBigDecimalOrZero
 import cn.wj.android.cashbook.base.ext.base.toFloatOrZero
+import cn.wj.android.cashbook.base.tools.DATE_FORMAT_MONTH_DAY
+import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.maps
 import cn.wj.android.cashbook.base.tools.mutableLiveDataOf
+import cn.wj.android.cashbook.base.tools.toLongTime
 import cn.wj.android.cashbook.base.ui.BaseViewModel
 import cn.wj.android.cashbook.data.config.AppConfigs
 import cn.wj.android.cashbook.data.constants.MS_DAY
@@ -42,6 +45,7 @@ import cn.wj.android.cashbook.data.repository.main.MainRepository
 import cn.wj.android.cashbook.data.transform.toSnackbarModel
 import cn.wj.android.cashbook.interfaces.RecordListClickListener
 import cn.wj.android.cashbook.manager.UpdateManager
+import java.util.Calendar
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 
@@ -62,17 +66,29 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(),
     /** 检查备份路径 */
     val checkBackupPathEvent: LifecycleEvent<String> = LifecycleEvent()
 
+    /** 显示选择年月弹出事件 */
+    val showSelectYearMonthDialogEvent: LifecycleEvent<(String) -> Unit> = LifecycleEvent()
+
+    /** 选中日期 */
+    private val selectedDate: MutableLiveData<Calendar> = mutableLiveDataOf(onActive = {
+        value = Calendar.getInstance()
+    })
+
+    /** 标题文本 */
+    val titleStr: LiveData<String> = selectedDate.map {
+        "${it[Calendar.YEAR]}-${it[Calendar.MONTH] + 1}"
+    }
+
     /** 当前月记录列表 */
     private val currentMonthRecord: MutableLiveData<List<RecordEntity>> = MutableLiveData()
 
     /** 首页列表数据 */
-    val listData: MutableLiveData<List<DateRecordEntity>> = MutableLiveData()
+    val listData = currentMonthRecord.map {
+        transTo(it)
+    }
 
     /** 账本名称 */
     val booksName: LiveData<String> = CurrentBooksLiveData.map { it.name }
-
-    /** 标记 - 是否允许标题 */
-    val titleEnable: MutableLiveData<Boolean> = MutableLiveData(false)
 
     /** 顶部背景图片 */
     val topBgImage: LiveData<String> = CurrentBooksLiveData.map { it.imageUrl }
@@ -129,29 +145,22 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(),
     /** 本月收入、结余透明度 */
     val incomeAndBalanceAlpha = ObservableFloat(1f)
 
-    /** 刷新状态 */
-    val refreshing: MutableLiveData<Boolean> = mutableLiveDataOf(
-        default = true,
-        onActive = {
-            // 进入自动加载数据
-            loadHomepageList()
-            // 获取当前月所有记录
-            getCurrentMonthRecord()
-        },
-        onSet = {
-            if (value.condition) {
-                // 刷新
-                loadHomepageList()
-                // 获取当前月所有记录
-                getCurrentMonthRecord()
+    /** 标题点击 */
+    val onTitleClick: () -> Unit = {
+        // 显示弹窗
+        showSelectYearMonthDialogEvent.value = { date ->
+            // 选择回调，更新选中日期
+            selectedDate.value = Calendar.getInstance().apply {
+                val splits = date.split("-")
+                set(Calendar.YEAR, splits.first().toInt())
+                set(Calendar.MONTH, splits.last().toInt() - 1)
             }
+            loadMonthRecord()
         }
-    )
+    }
 
     /** 状态栏折叠进度监听 */
     val onCollapsingChanged: (Float) -> Unit = { percent ->
-        // 完全折叠时才显示标题文本
-        titleEnable.value = percent <= 0.13f
         // 本月支出显示逻辑
         expenditureAlpha.set(MathUtils.clamp((1 - (0.9f - percent) / 0.3f), 0f, 1f))
         // 本月收入、结余显示逻辑
@@ -167,12 +176,14 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(),
                     jump(ROUTE_PATH_RECORD_SEARCH)
                 }
             }
+
             R.id.calendar -> {
                 // 跳转日历
                 uiNavigationEvent.value = UiNavigationModel.builder {
                     jump(ROUTE_PATH_RECORD_CALENDAR)
                 }
             }
+
             R.id.my_asset -> {
                 // 跳转我的资产
                 uiNavigationEvent.value = UiNavigationModel.builder {
@@ -310,27 +321,66 @@ class MainViewModel(private val repository: MainRepository) : BaseViewModel(),
         }
     }
 
-    /** 获取最近一周数据 */
-    private fun loadHomepageList() {
+    /** 获取当前月所有记录 */
+    fun loadMonthRecord() {
         viewModelScope.launch {
             try {
-                listData.value = repository.getHomepageList()
+                val date = selectedDate.value ?: Calendar.getInstance()
+                currentMonthRecord.value =
+                    repository.getRecordByYearMonth(date[Calendar.YEAR], date[Calendar.MONTH] + 1)
             } catch (throwable: Throwable) {
-                logger().e(throwable, "loadHomepageList")
-            } finally {
-                refreshing.value = false
+                logger().e(throwable, "loadMonthRecord")
             }
         }
     }
 
-    /** 获取当前月所有记录 */
-    private fun getCurrentMonthRecord() {
-        viewModelScope.launch {
-            try {
-                currentMonthRecord.value = repository.getCurrentMonthRecord()
-            } catch (throwable: Throwable) {
-                logger().e(throwable, "getCurrentMonthRecord")
+    private fun transTo(list1: List<RecordEntity>): List<DateRecordEntity> {
+        val result = arrayListOf<DateRecordEntity>()
+        val calendar = Calendar.getInstance()
+        val today = calendar.get(Calendar.DAY_OF_MONTH)
+        val list = list1.filter {
+            !it.system
+        }
+        val map = hashMapOf<String, MutableList<RecordEntity>>()
+        for (item in list) {
+            val dateKey = item.recordTime.dateFormat(DATE_FORMAT_MONTH_DAY)
+            val dayInt = dateKey.split(".").lastOrNull()?.toIntOrNull().orElse(-1)
+            val key = dateKey + when (dayInt) {
+                today -> {
+                    // 今天
+                    " ${R.string.today.string}"
+                }
+
+                today - 1 -> {
+                    // 昨天
+                    " ${R.string.yesterday.string}"
+                }
+
+                today - 2 -> {
+                    // 前天
+                    " ${R.string.the_day_before_yesterday.string}"
+                }
+
+                else -> {
+                    ""
+                }
+            }
+            if (key.isNotBlank()) {
+                if (map.containsKey(key)) {
+                    map[key]!!.add(item)
+                } else {
+                    map[key] = arrayListOf(item)
+                }
             }
         }
+        map.keys.forEach { key ->
+            result.add(
+                DateRecordEntity(
+                    date = key,
+                    list = map[key].orEmpty().sortedBy { it.recordTime }.reversed()
+                )
+            )
+        }
+        return result.sortedBy { it.date.toLongTime(DATE_FORMAT_MONTH_DAY) }.reversed()
     }
 }

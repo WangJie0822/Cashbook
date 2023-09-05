@@ -58,7 +58,7 @@ fun Date.dateFormat(format: String = DATE_FORMAT_DEFAULT): String {
 
 /** 根据[format]格式化时间，[format]默认[DATE_FORMAT_DEFAULT] */
 @JvmOverloads
-fun String.paresDate(format: String = DATE_FORMAT_DEFAULT): Date? {
+fun String.parseDate(format: String = DATE_FORMAT_DEFAULT): Date? {
     return try {
         SimpleDateFormat(format, Locale.getDefault()).parse(this)
     } catch (e: ParseException) {
@@ -67,8 +67,17 @@ fun String.paresDate(format: String = DATE_FORMAT_DEFAULT): Date? {
     }
 }
 
+fun String.parseDateLong(format: String = DATE_FORMAT_DEFAULT): Long {
+    return try {
+        parseDate(format)?.time ?: System.currentTimeMillis()
+    } catch (throwable: Throwable) {
+        logger().e(throwable, "parseDate")
+        System.currentTimeMillis()
+    }
+}
+
 /** 将字符串时间转换为 [Long] 类型时间 */
 @JvmOverloads
 fun String?.toLongTime(format: String = DATE_FORMAT_DEFAULT): Long? {
-    return this?.paresDate(format)?.time
+    return this?.parseDate(format)?.time
 }

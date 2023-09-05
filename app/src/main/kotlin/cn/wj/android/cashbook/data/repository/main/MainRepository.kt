@@ -6,6 +6,7 @@ import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.R
+import cn.wj.android.cashbook.base.ext.base.completeZero
 import cn.wj.android.cashbook.base.ext.base.isContentScheme
 import cn.wj.android.cashbook.base.ext.base.logger
 import cn.wj.android.cashbook.base.ext.base.orElse
@@ -19,6 +20,7 @@ import cn.wj.android.cashbook.base.tools.createFileIfNotExists
 import cn.wj.android.cashbook.base.tools.dateFormat
 import cn.wj.android.cashbook.base.tools.deleteAllFiles
 import cn.wj.android.cashbook.base.tools.deleteFiles
+import cn.wj.android.cashbook.base.tools.parseDateLong
 import cn.wj.android.cashbook.base.tools.readBytes
 import cn.wj.android.cashbook.base.tools.toJsonString
 import cn.wj.android.cashbook.base.tools.toLongTime
@@ -159,6 +161,30 @@ class MainRepository(
         }
         result
     }
+
+    suspend fun getRecordByYearMonth(year: Int, month: Int): List<RecordEntity> =
+        withContext(Dispatchers.IO) {
+            val result = arrayListOf<RecordEntity>()
+            var nextYearInt = year
+            val nextMonthInt = if (month >= 12) {
+                nextYearInt++
+                1
+            } else {
+                month + 1
+            }
+            val startDate = "${year.completeZero()}-${month.completeZero()}-01 00:00:00"
+            val endDate = "${nextYearInt.completeZero()}-${nextMonthInt.completeZero()}-01 00:00:00"
+            recordDao.queryByBooksIdBetweenDate(
+                startDate.parseDateLong(),
+                endDate.parseDateLong()
+            ).forEach { item ->
+                val record = loadRecordEntityFromTable(item, false)
+                if (null != record) {
+                    result.add(record)
+                }
+            }
+            result
+        }
 
     /** 获取最新 Release 信息 */
     suspend fun queryLatestRelease(useGitee: Boolean): UpdateInfoEntity =

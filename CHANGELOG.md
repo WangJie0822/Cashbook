@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 首页新增切换月份功能，可按月查看收支数据；
 ### Fixed
 - 修复 WebDAV 使用 http 协议闪退问题；
 

@@ -29,6 +29,7 @@ import cn.wj.android.cashbook.ui.general.dialog.GeneralDialog
 import cn.wj.android.cashbook.ui.main.viewmodel.MainViewModel
 import cn.wj.android.cashbook.ui.record.adapter.DateRecordRvAdapter
 import cn.wj.android.cashbook.ui.record.dialog.RecordInfoDialog
+import cn.wj.android.cashbook.ui.record.dialog.SelectYearMonthDialog
 import cn.wj.android.cashbook.widget.recyclerview.layoutmanager.WrapContentLinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.gyf.immersionbar.ImmersionBar
@@ -63,11 +64,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     showButton = true,
                     buttonTextResId = R.string.click_to_see_other_month
                 ) {
-                    // 跳转日历
-                    this@MainActivity.viewModel.uiNavigationEvent.value =
-                        UiNavigationModel.builder {
-                            jump(ROUTE_PATH_RECORD_CALENDAR)
-                        }
+                    // 选择其它月份
+                    this@MainActivity.viewModel.onTitleClick()
                 }
             }.root)
             addFooterView(RecyclerFooterHomepageBinding.inflate(LayoutInflater.from(context)).root.apply {
@@ -96,6 +94,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             layoutManager = WrapContentLinearLayoutManager()
             adapter = this@MainActivity.adapter
         }
+
+        viewModel.loadMonthRecord()
 
         // 检查更新
         viewModel.checkUpdate()
@@ -160,6 +160,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 显示记录详情弹窗
         viewModel.showRecordDetailsDialogEvent.observe(this) { record ->
             RecordInfoDialog.actionShow(supportFragmentManager, record)
+        }
+        // 显示选择年月弹窗
+        viewModel.showSelectYearMonthDialogEvent.observe(this) { callback ->
+            SelectYearMonthDialog.actionShow(supportFragmentManager, viewModel.titleStr.value.orEmpty(), callback)
         }
         // 升级提示弹窗
         viewModel.showUpdateDialogEvent.observe(this) { info ->
@@ -232,7 +236,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         })
         // 记录变化监听
         LiveEventBus.get<Int>(EVENT_RECORD_CHANGE).observe(this) {
-            viewModel.refreshing.value = true
+            viewModel.loadMonthRecord()
         }
     }
 

@@ -30,8 +30,6 @@
                 android:bind_ctl_collapsedTitleTextColor="@{@color/toolbar_collapsed_title_text}"
                 android:bind_ctl_expandedTitleTextColor="@{@color/toolbar_expanded_title_text}"
                 android:bind_ctl_onExpandOffsetChanged="@{viewModel.onCollapsingChanged}"
-                android:bind_ctl_title="@{viewModel.booksName}"
-                android:bind_ctl_title_enable="@{viewModel.titleEnable}"
                 app:contentScrim="@color/color_primary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:scrimVisibleHeightTrigger="@dimen/main_header_scrim_visible_height"
@@ -52,27 +50,30 @@
                     app:menu="@menu/toolbar_main"
                     app:navigationIcon="@drawable/vector_baseline_menu_24"
                     app:navigationIconTint="@color/color_on_primary"
-                    app:popupTheme="@style/Theme.Cashbook.PopupOverlay" />
+                    app:popupTheme="@style/Theme.Cashbook.PopupOverlay">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:bind_onClick="@{viewModel.onTitleClick}"
+                        android:text="@{viewModel.titleStr}"
+                        android:textColor="@color/color_on_primary"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        tools:text="2019-09" />
+
+                </com.google.android.material.appbar.MaterialToolbar>
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/srl"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:bind_srl_refreshing="@={viewModel.refreshing}"
-            android:bind_srl_schemeColorsStr="@{@string/swipe_refresh_scheme_colors}"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:listitem="@layout/recycler_item_record_date" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/recycler_item_record_date" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
