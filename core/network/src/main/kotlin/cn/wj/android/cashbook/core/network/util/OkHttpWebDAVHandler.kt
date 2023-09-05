@@ -45,13 +45,18 @@ class OkHttpWebDAVHandler @Inject constructor(
         if (url.isBlank()) {
             return false
         }
-        val response = callFactory.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Authorization", Credentials.basic(account, password))
-                .method("HEAD", null)
-                .build()
-        ).execute()
+        val response = runCatching {
+            callFactory.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", Credentials.basic(account, password))
+                    .method("HEAD", null)
+                    .build()
+            ).execute()
+        }.getOrElse { throwable ->
+            logger().e(throwable, "exists(url = <$url>)")
+            null
+        } ?: return false
         logger().i("exists(url = <$url>), response = <$response>")
         return response.isSuccessful
     }
@@ -61,13 +66,18 @@ class OkHttpWebDAVHandler @Inject constructor(
         if (url.isBlank()) {
             return false
         }
-        val response = callFactory.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Authorization", Credentials.basic(account, password))
-                .method("MKCOL", null)
-                .build()
-        ).execute()
+        val response = runCatching {
+            callFactory.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", Credentials.basic(account, password))
+                    .method("MKCOL", null)
+                    .build()
+            ).execute()
+        }.getOrElse { throwable ->
+            logger().e(throwable, "createDirectory(url = <$url>)")
+            null
+        } ?: return false
         logger().i("createDirectory(url = <$url>), response = <$response>")
         return response.isSuccessful
     }
@@ -78,13 +88,21 @@ class OkHttpWebDAVHandler @Inject constructor(
             return false
         }
         val requestBody = RequestBody.create(MediaType.parse(contentType), dataStream.readBytes())
-        val response = callFactory.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Authorization", Credentials.basic(account, password))
-                .put(requestBody)
-                .build()
-        ).execute()
+        val response = runCatching {
+            callFactory.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", Credentials.basic(account, password))
+                    .put(requestBody)
+                    .build()
+            ).execute()
+        }.getOrElse { throwable ->
+            logger().e(
+                throwable,
+                "put(url = <$url>, dataStream = <$dataStream>, contentType = <$contentType>)"
+            )
+            null
+        } ?: return false
         logger().i("put(url = <$url>, dataStream = <$dataStream>, contentType = <$contentType>), response = <$response>")
         return response.isSuccessful
     }
@@ -94,13 +112,18 @@ class OkHttpWebDAVHandler @Inject constructor(
         if (url.isBlank()) {
             return false
         }
-        val response = callFactory.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Authorization", Credentials.basic(account, password))
-                .put(RequestBody.create(MediaType.parse(contentType), file))
-                .build()
-        ).execute()
+        val response = runCatching {
+            callFactory.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", Credentials.basic(account, password))
+                    .put(RequestBody.create(MediaType.parse(contentType), file))
+                    .build()
+            ).execute()
+        }.getOrElse { throwable ->
+            logger().e(throwable, "put(url = <$url>, file = <$file>, contentType = <$contentType>)")
+            null
+        } ?: return false
         logger().i("put(url = <$url>, file = <$file>, contentType = <$contentType>), response = <$response>")
         return response.isSuccessful
     }
@@ -123,17 +146,22 @@ class OkHttpWebDAVHandler @Inject constructor(
                 toString()
             })
         }
-        val response = callFactory.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Authorization", Credentials.basic(account, password))
-                .addHeader("Depth", "1")
-                .method(
-                    "PROPFIND",
-                    RequestBody.create(MediaType.parse("text/plain"), requestPropText)
-                )
-                .build()
-        ).execute()
+        val response = runCatching {
+            callFactory.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", Credentials.basic(account, password))
+                    .addHeader("Depth", "1")
+                    .method(
+                        "PROPFIND",
+                        RequestBody.create(MediaType.parse("text/plain"), requestPropText)
+                    )
+                    .build()
+            ).execute()
+        }.getOrElse { throwable ->
+            logger().e(throwable, "list(url = <$url>, propsList = <$propsList>)")
+            null
+        } ?: return@withContext emptyList()
         logger().i("list(url = <$url>, propsList = <$propsList>), response = <${response.code()}>")
         val responseString = response.body()?.string() ?: return@withContext emptyList()
         val result = arrayListOf<BackupModel>()
@@ -155,12 +183,17 @@ class OkHttpWebDAVHandler @Inject constructor(
         if (url.isBlank()) {
             return@withContext null
         }
-        val response = callFactory.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Authorization", Credentials.basic(account, password))
-                .build()
-        ).execute()
+        val response = runCatching {
+            callFactory.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", Credentials.basic(account, password))
+                    .build()
+            ).execute()
+        }.getOrElse { throwable ->
+            logger().e(throwable, "get(url = <$url>)")
+            null
+        } ?: return@withContext null
         logger().i("get(url = <$url>), response = <${response.code()}>")
         response.body()?.byteStream()
     }

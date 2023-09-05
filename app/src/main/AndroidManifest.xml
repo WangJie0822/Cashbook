@@ -26,6 +26,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cashbook"
+        android:usesCleartextTraffic="true"
         tools:targetApi="o">
 
         <activity
