@@ -14,7 +14,7 @@ object ApplicationSetting {
         const val minSdk = 21
         const val targetSdk = 30
         val versionCode = generateVersionCode()
-        val versionName = "v0.6.1_$versionCode"
+        val versionName = "v0.6.2_$versionCode"
 
         /** 根据日期时间获取对应版本号 */
         private fun generateVersionCode(): Int {
