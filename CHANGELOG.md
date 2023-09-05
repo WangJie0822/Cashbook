@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Fixed
+- 修复 WebDAV 使用 http 协议闪退问题；
 
 ## [0.6.1_23093017]
 ### Add
