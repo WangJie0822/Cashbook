@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 
 plugins {
@@ -34,7 +35,10 @@ android {
         }
     }
 
-    buildFeatures.buildConfig = true
+    buildFeatures {
+        buildConfig = true
+        resValues = true
+    }
 
     buildTypes {
         getByName("debug") {
@@ -49,6 +53,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+    }
+
+    productFlavors {
+        getByName(CashbookFlavor.Dev.name) {
+            resValue("string", "app_name", "@string/app_name_dev")
         }
     }
 
@@ -122,8 +132,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.core.splashscreen)
-
-    implementation(libs.google.accompanist.systemuicontroller)
 
     debugImplementation(libs.didi.dokit.core)
     releaseImplementation(libs.didi.dokit.noop)
