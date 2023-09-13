@@ -21,9 +21,6 @@ dependencies {
     // Markdown 解析
     implementation(libs.noties.markwon)
 
-    // WebView
-    implementation(libs.google.accompanist.webview)
-
     // Constraintlayout
     implementation(libs.androidx.constraintlayout.compose)
 

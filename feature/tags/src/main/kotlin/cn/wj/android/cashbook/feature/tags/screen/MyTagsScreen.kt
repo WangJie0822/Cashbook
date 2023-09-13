@@ -1,6 +1,9 @@
 package cn.wj.android.cashbook.feature.tags.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,7 +42,6 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import cn.wj.android.cashbook.feature.tags.viewmodel.MyTagsViewModel
-import com.google.accompanist.flowlayout.FlowRow
 
 /**
  * 我的标签
@@ -85,7 +87,7 @@ internal fun MyTagsRoute(
  * @param onTagStatisticClick 统计数据点击回调
  * @param onBackClick 返回点击回调
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun MyTagsScreen(
     tagList: List<TagModel>,
@@ -152,8 +154,8 @@ internal fun MyTagsScreen(
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    mainAxisSpacing = 8.dp,
-                    crossAxisSpacing = 4.dp,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     tagList.forEach {
                         Box {

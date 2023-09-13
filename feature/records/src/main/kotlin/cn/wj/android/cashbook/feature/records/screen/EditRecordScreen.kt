@@ -1,8 +1,11 @@
 package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,7 +66,6 @@ import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
-import com.google.accompanist.flowlayout.FlowRow
 
 /**
  * 编辑记录
@@ -375,7 +377,7 @@ internal fun EditRecordScreen(
  * @param onRecordTimeClick 记录时间点击回调
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 private fun EditRecordScaffoldContent(
     uiState: EditRecordUiState,
     typeListContent: @Composable (
@@ -461,8 +463,8 @@ private fun EditRecordScaffoldContent(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 8.dp),
-                                mainAxisSpacing = 8.dp,
-                                crossAxisSpacing = 4.dp,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
                                 // 目标资产
                                 val hasAsset = uiState.assetText.isNotBlank()

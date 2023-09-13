@@ -11,5 +11,4 @@ android {
 dependencies {
 
     implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.google.accompanist.flowlayout)
 }

@@ -1,7 +1,10 @@
 package cn.wj.android.cashbook.feature.tags.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,7 +31,6 @@ import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModel
-import com.google.accompanist.flowlayout.FlowRow
 
 /**
  * 编辑记录界面选择标签抽屉
@@ -77,7 +79,7 @@ internal fun EditRecordSelectTagBottomSheetRoute(
  * @param onAddTagConfirmClick 添加标签确认点击回调
  * @param onTagItemClick 标签列表 item 点击回调
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun EditRecordSelectTagBottomSheetScreen(
     dialogState: DialogState,
@@ -143,8 +145,8 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .defaultMinSize(minHeight = 200.dp),
-                        mainAxisSpacing = 8.dp,
-                        crossAxisSpacing = 4.dp,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         tagList.forEach {
                             FilterChip(
