@@ -34,6 +34,12 @@ class RecordRepositoryImpl @Inject constructor(
         recordDao.queryById(recordId)?.asModel()
     }
 
+    override suspend fun queryByTypeId(id: Long): List<RecordModel> =
+        withContext(coroutineContext) {
+            recordDao.queryByTypeId(id)
+                .map { it.asModel() }
+        }
+
     override suspend fun queryRelatedById(recordId: Long): List<RecordModel> =
         withContext(coroutineContext) {
             recordDao.queryRelatedById(recordId)
@@ -111,5 +117,11 @@ class RecordRepositoryImpl @Inject constructor(
                 reimbursable = false,
                 recordTime = System.currentTimeMillis().dateFormat(DATE_FORMAT_NO_SECONDS),
             )
+        }
+
+    override suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long): Unit =
+        withContext(coroutineContext) {
+            recordDao.changeRecordTypeBeforeDeleteType(fromId = fromId, toId = toId)
+            recordDataVersion.updateVersion()
         }
 }

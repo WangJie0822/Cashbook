@@ -248,7 +248,10 @@ internal fun TypeItem(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
-            }, text = title, color = color, style = MaterialTheme.typography.labelMedium
+            },
+            text = title,
+            color = color,
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }

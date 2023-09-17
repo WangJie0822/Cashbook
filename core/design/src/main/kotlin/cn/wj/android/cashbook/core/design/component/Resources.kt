@@ -10,13 +10,17 @@ import cn.wj.android.cashbook.core.common.tools.funLogger
 @SuppressLint("DiscouragedApi")
 @Composable
 fun painterDrawableResource(idStr: String): Painter {
-    val context = LocalContext.current
-    funLogger("ResourcesKt").d("painterDrawableResource(idStr = <$idStr>)")
-    return painterResource(
-        id = context.resources.getIdentifier(
-            idStr,
-            "drawable",
-            context.packageName
+    return runCatching {
+        val context = LocalContext.current
+        painterResource(
+            id = context.resources.getIdentifier(
+                idStr,
+                "drawable",
+                context.packageName
+            )
         )
-    )
+    }.getOrElse { throwable ->
+        funLogger("ResourcesKt").e(throwable, "painterDrawableResource(idStr = <$idStr>)")
+        throw throwable
+    }
 }

@@ -119,7 +119,7 @@ internal fun AssetInfoScreen(
                         IconButton(onClick = onEditAssetClick) {
                             Icon(imageVector = CashbookIcons.EditNote, contentDescription = null)
                         }
-                        IconButton(onClick = { /*TODO*/ }) {
+                        IconButton(onClick = { /* TODO 显示资产更多信息*/ }) {
                             Icon(imageVector = CashbookIcons.MoreVert, contentDescription = null)
                         }
                     }
@@ -128,7 +128,7 @@ internal fun AssetInfoScreen(
         },
         floatingActionButton = {
             if (uiState is AssetInfoUiState.Success) {
-                CashbookFloatingActionButton(onClick = { /*TODO*/ }) {
+                CashbookFloatingActionButton(onClick = { /* TODO 使用当前资产添加记录 */ }) {
                     Icon(imageVector = CashbookIcons.Add, contentDescription = null)
                 }
             }

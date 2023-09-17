@@ -1,11 +1,10 @@
 package cn.wj.android.cashbook.core.data.repository.fake
 
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
-import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import kotlinx.coroutines.flow.Flow
 
-object FakeTypeRepository:TypeRepository {
+object FakeTypeRepository : TypeRepository {
     override val firstExpenditureTypeListData: Flow<List<RecordTypeModel>>
         get() = TODO("Not yet implemented")
     override val firstIncomeTypeListData: Flow<List<RecordTypeModel>>
@@ -25,15 +24,23 @@ object FakeTypeRepository:TypeRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel> {
         TODO("Not yet implemented")
     }
 
     override suspend fun needRelated(typeId: Long): Boolean {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun changeTypeToSecond(id: Long, parentId: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun changeSecondTypeToFirst(id: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteById(id: Long) {
+
     }
 }

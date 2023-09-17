@@ -8,7 +8,7 @@ package cn.wj.android.cashbook.core.ui
 sealed interface DialogState {
 
     /** 弹窗隐藏 */
-    object Dismiss : DialogState
+    data object Dismiss : DialogState
 
     /** 弹窗显示 */
     class Shown<T>(val data: T) : DialogState

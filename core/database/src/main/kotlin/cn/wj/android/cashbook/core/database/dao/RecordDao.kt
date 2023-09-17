@@ -71,10 +71,16 @@ interface RecordDao {
 
     /** 资产 id 为 [assetId] 的第 [pageNum] 页 [pageSize] 条记录 */
     @Query("SELECT * FROM db_record WHERE books_id=:booksId AND asset_id=:assetId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
-    fun queryRecordByAssetId(
+    suspend  fun queryRecordByAssetId(
         booksId: Long,
         assetId: Long,
         pageNum: Int,
         pageSize: Int,
     ): List<RecordTable>
+
+    @Query("SELECT * FROM db_record WHERE type_id=:id")
+    fun queryByTypeId(id: Long): List<RecordTable>
+
+    @Query("UPDATE db_record SET type_id=:toId WHERE type_id=:fromId")
+    suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long)
 }

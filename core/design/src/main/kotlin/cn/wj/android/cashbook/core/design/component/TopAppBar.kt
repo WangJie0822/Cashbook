@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package cn.wj.android.cashbook.core.design.component
 
 import android.content.res.Configuration
@@ -29,6 +27,7 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
  * @param actions 标题菜单
  * @param colors 标题控件颜色
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashbookTopAppBar(
     onBackClick: () -> Unit,
@@ -57,6 +56,7 @@ fun CashbookTopAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable

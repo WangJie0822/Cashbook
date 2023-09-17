@@ -33,8 +33,18 @@ interface TypeDao {
     suspend fun queryByLevel(typeLevel: Int): List<TypeTable>
 
     @Query("SELECT * FROM db_type WHERE parent_id=:parentId")
-    suspend fun queryByParentId(parentId: Long):List<TypeTable>
+    suspend fun queryByParentId(parentId: Long): List<TypeTable>
 
     @Query("SELECT * FROM db_type WHERE id=:typeId")
     suspend fun queryById(typeId: Long): TypeTable?
+
+    @Query("UPDATE db_type SET parent_id=:parentId, type_level=:typeLevel WHERE id=:id")
+    suspend fun updateTypeLevel(
+        id: Long,
+        parentId: Long,
+        typeLevel: Int,
+    )
+
+    @Query("DELETE FROM db_type WHERE id=:id")
+    suspend fun deleteById(id:Long)
 }

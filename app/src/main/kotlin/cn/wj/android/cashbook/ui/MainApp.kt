@@ -50,6 +50,8 @@ import cn.wj.android.cashbook.feature.tags.navigation.EditRecordSelectTagBottomS
 import cn.wj.android.cashbook.feature.tags.navigation.myTagsScreen
 import cn.wj.android.cashbook.feature.tags.navigation.naviToMyTags
 import cn.wj.android.cashbook.feature.types.navigation.EditRecordTypeListContent
+import cn.wj.android.cashbook.feature.types.navigation.myCategoriesScreen
+import cn.wj.android.cashbook.feature.types.navigation.naviToMyCategories
 
 /** 开始默认显示路径 */
 private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
@@ -90,7 +92,6 @@ fun CashbookNavHost(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-    // FIXME 使用 AnimatedNavHost 从二级界面返回时快速点击左上角菜单会导致 Navigation 不显示，后续添加界面动画时需修复此问题
     NavHost(
         navController = navController,
         startDestination = START_DESTINATION,
@@ -101,7 +102,7 @@ fun CashbookNavHost(
         settingsLauncherScreen(
             onRequestNaviToMyAsset = navController::naviToMyAsset,
             onRequestNaviToMyBooks = navController::naviToMyBooks,
-            onRequestNaviToMyCategory = {/* TODO */ },
+            onRequestNaviToMyCategory = navController::naviToMyCategories,
             onRequestNaviToMyTags = navController::naviToMyTags,
             onRequestNaviToSetting = navController::naviToSetting,
             onRequestNaviToAboutUs = navController::naviToAboutUs,
@@ -167,7 +168,7 @@ fun CashbookNavHost(
                     typeCategory = typeCategory,
                     selectedTypeId = selectedTypeId,
                     onTypeSelect = onTypeSelect,
-                    onRequestNaviToTypeManager = { /*TODO*/ },
+                    onRequestNaviToTypeManager = navController::naviToMyCategories,
                     headerContent = headerContent,
                     footerContent = footerContent,
                 )
@@ -239,6 +240,13 @@ fun CashbookNavHost(
         )
         // 编辑账本
         editBookScreen(
+            onRequestPopBackStack = navController::popBackStack,
+        )
+
+        // 我的分类
+        myCategoriesScreen(
+            onRequestNaviToEdiType = { id, parentId -> /*TODO*/ },
+            onRequestNaviToTypeStatistics = {  /*TODO*/ },
             onRequestPopBackStack = navController::popBackStack,
         )
     }

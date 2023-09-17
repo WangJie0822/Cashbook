@@ -1,14 +1,16 @@
 package cn.wj.android.cashbook.core.model.model
 
 /**
- * 可选数据封装
+ * 可展开数据封装
  *
  * @param data 数据源
- * @param selected 是否选中
+ * @param list 折叠数据列表
+ * @param expanded 是否展开
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/9/13
  */
-data class Selectable<T>(
+data class Expandable<T>(
     val data: T,
-    val selected: Boolean,
+    val list: List<T>,
+    val expanded: Boolean,
 )

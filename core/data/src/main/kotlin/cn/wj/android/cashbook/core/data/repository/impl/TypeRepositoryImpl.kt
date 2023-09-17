@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.core.data.repository.impl
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.model.typeDataVersion
+import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.database.dao.TypeDao
@@ -30,23 +31,18 @@ class TypeRepositoryImpl @Inject constructor(
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : TypeRepository {
 
-    private val firstTypeListData: Flow<List<RecordTypeModel>> = typeDataVersion.mapLatest {
-        getFirstRecordTypeList()
+    override val firstExpenditureTypeListData: Flow<List<RecordTypeModel>> =
+        typeDataVersion.mapLatest {
+            getFirstRecordTypeList().filter { it.typeCategory == RecordTypeCategoryEnum.EXPENDITURE }
+        }
+
+    override val firstIncomeTypeListData: Flow<List<RecordTypeModel>> = typeDataVersion.mapLatest {
+        getFirstRecordTypeList().filter { it.typeCategory == RecordTypeCategoryEnum.INCOME }
     }
 
-    override val firstExpenditureTypeListData: Flow<List<RecordTypeModel>> =
-        firstTypeListData.mapLatest { list ->
-            list.filter { it.typeCategory == RecordTypeCategoryEnum.EXPENDITURE }
-        }
-
-    override val firstIncomeTypeListData: Flow<List<RecordTypeModel>> =
-        firstTypeListData.mapLatest { list ->
-            list.filter { it.typeCategory == RecordTypeCategoryEnum.INCOME }
-        }
-
     override val firstTransferTypeListData: Flow<List<RecordTypeModel>> =
-        firstTypeListData.mapLatest { list ->
-            list.filter { it.typeCategory == RecordTypeCategoryEnum.TRANSFER }
+        typeDataVersion.mapLatest {
+            getFirstRecordTypeList().filter { it.typeCategory == RecordTypeCategoryEnum.TRANSFER }
         }
 
     override suspend fun getRecordTypeById(typeId: Long): RecordTypeModel? =
@@ -57,21 +53,12 @@ class TypeRepositoryImpl @Inject constructor(
     override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel =
         withContext(coroutineContext) {
             getRecordTypeById(typeId)
-                ?: getFirstRecordTypeListByCategory(RecordTypeCategoryEnum.EXPENDITURE)
-                    .first()
+                ?: firstExpenditureTypeListData.first().first()
         }
 
     override suspend fun getNoNullDefaultRecordType(): RecordTypeModel =
         withContext(coroutineContext) {
             getNoNullRecordTypeById(appPreferencesDataSource.appData.first().defaultTypeId)
-        }
-
-    override suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel> =
-        withContext(coroutineContext) {
-            typeDao.queryByLevelAndTypeCategory(TypeLevelEnum.FIRST.ordinal, typeCategory.ordinal)
-                .map {
-                    it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
-                }
         }
 
     private suspend fun getFirstRecordTypeList(): List<RecordTypeModel> =
@@ -95,5 +82,31 @@ class TypeRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             val appDataModel = appPreferencesDataSource.appData.first()
             typeId == appDataModel.refundTypeId || typeId == appDataModel.reimburseTypeId
+        }
+
+    override suspend fun changeTypeToSecond(id: Long, parentId: Long): Unit =
+        withContext(coroutineContext) {
+            typeDao.updateTypeLevel(
+                id = id,
+                parentId = parentId,
+                typeLevel = TypeLevelEnum.SECOND.ordinal
+            )
+            typeDataVersion.updateVersion()
+        }
+
+    override suspend fun changeSecondTypeToFirst(id: Long): Unit =
+        withContext(coroutineContext) {
+            typeDao.updateTypeLevel(
+                id = id,
+                parentId = -1L,
+                typeLevel = TypeLevelEnum.FIRST.ordinal
+            )
+            typeDataVersion.updateVersion()
+        }
+
+    override suspend fun deleteById(id: Long): Unit =
+        withContext(coroutineContext) {
+            typeDao.deleteById(id)
+            typeDataVersion.updateVersion()
         }
 }

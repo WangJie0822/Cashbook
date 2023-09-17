@@ -27,11 +27,15 @@ interface TypeRepository {
 
     suspend fun getNoNullDefaultRecordType(): RecordTypeModel
 
-    suspend fun getFirstRecordTypeListByCategory(typeCategory: RecordTypeCategoryEnum): List<RecordTypeModel>
-
     suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel>
 
     suspend fun needRelated(typeId: Long): Boolean
+
+    suspend fun changeTypeToSecond(id: Long, parentId: Long)
+
+    suspend fun changeSecondTypeToFirst(id: Long)
+
+    suspend fun deleteById(id: Long)
 }
 
 internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {

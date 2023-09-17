@@ -7,13 +7,14 @@ import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.database.table.RecordTable
-import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
 
     suspend fun queryById(recordId: Long): RecordModel?
+
+    suspend fun queryByTypeId(id: Long): List<RecordModel>
 
     suspend fun queryRelatedById(recordId: Long): List<RecordModel>
 
@@ -30,6 +31,8 @@ interface RecordRepository {
     fun queryRecordByYearMonth(year: String, month: String): Flow<List<RecordModel>>
 
     suspend fun getDefaultRecord(typeId: Long): RecordModel
+
+    suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long)
 }
 
 internal fun RecordTable.asModel(): RecordModel {

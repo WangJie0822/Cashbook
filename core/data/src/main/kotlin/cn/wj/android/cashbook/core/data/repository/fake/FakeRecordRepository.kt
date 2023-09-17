@@ -61,6 +61,10 @@ object FakeRecordRepository : RecordRepository {
         _recordListDate.first().firstOrNull { it.id == recordId }
     }
 
+    override suspend fun queryByTypeId(id: Long): List<RecordModel> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun queryRelatedById(recordId: Long): List<RecordModel> =
         withContext(coroutineContext) {
             _recordListDate.first().filter { it.id == recordId }
@@ -91,4 +95,8 @@ object FakeRecordRepository : RecordRepository {
         withContext(coroutineContext) {
             _recordListDate.first().first()
         }
+
+    override suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long) {
+        TODO("Not yet implemented")
+    }
 }

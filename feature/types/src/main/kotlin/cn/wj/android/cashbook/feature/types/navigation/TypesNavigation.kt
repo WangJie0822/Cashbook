@@ -2,8 +2,38 @@ package cn.wj.android.cashbook.feature.types.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+
+import androidx.navigation.compose.composable
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.types.screen.EditRecordTypeListRoute
+import cn.wj.android.cashbook.feature.types.screen.MyCategoriesRoute
+
+private const val ROUTE_MY_CATEGORIES = "type/my_categories"
+
+fun NavController.naviToMyCategories() {
+    this.navigate(ROUTE_MY_CATEGORIES)
+}
+
+/**
+ * 我的分类界面
+ *
+ * @param onRequestPopBackStack 导航到上一级
+ */
+fun NavGraphBuilder.myCategoriesScreen(
+    onRequestNaviToEdiType: (Long, Long) -> Unit,
+    onRequestNaviToTypeStatistics: (Long) -> Unit,
+    onRequestPopBackStack: () -> Unit,
+) {
+    composable(ROUTE_MY_CATEGORIES) {
+        MyCategoriesRoute(
+            onRequestNaviToEdiType = onRequestNaviToEdiType,
+            onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
+            onRequestPopBackStack = onRequestPopBackStack,
+        )
+    }
+}
 
 /**
  * 编辑记录页面标签列表
