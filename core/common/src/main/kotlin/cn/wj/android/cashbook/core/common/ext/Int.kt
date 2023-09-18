@@ -3,6 +3,7 @@
 
 package cn.wj.android.cashbook.core.common.ext
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import cn.wj.android.cashbook.core.common.tools.getColorById
@@ -19,17 +20,13 @@ import cn.wj.android.cashbook.core.common.tools.getStringById
  */
 
 /** String 字符串 */
-val Int.string: String
-    get() = getStringById(this)
+fun Int.string(context: Context): String = getStringById(this, context)
 
 /** 颜色值 */
-val Int.color: Int
-    get() = getColorById(this)
+fun Int.color(context: Context): Int = getColorById(this, context)
 
 /** 颜色值 */
-val Int.colorStateList: ColorStateList?
-    get() = getColorStateListById(this)
+fun Int.colorStateList(context: Context): ColorStateList? = getColorStateListById(this, context)
 
 /** 图片资源 */
-val Int.drawable: Drawable?
-    get() = getDrawableById(this)
+fun Int.drawable(context: Context): Drawable? = getDrawableById(this, context)

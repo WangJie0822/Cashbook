@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository
 
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.common.ext.orElse
 import cn.wj.android.cashbook.core.database.table.TypeTable
@@ -36,6 +37,12 @@ interface TypeRepository {
     suspend fun changeSecondTypeToFirst(id: Long)
 
     suspend fun deleteById(id: Long)
+
+    suspend fun countByName(name: String): Int
+
+    suspend fun update(model: RecordTypeModel)
+
+    suspend fun generateSortById(id: Long, parentId: Long): Int
 }
 
 internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {
@@ -49,5 +56,18 @@ internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {
         protected = this.protected == SWITCH_INT_ON,
         sort = this.sort,
         needRelated = needRelated,
+    )
+}
+
+internal fun RecordTypeModel.asTable(): TypeTable {
+    return TypeTable(
+        id = if (this.id == -1L) null else this.id,
+        parentId = this.parentId,
+        name = this.name,
+        iconName = this.iconName,
+        typeLevel = this.typeLevel.ordinal,
+        typeCategory = this.typeCategory.ordinal,
+        protected = if (this.protected) SWITCH_INT_ON else SWITCH_INT_OFF,
+        sort = this.sort,
     )
 }

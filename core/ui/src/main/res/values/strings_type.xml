@@ -11,7 +11,13 @@
     <string name="change_first_type_has_child_hint">当前分类下存在子分类，无法修改为二级分类</string>
     <string name="delete_first_type_has_child_hint">当前分类下存在子分类，无法直接删除</string>
     <string name="protected_type_hint">受保护分类，无法进行操作</string>
+    <string name="duplicate_type_name_hint">分类名称不能重复</string>
     <string name="select_first_type_to_move">选择要移动到的一级分类</string>
     <string name="select_type_to_move_before_delete_format">当前类型下有%1$s条记录，删除前需移动到其它类型</string>
     <string name="delete_success">删除成功</string>
+    <string name="first_type">一级分类</string>
+    <string name="second_type">二级分类</string>
+    <string name="type_name_must_not_blank">类型名不能为空</string>
+    <string name="save">保存</string>
+    <string name="save_type_hint">请确认类型名称不会重复</string>
 </resources>

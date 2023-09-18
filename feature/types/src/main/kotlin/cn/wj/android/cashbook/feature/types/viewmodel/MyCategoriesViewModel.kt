@@ -175,6 +175,51 @@ class MyCategoriesViewModel @Inject constructor(
             dismissDialog()
         }
     }
+
+    fun requestEditType(id: Long, parentId: Long) {
+        viewModelScope.launch {
+            dialogState = DialogState.Shown(
+                MyCategoriesDialogData.EditType(
+                    type = typeRepository.getRecordTypeById(id),
+                    parentType = typeRepository.getRecordTypeById(parentId),
+                )
+            )
+        }
+    }
+
+    fun saveRecordType(id: Long, parentId: Long, name: String, iconName: String) {
+        viewModelScope.launch {
+            var count = typeRepository.countByName(name)
+            val recordTypeById = typeRepository.getRecordTypeById(id)
+            if (recordTypeById?.name == name) {
+                count--
+            }
+            if (count > 0) {
+                // 类型名称不能相同
+                shouldDisplayBookmark = MyCategoriesBookmarkEnum.DUPLICATE_TYPE_NAME
+            } else {
+                // 更新类型数据
+                val model = (recordTypeById ?: RecordTypeModel(
+                    id = id,
+                    parentId = parentId,
+                    name = name,
+                    iconName = iconName,
+                    typeLevel = if (parentId == -1L) TypeLevelEnum.FIRST else TypeLevelEnum.SECOND,
+                    typeCategory = _selectedTabData.first(),
+                    protected = false,
+                    sort = typeRepository.generateSortById(id, parentId),
+                    needRelated = false,
+                )).copy(
+                    id = id,
+                    parentId = parentId,
+                    name = name,
+                    iconName = iconName,
+                )
+                typeRepository.update(model)
+            }
+            dismissDialog()
+        }
+    }
 }
 
 sealed interface MyCategoriesDialogData {
@@ -190,7 +235,8 @@ sealed interface MyCategoriesDialogData {
     ) : MyCategoriesDialogData
 
     data class EditType(
-        val id: Long,
+        val type: RecordTypeModel?,
+        val parentType: RecordTypeModel?,
     ) : MyCategoriesDialogData
 }
 

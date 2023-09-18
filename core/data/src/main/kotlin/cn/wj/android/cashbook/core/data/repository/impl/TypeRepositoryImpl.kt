@@ -6,6 +6,7 @@ import cn.wj.android.cashbook.core.common.model.typeDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
+import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -78,11 +79,10 @@ class TypeRepositoryImpl @Inject constructor(
                 }
         }
 
-    override suspend fun needRelated(typeId: Long): Boolean =
-        withContext(coroutineContext) {
-            val appDataModel = appPreferencesDataSource.appData.first()
-            typeId == appDataModel.refundTypeId || typeId == appDataModel.reimburseTypeId
-        }
+    override suspend fun needRelated(typeId: Long): Boolean = withContext(coroutineContext) {
+        val appDataModel = appPreferencesDataSource.appData.first()
+        typeId == appDataModel.refundTypeId || typeId == appDataModel.reimburseTypeId
+    }
 
     override suspend fun changeTypeToSecond(id: Long, parentId: Long): Unit =
         withContext(coroutineContext) {
@@ -94,19 +94,42 @@ class TypeRepositoryImpl @Inject constructor(
             typeDataVersion.updateVersion()
         }
 
-    override suspend fun changeSecondTypeToFirst(id: Long): Unit =
-        withContext(coroutineContext) {
-            typeDao.updateTypeLevel(
-                id = id,
-                parentId = -1L,
-                typeLevel = TypeLevelEnum.FIRST.ordinal
-            )
-            typeDataVersion.updateVersion()
-        }
+    override suspend fun changeSecondTypeToFirst(id: Long): Unit = withContext(coroutineContext) {
+        typeDao.updateTypeLevel(
+            id = id,
+            parentId = -1L,
+            typeLevel = TypeLevelEnum.FIRST.ordinal
+        )
+        typeDataVersion.updateVersion()
+    }
 
-    override suspend fun deleteById(id: Long): Unit =
+    override suspend fun deleteById(id: Long): Unit = withContext(coroutineContext) {
+        typeDao.deleteById(id)
+        typeDataVersion.updateVersion()
+    }
+
+    override suspend fun countByName(name: String): Int = withContext(coroutineContext) {
+        typeDao.countByName(name)
+    }
+
+    override suspend fun update(model: RecordTypeModel): Unit = withContext(coroutineContext) {
+        typeDao.insertOrReplace(model.asTable())
+        typeDataVersion.updateVersion()
+    }
+
+    override suspend fun generateSortById(id: Long, parentId: Long): Int =
         withContext(coroutineContext) {
-            typeDao.deleteById(id)
-            typeDataVersion.updateVersion()
+            var sort = getRecordTypeById(id)?.sort ?: -1
+            if (sort == -1) {
+                sort = if (parentId == -1L) {
+                    typeDao.countByLevel(TypeLevelEnum.FIRST.ordinal) + 1
+                } else {
+                    val parentSort = getRecordTypeById(parentId)?.sort ?: (typeDao.countByLevel(
+                        TypeLevelEnum.FIRST.ordinal
+                    ) + 1)
+                    parentSort * 1000 + typeDao.countByParentId(parentId)
+                }
+            }
+            sort
         }
 }

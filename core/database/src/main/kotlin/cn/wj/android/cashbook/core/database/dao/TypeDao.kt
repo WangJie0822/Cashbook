@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import cn.wj.android.cashbook.core.database.table.TypeTable
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +17,9 @@ interface TypeDao {
 
     @Insert
     suspend fun insertType(type: TypeTable): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(type: TypeTable): Long
 
     @Insert
     suspend fun insertTypes(vararg types: TypeTable)
@@ -46,5 +50,14 @@ interface TypeDao {
     )
 
     @Query("DELETE FROM db_type WHERE id=:id")
-    suspend fun deleteById(id:Long)
+    suspend fun deleteById(id: Long)
+
+    @Query("SELECT COUNT(*) FROM db_type WHERE name=:name")
+    suspend fun countByName(name: String): Int
+
+    @Query("SELECT COUNT(*) FROM db_type WHERE type_level=:level")
+    suspend fun countByLevel(level:Int):Int
+
+    @Query("SELECT COUNT(*) FROM db_type WHERE parent_id=:parentId")
+    suspend fun countByParentId(parentId: Long):Int
 }

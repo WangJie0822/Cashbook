@@ -245,7 +245,6 @@ fun CashbookNavHost(
 
         // 我的分类
         myCategoriesScreen(
-            onRequestNaviToEdiType = { id, parentId -> /*TODO*/ },
             onRequestNaviToTypeStatistics = {  /*TODO*/ },
             onRequestPopBackStack = navController::popBackStack,
         )

@@ -22,13 +22,11 @@ fun NavController.naviToMyCategories() {
  * @param onRequestPopBackStack 导航到上一级
  */
 fun NavGraphBuilder.myCategoriesScreen(
-    onRequestNaviToEdiType: (Long, Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(ROUTE_MY_CATEGORIES) {
         MyCategoriesRoute(
-            onRequestNaviToEdiType = onRequestNaviToEdiType,
             onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
             onRequestPopBackStack = onRequestPopBackStack,
         )

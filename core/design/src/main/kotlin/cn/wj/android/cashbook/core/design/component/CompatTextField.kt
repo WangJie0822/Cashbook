@@ -6,6 +6,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
@@ -190,6 +192,60 @@ fun CompatTextField(
 }
 
 @Composable
+fun CompatOutlinedTextField(
+    textFieldState: TextFieldState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = false,
+    maxLines: Int = Int.MAX_VALUE,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = OutlinedTextFieldDefaults.shape,
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
+) {
+    OutlinedTextField(
+        value = textFieldState.text,
+        onValueChange = {
+            textFieldState.onTextChange(it)
+            textFieldState.enableShowErrors()
+        },
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        isError = textFieldState.showErrors(),
+        supportingText = {
+            textFieldState.getError()?.let { error -> Text(text = error) }
+        },
+        colors = colors,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        interactionSource = interactionSource,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        shape = shape,
+        modifier = modifier.onFocusChanged { focusState ->
+            textFieldState.onFocusChange(focusState.isFocused)
+            if (!focusState.isFocused) {
+                textFieldState.enableShowErrors()
+            }
+        },
+    )
+}
+
+@Composable
 fun CompatPasswordTextField(
     textFieldState: TextFieldState,
     modifier: Modifier = Modifier,
@@ -209,6 +265,52 @@ fun CompatPasswordTextField(
     }
 
     CompatTextField(
+        textFieldState = textFieldState,
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(
+                    imageVector = if (visible) CashbookIcons.VisibilityOff else CashbookIcons.Visibility,
+                    contentDescription = null
+                )
+            }
+        },
+        visualTransformation = if (!visible) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = if (!visible) KeyboardType.Password else KeyboardType.Text),
+        keyboardActions = keyboardActions,
+        singleLine = true,
+        interactionSource = interactionSource,
+        shape = shape,
+        colors = colors,
+    )
+}
+
+@Composable
+fun CompatPasswordOutlinedTextField(
+    textFieldState: TextFieldState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = OutlinedTextFieldDefaults.shape,
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
+) {
+    var visible by remember {
+        mutableStateOf(false)
+    }
+
+    CompatOutlinedTextField(
         textFieldState = textFieldState,
         modifier = modifier,
         enabled = enabled,

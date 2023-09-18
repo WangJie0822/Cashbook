@@ -44,7 +44,7 @@ class ApkDownloadWorker(context: Context, workerParameters: WorkerParameters) :
             UpdateManager.downloading = true
             okhttpClient.newCall(request).execute().use { response ->
                 val downloads =
-                    AppManager.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                    AppManager.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
                 val saveFile = File(downloads, apkName)
                 logger().d("doWork save path: ${saveFile.path}")
 

@@ -76,18 +76,18 @@ class MyApplication : Application() {
             // 应用通知
             val appChannel = NotificationChannel(
                 NOTIFICATION_CHANNEL_APP,
-                R.string.channel_app_name.string,
+                R.string.channel_app_name.string(this),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = R.string.channel_app_description.string
+                description = R.string.channel_app_description.string(this@MyApplication)
             }
             // 更新通知
             val updateChannel = NotificationChannel(
                 NOTIFICATION_CHANNEL_UPDATE,
-                R.string.channel_update_name.string,
+                R.string.channel_update_name.string(this),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = R.string.channel_update_description.string
+                description = R.string.channel_update_description.string(this@MyApplication)
             }
             nm.createNotificationChannels(mutableListOf(appChannel, updateChannel))
         }

@@ -41,6 +41,18 @@ object FakeTypeRepository : TypeRepository {
     }
 
     override suspend fun deleteById(id: Long) {
+        TODO("Not yet implemented")
+    }
 
+    override suspend fun countByName(name: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun update(model: RecordTypeModel) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun generateSortById(id: Long, parentId: Long): Int {
+        TODO("Not yet implemented")
     }
 }

@@ -45,6 +45,7 @@ object AppManager {
         }
 
         override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+            // Empty block
         }
 
         override fun onActivityStarted(activity: Activity) {
@@ -58,9 +59,11 @@ object AppManager {
         }
 
         override fun onActivityResumed(activity: Activity) {
+            // Empty block
         }
 
         override fun onActivityPaused(activity: Activity) {
+            // Empty block
         }
 
         override fun onActivityStopped(activity: Activity) {
@@ -88,8 +91,8 @@ object AppManager {
     @JvmStatic
     fun isForeground(): Boolean {
         val activityManager =
-            getContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val packageName = getContext().packageName
+            context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val packageName = context.packageName
         // 获取Android设备中所有正在运行的App
         val appProcesses = activityManager.runningAppProcesses ?: return false
         for (appProcess in appProcesses) {
@@ -146,14 +149,13 @@ object AppManager {
         return mApplication!!
     }
 
-    /**
-     * 获取 [Context] 对象
-     * > 优先获取栈顶的 [Activity] 对象，若没有，则返回 [Application] 对象
-     */
     @JvmStatic
-    fun getContext(): Context {
-        return peekActivity() ?: getApplication()
-    }
+    val context: Context
+        get() = peekActivity() ?: getApplication()
+
+    @JvmStatic
+    val applicationContext: Context
+        get() = context.applicationContext
 
     /**
      * 通过反射获取当前 [Application] 对象

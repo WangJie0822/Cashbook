@@ -11,5 +11,6 @@ enum class MyCategoriesBookmarkEnum {
     DELETE_FIRST_TYPE_HAS_CHILD,
     PROTECTED_TYPE,
     DELETE_SUCCESS,
+    DUPLICATE_TYPE_NAME,
     ;
 }

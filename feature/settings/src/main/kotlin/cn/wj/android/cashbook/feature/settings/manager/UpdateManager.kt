@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.feature.settings.manager
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -42,7 +43,7 @@ object UpdateManager {
     private const val downloadWorkerTag = "ApkDownloadWorker"
 
     private val manager: WorkManager by lazy {
-        WorkManager.getInstance(AppManager.getContext())
+        WorkManager.getInstance(AppManager.applicationContext)
     }
 
     private var download: UpdateInfoEntity? = null
@@ -117,7 +118,7 @@ object UpdateManager {
         logger().d("install file: ${file.path}")
         downloading = false
         try {
-            val context = AppManager.getContext()
+            val context = AppManager.applicationContext
             context.startActivity(Intent(Intent.ACTION_VIEW).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -136,15 +137,14 @@ object UpdateManager {
     }
 
     private val nm: NotificationManager by lazy {
-        val context = AppManager.getContext()
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        AppManager.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     private val builder: NotificationCompat.Builder by lazy {
-        val context = AppManager.getContext()
+        val context = AppManager.context
         NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_UPDATE)
-            .setContentTitle(R.string.update_progress_title.string)
-            .setContentText(R.string.update_progress_format.string.format(0))
+            .setContentTitle(R.string.update_progress_title.string(context))
+            .setContentText(R.string.update_progress_format.string(context).format(0))
             .setWhen(System.currentTimeMillis())
             .setSilent(true)
             .setCategory(Notification.CATEGORY_PROGRESS)
@@ -152,7 +152,7 @@ object UpdateManager {
             .setProgress(100, 0, false)
             .addAction(
                 0,
-                R.string.cancel.string,
+                R.string.cancel.string(context),
                 PendingIntent.getBroadcast(
                     context,
                     0,
@@ -177,7 +177,9 @@ object UpdateManager {
         nm.notify(
             NOTIFICATION_ID_UPDATE,
             builder
-                .setContentText(R.string.update_progress_format.string.format(0))
+                .setContentText(
+                    R.string.update_progress_format.string(AppManager.context).format(0)
+                )
                 .setProgress(100, 0, false)
                 .build()
         )
@@ -194,7 +196,9 @@ object UpdateManager {
         nm.notify(
             NOTIFICATION_ID_UPDATE,
             builder
-                .setContentText(R.string.update_progress_format.string.format(progress))
+                .setContentText(
+                    R.string.update_progress_format.string(AppManager.context).format(progress)
+                )
                 .setProgress(100, progress, false)
                 .build()
         )
@@ -205,23 +209,28 @@ object UpdateManager {
         nm.cancel(NOTIFICATION_ID_UPDATE_ERROR)
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     fun showDownloadError() {
         hideNotification()
-        val context = AppManager.getContext()
+        val context = AppManager.applicationContext
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_UPDATE)
-            .setContentTitle(R.string.update_error_title.string)
+            .setContentTitle(R.string.update_error_title.string(context))
             .setWhen(System.currentTimeMillis())
             .setCategory(Notification.CATEGORY_RECOMMENDATION)
             .addAction(
                 0,
-                R.string.retry.string,
+                R.string.retry.string(context),
                 PendingIntent.getBroadcast(
                     context,
                     0,
                     Intent(EventReceiver.ACTION).apply {
                         putExtra(INTENT_KEY_RETRY_DOWNLOAD, "")
                     },
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_CANCEL_CURRENT
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    } else {
+                        PendingIntent.FLAG_CANCEL_CURRENT
+                    }
                 )
             )
             .setSmallIcon(R.mipmap.ic_launcher)

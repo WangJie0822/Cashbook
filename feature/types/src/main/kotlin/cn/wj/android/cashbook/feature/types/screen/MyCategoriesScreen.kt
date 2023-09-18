@@ -22,7 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -32,6 +35,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,16 +47,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CompatOutlinedTextField
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
+import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
@@ -63,13 +71,13 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.types.enums.MyCategoriesBookmarkEnum
 import cn.wj.android.cashbook.feature.types.model.ExpandableRecordTypeModel
+import cn.wj.android.cashbook.feature.types.view.TypeIconGroupList
 import cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesDialogData
 import cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesUiState
 import cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesViewModel
 
 @Composable
 internal fun MyCategoriesRoute(
-    onRequestNaviToEdiType: (Long, Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,21 +93,23 @@ internal fun MyCategoriesRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         uiState = uiState,
         onRequestSelectTypeCategory = viewModel::selectTypeCategory,
-        onRequestEditType = { onRequestNaviToEdiType(it, -1L) },
+        onRequestEditType = { viewModel.requestEditType(it, -1L) },
         onRequestChangeFirstTypeToSecond = viewModel::requestChangeFirstTypeToSecond,
-        onRequestAddFirstType = { onRequestNaviToEdiType(-1L, -1L) },
-        onRequestAddSecondType = { onRequestNaviToEdiType(-1L, it) },
+        onRequestAddFirstType = { viewModel.requestEditType(-1L, -1L) },
+        onRequestAddSecondType = { viewModel.requestEditType(-1L, it) },
         changeFirstTypeToSecond = viewModel::changeTypeToSecond,
         onRequestChangeSecondTypeToFirst = viewModel::changeSecondTypeToFirst,
         onRequestMoveSecondTypeToAnother = viewModel::requestMoveSecondTypeToAnother,
         onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
         onRequestDeleteType = viewModel::requestDeleteType,
         changeRecordTypeBeforeDelete = viewModel::changeRecordTypeBeforeDeleteType,
+        onRequestSaveRecordType = viewModel::saveRecordType,
         onRequestPopBackStack = onRequestPopBackStack,
         modifier = modifier,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyCategoriesScreen(
     shouldDisplayBookmark: MyCategoriesBookmarkEnum,
@@ -118,6 +128,7 @@ internal fun MyCategoriesScreen(
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestDeleteType: (Long) -> Unit,
     changeRecordTypeBeforeDelete: (Long, Long) -> Unit,
+    onRequestSaveRecordType: (Long, Long, String, String) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -129,6 +140,7 @@ internal fun MyCategoriesScreen(
         stringResource(id = R.string.delete_first_type_has_child_hint)
     val protectedTypeHintText = stringResource(id = R.string.protected_type_hint)
     val deleteSuccessHintText = stringResource(id = R.string.delete_success)
+    val duplicateTypeNameHintText = stringResource(id = R.string.duplicate_type_name_hint)
     LaunchedEffect(shouldDisplayBookmark) {
         if (shouldDisplayBookmark != MyCategoriesBookmarkEnum.DISMISS) {
             val hintText = when (shouldDisplayBookmark) {
@@ -136,6 +148,7 @@ internal fun MyCategoriesScreen(
                 MyCategoriesBookmarkEnum.DELETE_FIRST_TYPE_HAS_CHILD -> deleteFirstTypeHasChildHintText
                 MyCategoriesBookmarkEnum.PROTECTED_TYPE -> protectedTypeHintText
                 MyCategoriesBookmarkEnum.DELETE_SUCCESS -> deleteSuccessHintText
+                MyCategoriesBookmarkEnum.DUPLICATE_TYPE_NAME -> duplicateTypeNameHintText
                 else -> ""
             }
             if (hintText.isNotBlank()) {
@@ -169,18 +182,174 @@ internal fun MyCategoriesScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             (dialogState as? DialogState.Shown<*>)?.data?.let { data ->
-                if (data is MyCategoriesDialogData.SelectFirstType) {
-                    SelectFirstTypeDialog(
-                        onRequestDismissDialog = onRequestDismissDialog,
-                        data = data,
-                        changeFirstTypeToSecond = changeFirstTypeToSecond,
-                    )
-                } else if (data is MyCategoriesDialogData.DeleteType) {
-                    DeleteTypeDialog(
-                        onRequestDismissDialog = onRequestDismissDialog,
-                        data = data,
-                        changeRecordTypeBeforeDelete = changeRecordTypeBeforeDelete,
-                    )
+                if (data is MyCategoriesDialogData) {
+                    when (data) {
+                        is MyCategoriesDialogData.SelectFirstType -> {
+                            SelectFirstTypeDialog(
+                                onRequestDismissDialog = onRequestDismissDialog,
+                                data = data,
+                                changeFirstTypeToSecond = changeFirstTypeToSecond,
+                            )
+                        }
+
+                        is MyCategoriesDialogData.DeleteType -> {
+                            DeleteTypeDialog(
+                                onRequestDismissDialog = onRequestDismissDialog,
+                                data = data,
+                                changeRecordTypeBeforeDelete = changeRecordTypeBeforeDelete,
+                            )
+                        }
+
+                        is MyCategoriesDialogData.EditType -> {
+                            CashbookModalBottomSheet(
+                                onDismissRequest = onRequestDismissDialog,
+                                sheetState = rememberModalBottomSheetState(
+                                    confirmValueChange = {
+                                        if (it == SheetValue.Hidden) {
+                                            onRequestDismissDialog()
+                                        }
+                                        true
+                                    },
+                                ),
+                                content = {
+                                    var typeNameEdit by remember {
+                                        mutableStateOf(data.type != null)
+                                    }
+                                    val typeNameBlackHintText =
+                                        stringResource(id = R.string.type_name_must_not_blank)
+                                    val editTypeName = remember {
+                                        TextFieldState(
+                                            defaultText = data.type?.name.orEmpty(),
+                                            filter = {
+                                                typeNameEdit = true
+                                                true
+                                            },
+                                            validator = { it.isNotBlank() },
+                                            errorFor = { typeNameBlackHintText }
+                                        )
+                                    }
+                                    var editTypeIcon by remember {
+                                        mutableStateOf(
+                                            data.type?.iconName ?: "vector_type_three_meals_24"
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 16.dp,
+                                            vertical = 8.dp
+                                        ),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = stringResource(id = R.string.save_type_hint),
+                                            color = LocalContentColor.current.copy(alpha = 0.5f),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        TextButton(
+                                            onClick = {
+                                                if (editTypeName.isValid) {
+                                                    onRequestSaveRecordType(
+                                                        data.type?.id ?: -1L,
+                                                        data.parentType?.id ?: -1L,
+                                                        editTypeName.text,
+                                                        editTypeIcon
+                                                    )
+                                                }
+                                            },
+                                        ) {
+                                            Text(text = stringResource(id = R.string.save))
+                                        }
+                                    }
+                                    val color = LocalExtendedColors.current.selected
+                                    if (null != data.parentType) {
+                                        Row(
+                                            modifier = Modifier.padding(
+                                                horizontal = 16.dp,
+                                                vertical = 8.dp
+                                            ),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Text(text = stringResource(id = R.string.first_type))
+                                            Text(
+                                                text = data.parentType.name,
+                                                textAlign = TextAlign.End,
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .padding(horizontal = 16.dp),
+                                            )
+                                            Icon(
+                                                painter = painterDrawableResource(idStr = data.parentType.iconName),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .padding(bottom = 8.dp)
+                                                    .size(32.dp)
+                                                    .background(
+                                                        color = color.copy(alpha = 0.3f),
+                                                        shape = CircleShape
+                                                    )
+                                                    .clip(CircleShape)
+                                                    .padding(4.dp),
+                                            )
+                                        }
+                                    }
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = if (null != data.parentType) {
+                                                stringResource(id = R.string.second_type)
+                                            } else {
+                                                stringResource(id = R.string.first_type)
+                                            },
+                                            modifier = Modifier
+                                                .padding(bottom = 8.dp),
+                                        )
+                                        CompatOutlinedTextField(
+                                            textFieldState = editTypeName,
+                                            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
+                                            colors = OutlinedTextFieldDefaults.colors(
+                                                focusedContainerColor = Color.Transparent,
+                                                unfocusedContainerColor = Color.Transparent,
+                                                disabledContainerColor = Color.Transparent,
+                                                errorContainerColor = Color.Transparent,
+                                                focusedBorderColor = Color.Transparent,
+                                                unfocusedBorderColor = Color.Transparent,
+                                                disabledBorderColor = Color.Transparent,
+                                                errorBorderColor = Color.Transparent,
+                                            ),
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .padding(horizontal = 16.dp),
+                                        )
+                                        Icon(
+                                            painter = painterDrawableResource(idStr = editTypeIcon),
+                                            tint = color,
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .padding(bottom = 8.dp)
+                                                .size(32.dp)
+                                                .background(
+                                                    color = color.copy(alpha = 0.3f),
+                                                    shape = CircleShape
+                                                )
+                                                .clip(CircleShape)
+                                                .padding(4.dp),
+                                        )
+                                    }
+                                    TypeIconGroupList(
+                                        onTypeIconSelect = { name, iconName ->
+                                            if (!typeNameEdit) {
+                                                editTypeName.text = name
+                                            }
+                                            editTypeIcon = iconName
+                                        }
+                                    )
+                                },
+                            )
+                        }
+                    }
                 }
             }
 
@@ -230,7 +399,8 @@ private fun DeleteTypeDialog(
             Text(
                 text = stringResource(id = R.string.select_type_to_move_before_delete_format).format(
                     data.recordSize
-                )
+                ),
+                style = MaterialTheme.typography.labelLarge
             )
         },
         text = {
