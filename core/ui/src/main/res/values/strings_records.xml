@@ -23,6 +23,7 @@
     <string name="target_asset">目标资产</string>
     <string name="related_asset">关联的资产</string>
     <string name="related_record">关联的记录</string>
+    <string name="related_record_display_format">关联%1$s条记录，总计%2$s</string>
     <string name="tags">标签</string>
     <string name="reimbursable">可报销</string>
     <string name="charges">手续费</string>
@@ -43,4 +44,6 @@
     <string name="type">类型</string>
     <string name="asset">资产</string>
     <string name="time">时间</string>
+    <string name="related">已关联</string>
+    <string name="refund_reimbursed">已退款|报销</string>
 </resources>

@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.model.dataVersion
+import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -17,9 +19,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -48,19 +50,30 @@ class MyCategoriesViewModel @Inject constructor(
         }
     }
 
-    val uiState = _currentTypeList
-        .mapLatest { typeList ->
-            val firstTypeList = typeList.map {
-                ExpandableRecordTypeModel(
-                    data = it,
-                    list = typeRepository.getSecondRecordTypeListByParentId(it.id),
-                )
-            }
-            MyCategoriesUiState.Success(
-                selectedTab = _selectedTabData.first(),
-                typeList = firstTypeList,
+    private val _dataVersion = dataVersion()
+
+    val uiState = combine(_dataVersion, _currentTypeList) { _, typeList ->
+        val firstTypeList = typeList.map { first ->
+            ExpandableRecordTypeModel(
+                data = first,
+                list = typeRepository.getSecondRecordTypeListByParentId(first.id)
+                    .map { second ->
+                        ExpandableRecordTypeModel(
+                            data = second,
+                            list = emptyList(),
+                            reimburseType = typeRepository.isReimburseType(second.id),
+                            refundType = typeRepository.isRefundType(second.id),
+                        )
+                    },
+                reimburseType = typeRepository.isReimburseType(first.id),
+                refundType = typeRepository.isRefundType(first.id),
             )
         }
+        MyCategoriesUiState.Success(
+            selectedTab = _selectedTabData.first(),
+            typeList = firstTypeList,
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
@@ -157,7 +170,17 @@ class MyCategoriesViewModel @Inject constructor(
                                             list = typeRepository.getSecondRecordTypeListByParentId(
                                                 first.id
                                             )
-                                                .filter { it.id != id },
+                                                .filter { it.id != id }
+                                                .map { second ->
+                                                    ExpandableRecordTypeModel(
+                                                        data = second,
+                                                        list = emptyList(),
+                                                        reimburseType = false,
+                                                        refundType = false
+                                                    )
+                                                },
+                                            reimburseType = false,
+                                            refundType = false,
                                         )
                                     }
                             ))
@@ -218,6 +241,20 @@ class MyCategoriesViewModel @Inject constructor(
                 typeRepository.update(model)
             }
             dismissDialog()
+        }
+    }
+
+    fun setReimburseType(id: Long) {
+        viewModelScope.launch {
+            typeRepository.setReimburseType(id)
+            _dataVersion.updateVersion()
+        }
+    }
+
+    fun setRefundType(id: Long) {
+        viewModelScope.launch {
+            typeRepository.setRefundType(id)
+            _dataVersion.updateVersion()
         }
     }
 }

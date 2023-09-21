@@ -11,6 +11,7 @@ import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.TagWithRecordTable
 import cn.wj.android.cashbook.core.database.table.TypeTable
 import cn.wj.android.cashbook.core.database.throwable.DataTransactionException
@@ -68,9 +69,24 @@ interface TransactionDao {
     )
     suspend fun queryRecordById(recordId: Long): RecordTable?
 
+    @Query(
+        value = """
+        DELETE FROM db_record_with_related WHERE record_id=:id
+    """
+    )
+    suspend fun clearRelatedRecordById(id: Long)
+
+    @Insert
+    suspend fun insertRelatedRecord(related: List<RecordWithRelatedTable>)
+
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun updateRecordTransaction(recordTable: RecordTable, tagIdList: List<Long>) {
+    suspend fun updateRecordTransaction(
+        recordTable: RecordTable,
+        tagIdList: List<Long>,
+        needRelated: Boolean,
+        relatedRecordIdList: List<Long>,
+    ) {
         if (null != recordTable.id) {
             // 修改记录，获取之前记录信息
             val oldRecord = queryRecordById(recordTable.id)
@@ -182,7 +198,17 @@ interface TransactionDao {
         }
         insertRelatedTags(insertTags)
 
-        // TODO 更新关联记录
+        if (needRelated) {
+            // 更新关联记录
+            clearRelatedRecordById(id = id)
+            insertRelatedRecord(relatedRecordIdList.map {
+                RecordWithRelatedTable(
+                    id = null,
+                    recordId = id,
+                    relatedRecordId = it,
+                )
+            })
+        }
     }
 
     @Throws(DataTransactionException::class)

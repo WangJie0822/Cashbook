@@ -20,4 +20,8 @@
     <string name="type_name_must_not_blank">类型名不能为空</string>
     <string name="save">保存</string>
     <string name="save_type_hint">请确认类型名称不会重复</string>
+    <string name="refund_type">退款类型</string>
+    <string name="set_refund_type">设置退款类型</string>
+    <string name="reimburse_type">报销类型</string>
+    <string name="set_reimburse_type">设置报销类型</string>
 </resources>

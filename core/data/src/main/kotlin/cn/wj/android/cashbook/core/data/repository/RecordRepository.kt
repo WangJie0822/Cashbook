@@ -18,7 +18,12 @@ interface RecordRepository {
 
     suspend fun queryRelatedById(recordId: Long): List<RecordModel>
 
-    suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>)
+    suspend fun updateRecord(
+        record: RecordModel,
+        tagIdList: List<Long>,
+        needRelated: Boolean,
+        relatedRecordIdList: List<Long>,
+    )
 
     suspend fun deleteRecord(recordId: Long)
 
@@ -33,6 +38,18 @@ interface RecordRepository {
     suspend fun getDefaultRecord(typeId: Long): RecordModel
 
     suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long)
+
+    suspend fun getRelatedIdListById(id: Long): List<Long>
+
+    suspend fun getRecordIdListFromRelatedId(id: Long): List<Long>
+
+    suspend fun getLastThreeMonthReimbursableRecordList(): List<RecordModel>
+
+    suspend fun getLastThreeMonthRefundableRecordList(): List<RecordModel>
+
+    suspend fun getLastThreeMonthReimbursableRecordListByKeyword(keyword: String): List<RecordModel>
+
+    suspend fun getLastThreeMonthRefundableRecordListByKeyword(keyword: String): List<RecordModel>
 }
 
 internal fun RecordTable.asModel(): RecordModel {

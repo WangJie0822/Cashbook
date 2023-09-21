@@ -463,8 +463,8 @@ private fun FrontLayerContent(
                         }
                         items(recordList, key = { it.id }) {
                             RecordListItem(
-                                recordViewsEntity = it,
-                                onRecordItemClick = {
+                                item = it,
+                                modifier = Modifier.clickable {
                                     onRecordItemClick(it)
                                 },
                             )
@@ -483,30 +483,28 @@ private fun FrontLayerContent(
 /**
  * 记录列表 item 布局
  *
- * @param recordViewsEntity 记录数据
- * @param onRecordItemClick 点击回调
+ * @param item 记录数据
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RecordListItem(
-    recordViewsEntity: RecordViewsEntity,
-    onRecordItemClick: () -> Unit,
+    item: RecordViewsEntity,
+    modifier: Modifier = Modifier,
+    showTags: Boolean = true,
+    showRemarks: Boolean = true,
 ) {
     TransparentListItem(
-        modifier = Modifier.clickable {
-            onRecordItemClick()
-        },
+        modifier = modifier,
         leadingContent = {
             Icon(
-                painter = painterDrawableResource(idStr = recordViewsEntity.typeIconResName),
+                painter = painterDrawableResource(idStr = item.typeIconResName),
                 contentDescription = null
             )
         },
         headlineContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = recordViewsEntity.typeName)
-                val tags = recordViewsEntity.relatedTags
-                if (tags.isNotEmpty()) {
+                Text(text = item.typeName)
+                val tags = item.relatedTags
+                if (showTags && tags.isNotEmpty()) {
                     val tagsText = with(StringBuilder()) {
                         tags.forEach { tag ->
                             if (!isBlank()) {
@@ -536,32 +534,50 @@ internal fun RecordListItem(
             }
         },
         supportingContent = {
-            Text(
-                text = "${
-                    recordViewsEntity.recordTime.split(" ").first()
-                } ${recordViewsEntity.remark}"
-            )
+            Text(text = buildAnnotatedString {
+                append(item.recordTime.split(" ").first())
+                if (showRemarks) {
+                    withStyle(SpanStyle(color = LocalContentColor.current.copy(alpha = 0.7f))) {
+                        append("  ${item.remark}")
+                    }
+                }
+            })
         },
         trailingContent = {
             Column(
                 horizontalAlignment = Alignment.End
             ) {
-                // TODO 关联记录
-                Text(
-                    text = buildAnnotatedString {
-                        append(recordViewsEntity.amount.withCNY())
-                    },
-                    color = when (recordViewsEntity.typeCategory) {
-                        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
-                        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
-                        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
-                    },
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                recordViewsEntity.assetName?.let { assetName ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (item.relatedRecord.isNotEmpty()) {
+                        Text(
+                            text = stringResource(
+                                id = if (item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+                                    R.string.refund_reimbursed
+                                } else {
+                                    R.string.related
+                                }
+                            ) + "(${item.relatedAmount.withCNY()})",
+                            color = LocalContentColor.current.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                    }
+                    Text(
+                        text = item.amount.withCNY(),
+                        color = when (item.typeCategory) {
+                            RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
+                            RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
+                            RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
+                        },
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+                item.assetName?.let { assetName ->
                     Text(text = buildAnnotatedString {
-                        val hasCharges = recordViewsEntity.charges.toDoubleOrZero() > 0.0
-                        val hasConcessions = recordViewsEntity.concessions.toDoubleOrZero() > 0.0
+                        val hasCharges = item.charges.toDoubleOrZero() > 0.0
+                        val hasConcessions = item.concessions.toDoubleOrZero() > 0.0
                         if (hasCharges || hasConcessions) {
                             // 有手续费、优惠信息
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
@@ -569,7 +585,7 @@ internal fun RecordListItem(
                             }
                             if (hasCharges) {
                                 withStyle(style = SpanStyle(color = LocalExtendedColors.current.expenditure)) {
-                                    append("-${recordViewsEntity.charges}".withCNY())
+                                    append("-${item.charges}".withCNY())
                                 }
                             }
                             if (hasConcessions) {
@@ -577,7 +593,7 @@ internal fun RecordListItem(
                                     append(" ")
                                 }
                                 withStyle(style = SpanStyle(color = LocalExtendedColors.current.income)) {
-                                    append("+${recordViewsEntity.concessions.withCNY()}")
+                                    append("+${item.concessions.withCNY()}")
                                 }
                             }
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
@@ -585,8 +601,8 @@ internal fun RecordListItem(
                             }
                         }
                         append(assetName)
-                        if (recordViewsEntity.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                            append(" -> ${recordViewsEntity.relatedAssetName}")
+                        if (item.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                            append(" -> ${item.relatedAssetName}")
                         }
                     })
                 }

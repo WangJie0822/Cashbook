@@ -84,6 +84,24 @@ class TypeRepositoryImpl @Inject constructor(
         typeId == appDataModel.refundTypeId || typeId == appDataModel.reimburseTypeId
     }
 
+    override suspend fun isReimburseType(typeId: Long): Boolean = withContext(coroutineContext) {
+        val appDataModel = appPreferencesDataSource.appData.first()
+        typeId == appDataModel.reimburseTypeId
+    }
+
+    override suspend fun isRefundType(typeId: Long): Boolean = withContext(coroutineContext) {
+        val appDataModel = appPreferencesDataSource.appData.first()
+        typeId == appDataModel.refundTypeId
+    }
+
+    override suspend fun setReimburseType(typeId: Long): Unit = withContext(coroutineContext) {
+        appPreferencesDataSource.updateReimburseTypeId(typeId)
+    }
+
+    override suspend fun setRefundType(typeId: Long): Unit = withContext(coroutineContext) {
+        appPreferencesDataSource.updateRefundTypeId(typeId)
+    }
+
     override suspend fun changeTypeToSecond(id: Long, parentId: Long): Unit =
         withContext(coroutineContext) {
             typeDao.updateTypeLevel(

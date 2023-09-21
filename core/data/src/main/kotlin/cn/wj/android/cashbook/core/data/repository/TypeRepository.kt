@@ -32,6 +32,14 @@ interface TypeRepository {
 
     suspend fun needRelated(typeId: Long): Boolean
 
+    suspend fun isReimburseType(typeId: Long): Boolean
+
+    suspend fun isRefundType(typeId: Long): Boolean
+
+    suspend fun setReimburseType(typeId: Long)
+
+    suspend fun setRefundType(typeId: Long)
+
     suspend fun changeTypeToSecond(id: Long, parentId: Long)
 
     suspend fun changeSecondTypeToFirst(id: Long)

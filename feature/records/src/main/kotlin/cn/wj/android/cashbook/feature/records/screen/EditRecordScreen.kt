@@ -56,9 +56,7 @@ import cn.wj.android.cashbook.core.design.component.TimePickerDialog
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
@@ -79,17 +77,18 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
  */
 @Composable
 internal fun EditRecordRoute(
-    modifier: Modifier = Modifier,
-    recordId: Long = -1L,
-    typeId: Long = -1L,
+    recordId: Long,
+    typeId: Long,
     typeListContent: @Composable (
         RecordTypeCategoryEnum, Long, (Long) -> Unit,
         @Composable (modifier: Modifier) -> Unit,
         @Composable (modifier: Modifier) -> Unit,
-    ) -> Unit = { _, _, _, _, _ -> },
-    assetBottomSheetContent: @Composable (Long, Boolean, (Long) -> Unit) -> Unit = { _, _, _ -> },
-    tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit = { _, _ -> },
-    onRequestPopBackStack: () -> Unit = {},
+    ) -> Unit,
+    assetBottomSheetContent: @Composable (Long, Boolean, (Long) -> Unit) -> Unit,
+    tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit,
+    onRequestNaviToSelectRelatedRecord: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
         updateRecordId(recordId)
         updateType(typeId)
@@ -147,6 +146,7 @@ internal fun EditRecordRoute(
             tagBottomSheetContent(selectedTagIdList, viewModel::updateTag)
         },
         onReimbursableClick = viewModel::switchReimbursable,
+        onRelatedRecordClick = onRequestNaviToSelectRelatedRecord,
         onSaveClick = { viewModel.trySave(onSuccess = onRequestPopBackStack) },
         modifier = modifier,
     )
@@ -206,6 +206,7 @@ internal fun EditRecordScreen(
     onChargesClick: () -> Unit,
     onChargesChange: (String) -> Unit,
     onConcessionsClick: () -> Unit,
+    onRelatedRecordClick: () -> Unit,
     onConcessionsChange: (String) -> Unit,
     typeListContent: @Composable (
         @Composable (modifier: Modifier) -> Unit,
@@ -351,6 +352,7 @@ internal fun EditRecordScreen(
                     onReimbursableClick = onReimbursableClick,
                     onChargesClick = onChargesClick,
                     onConcessionsClick = onConcessionsClick,
+                    onRelatedRecordClick = onRelatedRecordClick,
                     onRecordTimeClick = onRecordTimeClick,
                 )
             }
@@ -395,6 +397,7 @@ private fun EditRecordScaffoldContent(
     onReimbursableClick: () -> Unit,
     onChargesClick: () -> Unit,
     onConcessionsClick: () -> Unit,
+    onRelatedRecordClick: () -> Unit,
     onRecordTimeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -538,7 +541,25 @@ private fun EditRecordScaffoldContent(
                                     )
                                 }
 
-                                // TODO 关联的支出记录
+                                // 关联的支出记录
+                                if (uiState.needRelated) {
+                                    FilterChip(
+                                        selected = false,
+                                        onClick = onRelatedRecordClick,
+                                        label = {
+                                            Text(
+                                                text = if (uiState.relatedCount > 0) {
+                                                    stringResource(id = R.string.related_record_display_format).format(
+                                                        uiState.relatedCount,
+                                                        uiState.relatedAmount.withCNY()
+                                                    )
+                                                } else {
+                                                    stringResource(id = R.string.related_record)
+                                                }
+                                            )
+                                        },
+                                    )
+                                }
                             }
                         }
                     },
@@ -720,13 +741,5 @@ internal fun Amount(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(8.dp),
         )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun EditRecordScreenPreview() {
-    PreviewTheme {
-        EditRecordRoute()
     }
 }

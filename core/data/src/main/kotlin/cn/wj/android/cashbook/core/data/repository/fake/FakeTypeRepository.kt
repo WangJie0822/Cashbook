@@ -32,6 +32,22 @@ object FakeTypeRepository : TypeRepository {
         TODO("Not yet implemented")
     }
 
+    override suspend fun isReimburseType(typeId: Long): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun isRefundType(typeId: Long): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setReimburseType(typeId: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setRefundType(typeId: Long) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun changeTypeToSecond(id: Long, parentId: Long) {
         TODO("Not yet implemented")
     }

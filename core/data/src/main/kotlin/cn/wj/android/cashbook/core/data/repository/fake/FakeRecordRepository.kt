@@ -70,7 +70,12 @@ object FakeRecordRepository : RecordRepository {
             _recordListDate.first().filter { it.id == recordId }
         }
 
-    override suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>) =
+    override suspend fun updateRecord(
+        record: RecordModel,
+        tagIdList: List<Long>,
+        needRelated: Boolean,
+        relatedRecordIdList: List<Long>,
+    ) =
         withContext(coroutineContext) {
 
         }
@@ -97,6 +102,30 @@ object FakeRecordRepository : RecordRepository {
         }
 
     override suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getRelatedIdListById(id: Long): List<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getRecordIdListFromRelatedId(id: Long): List<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getLastThreeMonthRefundableRecordList(): List<RecordModel> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getLastThreeMonthReimbursableRecordList(): List<RecordModel> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getLastThreeMonthRefundableRecordListByKeyword(keyword: String): List<RecordModel> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getLastThreeMonthReimbursableRecordListByKeyword(keyword: String): List<RecordModel> {
         TODO("Not yet implemented")
     }
 }

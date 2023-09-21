@@ -2,7 +2,6 @@ package cn.wj.android.cashbook.ui
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -36,6 +35,8 @@ import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToCalendar
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
+import cn.wj.android.cashbook.feature.records.navigation.naviToSelectRelatedRecord
+import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
 import cn.wj.android.cashbook.feature.settings.navigation.backupAndRecoveryScreen
@@ -57,7 +58,6 @@ import cn.wj.android.cashbook.feature.types.navigation.naviToMyCategories
 private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 
 /** 应用入口 */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainApp() {
 
@@ -187,6 +187,11 @@ fun CashbookNavHost(
                     onTagIdListChange = onTagIdListChange,
                 )
             },
+            onRequestNaviToSelectRelatedRecord = navController::naviToSelectRelatedRecord,
+            onRequestPopBackStack = navController::popBackStack,
+        )
+        // 选择关联记录
+        selectRelatedRecordScreen(
             onRequestPopBackStack = navController::popBackStack,
         )
         // 记录日历

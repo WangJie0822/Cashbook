@@ -8,9 +8,9 @@ package cn.wj.android.cashbook.core.model.model
  *  @param booksId 关联账本 id
  * @param typeId 记录类型
  * @param assetId 关联资产
- * @param relatedAssetId 转账转入资产
+ * @param relatedAssetId 转账关联资产
  * @param amount 记录金额
- * @param charges 转账手续费
+ * @param charges 手续费
  * @param concessions 优惠
  * @param remark 备注
  * @param reimbursable 能否报销

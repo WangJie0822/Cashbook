@@ -5,6 +5,7 @@ import androidx.room.Query
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 
 /**
  * 记录数据库操作类
@@ -71,7 +72,7 @@ interface RecordDao {
 
     /** 资产 id 为 [assetId] 的第 [pageNum] 页 [pageSize] 条记录 */
     @Query("SELECT * FROM db_record WHERE books_id=:booksId AND asset_id=:assetId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
-    suspend  fun queryRecordByAssetId(
+    suspend fun queryRecordByAssetId(
         booksId: Long,
         assetId: Long,
         pageNum: Int,
@@ -83,4 +84,72 @@ interface RecordDao {
 
     @Query("UPDATE db_record SET type_id=:toId WHERE type_id=:fromId")
     suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long)
+
+    @Query("SELECT related_record_id FROM db_record_with_related WHERE record_id=:id")
+    suspend fun getRelatedIdListById(id: Long): List<Long>
+
+    @Query("SELECT record_id FROM db_record_with_related WHERE related_record_id=:id")
+    suspend fun getRecordIdListFromRelatedId(id: Long): List<Long>
+
+    @Query(
+        """
+        SELECT * FROM db_record 
+        WHERE record_time>=:recordTime 
+        AND type_id IN (SELECT id FROM db_type WHERE type_category=:incomeCategory)
+        AND books_id=:booksId 
+        ORDER BY record_time DESC LIMIT 50
+    """
+    )
+    fun getLastThreeMonthExpenditureRecordList(
+        booksId: Long,
+        recordTime: Long,
+        incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal
+    ): List<RecordTable>
+
+    @Query(
+        """
+        SELECT * FROM db_record 
+        WHERE record_time>=:recordTime 
+        AND reimbursable=$SWITCH_INT_ON
+        AND books_id=:booksId 
+        ORDER BY record_time DESC LIMIT 50
+    """
+    )
+    fun getLastThreeMonthExpenditureReimburseRecordList(
+        booksId: Long,
+        recordTime: Long,
+    ): List<RecordTable>
+
+    @Query(
+        """
+        SELECT * FROM db_record 
+        WHERE record_time>=:recordTime 
+        AND type_id IN (SELECT id FROM db_type WHERE type_category=:incomeCategory)
+        AND books_id=:booksId
+        AND (remark LIKE :keyword OR amount LIKE :keyword)
+        ORDER BY record_time DESC LIMIT 50
+    """
+    )
+    fun getLastThreeMonthExpenditureRecordListByKeyword(
+        keyword: String,
+        booksId: Long,
+        recordTime: Long,
+        incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal
+    ): List<RecordTable>
+
+    @Query(
+        """
+        SELECT * FROM db_record 
+        WHERE record_time>=:recordTime 
+        AND reimbursable=$SWITCH_INT_ON
+        AND books_id=:booksId 
+        AND (remark LIKE :keyword OR amount LIKE :keyword)
+        ORDER BY record_time DESC LIMIT 50
+    """
+    )
+    fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
+        keyword: String,
+        booksId: Long,
+        recordTime: Long,
+    ): List<RecordTable>
 }

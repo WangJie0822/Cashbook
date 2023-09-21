@@ -2,8 +2,10 @@ package cn.wj.android.cashbook.core.model.transfer
 
 import cn.wj.android.cashbook.core.model.entity.RecordEntity
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
+import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 
 fun RecordModel.asEntity(): RecordEntity {
     return RecordEntity(
@@ -51,5 +53,27 @@ fun RecordTypeModel.asEntity(
         selected = false,
         shapeType = -1,
         needRelated = needRelated,
+    )
+}
+
+fun RecordViewsModel.asEntity(): RecordViewsEntity {
+    return RecordViewsEntity(
+        id = this.id,
+        typeCategory = this.type.typeCategory,
+        typeName = this.type.name,
+        typeIconResName = this.type.iconName,
+        assetName = this.asset?.name,
+        assetIconResId = this.asset?.iconResId,
+        relatedAssetName = this.relatedAsset?.name,
+        relatedAssetIconResId = this.relatedAsset?.iconResId,
+        amount = this.amount,
+        charges = this.charges,
+        concessions = this.concessions,
+        remark = this.remark,
+        reimbursable = this.reimbursable,
+        relatedTags = this.relatedTags,
+        relatedRecord = this.relatedRecord,
+        relatedAmount = this.relatedAmount,
+        recordTime = this.recordTime,
     )
 }

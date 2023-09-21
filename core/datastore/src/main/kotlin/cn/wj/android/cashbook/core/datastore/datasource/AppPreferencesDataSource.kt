@@ -30,7 +30,7 @@ class AppPreferencesDataSource @Inject constructor(
                 defaultTypeId = it.defaultTypeId,
                 lastAssetId = it.lastAssetId,
                 refundTypeId = it.refundTypeId,
-                reimburseTypeId = it.refundTypeId,
+                reimburseTypeId = it.reimburseTypeId,
                 useGithub = it.useGithub,
                 autoCheckUpdate = it.autoCheckUpdate,
                 ignoreUpdateVersion = it.ignoreUpdateVersion,
@@ -158,6 +158,14 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateBackupMs(ms: Long) {
         appPreferences.updateData { it.copy { this.lastBackupMs = ms } }
+    }
+
+    suspend fun updateRefundTypeId(id: Long) {
+        appPreferences.updateData { it.copy { this.refundTypeId = id } }
+    }
+
+    suspend fun updateReimburseTypeId(id: Long) {
+        appPreferences.updateData { it.copy { this.reimburseTypeId = id } }
     }
 
     suspend fun needRelated(typeId: Long): Boolean {

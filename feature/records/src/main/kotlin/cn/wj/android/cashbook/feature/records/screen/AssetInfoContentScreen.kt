@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.feature.records.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -72,8 +73,8 @@ internal fun AssetInfoContentScreen(
                 items(count = recordList.itemCount) { index ->
                     recordList[index]?.let { item ->
                         RecordListItem(
-                            recordViewsEntity = item,
-                            onRecordItemClick = {
+                            item = item,
+                            modifier = Modifier.clickable {
                                 onRecordItemClick.invoke(item)
                             },
                         )

@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
+import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -25,7 +26,9 @@ import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -50,6 +53,7 @@ class EditRecordViewModel @Inject constructor(
     private val typeRepository: TypeRepository,
     assetRepository: AssetRepository,
     tagRepository: TagRepository,
+    recordRepository: RecordRepository,
     getDefaultRecordUseCase: GetDefaultRecordUseCase,
     private val saveRecordUseCase: SaveRecordUseCase,
 ) : ViewModel() {
@@ -79,43 +83,71 @@ class EditRecordViewModel @Inject constructor(
             mutable ?: default
         }
 
-    /** 界面 UI 状态 */
-    val uiState = _displayRecordData.mapLatest { record ->
-        val assetText = assetRepository.getAssetById(record.assetId)?.let { asset ->
-            "${asset.name}(${
-                if (asset.type.isCreditCard()) {
-                    (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
-                } else {
-                    asset.balance
-                }.withCNY()
-            })"
-        }.orEmpty()
-        val relatedAssetText = assetRepository.getAssetById(record.relatedAssetId)?.let { asset ->
-            "${asset.name}(${
-                if (asset.type.isCreditCard()) {
-                    (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
-                } else {
-                    asset.balance
-                }.withCNY()
-            })"
-        }.orEmpty()
-        EditRecordUiState.Success(
-            amountText = record.amount.ifBlank { "0" },
-            chargesText = record.charges.clearZero(),
-            concessionsText = record.concessions.clearZero(),
-            remarkText = record.remark,
-            assetText = assetText,
-            relatedAssetText = relatedAssetText,
-            dateTimeText = record.recordTime,
-            reimbursable = record.reimbursable,
-            selectedTypeId = record.typeId,
-        )
+    /** 关联记录 */
+    private val _mutableRelatedRecordIdData = MutableStateFlow<List<Long>?>(null)
+    private val _defaultRelatedRecordIdData = _recordIdData.mapLatest {
+        recordRepository.getRelatedIdListById(it)
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = EditRecordUiState.Loading,
-        )
+    private val _relatedRecordIdData =
+        combine(_mutableRelatedRecordIdData, _defaultRelatedRecordIdData) { mutable, default ->
+            mutable ?: default
+        }
+    private val _relatedRecordListData = _relatedRecordIdData.mapLatest { ids ->
+        ids.mapNotNull {
+            recordRepository.queryById(it)
+        }
+    }
+    private val _relatedRecordTotalAmountData = _relatedRecordListData.mapLatest { list ->
+        var total = BigDecimal.ZERO
+        list.forEach {
+            total += (it.amount.toBigDecimalOrZero() + it.charges.toBigDecimalOrZero() - it.concessions.toBigDecimalOrZero())
+        }
+        total.decimalFormat()
+    }
+
+    /** 界面 UI 状态 */
+    val uiState =
+        combine(_displayRecordData, _relatedRecordTotalAmountData) { record, relatedAmount ->
+            val assetText = assetRepository.getAssetById(record.assetId)?.let { asset ->
+                "${asset.name}(${
+                    if (asset.type.isCreditCard()) {
+                        (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
+                    } else {
+                        asset.balance
+                    }.withCNY()
+                })"
+            }.orEmpty()
+            val relatedAssetText =
+                assetRepository.getAssetById(record.relatedAssetId)?.let { asset ->
+                    "${asset.name}(${
+                        if (asset.type.isCreditCard()) {
+                            (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
+                        } else {
+                            asset.balance
+                        }.withCNY()
+                    })"
+                }.orEmpty()
+            val needRelated = typeRepository.needRelated(record.typeId)
+            EditRecordUiState.Success(
+                amountText = record.amount.ifBlank { "0" },
+                chargesText = record.charges.clearZero(),
+                concessionsText = record.concessions.clearZero(),
+                remarkText = record.remark,
+                assetText = assetText,
+                relatedAssetText = relatedAssetText,
+                dateTimeText = record.recordTime,
+                reimbursable = record.reimbursable,
+                selectedTypeId = record.typeId,
+                needRelated = needRelated,
+                relatedCount = _relatedRecordListData.first().size,
+                relatedAmount = relatedAmount
+            )
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = EditRecordUiState.Loading,
+            )
 
     /** 类型数据 */
     private val _mutableTypeCategoryData = MutableStateFlow<RecordTypeCategoryEnum?>(null)
@@ -318,7 +350,6 @@ class EditRecordViewModel @Inject constructor(
                 shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_NOT_MATCH_CATEGORY
                 return@launch
             }
-            // TODO 关联记录
             try {
                 saveRecordUseCase(
                     recordModel = recordEntity.copy(
@@ -327,6 +358,7 @@ class EditRecordViewModel @Inject constructor(
                         reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
                     ),
                     tagIdList = displayTagIdListData.first(),
+                    relatedRecordIdList = _relatedRecordIdData.first(),
                 )
                 onSuccess.invoke()
             } catch (throwable: Throwable) {
@@ -394,6 +426,18 @@ class EditRecordViewModel @Inject constructor(
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
+
+    fun currentRecord(): Flow<RecordModel> {
+        return _displayRecordData
+    }
+
+    fun currentRelatedRecord(): Flow<List<Long>> {
+        return _relatedRecordIdData
+    }
+
+    fun updateRelatedRecord(ids: List<Long>) {
+        _mutableRelatedRecordIdData.tryEmit(ids)
+    }
 }
 
 /** 界面 UI 状态 */
@@ -413,6 +457,7 @@ sealed class EditRecordUiState(open val selectedTypeId: Long = -1L) {
      * @param dateTimeText 日期时间
      * @param reimbursable 是否可报销
      * @param selectedTypeId 当前选择类型 id
+     * @param needRelated 是否需要关联记录
      */
     data class Success(
         val amountText: String,
@@ -424,6 +469,9 @@ sealed class EditRecordUiState(open val selectedTypeId: Long = -1L) {
         val dateTimeText: String,
         val reimbursable: Boolean,
         override val selectedTypeId: Long,
+        val needRelated: Boolean,
+        val relatedCount: Int,
+        val relatedAmount: String,
     ) : EditRecordUiState()
 }
 

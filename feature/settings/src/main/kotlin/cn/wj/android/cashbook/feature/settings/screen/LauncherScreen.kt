@@ -53,9 +53,7 @@ import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.LauncherBookmarkEnum
@@ -80,15 +78,15 @@ import javax.crypto.Cipher
  */
 @Composable
 internal fun LauncherRoute(
+    onRequestNaviToMyAsset: () -> Unit,
+    onRequestNaviToMyBooks: () -> Unit,
+    onRequestNaviToMyCategory: () -> Unit,
+    onRequestNaviToMyTags: () -> Unit,
+    onRequestNaviToSetting: () -> Unit,
+    onRequestNaviToAboutUs: () -> Unit,
+    onRequestNaviToPrivacyPolicy: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
-    onRequestNaviToMyAsset: () -> Unit = {},
-    onRequestNaviToMyBooks: () -> Unit = {},
-    onRequestNaviToMyCategory: () -> Unit = {},
-    onRequestNaviToMyTags: () -> Unit = {},
-    onRequestNaviToSetting: () -> Unit = {},
-    onRequestNaviToAboutUs: () -> Unit = {},
-    onRequestNaviToPrivacyPolicy: () -> Unit = {},
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     viewModel: LauncherViewModel = hiltViewModel(),
     content: @Composable (() -> Unit) -> Unit,
 ) {
@@ -584,15 +582,5 @@ internal fun Verification(
                 }
             }
         }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun LauncherScreenPreview() {
-    PreviewTheme {
-        LauncherRoute(
-            content = {},
-        )
     }
 }

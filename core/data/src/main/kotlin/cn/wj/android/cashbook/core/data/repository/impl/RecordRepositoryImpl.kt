@@ -6,9 +6,11 @@ import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
+import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
+import cn.wj.android.cashbook.core.common.tools.toLongTime
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
@@ -16,6 +18,7 @@ import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.model.RecordModel
+import java.util.Calendar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
@@ -46,14 +49,23 @@ class RecordRepositoryImpl @Inject constructor(
                 .map { it.asModel() }
         }
 
-    override suspend fun updateRecord(record: RecordModel, tagIdList: List<Long>) =
-        withContext(coroutineContext) {
-            logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
-            transactionDao.updateRecordTransaction(record.asTable(), tagIdList)
-            recordDataVersion.updateVersion()
-            // 更新上次使用的默认数据
-            appPreferencesDataSource.updateLastAssetId(record.assetId)
-        }
+    override suspend fun updateRecord(
+        record: RecordModel,
+        tagIdList: List<Long>,
+        needRelated: Boolean,
+        relatedRecordIdList: List<Long>,
+    ) = withContext(coroutineContext) {
+        logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
+        transactionDao.updateRecordTransaction(
+            recordTable = record.asTable(),
+            tagIdList = tagIdList,
+            needRelated = needRelated,
+            relatedRecordIdList = relatedRecordIdList,
+        )
+        recordDataVersion.updateVersion()
+        // 更新上次使用的默认数据
+        appPreferencesDataSource.updateLastAssetId(record.assetId)
+    }
 
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
         transactionDao.deleteRecordTransaction(recordId)
@@ -123,5 +135,73 @@ class RecordRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             recordDao.changeRecordTypeBeforeDeleteType(fromId = fromId, toId = toId)
             recordDataVersion.updateVersion()
+        }
+
+    override suspend fun getRelatedIdListById(id: Long): List<Long> =
+        withContext(coroutineContext) {
+            recordDao.getRelatedIdListById(id)
+        }
+
+    override suspend fun getRecordIdListFromRelatedId(id: Long): List<Long> =
+        withContext(coroutineContext) {
+            recordDao.getRecordIdListFromRelatedId(id)
+        }
+
+    override suspend fun getLastThreeMonthRefundableRecordList(): List<RecordModel> =
+        withContext(coroutineContext) {
+            // 获取最近三个月开始时间
+            val calendar = Calendar.getInstance()
+            calendar[Calendar.DAY_OF_MONTH] = -90
+            val startDate =
+                "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
+            val appDataModel = appPreferencesDataSource.appData.first()
+            recordDao.getLastThreeMonthExpenditureRecordList(
+                booksId = appDataModel.currentBookId,
+                recordTime = startDate,
+            ).map { it.asModel() }
+        }
+
+    override suspend fun getLastThreeMonthReimbursableRecordList(): List<RecordModel> =
+        withContext(coroutineContext) {
+            // 获取最近三个月开始时间
+            val calendar = Calendar.getInstance()
+            calendar[Calendar.DAY_OF_MONTH] = -90
+            val startDate =
+                "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
+            val appDataModel = appPreferencesDataSource.appData.first()
+            recordDao.getLastThreeMonthExpenditureReimburseRecordList(
+                booksId = appDataModel.currentBookId,
+                recordTime = startDate,
+            ).map { it.asModel() }
+        }
+
+    override suspend fun getLastThreeMonthRefundableRecordListByKeyword(keyword: String): List<RecordModel> =
+        withContext(coroutineContext) {
+            // 获取最近三个月开始时间
+            val calendar = Calendar.getInstance()
+            calendar[Calendar.DAY_OF_MONTH] = -90
+            val startDate =
+                "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
+            val appDataModel = appPreferencesDataSource.appData.first()
+            recordDao.getLastThreeMonthExpenditureRecordListByKeyword(
+                keyword = keyword,
+                booksId = appDataModel.currentBookId,
+                recordTime = startDate,
+            ).map { it.asModel() }
+        }
+
+    override suspend fun getLastThreeMonthReimbursableRecordListByKeyword(keyword: String): List<RecordModel> =
+        withContext(coroutineContext) {
+            // 获取最近三个月开始时间
+            val calendar = Calendar.getInstance()
+            calendar[Calendar.DAY_OF_MONTH] = -90
+            val startDate =
+                "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
+            val appDataModel = appPreferencesDataSource.appData.first()
+            recordDao.getLastThreeMonthExpenditureReimburseRecordListByKeyword(
+                keyword = keyword,
+                booksId = appDataModel.currentBookId,
+                recordTime = startDate,
+            ).map { it.asModel() }
         }
 }

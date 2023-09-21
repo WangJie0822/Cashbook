@@ -2,9 +2,7 @@ package cn.wj.android.cashbook.feature.records.navigation
 
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -12,20 +10,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.feature.records.screen.AssetInfoContentRoute
 import cn.wj.android.cashbook.feature.records.screen.CalendarRoute
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentRoute
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
-import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 
 private const val ROUTE_EDIT_RECORD_KEY_RECORD_ID = "recordId"
 private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
 
 /** 路由 - 编辑记录 */
-private const val ROUTE_EDIT_RECORD =
+internal const val ROUTE_EDIT_RECORD =
     "record/edit_record?$ROUTE_EDIT_RECORD_KEY_RECORD_ID={$ROUTE_EDIT_RECORD_KEY_RECORD_ID}&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}"
 
 /** 路由 - 选择关联记录 */
@@ -72,6 +68,7 @@ fun NavGraphBuilder.editRecordScreen(
     ) -> Unit,
     assetBottomSheetContent: @Composable (Long, Boolean, (Long) -> Unit) -> Unit,
     tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit,
+    onRequestNaviToSelectRelatedRecord: () -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(
@@ -93,25 +90,20 @@ fun NavGraphBuilder.editRecordScreen(
             typeListContent = typeListContent,
             assetBottomSheetContent = assetBottomSheetContent,
             tagBottomSheetContent = tagBottomSheetContent,
+            onRequestNaviToSelectRelatedRecord = onRequestNaviToSelectRelatedRecord,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }
 
 fun NavGraphBuilder.selectRelatedRecordScreen(
-    onBackClick: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
 ) {
     composable(
         route = ROUTE_SELECT_RELATED_RECORD,
     ) {
-        val navController = LocalNavController.current
-        val parentEntry = remember(it) {
-            navController.getBackStackEntry(ROUTE_EDIT_RECORD)
-        }
-        val parentViewModel = hiltViewModel<EditRecordViewModel>(parentEntry)
         SelectRelatedRecordRoute(
-            onBackPressed = onBackClick,
-            parentViewModel = parentViewModel,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }

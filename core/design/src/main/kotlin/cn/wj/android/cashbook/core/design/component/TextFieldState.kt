@@ -4,6 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * 文本输入框状态
@@ -15,6 +22,8 @@ open class TextFieldState(
     private val validator: (String) -> Boolean = { true },
     private val filter: (String) -> Boolean = { true },
     private val errorFor: (String) -> String = { "" },
+    private val delayAfterTextChange: Long = 200L,
+    private val afterTextChange: (String) -> Unit = {},
 ) {
     var text: String by mutableStateOf(defaultText)
 
@@ -29,6 +38,23 @@ open class TextFieldState(
     fun onTextChange(text: String) {
         if (filter(text)) {
             this.text = text
+            onTextChanged(text)
+        }
+    }
+
+    private var delayJob: Job? = null
+    private val coroutineScope: CoroutineScope by lazy {
+        object : CoroutineScope {
+            override val coroutineContext: CoroutineContext
+                get() = SupervisorJob() + Dispatchers.Main.immediate
+        }
+    }
+
+    private fun onTextChanged(text: String) {
+        delayJob?.cancel()
+        delayJob = coroutineScope.launch {
+            delay(delayAfterTextChange)
+            afterTextChange(text)
         }
     }
 

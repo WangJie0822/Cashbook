@@ -9,29 +9,20 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.withContext
 
 /**
- * 获取当前资产记录显示数据用例
+ * 获取记录数据用例
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/3
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/22
  */
-class GetAssetRecordViewsUseCase @Inject constructor(
+class GetRecordViewsUseCase @Inject constructor(
     private val recordRepository: RecordRepository,
     private val recordModelTransToViewsUseCase: RecordModelTransToViewsUseCase,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) {
 
-    suspend operator fun invoke(
-        assetId: Long,
-        pageNum: Int,
-        pageSize: Int,
-    ): List<RecordViewsEntity> = withContext(coroutineContext) {
-        if (assetId == -1L) {
-            return@withContext emptyList()
+    suspend operator fun invoke(id: Long): RecordViewsEntity? = withContext(coroutineContext) {
+        recordRepository.queryById(id)?.let {
+            recordModelTransToViewsUseCase(it)
         }
-        recordRepository.queryPagingRecordListByAssetId(assetId, pageNum, pageSize)
-            .sortedBy { it.recordTime }
-            .reversed()
-            .map {
-                recordModelTransToViewsUseCase(it)
-            }
     }
+
 }

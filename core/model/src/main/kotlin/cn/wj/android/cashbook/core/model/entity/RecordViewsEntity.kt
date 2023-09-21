@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.core.model.entity
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 
 /**
@@ -31,7 +32,8 @@ data class RecordViewsEntity(
     val remark: String,
     val reimbursable: Boolean,
     val relatedTags: List<TagModel>,
-    val relatedRecord: List<RecordViewsEntity>,
+    val relatedRecord: List<RecordModel>,
+    val relatedAmount: String,
     val recordTime: String,
 ) : RecordViews
 
