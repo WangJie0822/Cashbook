@@ -245,7 +245,8 @@ interface TransactionDao {
         // 移除关联标签
         deleteOldRelatedTags(recordId)
 
-        // TODO 移除关联记录
+        // 移除关联记录
+        clearRelatedRecordById(recordId)
 
         // 删除当前记录
         val result = deleteRecord(record)

@@ -16,6 +16,5 @@ class DeleteRecordUseCase @Inject constructor(
     ) = withContext(coroutineContext) {
         // 从数据库中删除记录及相关信息
         recordRepository.deleteRecord(recordId)
-        // TODO 删除关联信息
     }
 }
