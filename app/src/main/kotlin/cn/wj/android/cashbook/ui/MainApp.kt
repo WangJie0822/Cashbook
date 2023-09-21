@@ -108,7 +108,6 @@ fun MainApp(
     viewModel: MainAppViewModel = viewModel()
 ) {
 
-
     CashbookGradientBackground {
         val navController = rememberNavController()
         val snackbarHostState = remember { SnackbarHostState() }
@@ -304,7 +303,7 @@ fun CashbookNavHost(
                     onRequestNaviToEditRecord = navController::naviToEditRecord,
                     onRequestNaviToSearch = { /* TODO */ },
                     onRequestNaviToCalendar = navController::naviToCalendar,
-                    onRequestNaviToMyAsset = navController::naviToMyAsset,
+                    onRequestNaviToAnalytics = { /* TODO */ },
                     onShowSnackbar = onShowSnackbar,
                 )
             },

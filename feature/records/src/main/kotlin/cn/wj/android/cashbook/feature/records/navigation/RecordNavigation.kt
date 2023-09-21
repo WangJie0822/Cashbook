@@ -137,7 +137,7 @@ fun NavGraphBuilder.calendarScreen(
  * @param onRequestNaviToEditRecord 导航到编辑记录
  * @param onRequestNaviToSearch 导航到搜索
  * @param onRequestNaviToCalendar 导航到日历
- * @param onRequestNaviToMyAsset 导航到我的资产
+ * @param onRequestNaviToAnalytics 导航到数据分析
  * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 @Composable
@@ -147,7 +147,7 @@ fun LauncherContent(
     onRequestNaviToEditRecord: (Long) -> Unit,
     onRequestNaviToSearch: () -> Unit,
     onRequestNaviToCalendar: () -> Unit,
-    onRequestNaviToMyAsset: () -> Unit,
+    onRequestNaviToAnalytics: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     LauncherContentRoute(
@@ -156,7 +156,7 @@ fun LauncherContent(
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
         onRequestNaviToSearch = onRequestNaviToSearch,
         onRequestNaviToCalendar = onRequestNaviToCalendar,
-        onRequestNaviToMyAsset = onRequestNaviToMyAsset,
+        onRequestNaviToAnalytics = onRequestNaviToAnalytics,
         onShowSnackbar = onShowSnackbar,
     )
 }

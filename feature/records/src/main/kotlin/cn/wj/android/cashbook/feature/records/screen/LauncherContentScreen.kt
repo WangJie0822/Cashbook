@@ -39,7 +39,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -62,11 +61,9 @@ import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
@@ -82,19 +79,19 @@ import java.time.YearMonth
  * @param onRequestNaviToEditRecord 导航到编辑记录
  * @param onRequestNaviToSearch 导航到搜索
  * @param onRequestNaviToCalendar 导航到日历
- * @param onRequestNaviToMyAsset 导航到我的资产
+ * @param onRequestNaviToAnalytics 导航到数据分析
  * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 @Composable
 internal fun LauncherContentRoute(
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
+    onRequestOpenDrawer: () -> Unit,
+    onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToSearch: () -> Unit,
+    onRequestNaviToCalendar: () -> Unit,
+    onRequestNaviToAnalytics: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
-    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit = { _, _ -> },
-    onRequestOpenDrawer: () -> Unit = {},
-    onRequestNaviToEditRecord: (Long) -> Unit = {},
-    onRequestNaviToSearch: () -> Unit = {},
-    onRequestNaviToCalendar: () -> Unit = {},
-    onRequestNaviToMyAsset: () -> Unit = {},
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     viewModel: LauncherContentViewModel = hiltViewModel(),
 ) {
 
@@ -114,7 +111,7 @@ internal fun LauncherContentRoute(
         onDateSelected = viewModel::refreshSelectedDate,
         onSearchClick = onRequestNaviToSearch,
         onCalendarClick = onRequestNaviToCalendar,
-        onMyAssetClick = onRequestNaviToMyAsset,
+        onAnalyticsClick = onRequestNaviToAnalytics,
         onAddClick = { onRequestNaviToEditRecord.invoke(-1L) },
         uiState = uiState,
         onRecordItemClick = viewModel::displayRecordDetailsSheet,
@@ -139,7 +136,7 @@ internal fun LauncherContentRoute(
  * @param onDateSelected 日期选择回调
  * @param onSearchClick 搜索点击回调
  * @param onCalendarClick 日历点击回调
- * @param onMyAssetClick 我的资产点击回调
+ * @param onAnalyticsClick 分析点击回调
  * @param onAddClick 添加点击回调
  * @param uiState 界面 UI 数据
  * @param onRecordItemClick 记录列表 item 点击回调
@@ -161,7 +158,7 @@ internal fun LauncherContentScreen(
     onDateSelected: (YearMonth) -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
-    onMyAssetClick: () -> Unit,
+    onAnalyticsClick: () -> Unit,
     onAddClick: () -> Unit,
     uiState: LauncherContentUiState,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
@@ -195,7 +192,7 @@ internal fun LauncherContentScreen(
                 onDateClick = onDateClick,
                 onSearchClick = onSearchClick,
                 onCalendarClick = onCalendarClick,
-                onMyAssetClick = onMyAssetClick,
+                onAnalyticsClick = onAnalyticsClick,
             )
         },
         floatingActionButton = {
@@ -269,7 +266,7 @@ internal fun LauncherContentScreen(
  * @param onDateClick 日期点击回调
  * @param onSearchClick 搜索点击回调
  * @param onCalendarClick 日历点击回调
- * @param onMyAssetClick 资产点击回调
+ * @param onAnalyticsClick 分析点击回调
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -279,7 +276,7 @@ internal fun LauncherTopBar(
     onDateClick: () -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
-    onMyAssetClick: () -> Unit,
+    onAnalyticsClick: () -> Unit,
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -315,9 +312,9 @@ internal fun LauncherTopBar(
                     contentDescription = null,
                 )
             }
-            IconButton(onClick = onMyAssetClick) {
+            IconButton(onClick = onAnalyticsClick) {
                 Icon(
-                    imageVector = CashbookIcons.WebAsset,
+                    imageVector = CashbookIcons.Analytics,
                     contentDescription = null,
                 )
             }
@@ -507,7 +504,7 @@ internal fun RecordListItem(
                 if (showTags && tags.isNotEmpty()) {
                     val tagsText = with(StringBuilder()) {
                         tags.forEach { tag ->
-                            if (!isBlank()) {
+                            if (isNotBlank()) {
                                 append(",")
                             }
                             append(tag.name)
@@ -609,14 +606,4 @@ internal fun RecordListItem(
             }
         },
     )
-}
-
-@DevicePreviews
-@Composable
-internal fun LauncherContentScreenPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        LauncherContentRoute()
-    }
 }
