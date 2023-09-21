@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.feature.settings.enums
 
-enum class LauncherBookmarkEnum {
+enum class MainAppBookmarkEnum {
 
     /** 无提示 */
     NONE,

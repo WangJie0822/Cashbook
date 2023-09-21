@@ -67,8 +67,6 @@ fun NavController.naviToBackupAndRecovery() {
  * @param onRequestNaviToMyTags 导航到我的标签
  * @param onRequestNaviToSetting 导航到设置
  * @param onRequestNaviToAboutUs 导航到关于我们
- * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
- * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  * @param content 显示内容，参数 (打开抽屉) -> [Unit]
  */
 fun NavGraphBuilder.settingsLauncherScreen(
@@ -78,8 +76,6 @@ fun NavGraphBuilder.settingsLauncherScreen(
     onRequestNaviToMyTags: () -> Unit,
     onRequestNaviToSetting: () -> Unit,
     onRequestNaviToAboutUs: () -> Unit,
-    onRequestNaviToPrivacyPolicy: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     content: @Composable (() -> Unit) -> Unit,
 ) {
     composable(route = ROUTE_SETTINGS_LAUNCHER) {
@@ -90,8 +86,6 @@ fun NavGraphBuilder.settingsLauncherScreen(
             onRequestNaviToMyTags = onRequestNaviToMyTags,
             onRequestNaviToSetting = onRequestNaviToSetting,
             onRequestNaviToAboutUs = onRequestNaviToAboutUs,
-            onRequestNaviToPrivacyPolicy = onRequestNaviToPrivacyPolicy,
-            onShowSnackbar = onShowSnackbar,
             content = content,
         )
     }

@@ -13,7 +13,7 @@ import cn.wj.android.cashbook.core.ui.LocalBackPressedDispatcher
 import cn.wj.android.cashbook.core.ui.R
 
 sealed interface ActivityUiState {
-    object Loading : ActivityUiState
+    data object Loading : ActivityUiState
 
     data class Success(
         val darkMode: DarkModeEnum,
