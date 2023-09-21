@@ -248,7 +248,6 @@ internal fun SettingScreen(
  * @param onBackupAndRecoveryClick 备份与恢复点击回调
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 internal fun SettingContent(
     supportFingerprint: Boolean,
     uiState: SettingUiState,

@@ -570,7 +570,7 @@ internal fun Verification(
                 )
             }
             if (supportFingerprint) {
-                IconButton(onClick = { onFingerprintClick.invoke() }) {
+                IconButton(onClick = { onFingerprintClick() }) {
                     Icon(
                         imageVector = CashbookIcons.Fingerprint,
                         tint = MaterialTheme.colorScheme.primary,
@@ -578,7 +578,7 @@ internal fun Verification(
                     )
                 }
                 if (firstOpen) {
-                    onFingerprintClick.invoke()
+                    onFingerprintClick()
                 }
             }
         }

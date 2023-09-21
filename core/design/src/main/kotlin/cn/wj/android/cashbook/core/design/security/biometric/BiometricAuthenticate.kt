@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "unused")
 
 package cn.wj.android.cashbook.core.design.security.biometric
 
@@ -9,6 +9,10 @@ import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.CompositionLocalProvider
@@ -16,6 +20,9 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import javax.crypto.Cipher
+
+/** 标记 - 是否支持 AndroidQ API */
+var biometricSupportQ: Boolean = true
 
 @SuppressLint("InlinedApi")
 @RequiresPermission(allOf = [android.Manifest.permission.USE_BIOMETRIC, android.Manifest.permission.USE_FINGERPRINT])
@@ -47,7 +54,7 @@ fun BiometricAuthenticate(
 
         else -> {
             // 支持
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && biometricSupportQ) {
                 BiometricAuthenticateQ(
                     title = title,
                     subTitle = subTitle,
@@ -87,7 +94,7 @@ internal fun BiometricAuthenticateQ(
     val hintData = LocalBiometricAuthenticateHintData.current
     val cancellationSignal = android.os.CancellationSignal()
     cancellationSignal.setOnCancelListener {
-        onError.invoke(5, hintData.userCancelHint)
+        onError.invoke(ERROR_CANCELED, hintData.userCancelHint)
     }
     val context = LocalContext.current
     val prompt = with(BiometricPrompt.Builder(context)) {
@@ -135,6 +142,9 @@ internal fun BiometricAuthenticateQ(
         })
 }
 
+@SuppressLint("ObsoleteSdkInt")
+@RequiresApi(Build.VERSION_CODES.M)
+@RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
 @Composable
 internal fun BiometricAuthenticateM(
     title: String,
@@ -144,7 +154,55 @@ internal fun BiometricAuthenticateM(
     onSuccess: (Cipher) -> Unit,
     onError: (Int, String) -> Unit,
 ) {
-    // TODO 低版本实现
+    val hintData = LocalBiometricAuthenticateHintData.current
+    val cancellationSignal = androidx.core.os.CancellationSignal()
+    cancellationSignal.setOnCancelListener {
+        onError.invoke(ERROR_CANCELED, hintData.userCancelHint)
+    }
+    AlertDialog(
+        onDismissRequest = { cancellationSignal.cancel() },
+        title = { Text(text = title) },
+        text = {
+            Column {
+                Text(text = subTitle)
+                Text(text = hint)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { cancellationSignal.cancel() }) {
+                Text(text = "Cancel")
+            }
+        },
+    )
+    fingerprintManager.authenticate(
+        FingerprintManagerCompat.CryptoObject(cryptoCipher),
+        0,
+        cancellationSignal,
+        object : FingerprintManagerCompat.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
+                try {
+                    val cipher = result?.cryptoObject?.cipher
+                        ?: throw RuntimeException("cipher is null!")
+                    onSuccess.invoke(cipher)
+                } catch (throwable: Throwable) {
+                    onError.invoke(ERROR_FAILED, hintData.verificationFailedHint)
+                }
+            }
+
+            override fun onAuthenticationHelp(helpCode: Int, helpString: CharSequence?) {
+                onError.invoke(helpCode, helpString.toString())
+            }
+
+            override fun onAuthenticationFailed() {
+                onError.invoke(ERROR_FAILED, hintData.verificationFailedHint)
+            }
+
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
+                onError.invoke(errorCode, errString.toString())
+            }
+        },
+        null
+    )
 }
 
 @SuppressLint("InlinedApi")
@@ -195,7 +253,7 @@ data class BiometricAuthenticateHintData(
  *
  * ```
  * CompositionLocalProvider(
- *     LocalEmptyImagePainter provides painterResource(id = R.drawable.xxxx)
+ *     LocalEmptyImagePainter provides painterResource(id = R.drawable.)
  * ) { }
  * ```
  *

@@ -102,7 +102,11 @@ class SettingViewModel @Inject constructor(
 
     fun onEnableFingerprintVerificationChanged(enable: Boolean) {
         viewModelScope.launch {
-            settingRepository.updateEnableFingerprintVerification(enable)
+            if (enable) {
+                dialogState = DialogState.Shown(SettingDialogEnum.VERIFY_PASSWORD)
+            } else {
+                settingRepository.updateEnableFingerprintVerification(false)
+            }
         }
     }
 
