@@ -218,7 +218,7 @@ internal fun AboutUsScreen(
                 item {
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
-                        text = stringResource(id = R.string.app_name),
+                        text = stringResource(id = R.string.app_name_shown),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                 }

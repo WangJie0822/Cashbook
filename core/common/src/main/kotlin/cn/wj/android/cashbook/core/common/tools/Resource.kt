@@ -57,7 +57,6 @@ fun getStringById(@StringRes resId: Int, context: Context): String {
  * 根据资源id[resId] 获取 [Drawable]
  * > [context]
  */
-@JvmOverloads
 fun getDrawableById(
     @DrawableRes resId: Int,
     context: Context
@@ -69,7 +68,6 @@ fun getDrawableById(
  * 根据资源id[resId] 获取 尺寸数值[Float]，单位**px**
  * > [context]
  */
-@JvmOverloads
 fun getFloatDimensionById(@DimenRes resId: Int, context: Context): Float {
     return context.resources.getDimension(resId)
 }

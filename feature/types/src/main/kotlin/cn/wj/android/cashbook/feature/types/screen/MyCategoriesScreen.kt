@@ -110,7 +110,6 @@ internal fun MyCategoriesRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyCategoriesScreen(
     shouldDisplayBookmark: MyCategoriesBookmarkEnum,
