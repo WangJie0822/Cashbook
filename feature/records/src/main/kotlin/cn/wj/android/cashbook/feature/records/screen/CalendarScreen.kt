@@ -150,9 +150,7 @@ internal fun CalendarScreen(
             CashbookTopAppBar(onBackClick = onBackClick, title = {
                 Text(
                     text = "${selectedDate.year}-${selectedDate.monthValue.completeZero()}",
-                    modifier = Modifier
-                        .clickable(onClick = onDateClick)
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.clickable(onClick = onDateClick),
                 )
             })
         },

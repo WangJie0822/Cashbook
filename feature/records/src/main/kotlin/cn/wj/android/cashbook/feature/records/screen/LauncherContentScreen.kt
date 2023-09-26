@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BackdropScaffold
-import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
@@ -36,6 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -167,7 +169,6 @@ internal fun LauncherContentScreen(
     onRequestDismissSheet: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
-    scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
 ) {
     // 提示文本
     val deleteFailedFormatText = stringResource(id = R.string.delete_failed_format)
@@ -226,11 +227,24 @@ internal fun LauncherContentScreen(
                 }
 
                 is LauncherContentUiState.Success -> {
+                    val revealedColor = MaterialTheme.colorScheme.tertiaryContainer
+                    var backLayerBackgroundColor by remember {
+                        mutableStateOf(revealedColor)
+                    }
                     BackdropScaffold(
-                        scaffoldState = scaffoldState,
+                        scaffoldState = rememberBackdropScaffoldState(
+                            initialValue = BackdropValue.Revealed,
+                            confirmStateChange = {
+                                backLayerBackgroundColor = if (it == BackdropValue.Revealed) {
+                                    revealedColor
+                                } else {
+                                    Color.Unspecified
+                                }
+                                true
+                            }),
                         appBar = { /* 使用上层 topBar 处理 */ },
                         peekHeight = paddingValues.calculateTopPadding(),
-                        backLayerBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        backLayerBackgroundColor = backLayerBackgroundColor,
                         backLayerContent = {
                             // 背景布局
                             BackLayerContent(
@@ -285,10 +299,7 @@ internal fun LauncherTopBar(
         title = {
             Text(
                 text = dateStr,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .clickable(onClick = onDateClick)
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.clickable(onClick = onDateClick),
             )
         },
         navigationIcon = {
