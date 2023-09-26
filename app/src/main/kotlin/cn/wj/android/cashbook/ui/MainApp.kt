@@ -276,7 +276,6 @@ fun CashbookNavHost(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-    // FIXME 二级界面返回快速点击左上角界面显示异常
     NavHost(
         navController = navController,
         startDestination = START_DESTINATION,

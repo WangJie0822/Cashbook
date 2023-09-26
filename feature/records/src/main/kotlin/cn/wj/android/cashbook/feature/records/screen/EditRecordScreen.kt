@@ -16,7 +16,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SheetValue
@@ -28,7 +27,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -48,6 +46,7 @@ import cn.wj.android.cashbook.core.design.component.Calculator
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.component.DatePickerDialog
 import cn.wj.android.cashbook.core.design.component.Loading
@@ -662,16 +661,12 @@ internal fun EditRecordTopBar(
     onTabSelected: (RecordTypeCategoryEnum) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    TopAppBar(
+    CashbookTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             navigationIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
         ),
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(imageVector = CashbookIcons.ArrowBack, contentDescription = null)
-            }
-        },
+        onBackClick = onBackClick,
         title = {
             if (uiState is EditRecordUiState.Success) {
                 TabRow(
