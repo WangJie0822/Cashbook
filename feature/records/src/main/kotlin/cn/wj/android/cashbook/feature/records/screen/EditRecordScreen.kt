@@ -542,12 +542,13 @@ private fun EditRecordScaffoldContent(
 
                                 // 关联的支出记录
                                 if (uiState.needRelated) {
+                                    val hasRelated = uiState.relatedCount > 0
                                     FilterChip(
-                                        selected = false,
+                                        selected = hasRelated,
                                         onClick = onRelatedRecordClick,
                                         label = {
                                             Text(
-                                                text = if (uiState.relatedCount > 0) {
+                                                text = if (hasRelated) {
                                                     stringResource(id = R.string.related_record_display_format).format(
                                                         uiState.relatedCount,
                                                         uiState.relatedAmount.withCNY()

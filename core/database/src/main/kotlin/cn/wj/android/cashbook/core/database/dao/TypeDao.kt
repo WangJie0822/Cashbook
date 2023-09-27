@@ -42,6 +42,9 @@ interface TypeDao {
     @Query("SELECT * FROM db_type WHERE id=:typeId")
     suspend fun queryById(typeId: Long): TypeTable?
 
+    @Query("SELECT * FROM db_type WHERE name=:name")
+    suspend fun queryByName(name: String): TypeTable?
+
     @Query("UPDATE db_type SET parent_id=:parentId, type_level=:typeLevel WHERE id=:id")
     suspend fun updateTypeLevel(
         id: Long,

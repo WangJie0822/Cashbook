@@ -81,17 +81,53 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun needRelated(typeId: Long): Boolean = withContext(coroutineContext) {
         val appDataModel = appPreferencesDataSource.appData.first()
-        typeId == appDataModel.refundTypeId || typeId == appDataModel.reimburseTypeId
+        val refundTypeId = if (appDataModel.refundTypeId > 0L) {
+            appDataModel.refundTypeId
+        } else {
+            val id = typeDao.queryByName("退款")?.id ?: 0L
+            if (id > 0L) {
+                appPreferencesDataSource.updateRefundTypeId(id)
+            }
+            id
+        }
+        val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
+            appDataModel.reimburseTypeId
+        } else {
+            val id = typeDao.queryByName("报销")?.id ?: 0L
+            if (id > 0L) {
+                appPreferencesDataSource.updateReimburseTypeId(id)
+            }
+            id
+        }
+        typeId == refundTypeId || typeId == reimburseTypeId
     }
 
     override suspend fun isReimburseType(typeId: Long): Boolean = withContext(coroutineContext) {
         val appDataModel = appPreferencesDataSource.appData.first()
-        typeId == appDataModel.reimburseTypeId
+        val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
+            appDataModel.reimburseTypeId
+        } else {
+            val id = typeDao.queryByName("报销")?.id ?: 0L
+            if (id > 0L) {
+                appPreferencesDataSource.updateReimburseTypeId(id)
+            }
+            id
+        }
+        typeId == reimburseTypeId
     }
 
     override suspend fun isRefundType(typeId: Long): Boolean = withContext(coroutineContext) {
         val appDataModel = appPreferencesDataSource.appData.first()
-        typeId == appDataModel.refundTypeId
+        val refundTypeId = if (appDataModel.refundTypeId > 0L) {
+            appDataModel.refundTypeId
+        } else {
+            val id = typeDao.queryByName("退款")?.id ?: 0L
+            if (id > 0L) {
+                appPreferencesDataSource.updateRefundTypeId(id)
+            }
+            id
+        }
+        typeId == refundTypeId
     }
 
     override suspend fun setReimburseType(typeId: Long): Unit = withContext(coroutineContext) {
