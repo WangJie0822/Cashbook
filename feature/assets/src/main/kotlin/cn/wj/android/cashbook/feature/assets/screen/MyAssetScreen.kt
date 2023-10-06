@@ -20,13 +20,11 @@ import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -141,9 +139,7 @@ internal fun MyAssetScreen(
                 CashbookTopAppBar(
                     onBackClick = onBackClick,
                     title = {
-                        if (scaffoldState.isConcealed) {
-                            Text(text = stringResource(id = R.string.my_assets))
-                        }
+                        Text(text = stringResource(id = R.string.my_assets))
                     },
                 )
             },
@@ -294,7 +290,7 @@ internal fun MyAssetBackdropScaffold(
         scaffoldState = scaffoldState,
         appBar = { /* 使用上层 topBar 处理 */ },
         peekHeight = paddingValues.calculateTopPadding(),
-        backLayerBackgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+        backLayerBackgroundColor = Color.Transparent,
         backLayerContent = {
             BackLayerContent(
                 paddingValues = paddingValues,
@@ -399,62 +395,60 @@ internal fun BackLayerContent(
     paddingValues: PaddingValues,
     uiState: MyAssetUiState,
 ) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onTertiaryContainer) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(bottom = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            when (uiState) {
-                MyAssetUiState.Loading -> {
-                    Loading()
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues)
+            .padding(bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        when (uiState) {
+            MyAssetUiState.Loading -> {
+                Loading()
+            }
 
-                is MyAssetUiState.Success -> {
-                    Text(
-                        text = stringResource(id = R.string.net_asset),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
-                    )
-                    Text(
-                        text = uiState.netAsset.withCNY(),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Row(
-                        modifier = Modifier.padding(top = 8.dp),
+            is MyAssetUiState.Success -> {
+                Text(
+                    text = stringResource(id = R.string.net_asset),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
+                )
+                Text(
+                    text = uiState.netAsset.withCNY(),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.total_asset),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
-                            )
-                            Text(
-                                text = uiState.totalAsset.withCNY(),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
-                        Column(
-                            modifier = Modifier
-                                .weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.total_liabilities),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
-                            )
-                            Text(
-                                text = uiState.totalLiabilities.withCNY(),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
+                        Text(
+                            text = stringResource(id = R.string.total_asset),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
+                        )
+                        Text(
+                            text = uiState.totalAsset.withCNY(),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.total_liabilities),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
+                        )
+                        Text(
+                            text = uiState.totalLiabilities.withCNY(),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
                     }
                 }
             }

@@ -27,7 +27,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -663,10 +662,6 @@ internal fun EditRecordTopBar(
     onBackClick: () -> Unit,
 ) {
     CashbookTopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            navigationIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-        ),
         onBackClick = onBackClick,
         title = {
             if (uiState is EditRecordUiState.Success) {

@@ -27,17 +27,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBackdropScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,6 +51,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
@@ -227,24 +223,11 @@ internal fun LauncherContentScreen(
                 }
 
                 is LauncherContentUiState.Success -> {
-                    val revealedColor = MaterialTheme.colorScheme.tertiaryContainer
-                    var backLayerBackgroundColor by remember {
-                        mutableStateOf(revealedColor)
-                    }
                     BackdropScaffold(
-                        scaffoldState = rememberBackdropScaffoldState(
-                            initialValue = BackdropValue.Revealed,
-                            confirmStateChange = {
-                                backLayerBackgroundColor = if (it == BackdropValue.Revealed) {
-                                    revealedColor
-                                } else {
-                                    Color.Unspecified
-                                }
-                                true
-                            }),
+                        scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
                         appBar = { /* 使用上层 topBar 处理 */ },
                         peekHeight = paddingValues.calculateTopPadding(),
-                        backLayerBackgroundColor = backLayerBackgroundColor,
+                        backLayerBackgroundColor = Color.Transparent,
                         backLayerContent = {
                             // 背景布局
                             BackLayerContent(
@@ -292,7 +275,7 @@ internal fun LauncherTopBar(
     onCalendarClick: () -> Unit,
     onAnalyticsClick: () -> Unit,
 ) {
-    TopAppBar(
+    CashbookTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
         ),
@@ -349,27 +332,25 @@ private fun BackLayerContent(
     monthBalance: String,
     modifier: Modifier = Modifier,
 ) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onTertiaryContainer) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(16.dp),
-        ) {
-            Text(text = stringResource(id = R.string.month_income))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = monthIncome.withCNY())
-            Spacer(modifier = Modifier.height(24.dp))
-            Row {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "${stringResource(id = R.string.month_expend)} ${monthExpand.withCNY()}",
-                )
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "${stringResource(id = R.string.month_balance)} ${monthBalance.withCNY()}",
-                )
-            }
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(paddingValues)
+            .padding(16.dp),
+    ) {
+        Text(text = stringResource(id = R.string.month_income))
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = monthIncome.withCNY())
+        Spacer(modifier = Modifier.height(24.dp))
+        Row {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "${stringResource(id = R.string.month_expend)} ${monthExpand.withCNY()}",
+            )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "${stringResource(id = R.string.month_balance)} ${monthBalance.withCNY()}",
+            )
         }
     }
 }

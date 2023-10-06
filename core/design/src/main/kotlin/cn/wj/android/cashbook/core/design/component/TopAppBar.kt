@@ -30,15 +30,15 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashbookTopAppBar(
+    title: @Composable () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
-    TopAppBar(
+    CashbookTopAppBar(
         title = title,
         modifier = modifier,
         navigationIcon = {
@@ -57,6 +57,28 @@ fun CashbookTopAppBar(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CashbookTopAppBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+    scrollBehavior: TopAppBarScrollBehavior? = null
+) {
+    TopAppBar(
+        title = title,
+        modifier = modifier,
+        navigationIcon = navigationIcon,
+        actions = actions,
+        windowInsets = windowInsets,
+        colors = colors,
+        scrollBehavior = scrollBehavior,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
@@ -64,9 +86,8 @@ fun CommonTopBarPreview() {
     CashbookTheme {
         CashbookGradientBackground {
             Column {
-                CashbookTopAppBar(onBackClick = { })
                 CashbookTopAppBar(title = { Text(text = "标题") }, onBackClick = { })
-                CashbookTopAppBar(onBackClick = { }, actions = {
+                CashbookTopAppBar(title = { Text(text = "标题") }, onBackClick = { }, actions = {
                     IconButton(onClick = { }) {
                         Icon(imageVector = CashbookIcons.Menu, contentDescription = null)
                     }

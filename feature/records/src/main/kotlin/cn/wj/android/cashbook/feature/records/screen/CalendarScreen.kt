@@ -239,6 +239,69 @@ internal fun CalendarScreen(
                         }
 
                         is CalendarUiState.Success -> {
+                            item {
+                                Card(
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                        .padding(top = 8.dp),
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 16.dp)
+                                    ) {
+                                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer) {
+                                            ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
+                                                Text(
+                                                    text = stringResource(id = R.string.month_income),
+                                                    textAlign = TextAlign.Center,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                                Text(
+                                                    text = stringResource(id = R.string.month_expend),
+                                                    textAlign = TextAlign.Center,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                                Text(
+                                                    text = stringResource(id = R.string.month_balance),
+                                                    textAlign = TextAlign.Center,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                            }
+                                        }
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp, bottom = 16.dp),
+                                    ) {
+                                        ProvideTextStyle(value = MaterialTheme.typography.labelMedium) {
+                                            Text(
+                                                text = uiState.monthIncome.withCNY(),
+                                                color = LocalExtendedColors.current.income,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            Text(
+                                                text = uiState.monthExpand.withCNY(),
+                                                color = LocalExtendedColors.current.expenditure,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            Text(
+                                                text = uiState.monthBalance.withCNY(),
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                    alpha = 0.5f
+                                                ),
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                             if (uiState.recordList.isEmpty()) {
                                 item {
                                     Empty(
@@ -247,69 +310,6 @@ internal fun CalendarScreen(
                                     )
                                 }
                             } else {
-                                item {
-                                    Card(
-                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
-                                            .padding(top = 8.dp),
-                                    ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 16.dp)
-                                        ) {
-                                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimaryContainer) {
-                                                ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
-                                                    Text(
-                                                        text = stringResource(id = R.string.month_income),
-                                                        textAlign = TextAlign.Center,
-                                                        modifier = Modifier.weight(1f)
-                                                    )
-                                                    Text(
-                                                        text = stringResource(id = R.string.month_expend),
-                                                        textAlign = TextAlign.Center,
-                                                        modifier = Modifier.weight(1f)
-                                                    )
-                                                    Text(
-                                                        text = stringResource(id = R.string.month_balance),
-                                                        textAlign = TextAlign.Center,
-                                                        modifier = Modifier.weight(1f)
-                                                    )
-                                                }
-                                            }
-                                        }
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 8.dp, bottom = 16.dp),
-                                        ) {
-                                            ProvideTextStyle(value = MaterialTheme.typography.labelMedium) {
-                                                Text(
-                                                    text = uiState.monthIncome.withCNY(),
-                                                    color = LocalExtendedColors.current.income,
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
-                                                )
-                                                Text(
-                                                    text = uiState.monthExpand.withCNY(),
-                                                    color = LocalExtendedColors.current.expenditure,
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
-                                                )
-                                                Text(
-                                                    text = uiState.monthBalance.withCNY(),
-                                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
-                                                        alpha = 0.5f
-                                                    ),
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
                                 items(uiState.recordList) {
                                     RecordListItem(
                                         item = it,

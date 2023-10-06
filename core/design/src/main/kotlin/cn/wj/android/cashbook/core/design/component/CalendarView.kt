@@ -188,8 +188,8 @@ internal fun MonthView(
                     val isToday = nowDate == currentDate
                     val textColor = when {
                         isLastMonth || isNextMonth -> MaterialTheme.colorScheme.onSurface.copy(0.3f)
-                        selected -> MaterialTheme.colorScheme.onPrimaryContainer
-                        isToday -> MaterialTheme.colorScheme.secondary
+                        selected -> MaterialTheme.colorScheme.onSecondaryContainer
+                        isToday -> MaterialTheme.colorScheme.primary
                         else -> MaterialTheme.colorScheme.onSurface
                     }
                     val textWeight = if (isToday) {
@@ -209,7 +209,7 @@ internal fun MonthView(
                         .weight(1f)
                         .align(Alignment.CenterVertically)
                         .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
                             shape = ShapeDefaults.Small,
                         )
                     Box(

@@ -81,7 +81,7 @@ internal fun MarkdownScreen(
     CashbookScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(onBackClick = onBackClick)
+            CashbookTopAppBar(title = {}, onBackClick = onBackClick)
         }
     ) { paddingValues ->
         Box(

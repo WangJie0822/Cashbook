@@ -14,7 +14,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -102,19 +101,31 @@ val DarkAndroidColorScheme = darkColorScheme(
 )
 
 val LightExtendedColors = ExtendedColors(
-    selected = md_theme_light_inversePrimary,
-    unselected = md_theme_light_outline,
-    income = Color(0xFF00ACC1),
-    expenditure = Color(0xFFD7072F),
-    transfer = Color(0xFF2196F3),
+    quaternary = light_quaternary,
+    onQuaternary = light_onQuaternary,
+    quaternaryContainer = light_quaternaryContainer,
+    onQuaternaryContainer = light_onQuaternaryContainer,
+    selected = light_selected,
+    unselected = light_unselected,
+    income = light_income,
+    expenditure = light_expenditure,
+    transfer = light_transfer,
+    github = light_github,
+    gitee = light_gitee,
 )
 
 val DarkExtendedColors = ExtendedColors(
-    selected = md_theme_dark_inversePrimary,
-    unselected = md_theme_dark_outline,
-    income = Color(0xFF00838F),
-    expenditure = Color(0xFFD7072F),
-    transfer = Color(0xFF2196F3),
+    quaternary = dark_quaternary,
+    onQuaternary = dark_onQuaternary,
+    quaternaryContainer = dark_quaternaryContainer,
+    onQuaternaryContainer = dark_onQuaternaryContainer,
+    selected = dark_selected,
+    unselected = dark_unselected,
+    income = dark_income,
+    expenditure = dark_expenditure,
+    transfer = dark_transfer,
+    github = dark_github,
+    gitee = dark_gitee,
 )
 
 /**
@@ -143,8 +154,8 @@ fun CashbookTheme(
     // 渐变色
     val emptyGradientColors = GradientColors(container = colorScheme.surfaceColorAtElevation(2.dp))
     val defaultGradientColors = GradientColors(
-        top = colorScheme.inverseOnSurface,
-        bottom = colorScheme.primaryContainer,
+        top = colorScheme.surface,
+        bottom = colorScheme.tertiaryContainer,
         container = colorScheme.surface,
     )
     val gradientColors = when {
