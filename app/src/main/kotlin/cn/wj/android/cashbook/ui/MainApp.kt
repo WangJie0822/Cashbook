@@ -57,6 +57,7 @@ import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.popBackStackSafety
 import cn.wj.android.cashbook.feature.assets.navigation.EditRecordSelectAssetBottomSheetContent
 import cn.wj.android.cashbook.feature.assets.navigation.assetInfoScreen
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
@@ -319,28 +320,28 @@ fun CashbookNavHost(
                 // 用户协议及隐私政策
                 navController.naviToMarkdown(MarkdownTypeEnum.PRIVACY_POLICY)
             },
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 设置
         settingScreen(
             onRequestNaviToBackupAndRecovery = navController::naviToBackupAndRecovery,
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
             onShowSnackbar = onShowSnackbar,
         )
         // Markdown 显示界面
         markdownScreen(
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 备份与恢复
         backupAndRecoveryScreen(
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
             onShowSnackbar = onShowSnackbar,
         )
 
         // 我的标签
         myTagsScreen(
             onRequestNaviToTagStatistic = { /* TODO */ },
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
 
         // 编辑记录
@@ -370,11 +371,11 @@ fun CashbookNavHost(
                 )
             },
             onRequestNaviToSelectRelatedRecord = navController::naviToSelectRelatedRecord,
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 选择关联记录
         selectRelatedRecordScreen(
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 记录日历
         calendarScreen(
@@ -385,7 +386,7 @@ fun CashbookNavHost(
                     onRequestDismissSheet = onRequestDismissSheet,
                 )
             },
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
             onShowSnackbar = onShowSnackbar,
         )
 
@@ -394,7 +395,7 @@ fun CashbookNavHost(
             onRequestNaviToAssetInfo = navController::naviToAssetInfo,
             onRequestNaviToAddAsset = navController::naviToEditAsset,
             onRequestNaviToInvisibleAsset = {/*TODO*/ },
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 资产信息
         assetInfoScreen(
@@ -413,27 +414,27 @@ fun CashbookNavHost(
                 )
             },
             onRequestNaviToEditAsset = navController::naviToEditAsset,
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 编辑资产
         editAssetScreen(
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
 
         // 我的账本
         myBooksScreen(
             onRequestNaviToEditBook = navController::naviToEditBook,
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 编辑账本
         editBookScreen(
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
 
         // 我的分类
         myCategoriesScreen(
             onRequestNaviToTypeStatistics = {  /*TODO*/ },
-            onRequestPopBackStack = navController::popBackStack,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
     }
 }

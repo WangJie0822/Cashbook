@@ -13,10 +13,6 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,18 +42,7 @@ fun CashbookTopAppBar(
         title = title,
         modifier = modifier,
         navigationIcon = {
-            var onBackClicked by remember {
-                mutableStateOf(false)
-            }
-            IconButton(onClick = {
-                if (!onBackClicked) {
-                    /* 从 [NavHost] 二级界面连续快速点击返回按钮，由于动画效果，会多次响应返回事件，
-                    [NavController.popBackStack] 在栈里只有一个页面的时候推出了多次，导致 [NavHost] 无法正常显示，
-                    因此在这里添加处理，返回事件只能执行一次 */
-                    onBackClicked = true
-                    onBackClick()
-                }
-            }) {
+            IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = CashbookIcons.ArrowBack,
                     contentDescription = null,
