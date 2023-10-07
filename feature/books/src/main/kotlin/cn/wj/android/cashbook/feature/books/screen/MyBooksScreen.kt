@@ -1,8 +1,10 @@
 package cn.wj.android.cashbook.feature.books.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -30,17 +35,13 @@ import androidx.constraintlayout.compose.Visibility
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.tools.dateFormat
-import cn.wj.android.cashbook.core.data.repository.fake.FakeBooksRepository
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.domain.usecase.GetSelectableBooksListUseCase
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksUiState
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksViewModel
 
@@ -52,9 +53,9 @@ import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksViewModel
  */
 @Composable
 internal fun MyBooksRoute(
+    onRequestNaviToEditBook: (Long) -> Unit,
+    onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
-    onRequestNaviToEditBook: (Long) -> Unit = {},
-    onRequestPopBackStack: () -> Unit = {},
     viewModel: MyBooksViewModel = hiltViewModel(),
 ) {
 
@@ -173,7 +174,12 @@ private fun MyBooksContent(
 
                                     ConstraintLayout(
                                         modifier = Modifier
-                                            .fillMaxWidth(),
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                            .paint(
+                                                painter = painterResource(id = R.drawable.im_top_background),
+                                                contentScale = ContentScale.Crop,
+                                            ),
                                     ) {
 
                                         val (selected, name, description, time, more) = createRefs()
@@ -217,11 +223,18 @@ private fun MyBooksContent(
                                         Text(
                                             text = stringResource(id = R.string.modify_time_with_colon) + item.data.modifyTime.dateFormat(),
                                             style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.constrainAs(time) {
-                                                top.linkTo(description.bottom, 16.dp)
-                                                bottom.linkTo(parent.bottom, 8.dp)
-                                                start.linkTo(parent.start, 8.dp)
-                                            },
+                                            modifier = Modifier
+                                                .constrainAs(time) {
+                                                    bottom.linkTo(parent.bottom, 8.dp)
+                                                    start.linkTo(parent.start, 8.dp)
+                                                }
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.primaryContainer.copy(
+                                                        alpha = 0.7f
+                                                    ),
+                                                    shape = MaterialTheme.shapes.small,
+                                                )
+                                                .padding(horizontal = 8.dp),
                                         )
                                         Box(
                                             modifier = Modifier.constrainAs(more) {
@@ -273,17 +286,4 @@ private fun MyBooksContent(
             }
         },
     )
-}
-
-@DevicePreviews
-@Composable
-private fun MyBooksScreenPreview() {
-    PreviewTheme {
-        MyBooksRoute(
-            viewModel = MyBooksViewModel(
-                getSelectableBooksListUseCase = GetSelectableBooksListUseCase(booksRepository = FakeBooksRepository),
-                booksRepository = FakeBooksRepository
-            )
-        )
-    }
 }

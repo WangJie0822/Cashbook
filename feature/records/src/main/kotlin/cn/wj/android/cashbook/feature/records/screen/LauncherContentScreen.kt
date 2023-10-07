@@ -31,11 +31,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBackdropScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -332,25 +336,54 @@ private fun BackLayerContent(
     monthBalance: String,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
+    Box(
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(paddingValues)
-            .padding(16.dp),
+            .height(230.dp)
+            .paint(
+                painter = painterResource(id = R.drawable.im_top_background),
+                contentScale = ContentScale.Crop,
+            ),
     ) {
-        Text(text = stringResource(id = R.string.month_income))
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = monthIncome.withCNY())
-        Spacer(modifier = Modifier.height(24.dp))
-        Row {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "${stringResource(id = R.string.month_expend)} ${monthExpand.withCNY()}",
-            )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "${stringResource(id = R.string.month_balance)} ${monthBalance.withCNY()}",
-            )
+        Column(
+            modifier = modifier
+                .padding(paddingValues)
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            val textModifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                    shape = MaterialTheme.shapes.small,
+                )
+                .padding(horizontal = 8.dp)
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimaryContainer) {
+                Text(
+                    modifier = textModifier,
+                    text = stringResource(id = R.string.month_income),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    modifier = textModifier,
+                    text = monthIncome.withCNY(),
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row {
+                    Box(modifier = Modifier.weight(1f)) {
+                        Text(
+                            modifier = textModifier,
+                            text = "${stringResource(id = R.string.month_expend)} ${monthExpand.withCNY()}",
+                        )
+                    }
+                    Box(modifier = Modifier.weight(1f)) {
+                        Text(
+                            modifier = textModifier,
+                            text = "${stringResource(id = R.string.month_balance)} ${monthBalance.withCNY()}",
+                        )
+                    }
+                }
+            }
+
         }
     }
 }
