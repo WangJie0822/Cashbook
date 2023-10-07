@@ -18,7 +18,7 @@ kotlinx-serialization-json = "1.5.1"
 
 # Google 相关
 # Material [版本查询](https://www.wanandroid.com/maven_pom/index?k=com.google.android.material)
-google-material = "1.9.0"
+google-material = "1.10.0"
 # zxing [Github](https://github.com/zxing/zxing)
 google-zxing = "3.5.1"
 # gson [Github](https://github.com/google/gson)
@@ -38,7 +38,7 @@ androidx-hilt = "1.0.0"
 # 脱糖
 android-desugarJdkLibs = "2.0.3"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
-android-gradle-plugin = "8.1.1"
+android-gradle-plugin = "8.1.2"
 
 # Androidx
 # legacy [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/legacy?hl=zh-cn)
@@ -57,30 +57,30 @@ androidx-constraintlayout-compose = "1.0.1"
 # multidex 分包 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/multidex?hl=zh-cn)
 androidx-multidex = "2.0.1"
 # core 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/core?hl=zh-cn)
-androidx-core = "1.10.1"
+androidx-core = "1.12.0"
 androidx-core-splashscreen = "1.0.1"
 # Compose 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/compose?hl=zh-cn)
-androidx-compose-bom = "2023.08.00"
+androidx-compose-bom = "2023.10.00"
 # Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin?hl=zh-cn)
 androidx-compose-compiler = "1.5.0"
 # activity 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/activity?hl=zh-cn)
-androidx-activity = "1.7.2"
+androidx-activity = "1.8.0"
 # Fragment 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/fragment?hl=zh-cn)
 androidx-fragment = "1.6.1"
 # 生命周期相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/lifecycle?hl=zh-cn)
-androidx-lifecycle = "2.6.1"
+androidx-lifecycle = "2.6.2"
 # Room 数据库相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/room?hl=zh-cn)
 androidx-room = "2.5.2"
 # Paging 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/paging?hl=zh-cn)
-androidx-paging = "3.2.0"
+androidx-paging = "3.2.1"
 # Navigation 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
-androidx-navigation = "2.7.1"
+androidx-navigation = "2.7.4"
 # WorkManager 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/work?hl=zh-cn)
 androidx-work = "2.8.1"
 # DataStore 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/datastore?hl=zh-cn)
 androidx-datastore = "1.0.0"
 # Annotation [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/annotation?hl=zh-cn)
-androidx-annotation = "1.6.0"
+androidx-annotation = "1.7.0"
 # DocumentFile [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
 androidx-documentfile = "1.0.1"
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/test?hl=zh-cn)
