@@ -6,9 +6,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.model.ResultModel
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.viewmodel.ConfirmDeleteRecordDialogViewModel
 
@@ -19,10 +17,10 @@ internal fun ConfirmDeleteRecordDialogRoute(
     onDialogDismiss: () -> Unit,
     viewModel: ConfirmDeleteRecordDialogViewModel = hiltViewModel(),
 ) {
+    val recordRemovingText = stringResource(id = R.string.record_removing)
     ConfirmDeleteRecordDialog(
-        recordId = recordId,
         onDeleteRecordConfirm = {
-            viewModel.onDeleteRecordConfirm(it, onResult)
+            viewModel.onDeleteRecordConfirm(recordRemovingText, recordId, onResult)
         },
         onDialogDismiss = onDialogDismiss,
     )
@@ -30,8 +28,7 @@ internal fun ConfirmDeleteRecordDialogRoute(
 
 @Composable
 internal fun ConfirmDeleteRecordDialog(
-    recordId: Long,
-    onDeleteRecordConfirm: (Long) -> Unit,
+    onDeleteRecordConfirm: () -> Unit,
     onDialogDismiss: () -> Unit,
 ) {
     AlertDialog(
@@ -40,9 +37,7 @@ internal fun ConfirmDeleteRecordDialog(
             Text(text = stringResource(id = R.string.record_delete_hint))
         },
         confirmButton = {
-            TextButton(onClick = {
-                onDeleteRecordConfirm.invoke(recordId)
-            }) {
+            TextButton(onClick = onDeleteRecordConfirm) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
@@ -52,16 +47,4 @@ internal fun ConfirmDeleteRecordDialog(
             }
         },
     )
-}
-
-@DevicePreviews
-@Composable
-private fun ConfirmDeleteRecordDialogPreview() {
-    PreviewTheme {
-        ConfirmDeleteRecordDialog(
-            recordId = -1L,
-            onDeleteRecordConfirm = {},
-            onDialogDismiss = {},
-        )
-    }
 }
