@@ -56,6 +56,7 @@ import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAut
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.LocalNavController
+import cn.wj.android.cashbook.core.ui.ProgressDialog
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.popBackStackSafety
 import cn.wj.android.cashbook.feature.assets.navigation.EditRecordSelectAssetBottomSheetContent
@@ -194,6 +195,11 @@ private fun MainAppScreen(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
+
+        // 全局进度弹窗
+        ProgressDialog()
+
+        // 显示 UI
         when (uiState) {
             MainAppUiState.Loading -> {
                 Loading(modifier = Modifier.align(Alignment.Center))

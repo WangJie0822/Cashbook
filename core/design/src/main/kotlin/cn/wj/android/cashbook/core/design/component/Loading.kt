@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,15 +27,16 @@ fun Loading(
     hintText: String = LocalDefaultLoadingHint.current,
 ) {
     Column(
-        modifier = modifier.defaultMinSize(minHeight = 120.dp),
+        modifier = modifier
+            .defaultMinSize(minHeight = 120.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CircularProgressIndicator()
+        LinearProgressIndicator()
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(16.dp),
+                .height(32.dp),
         )
         Text(text = hintText, color = LocalContentColor.current.copy(0.5f))
     }

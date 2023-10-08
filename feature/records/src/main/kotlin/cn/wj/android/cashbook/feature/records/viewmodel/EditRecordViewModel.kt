@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
@@ -335,7 +336,7 @@ class EditRecordViewModel @Inject constructor(
     }
 
     /** 保存记录 */
-    fun trySave(onSuccess: () -> Unit) {
+    fun trySave(hintText: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val recordEntity = _displayRecordData.first()
             if (recordEntity.amount.toDoubleOrZero() == 0.0) {
@@ -350,7 +351,7 @@ class EditRecordViewModel @Inject constructor(
                 shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_NOT_MATCH_CATEGORY
                 return@launch
             }
-            try {
+            runCatchWithProgress(hint = hintText, cancelable = false) {
                 saveRecordUseCase(
                     recordModel = recordEntity.copy(
                         relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
@@ -360,8 +361,8 @@ class EditRecordViewModel @Inject constructor(
                     tagIdList = displayTagIdListData.first(),
                     relatedRecordIdList = _relatedRecordIdData.first(),
                 )
-                onSuccess.invoke()
-            } catch (throwable: Throwable) {
+                onSuccess()
+            }.getOrElse { throwable ->
                 // 保存失败
                 this@EditRecordViewModel.logger().e(throwable, "onSaveClick()")
                 shouldDisplayBookmark = EditRecordBookmarkEnum.SAVE_FAILED

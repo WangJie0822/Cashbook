@@ -10,6 +10,7 @@ import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainte
 import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHint
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.ui.LocalBackPressedDispatcher
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogHint
 import cn.wj.android.cashbook.core.ui.R
 
 sealed interface ActivityUiState {
@@ -30,6 +31,7 @@ internal fun ProvideLocalState(
         LocalBackPressedDispatcher provides onBackPressedDispatcher,
         LocalDefaultEmptyImagePainter provides painterResource(id = R.drawable.vector_no_data_200),
         LocalDefaultLoadingHint provides stringResource(id = R.string.data_in_loading),
+        LocalProgressDialogHint provides stringResource(id = R.string.progress_loading_default),
         content = content
     )
 }

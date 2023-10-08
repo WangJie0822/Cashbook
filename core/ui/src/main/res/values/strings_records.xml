@@ -47,4 +47,5 @@
     <string name="related">已关联</string>
     <string name="refund_reimbursed">已退款|报销</string>
     <string name="refund_reimbursed_format">已退款|报销（%1$s）</string>
+    <string name="record_saving">记录保存中…</string>
 </resources>

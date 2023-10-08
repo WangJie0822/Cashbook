@@ -93,13 +93,14 @@ internal fun EditRecordRoute(
     },
 ) {
 
+    val savingHintText = stringResource(id = R.string.record_saving)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selectedTypeCategory by viewModel.selectedTypeCategoryData.collectAsStateWithLifecycle()
     val tagText by viewModel.tagTextData.collectAsStateWithLifecycle()
     val selectedTagIdList by viewModel.displayTagIdListData.collectAsStateWithLifecycle()
 
     val selectedTypeId = uiState.selectedTypeId
-
     EditRecordScreen(
         uiState = uiState,
         dialogState = viewModel.dialogState,
@@ -145,7 +146,12 @@ internal fun EditRecordRoute(
         },
         onReimbursableClick = viewModel::switchReimbursable,
         onRelatedRecordClick = onRequestNaviToSelectRelatedRecord,
-        onSaveClick = { viewModel.trySave(onSuccess = onRequestPopBackStack) },
+        onSaveClick = {
+            viewModel.trySave(
+                hintText = savingHintText,
+                onSuccess = onRequestPopBackStack,
+            )
+        },
         modifier = modifier,
     )
 }
