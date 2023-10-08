@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.common.ext.decimalFormat
+import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
@@ -35,6 +36,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
+import java.math.BigDecimal
 
 /**
  * 记录详情 sheet 内容
@@ -43,7 +45,6 @@ import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRo
  * @param onRequestNaviToEditRecord 导航到编辑记录
  * @param onRequestDismissSheet 隐藏 sheet
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RecordDetailsSheet(
     recordData: RecordViewsEntity?,
@@ -198,7 +199,43 @@ internal fun RecordDetailsSheet(
                         },
                     )
 
-                    // TODO 关联的记录
+                    if (recordData.relatedRecord.isNotEmpty()
+                        && (recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE
+                                || recordData.typeCategory == RecordTypeCategoryEnum.INCOME)
+                    ) {
+                        // 有关联记录，且是收入、支出类型
+                        val list = recordData.relatedRecord
+                        TransparentListItem(
+                            headlineContent = { Text(text = stringResource(id = R.string.related_record)) },
+                            trailingContent = {
+                                val text =
+                                    if (recordData.typeCategory == RecordTypeCategoryEnum.INCOME) {
+                                        // 收入类型，报销 or 退款，计算关联记录的金额
+                                        var total = BigDecimal.ZERO
+                                        list.forEach {
+                                            total += (it.amount.toBigDecimalOrZero() + it.charges.toBigDecimalOrZero() - it.concessions.toBigDecimalOrZero())
+                                        }
+                                        stringResource(id = R.string.related_record_display_format).format(
+                                            list.size,
+                                            total.decimalFormat().withCNY()
+                                        )
+                                    } else {
+                                        // 支出类型，被退款 or 被报销，计算金额
+                                        var total = BigDecimal.ZERO
+                                        list.forEach {
+                                            total += (it.amount.toBigDecimalOrZero() - it.charges.toBigDecimalOrZero())
+                                        }
+                                        stringResource(id = R.string.refund_reimbursed_format).format(
+                                            total.decimalFormat().withCNY()
+                                        )
+                                    }
+                                Text(
+                                    text = text,
+                                    style = MaterialTheme.typography.labelLarge,
+                                )
+                            },
+                        )
+                    }
 
                     recordData.assetName?.let { assetName ->
                         // 资产

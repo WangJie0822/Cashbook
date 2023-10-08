@@ -46,4 +46,5 @@
     <string name="time">时间</string>
     <string name="related">已关联</string>
     <string name="refund_reimbursed">已退款|报销</string>
+    <string name="refund_reimbursed_format">已退款|报销（%1$s）</string>
 </resources>
