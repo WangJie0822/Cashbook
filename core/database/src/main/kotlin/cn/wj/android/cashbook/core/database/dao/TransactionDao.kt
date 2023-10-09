@@ -88,7 +88,7 @@ interface TransactionDao {
         relatedRecordIdList: List<Long>,
     ) {
         // 删除旧数据
-        deleteRecordTransaction(record)
+        deleteRecordTransaction(record.id)
         // 插入新数据
         insertRecordTransaction(
             record = record,
@@ -150,11 +150,11 @@ interface TransactionDao {
                 val balance =
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - recordAmount
+                        asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
 
                     } else {
                         // 非信用卡账户，余额 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + recordAmount
+                        asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
                     }
                 // 更新资产
                 updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
@@ -182,7 +182,10 @@ interface TransactionDao {
 
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun deleteRecordTransaction(recordId: Long) {
+    suspend fun deleteRecordTransaction(recordId: Long?) {
+        if (null == recordId) {
+            return
+        }
         // 获取记录信息
         val record =
             queryRecordById(recordId) ?: throw DataTransactionException("Record id not found")
@@ -237,11 +240,11 @@ interface TransactionDao {
                 val balance =
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                        asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
 
                     } else {
                         // 非信用卡账户，余额 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                        asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
                     }
                 // 更新资产
                 updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
@@ -301,8 +304,8 @@ interface TransactionDao {
         recordList.forEach { record ->
             val id = record.id
             if (null != id) {
-                deleteRecordRelationByRecordId(id)
                 deleteTagRelationByRecordId(id)
+                deleteRecordRelationByRecordId(id)
             }
             deleteRecord(record)
         }
