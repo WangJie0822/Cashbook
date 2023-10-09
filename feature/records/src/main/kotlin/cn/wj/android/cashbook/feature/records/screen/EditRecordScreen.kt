@@ -69,7 +69,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
  * @param recordId 记录id，`-1` 为新建
  * @param typeId 类型 id，默认为 `-1`
  * @param typeListContent 类型列表布局，参数：(类型大类, 已选择类型id, 类型选择回调, 头布局, 脚布局) -> [Unit]
- * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 是否是关联资产, 资产选择回调) -> [Unit]
+ * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 已选择资产id, 是否是关联资产, 资产选择回调) -> [Unit]
  * @param tagBottomSheetContent 选择标签抽屉布局，参数：(已选择标签id列表, 标签id列表变化回调) -> [Unit]
  * @param onRequestPopBackStack 导航到上一级
  */
@@ -79,10 +79,10 @@ internal fun EditRecordRoute(
     typeId: Long,
     typeListContent: @Composable (
         RecordTypeCategoryEnum, Long, (Long) -> Unit,
-        @Composable (modifier: Modifier) -> Unit,
-        @Composable (modifier: Modifier) -> Unit,
+        @Composable (Modifier) -> Unit,
+        @Composable (Modifier) -> Unit,
     ) -> Unit,
-    assetBottomSheetContent: @Composable (Long, Boolean, (Long) -> Unit) -> Unit,
+    assetBottomSheetContent: @Composable (Long, Long, Boolean, (Long) -> Unit) -> Unit,
     tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit,
     onRequestNaviToSelectRelatedRecord: () -> Unit,
     onRequestPopBackStack: () -> Unit,
@@ -100,7 +100,6 @@ internal fun EditRecordRoute(
     val tagText by viewModel.tagTextData.collectAsStateWithLifecycle()
     val selectedTagIdList by viewModel.displayTagIdListData.collectAsStateWithLifecycle()
 
-    val selectedTypeId = uiState.selectedTypeId
     EditRecordScreen(
         uiState = uiState,
         dialogState = viewModel.dialogState,
@@ -122,22 +121,39 @@ internal fun EditRecordRoute(
         onConcessionsClick = viewModel::displayConcessions,
         onConcessionsChange = viewModel::updateConcessions,
         typeListContent = { headerContent, footerContent ->
-            typeListContent(
-                selectedTypeCategory,
-                selectedTypeId,
-                viewModel::updateType,
-                headerContent,
-                footerContent
-            )
+            (uiState as? EditRecordUiState.Success)?.run {
+                typeListContent(
+                    selectedTypeCategory,
+                    selectedTypeId,
+                    viewModel::updateType,
+                    headerContent,
+                    footerContent
+                )
+            }
+
         },
         onRemarkChange = viewModel::updateRemark,
         onAssetClick = viewModel::displayAssetSheet,
         onRelatedAssetClick = viewModel::displayRelatedAssetSheet,
         selectAssetBottomSheetContent = {
-            assetBottomSheetContent(selectedTypeId, false, viewModel::updateAsset)
+            (uiState as? EditRecordUiState.Success)?.run {
+                assetBottomSheetContent(
+                    selectedTypeId,
+                    selectedAssetId,
+                    false,
+                    viewModel::updateAsset
+                )
+            }
         },
         selectRelatedAssetBottomSheetContent = {
-            assetBottomSheetContent(selectedTypeId, true, viewModel::updateRelatedAsset)
+            (uiState as? EditRecordUiState.Success)?.run {
+                assetBottomSheetContent(
+                    selectedTypeId,
+                    selectedAssetId,
+                    true,
+                    viewModel::updateRelatedAsset
+                )
+            }
         },
         tagText = tagText,
         onTagClick = viewModel::displayTagSheet,

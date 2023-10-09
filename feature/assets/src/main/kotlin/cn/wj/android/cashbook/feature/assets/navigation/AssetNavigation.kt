@@ -40,6 +40,7 @@ fun NavController.naviToEditAsset(assetId: Long = -1L) {
  * 编辑记录界面选择资产抽屉
  *
  * @param currentTypeId 当前选择的类型 id
+ * @param selectedAssetId 已选择资产 id
  * @param isRelated 是否是关联资产
  * @param onAssetChange 资产变化回调
  * @param onRequestNaviToEditAsset 导航到编辑资产
@@ -47,12 +48,14 @@ fun NavController.naviToEditAsset(assetId: Long = -1L) {
 @Composable
 fun EditRecordSelectAssetBottomSheetContent(
     currentTypeId: Long,
+    selectedAssetId: Long,
     isRelated: Boolean,
     onAssetChange: (Long) -> Unit,
     onRequestNaviToEditAsset: () -> Unit,
 ) {
     EditRecordSelectAssetBottomSheetRoute(
         currentTypeId = currentTypeId,
+        selectedAssetId = selectedAssetId,
         isRelated = isRelated,
         onAssetChange = onAssetChange,
         onRequestNaviToEditAsset = onRequestNaviToEditAsset,

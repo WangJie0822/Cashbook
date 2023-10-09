@@ -17,9 +17,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.model.AssetModel
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
 import cn.wj.android.cashbook.feature.assets.component.NotAssociatedAssetListItem
@@ -29,19 +27,21 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.EditRecordSelectAssetBott
  * 编辑记录界面选择资产抽屉
  *
  * @param currentTypeId 当前选择的类型 id
+ * @param selectedAssetId 已选择资产 id
  * @param isRelated 是否是关联资产
  * @param onAssetChange 资产变化回调
  * @param onRequestNaviToEditAsset 导航到编辑资产
  */
 @Composable
 internal fun EditRecordSelectAssetBottomSheetRoute(
+    currentTypeId: Long,
+    selectedAssetId: Long,
+    isRelated: Boolean,
+    onAssetChange: (Long) -> Unit,
+    onRequestNaviToEditAsset: () -> Unit,
     modifier: Modifier = Modifier,
-    currentTypeId: Long = -1L,
-    isRelated: Boolean = false,
-    onAssetChange: (Long) -> Unit = {},
-    onRequestNaviToEditAsset: () -> Unit = {},
     viewModel: EditRecordSelectAssetBottomSheetViewModel = hiltViewModel<EditRecordSelectAssetBottomSheetViewModel>().apply {
-        update(currentTypeId, isRelated)
+        update(currentTypeId, selectedAssetId, isRelated)
     },
 ) {
     val assetList by viewModel.assetListData.collectAsStateWithLifecycle()
@@ -129,12 +129,4 @@ internal fun EditRecordSelectAssetBottomSheetScreen(
             }
         },
     )
-}
-
-@DevicePreviews
-@Composable
-private fun EditRecordSelectAssetBottomSheetScreenPreview() {
-    PreviewTheme {
-        EditRecordSelectAssetBottomSheetRoute()
-    }
 }

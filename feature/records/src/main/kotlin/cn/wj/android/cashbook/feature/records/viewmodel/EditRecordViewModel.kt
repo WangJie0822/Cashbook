@@ -134,6 +134,7 @@ class EditRecordViewModel @Inject constructor(
                 chargesText = record.charges.clearZero(),
                 concessionsText = record.concessions.clearZero(),
                 remarkText = record.remark,
+                selectedAssetId = record.assetId,
                 assetText = assetText,
                 relatedAssetText = relatedAssetText,
                 dateTimeText = record.recordTime,
@@ -442,9 +443,9 @@ class EditRecordViewModel @Inject constructor(
 }
 
 /** 界面 UI 状态 */
-sealed class EditRecordUiState(open val selectedTypeId: Long = -1L) {
+sealed interface EditRecordUiState {
     /** 加载中 */
-    data object Loading : EditRecordUiState()
+    data object Loading : EditRecordUiState
 
     /**
      * 加载完成
@@ -453,6 +454,7 @@ sealed class EditRecordUiState(open val selectedTypeId: Long = -1L) {
      * @param chargesText 手续费
      * @param concessionsText 优惠
      * @param remarkText 备注
+     * @param selectedAssetId 已选择资产 id
      * @param assetText 资产
      * @param relatedAssetText 关联资产
      * @param dateTimeText 日期时间
@@ -465,15 +467,16 @@ sealed class EditRecordUiState(open val selectedTypeId: Long = -1L) {
         val chargesText: String,
         val concessionsText: String,
         val remarkText: String,
+        val selectedAssetId: Long,
         val assetText: String,
         val relatedAssetText: String,
         val dateTimeText: String,
         val reimbursable: Boolean,
-        override val selectedTypeId: Long,
+        val selectedTypeId: Long,
         val needRelated: Boolean,
         val relatedCount: Int,
         val relatedAmount: String,
-    ) : EditRecordUiState()
+    ) : EditRecordUiState
 }
 
 private fun String.clearZero(): String {

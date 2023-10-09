@@ -364,9 +364,10 @@ fun CashbookNavHost(
                     footerContent = footerContent,
                 )
             },
-            assetBottomSheetContent = { currentTypeId, isRelated, onAssetChange ->
+            assetBottomSheetContent = { currentTypeId,selectedAssetId, isRelated, onAssetChange ->
                 EditRecordSelectAssetBottomSheetContent(
                     currentTypeId = currentTypeId,
+                    selectedAssetId = selectedAssetId,
                     isRelated = isRelated,
                     onAssetChange = onAssetChange,
                     onRequestNaviToEditAsset = navController::naviToEditAsset,
