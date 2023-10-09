@@ -177,7 +177,7 @@ internal fun EditAssetScreen(
         floatingActionButton = {
             if (uiState is EditAssetUiState.Success) {
                 CashbookFloatingActionButton(onClick = {
-                    if (!assetNameTextState.isValid || (uiState.isCreditCard && totalAmountTextState.isValid)) {
+                    if (!assetNameTextState.isValid || !(uiState.isCreditCard && totalAmountTextState.isValid)) {
                         // 不满足必要条件
                     } else {
                         onSaveClick(
@@ -256,6 +256,7 @@ internal fun EditAssetScreen(
                                     )
                                     Text(
                                         text = stringResource(id = uiState.classification.nameResId),
+                                        style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(horizontal = 8.dp)
                                     )
                                     Icon(
@@ -286,7 +287,10 @@ internal fun EditAssetScreen(
                             CompatTextField(
                                 textFieldState = totalAmountTextState,
                                 label = { Text(text = stringResource(id = R.string.total_amount)) },
-                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Next,
+                                    keyboardType = KeyboardType.Decimal,
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 8.dp)
@@ -298,7 +302,10 @@ internal fun EditAssetScreen(
                         CompatTextField(
                             textFieldState = balanceTextState,
                             label = { Text(text = stringResource(id = if (uiState.isCreditCard) R.string.arrears else R.string.balance)) },
-                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                imeAction = ImeAction.Next,
+                                keyboardType = KeyboardType.Decimal,
+                            ),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 8.dp)

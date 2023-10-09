@@ -48,12 +48,7 @@ class MyAssetViewModel @Inject constructor(
             list.forEach { assetModel ->
                 if (assetModel.type.isCreditCard() || assetModel.classification == AssetClassificationEnum.BORROW) {
                     // 信用卡和债务借入
-                    totalLiabilities += if (assetModel.type.isCreditCard()) {
-                        // 信用卡，总额度 - 可用
-                        (assetModel.totalAmount.toBigDecimalOrZero() - assetModel.balance.toBigDecimalOrZero())
-                    } else {
-                        assetModel.balance.toBigDecimalOrZero()
-                    }
+                    totalLiabilities += assetModel.balance.toBigDecimalOrZero()
                 } else {
                     totalAsset += assetModel.balance.toBigDecimalOrZero()
                 }
@@ -81,7 +76,7 @@ class MyAssetViewModel @Inject constructor(
 }
 
 sealed class MyAssetUiState {
-    object Loading : MyAssetUiState()
+    data object Loading : MyAssetUiState()
     data class Success(
         val totalAsset: String,
         val totalLiabilities: String,

@@ -21,7 +21,7 @@ import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
  * @param remark 备注
  * @param sort 排序
  * @param modifyTime 修改时间
- * @param balance 显示余额
+ * @param balance 显示余额，信用卡为已使用额度
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/3
  */
@@ -42,23 +42,4 @@ data class AssetModel(
     val sort: Int,
     val modifyTime: String,
     val balance: String,
-)
-
-val assetModelTestObject = AssetModel(
-    id = -1L,
-    booksId = -1L,
-    name = "默认资产",
-    iconResId = -1,
-    totalAmount = "1000",
-    billingDate = "",
-    repaymentDate = "",
-    type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
-    classification = AssetClassificationEnum.CASH,
-    invisible = false,
-    openBank = "",
-    cardNo = "",
-    remark = "",
-    sort = -1,
-    modifyTime = "",
-    balance = "200",
 )

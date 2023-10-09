@@ -2,12 +2,16 @@
 
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.string
+import cn.wj.android.cashbook.core.data.helper.nameResId
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
@@ -37,7 +41,8 @@ import kotlinx.coroutines.launch
 class EditAssetViewModel @Inject constructor(
     private val assetRepository: AssetRepository,
     getDefaultAssetUseCase: GetDefaultAssetUseCase,
-) : ViewModel() {
+    application: Application,
+) : AndroidViewModel(application) {
 
     /** 底部 Sheet 类型 */
     var bottomSheetData by mutableStateOf(EditAssetBottomSheetEnum.DISMISS)
@@ -110,7 +115,7 @@ class EditAssetViewModel @Inject constructor(
             viewModelScope.launch {
                 _mutableAssetInfo.tryEmit(
                     _displayAssetInfo.first().copy(
-                        name = classification.name,
+                        name = classification.nameResId.string(getApplication()),
                         type = typeTemp,
                         classification = classification,
                     )
