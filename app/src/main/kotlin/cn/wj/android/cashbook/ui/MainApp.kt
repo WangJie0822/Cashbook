@@ -84,10 +84,8 @@ import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
 import cn.wj.android.cashbook.feature.settings.navigation.backupAndRecoveryScreen
-import cn.wj.android.cashbook.feature.settings.navigation.markdownScreen
 import cn.wj.android.cashbook.feature.settings.navigation.naviToAboutUs
 import cn.wj.android.cashbook.feature.settings.navigation.naviToBackupAndRecovery
-import cn.wj.android.cashbook.feature.settings.navigation.naviToMarkdown
 import cn.wj.android.cashbook.feature.settings.navigation.naviToSetting
 import cn.wj.android.cashbook.feature.settings.navigation.settingScreen
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
@@ -160,6 +158,8 @@ fun MainApp(
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+                val context = LocalContext.current
+
                 MainAppScreen(
                     uiState = uiState,
                     onAgreeProtocolClick = viewModel::agreeProtocol,
@@ -169,7 +169,12 @@ fun MainApp(
                     onFingerprintClick = viewModel::showFingerprintVerify,
                     onFingerprintVerifySuccess = viewModel::onFingerprintVerifySuccess,
                     onFingerprintVerifyError = viewModel::onFingerprintVerifyError,
-                    onPrivacyPolicyClick = { navController.naviToMarkdown(MarkdownTypeEnum.PRIVACY_POLICY) },
+                    onPrivacyPolicyClick = {
+                        MarkdownActivity.actionStart(
+                            context,
+                            MarkdownTypeEnum.PRIVACY_POLICY
+                        )
+                    },
                     navController = navController,
                     onShowSnackbar = onShowSnackbar,
                     modifier = Modifier.padding(paddingValues),
@@ -283,6 +288,7 @@ fun CashbookNavHost(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     NavHost(
         navController = navController,
         startDestination = START_DESTINATION,
@@ -320,11 +326,11 @@ fun CashbookNavHost(
             onShowSnackbar = onShowSnackbar,
             onRequestNaviToChangelog = {
                 // 版本信息
-                navController.naviToMarkdown(MarkdownTypeEnum.CHANGELOG)
+                MarkdownActivity.actionStart(context, MarkdownTypeEnum.CHANGELOG)
             },
             onRequestNaviToPrivacyPolicy = {
                 // 用户协议及隐私政策
-                navController.naviToMarkdown(MarkdownTypeEnum.PRIVACY_POLICY)
+                MarkdownActivity.actionStart(context, MarkdownTypeEnum.PRIVACY_POLICY)
             },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
@@ -333,10 +339,6 @@ fun CashbookNavHost(
             onRequestNaviToBackupAndRecovery = navController::naviToBackupAndRecovery,
             onRequestPopBackStack = navController::popBackStackSafety,
             onShowSnackbar = onShowSnackbar,
-        )
-        // Markdown 显示界面
-        markdownScreen(
-            onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 备份与恢复
         backupAndRecoveryScreen(

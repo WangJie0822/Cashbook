@@ -23,6 +23,7 @@
     <string name="no_more_prompt">不再提示</string>
     <string name="no_wifi_download_available_hint">未连接Wi-Fi，确定使用数据流量下载吗？</string>
     <string name="update">更新</string>
+    <string name="unknown_type">未知类型</string>
     <string name="version_info">版本信息</string>
     <string name="user_agreement_and_privacy_policy">用户协议和隐私政策</string>
     <string name="user_agreement_and_privacy_policy_hint_start">欢迎使用记账本APP！我们非常尊重并保护所有使用服务用户的个人隐私权，在使用记账本各项服务前，请您务必仔细阅读、透彻理解并同意接受</string>

@@ -17,18 +17,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.MarkdownViewModel
 import io.noties.markwon.Markwon
@@ -40,10 +38,10 @@ import io.noties.markwon.Markwon
  * @param onRequestPopBackStack 导航到上一级
  */
 @Composable
-internal fun MarkdownRoute(
+fun MarkdownRoute(
     modifier: Modifier = Modifier,
-    markdownType: MarkdownTypeEnum? = null,
-    onRequestPopBackStack: () -> Unit = {},
+    markdownType: MarkdownTypeEnum?,
+    onRequestPopBackStack: () -> Unit,
     viewModel: MarkdownViewModel = hiltViewModel<MarkdownViewModel>().apply {
         updateMarkdownType(markdownType)
     }
@@ -53,6 +51,11 @@ internal fun MarkdownRoute(
     val markdownData by viewModel.markdownData.collectAsStateWithLifecycle()
 
     MarkdownScreen(
+        title = when (markdownType) {
+            MarkdownTypeEnum.CHANGELOG -> stringResource(id = R.string.version_info)
+            MarkdownTypeEnum.PRIVACY_POLICY -> stringResource(id = R.string.user_agreement_and_privacy_policy)
+            else -> stringResource(id = R.string.unknown_type)
+        },
         isSyncing = isSyncing,
         markdownData = markdownData,
         onRetryClick = viewModel::onRetryClick,
@@ -64,6 +67,7 @@ internal fun MarkdownRoute(
 /**
  * Markdown 显示界面
  *
+ * @param title 标题文本
  * @param isSyncing 数据是否正在同步
  * @param markdownData Markdown 显示数据
  * @param onRetryClick 重试点击回调
@@ -72,60 +76,53 @@ internal fun MarkdownRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MarkdownScreen(
+    title: String,
     isSyncing: Boolean,
     markdownData: String,
     onRetryClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookScaffold(
-        modifier = modifier,
-        topBar = {
-            CashbookTopAppBar(title = {}, onBackClick = onBackClick)
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-        ) {
-            if (markdownData.isBlank()) {
-                Empty(
-                    hintText = stringResource(id = R.string.markdown_no_data_hint),
-                    button = {
-                        FilledTonalButton(onClick = onRetryClick) {
-                            if (isSyncing) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .size(16.dp),
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
+    CashbookGradientBackground {
+        CashbookScaffold(
+            modifier = modifier,
+            topBar = {
+                CashbookTopAppBar(title = { Text(text = title) }, onBackClick = onBackClick)
+            }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+            ) {
+                if (markdownData.isBlank()) {
+                    Empty(
+                        hintText = stringResource(id = R.string.markdown_no_data_hint),
+                        button = {
+                            FilledTonalButton(onClick = onRetryClick) {
+                                if (isSyncing) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(16.dp),
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(text = stringResource(id = R.string.retry))
                             }
-                            Text(text = stringResource(id = R.string.retry))
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.TopCenter),
-                )
-            } else {
-                Text(
-                    text = buildAnnotatedString {
-                        append(Markwon.create(LocalContext.current).toMarkdown(markdownData))
-                    },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .verticalScroll(state = rememberScrollState()),
-                )
+                        },
+                        modifier = Modifier.align(Alignment.TopCenter),
+                    )
+                } else {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(Markwon.create(LocalContext.current).toMarkdown(markdownData))
+                        },
+                        modifier = Modifier
+                            .verticalScroll(state = rememberScrollState())
+                            .padding(16.dp),
+                    )
+                }
             }
         }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun MarkdownScreenPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)
-    ) {
-        MarkdownRoute()
     }
 }

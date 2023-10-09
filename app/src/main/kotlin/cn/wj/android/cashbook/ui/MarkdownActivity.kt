@@ -1,5 +1,9 @@
 package cn.wj.android.cashbook.ui
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -10,23 +14,23 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
+import cn.wj.android.cashbook.feature.settings.screen.MarkdownRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MarkdownActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
         var uiState: ActivityUiState by mutableStateOf(ActivityUiState.Loading)
@@ -42,14 +46,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // uiState 为 Success 时关闭 Splash
-        splashScreen.setKeepOnScreenCondition {
-            when (uiState) {
-                ActivityUiState.Loading -> true
-                is ActivityUiState.Success -> false
-            }
-        }
-
         // 关闭系统装饰窗口，以允许应用自行处理
         enableEdgeToEdge()
 
@@ -60,8 +56,8 @@ class MainActivity : AppCompatActivity() {
             DisposableEffect(darkTheme) {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.auto(
-                        android.graphics.Color.TRANSPARENT,
-                        android.graphics.Color.TRANSPARENT,
+                        Color.TRANSPARENT,
+                        Color.TRANSPARENT,
                     ) { darkTheme },
                     navigationBarStyle = SystemBarStyle.auto(
                         lightScrim,
@@ -78,21 +74,31 @@ class MainActivity : AppCompatActivity() {
                 ProvideLocalState(
                     onBackPressedDispatcher = this.onBackPressedDispatcher,
                 ) {
-                    MainApp()
+                    MarkdownRoute(
+                        markdownType = MarkdownTypeEnum.ordinalOf(
+                            intent.getIntExtra(
+                                MARKDOWN_TYPE,
+                                -1
+                            )
+                        ),
+                        onRequestPopBackStack = ::finish
+                    )
                 }
             }
         }
     }
+
+    companion object {
+
+        private const val MARKDOWN_TYPE = "markdown_type"
+
+        fun actionStart(context: Context, type: MarkdownTypeEnum) {
+            context.startActivity(Intent(context, MarkdownActivity::class.java).apply {
+                if (context !is Activity) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                putExtra(MARKDOWN_TYPE, type.ordinal)
+            })
+        }
+    }
 }
-
-/**
- * The default light scrim, as defined by androidx and the platform:
- * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:activity/activity/src/main/java/androidx/activity/EdgeToEdge.kt;l=35-38;drc=27e7d52e8604a080133e8b842db10c89b4482598
- */
-internal val lightScrim = android.graphics.Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
-
-/**
- * The default dark scrim, as defined by androidx and the platform:
- * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:activity/activity/src/main/java/androidx/activity/EdgeToEdge.kt;l=40-44;drc=27e7d52e8604a080133e8b842db10c89b4482598
- */
-internal val darkScrim = android.graphics.Color.argb(0x80, 0x1b, 0x1b, 0x1b)
