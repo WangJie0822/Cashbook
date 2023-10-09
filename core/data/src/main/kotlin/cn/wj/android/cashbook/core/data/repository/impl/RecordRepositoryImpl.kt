@@ -57,7 +57,7 @@ class RecordRepositoryImpl @Inject constructor(
     ) = withContext(coroutineContext) {
         logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
         transactionDao.updateRecordTransaction(
-            recordTable = record.asTable(),
+            record = record.asTable(),
             tagIdList = tagIdList,
             needRelated = needRelated,
             relatedRecordIdList = relatedRecordIdList,

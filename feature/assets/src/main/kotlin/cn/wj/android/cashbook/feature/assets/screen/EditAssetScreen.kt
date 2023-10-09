@@ -50,6 +50,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
@@ -179,7 +180,7 @@ internal fun EditAssetScreen(
                     if (!assetNameTextState.isValid || (uiState.isCreditCard && totalAmountTextState.isValid)) {
                         // 不满足必要条件
                     } else {
-                        onSaveClick.invoke(
+                        onSaveClick(
                             assetNameTextState.text,
                             totalAmountTextState.text,
                             balanceTextState.text,
@@ -426,6 +427,8 @@ internal fun EditAssetScreen(
                                 )
                             },
                         )
+
+                        Footer(hintText = stringResource(id = R.string.footer_hint_default))
                     }
                 }
             }

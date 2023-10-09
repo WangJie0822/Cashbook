@@ -109,7 +109,11 @@ class EditAssetViewModel @Inject constructor(
             // 其它类型，保存
             viewModelScope.launch {
                 _mutableAssetInfo.tryEmit(
-                    _displayAssetInfo.first().copy(type = typeTemp, classification = classification)
+                    _displayAssetInfo.first().copy(
+                        name = classification.name,
+                        type = typeTemp,
+                        classification = classification,
+                    )
                 )
             }
             dismissBottomSheet()
@@ -200,7 +204,7 @@ sealed class EditAssetUiState(
     open val billingDate: String = "",
     open val repaymentDate: String = "",
 ) {
-    object Loading : EditAssetUiState()
+    data object Loading : EditAssetUiState()
 
     data class Success(
         val isCreditCard: Boolean,
