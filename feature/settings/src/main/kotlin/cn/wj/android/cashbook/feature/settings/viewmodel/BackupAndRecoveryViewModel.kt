@@ -1,15 +1,19 @@
 package cn.wj.android.cashbook.feature.settings.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogManager
+import cn.wj.android.cashbook.core.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,7 +35,8 @@ import kotlinx.coroutines.launch
 class BackupAndRecoveryViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     private val backupRecoveryManager: BackupRecoveryManager,
-) : ViewModel() {
+    application: Application,
+) : AndroidViewModel(application) {
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
@@ -68,6 +73,19 @@ class BackupAndRecoveryViewModel @Inject constructor(
             backupRecoveryManager.backupState,
             backupRecoveryManager.recoveryState
         ) { backup, recovery ->
+            if (backup == BackupRecoveryState.InProgress) {
+                ProgressDialogManager.show(
+                    hint = R.string.in_backup.string(getApplication()),
+                    cancelable = false,
+                )
+            } else if (recovery == BackupRecoveryState.InProgress) {
+                ProgressDialogManager.show(
+                    hint = R.string.in_recovery.string(getApplication()),
+                    cancelable = false,
+                )
+            } else {
+                ProgressDialogManager.dismiss()
+            }
             if (backup.code != 0) {
                 backup.code
             } else {

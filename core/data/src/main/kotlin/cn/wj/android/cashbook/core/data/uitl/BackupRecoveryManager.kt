@@ -550,8 +550,8 @@ sealed class BackupRecoveryState(open val code: Int = 0) {
         const val SUCCESS_RECOVERY = 2002
     }
 
-    object None : BackupRecoveryState()
-    object InProgress : BackupRecoveryState()
+    data object None : BackupRecoveryState()
+    data object InProgress : BackupRecoveryState()
     data class Failed(override val code: Int) : BackupRecoveryState()
     data class Success(override val code: Int) : BackupRecoveryState()
 }

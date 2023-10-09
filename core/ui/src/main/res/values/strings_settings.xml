@@ -97,6 +97,8 @@
     <string name="auto_backup">自动备份</string>
     <string name="each_day">每天一次</string>
     <string name="each_week">每周一次</string>
+    <string name="in_backup">备份中…</string>
+    <string name="in_recovery">恢复中…</string>
 
     <string name="please_select_backup_path_first">请先选择备份路径</string>
     <string name="unauthorized_path">未授权路径</string>
