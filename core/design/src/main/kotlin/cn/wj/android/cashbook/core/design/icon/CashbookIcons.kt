@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Fingerprint
@@ -63,4 +64,5 @@ object CashbookIcons {
     val CheckCircle = Icons.Filled.CheckCircle
     val Error = Icons.Filled.Error
     val Analytics = Icons.Filled.InsertChartOutlined
+    val ContentCopy = Icons.Filled.ContentCopy
 }

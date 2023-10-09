@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.ui.DialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,14 @@ class AssetInfoViewModel @Inject constructor(
     var viewRecordData by mutableStateOf<RecordViewsEntity?>(null)
         private set
 
+    /** 提示语状态 */
+    var shouldDisplayBookmark by mutableStateOf(false)
+        private set
+
+    /** 弹窗状态 */
+    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
+        private set
+
     /** 当前资产 id */
     private val assetIdData = MutableStateFlow(-1L)
 
@@ -40,6 +49,9 @@ class AssetInfoViewModel @Inject constructor(
             totalAmount = assetInfo?.totalAmount ?: "0",
             billingDate = assetInfo?.billingDate.orEmpty(),
             repaymentDate = assetInfo?.repaymentDate.orEmpty(),
+            openBank = assetInfo?.openBank.orEmpty(),
+            cardNo = assetInfo?.cardNo.orEmpty(),
+            remark = assetInfo?.remark.orEmpty(),
         )
     }
         .stateIn(
@@ -59,10 +71,26 @@ class AssetInfoViewModel @Inject constructor(
     fun dismissRecordDetailSheet() {
         viewRecordData = null
     }
+
+    fun displayMoreDialog() {
+        dialogState = DialogState.Shown(0)
+    }
+
+    fun dismissDialog() {
+        dialogState = DialogState.Dismiss
+    }
+
+    fun displayBookmark() {
+        shouldDisplayBookmark = true
+    }
+
+    fun dismissBookmark() {
+        shouldDisplayBookmark = false
+    }
 }
 
 sealed class AssetInfoUiState(val title: String = "") {
-    object Loading : AssetInfoUiState()
+    data object Loading : AssetInfoUiState()
 
     data class Success(
         private val assetName: String,
@@ -71,5 +99,11 @@ sealed class AssetInfoUiState(val title: String = "") {
         val totalAmount: String,
         val billingDate: String,
         val repaymentDate: String,
-    ) : AssetInfoUiState(title = assetName)
+        val openBank: String,
+        val cardNo: String,
+        val remark: String,
+    ) : AssetInfoUiState(title = assetName) {
+        val shouldDisplayMore: Boolean
+            get() = openBank.isNotBlank() || cardNo.isNotBlank() || remark.isNotBlank()
+    }
 }

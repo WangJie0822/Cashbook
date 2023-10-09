@@ -35,6 +35,10 @@ open class TextFieldState(
     open val isValid: Boolean
         get() = validator(text)
 
+    fun requestErrors() {
+        displayErrors = true
+    }
+
     fun onTextChange(text: String) {
         if (filter(text)) {
             this.text = text

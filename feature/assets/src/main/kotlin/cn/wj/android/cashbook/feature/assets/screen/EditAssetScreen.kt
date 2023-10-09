@@ -177,8 +177,11 @@ internal fun EditAssetScreen(
         floatingActionButton = {
             if (uiState is EditAssetUiState.Success) {
                 CashbookFloatingActionButton(onClick = {
-                    if (!assetNameTextState.isValid || !(uiState.isCreditCard && totalAmountTextState.isValid)) {
+                    if (!assetNameTextState.isValid || (uiState.isCreditCard && !totalAmountTextState.isValid)) {
                         // 不满足必要条件
+                        assetNameTextState.requestErrors()
+                        totalAmountTextState.requestErrors()
+
                     } else {
                         onSaveClick(
                             assetNameTextState.text,
@@ -373,6 +376,7 @@ internal fun EditAssetScreen(
                                         }
                                         Text(
                                             text = billingDateText,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             modifier = Modifier.padding(horizontal = 8.dp)
                                         )
                                         Icon(
@@ -403,6 +407,7 @@ internal fun EditAssetScreen(
                                             }
                                         Text(
                                             text = repaymentDateText,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             modifier = Modifier.padding(horizontal = 8.dp)
                                         )
                                         Icon(
