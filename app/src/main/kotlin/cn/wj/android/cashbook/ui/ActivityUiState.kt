@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.ui
 
 import androidx.activity.OnBackPressedDispatcher
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -50,8 +51,19 @@ internal fun shouldUseDarkTheme(
 ): Boolean = when (uiState) {
     ActivityUiState.Loading -> isSystemInDarkTheme()
     is ActivityUiState.Success -> when (uiState.darkMode) {
-        DarkModeEnum.FOLLOW_SYSTEM -> isSystemInDarkTheme()
-        DarkModeEnum.LIGHT -> false
-        DarkModeEnum.DARK -> true
+        DarkModeEnum.FOLLOW_SYSTEM -> {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            isSystemInDarkTheme()
+        }
+
+        DarkModeEnum.LIGHT -> {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            false
+        }
+
+        DarkModeEnum.DARK -> {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            true
+        }
     }
 }
