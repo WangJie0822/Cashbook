@@ -152,7 +152,7 @@ internal fun AssetInfoScreen(
                         if (uiState.shouldDisplayMore) {
                             IconButton(onClick = onRequestShowMoreDialog) {
                                 Icon(
-                                    imageVector = CashbookIcons.MoreVert,
+                                    imageVector = CashbookIcons.Info,
                                     contentDescription = null
                                 )
                             }
