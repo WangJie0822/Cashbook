@@ -50,6 +50,8 @@ interface RecordRepository {
     suspend fun getLastThreeMonthReimbursableRecordListByKeyword(keyword: String): List<RecordModel>
 
     suspend fun getLastThreeMonthRefundableRecordListByKeyword(keyword: String): List<RecordModel>
+
+    suspend fun getLastThreeMonthRecordCountByAssetId(assetId: Long): Int
 }
 
 internal fun RecordTable.asModel(): RecordModel {

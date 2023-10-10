@@ -24,4 +24,6 @@
     <string name="set_refund_type">设置退款类型</string>
     <string name="reimburse_type">报销类型</string>
     <string name="set_reimburse_type">设置报销类型</string>
+    <string name="credit_card_payment_type">信用卡还款类型</string>
+    <string name="set_credit_card_payment_type">设置信用卡还款类型</string>
 </resources>

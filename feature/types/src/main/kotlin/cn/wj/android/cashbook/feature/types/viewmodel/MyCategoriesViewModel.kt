@@ -63,10 +63,12 @@ class MyCategoriesViewModel @Inject constructor(
                             list = emptyList(),
                             reimburseType = typeRepository.isReimburseType(second.id),
                             refundType = typeRepository.isRefundType(second.id),
+                            creditCardPaymentType = typeRepository.isCreditPaymentType(second.id),
                         )
                     },
                 reimburseType = typeRepository.isReimburseType(first.id),
                 refundType = typeRepository.isRefundType(first.id),
+                creditCardPaymentType = typeRepository.isCreditPaymentType(first.id),
             )
         }
         MyCategoriesUiState.Success(
@@ -176,11 +178,13 @@ class MyCategoriesViewModel @Inject constructor(
                                                         data = second,
                                                         list = emptyList(),
                                                         reimburseType = false,
-                                                        refundType = false
+                                                        refundType = false,
+                                                        creditCardPaymentType = false,
                                                     )
                                                 },
                                             reimburseType = false,
                                             refundType = false,
+                                            creditCardPaymentType = false,
                                         )
                                     }
                             ))
@@ -254,6 +258,13 @@ class MyCategoriesViewModel @Inject constructor(
     fun setRefundType(id: Long) {
         viewModelScope.launch {
             typeRepository.setRefundType(id)
+            _dataVersion.updateVersion()
+        }
+    }
+
+    fun setCreditCardPaymentType(id: Long) {
+        viewModelScope.launch {
+            typeRepository.setCreditPaymentType(id)
             _dataVersion.updateVersion()
         }
     }

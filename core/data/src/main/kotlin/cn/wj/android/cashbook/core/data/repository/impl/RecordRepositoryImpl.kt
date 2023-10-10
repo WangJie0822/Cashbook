@@ -155,7 +155,7 @@ class RecordRepositoryImpl @Inject constructor(
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
             val appDataModel = appPreferencesDataSource.appData.first()
-            recordDao.getLastThreeMonthExpenditureRecordList(
+            recordDao.getExpenditureRecordListAfterTime(
                 booksId = appDataModel.currentBookId,
                 recordTime = startDate,
             ).map { it.asModel() }
@@ -169,7 +169,7 @@ class RecordRepositoryImpl @Inject constructor(
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
             val appDataModel = appPreferencesDataSource.appData.first()
-            recordDao.getLastThreeMonthExpenditureReimburseRecordList(
+            recordDao.getExpenditureReimburseRecordListAfterTime(
                 booksId = appDataModel.currentBookId,
                 recordTime = startDate,
             ).map { it.asModel() }
@@ -183,11 +183,21 @@ class RecordRepositoryImpl @Inject constructor(
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
             val appDataModel = appPreferencesDataSource.appData.first()
-            recordDao.getLastThreeMonthExpenditureRecordListByKeyword(
+            recordDao.getExpenditureRecordListByKeywordAfterTime(
                 keyword = keyword,
                 booksId = appDataModel.currentBookId,
                 recordTime = startDate,
             ).map { it.asModel() }
+        }
+
+    override suspend fun getLastThreeMonthRecordCountByAssetId(assetId: Long): Int =
+        withContext(coroutineContext) {
+            // 获取最近三个月开始时间
+            val calendar = Calendar.getInstance()
+            calendar[Calendar.DAY_OF_MONTH] = -90
+            val startDate =
+                "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
+            recordDao.getRecordCountByAssetIdAfterTime(assetId, startDate)
         }
 
     override suspend fun getLastThreeMonthReimbursableRecordListByKeyword(keyword: String): List<RecordModel> =

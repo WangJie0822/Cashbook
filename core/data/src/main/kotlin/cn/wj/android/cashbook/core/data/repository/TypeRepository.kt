@@ -51,6 +51,10 @@ interface TypeRepository {
     suspend fun update(model: RecordTypeModel)
 
     suspend fun generateSortById(id: Long, parentId: Long): Int
+
+    suspend fun isCreditPaymentType(typeId: Long): Boolean
+
+    suspend fun setCreditPaymentType(typeId: Long)
 }
 
 internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {

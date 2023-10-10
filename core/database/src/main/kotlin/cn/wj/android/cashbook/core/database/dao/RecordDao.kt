@@ -100,7 +100,7 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """
     )
-    fun getLastThreeMonthExpenditureRecordList(
+    fun getExpenditureRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
         incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal
@@ -115,7 +115,7 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """
     )
-    fun getLastThreeMonthExpenditureReimburseRecordList(
+    fun getExpenditureReimburseRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
     ): List<RecordTable>
@@ -130,12 +130,24 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """
     )
-    fun getLastThreeMonthExpenditureRecordListByKeyword(
+    fun getExpenditureRecordListByKeywordAfterTime(
         keyword: String,
         booksId: Long,
         recordTime: Long,
         incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal
     ): List<RecordTable>
+
+    @Query(
+        """
+        SELECT COUNT(*) FROM db_record 
+        WHERE record_time>=:recordTime 
+        AND asset_id=:assetId
+    """
+    )
+    fun getRecordCountByAssetIdAfterTime(
+        assetId: Long,
+        recordTime: Long,
+    ): Int
 
     @Query(
         """

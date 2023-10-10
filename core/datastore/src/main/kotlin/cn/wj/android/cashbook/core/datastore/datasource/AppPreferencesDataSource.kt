@@ -51,6 +51,7 @@ class AppPreferencesDataSource @Inject constructor(
                 backupPath = it.backupPath,
                 autoBackup = AutoBackupModeEnum.ordinalOf(it.autoBackup),
                 lastBackupMs = it.lastBackupMs,
+                creditCardPaymentTypeId = it.creditCardPaymentTypeId,
             )
         }
 
@@ -166,6 +167,10 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateReimburseTypeId(id: Long) {
         appPreferences.updateData { it.copy { this.reimburseTypeId = id } }
+    }
+
+    suspend fun updateCreditCardPaymentTypeId(id: Long) {
+        appPreferences.updateData { it.copy { this.creditCardPaymentTypeId = id } }
     }
 
     suspend fun needRelated(typeId: Long): Boolean {

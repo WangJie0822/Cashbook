@@ -186,4 +186,23 @@ class TypeRepositoryImpl @Inject constructor(
             }
             sort
         }
+
+    override suspend fun isCreditPaymentType(typeId: Long): Boolean =
+        withContext(coroutineContext) {
+            val appDataModel = appPreferencesDataSource.appData.first()
+            val creditCardPaymentTypeId = if (appDataModel.creditCardPaymentTypeId > 0L) {
+                appDataModel.creditCardPaymentTypeId
+            } else {
+                val id = typeDao.queryByName("还信用卡")?.id ?: 0L
+                if (id > 0L) {
+                    appPreferencesDataSource.updateCreditCardPaymentTypeId(id)
+                }
+                id
+            }
+            creditCardPaymentTypeId == typeId
+        }
+
+    override suspend fun setCreditPaymentType(typeId: Long): Unit = withContext(coroutineContext) {
+        appPreferencesDataSource.updateCreditCardPaymentTypeId(typeId)
+    }
 }

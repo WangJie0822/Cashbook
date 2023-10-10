@@ -35,4 +35,5 @@ data class AppDataModel(
     val backupPath: String,
     val autoBackup: AutoBackupModeEnum,
     val lastBackupMs: Long,
+    val creditCardPaymentTypeId: Long,
 )

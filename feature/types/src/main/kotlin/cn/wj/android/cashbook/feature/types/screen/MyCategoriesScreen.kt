@@ -101,6 +101,7 @@ internal fun MyCategoriesRoute(
         onRequestMoveSecondTypeToAnother = viewModel::requestMoveSecondTypeToAnother,
         onRequestSetRefundType = viewModel::setRefundType,
         onRequestSetReimburseType = viewModel::setReimburseType,
+        onRequestSetCreditCardPaymentType = viewModel::setCreditCardPaymentType,
         onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
         onRequestDeleteType = viewModel::requestDeleteType,
         changeRecordTypeBeforeDelete = viewModel::changeRecordTypeBeforeDeleteType,
@@ -127,6 +128,7 @@ internal fun MyCategoriesScreen(
     onRequestMoveSecondTypeToAnother: (Long, Long) -> Unit,
     onRequestSetRefundType: (Long) -> Unit,
     onRequestSetReimburseType: (Long) -> Unit,
+    onRequestSetCreditCardPaymentType: (Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestDeleteType: (Long) -> Unit,
     changeRecordTypeBeforeDelete: (Long, Long) -> Unit,
@@ -240,6 +242,7 @@ internal fun MyCategoriesScreen(
                                 onRequestMoveSecondTypeToAnother = onRequestMoveSecondTypeToAnother,
                                 onRequestSetRefundType = onRequestSetRefundType,
                                 onRequestSetReimburseType = onRequestSetReimburseType,
+                                onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                             )
                         }
                     }
@@ -482,6 +485,7 @@ private fun ExpandableTypeList(
     onRequestMoveSecondTypeToAnother: (Long, Long) -> Unit,
     onRequestSetRefundType: (Long) -> Unit,
     onRequestSetReimburseType: (Long) -> Unit,
+    onRequestSetCreditCardPaymentType: (Long) -> Unit,
 ) {
     LazyColumn(
         content = {
@@ -498,6 +502,7 @@ private fun ExpandableTypeList(
                         onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
                         onRequestSetRefundType = onRequestSetRefundType,
                         onRequestSetReimburseType = onRequestSetReimburseType,
+                        onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                     )
                     if (first.expanded && hasChild) {
                         SecondTypeList(
@@ -509,6 +514,7 @@ private fun ExpandableTypeList(
                             onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
                             onRequestSetRefundType = onRequestSetRefundType,
                             onRequestSetReimburseType = onRequestSetReimburseType,
+                            onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                         )
                     }
                 }
@@ -625,6 +631,7 @@ private fun FirstTypeItem(
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestSetRefundType: (Long) -> Unit,
     onRequestSetReimburseType: (Long) -> Unit,
+    onRequestSetCreditCardPaymentType: (Long) -> Unit,
 ) {
     Box {
         var expandedMenu by remember {
@@ -655,6 +662,7 @@ private fun FirstTypeItem(
                     }
                 }
             },
+
             modifier = Modifier.clickable { expandedMenu = true },
         )
         DropdownMenu(
@@ -727,6 +735,26 @@ private fun FirstTypeItem(
                     },
                 )
             }
+            if (first.data.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(
+                                id = if (first.creditCardPaymentType) {
+                                    R.string.credit_card_payment_type
+                                } else {
+                                    R.string.set_credit_card_payment_type
+                                }
+                            )
+                        )
+                    },
+                    enabled = !first.creditCardPaymentType,
+                    onClick = {
+                        expandedMenu = false
+                        onRequestSetCreditCardPaymentType(first.data.id)
+                    },
+                )
+            }
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.statistic_data)) },
                 onClick = {
@@ -748,6 +776,7 @@ private fun SecondTypeList(
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestSetRefundType: (Long) -> Unit,
     onRequestSetReimburseType: (Long) -> Unit,
+    onRequestSetCreditCardPaymentType: (Long) -> Unit,
 ) {
     ElevatedCard(Modifier.padding(horizontal = 8.dp)) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -773,6 +802,7 @@ private fun SecondTypeList(
                                 onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
                                 onRequestSetRefundType = onRequestSetRefundType,
                                 onRequestSetReimburseType = onRequestSetReimburseType,
+                                onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -793,6 +823,7 @@ private fun SecondTypeItem(
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestSetRefundType: (Long) -> Unit,
     onRequestSetReimburseType: (Long) -> Unit,
+    onRequestSetCreditCardPaymentType: (Long) -> Unit,
     modifier: Modifier,
 ) {
     Box(
@@ -903,6 +934,26 @@ private fun SecondTypeItem(
                     onClick = {
                         expandedMenu = false
                         onRequestSetReimburseType(second.data.id)
+                    },
+                )
+            }
+            if (second.data.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(
+                                id = if (second.creditCardPaymentType) {
+                                    R.string.credit_card_payment_type
+                                } else {
+                                    R.string.set_credit_card_payment_type
+                                }
+                            )
+                        )
+                    },
+                    enabled = !second.creditCardPaymentType,
+                    onClick = {
+                        expandedMenu = false
+                        onRequestSetCreditCardPaymentType(second.data.id)
                     },
                 )
             }

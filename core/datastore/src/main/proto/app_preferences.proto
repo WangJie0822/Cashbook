@@ -30,4 +30,5 @@ message AppPreferences {
   string backupPath = 23; // 备份路径
   int32 autoBackup = 24; // 自动备份
   sint64 lastBackupMs = 25; // 上次备份时间戳
+  sint64 creditCardPaymentTypeId = 26; // 信用卡还款类型 id
 }
