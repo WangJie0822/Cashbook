@@ -3,6 +3,9 @@ package cn.wj.android.cashbook.core.database.table
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 
 /**
  * 类型数据表
@@ -29,3 +32,30 @@ data class TypeTable(
     @ColumnInfo(name = TABLE_TYPE_PROTECTED) val protected: Int,
     @ColumnInfo(name = TABLE_TYPE_SORT) val sort: Int
 )
+
+
+/** 固定类型 - 平账，支出 */
+val TYPE_TABLE_BALANCE_EXPENDITURE: TypeTable
+    get() = TypeTable(
+        id = -1101L,
+        parentId = -1L,
+        name = "平账",
+        iconName = "vector_balance_account",
+        typeLevel = TypeLevelEnum.FIRST.ordinal,
+        typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
+        protected = SWITCH_INT_OFF,
+        sort = 0,
+    )
+
+/** 固定类型 - 平账，收入 */
+val TYPE_TABLE_BALANCE_INCOME: TypeTable
+    get() = TypeTable(
+        id = -1102L,
+        parentId = -1L,
+        name = "平账",
+        iconName = "vector_balance_account",
+        typeLevel = TypeLevelEnum.FIRST.ordinal,
+        typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
+        protected = SWITCH_INT_OFF,
+        sort = 0,
+    )

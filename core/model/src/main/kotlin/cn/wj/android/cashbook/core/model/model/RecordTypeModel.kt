@@ -26,5 +26,33 @@ data class RecordTypeModel(
     val typeCategory: RecordTypeCategoryEnum,
     val protected: Boolean,
     val sort: Int,
-    val needRelated:Boolean,
+    val needRelated: Boolean,
 )
+
+/** 固定类型 - 平账，支出 */
+val RECORD_TYPE_BALANCE_EXPENDITURE: RecordTypeModel
+    get() = RecordTypeModel(
+        id = -1101L,
+        parentId = -1L,
+        name = "平账",
+        iconName = "vector_balance_account",
+        typeLevel = TypeLevelEnum.FIRST,
+        typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        protected = true,
+        sort = 0,
+        needRelated = false,
+    )
+
+/** 固定类型 - 平账，收入 */
+val RECORD_TYPE_BALANCE_INCOME: RecordTypeModel
+    get() = RecordTypeModel(
+        id = -1102L,
+        parentId = -1L,
+        name = "平账",
+        iconName = "vector_balance_account",
+        typeLevel = TypeLevelEnum.FIRST,
+        typeCategory = RecordTypeCategoryEnum.INCOME,
+        protected = true,
+        sort = 0,
+        needRelated = false,
+    )

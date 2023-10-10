@@ -47,6 +47,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
 
@@ -89,6 +90,8 @@ internal fun AssetInfoRoute(
             recordDetailSheetContent(record, viewModel::dismissRecordDetailSheet)
         },
         onEditAssetClick = onRequestNaviToEditAsset,
+        onDeleteAssetClick = viewModel::showDeleteConfirmDialog,
+        onConfirmDeleteAsset = { viewModel.deleteAsset(onSuccess = onRequestPopBackStack) },
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
         onBackClick = onRequestPopBackStack,
         modifier = modifier,
@@ -120,6 +123,8 @@ internal fun AssetInfoScreen(
     assetRecordListContent: @Composable (@Composable () -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     onEditAssetClick: () -> Unit,
+    onDeleteAssetClick: () -> Unit,
+    onConfirmDeleteAsset: () -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -148,6 +153,12 @@ internal fun AssetInfoScreen(
                     if (uiState is AssetInfoUiState.Success) {
                         IconButton(onClick = onEditAssetClick) {
                             Icon(imageVector = CashbookIcons.EditNote, contentDescription = null)
+                        }
+                        IconButton(onClick = onDeleteAssetClick) {
+                            Icon(
+                                imageVector = CashbookIcons.DeleteForever,
+                                contentDescription = null
+                            )
                         }
                         if (uiState.shouldDisplayMore) {
                             IconButton(onClick = onRequestShowMoreDialog) {
@@ -194,87 +205,104 @@ internal fun AssetInfoScreen(
                     )
                 }
 
-                (dialogState as? DialogState.Shown<*>)?.run {
-                    if (uiState is AssetInfoUiState.Success && uiState.shouldDisplayMore) {
-                        val clipboardManager = LocalClipboardManager.current
-                        AlertDialog(
-                            onDismissRequest = onRequestDismissDialog,
-                            text = {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) {
-                                    val textStartModifier = Modifier.width(50.dp)
-                                    if (uiState.openBank.isNotBlank()) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = stringResource(id = R.string.open_bank),
-                                                modifier = textStartModifier,
-                                            )
-                                            Text(
-                                                text = uiState.openBank,
-                                                modifier = Modifier.weight(1f)
-                                            )
-                                            IconButton(onClick = {
-                                                clipboardManager.setText(AnnotatedString(uiState.openBank))
-                                                onRequestDisplayBookmark()
-                                            }) {
-                                                Icon(
-                                                    imageVector = CashbookIcons.ContentCopy,
-                                                    contentDescription = null
-                                                )
+                (dialogState as? DialogState.Shown<*>)?.data?.let { data ->
+                    when (data) {
+                        AssetInfoDialogEnum.MORE_INFO -> {
+                            if (uiState is AssetInfoUiState.Success && uiState.shouldDisplayMore) {
+                                val clipboardManager = LocalClipboardManager.current
+                                AlertDialog(
+                                    onDismissRequest = onRequestDismissDialog,
+                                    text = {
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                        ) {
+                                            val textStartModifier = Modifier.width(50.dp)
+                                            if (uiState.openBank.isNotBlank()) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text(
+                                                        text = stringResource(id = R.string.open_bank),
+                                                        modifier = textStartModifier,
+                                                    )
+                                                    Text(
+                                                        text = uiState.openBank,
+                                                        modifier = Modifier.weight(1f)
+                                                    )
+                                                    IconButton(onClick = {
+                                                        clipboardManager.setText(
+                                                            AnnotatedString(
+                                                                uiState.openBank
+                                                            )
+                                                        )
+                                                        onRequestDisplayBookmark()
+                                                    }) {
+                                                        Icon(
+                                                            imageVector = CashbookIcons.ContentCopy,
+                                                            contentDescription = null
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            if (uiState.cardNo.isNotBlank()) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text(
+                                                        text = stringResource(id = R.string.card_no),
+                                                        modifier = textStartModifier,
+                                                    )
+                                                    Text(
+                                                        text = uiState.cardNo,
+                                                        modifier = Modifier.weight(1f)
+                                                    )
+                                                    IconButton(onClick = {
+                                                        clipboardManager.setText(
+                                                            AnnotatedString(
+                                                                uiState.cardNo
+                                                            )
+                                                        )
+                                                        onRequestDisplayBookmark()
+                                                    }) {
+                                                        Icon(
+                                                            imageVector = CashbookIcons.ContentCopy,
+                                                            contentDescription = null
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            if (uiState.remark.isNotBlank()) {
+                                                Row {
+                                                    Text(
+                                                        text = stringResource(id = R.string.remark),
+                                                        modifier = textStartModifier,
+                                                    )
+                                                    Text(
+                                                        text = uiState.remark,
+                                                        modifier = Modifier.weight(1f)
+                                                    )
+                                                }
                                             }
                                         }
-                                    }
-                                    if (uiState.cardNo.isNotBlank()) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = stringResource(id = R.string.card_no),
-                                                modifier = textStartModifier,
-                                            )
-                                            Text(
-                                                text = uiState.cardNo,
-                                                modifier = Modifier.weight(1f)
-                                            )
-                                            IconButton(onClick = {
-                                                clipboardManager.setText(AnnotatedString(uiState.cardNo))
-                                                onRequestDisplayBookmark()
-                                            }) {
-                                                Icon(
-                                                    imageVector = CashbookIcons.ContentCopy,
-                                                    contentDescription = null
-                                                )
-                                            }
+                                    },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            clipboardManager.setText(AnnotatedString("${uiState.openBank}\n${uiState.cardNo}"))
+                                            onRequestDisplayBookmark()
+                                        }) {
+                                            Text(text = stringResource(id = R.string.copy_all))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = onRequestDismissDialog) {
+                                            Text(text = stringResource(id = R.string.cancel))
                                         }
                                     }
-                                    if (uiState.remark.isNotBlank()) {
-                                        Row {
-                                            Text(
-                                                text = stringResource(id = R.string.remark),
-                                                modifier = textStartModifier,
-                                            )
-                                            Text(
-                                                text = uiState.remark,
-                                                modifier = Modifier.weight(1f)
-                                            )
-                                        }
-                                    }
-                                }
-                            },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    clipboardManager.setText(AnnotatedString("${uiState.openBank}\n${uiState.cardNo}"))
-                                    onRequestDisplayBookmark()
-                                }) {
-                                    Text(text = stringResource(id = R.string.copy_all))
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = onRequestDismissDialog) {
-                                    Text(text = stringResource(id = R.string.cancel))
-                                }
+                                )
                             }
-                        )
+                        }
+
+                        AssetInfoDialogEnum.DELETE_ASSET -> {
+                            // TODO 删除记录
+                        }
                     }
+
                 }
 
                 when (uiState) {

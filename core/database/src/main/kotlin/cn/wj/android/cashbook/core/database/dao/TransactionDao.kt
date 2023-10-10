@@ -12,6 +12,8 @@ import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
+import cn.wj.android.cashbook.core.database.table.TYPE_TABLE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.database.table.TYPE_TABLE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.database.table.TagWithRecordTable
 import cn.wj.android.cashbook.core.database.table.TypeTable
 import cn.wj.android.cashbook.core.database.throwable.DataTransactionException
@@ -107,7 +109,11 @@ interface TransactionDao {
         relatedRecordIdList: List<Long>,
     ) {
         val type =
-            queryTypeById(record.typeId) ?: throw DataTransactionException("Type must not be null")
+            (if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) TYPE_TABLE_BALANCE_EXPENDITURE
+            else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) TYPE_TABLE_BALANCE_INCOME
+            else queryTypeById(record.typeId))
+                ?: throw DataTransactionException("Type must not be null")
+
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
         // 计算记录涉及金额
         val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
@@ -197,7 +203,11 @@ interface TransactionDao {
     suspend fun deleteRecordTransaction(record: RecordTable) {
         val recordId = record.id ?: return
         val type =
-            queryTypeById(record.typeId) ?: throw DataTransactionException("Type must not be null")
+            if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) TYPE_TABLE_BALANCE_EXPENDITURE
+            else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) TYPE_TABLE_BALANCE_INCOME
+            else queryTypeById(record.typeId)
+                ?: throw DataTransactionException("Type must not be null")
+
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
         // 计算之前记录涉及金额
         val oldRecordAmount = if (category == RecordTypeCategoryEnum.INCOME) {

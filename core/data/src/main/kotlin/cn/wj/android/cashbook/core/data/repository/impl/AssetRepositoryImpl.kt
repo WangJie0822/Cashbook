@@ -78,11 +78,11 @@ class AssetRepositoryImpl @Inject constructor(
             table = table.copy(booksId = appPreferencesDataSource.appData.first().currentBookId)
         }
         if (null == table.id) {
+            // 插入
             assetDao.insert(table)
         } else {
             assetDao.update(table)
         }
         assetDataVersion.updateVersion()
-
     }
 }

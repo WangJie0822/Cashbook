@@ -4,6 +4,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
@@ -63,6 +64,7 @@ class RecordRepositoryImpl @Inject constructor(
             relatedRecordIdList = relatedRecordIdList,
         )
         recordDataVersion.updateVersion()
+        assetDataVersion.updateVersion()
         // 更新上次使用的默认数据
         appPreferencesDataSource.updateLastAssetId(record.assetId)
     }
@@ -70,6 +72,7 @@ class RecordRepositoryImpl @Inject constructor(
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
         transactionDao.deleteRecordTransaction(recordId)
         recordDataVersion.updateVersion()
+        assetDataVersion.updateVersion()
     }
 
     override suspend fun queryPagingRecordListByAssetId(

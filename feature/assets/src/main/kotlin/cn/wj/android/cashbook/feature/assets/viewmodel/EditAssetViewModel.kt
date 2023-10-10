@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.string
@@ -18,6 +17,7 @@ import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.domain.usecase.GetDefaultAssetUseCase
+import cn.wj.android.cashbook.domain.usecase.SaveAssetUseCase
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
 import cn.wj.android.cashbook.feature.assets.enums.SelectDayEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class EditAssetViewModel @Inject constructor(
     private val assetRepository: AssetRepository,
+    private val saveAssetUseCase: SaveAssetUseCase,
     getDefaultAssetUseCase: GetDefaultAssetUseCase,
     application: Application,
 ) : AndroidViewModel(application) {
@@ -67,6 +68,7 @@ class EditAssetViewModel @Inject constructor(
     val uiState = _displayAssetInfo
         .mapLatest {
             EditAssetUiState.Success(
+                typeEnable = _assetIdData.first() < 0L,
                 isCreditCard = it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
                 classification = it.classification,
                 assetName = it.name,
@@ -178,10 +180,9 @@ class EditAssetViewModel @Inject constructor(
         remark: String,
         onSuccess: () -> Unit,
     ) {
-        // TODO 修改余额平账功能
         viewModelScope.launch {
             try {
-                val assetInfo = _displayAssetInfo.first().copy(
+                val assetModel = _displayAssetInfo.first().copy(
                     name = assetName,
                     totalAmount = totalAmount,
                     balance = balance,
@@ -189,8 +190,15 @@ class EditAssetViewModel @Inject constructor(
                     cardNo = cardNo,
                     remark = remark,
                 )
-                assetRepository.updateAsset(assetInfo)
-                onSuccess()
+                if (_assetIdData.first() != -1L
+                    && _defaultAssetInfo.first().toString() == assetModel.toString()
+                ) {
+                    this@EditAssetViewModel.logger().i("save(), data no change, finish")
+                    onSuccess()
+                } else {
+                    saveAssetUseCase(assetModel)
+                    onSuccess()
+                }
             } catch (throwable: Throwable) {
                 this@EditAssetViewModel.logger().e(throwable, "save()")
             }
@@ -212,6 +220,7 @@ sealed class EditAssetUiState(
     data object Loading : EditAssetUiState()
 
     data class Success(
+        val typeEnable: Boolean,
         val isCreditCard: Boolean,
         override val classification: AssetClassificationEnum,
         override val assetName: String,

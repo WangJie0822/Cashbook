@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,7 +74,7 @@ class AssetInfoViewModel @Inject constructor(
     }
 
     fun displayMoreDialog() {
-        dialogState = DialogState.Shown(0)
+        dialogState = DialogState.Shown(AssetInfoDialogEnum.MORE_INFO)
     }
 
     fun dismissDialog() {
@@ -86,6 +87,14 @@ class AssetInfoViewModel @Inject constructor(
 
     fun dismissBookmark() {
         shouldDisplayBookmark = false
+    }
+
+    fun showDeleteConfirmDialog() {
+        dialogState = DialogState.Shown(AssetInfoDialogEnum.DELETE_ASSET)
+    }
+
+    fun deleteAsset(onSuccess:()->Unit) {
+        // TODO 删除资产
     }
 }
 

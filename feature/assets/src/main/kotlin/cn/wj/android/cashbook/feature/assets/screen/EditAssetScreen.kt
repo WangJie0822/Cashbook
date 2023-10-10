@@ -55,10 +55,8 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
@@ -73,9 +71,9 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetViewModel
  */
 @Composable
 internal fun EditAssetRoute(
+    assetId: Long,
+    onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
-    assetId: Long = -1L,
-    onRequestPopBackStack: () -> Unit = {},
     viewModel: EditAssetViewModel = hiltViewModel<EditAssetViewModel>().apply {
         updateAssetId(assetId)
     },
@@ -241,7 +239,10 @@ internal fun EditAssetScreen(
                         modifier = Modifier.verticalScroll(state = rememberScrollState()),
                     ) {
                         TransparentListItem(
-                            modifier = Modifier.clickable(onClick = onSelectClassificationClick),
+                            modifier = Modifier.clickable(
+                                enabled = uiState.typeEnable,
+                                onClick = onSelectClassificationClick,
+                            ),
                             headlineContent = {
                                 Text(
                                     text = stringResource(id = R.string.asset_classification),
@@ -602,13 +603,5 @@ internal fun SingleLineListItem(iconResId: Int, nameResId: Int, onItemClick: () 
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.align(Alignment.CenterVertically),
         )
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun EditAssetScreenPreview() {
-    PreviewTheme {
-        EditAssetRoute()
     }
 }
