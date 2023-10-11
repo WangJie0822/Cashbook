@@ -1,20 +1,29 @@
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
+import cn.wj.android.cashbook.core.data.repository.RecordRepository
+import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * 资产信息 ViewModel
@@ -23,15 +32,18 @@ import kotlinx.coroutines.flow.stateIn
  */
 @HiltViewModel
 class AssetInfoViewModel @Inject constructor(
-    assetRepository: AssetRepository,
-) : ViewModel() {
+    private val assetRepository: AssetRepository,
+    private val recordRepository: RecordRepository,
+    private val tagRepository: TagRepository,
+    application: Application,
+) : AndroidViewModel(application) {
 
     /** 需显示详情的记录数据 */
     var viewRecordData by mutableStateOf<RecordViewsEntity?>(null)
         private set
 
     /** 提示语状态 */
-    var shouldDisplayBookmark by mutableStateOf(false)
+    var shouldDisplayBookmark by mutableStateOf("")
         private set
 
     /** 弹窗状态 */
@@ -39,9 +51,9 @@ class AssetInfoViewModel @Inject constructor(
         private set
 
     /** 当前资产 id */
-    private val assetIdData = MutableStateFlow(-1L)
+    private val _assetIdData = MutableStateFlow(-1L)
 
-    val uiState = assetIdData.mapLatest {
+    val uiState = _assetIdData.mapLatest {
         val assetInfo = assetRepository.getAssetById(it)
         AssetInfoUiState.Success(
             assetName = assetInfo?.name.orEmpty(),
@@ -62,7 +74,7 @@ class AssetInfoViewModel @Inject constructor(
         )
 
     fun updateAssetId(id: Long) {
-        assetIdData.tryEmit(id)
+        _assetIdData.tryEmit(id)
     }
 
     fun onRecordItemClick(item: RecordViewsEntity) {
@@ -82,19 +94,36 @@ class AssetInfoViewModel @Inject constructor(
     }
 
     fun displayBookmark() {
-        shouldDisplayBookmark = true
+        shouldDisplayBookmark = R.string.copied_to_clipboard.string(getApplication())
     }
 
     fun dismissBookmark() {
-        shouldDisplayBookmark = false
+        shouldDisplayBookmark = ""
     }
 
     fun showDeleteConfirmDialog() {
         dialogState = DialogState.Shown(AssetInfoDialogEnum.DELETE_ASSET)
     }
 
-    fun deleteAsset(onSuccess:()->Unit) {
-        // TODO 删除资产
+    fun deleteAsset(onSuccess: () -> Unit) {
+        // 删除资产
+        viewModelScope.launch {
+            runCatchWithProgress(
+                hint = R.string.asset_in_delete.string(getApplication()),
+                cancelable = false,
+            ) {
+                val assetId = _assetIdData.first()
+                tagRepository.deleteRelatedWithAsset(assetId)
+                recordRepository.deleteRecordRelatedWithAsset(assetId)
+                recordRepository.deleteRecordsWithAsset(assetId)
+                assetRepository.deleteById(assetId)
+                dismissDialog()
+                onSuccess()
+            }.getOrElse { throwable ->
+                this@AssetInfoViewModel.logger().e(throwable, "deleteAsset()")
+                shouldDisplayBookmark = R.string.asset_delete_falied.string(getApplication())
+            }
+        }
     }
 }
 

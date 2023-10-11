@@ -217,4 +217,15 @@ class RecordRepositoryImpl @Inject constructor(
                 recordTime = startDate,
             ).map { it.asModel() }
         }
+
+    override suspend fun deleteRecordsWithAsset(assetId: Long): Unit =
+        withContext(coroutineContext) {
+            recordDao.deleteWithAsset(assetId)
+            recordDataVersion.updateVersion()
+        }
+
+    override suspend fun deleteRecordRelatedWithAsset(assetId: Long): Unit =
+        withContext(coroutineContext) {
+            recordDao.deleteRelatedWithAsset(assetId)
+        }
 }

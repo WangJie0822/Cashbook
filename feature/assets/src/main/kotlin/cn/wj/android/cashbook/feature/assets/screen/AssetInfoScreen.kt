@@ -112,7 +112,7 @@ internal fun AssetInfoRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AssetInfoScreen(
-    shouldDisplayBookmark: Boolean,
+    shouldDisplayBookmark: String,
     onRequestDisplayBookmark: () -> Unit,
     onRequestDismissBookmark: () -> Unit,
     dialogState: DialogState,
@@ -133,10 +133,9 @@ internal fun AssetInfoScreen(
     }
 ) {
 
-    val copiedText = stringResource(id = R.string.copied_to_clipboard)
     LaunchedEffect(shouldDisplayBookmark) {
-        if (shouldDisplayBookmark) {
-            val result = snackbarHostState.showSnackbar(copiedText)
+        if (shouldDisplayBookmark.isNotBlank()) {
+            val result = snackbarHostState.showSnackbar(shouldDisplayBookmark)
             if (result == SnackbarResult.Dismissed) {
                 onRequestDismissBookmark()
             }
@@ -299,10 +298,24 @@ internal fun AssetInfoScreen(
                         }
 
                         AssetInfoDialogEnum.DELETE_ASSET -> {
-                            // TODO 删除记录
+                            // 删除资产
+                            AlertDialog(
+                                onDismissRequest = onRequestDismissDialog,
+                                title = { Text(text = stringResource(id = R.string.sure_to_delete_asset)) },
+                                text = { Text(text = stringResource(id = R.string.delete_asset_hint)) },
+                                confirmButton = {
+                                    TextButton(onClick = onConfirmDeleteAsset) {
+                                        Text(text = stringResource(id = R.string.confirm))
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = onRequestDismissDialog) {
+                                        Text(text = stringResource(id = R.string.cancel))
+                                    }
+                                }
+                            )
                         }
                     }
-
                 }
 
                 when (uiState) {

@@ -32,6 +32,8 @@ interface AssetRepository {
     suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel>
 
     suspend fun updateAsset(asset: AssetModel)
+
+    suspend fun deleteById(assetId: Long)
 }
 
 internal fun AssetTable.asModel(): AssetModel {

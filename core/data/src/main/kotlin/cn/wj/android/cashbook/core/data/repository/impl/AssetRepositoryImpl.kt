@@ -85,4 +85,8 @@ class AssetRepositoryImpl @Inject constructor(
         }
         assetDataVersion.updateVersion()
     }
+
+    override suspend fun deleteById(assetId: Long) = withContext(coroutineContext) {
+        assetDao.deleteById(assetId)
+    }
 }

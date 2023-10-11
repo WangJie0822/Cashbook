@@ -26,4 +26,9 @@ interface AssetDao {
 
     @Query("SELECT * FROM db_asset WHERE books_id=:bookId")
     suspend fun queryVisibleAssetByBookId(bookId: Long): List<AssetTable>
+
+    @Query(value = """
+        DELETE FROM db_asset WHERE id=:assetId
+    """)
+    suspend fun deleteById(assetId: Long)
 }

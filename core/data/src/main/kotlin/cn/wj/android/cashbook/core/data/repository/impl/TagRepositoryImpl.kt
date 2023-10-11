@@ -61,4 +61,9 @@ class TagRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             tagListData.first().firstOrNull { it.id == tagId }
         }
+
+    override suspend fun deleteRelatedWithAsset(assetId: Long): Unit =
+        withContext(coroutineContext) {
+            tagDao.deleteRelatedWithAsset(assetId)
+        }
 }

@@ -164,4 +164,17 @@ interface RecordDao {
         booksId: Long,
         recordTime: Long,
     ): List<RecordTable>
+
+    @Query(value = """
+        DELETE FROM db_record
+        WHERE asset_id=:assetId OR into_asset_id=:assetId
+    """)
+    fun deleteWithAsset(assetId: Long)
+
+    @Query(value = """
+        DELETE FROM db_record_with_related
+        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+        OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+    """)
+    fun deleteRelatedWithAsset(assetId: Long)
 }

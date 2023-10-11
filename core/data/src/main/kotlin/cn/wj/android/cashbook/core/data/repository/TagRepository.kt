@@ -15,6 +15,8 @@ interface TagRepository {
     suspend fun getRelatedTag(recordId: Long): List<TagModel>
 
     suspend fun getTagById(tagId: Long): TagModel?
+
+    suspend fun deleteRelatedWithAsset(assetId: Long)
 }
 
 internal fun TagTable.asModel(): TagModel {
