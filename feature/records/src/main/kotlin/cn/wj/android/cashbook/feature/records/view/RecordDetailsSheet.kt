@@ -98,17 +98,20 @@ internal fun RecordDetailsSheet(
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.weight(1f),
                         )
-                        TextButton(
-                            onClick = {
-                                onRequestNaviToEditRecord(recordData.id)
-                                onRequestDismissSheet()
-                            },
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.edit),
-                                color = MaterialTheme.colorScheme.primary,
-                            )
+                        if (!recordData.isBalanceAccount) {
+                            TextButton(
+                                onClick = {
+                                    onRequestNaviToEditRecord(recordData.id)
+                                    onRequestDismissSheet()
+                                },
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.edit),
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
                         }
+
                         TextButton(
                             onClick = { dialogState = DialogState.Shown(0) },
                         ) {
@@ -266,7 +269,9 @@ internal fun RecordDetailsSheet(
                                         tint = Color.Unspecified,
                                         modifier = Modifier
                                             .background(
-                                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+                                                color = MaterialTheme.colorScheme.primaryContainer.copy(
+                                                    alpha = 0.2f
+                                                ),
                                                 shape = CircleShape
                                             )
                                             .padding(2.dp)

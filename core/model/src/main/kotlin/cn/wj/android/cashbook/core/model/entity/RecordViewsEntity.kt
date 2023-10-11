@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.core.model.entity
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 
@@ -35,6 +36,9 @@ data class RecordViewsEntity(
     val relatedRecord: List<RecordModel>,
     val relatedAmount: String,
     val recordTime: String,
-) : RecordViews
+) : RecordViews {
+    val isBalanceAccount: Boolean
+        get() = typeName == RECORD_TYPE_BALANCE_EXPENDITURE.name
+}
 
 interface RecordViews
