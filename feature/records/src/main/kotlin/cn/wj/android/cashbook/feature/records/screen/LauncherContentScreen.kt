@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.Divider
@@ -36,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -43,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -514,12 +517,26 @@ internal fun RecordListItem(
     showTags: Boolean = true,
     showRemarks: Boolean = true,
 ) {
+    val typeColor = when (item.typeCategory) {
+        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
+        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
+        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
+    }
     TransparentListItem(
         modifier = modifier,
         leadingContent = {
             Icon(
                 painter = painterDrawableResource(idStr = item.typeIconResName),
-                contentDescription = null
+                contentDescription = null,
+                tint = typeColor,
+                modifier = Modifier
+                    .background(
+                        color = typeColor.copy(alpha = 0.1f),
+                        shape = CircleShape
+                    )
+                    .padding(2.dp)
+                    .clip(CircleShape)
+                    .padding(4.dp)
             )
         },
         headlineContent = {
@@ -556,14 +573,18 @@ internal fun RecordListItem(
             }
         },
         supportingContent = {
-            Text(text = buildAnnotatedString {
-                append(item.recordTime.split(" ").first())
-                if (showRemarks) {
-                    withStyle(SpanStyle(color = LocalContentColor.current.copy(alpha = 0.7f))) {
-                        append("  ${item.remark}")
+            Text(
+                text = buildAnnotatedString {
+                    append(item.recordTime.split(" ").first())
+                    if (showRemarks) {
+                        withStyle(SpanStyle(color = LocalContentColor.current.copy(alpha = 0.7f))) {
+                            append("  ${item.remark}")
+                        }
                     }
-                }
-            })
+                },
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+            )
         },
         trailingContent = {
             Column(
@@ -588,11 +609,7 @@ internal fun RecordListItem(
                     }
                     Text(
                         text = item.amount.withCNY(),
-                        color = when (item.typeCategory) {
-                            RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
-                            RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
-                            RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
-                        },
+                        color = typeColor,
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }

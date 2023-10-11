@@ -10,6 +10,8 @@ import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
@@ -32,7 +34,11 @@ class RecordModelTransToViewsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(recordModel: RecordModel): RecordViewsEntity =
         withContext(coroutineContext) {
-            val type = typeRepository.getNoNullRecordTypeById(recordModel.typeId)
+            val type = when (recordModel.typeId) {
+                RECORD_TYPE_BALANCE_INCOME.id -> RECORD_TYPE_BALANCE_INCOME
+                RECORD_TYPE_BALANCE_EXPENDITURE.id -> RECORD_TYPE_BALANCE_EXPENDITURE
+                else -> typeRepository.getNoNullRecordTypeById(recordModel.typeId)
+            }
             val relatedRecord = if (type.typeCategory == RecordTypeCategoryEnum.INCOME) {
                 recordRepository.getRelatedIdListById(recordModel.id).mapNotNull { id ->
                     recordRepository.queryById(id)

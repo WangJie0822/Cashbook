@@ -21,7 +21,6 @@ class SaveAssetUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(assetModel: AssetModel) = withContext(coroutineContext) {
-        // TODO 平账 未完成
         val oldAsset = assetRepository.getAssetById(assetModel.id)
         if (null != oldAsset) {
             // 修改资产，计算差额
@@ -52,7 +51,7 @@ class SaveAssetUseCase @Inject constructor(
                     .copy(
                         assetId = assetModel.id,
                         amount = diffBalance.absoluteValue.decimalFormat(),
-                        remark = "资产金额变动，自动生成",
+                        remark = "金额变动，自动生成",
                     )
                 // 插入记录
                 recordRepository.updateRecord(

@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -116,6 +120,12 @@ internal fun RecordDetailsSheet(
                     }
                     CommonDivider()
 
+                    val typeColor = when (recordData.typeCategory) {
+                        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
+                        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
+                        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
+                    }
+
                     // 金额
                     TransparentListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.amount)) },
@@ -140,11 +150,7 @@ internal fun RecordDetailsSheet(
                                 }
                                 Text(
                                     text = recordData.amount.withCNY(),
-                                    color = when (recordData.typeCategory) {
-                                        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
-                                        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
-                                        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
-                                    },
+                                    color = typeColor,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                             }
@@ -189,8 +195,17 @@ internal fun RecordDetailsSheet(
                                 Icon(
                                     painter = painterDrawableResource(idStr = recordData.typeIconResName),
                                     contentDescription = null,
-                                    modifier = Modifier.padding(end = 8.dp),
+                                    tint = typeColor,
+                                    modifier = Modifier
+                                        .background(
+                                            color = typeColor.copy(alpha = 0.1f),
+                                            shape = CircleShape
+                                        )
+                                        .padding(2.dp)
+                                        .clip(CircleShape)
+                                        .padding(4.dp),
                                 )
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = recordData.typeName,
                                     style = MaterialTheme.typography.labelLarge,
@@ -249,8 +264,16 @@ internal fun RecordDetailsSheet(
                                         painter = painterResource(id = recordData.assetIconResId!!),
                                         contentDescription = null,
                                         tint = Color.Unspecified,
-                                        modifier = Modifier.padding(end = 8.dp),
+                                        modifier = Modifier
+                                            .background(
+                                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+                                                shape = CircleShape
+                                            )
+                                            .padding(2.dp)
+                                            .clip(CircleShape)
+                                            .padding(4.dp),
                                     )
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = assetName,
                                         style = MaterialTheme.typography.labelLarge,
