@@ -354,17 +354,15 @@ fun CashbookNavHost(
 
         // 编辑记录
         editRecordScreen(
-            typeListContent = { typeCategory, selectedTypeId, onTypeSelect, headerContent, footerContent ->
+            typeListContent = { typeCategory, onTypeCategorySelect, onTypeSelect ->
                 EditRecordTypeListContent(
                     typeCategory = typeCategory,
-                    selectedTypeId = selectedTypeId,
+                    onTypeCategorySelect = onTypeCategorySelect,
                     onTypeSelect = onTypeSelect,
                     onRequestNaviToTypeManager = navController::naviToMyCategories,
-                    headerContent = headerContent,
-                    footerContent = footerContent,
                 )
             },
-            assetBottomSheetContent = { currentTypeId,selectedAssetId, isRelated, onAssetChange ->
+            assetBottomSheetContent = { currentTypeId, selectedAssetId, isRelated, onAssetChange ->
                 EditRecordSelectAssetBottomSheetContent(
                     currentTypeId = currentTypeId,
                     selectedAssetId = selectedAssetId,

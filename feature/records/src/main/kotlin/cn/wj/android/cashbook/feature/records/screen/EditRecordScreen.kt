@@ -68,7 +68,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
  *
  * @param recordId 记录id，`-1` 为新建
  * @param typeId 类型 id，默认为 `-1`
- * @param typeListContent 类型列表布局，参数：(类型大类, 已选择类型id, 类型选择回调, 头布局, 脚布局) -> [Unit]
+ * @param typeListContent 类型列表布局，参数：(类型大类, 类型大类选择回调, 类型选择回调) -> [Unit]
  * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 已选择资产id, 是否是关联资产, 资产选择回调) -> [Unit]
  * @param tagBottomSheetContent 选择标签抽屉布局，参数：(已选择标签id列表, 标签id列表变化回调) -> [Unit]
  * @param onRequestPopBackStack 导航到上一级
@@ -77,11 +77,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 internal fun EditRecordRoute(
     recordId: Long,
     typeId: Long,
-    typeListContent: @Composable (
-        RecordTypeCategoryEnum, Long, (Long) -> Unit,
-        @Composable (Modifier) -> Unit,
-        @Composable (Modifier) -> Unit,
-    ) -> Unit,
+    typeListContent: @Composable (RecordTypeCategoryEnum, (RecordTypeCategoryEnum) -> Unit, (Long) -> Unit) -> Unit,
     assetBottomSheetContent: @Composable (Long, Long, Boolean, (Long) -> Unit) -> Unit,
     tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit,
     onRequestNaviToSelectRelatedRecord: () -> Unit,
@@ -120,14 +116,12 @@ internal fun EditRecordRoute(
         onChargesChange = viewModel::updateCharge,
         onConcessionsClick = viewModel::displayConcessions,
         onConcessionsChange = viewModel::updateConcessions,
-        typeListContent = { headerContent, footerContent ->
+        typeListContent = {
             (uiState as? EditRecordUiState.Success)?.run {
                 typeListContent(
                     selectedTypeCategory,
-                    selectedTypeId,
+                    viewModel::updateTypeCategory,
                     viewModel::updateType,
-                    headerContent,
-                    footerContent
                 )
             }
 
@@ -228,10 +222,7 @@ internal fun EditRecordScreen(
     onConcessionsClick: () -> Unit,
     onRelatedRecordClick: () -> Unit,
     onConcessionsChange: (String) -> Unit,
-    typeListContent: @Composable (
-        @Composable (Modifier) -> Unit,
-        @Composable (Modifier) -> Unit,
-    ) -> Unit,
+    typeListContent: @Composable () -> Unit,
     onRemarkChange: (String) -> Unit,
     onAssetClick: () -> Unit,
     onRelatedAssetClick: () -> Unit,
@@ -395,10 +386,7 @@ internal fun EditRecordScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 private fun EditRecordScaffoldContent(
     uiState: EditRecordUiState,
-    typeListContent: @Composable (
-        @Composable (Modifier) -> Unit,
-        @Composable (Modifier) -> Unit,
-    ) -> Unit,
+    typeListContent: @Composable () -> Unit,
     selectedTypeCategory: RecordTypeCategoryEnum,
     typeColor: Color,
     onAmountClick: () -> Unit,
@@ -423,161 +411,153 @@ private fun EditRecordScaffoldContent(
             }
 
             is EditRecordUiState.Success -> {
-                typeListContent(
-                    { modifier ->
-                        Column(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        ) {
-                            // 金额显示
-                            Amount(
-                                amount = uiState.amountText,
-                                primaryColor = typeColor,
-                                onAmountClick = onAmountClick,
-                            )
-                            Divider()
-                            Text(
-                                text = stringResource(id = R.string.record_type),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                ) {
+                    // 金额显示
+                    Amount(
+                        amount = uiState.amountText,
+                        primaryColor = typeColor,
+                        onAmountClick = onAmountClick,
+                    )
+                    Divider()
+                    Text(
+                        text = stringResource(id = R.string.record_type),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                    )
+
+                    typeListContent()
+
+                    Divider()
+
+                    // 备注文本
+                    val remarkTextState = remember {
+                        TextFieldState(
+                            defaultText = uiState.remarkText,
+                            filter = { text ->
+                                onRemarkChange(text)
+                                true
+                            },
+                        )
+                    }
+
+                    // 备注信息
+                    CompatTextField(
+                        textFieldState = remarkTextState,
+                        label = { Text(text = stringResource(id = R.string.remark)) },
+                        colors = OutlinedTextFieldDefaults.colors(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                    )
+
+                    // 其他选项
+                    FlowRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        // 目标资产
+                        val hasAsset = uiState.assetText.isNotBlank()
+                        FilterChip(
+                            selected = hasAsset,
+                            onClick = onAssetClick,
+                            label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":${uiState.assetText}" else "") },
+                        )
+
+                        if (selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                            // 只有转账类型显示关联资产
+                            val hasRelatedAsset =
+                                uiState.relatedAssetText.isNotBlank()
+                            FilterChip(
+                                selected = hasRelatedAsset,
+                                onClick = onRelatedAssetClick,
+                                label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":${uiState.relatedAssetText}" else "") },
                             )
                         }
-                    },
-                    { modifier ->
-                        Column(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        ) {
-                            Divider()
 
-                            // 备注文本
-                            val remarkTextState = remember {
-                                TextFieldState(
-                                    defaultText = uiState.remarkText,
-                                    filter = { text ->
-                                        onRemarkChange(text)
-                                        true
-                                    },
-                                )
-                            }
+                        // 记录时间
+                        val dateTime = uiState.dateTimeText
+                        FilterChip(
+                            selected = true,
+                            onClick = onRecordTimeClick,
+                            label = { Text(text = dateTime) },
+                        )
 
-                            // 备注信息
-                            CompatTextField(
-                                textFieldState = remarkTextState,
-                                label = { Text(text = stringResource(id = R.string.remark)) },
-                                colors = OutlinedTextFieldDefaults.colors(),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp),
+                        // 标签
+                        val hasTag = tagText.isNotBlank()
+                        FilterChip(
+                            selected = hasTag,
+                            onClick = onTagClick,
+                            label = { Text(text = stringResource(id = R.string.tags) + if (hasTag) ":$tagText" else "") },
+                        )
+
+                        if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+                            // 只有支出类型显示是否可报销
+                            val reimbursable = uiState.reimbursable
+                            FilterChip(
+                                selected = reimbursable,
+                                onClick = onReimbursableClick,
+                                leadingIcon = {
+                                    if (reimbursable) {
+                                        Icon(
+                                            imageVector = CashbookIcons.Check,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
+                                label = { Text(text = stringResource(id = R.string.reimbursable)) },
                             )
+                        }
 
-                            // 其他选项
-                            FlowRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                // 目标资产
-                                val hasAsset = uiState.assetText.isNotBlank()
-                                FilterChip(
-                                    selected = hasAsset,
-                                    onClick = onAssetClick,
-                                    label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":${uiState.assetText}" else "") },
-                                )
+                        // 手续费
+                        val hasCharges = uiState.chargesText.isNotBlank()
+                        FilterChip(
+                            selected = hasCharges,
+                            onClick = onChargesClick,
+                            label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${uiState.chargesText.withCNY()}" else "") },
+                        )
 
-                                if (selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                                    // 只有转账类型显示关联资产
-                                    val hasRelatedAsset =
-                                        uiState.relatedAssetText.isNotBlank()
-                                    FilterChip(
-                                        selected = hasRelatedAsset,
-                                        onClick = onRelatedAssetClick,
-                                        label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":${uiState.relatedAssetText}" else "") },
-                                    )
-                                }
+                        if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
+                            // 非收入类型才有优惠
+                            val hasConcessions =
+                                uiState.concessionsText.isNotBlank()
+                            FilterChip(
+                                selected = hasConcessions,
+                                onClick = onConcessionsClick,
+                                label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${uiState.concessionsText.withCNY()}" else "") },
+                            )
+                        }
 
-                                // 记录时间
-                                val dateTime = uiState.dateTimeText
-                                FilterChip(
-                                    selected = true,
-                                    onClick = onRecordTimeClick,
-                                    label = { Text(text = dateTime) },
-                                )
-
-                                // 标签
-                                val hasTag = tagText.isNotBlank()
-                                FilterChip(
-                                    selected = hasTag,
-                                    onClick = onTagClick,
-                                    label = { Text(text = stringResource(id = R.string.tags) + if (hasTag) ":$tagText" else "") },
-                                )
-
-                                if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                                    // 只有支出类型显示是否可报销
-                                    val reimbursable = uiState.reimbursable
-                                    FilterChip(
-                                        selected = reimbursable,
-                                        onClick = onReimbursableClick,
-                                        leadingIcon = {
-                                            if (reimbursable) {
-                                                Icon(
-                                                    imageVector = CashbookIcons.Check,
-                                                    contentDescription = null,
-                                                )
-                                            }
-                                        },
-                                        label = { Text(text = stringResource(id = R.string.reimbursable)) },
-                                    )
-                                }
-
-                                // 手续费
-                                val hasCharges = uiState.chargesText.isNotBlank()
-                                FilterChip(
-                                    selected = hasCharges,
-                                    onClick = onChargesClick,
-                                    label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${uiState.chargesText.withCNY()}" else "") },
-                                )
-
-                                if (selectedTypeCategory != RecordTypeCategoryEnum.INCOME) {
-                                    // 非收入类型才有优惠
-                                    val hasConcessions =
-                                        uiState.concessionsText.isNotBlank()
-                                    FilterChip(
-                                        selected = hasConcessions,
-                                        onClick = onConcessionsClick,
-                                        label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${uiState.concessionsText.withCNY()}" else "") },
-                                    )
-                                }
-
-                                // 关联的支出记录
-                                if (uiState.needRelated) {
-                                    val hasRelated = uiState.relatedCount > 0
-                                    FilterChip(
-                                        selected = hasRelated,
-                                        onClick = onRelatedRecordClick,
-                                        label = {
-                                            Text(
-                                                text = if (hasRelated) {
-                                                    stringResource(id = R.string.related_record_display_format).format(
-                                                        uiState.relatedCount,
-                                                        uiState.relatedAmount.withCNY()
-                                                    )
-                                                } else {
-                                                    stringResource(id = R.string.related_record)
-                                                }
+                        // 关联的支出记录
+                        if (uiState.needRelated) {
+                            val hasRelated = uiState.relatedCount > 0
+                            FilterChip(
+                                selected = hasRelated,
+                                onClick = onRelatedRecordClick,
+                                label = {
+                                    Text(
+                                        text = if (hasRelated) {
+                                            stringResource(id = R.string.related_record_display_format).format(
+                                                uiState.relatedCount,
+                                                uiState.relatedAmount.withCNY()
                                             )
-                                        },
+                                        } else {
+                                            stringResource(id = R.string.related_record)
+                                        }
                                     )
-                                }
-                            }
+                                },
+                            )
                         }
-                    },
-                )
+                    }
+                }
+
             }
         }
     }

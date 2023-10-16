@@ -43,23 +43,19 @@ import cn.wj.android.cashbook.feature.types.viewmodel.EditRecordTypeListViewMode
  * 编辑记录页面标签列表
  *
  * @param typeCategory 记录大类
- * @param selectedTypeId 当前选中的类型 id
+ * @param onTypeCategorySelect 类型大类选中回调
  * @param onTypeSelect 类型选中回调
  * @param onRequestNaviToTypeManager 导航到类型管理
- * @param headerContent 头布局
- * @param footerContent 脚布局
  */
 @Composable
 internal fun EditRecordTypeListRoute(
     typeCategory: RecordTypeCategoryEnum,
-    selectedTypeId: Long,
+    onTypeCategorySelect: (RecordTypeCategoryEnum) -> Unit,
     onTypeSelect: (Long) -> Unit,
     onRequestNaviToTypeManager: () -> Unit,
-    headerContent: @Composable (modifier: Modifier) -> Unit,
-    footerContent: @Composable (modifier: Modifier) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditRecordTypeListViewModel = hiltViewModel<EditRecordTypeListViewModel>().apply {
-        update(typeCategory, selectedTypeId)
+        update(typeCategory, -1L) // TODO 选择类型列表处理
     },
 ) {
     val typeList by viewModel.typeListData.collectAsStateWithLifecycle()
@@ -68,8 +64,6 @@ internal fun EditRecordTypeListRoute(
         typeList = typeList,
         onTypeSelect = onTypeSelect,
         onTypeSettingClick = onRequestNaviToTypeManager,
-        headerContent = headerContent,
-        footerContent = footerContent,
         modifier = modifier,
     )
 }
@@ -80,8 +74,6 @@ internal fun EditRecordTypeListRoute(
  * @param typeList 类型列表
  * @param onTypeSelect 类型选中回调
  * @param onTypeSettingClick 类型设置点击
- * @param headerContent 头布局
- * @param footerContent 脚布局
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -89,22 +81,12 @@ internal fun EditRecordTypeListScreen(
     typeList: List<RecordTypeEntity>,
     onTypeSelect: (Long) -> Unit,
     onTypeSettingClick: () -> Unit,
-    headerContent: @Composable (Modifier) -> Unit,
-    footerContent: @Composable (Modifier) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
         modifier = modifier.padding(horizontal = 16.dp),
         columns = GridCells.Fixed(RECORD_TYPE_COLUMNS),
         content = {
-            item(
-                span = {
-                    GridItemSpan(maxLineSpan)
-                },
-            ) {
-                headerContent(Modifier.animateItemPlacement())
-            }
-
             // 分类列表
             items(typeList, key = { it.id }) { type ->
                 if (type == RECORD_TYPE_SETTINGS) {
@@ -147,14 +129,6 @@ internal fun EditRecordTypeListScreen(
                         },
                     )
                 }
-            }
-
-            item(
-                span = {
-                    GridItemSpan(maxLineSpan)
-                },
-            ) {
-                footerContent(Modifier.animateItemPlacement())
             }
         },
     )
