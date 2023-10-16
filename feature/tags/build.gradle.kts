@@ -1,7 +1,7 @@
 plugins {
-    id("cashbook.android.library.feature")
-    id("cashbook.android.library.compose")
-    id("cashbook.android.library.jacoco")
+    alias(libs.plugins.cashbook.android.library.feature)
+    alias(libs.plugins.cashbook.android.library.compose)
+    alias(libs.plugins.cashbook.android.library.jacoco)
 }
 
 android {

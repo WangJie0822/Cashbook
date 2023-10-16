@@ -1,5 +1,5 @@
 plugins {
-    id("cashbook.android.library")
+    alias(libs.plugins.cashbook.android.library)
 }
 
 android {

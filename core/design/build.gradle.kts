@@ -1,7 +1,7 @@
 plugins {
-    id("cashbook.android.library")
-    id("cashbook.android.library.compose")
-    id("cashbook.android.library.jacoco")
+    alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.compose)
+    alias(libs.plugins.cashbook.android.library.jacoco)
 }
 
 android {
@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+
+    implementation(projects.core.common)
 
     debugApi(libs.androidx.compose.ui.tooling)
     api(libs.androidx.compose.ui.tooling.preview)
@@ -25,6 +27,4 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.google.material)
-
-    implementation(project(":core:common"))
 }

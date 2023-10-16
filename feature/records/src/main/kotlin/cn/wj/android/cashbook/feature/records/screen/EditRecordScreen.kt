@@ -53,10 +53,10 @@ import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TimePickerDialog
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
@@ -229,8 +229,8 @@ internal fun EditRecordScreen(
     onRelatedRecordClick: () -> Unit,
     onConcessionsChange: (String) -> Unit,
     typeListContent: @Composable (
-        @Composable (modifier: Modifier) -> Unit,
-        @Composable (modifier: Modifier) -> Unit,
+        @Composable (Modifier) -> Unit,
+        @Composable (Modifier) -> Unit,
     ) -> Unit,
     onRemarkChange: (String) -> Unit,
     onAssetClick: () -> Unit,
@@ -268,13 +268,6 @@ internal fun EditRecordScreen(
                 }
             }
         }
-    }
-
-    // 获取不同大类主色调
-    val primaryColor = when (selectedTypeCategory) {
-        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
-        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
-        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
     }
 
     CashbookScaffold(
@@ -324,7 +317,7 @@ internal fun EditRecordScreen(
                             EditRecordBottomSheetContent(
                                 bottomSheetType,
                                 uiState,
-                                primaryColor,
+                                selectedTypeCategory.typeColor,
                                 onAmountChange,
                                 onChargesChange,
                                 onConcessionsChange,
@@ -362,7 +355,7 @@ internal fun EditRecordScreen(
                     uiState = uiState,
                     typeListContent = typeListContent,
                     selectedTypeCategory = selectedTypeCategory,
-                    primaryColor = primaryColor,
+                    typeColor = selectedTypeCategory.typeColor,
                     onAmountClick = onAmountClick,
                     onRemarkChange = onRemarkChange,
                     onAssetClick = onAssetClick,
@@ -385,7 +378,7 @@ internal fun EditRecordScreen(
  *
  * @param uiState 界面 UI 状态
  * @param selectedTypeCategory 已选择大类
- * @param primaryColor 分类主色调
+ * @param typeColor 分类主色调
  * @param onAmountClick 金额点击回调
  * @param onChargesClick 手续费点击回调
  * @param onConcessionsClick 优惠点击回调
@@ -407,7 +400,7 @@ private fun EditRecordScaffoldContent(
         @Composable (Modifier) -> Unit,
     ) -> Unit,
     selectedTypeCategory: RecordTypeCategoryEnum,
-    primaryColor: Color,
+    typeColor: Color,
     onAmountClick: () -> Unit,
     onRemarkChange: (String) -> Unit,
     onAssetClick: () -> Unit,
@@ -440,7 +433,7 @@ private fun EditRecordScaffoldContent(
                             // 金额显示
                             Amount(
                                 amount = uiState.amountText,
-                                primaryColor = primaryColor,
+                                primaryColor = typeColor,
                                 onAmountClick = onAmountClick,
                             )
                             Divider()
@@ -695,7 +688,7 @@ internal fun EditRecordTopBar(
                     indicator = { tabPositions ->
                         TabRowDefaults.Indicator(
                             modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.ordinal]),
-                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            color = selectedTab.typeColor,
                         )
                     },
                     divider = {},
@@ -705,8 +698,8 @@ internal fun EditRecordTopBar(
                             selected = selectedTab == enum,
                             onClick = { onTabSelected(enum) },
                             text = { Text(text = enum.text) },
-                            selectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            unselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            selectedContentColor = selectedTab.typeColor,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }

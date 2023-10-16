@@ -1,20 +1,13 @@
-@file:Suppress("UnstableApiUsage")
-
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 
 plugins {
-    // Android Kotlin 应用
-    id("cashbook.android.application")
-    id("cashbook.android.application.compose")
-    id("cashbook.android.application.flavors")
-    id("cashbook.android.application.jacoco")
-    id("cashbook.android.hilt")
-    id("jacoco")
-    // Kotlin 注解处理
-    kotlin("kapt")
-    // Kotlin json 转换
-    kotlin("plugin.serialization")
+    alias(libs.plugins.cashbook.android.application)
+    alias(libs.plugins.cashbook.android.application.compose)
+    alias(libs.plugins.cashbook.android.application.flavors)
+    alias(libs.plugins.cashbook.android.application.jacoco)
+    alias(libs.plugins.cashbook.android.hilt)
+    alias(libs.plugins.kotlin.serialization)
     // Kotlin Parcelize 序列化
     id("kotlin-parcelize")
 }
@@ -101,22 +94,22 @@ dependencies {
     implementation(libs.google.material)
 
     // 功能
-    implementation(project(":feature:tags"))
-    implementation(project(":feature:types"))
-    implementation(project(":feature:books"))
-    implementation(project(":feature:assets"))
-    implementation(project(":feature:records"))
-    implementation(project(":feature:settings"))
+    implementation(projects.feature.tags)
+    implementation(projects.feature.types)
+    implementation(projects.feature.books)
+    implementation(projects.feature.assets)
+    implementation(projects.feature.records)
+    implementation(projects.feature.settings)
 
     // 设计
-    implementation(project(":core:design"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:model"))
-    implementation(project(":core:common"))
-    implementation(project(":core:data"))
+    implementation(projects.core.common)
+    implementation(projects.core.model)
+    implementation(projects.core.design)
+    implementation(projects.core.ui)
+    implementation(projects.core.data)
 
     // 数据同步
-    implementation(project(":sync:work"))
+    implementation(projects.sync.work)
 
     // Markdown 解析
     implementation(libs.noties.markwon)

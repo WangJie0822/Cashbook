@@ -1,8 +1,8 @@
 plugins {
-    id("cashbook.android.library")
-    id("cashbook.android.library.jacoco")
-    id("cashbook.android.room")
-    id("cashbook.android.hilt")
+    alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.cashbook.android.room)
+    alias(libs.plugins.cashbook.android.hilt)
 }
 
 android {
@@ -27,8 +27,8 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
 
-    androidTestImplementation(project(":core:testing"))
+    androidTestImplementation(projects.core.testing)
 
-    implementation(project(":core:model"))
-    implementation(project(":core:common"))
+    implementation(projects.core.common)
+    implementation(projects.core.model)
 }

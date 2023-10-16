@@ -1,7 +1,7 @@
 plugins {
-    id("cashbook.android.library")
-    id("cashbook.android.library.compose")
-    id("cashbook.android.library.jacoco")
+    alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.compose)
+    alias(libs.plugins.cashbook.android.library.jacoco)
 }
 
 android {
@@ -9,6 +9,9 @@ android {
 }
 
 dependencies {
+
+    implementation(projects.core.model)
+    implementation(projects.core.design)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)

@@ -1,3 +1,3 @@
 plugins {
-    id("cashbook.jvm.library")
+    alias(libs.plugins.cashbook.jvm.library)
 }

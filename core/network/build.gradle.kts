@@ -1,9 +1,7 @@
-@file:Suppress("UnstableApiUsage")
-
 plugins {
-    id("cashbook.android.library")
-    id("cashbook.android.library.jacoco")
-    id("cashbook.android.hilt")
+    alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.cashbook.android.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
 
@@ -13,8 +11,8 @@ android {
 
 dependencies {
 
-    implementation(project(":core:common"))
-    implementation(project(":core:model"))
+    implementation(projects.core.common)
+    implementation(projects.core.model)
 
     // kotlin 协程
     implementation(libs.kotlinx.coroutines.android)

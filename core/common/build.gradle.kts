@@ -1,14 +1,12 @@
-@file:Suppress("UnstableApiUsage")
-
 import cn.wj.android.cashbook.buildlogic.generateFlavorFile
 
 generateFlavorFile = true
 
 plugins {
-    id("cashbook.android.library")
-    id("cashbook.android.library.jacoco")
-    id("cashbook.android.library.flavors")
-    id("cashbook.android.hilt")
+    alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.cashbook.android.library.flavors)
+    alias(libs.plugins.cashbook.android.hilt)
 }
 
 android {

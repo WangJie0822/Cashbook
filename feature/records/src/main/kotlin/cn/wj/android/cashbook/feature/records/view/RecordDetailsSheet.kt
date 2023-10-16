@@ -39,6 +39,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
 import java.math.BigDecimal
 
@@ -123,12 +124,6 @@ internal fun RecordDetailsSheet(
                     }
                     CommonDivider()
 
-                    val typeColor = when (recordData.typeCategory) {
-                        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
-                        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
-                        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
-                    }
-
                     // 金额
                     TransparentListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.amount)) },
@@ -153,7 +148,7 @@ internal fun RecordDetailsSheet(
                                 }
                                 Text(
                                     text = recordData.amount.withCNY(),
-                                    color = typeColor,
+                                    color = recordData.typeCategory.typeColor,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                             }
@@ -198,10 +193,10 @@ internal fun RecordDetailsSheet(
                                 Icon(
                                     painter = painterDrawableResource(idStr = recordData.typeIconResName),
                                     contentDescription = null,
-                                    tint = typeColor,
+                                    tint = recordData.typeCategory.typeColor,
                                     modifier = Modifier
                                         .background(
-                                            color = typeColor.copy(alpha = 0.1f),
+                                            color = recordData.typeCategory.typeColor.copy(alpha = 0.1f),
                                             shape = CircleShape
                                         )
                                         .padding(2.dp)
@@ -313,7 +308,7 @@ internal fun RecordDetailsSheet(
                             trailingContent = {
                                 val tagsText = with(StringBuilder()) {
                                     recordData.relatedTags.forEach { tag ->
-                                        if (!isBlank()) {
+                                        if (isNotBlank()) {
                                             append(",")
                                         }
                                         append(tag.name)

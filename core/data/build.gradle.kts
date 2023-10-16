@@ -1,7 +1,7 @@
 plugins {
-    id("cashbook.android.library")
-    id("cashbook.android.library.jacoco")
-    id("cashbook.android.hilt")
+    alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.cashbook.android.hilt)
 }
 
 android {
@@ -10,12 +10,12 @@ android {
 
 dependencies {
 
-    implementation(project(":core:common"))
-    implementation(project(":core:model"))
-    implementation(project(":core:database"))
-    implementation(project(":core:datastore"))
-    implementation(project(":core:network"))
-    implementation(project(":core:ui"))
+    implementation(projects.core.common)
+    implementation(projects.core.model)
+    implementation(projects.core.database)
+    implementation(projects.core.datastore)
+    implementation(projects.core.network)
+    implementation(projects.core.ui)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.documentfile)

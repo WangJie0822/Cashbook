@@ -12,7 +12,6 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
                 apply(ApplicationSetting.Plugin.PLUGIN_JACOCO)
             }
 

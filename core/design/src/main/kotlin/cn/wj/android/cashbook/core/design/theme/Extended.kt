@@ -16,8 +16,11 @@ data class ExtendedColors(
     val selected: Color = Color.Unspecified,
     val unselected: Color = Color.Unspecified,
     val income: Color = Color.Unspecified,
+    val onIncome: Color = Color.Unspecified,
     val expenditure: Color = Color.Unspecified,
+    val onExpenditure: Color = Color.Unspecified,
     val transfer: Color = Color.Unspecified,
+    val onTransfer: Color = Color.Unspecified,
     val github: Color = Color.Unspecified,
     val gitee: Color = Color.Unspecified,
 )

@@ -18,10 +18,6 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
-            }
-
             extensions.configure<KotlinProjectExtension> {
                 jvmToolchain(ApplicationSetting.Config.javaVersion.version)
             }

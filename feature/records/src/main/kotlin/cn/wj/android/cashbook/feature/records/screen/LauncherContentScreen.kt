@@ -71,6 +71,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
@@ -517,21 +518,16 @@ internal fun RecordListItem(
     showTags: Boolean = true,
     showRemarks: Boolean = true,
 ) {
-    val typeColor = when (item.typeCategory) {
-        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
-        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
-        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
-    }
     TransparentListItem(
         modifier = modifier,
         leadingContent = {
             Icon(
                 painter = painterDrawableResource(idStr = item.typeIconResName),
                 contentDescription = null,
-                tint = typeColor,
+                tint = item.typeCategory.typeColor,
                 modifier = Modifier
                     .background(
-                        color = typeColor.copy(alpha = 0.1f),
+                        color = item.typeCategory.typeColor.copy(alpha = 0.1f),
                         shape = CircleShape
                     )
                     .padding(2.dp)
@@ -609,7 +605,7 @@ internal fun RecordListItem(
                     }
                     Text(
                         text = item.amount.withCNY(),
-                        color = typeColor,
+                        color = item.typeCategory.typeColor,
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }

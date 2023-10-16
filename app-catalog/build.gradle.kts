@@ -1,7 +1,6 @@
 plugins {
-    // Android Kotlin 应用
-    id("cashbook.android.application")
-    id("cashbook.android.application.compose")
+    alias(libs.plugins.cashbook.android.application)
+    alias(libs.plugins.cashbook.android.application.compose)
 }
 
 android {
@@ -22,7 +21,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core:design"))
-    implementation(project(":core:ui"))
+    implementation(projects.core.design)
+    implementation(projects.core.ui)
     implementation(libs.androidx.activity.compose)
 }

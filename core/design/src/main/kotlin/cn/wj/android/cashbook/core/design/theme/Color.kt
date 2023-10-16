@@ -66,14 +66,7 @@ val md_theme_dark_scrim = Color(0xFF000000)
 
 
 val seed = Color(0xFF03776A)
-val expenditure = Color(0xFFEB4B17)
-val income = Color(0xFF00914F)
-val transfer = Color(0xFF2775AB)
-val selected = Color(0xFFBD9683)
-val unselected = Color(0xFFBFC1A9)
-val quaternary = Color(0xFFFBD15C)
-val github = Color(0xFF212121)
-val gitee = Color(0xFFA90022)
+
 val light_expenditure = Color(0xFFB02F00)
 val light_onExpenditure = Color(0xFFFFFFFF)
 val light_expenditureContainer = Color(0xFFFFDBD1)

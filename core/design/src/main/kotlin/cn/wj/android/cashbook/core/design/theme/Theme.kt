@@ -108,8 +108,11 @@ val LightExtendedColors = ExtendedColors(
     selected = light_selected,
     unselected = light_unselected,
     income = light_income,
+    onIncome = light_onIncome,
     expenditure = light_expenditure,
+    onExpenditure = light_onExpenditure,
     transfer = light_transfer,
+    onTransfer = light_onTransfer,
     github = light_github,
     gitee = light_gitee,
 )
@@ -122,8 +125,11 @@ val DarkExtendedColors = ExtendedColors(
     selected = dark_selected,
     unselected = dark_unselected,
     income = dark_income,
+    onIncome = dark_onIncome,
     expenditure = dark_expenditure,
+    onExpenditure = dark_onExpenditure,
     transfer = dark_transfer,
+    onTransfer = dark_onTransfer,
     github = dark_github,
     gitee = dark_gitee,
 )

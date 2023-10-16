@@ -1,4 +1,3 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
 import cn.wj.android.cashbook.buildlogic.configureAndroidCompose
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
@@ -15,10 +14,6 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_LIBRARY)
-            }
-
             val extension = extensions.getByType<LibraryExtension>()
             configureAndroidCompose(extension)
         }

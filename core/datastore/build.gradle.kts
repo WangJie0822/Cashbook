@@ -1,7 +1,7 @@
 plugins {
-    id("cashbook.android.library")
-    id("cashbook.android.library.jacoco")
-    id("cashbook.android.hilt")
+    alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.cashbook.android.hilt)
     alias(libs.plugins.google.protobuf)
 }
 
@@ -38,8 +38,8 @@ androidComponents.beforeVariants {
 
 dependencies {
 
-    implementation(project(":core:common"))
-    implementation(project(":core:model"))
+    implementation(projects.core.common)
+    implementation(projects.core.model)
 
     implementation(libs.kotlinx.coroutines.android)
 

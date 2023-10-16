@@ -83,6 +83,8 @@ androidx-datastore = "1.0.0"
 androidx-annotation = "1.7.0"
 # DocumentFile [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
 androidx-documentfile = "1.0.1"
+# palette [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/palette?hl=zh-cn)
+androidx-palette = "1.0.0"
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/test?hl=zh-cn)
 androidx-test-annotation = "1.0.1"
 androidx-test-core = "1.5.0"
@@ -370,6 +372,8 @@ androidx-datastore-preferences-rxjava3 = { group = "androidx.datastore", name = 
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidx-annotation" }
 # DocumentFile [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "androidx-documentfile" }
+# palette [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
+androidx-palette = { group = "androidx.palette", name = "palette", version.ref = "androidx-palette" }
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/test?hl=zh-cn)
 androidx-test-annotation = { group = "androidx.test", name = "annotation", version.ref = "androidx-test-annotation" }
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test-core" }
@@ -511,24 +515,6 @@ lookfirst-sardine = { group = "com.github.lookfirst", name = "sardine", version.
 # WebDAV 客户端 [Github](https://github.com/thegrizzlylabs/sardine-android)
 thegrizzlylabs-sardine = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "thegrizzlylabs-sardine" }
 
-# 插件
-[plugins]
-# Android 应用
-android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
-# Android 仓库
-android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
-# Kotlin Android
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-# Kotlin kapt
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-# json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "google-devtools-ksp" }
-# protobuf [Github](https://github.com/protocolbuffers/protobuf)
-google-protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf-plugin" }
-# hilt [指南](https://dagger.dev/hilt)
-google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "google-hilt" }
-
 # 依赖组合
 [bundles]
 # Androidx 基本组合
@@ -550,3 +536,36 @@ scwang90-refresh = ["scwang90-refresh-layout", "scwang90-refresh-classics-header
 
 # 换肤组合
 skin-support = ["skin-support", "skin-support-appcompat", "skin-support-design", "skin-support-constraintlayout", "skin-support-cardview"]
+
+# 插件
+[plugins]
+# Android 应用
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+# Android 仓库
+android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+# Kotlin Android
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+# Kotlin kapt
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+# json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "google-devtools-ksp" }
+# protobuf [Github](https://github.com/protocolbuffers/protobuf)
+google-protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf-plugin" }
+# hilt [指南](https://dagger.dev/hilt)
+google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "google-hilt" }
+
+# 项目定义插件
+cashbook-jvm-library = { id = "cashbook.jvm.library", version = "unspecified" }
+cashbook-android-test = { id = "cashbook.android.test", version = "unspecified" }
+cashbook-android-hilt = { id = "cashbook.android.hilt", version = "unspecified" }
+cashbook-android-room = { id = "cashbook.android.room", version = "unspecified" }
+cashbook-android-application = { id = "cashbook.android.application", version = "unspecified" }
+cashbook-android-application-compose = { id = "cashbook.android.application.compose", version = "unspecified" }
+cashbook-android-application-jacoco = { id = "cashbook.android.application.jacoco", version = "unspecified" }
+cashbook-android-application-flavors = { id = "cashbook.android.application.flavors", version = "unspecified" }
+cashbook-android-library = { id = "cashbook.android.library", version = "unspecified" }
+cashbook-android-library-compose = { id = "cashbook.android.library.compose", version = "unspecified" }
+cashbook-android-library-jacoco = { id = "cashbook.android.library.jacoco", version = "unspecified" }
+cashbook-android-library-flavors = { id = "cashbook.android.library.flavors", version = "unspecified" }
+cashbook-android-library-feature = { id = "cashbook.android.library.feature", version = "unspecified" }
