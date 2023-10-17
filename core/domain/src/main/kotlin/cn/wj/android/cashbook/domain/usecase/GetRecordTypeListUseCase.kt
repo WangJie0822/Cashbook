@@ -1,5 +1,7 @@
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
+import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
@@ -7,7 +9,6 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -21,13 +22,13 @@ import kotlinx.coroutines.withContext
  */
 class GetRecordTypeListUseCase @Inject constructor(
     private val typeRepository: TypeRepository,
+    @Dispatcher(CashbookDispatchers.IO) private val ioCoroutineContext: CoroutineContext,
 ) {
 
     suspend operator fun invoke(
         typeCategory: RecordTypeCategoryEnum,
         selectedTypeId: Long,
-        coroutineContext: CoroutineContext = Dispatchers.IO,
-    ): List<RecordTypeEntity> = withContext(coroutineContext) {
+    ): List<RecordTypeEntity> = withContext(ioCoroutineContext) {
         when (typeCategory) {
             RecordTypeCategoryEnum.EXPENDITURE -> typeRepository.firstExpenditureTypeListData
             RecordTypeCategoryEnum.INCOME -> typeRepository.firstIncomeTypeListData
@@ -44,8 +45,10 @@ class GetRecordTypeListUseCase @Inject constructor(
                     .sortedBy { it.sort }
             }
             .map { list ->
-                val selectedType = typeRepository.getRecordTypeById(selectedTypeId)?.asEntity()
-                val selectedEntity = selectedType ?: list.first()
+                var selectedEntity = typeRepository.getRecordTypeById(selectedTypeId)?.asEntity()
+                if (null == selectedEntity || selectedEntity.typeCategory != typeCategory) {
+                    selectedEntity = list.first()
+                }
                 // 最终输出结果
                 val result = arrayListOf<RecordTypeEntity>()
                 // 是否选中一级类型
@@ -90,11 +93,7 @@ class GetRecordTypeListUseCase @Inject constructor(
                 if (typeCategory == RecordTypeCategoryEnum.INCOME) {
                     // 更新退款、报销类型标记
                     result.map {
-                        if (typeRepository.needRelated(it.id)) {
-                            it.copy(needRelated = true)
-                        } else {
-                            it
-                        }
+                        it.copy(needRelated = typeRepository.needRelated(it.id))
                     }
                 } else {
                     result

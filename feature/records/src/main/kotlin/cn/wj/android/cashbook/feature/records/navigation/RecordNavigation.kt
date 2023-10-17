@@ -2,7 +2,6 @@ package cn.wj.android.cashbook.feature.records.navigation
 
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -55,14 +54,14 @@ fun NavController.naviToCalendar() {
 /**
  * 编辑记录
  *
- * @param typeListContent 类型列表布局，参数：(类型大类, 类型大类选择回调, 类型选择回调) -> [Unit]
+ * @param typeListContent 类型列表布局，参数：(类型大类, 默认类型 id, 类型选择回调) -> [Unit]
  * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 已选择资产id, 是否是关联资产, 资产选择回调) -> [Unit]
  * @param tagBottomSheetContent 选择标签抽屉布局，参数：(已选择标签id列表, 标签id列表变化回调) -> [Unit]
  * @param onRequestPopBackStack 导航到上一级
  */
 fun NavGraphBuilder.editRecordScreen(
-    typeListContent: @Composable (RecordTypeCategoryEnum, (RecordTypeCategoryEnum) -> Unit, (Long) -> Unit) -> Unit,
-    assetBottomSheetContent: @Composable (Long, Long,Boolean, (Long) -> Unit) -> Unit,
+    typeListContent: @Composable (RecordTypeCategoryEnum, Long, (Long) -> Unit) -> Unit,
+    assetBottomSheetContent: @Composable (Long, Long, Boolean, (Long) -> Unit) -> Unit,
     tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit,
     onRequestNaviToSelectRelatedRecord: () -> Unit,
     onRequestPopBackStack: () -> Unit,

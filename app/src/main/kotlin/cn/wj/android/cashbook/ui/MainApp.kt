@@ -354,10 +354,10 @@ fun CashbookNavHost(
 
         // 编辑记录
         editRecordScreen(
-            typeListContent = { typeCategory, onTypeCategorySelect, onTypeSelect ->
+            typeListContent = { typeCategory, defaultTypeId, onTypeSelect ->
                 EditRecordTypeListContent(
                     typeCategory = typeCategory,
-                    onTypeCategorySelect = onTypeCategorySelect,
+                    defaultTypeId = defaultTypeId,
                     onTypeSelect = onTypeSelect,
                     onRequestNaviToTypeManager = navController::naviToMyCategories,
                 )

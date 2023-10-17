@@ -152,6 +152,12 @@ class EditRecordViewModel @Inject constructor(
             )
 
     /** 类型数据 */
+    val defaultTypeIdData = _defaultRecordData.mapLatest { it.typeId }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = -1L,
+        )
     private val _mutableTypeCategoryData = MutableStateFlow<RecordTypeCategoryEnum?>(null)
     val selectedTypeCategoryData =
         combine(_mutableTypeCategoryData, _defaultRecordData) { mutable, defaultRecord ->

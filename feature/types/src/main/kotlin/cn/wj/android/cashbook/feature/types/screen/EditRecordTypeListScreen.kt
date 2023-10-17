@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package cn.wj.android.cashbook.feature.types.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -8,15 +6,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,37 +31,47 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.types.viewmodel.EditRecordTypeListViewModel
 
 /**
  * 编辑记录页面标签列表
  *
  * @param typeCategory 记录大类
- * @param onTypeCategorySelect 类型大类选中回调
+ * @param defaultTypeId 默认类型 id
  * @param onTypeSelect 类型选中回调
  * @param onRequestNaviToTypeManager 导航到类型管理
  */
 @Composable
 internal fun EditRecordTypeListRoute(
     typeCategory: RecordTypeCategoryEnum,
-    onTypeCategorySelect: (RecordTypeCategoryEnum) -> Unit,
+    defaultTypeId: Long,
     onTypeSelect: (Long) -> Unit,
     onRequestNaviToTypeManager: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditRecordTypeListViewModel = hiltViewModel<EditRecordTypeListViewModel>().apply {
-        update(typeCategory, -1L) // TODO 选择类型列表处理
+        update(typeCategory, defaultTypeId)
     },
 ) {
+    val currentTypeCategory by viewModel.currentTypeCategoryData.collectAsStateWithLifecycle()
     val typeList by viewModel.typeListData.collectAsStateWithLifecycle()
 
+    val currentSelectedTypeId by viewModel.currentSelectedTypeId.collectAsStateWithLifecycle()
+
+    LaunchedEffect(currentSelectedTypeId) {
+        if (currentSelectedTypeId != -1L) {
+            onTypeSelect(currentSelectedTypeId)
+        }
+    }
+
     EditRecordTypeListScreen(
+        currentTypeCategory = currentTypeCategory,
         typeList = typeList,
-        onTypeSelect = onTypeSelect,
+        onTypeSelect = viewModel::updateTypeId,
         onTypeSettingClick = onRequestNaviToTypeManager,
         modifier = modifier,
     )
@@ -71,20 +80,23 @@ internal fun EditRecordTypeListRoute(
 /**
  * 编辑记录页面标签列表
  *
- * @param typeList 类型列表
  * @param onTypeSelect 类型选中回调
  * @param onTypeSettingClick 类型设置点击
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun EditRecordTypeListScreen(
+    currentTypeCategory: RecordTypeCategoryEnum,
     typeList: List<RecordTypeEntity>,
     onTypeSelect: (Long) -> Unit,
     onTypeSettingClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val typeColor = currentTypeCategory.typeColor
     LazyVerticalGrid(
-        modifier = modifier.padding(horizontal = 16.dp),
+        modifier = modifier
+            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp),
         columns = GridCells.Fixed(RECORD_TYPE_COLUMNS),
         content = {
             // 分类列表
@@ -96,6 +108,7 @@ internal fun EditRecordTypeListScreen(
                         first = true,
                         shapeType = type.shapeType,
                         iconPainter = painterResource(id = R.drawable.vector_baseline_settings_24),
+                        typeColor = typeColor,
                         showMore = false,
                         title = stringResource(id = R.string.settings),
                         selected = true,
@@ -107,6 +120,7 @@ internal fun EditRecordTypeListScreen(
                         first = type.parentId == -1L,
                         shapeType = type.shapeType,
                         iconPainter = painterDrawableResource(idStr = type.iconResName),
+                        typeColor = typeColor,
                         showMore = type.child.isNotEmpty(),
                         title = type.name,
                         selected = type.selected,
@@ -150,6 +164,7 @@ internal fun TypeItem(
     first: Boolean,
     shapeType: Int,
     iconPainter: Painter,
+    typeColor: Color,
     showMore: Boolean,
     title: String,
     selected: Boolean,
@@ -179,7 +194,7 @@ internal fun TypeItem(
         val (iconBg, iconMore, text) = createRefs()
         // 根据选中状态显示主要颜色
         val color =
-            if (selected) LocalExtendedColors.current.selected else LocalExtendedColors.current.unselected
+            if (selected) typeColor else LocalContentColor.current.copy(alpha = 0.5f)
         // 记录类型对应的图标，使用圆形边框
         Icon(
             painter = iconPainter,
@@ -188,7 +203,7 @@ internal fun TypeItem(
             modifier = Modifier
                 .size(32.dp)
                 .background(
-                    color = if (selected) color.copy(alpha = 0.3f) else Color.Unspecified,
+                    color = if (selected) color.copy(alpha = 0.1f) else Color.Unspecified,
                     shape = CircleShape
                 )
                 .clip(CircleShape)
