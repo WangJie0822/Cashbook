@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
@@ -170,13 +169,6 @@ internal fun AssetInfoScreen(
                     }
                 },
             )
-        },
-        floatingActionButton = {
-            if (uiState is AssetInfoUiState.Success) {
-                CashbookFloatingActionButton(onClick = { /* TODO 使用当前资产添加记录 */ }) {
-                    Icon(imageVector = CashbookIcons.Add, contentDescription = null)
-                }
-            }
         },
         snackbarHost = {
             SnackbarHost(snackbarHostState)

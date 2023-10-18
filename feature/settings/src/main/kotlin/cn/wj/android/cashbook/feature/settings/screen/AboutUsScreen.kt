@@ -47,9 +47,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.AboutUsBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsUiState
@@ -69,10 +67,10 @@ import io.noties.markwon.Markwon
 @Composable
 internal fun AboutUsRoute(
     modifier: Modifier = Modifier,
-    onRequestNaviToChangelog: () -> Unit = {},
-    onRequestNaviToPrivacyPolicy: () -> Unit = {},
-    onRequestPopBackStack: () -> Unit = {},
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
+    onRequestNaviToChangelog: () -> Unit,
+    onRequestNaviToPrivacyPolicy: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     viewModel: AboutUsViewModel = hiltViewModel(),
 ) {
 
@@ -482,12 +480,4 @@ internal fun NoWifiUpdateHintDialog(
             }
         },
     )
-}
-
-@DevicePreviews
-@Composable
-private fun AboutUsScreenPreview() {
-    PreviewTheme {
-        AboutUsRoute()
-    }
 }

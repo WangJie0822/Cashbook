@@ -13,11 +13,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
+/**
+ * 我的标签 ViewModel
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/11
+ */
 @HiltViewModel
 class MyTagsViewModel @Inject constructor(
-    private val tagRepository: TagRepository
+    tagRepository: TagRepository,
 ) : ViewModel() {
 
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
@@ -41,21 +45,5 @@ class MyTagsViewModel @Inject constructor(
 
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
-    }
-
-    fun modifyTag(tag: TagModel) {
-        viewModelScope.launch {
-            // TODO 事件校验
-            tagRepository.updateTag(tag)
-            dismissDialog()
-        }
-    }
-
-    fun deleteTag(tag: TagModel) {
-        viewModelScope.launch {
-            // TODO 事件校验
-            tagRepository.deleteTag(tag)
-            dismissDialog()
-        }
     }
 }

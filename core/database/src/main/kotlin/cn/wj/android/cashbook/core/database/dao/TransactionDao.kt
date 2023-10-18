@@ -299,6 +299,22 @@ interface TransactionDao {
 
     @Query(
         value = """
+        DELETE FROM db_tag_with_record
+        WHERE tag_id=:tagId
+    """
+    )
+    suspend fun deleteTagRelationByTagId(tagId: Long)
+
+    @Query(
+        value = """
+        DELETE FROM db_tag
+        WHERE id=:tagId
+    """
+    )
+    suspend fun deleteTagById(tagId: Long)
+
+    @Query(
+        value = """
        DELETE FROM db_books
         WHERE id=:bookId
     """
@@ -321,6 +337,12 @@ interface TransactionDao {
         }
         // 删除账本
         deleteBookById(bookId)
+    }
+
+    @Transaction
+    suspend fun deleteTag(id: Long) {
+        deleteTagRelationByTagId(id)
+        deleteTagById(id)
     }
 
 }

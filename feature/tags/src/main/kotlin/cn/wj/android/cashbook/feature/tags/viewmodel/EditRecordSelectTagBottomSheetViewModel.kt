@@ -80,12 +80,4 @@ class EditRecordSelectTagBottomSheetViewModel @Inject constructor(
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
-
-    /** 添加标签 */
-    fun addTag(tag: TagModel) {
-        viewModelScope.launch {
-            tagRepository.updateTag(tag)
-            dismissDialog()
-        }
-    }
 }

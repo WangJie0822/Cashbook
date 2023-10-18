@@ -17,6 +17,8 @@ interface TagRepository {
     suspend fun getTagById(tagId: Long): TagModel?
 
     suspend fun deleteRelatedWithAsset(assetId: Long)
+
+    suspend fun countTagByName(name: String): Int
 }
 
 internal fun TagTable.asModel(): TagModel {

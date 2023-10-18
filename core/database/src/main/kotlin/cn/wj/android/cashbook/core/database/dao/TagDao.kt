@@ -34,5 +34,10 @@ interface TagDao {
         DELETE FROM db_tag_with_record
         WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
     """)
-    fun deleteRelatedWithAsset(assetId: Long)
+    suspend fun deleteRelatedWithAsset(assetId: Long)
+
+    @Query(value="""
+        SELECT COUNT(*) FROM db_tag WHERE name=:name
+    """)
+    suspend fun countByName(name:String):Int
 }

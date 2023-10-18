@@ -30,6 +30,7 @@ import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.tags.dialog.EditTagDialogRoute
 import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModel
 
 /**
@@ -56,7 +57,6 @@ internal fun EditRecordSelectTagBottomSheetRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         tagList = tagList,
         onAddTagClick = viewModel::displayAddTagDialog,
-        onAddTagConfirmClick = viewModel::addTag,
         onTagItemClick = { tagEntity ->
             viewModel.updateSelectedTagList(
                 id = tagEntity.id,
@@ -76,7 +76,6 @@ internal fun EditRecordSelectTagBottomSheetRoute(
  * @param onRequestDismissDialog 隐藏弹窗
  * @param tagList 标签列表数据
  * @param onAddTagClick 添加标签点击回调
- * @param onAddTagConfirmClick 添加标签确认点击回调
  * @param onTagItemClick 标签列表 item 点击回调
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -86,7 +85,6 @@ internal fun EditRecordSelectTagBottomSheetScreen(
     onRequestDismissDialog: () -> Unit,
     tagList: List<Selectable<TagModel>>,
     onAddTagClick: () -> Unit,
-    onAddTagConfirmClick: (TagModel) -> Unit,
     onTagItemClick: (TagModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -160,9 +158,8 @@ internal fun EditRecordSelectTagBottomSheetScreen(
             },
         )
         if (dialogState is DialogState.Shown<*>) {
-            EditTagDialog(
-                tagEntity = null,
-                onConfirmClick = onAddTagConfirmClick,
+            EditTagDialogRoute(
+                tagModel = null,
                 onRequestDismissDialog = onRequestDismissDialog,
             )
         }

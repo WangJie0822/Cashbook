@@ -116,7 +116,6 @@ fun MainApp(
             snackbarHostState.showSnackbar(
                 message = message,
                 actionLabel = action,
-                duration = SnackbarDuration.Short,
             )
         }
 

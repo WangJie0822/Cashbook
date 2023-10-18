@@ -2,12 +2,14 @@ package cn.wj.android.cashbook.core.data.repository.impl
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
+import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.tagDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.TagDao
+import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.model.model.TagModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -18,6 +20,7 @@ import kotlinx.coroutines.withContext
 
 class TagRepositoryImpl @Inject constructor(
     private val tagDao: TagDao,
+    private val transactionDao: TransactionDao,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : TagRepository {
 
@@ -42,13 +45,14 @@ class TagRepositoryImpl @Inject constructor(
                 tagDao.update(tagTable)
             }
             tagDataVersion.updateVersion()
+            recordDataVersion.updateVersion()
         }
 
     override suspend fun deleteTag(tag: TagModel) =
         withContext(coroutineContext) {
-            val tagTable = tag.asTable()
-            tagDao.delete(tagTable)
+            transactionDao.deleteTag(tag.id)
             tagDataVersion.updateVersion()
+            recordDataVersion.updateVersion()
         }
 
     override suspend fun getRelatedTag(recordId: Long): List<TagModel> =
@@ -65,5 +69,10 @@ class TagRepositoryImpl @Inject constructor(
     override suspend fun deleteRelatedWithAsset(assetId: Long): Unit =
         withContext(coroutineContext) {
             tagDao.deleteRelatedWithAsset(assetId)
+        }
+
+    override suspend fun countTagByName(name: String): Int =
+        withContext(coroutineContext) {
+            tagDao.countByName(name)
         }
 }
