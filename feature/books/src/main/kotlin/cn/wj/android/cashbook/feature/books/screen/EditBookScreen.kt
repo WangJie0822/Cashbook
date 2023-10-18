@@ -23,7 +23,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.data.repository.fake.FakeBooksRepository
 import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
@@ -31,8 +30,6 @@ import cn.wj.android.cashbook.core.design.component.CompatTextField
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.books.enums.EditBookBookmarkEnum
 import cn.wj.android.cashbook.feature.books.viewmodel.EditBookUiState
@@ -40,9 +37,9 @@ import cn.wj.android.cashbook.feature.books.viewmodel.EditBookViewModel
 
 @Composable
 internal fun EditBookRoute(
+    bookId: Long,
+    onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
-    bookId: Long = -1L,
-    onRequestPopBackStack: () -> Unit = {},
     viewModel: EditBookViewModel = hiltViewModel<EditBookViewModel>().apply {
         updateBookId(bookId)
     },
@@ -155,18 +152,5 @@ internal fun EditBookScreen(
                 }
             }
         }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun EditBookPreview() {
-    PreviewTheme {
-        EditBookRoute(
-            viewModel = EditBookViewModel(booksRepository = FakeBooksRepository).apply {
-                updateBookId(
-                    1L
-                )
-            })
     }
 }

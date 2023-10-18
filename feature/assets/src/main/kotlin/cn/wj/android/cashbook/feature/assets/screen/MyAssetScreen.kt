@@ -48,10 +48,8 @@ import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
 import cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetUiState
@@ -69,11 +67,11 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetViewModel
  */
 @Composable
 internal fun MyAssetRoute(
+    onRequestNaviToAssetInfo: (Long) -> Unit,
+    onRequestNaviToAddAsset: () -> Unit,
+    onRequestNaviToInvisibleAsset: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
-    onRequestNaviToAssetInfo: (Long) -> Unit = {},
-    onRequestNaviToAddAsset: () -> Unit = {},
-    onRequestNaviToInvisibleAsset: () -> Unit = {},
-    onRequestPopBackStack: () -> Unit = {},
     viewModel: MyAssetViewModel = hiltViewModel(),
 ) {
 
@@ -250,7 +248,7 @@ private fun ShowMoreContent(
                 }
                 CashbookSmallFloatingActionButton(
                     onClick = {
-                        onInvisibleAssetClick.invoke()
+                        onInvisibleAssetClick()
                         onCloseClick.invoke()
                     },
                 ) {
@@ -453,15 +451,5 @@ internal fun BackLayerContent(
                 }
             }
         }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun MyAssetScreenPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)
-    ) {
-        MyAssetRoute()
     }
 }

@@ -16,7 +16,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -24,10 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CommonDivider
 import cn.wj.android.cashbook.core.design.component.Empty
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.model.Selectable
 import cn.wj.android.cashbook.core.model.model.TagModel
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.dialog.EditTagDialogRoute
@@ -41,9 +38,9 @@ import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSh
  */
 @Composable
 internal fun EditRecordSelectTagBottomSheetRoute(
+    selectedTagIdList: List<Long>,
+    onTagIdListChange: (List<Long>) -> Unit,
     modifier: Modifier = Modifier,
-    selectedTagIdList: List<Long> = emptyList(),
-    onTagIdListChange: (List<Long>) -> Unit = {},
     viewModel: EditRecordSelectTagBottomSheetViewModel = hiltViewModel<EditRecordSelectTagBottomSheetViewModel>().apply {
         updateSelectedTags(selectedTagIdList)
     },
@@ -162,20 +159,6 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                 tagModel = null,
                 onRequestDismissDialog = onRequestDismissDialog,
             )
-        }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun EditRecordSelectTagBottomSheetScreenPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        PreviewTheme(
-            defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-        ) {
-            EditRecordSelectTagBottomSheetRoute()
         }
     }
 }

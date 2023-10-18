@@ -24,7 +24,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,9 +40,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
@@ -62,10 +59,10 @@ import java.time.YearMonth
  */
 @Composable
 internal fun CalendarRoute(
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
+    onRequestPopBackStack: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
-    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit = { _, _ -> },
-    onRequestPopBackStack: () -> Unit = {},
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     viewModel: CalendarViewModel = hiltViewModel(),
 ) {
 
@@ -324,13 +321,5 @@ internal fun CalendarScreen(
                 },
             )
         }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun CalendarPreview() {
-    PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)) {
-        CalendarRoute()
     }
 }

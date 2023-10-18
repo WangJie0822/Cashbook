@@ -47,11 +47,9 @@ import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthentica
 import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
@@ -72,10 +70,10 @@ import javax.crypto.Cipher
  */
 @Composable
 internal fun SettingRoute(
+    onRequestNaviToBackupAndRecovery: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
-    onRequestNaviToBackupAndRecovery: () -> Unit = {},
-    onRequestPopBackStack: () -> Unit = {},
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
     supportFingerprint: Boolean = checkBiometric() == HW_AVAILABLE,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
@@ -1087,11 +1085,3 @@ internal val VerificationModeEnum.text: String
             VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
         }
     )
-
-@DevicePreviews
-@Composable
-private fun SettingScreenPreview() {
-    PreviewTheme {
-        SettingRoute()
-    }
-}

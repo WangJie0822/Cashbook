@@ -14,7 +14,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -313,9 +312,9 @@ fun CashbookNavHost(
                     },
                     onRequestOpenDrawer = onRequestOpenDrawer,
                     onRequestNaviToEditRecord = navController::naviToEditRecord,
-                    onRequestNaviToSearch = { /* TODO */ },
+                    onRequestNaviToSearch = { /* TODO 跳转搜索记录 */ },
                     onRequestNaviToCalendar = navController::naviToCalendar,
-                    onRequestNaviToAnalytics = { /* TODO */ },
+                    onRequestNaviToAnalytics = { /* TODO 跳转账单分析 */ },
                     onShowSnackbar = onShowSnackbar,
                 )
             },
@@ -347,7 +346,7 @@ fun CashbookNavHost(
 
         // 我的标签
         myTagsScreen(
-            onRequestNaviToTagStatistic = { /* TODO */ },
+            onRequestNaviToTagStatistic = { /* TODO 跳转账单分析-指定标签 */ },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
 
@@ -400,7 +399,7 @@ fun CashbookNavHost(
         myAssetScreen(
             onRequestNaviToAssetInfo = navController::naviToAssetInfo,
             onRequestNaviToAddAsset = navController::naviToEditAsset,
-            onRequestNaviToInvisibleAsset = {/*TODO*/ },
+            onRequestNaviToInvisibleAsset = { /* TODO 跳转不可见资产 */ },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 资产信息
@@ -439,7 +438,7 @@ fun CashbookNavHost(
 
         // 我的分类
         myCategoriesScreen(
-            onRequestNaviToTypeStatistics = {  /*TODO*/ },
+            onRequestNaviToTypeStatistics = {  /* TODO 跳转账单分析 - 指定分类 */ },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
     }
