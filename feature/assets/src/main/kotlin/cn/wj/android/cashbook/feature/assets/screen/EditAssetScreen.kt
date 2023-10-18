@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.PATTERN_SIGN_MONEY
+import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
@@ -81,11 +83,18 @@ internal fun EditAssetRoute(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     EditAssetScreen(
         isCreate = assetId == -1L,
         uiState = uiState,
         onSelectClassificationClick = viewModel::showSelectClassificationSheet,
-        onClassificationChange = viewModel::updateClassification,
+        onClassificationChange = { type, classification ->
+            viewModel.updateClassification(
+                type,
+                classification,
+                classification.nameResId.string(context),
+            )
+        },
         onBillingDateClick = viewModel::showSelectBillingDateDialog,
         onRepaymentDateClick = viewModel::showSelectRepaymentDateDialog,
         onInvisibleChange = viewModel::updateInvisible,
@@ -263,10 +272,12 @@ internal fun EditAssetScreen(
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(horizontal = 8.dp)
                                     )
-                                    Icon(
-                                        imageVector = CashbookIcons.KeyboardArrowRight,
-                                        contentDescription = null,
-                                    )
+                                    if (uiState.typeEnable) {
+                                        Icon(
+                                            imageVector = CashbookIcons.KeyboardArrowRight,
+                                            contentDescription = null,
+                                        )
+                                    }
                                 }
                             },
                         )

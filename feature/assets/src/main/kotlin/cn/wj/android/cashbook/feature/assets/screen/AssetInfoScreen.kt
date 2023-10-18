@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -41,11 +40,10 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
-import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
@@ -60,21 +58,22 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
  */
 @Composable
 internal fun AssetInfoRoute(
+    assetId: Long,
+    assetRecordListContent: @Composable (@Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
+    onRequestNaviToEditAsset: () -> Unit,
+    onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
-    assetId: Long = -1L,
-    assetRecordListContent: @Composable (@Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit = { _, _ -> },
-    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit = { _, _ -> },
-    onRequestNaviToEditAsset: () -> Unit = {},
-    onRequestPopBackStack: () -> Unit = {},
     viewModel: AssetInfoViewModel = hiltViewModel<AssetInfoViewModel>().apply {
         updateAssetId(assetId)
+        setProgressDialogHintText(stringResource(id = R.string.asset_in_delete))
     },
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AssetInfoScreen(
-        shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
+        bookmark = viewModel.bookmark,
         onRequestDisplayBookmark = viewModel::displayBookmark,
         onRequestDismissBookmark = viewModel::dismissBookmark,
         dialogState = viewModel.dialogState,
@@ -111,7 +110,7 @@ internal fun AssetInfoRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AssetInfoScreen(
-    shouldDisplayBookmark: String,
+    bookmark: AssetInfoBookmarkEnum,
     onRequestDisplayBookmark: () -> Unit,
     onRequestDismissBookmark: () -> Unit,
     dialogState: DialogState,
@@ -132,9 +131,16 @@ internal fun AssetInfoScreen(
     }
 ) {
 
-    LaunchedEffect(shouldDisplayBookmark) {
-        if (shouldDisplayBookmark.isNotBlank()) {
-            val result = snackbarHostState.showSnackbar(shouldDisplayBookmark)
+    val copiedToClipboardText = stringResource(id = R.string.copied_to_clipboard)
+    val assetDeleteFailedText = stringResource(id = R.string.asset_delete_falied)
+    LaunchedEffect(bookmark) {
+        val hintText = when (bookmark) {
+            AssetInfoBookmarkEnum.COPIED_TO_CLIPBOARD -> copiedToClipboardText
+            AssetInfoBookmarkEnum.ASSET_DELETE_FAILED -> assetDeleteFailedText
+            else -> ""
+        }
+        if (hintText.isNotBlank()) {
+            val result = snackbarHostState.showSnackbar(hintText)
             if (result == SnackbarResult.Dismissed) {
                 onRequestDismissBookmark()
             }
@@ -440,15 +446,5 @@ private fun AssetInfoContent(
                 }
             }
         }
-    }
-}
-
-@DevicePreviews
-@Composable
-private fun AssetInfoScreenPreview() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        AssetInfoRoute()
     }
 }

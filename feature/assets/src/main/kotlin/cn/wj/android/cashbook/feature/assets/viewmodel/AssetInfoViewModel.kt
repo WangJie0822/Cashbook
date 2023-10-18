@@ -1,20 +1,18 @@
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
+import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -35,15 +33,16 @@ class AssetInfoViewModel @Inject constructor(
     private val assetRepository: AssetRepository,
     private val recordRepository: RecordRepository,
     private val tagRepository: TagRepository,
-    application: Application,
-) : AndroidViewModel(application) {
+) : ViewModel() {
+
+    private var progressDialogHintText = ""
 
     /** 需显示详情的记录数据 */
     var viewRecordData by mutableStateOf<RecordViewsEntity?>(null)
         private set
 
     /** 提示语状态 */
-    var shouldDisplayBookmark by mutableStateOf("")
+    var bookmark: AssetInfoBookmarkEnum by mutableStateOf(AssetInfoBookmarkEnum.DISMISS)
         private set
 
     /** 弹窗状态 */
@@ -73,6 +72,10 @@ class AssetInfoViewModel @Inject constructor(
             initialValue = AssetInfoUiState.Loading,
         )
 
+    fun setProgressDialogHintText(text: String) {
+        progressDialogHintText = text
+    }
+
     fun updateAssetId(id: Long) {
         _assetIdData.tryEmit(id)
     }
@@ -94,11 +97,11 @@ class AssetInfoViewModel @Inject constructor(
     }
 
     fun displayBookmark() {
-        shouldDisplayBookmark = R.string.copied_to_clipboard.string(getApplication())
+        bookmark = AssetInfoBookmarkEnum.COPIED_TO_CLIPBOARD
     }
 
     fun dismissBookmark() {
-        shouldDisplayBookmark = ""
+        bookmark = AssetInfoBookmarkEnum.DISMISS
     }
 
     fun showDeleteConfirmDialog() {
@@ -109,7 +112,7 @@ class AssetInfoViewModel @Inject constructor(
         // 删除资产
         viewModelScope.launch {
             runCatchWithProgress(
-                hint = R.string.asset_in_delete.string(getApplication()),
+                hint = progressDialogHintText,
                 cancelable = false,
             ) {
                 val assetId = _assetIdData.first()
@@ -121,7 +124,7 @@ class AssetInfoViewModel @Inject constructor(
                 onSuccess()
             }.getOrElse { throwable ->
                 this@AssetInfoViewModel.logger().e(throwable, "deleteAsset()")
-                shouldDisplayBookmark = R.string.asset_delete_falied.string(getApplication())
+                bookmark = AssetInfoBookmarkEnum.ASSET_DELETE_FAILED
             }
         }
     }
