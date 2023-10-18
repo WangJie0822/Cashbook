@@ -9,7 +9,7 @@ import java.util.List;
  */
 public final class FSize extends ObjectPool.Poolable{
 
-    // TODO : Encapsulate width & height
+    //  : Encapsulate width & height
 
     public float width;
     public float height;
