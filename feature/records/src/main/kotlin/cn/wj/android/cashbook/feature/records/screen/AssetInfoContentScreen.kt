@@ -75,7 +75,7 @@ internal fun AssetInfoContentScreen(
                         RecordListItem(
                             item = item,
                             modifier = Modifier.clickable {
-                                onRecordItemClick.invoke(item)
+                                onRecordItemClick(item)
                             },
                         )
                     }

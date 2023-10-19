@@ -13,6 +13,7 @@ import cn.wj.android.cashbook.feature.records.screen.AssetInfoContentRoute
 import cn.wj.android.cashbook.feature.records.screen.CalendarRoute
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentRoute
+import cn.wj.android.cashbook.feature.records.screen.SearchRoute
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
 
@@ -28,6 +29,9 @@ private const val ROUTE_SELECT_RELATED_RECORD = "record/select_related_record"
 
 /** 路由 - 日历 */
 private const val ROUTE_RECORD_CALENDAR = "record/calendar"
+
+/** 路由 - 搜索 */
+private const val ROUTE_RECORD_SEARCH = "record/search"
 
 fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
     this.navigate(
@@ -49,6 +53,10 @@ fun NavController.naviToSelectRelatedRecord() {
 
 fun NavController.naviToCalendar() {
     this.navigate(ROUTE_RECORD_CALENDAR)
+}
+
+fun NavController.naviToSearch() {
+    this.navigate(ROUTE_RECORD_SEARCH)
 }
 
 /**
@@ -120,6 +128,18 @@ fun NavGraphBuilder.calendarScreen(
             recordDetailSheetContent = recordDetailSheetContent,
             onRequestPopBackStack = onRequestPopBackStack,
             onShowSnackbar = onShowSnackbar,
+        )
+    }
+}
+
+fun NavGraphBuilder.searchScreen(
+    onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestPopBackStack: () -> Unit,
+) {
+    composable(route = ROUTE_RECORD_SEARCH) {
+        SearchRoute(
+            onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+            onRequestPopBackStack = onRequestPopBackStack,
         )
     }
 }

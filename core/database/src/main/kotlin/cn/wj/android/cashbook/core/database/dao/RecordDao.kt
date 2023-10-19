@@ -79,6 +79,26 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
+    @Query(
+        value = """
+        SELECT * FROM db_record 
+        WHERE books_id=:booksId 
+        AND (remark LIKE '%'||:keyword||'%'
+        OR amount LIKE '%'||:keyword||'%'
+        OR charge  LIKE '%'||:keyword||'%'
+        OR concessions LIKE '%'||:keyword||'%') 
+        ORDER BY record_time 
+        DESC LIMIT :pageSize 
+        OFFSET :pageNum
+    """
+    )
+    suspend fun queryRecordByKeyword(
+        booksId: Long,
+        keyword: String,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
     @Query("SELECT * FROM db_record WHERE type_id=:id")
     fun queryByTypeId(id: Long): List<RecordTable>
 
@@ -165,16 +185,20 @@ interface RecordDao {
         recordTime: Long,
     ): List<RecordTable>
 
-    @Query(value = """
+    @Query(
+        value = """
         DELETE FROM db_record
         WHERE asset_id=:assetId OR into_asset_id=:assetId
-    """)
+    """
+    )
     fun deleteWithAsset(assetId: Long)
 
-    @Query(value = """
+    @Query(
+        value = """
         DELETE FROM db_record_with_related
         WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
         OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-    """)
+    """
+    )
     fun deleteRelatedWithAsset(assetId: Long)
 }

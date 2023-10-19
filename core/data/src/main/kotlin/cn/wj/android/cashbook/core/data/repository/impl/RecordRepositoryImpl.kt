@@ -90,6 +90,21 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun queryPagingRecordListByKeyword(
+        keyword: String,
+        page: Int,
+        pageSize: Int
+    ): List<RecordModel> = withContext(coroutineContext){
+        recordDao.queryRecordByKeyword(
+            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            keyword = keyword,
+            pageNum = page * pageSize,
+            pageSize = pageSize,
+        ).map {
+            it.asModel()
+        }
+    }
+
     override fun queryRecordByYearMonth(
         year: String,
         month: String

@@ -132,7 +132,7 @@ internal fun AssetInfoScreen(
 ) {
 
     val copiedToClipboardText = stringResource(id = R.string.copied_to_clipboard)
-    val assetDeleteFailedText = stringResource(id = R.string.asset_delete_falied)
+    val assetDeleteFailedText = stringResource(id = R.string.asset_delete_failed)
     LaunchedEffect(bookmark) {
         val hintText = when (bookmark) {
             AssetInfoBookmarkEnum.COPIED_TO_CLIPBOARD -> copiedToClipboardText

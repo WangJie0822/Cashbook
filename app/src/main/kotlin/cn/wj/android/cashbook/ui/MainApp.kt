@@ -78,7 +78,9 @@ import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToCalendar
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
+import cn.wj.android.cashbook.feature.records.navigation.naviToSearch
 import cn.wj.android.cashbook.feature.records.navigation.naviToSelectRelatedRecord
+import cn.wj.android.cashbook.feature.records.navigation.searchScreen
 import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
@@ -314,7 +316,7 @@ fun CashbookNavHost(
                     },
                     onRequestOpenDrawer = onRequestOpenDrawer,
                     onRequestNaviToEditRecord = navController::naviToEditRecord,
-                    onRequestNaviToSearch = { /* TODO 跳转搜索记录 */ },
+                    onRequestNaviToSearch = navController::naviToSearch,
                     onRequestNaviToCalendar = navController::naviToCalendar,
                     onRequestNaviToAnalytics = { /* TODO 跳转账单分析 */ },
                     onShowSnackbar = onShowSnackbar,
@@ -395,6 +397,11 @@ fun CashbookNavHost(
             },
             onRequestPopBackStack = navController::popBackStackSafety,
             onShowSnackbar = onShowSnackbar,
+        )
+        // 搜索记录
+        searchScreen(
+            onRequestNaviToEditRecord = navController::naviToEditRecord,
+            onRequestPopBackStack = navController::popBackStackSafety,
         )
 
         // 我的资产

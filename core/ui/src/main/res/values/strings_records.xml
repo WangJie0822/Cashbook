@@ -51,4 +51,6 @@
     <string name="refund_reimbursed_format">已退款|报销（%1$s）</string>
     <string name="record_saving">记录保存中…</string>
     <string name="record_removing">记录删除中…</string>
+    <string name="record_search_hint">输入金额/备注进行搜索</string>
+    <string name="record_search_no_data_hint">未搜索到记录，请修改关键字搜索</string>
 </resources>

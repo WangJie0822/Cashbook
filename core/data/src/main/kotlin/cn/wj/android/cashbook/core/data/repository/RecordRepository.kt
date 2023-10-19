@@ -33,6 +33,12 @@ interface RecordRepository {
         pageSize: Int
     ): List<RecordModel>
 
+    suspend fun queryPagingRecordListByKeyword(
+        keyword: String,
+        page: Int,
+        pageSize: Int
+    ): List<RecordModel>
+
     fun queryRecordByYearMonth(year: String, month: String): Flow<List<RecordModel>>
 
     suspend fun getDefaultRecord(typeId: Long): RecordModel

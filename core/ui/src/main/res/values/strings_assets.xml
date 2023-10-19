@@ -37,5 +37,5 @@
     <string name="sure_to_delete_asset">确定要删除这个资产账户吗？</string>
     <string name="delete_asset_hint">将会执行以下操作：\n1.删除与此资产账户相关的账单记录（不会影响其他资产余额）；\n2.删除此资产账户信息；</string>
     <string name="asset_in_delete">资产删除中…</string>
-    <string name="asset_delete_falied">资产删除失败</string>
+    <string name="asset_delete_failed">资产删除失败</string>
 </resources>

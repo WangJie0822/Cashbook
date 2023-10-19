@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
@@ -67,4 +68,5 @@ object CashbookIcons {
     val Analytics = Icons.Filled.InsertChartOutlined
     val ContentCopy = Icons.Filled.ContentCopy
     val DeleteForever = Icons.Filled.DeleteForever
+    val Cancel = Icons.Filled.Cancel
 }
