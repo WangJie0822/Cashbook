@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
+import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import kotlinx.coroutines.flow.Flow
 
@@ -24,11 +26,19 @@ interface AssetDao {
     @Query("SELECT * FROM db_asset WHERE id=:assetId")
     suspend fun queryAssetById(assetId: Long): AssetTable?
 
-    @Query("SELECT * FROM db_asset WHERE books_id=:bookId")
+    @Query("SELECT * FROM db_asset WHERE books_id=:bookId AND invisible=$SWITCH_INT_OFF")
     suspend fun queryVisibleAssetByBookId(bookId: Long): List<AssetTable>
+
+    @Query("SELECT * FROM db_asset WHERE books_id=:bookId AND invisible=$SWITCH_INT_ON")
+    suspend fun queryInvisibleAssetByBookId(bookId: Long): List<AssetTable>
 
     @Query(value = """
         DELETE FROM db_asset WHERE id=:assetId
     """)
     suspend fun deleteById(assetId: Long)
+
+    @Query(value = """
+        UPDATE db_asset SET invisible=$SWITCH_INT_OFF WHERE id=:id
+    """)
+    suspend fun visibleById(id:Long)
 }

@@ -23,6 +23,21 @@ class SaveAssetUseCase @Inject constructor(
     suspend operator fun invoke(assetModel: AssetModel) = withContext(coroutineContext) {
         val oldAsset = assetRepository.getAssetById(assetModel.id)
         if (null != oldAsset) {
+            // 已有资产，先更新除金额外的数据
+            with(assetModel) {
+                assetRepository.updateAsset(
+                    oldAsset.copy(
+                        name = name,
+                        totalAmount = totalAmount,
+                        openBank = openBank,
+                        cardNo = cardNo,
+                        billingDate = billingDate,
+                        repaymentDate = repaymentDate,
+                        invisible = invisible,
+                        remark = remark,
+                    )
+                )
+            }
             // 修改资产，计算差额
             val diffBalance =
                 (assetModel.balance.toBigDecimalOrZero() - oldAsset.balance.toBigDecimalOrZero()).toDouble()

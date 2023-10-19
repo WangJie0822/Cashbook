@@ -23,6 +23,7 @@
     <string name="please_select">请选择</string>
     <string name="invisible_asset">隐藏资产</string>
     <string name="invisible_asset_hint">隐藏不使用的资产，将不会在资产列表显示</string>
+    <string name="invisible_asset_show_hint">长按资产取消隐藏</string>
     <string name="net_asset">净资产</string>
     <string name="total_asset">总资产</string>
     <string name="total_income">总收入</string>

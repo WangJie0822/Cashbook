@@ -431,6 +431,7 @@ private fun EditRecordScaffoldContent(
                         modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                     )
 
+                    // 类型列表
                     typeListContent()
 
                     Divider()

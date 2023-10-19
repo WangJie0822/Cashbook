@@ -339,6 +339,7 @@ internal fun AssetTypedInfoItem(
     onAssetItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     expandDefault: Boolean = true,
+    onAssetItemLongClick: ((Long) -> Unit)? = null,
 ) {
     var expand by remember {
         mutableStateOf(expandDefault)
@@ -376,7 +377,8 @@ internal fun AssetTypedInfoItem(
                 iconPainter = painterResource(id = assetModel.iconResId),
                 balance = assetModel.balance,
                 totalAmount = assetModel.totalAmount,
-                onItemClick = { onAssetItemClick.invoke(assetModel.id) },
+                onItemClick = { onAssetItemClick(assetModel.id) },
+                onItemLongClick = { onAssetItemLongClick?.invoke(assetModel.id) },
             )
         }
     }

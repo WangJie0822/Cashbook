@@ -61,9 +61,11 @@ import cn.wj.android.cashbook.core.ui.popBackStackSafety
 import cn.wj.android.cashbook.feature.assets.navigation.EditRecordSelectAssetBottomSheetContent
 import cn.wj.android.cashbook.feature.assets.navigation.assetInfoScreen
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
+import cn.wj.android.cashbook.feature.assets.navigation.invisibleAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.myAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.naviToAssetInfo
 import cn.wj.android.cashbook.feature.assets.navigation.naviToEditAsset
+import cn.wj.android.cashbook.feature.assets.navigation.naviToInvisibleAsset
 import cn.wj.android.cashbook.feature.assets.navigation.naviToMyAsset
 import cn.wj.android.cashbook.feature.books.navigation.editBookScreen
 import cn.wj.android.cashbook.feature.books.navigation.myBooksScreen
@@ -399,7 +401,12 @@ fun CashbookNavHost(
         myAssetScreen(
             onRequestNaviToAssetInfo = navController::naviToAssetInfo,
             onRequestNaviToAddAsset = navController::naviToEditAsset,
-            onRequestNaviToInvisibleAsset = { /* TODO 跳转不可见资产 */ },
+            onRequestNaviToInvisibleAsset = navController::naviToInvisibleAsset,
+            onRequestPopBackStack = navController::popBackStackSafety,
+        )
+        // 不可见资产
+        invisibleAssetScreen(
+            onRequestNaviToAssetInfo = navController::naviToAssetInfo,
             onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 资产信息

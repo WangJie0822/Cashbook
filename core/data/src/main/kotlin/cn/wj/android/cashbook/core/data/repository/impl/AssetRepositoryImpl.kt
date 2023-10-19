@@ -62,6 +62,33 @@ class AssetRepositoryImpl @Inject constructor(
             result
         }
 
+    override val currentInvisibleAssetListData: Flow<List<AssetModel>> =
+        combine(assetDataVersion, appPreferencesDataSource.appData) { _, appData ->
+            getInvisibleAssetsByBookId(appData.currentBookId)
+        }
+
+    override val currentInvisibleAssetTypeData: Flow<List<AssetTypeViewsModel>> =
+        currentInvisibleAssetListData.mapLatest { list ->
+            val result = mutableListOf<AssetTypeViewsModel>()
+            ClassificationTypeEnum.entries.forEach { type ->
+                val assetList = list.filter { it.type == type }
+                if (assetList.isNotEmpty()) {
+                    var totalAmount = BigDecimal.ZERO
+                    assetList.forEach { asset ->
+                        totalAmount += asset.balance.toBigDecimalOrZero()
+                    }
+                    result.add(
+                        AssetTypeViewsModel(
+                            nameResId = AssetHelper.getNameResIdByType(type),
+                            totalAmount = totalAmount.decimalFormat(),
+                            assetList = assetList
+                        )
+                    )
+                }
+            }
+            result
+        }
+
     override suspend fun getAssetById(assetId: Long): AssetModel? = withContext(coroutineContext) {
         assetDao.queryAssetById(assetId)?.asModel()
     }
@@ -69,6 +96,12 @@ class AssetRepositoryImpl @Inject constructor(
     override suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel> =
         withContext(coroutineContext) {
             assetDao.queryVisibleAssetByBookId(bookId)
+                .map { it.asModel() }
+        }
+
+    override suspend fun getInvisibleAssetsByBookId(bookId: Long): List<AssetModel> =
+        withContext(coroutineContext) {
+            assetDao.queryInvisibleAssetByBookId(bookId)
                 .map { it.asModel() }
         }
 
@@ -88,5 +121,11 @@ class AssetRepositoryImpl @Inject constructor(
 
     override suspend fun deleteById(assetId: Long) = withContext(coroutineContext) {
         assetDao.deleteById(assetId)
+        assetDataVersion.updateVersion()
+    }
+
+    override suspend fun visibleAssetById(id: Long) = withContext(coroutineContext) {
+        assetDao.visibleById(id)
+        assetDataVersion.updateVersion()
     }
 }

@@ -10,12 +10,16 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.feature.assets.screen.AssetInfoRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditRecordSelectAssetBottomSheetRoute
+import cn.wj.android.cashbook.feature.assets.screen.InvisibleAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.MyAssetRoute
 
 private const val ROUTE_KEY_ASSET_ID = "assetId"
 
 /** 我的资产 */
 private const val ROUTE_MY_ASSET = "asset/my"
+
+/** 不可见资产 */
+private const val ROUTE_ASSET_INVISIBLE = "asset/invisible"
 
 /** 资产信息 */
 private const val ROUTE_ASSET_INFO = "asset/info?$ROUTE_KEY_ASSET_ID={$ROUTE_KEY_ASSET_ID}"
@@ -26,6 +30,10 @@ private const val ROUTE_EDIT_ASSET =
 
 fun NavController.naviToMyAsset() {
     this.navigate(ROUTE_MY_ASSET)
+}
+
+fun NavController.naviToInvisibleAsset() {
+    this.navigate(ROUTE_ASSET_INVISIBLE)
 }
 
 fun NavController.naviToAssetInfo(assetId: Long) {
@@ -64,7 +72,7 @@ fun EditRecordSelectAssetBottomSheetContent(
 
 /**
  * 我的资产界面
- * 
+ *
  * @param onRequestNaviToAssetInfo 导航到资产信息
  * @param onRequestNaviToAddAsset 导航到添加资产
  * @param onRequestNaviToInvisibleAsset 导航到隐藏资产
@@ -81,6 +89,21 @@ fun NavGraphBuilder.myAssetScreen(
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestNaviToAddAsset = onRequestNaviToAddAsset,
             onRequestNaviToInvisibleAsset = onRequestNaviToInvisibleAsset,
+            onRequestPopBackStack = onRequestPopBackStack,
+        )
+    }
+}
+
+/**
+ * 不可见资产
+ */
+fun NavGraphBuilder.invisibleAssetScreen(
+    onRequestNaviToAssetInfo: (Long) -> Unit,
+    onRequestPopBackStack: () -> Unit,
+) {
+    composable(route = ROUTE_ASSET_INVISIBLE) {
+        InvisibleAssetRoute(
+            onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }

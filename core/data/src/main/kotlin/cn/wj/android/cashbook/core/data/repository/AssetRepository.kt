@@ -26,14 +26,24 @@ interface AssetRepository {
     /** 当前可见资产大类数据 */
     val currentVisibleAssetTypeData: Flow<List<AssetTypeViewsModel>>
 
+    /** 当前不可见资产列表数据 */
+    val currentInvisibleAssetListData: Flow<List<AssetModel>>
+
+    /** 当前不可见资产大类数据 */
+    val currentInvisibleAssetTypeData: Flow<List<AssetTypeViewsModel>>
+
     /** 根据资产id [assetId] 获取对应资产数据并返回 */
     suspend fun getAssetById(assetId: Long): AssetModel?
 
     suspend fun getVisibleAssetsByBookId(bookId: Long): List<AssetModel>
 
+    suspend fun getInvisibleAssetsByBookId(bookId: Long): List<AssetModel>
+
     suspend fun updateAsset(asset: AssetModel)
 
     suspend fun deleteById(assetId: Long)
+
+    suspend fun visibleAssetById(id: Long)
 }
 
 internal fun AssetTable.asModel(): AssetModel {
