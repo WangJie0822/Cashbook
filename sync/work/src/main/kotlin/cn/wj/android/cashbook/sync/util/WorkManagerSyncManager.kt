@@ -30,12 +30,13 @@ class WorkManagerSyncManager @Inject constructor(
             .conflate()
 
     override fun requestSync() {
-        val workManager = WorkManager.getInstance(context)
-        workManager.enqueueUniqueWork(
-            SyncWorkName,
-            ExistingWorkPolicy.KEEP,
-            SyncWorker.startUpOneTimeSyncWork(),
-        )
+        WorkManager.getInstance(context).apply {
+            enqueueUniqueWork(
+                SyncWorkName,
+                ExistingWorkPolicy.KEEP,
+                SyncWorker.startUpOneTimeSyncWork(),
+            )
+        }
     }
 }
 

@@ -12,12 +12,6 @@ android {
 
 dependencies {
 
-    // WorkManager
-    implementation(libs.androidx.work.runtime.ktx)
-
-    // okhttp
-    implementation(libs.squareup.okhttp3)
-
     // Markdown 解析
     implementation(libs.noties.markwon)
 

@@ -10,7 +10,7 @@ package cn.wj.android.cashbook.core.model.entity
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/21
  */
-data class UpdateInfoEntity(
+data class UpgradeInfoEntity(
     val versionName: String,
     val versionInfo: String,
     val apkName: String,

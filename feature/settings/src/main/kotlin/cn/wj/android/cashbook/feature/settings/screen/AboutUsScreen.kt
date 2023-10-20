@@ -47,7 +47,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.AboutUsBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsUiState
@@ -132,10 +132,10 @@ internal fun AboutUsScreen(
     onUseGiteeSwitch: (Boolean) -> Unit,
     onAutoCheckUpdateSwitch: (Boolean) -> Unit,
     onCheckUpdateClick: () -> Unit,
-    shouldDisplayUpdateDialog: UpdateInfoEntity?,
+    shouldDisplayUpdateDialog: UpgradeInfoEntity?,
     onConfirmUpdateClick: () -> Unit,
     onRequestDismissUpdateDialog: (Boolean) -> Unit,
-    shouldDisplayNoWifiUpdateDialog: UpdateInfoEntity?,
+    shouldDisplayNoWifiUpdateDialog: UpgradeInfoEntity?,
     onConfirmDownloadClick: (Boolean) -> Unit,
     onRequestDismissNoWifiUpdateDialog: () -> Unit,
     onVersionInfoClick: () -> Unit,

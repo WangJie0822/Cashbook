@@ -4,4 +4,16 @@
     <string name="sync_notification_title">记账本</string>
     <string name="sync_notification_channel_name">数据同步</string>
     <string name="sync_notification_channel_description">记账本后台任务，用于数据同步</string>
+
+    <string name="upgrade_notification_channel_update_name">应用升级</string>
+    <string name="upgrade_notification_channel_update_description">该渠道用于通知更新下载进度</string>
+    <string name="notice_notification_channel_app_name">应用通知</string>
+    <string name="notice_notification_channel_app_description">该渠道用于通知应用信息</string>
+
+    <string name="update_progress_title">下载进度</string>
+    <string name="update_error_title">下载失败</string>
+    <string name="retry">重试</string>
+    <string name="cancel">取消</string>
+
+    <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

@@ -30,15 +30,6 @@
     <string name="user_agreement_and_privacy_policy_hint_end">后，再开始使用我们的服务。</string>
     <string name="user_agreement_and_privacy_policy_with_chevron">《用户协议和隐私政策》</string>
 
-    <string name="show_notification">显示通知</string>
-    <string name="update_progress_title">下载进度</string>
-    <string name="update_notification_progress">更新通知进度</string>
-    <string name="hide_notification">取消通知</string>
-    <string name="channel_update_name">应用升级</string>
-    <string name="channel_update_description">该渠道用于通知更新下载进度</string>
-    <string name="channel_app_name">应用通知</string>
-    <string name="channel_app_description">该渠道用于通知应用信息</string>
-    <string name="update_error_title">下载失败</string>
     <string name="retry">重试</string>
 
     <string name="mobile_network_download_enable">允许手机流量下载</string>
@@ -107,6 +98,4 @@
     <string name="backup_success">备份成功</string>
     <string name="recovery_success">恢复成功</string>
     <string name="backup_path_empty">备份路径为空</string>
-
-    <string name="update_progress_format" translatable="false">%1$s%%</string>
 </resources>

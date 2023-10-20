@@ -6,7 +6,7 @@ import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.datastore.datasource.GitInfosDataSource
-import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
@@ -106,9 +106,9 @@ class SettingRepositoryImpl @Inject constructor(
             appPreferencesDataSource.updateAgreedProtocol(agreedProtocol)
         }
 
-    override suspend fun checkUpdate(): UpdateInfoEntity = withContext(coroutineContext) {
+    override suspend fun checkUpdate(): UpgradeInfoEntity = withContext(coroutineContext) {
         val gitDataModel = gitDataModel.first()
-        UpdateInfoEntity(
+        UpgradeInfoEntity(
             versionName = gitDataModel.latestVersionName,
             versionInfo = gitDataModel.latestVersionInfo,
             apkName = gitDataModel.latestApkName,

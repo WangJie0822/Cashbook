@@ -214,7 +214,7 @@ class BackupRecoveryManager @Inject constructor(
         }
     }
 
-    suspend fun getLocalBackupList(
+    private suspend fun getLocalBackupList(
         path: String
     ): List<BackupModel> = withContext(ioCoroutineContext) {
         if (!grantedPermissions(path)) {

@@ -3,19 +3,11 @@
 package cn.wj.android.cashbook
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
 import android.util.Log
 import cn.wj.android.cashbook.core.common.ApplicationInfo
-import cn.wj.android.cashbook.core.common.NOTIFICATION_CHANNEL_APP
-import cn.wj.android.cashbook.core.common.NOTIFICATION_CHANNEL_UPDATE
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
-import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.sync.initializers.Sync
 import com.didichuxing.doraemonkit.DoKit
 import com.orhanobut.logger.AndroidLogAdapter
@@ -62,34 +54,8 @@ class MyApplication : Application() {
         // 初始化同步服务
         Sync.initialize(this)
 
-        // 初始化通知渠道
-        initNotificationChannel()
-
         // 初始化 didi 开发工具
         DoKit.Builder(this).build()
     }
 
-    /** 初始化通知渠道 */
-    private fun initNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            // 应用通知
-            val appChannel = NotificationChannel(
-                NOTIFICATION_CHANNEL_APP,
-                R.string.channel_app_name.string(this),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = R.string.channel_app_description.string(this@MyApplication)
-            }
-            // 更新通知
-            val updateChannel = NotificationChannel(
-                NOTIFICATION_CHANNEL_UPDATE,
-                R.string.channel_update_name.string(this),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = R.string.channel_update_description.string(this@MyApplication)
-            }
-            nm.createNotificationChannels(mutableListOf(appChannel, updateChannel))
-        }
-    }
 }

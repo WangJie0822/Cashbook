@@ -28,3 +28,4 @@ object Sync {
 internal const val InitWorkName = "InitWorkName"
 internal const val SyncWorkName = "SyncWorkName"
 internal const val AutoBackupWorkName = "AutoBackupWorkName"
+internal const val ApkDownloadWorkName = "ApkDownloadWorkName"

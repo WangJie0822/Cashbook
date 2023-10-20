@@ -25,4 +25,7 @@ dependencies {
     implementation(libs.androidx.hilt.work)
 
     kapt(libs.androidx.hilt.compiler)
+
+    // okhttp
+    implementation(libs.squareup.okhttp3)
 }

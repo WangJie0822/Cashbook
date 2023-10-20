@@ -5,12 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
-import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.feature.settings.enums.AboutUsBookmarkEnum
-import cn.wj.android.cashbook.feature.settings.manager.UpdateManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +34,10 @@ import kotlinx.coroutines.launch
 class AboutUsViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     networkMonitor: NetworkMonitor,
+    private val appUpgradeManager: AppUpgradeManager,
 ) : ViewModel() {
+
+    private val _isUpgradeDownloading = appUpgradeManager.isDownloading
 
     /** 是否需要显示提示 */
     var shouldDisplayBookmark by mutableStateOf(AboutUsBookmarkEnum.NONE)
@@ -44,12 +48,12 @@ class AboutUsViewModel @Inject constructor(
         private set
 
     /** 更新数据 */
-    private val _updateInfoData = MutableStateFlow<UpdateInfoEntity?>(null)
-    val updateInfoData: StateFlow<UpdateInfoEntity?> = _updateInfoData
+    private val _updateInfoData = MutableStateFlow<UpgradeInfoEntity?>(null)
+    val updateInfoData: StateFlow<UpgradeInfoEntity?> = _updateInfoData
 
     /** 下载确认数据 */
-    private val _confirmUpdateInfoData = MutableStateFlow<UpdateInfoEntity?>(null)
-    val confirmUpdateInfoData: StateFlow<UpdateInfoEntity?> = _confirmUpdateInfoData
+    private val _confirmUpdateInfoData = MutableStateFlow<UpgradeInfoEntity?>(null)
+    val confirmUpdateInfoData: StateFlow<UpgradeInfoEntity?> = _confirmUpdateInfoData
 
     /** 界面 UI 状态 */
     val uiState =
@@ -93,16 +97,16 @@ class AboutUsViewModel @Inject constructor(
     fun checkUpdate() {
         viewModelScope.launch {
             try {
-                if (UpdateManager.downloading) {
+                if (_isUpgradeDownloading.first()) {
                     shouldDisplayBookmark = AboutUsBookmarkEnum.UPDATE_DOWNLOADING
                     return@launch
                 }
                 inRequestUpdateData = true
-                val updateInfoEntity = settingRepository.checkUpdate()
-                UpdateManager.checkFromInfo(
-                    info = updateInfoEntity,
+                val upgradeInfoEntity = settingRepository.checkUpdate()
+                checkUpgradeFromInfo(
+                    info = upgradeInfoEntity,
                     need = {
-                        _updateInfoData.tryEmit(updateInfoEntity)
+                        _updateInfoData.tryEmit(upgradeInfoEntity)
                     },
                     noNeed = {
                         shouldDisplayBookmark = AboutUsBookmarkEnum.NO_NEED_UPDATE
@@ -118,16 +122,16 @@ class AboutUsViewModel @Inject constructor(
 
     /** 确认升级 */
     fun confirmUpdate() {
-        val updateInfo = updateInfoData.value ?: return
+        val upgradeInfo = updateInfoData.value ?: return
         _updateInfoData.tryEmit(null)
         viewModelScope.launch {
             if (_allowDownload.first()) {
                 // 允许直接下载
-                UpdateManager.startDownload(updateInfo)
+                appUpgradeManager.startDownload(upgradeInfo)
                 shouldDisplayBookmark = AboutUsBookmarkEnum.START_DOWNLOAD
             } else {
                 // 未连接WiFi且未允许流量下载，弹窗提示
-                _confirmUpdateInfoData.tryEmit(updateInfo)
+                _confirmUpdateInfoData.tryEmit(upgradeInfo)
             }
         }
     }
@@ -148,7 +152,7 @@ class AboutUsViewModel @Inject constructor(
             // 更新是否允许流量下载属性
             settingRepository.updateMobileNetworkDownloadEnable(noMorePrompt)
             // 开始下载
-            UpdateManager.startDownload(updateInfo)
+            appUpgradeManager.startDownload(updateInfo)
             shouldDisplayBookmark = AboutUsBookmarkEnum.START_DOWNLOAD
         }
     }
@@ -161,6 +165,47 @@ class AboutUsViewModel @Inject constructor(
     /** 隐藏提示 */
     fun dismissBookmark() {
         shouldDisplayBookmark = AboutUsBookmarkEnum.NONE
+    }
+
+    private fun checkUpgradeFromInfo(info: UpgradeInfoEntity, need: () -> Unit, noNeed: () -> Unit) {
+        logger().d("checkFromInfo info: $info")
+        if (ApplicationInfo.isDev) {
+            // Dev 环境，永远提示更新
+            need.invoke()
+            return
+        }
+        if (!needUpdate(info.versionName)) {
+            // 已是最新版本
+            noNeed.invoke()
+            return
+        }
+        // 不是最新版本
+        if (info.downloadUrl.isBlank()) {
+            // 没有下载资源
+            noNeed.invoke()
+            return
+        }
+        need.invoke()
+    }
+
+    /** 根据网络返回的版本信息判断是否需要更新 */
+    private fun needUpdate(versionName: String?): Boolean {
+        if (versionName.isNullOrBlank()) {
+            return false
+        }
+        val localSplits = ApplicationInfo.versionName.split("_")
+        val splits = versionName.split("_")
+        val localVersions = localSplits.first().replace("v", "").split(".")
+        val versions = splits.first().replace("v", "").split(".")
+        if (localSplits.first() == splits.first()) {
+            return splits[1].toInt() > localSplits[1].toInt()
+        }
+        for (i in localVersions.indices) {
+            if (versions[i] > localVersions[i]) {
+                return true
+            }
+        }
+        return false
     }
 }
 

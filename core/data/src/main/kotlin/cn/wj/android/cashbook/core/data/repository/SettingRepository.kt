@@ -1,6 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository
 
-import cn.wj.android.cashbook.core.model.entity.UpdateInfoEntity
+import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
@@ -58,7 +58,7 @@ interface SettingRepository {
     suspend fun updateAgreedProtocol(agreedProtocol: Boolean)
 
     /** 检查更新 */
-    suspend fun checkUpdate(): UpdateInfoEntity
+    suspend fun checkUpdate(): UpgradeInfoEntity
 
     suspend fun syncChangelog(): Boolean
 

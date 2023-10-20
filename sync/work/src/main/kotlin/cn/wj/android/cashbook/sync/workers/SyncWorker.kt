@@ -12,7 +12,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
-import cn.wj.android.cashbook.sync.initializers.SyncConstraints
+import cn.wj.android.cashbook.sync.initializers.NetworkConstraints
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -68,13 +68,13 @@ class SyncWorker @AssistedInject constructor(
         /** 使用代理任务启动同步任务，以支持依赖注入 */
         fun startUpOneTimeSyncWork() = OneTimeWorkRequestBuilder<DelegatingWorker>()
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setConstraints(SyncConstraints)
+            .setConstraints(NetworkConstraints)
             .setInputData(SyncWorker::class.delegatedData())
             .build()
 
         fun startUpPeriodicSyncWork() =
             PeriodicWorkRequestBuilder<DelegatingWorker>(Duration.ofDays(1))
-                .setConstraints(SyncConstraints)
+                .setConstraints(NetworkConstraints)
                 .setInputData(SyncWorker::class.delegatedData())
                 .build()
     }
