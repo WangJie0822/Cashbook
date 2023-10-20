@@ -1,17 +1,22 @@
 package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
@@ -42,12 +48,15 @@ internal fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
 
+    val searchHistoryList by viewModel.searchHistoryListData.collectAsStateWithLifecycle()
     val recordList = viewModel.recordListData.collectAsLazyPagingItems()
 
     SearchScreen(
         viewRecord = viewModel.viewRecordData,
         onRequestShowRecordDetailSheet = viewModel::showRecordDetailSheet,
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
+        searchHistoryList = searchHistoryList,
+        onRequestClearSearchHistory = viewModel::clearSearchHistory,
         recordList = recordList,
         onKeywordChange = viewModel::onKeywordChange,
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
@@ -56,12 +65,14 @@ internal fun SearchRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun SearchScreen(
     viewRecord: RecordViewsEntity?,
     onRequestShowRecordDetailSheet: (RecordViewsEntity) -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
+    searchHistoryList: List<String>,
+    onRequestClearSearchHistory: () -> Unit,
     recordList: LazyPagingItems<RecordViewsEntity>,
     onKeywordChange: (String) -> Unit,
     onRequestNaviToEditRecord: (Long) -> Unit,
@@ -127,13 +138,36 @@ private fun SearchScreen(
                 }
             },
             content = {
-                // TODO 搜索历史
+                if (searchHistoryList.isEmpty()) {
+                    Empty(
+                        hintText = stringResource(id = R.string.record_search_no_history),
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                    )
+                } else {
+                    TextButton(onClick = onRequestClearSearchHistory) {
+                        Text(text = stringResource(id = R.string.clear))
+                    }
+                    FlowRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        searchHistoryList.forEach {
+                            ElevatedSuggestionChip(
+                                onClick = { text = it },
+                                label = { Text(text = it) },
+                            )
+                        }
+                    }
+                }
             },
         )
         LazyColumn(
             modifier = Modifier.padding(top = 8.dp),
             content = {
-
                 if (recordList.itemCount <= 0) {
                     item {
                         Empty(

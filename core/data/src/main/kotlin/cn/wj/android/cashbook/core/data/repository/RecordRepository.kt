@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
 
+    val searchHistoryListData: Flow<List<String>>
+
     suspend fun queryById(recordId: Long): RecordModel?
 
     suspend fun queryByTypeId(id: Long): List<RecordModel>
@@ -62,6 +64,10 @@ interface RecordRepository {
     suspend fun deleteRecordsWithAsset(assetId: Long)
 
     suspend fun deleteRecordRelatedWithAsset(assetId: Long)
+
+    suspend fun addSearchHistory(keyword: String)
+
+    suspend fun clearSearchHistory()
 }
 
 internal fun RecordTable.asModel(): RecordModel {

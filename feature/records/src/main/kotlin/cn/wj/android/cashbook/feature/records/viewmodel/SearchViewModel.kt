@@ -13,13 +13,18 @@ import androidx.paging.cachedIn
 import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
+import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.domain.usecase.GetSearchRecordViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * 搜索 ViewModel
@@ -28,6 +33,7 @@ import kotlinx.coroutines.flow.flatMapLatest
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
+    private val recordRepository: RecordRepository,
     private val getSearchRecordViewsUseCase: GetSearchRecordViewsUseCase,
 ) : ViewModel() {
 
@@ -36,6 +42,13 @@ class SearchViewModel @Inject constructor(
         private set
 
     private val _keywordData = MutableStateFlow("")
+
+    val searchHistoryListData = recordRepository.searchHistoryListData
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyList(),
+        )
 
     /** 记录列表数据 */
     val recordListData = combine(_keywordData, recordDataVersion) { keyword, _ ->
@@ -55,7 +68,11 @@ class SearchViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
     fun onKeywordChange(keyword: String) {
-        _keywordData.tryEmit(keyword)
+        viewModelScope.launch {
+            _keywordData.tryEmit(keyword)
+            delay(500L)
+            recordRepository.addSearchHistory(keyword)
+        }
     }
 
     fun showRecordDetailSheet(item: RecordViewsEntity) {
@@ -64,6 +81,12 @@ class SearchViewModel @Inject constructor(
 
     fun dismissRecordDetailSheet() {
         viewRecordData = null
+    }
+
+    fun clearSearchHistory() {
+        viewModelScope.launch {
+            recordRepository.clearSearchHistory()
+        }
     }
 }
 

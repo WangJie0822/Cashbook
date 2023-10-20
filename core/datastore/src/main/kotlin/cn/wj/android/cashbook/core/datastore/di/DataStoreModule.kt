@@ -8,8 +8,10 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.GitInfos
+import cn.wj.android.cashbook.core.datastore.SearchHistory
 import cn.wj.android.cashbook.core.datastore.serializer.AppPreferencesSerializer
 import cn.wj.android.cashbook.core.datastore.serializer.GitInfosSerializer
+import cn.wj.android.cashbook.core.datastore.serializer.SearchHistorySerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,5 +52,19 @@ object DataStoreModule {
             scope = CoroutineScope(ioDispatcher + SupervisorJob()),
         ) {
             context.dataStoreFile("git_infos.pb")
+        }
+
+    @Provides
+    @Singleton
+    fun providesSearchHistoryDataStore(
+        @ApplicationContext context: Context,
+        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineContext,
+        searchHistorySerializer: SearchHistorySerializer,
+    ): DataStore<SearchHistory> =
+        DataStoreFactory.create(
+            serializer = searchHistorySerializer,
+            scope = CoroutineScope(ioDispatcher + SupervisorJob()),
+        ) {
+            context.dataStoreFile("search_history.pb")
         }
 }

@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -144,7 +144,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         tagList.forEach {
-                            FilterChip(
+                            ElevatedFilterChip(
                                 selected = it.selected,
                                 onClick = { onTagItemClick(it.data) },
                                 label = { Text(text = it.data.name) },

@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -145,7 +145,7 @@ internal fun MyTagsScreen(
                     tagList.forEach {
                         Box {
                             var expanded by remember { mutableStateOf(false) }
-                            FilterChip(
+                            ElevatedFilterChip(
                                 selected = true,
                                 onClick = { expanded = true },
                                 label = { Text(text = it.name) },

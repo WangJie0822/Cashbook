@@ -18,6 +18,7 @@ import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
+import cn.wj.android.cashbook.core.datastore.datasource.SearchHistoryDataSource
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import java.util.Calendar
 import javax.inject.Inject
@@ -25,14 +26,19 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
 class RecordRepositoryImpl @Inject constructor(
     private val recordDao: RecordDao,
     private val transactionDao: TransactionDao,
     private val appPreferencesDataSource: AppPreferencesDataSource,
+    private val searchHistoryDataSource: SearchHistoryDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : RecordRepository {
+
+    override val searchHistoryListData: Flow<List<String>> =
+        searchHistoryDataSource.searchHistoryData.mapLatest { it.keywords }
 
     override suspend fun queryById(recordId: Long): RecordModel? = withContext(coroutineContext) {
         recordDao.queryById(recordId)?.asModel()
@@ -94,7 +100,7 @@ class RecordRepositoryImpl @Inject constructor(
         keyword: String,
         page: Int,
         pageSize: Int
-    ): List<RecordModel> = withContext(coroutineContext){
+    ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByKeyword(
             booksId = appPreferencesDataSource.appData.first().currentBookId,
             keyword = keyword,
@@ -243,4 +249,23 @@ class RecordRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             recordDao.deleteRelatedWithAsset(assetId)
         }
+
+    override suspend fun addSearchHistory(keyword: String): Unit = withContext(coroutineContext) {
+        if (keyword.isBlank()) {
+            return@withContext
+        }
+        var currentList: MutableList<String> = ArrayList(searchHistoryListData.first())
+        if (currentList.contains(keyword)) {
+            return@withContext
+        }
+        currentList.add(0, keyword)
+        if (currentList.size > 10) {
+            currentList = currentList.subList(0, 10)
+        }
+        searchHistoryDataSource.updateKeywords(currentList)
+    }
+
+    override suspend fun clearSearchHistory(): Unit = withContext(coroutineContext) {
+        searchHistoryDataSource.updateKeywords(emptyList())
+    }
 }

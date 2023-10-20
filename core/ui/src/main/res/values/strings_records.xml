@@ -53,4 +53,5 @@
     <string name="record_removing">记录删除中…</string>
     <string name="record_search_hint">输入金额/备注进行搜索</string>
     <string name="record_search_no_data_hint">未搜索到记录，请修改关键字搜索</string>
+    <string name="record_search_no_history">还没有搜索记录</string>
 </resources>

@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -467,7 +467,7 @@ private fun EditRecordScaffoldContent(
                     ) {
                         // 目标资产
                         val hasAsset = uiState.assetText.isNotBlank()
-                        FilterChip(
+                        ElevatedFilterChip(
                             selected = hasAsset,
                             onClick = onAssetClick,
                             label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":${uiState.assetText}" else "") },
@@ -477,7 +477,7 @@ private fun EditRecordScaffoldContent(
                             // 只有转账类型显示关联资产
                             val hasRelatedAsset =
                                 uiState.relatedAssetText.isNotBlank()
-                            FilterChip(
+                            ElevatedFilterChip(
                                 selected = hasRelatedAsset,
                                 onClick = onRelatedAssetClick,
                                 label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":${uiState.relatedAssetText}" else "") },
@@ -486,7 +486,7 @@ private fun EditRecordScaffoldContent(
 
                         // 记录时间
                         val dateTime = uiState.dateTimeText
-                        FilterChip(
+                        ElevatedFilterChip(
                             selected = true,
                             onClick = onRecordTimeClick,
                             label = { Text(text = dateTime) },
@@ -494,7 +494,7 @@ private fun EditRecordScaffoldContent(
 
                         // 标签
                         val hasTag = tagText.isNotBlank()
-                        FilterChip(
+                        ElevatedFilterChip(
                             selected = hasTag,
                             onClick = onTagClick,
                             label = { Text(text = stringResource(id = R.string.tags) + if (hasTag) ":$tagText" else "") },
@@ -503,7 +503,7 @@ private fun EditRecordScaffoldContent(
                         if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
                             // 只有支出类型显示是否可报销
                             val reimbursable = uiState.reimbursable
-                            FilterChip(
+                            ElevatedFilterChip(
                                 selected = reimbursable,
                                 onClick = onReimbursableClick,
                                 leadingIcon = {
@@ -520,7 +520,7 @@ private fun EditRecordScaffoldContent(
 
                         // 手续费
                         val hasCharges = uiState.chargesText.isNotBlank()
-                        FilterChip(
+                        ElevatedFilterChip(
                             selected = hasCharges,
                             onClick = onChargesClick,
                             label = { Text(text = stringResource(id = R.string.charges) + if (hasCharges) ":${uiState.chargesText.withCNY()}" else "") },
@@ -530,7 +530,7 @@ private fun EditRecordScaffoldContent(
                             // 非收入类型才有优惠
                             val hasConcessions =
                                 uiState.concessionsText.isNotBlank()
-                            FilterChip(
+                            ElevatedFilterChip(
                                 selected = hasConcessions,
                                 onClick = onConcessionsClick,
                                 label = { Text(text = stringResource(id = R.string.concessions) + if (hasConcessions) ":${uiState.concessionsText.withCNY()}" else "") },
@@ -540,7 +540,7 @@ private fun EditRecordScaffoldContent(
                         // 关联的支出记录
                         if (uiState.needRelated) {
                             val hasRelated = uiState.relatedCount > 0
-                            FilterChip(
+                            ElevatedFilterChip(
                                 selected = hasRelated,
                                 onClick = onRelatedRecordClick,
                                 label = {
