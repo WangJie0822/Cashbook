@@ -1,5 +1,6 @@
-package cn.wj.android.cashbook.feature.records.dialog
+package cn.wj.android.cashbook.core.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,26 +10,28 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cn.wj.android.cashbook.core.design.component.CommonDivider
-import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.ui.R
 import java.time.YearMonth
 import java.util.Calendar
 
 @Composable
-internal fun SelectDateDialog(
+fun SelectDateDialog(
     onDialogDismiss: () -> Unit,
     date: YearMonth,
     onDateSelected: (YearMonth) -> Unit
@@ -41,12 +44,13 @@ internal fun SelectDateDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .sizeIn(minWidth = 280.dp, maxWidth = 560.dp),
+                    .sizeIn(minWidth = 280.dp, maxWidth = 560.dp)
+                    .padding(16.dp),
             ) {
                 val currentYear = date.year
                 val currentMonth = date.monthValue
                 var selectedYear by remember(date) {
-                    mutableStateOf(currentYear)
+                    mutableIntStateOf(currentYear)
                 }
                 val startYear = Calendar.getInstance()[Calendar.YEAR] + 1
                 val yearList = mutableListOf<Int>()
@@ -54,24 +58,29 @@ internal fun SelectDateDialog(
                     yearList.add(i)
                 }
                 LazyRow(
-                    modifier = Modifier,
+                    modifier = Modifier.padding(vertical = 4.dp),
                     content = {
                         items(yearList) { year ->
+                            val containerColor = if (year == selectedYear) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                Color.Transparent
+                            }
                             Text(
                                 text = "$year${stringResource(id = R.string.year)}",
-                                color = if (year == selectedYear) {
-                                    LocalExtendedColors.current.selected
-                                } else {
-                                    LocalExtendedColors.current.unselected
-                                },
+                                color = contentColorFor(backgroundColor = containerColor),
                                 modifier = Modifier
                                     .clickable {
                                         selectedYear = year
                                     }
-                                    .padding(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp
+                                    .background(
+                                        color = containerColor,
+                                        shape = MaterialTheme.shapes.large,
                                     )
+                                    .padding(
+                                        horizontal = 8.dp,
+                                        vertical = 4.dp
+                                    ),
                             )
                         }
                     },
@@ -87,14 +96,16 @@ internal fun SelectDateDialog(
                                 content = {
                                     for (r in 0 until 3) {
                                         val month = c * 3 + r + 1
+                                        val containerColor =
+                                            if (selectedYear == currentYear && month == currentMonth) {
+                                                MaterialTheme.colorScheme.primaryContainer
+                                            } else {
+                                                Color.Transparent
+                                            }
                                         Text(
                                             text = "$month${stringResource(id = R.string.month)}",
                                             textAlign = TextAlign.Center,
-                                            color = if (selectedYear == currentYear && month == currentMonth) {
-                                                LocalExtendedColors.current.selected
-                                            } else {
-                                                LocalExtendedColors.current.unselected
-                                            },
+                                            color = contentColorFor(backgroundColor = containerColor),
                                             modifier = Modifier
                                                 .clickable {
                                                     onDateSelected(
@@ -104,6 +115,10 @@ internal fun SelectDateDialog(
                                                         )
                                                     )
                                                 }
+                                                .background(
+                                                    color = containerColor,
+                                                    shape = MaterialTheme.shapes.large,
+                                                )
                                                 .weight(1f)
                                                 .padding(vertical = 8.dp),
                                         )

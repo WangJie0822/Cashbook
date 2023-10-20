@@ -43,7 +43,7 @@ import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.records.dialog.SelectDateDialog
+import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarViewModel
 import java.math.BigDecimal

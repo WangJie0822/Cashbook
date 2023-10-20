@@ -14,7 +14,6 @@ import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
 import cn.wj.android.cashbook.sync.initializers.ApkDownloadWorkName
-import cn.wj.android.cashbook.sync.initializers.NetworkConstraints
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -127,7 +126,6 @@ class ApkDownloadWorker @AssistedInject constructor(
         fun startUpApkDownloadWork(apkName: String, downloadUrl: String) =
             OneTimeWorkRequestBuilder<DelegatingWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .setConstraints(NetworkConstraints)
                 .setInputData(
                     ApkDownloadWorker::class.delegatedData(
                         Data.Builder()
