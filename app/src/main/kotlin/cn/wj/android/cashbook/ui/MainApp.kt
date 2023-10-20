@@ -74,8 +74,10 @@ import cn.wj.android.cashbook.feature.books.navigation.naviToMyBooks
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
+import cn.wj.android.cashbook.feature.records.navigation.analyticsScreen
 import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
+import cn.wj.android.cashbook.feature.records.navigation.naviToAnalytics
 import cn.wj.android.cashbook.feature.records.navigation.naviToCalendar
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.records.navigation.naviToSearch
@@ -318,7 +320,7 @@ fun CashbookNavHost(
                     onRequestNaviToEditRecord = navController::naviToEditRecord,
                     onRequestNaviToSearch = navController::naviToSearch,
                     onRequestNaviToCalendar = navController::naviToCalendar,
-                    onRequestNaviToAnalytics = { /* TODO 跳转账单分析 */ },
+                    onRequestNaviToAnalytics = navController::naviToAnalytics,
                     onShowSnackbar = onShowSnackbar,
                 )
             },
@@ -350,7 +352,7 @@ fun CashbookNavHost(
 
         // 我的标签
         myTagsScreen(
-            onRequestNaviToTagStatistic = { /* TODO 跳转账单分析-指定标签 */ },
+            onRequestNaviToTagStatistic = { navController.naviToAnalytics(tagId = it) },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
 
@@ -403,6 +405,10 @@ fun CashbookNavHost(
             onRequestNaviToEditRecord = navController::naviToEditRecord,
             onRequestPopBackStack = navController::popBackStackSafety,
         )
+        // 数据分析
+        analyticsScreen(
+            onRequestPopBackStack = navController::popBackStackSafety,
+        )
 
         // 我的资产
         myAssetScreen(
@@ -452,7 +458,7 @@ fun CashbookNavHost(
 
         // 我的分类
         myCategoriesScreen(
-            onRequestNaviToTypeStatistics = {  /* TODO 跳转账单分析 - 指定分类 */ },
+            onRequestNaviToTypeStatistics = { navController.naviToAnalytics(typeId = it) },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
     }

@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.feature.records.screen.AnalyticsRoute
 import cn.wj.android.cashbook.feature.records.screen.AssetInfoContentRoute
 import cn.wj.android.cashbook.feature.records.screen.CalendarRoute
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
@@ -19,6 +20,11 @@ import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
 
 private const val ROUTE_EDIT_RECORD_KEY_RECORD_ID = "recordId"
 private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
+private const val ROUTE_EDIT_RECORD_KEY_TAG_ID = "tagId"
+
+/** 路由 - 数据分析 */
+private const val ROUTE_ANALYTICS =
+    "record/analytics?$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}&$ROUTE_EDIT_RECORD_KEY_TAG_ID={$ROUTE_EDIT_RECORD_KEY_TAG_ID}"
 
 /** 路由 - 编辑记录 */
 internal const val ROUTE_EDIT_RECORD =
@@ -32,6 +38,20 @@ private const val ROUTE_RECORD_CALENDAR = "record/calendar"
 
 /** 路由 - 搜索 */
 private const val ROUTE_RECORD_SEARCH = "record/search"
+
+fun NavController.naviToAnalytics(typeId: Long = -1L, tagId: Long = -1L) {
+    this.navigate(
+        ROUTE_ANALYTICS
+            .replace(
+                oldValue = "{$ROUTE_EDIT_RECORD_KEY_TAG_ID}",
+                newValue = tagId.toString()
+            )
+            .replace(
+                oldValue = "{$ROUTE_EDIT_RECORD_KEY_TYPE_ID}",
+                newValue = typeId.toString()
+            )
+    )
+}
 
 fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
     this.navigate(
@@ -94,6 +114,30 @@ fun NavGraphBuilder.editRecordScreen(
             assetBottomSheetContent = assetBottomSheetContent,
             tagBottomSheetContent = tagBottomSheetContent,
             onRequestNaviToSelectRelatedRecord = onRequestNaviToSelectRelatedRecord,
+            onRequestPopBackStack = onRequestPopBackStack,
+        )
+    }
+}
+
+fun NavGraphBuilder.analyticsScreen(
+    onRequestPopBackStack: () -> Unit,
+) {
+    composable(
+        route = ROUTE_ANALYTICS,
+        arguments = listOf(
+            navArgument(ROUTE_EDIT_RECORD_KEY_TYPE_ID) {
+                type = NavType.LongType
+                defaultValue = -1L
+            },
+            navArgument(ROUTE_EDIT_RECORD_KEY_TAG_ID) {
+                type = NavType.LongType
+                defaultValue = -1L
+            },
+        ),
+    ) {
+        AnalyticsRoute(
+            typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
+            tagId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TAG_ID) ?: -1L,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }
