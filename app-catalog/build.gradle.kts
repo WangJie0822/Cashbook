@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.cashbook.android.application)
+    alias(libs.plugins.cashbook.android.application.flavors)
     alias(libs.plugins.cashbook.android.application.compose)
 }
 
@@ -21,7 +22,13 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+
+    implementation(libs.google.material)
+
     implementation(projects.core.design)
     implementation(projects.core.ui)
-    implementation(libs.androidx.activity.compose)
+
+    implementation(projects.repos.mpChartLib)
 }
