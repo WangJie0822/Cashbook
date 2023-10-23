@@ -33,8 +33,10 @@ import java.util.Calendar
 @Composable
 fun SelectDateDialog(
     onDialogDismiss: () -> Unit,
-    date: YearMonth,
-    onDateSelected: (YearMonth) -> Unit
+    currentDate: YearMonth,
+    yearSelectable: Boolean = false,
+    yearSelected: Boolean = false,
+    onDateSelected: (YearMonth, Boolean) -> Unit
 ) {
     Dialog(onDismissRequest = onDialogDismiss) {
         Surface(
@@ -47,9 +49,9 @@ fun SelectDateDialog(
                     .sizeIn(minWidth = 280.dp, maxWidth = 560.dp)
                     .padding(16.dp),
             ) {
-                val currentYear = date.year
-                val currentMonth = date.monthValue
-                var selectedYear by remember(date) {
+                val currentYear = currentDate.year
+                val currentMonth = currentDate.monthValue
+                var selectedYear by remember(currentDate) {
                     mutableIntStateOf(currentYear)
                 }
                 val startYear = Calendar.getInstance()[Calendar.YEAR] + 1
@@ -97,7 +99,7 @@ fun SelectDateDialog(
                                     for (r in 0 until 3) {
                                         val month = c * 3 + r + 1
                                         val containerColor =
-                                            if (selectedYear == currentYear && month == currentMonth) {
+                                            if (!(yearSelectable && yearSelected) && selectedYear == currentYear && month == currentMonth) {
                                                 MaterialTheme.colorScheme.primaryContainer
                                             } else {
                                                 Color.Transparent
@@ -112,7 +114,7 @@ fun SelectDateDialog(
                                                         YearMonth.of(
                                                             selectedYear,
                                                             month
-                                                        )
+                                                        ), false
                                                     )
                                                 }
                                                 .background(
@@ -128,6 +130,34 @@ fun SelectDateDialog(
                         }
                     },
                 )
+                if (yearSelectable) {
+                    val containerColor =
+                        if (yearSelected && selectedYear == currentYear) {
+                            MaterialTheme.colorScheme.primaryContainer
+                        } else {
+                            Color.Transparent
+                        }
+                    Text(
+                        text = "全年",
+                        textAlign = TextAlign.Center,
+                        color = contentColorFor(backgroundColor = containerColor),
+                        modifier = Modifier
+                            .clickable {
+                                onDateSelected(
+                                    YearMonth.of(
+                                        selectedYear,
+                                        1
+                                    ), true
+                                )
+                            }
+                            .fillMaxWidth()
+                            .background(
+                                color = containerColor,
+                                shape = MaterialTheme.shapes.large,
+                            )
+                            .padding(vertical = 8.dp),
+                    )
+                }
             }
         }
     }

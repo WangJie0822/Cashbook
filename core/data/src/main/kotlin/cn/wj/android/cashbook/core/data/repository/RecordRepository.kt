@@ -41,6 +41,8 @@ interface RecordRepository {
         pageSize: Int
     ): List<RecordModel>
 
+    suspend fun queryRecordListBetweenDate(from: String, to: String): List<RecordModel>
+
     fun queryRecordByYearMonth(year: String, month: String): Flow<List<RecordModel>>
 
     suspend fun getDefaultRecord(typeId: Long): RecordModel

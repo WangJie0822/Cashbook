@@ -124,8 +124,8 @@ class RecordRepositoryImpl @Inject constructor(
         } else {
             monthInt + 1
         }
-        val startDate = "${yearInt.completeZero()}-${monthInt.completeZero()}-01 00:00:00"
-        val endDate = "${nextYearInt.completeZero()}-${nextMonthInt.completeZero()}-01 00:00:00"
+        val startDate = "$yearInt-${monthInt.completeZero()}-01 00:00:00"
+        val endDate = "$nextYearInt-${nextMonthInt.completeZero()}-01 00:00:00"
         return combine(recordDataVersion, appPreferencesDataSource.appData) { _, appData ->
             recordDao.queryByBooksIdBetweenDate(
                 appData.currentBookId,
@@ -136,6 +136,19 @@ class RecordRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun queryRecordListBetweenDate(from: String, to: String): List<RecordModel> =
+        withContext(coroutineContext) {
+            this@RecordRepositoryImpl.logger()
+                .i("queryRecordListBetweenDate(from = <$from>, to = <$to>)")
+            recordDao.queryByBooksIdBetweenDate(
+                appPreferencesDataSource.appData.first().currentBookId,
+                from.parseDateLong(),
+                to.parseDateLong()
+            ).map {
+                it.asModel()
+            }
+        }
 
     override suspend fun getDefaultRecord(typeId: Long): RecordModel =
         withContext(coroutineContext) {

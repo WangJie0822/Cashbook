@@ -174,8 +174,8 @@ internal fun CalendarScreen(
                 if (date is YearMonth) {
                     SelectDateDialog(
                         onDialogDismiss = onRequestDismissDialog,
-                        date = selectedDate.yearMonth,
-                        onDateSelected = { ym ->
+                        currentDate = selectedDate.yearMonth,
+                        onDateSelected = { ym, _ ->
                             if (selectedDate.yearMonth != ym) {
                                 onDateSelected(ym.atDay(1))
                             }

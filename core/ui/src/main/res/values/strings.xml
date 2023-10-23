@@ -7,5 +7,5 @@
     <string name="footer_hint_default">我是有底线的</string>
     <string name="data_in_loading">数据加载中</string>
     <string name="markdown_no_data_hint">暂无数据，请联网后重试</string>
-    <string name="progress_loading_default">加载中…</string>
+    <string name="progress_loading_default">处理中…</string>
 </resources>

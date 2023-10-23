@@ -387,7 +387,6 @@ private fun BackLayerContent(
                     }
                 }
             }
-
         }
     }
 }
@@ -421,8 +420,8 @@ private fun FrontLayerContent(
                     // 显示选择日期弹窗
                     SelectDateDialog(
                         onDialogDismiss = onRequestDismissDialog,
-                        date = date,
-                        onDateSelected = onDateSelected,
+                        currentDate = date,
+                        onDateSelected = { ym, _ -> onDateSelected(ym) },
                     )
                 }
             }

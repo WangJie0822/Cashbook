@@ -56,6 +56,7 @@ import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.expand.text
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
@@ -689,15 +690,6 @@ internal fun EditRecordTopBar(
         },
     )
 }
-
-internal val RecordTypeCategoryEnum.text: String
-    @Composable get() = stringResource(
-        id = when (this) {
-            RecordTypeCategoryEnum.EXPENDITURE -> R.string.expend
-            RecordTypeCategoryEnum.INCOME -> R.string.income
-            RecordTypeCategoryEnum.TRANSFER -> R.string.transfer
-        }
-    )
 
 /**
  * 金额显示框
