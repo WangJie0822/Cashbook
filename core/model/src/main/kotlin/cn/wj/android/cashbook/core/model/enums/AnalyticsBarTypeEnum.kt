@@ -1,13 +1,17 @@
 package cn.wj.android.cashbook.core.model.enums
 
-enum class AnalyticsIncomeExpenditureEnum {
+enum class AnalyticsBarTypeEnum {
     EXPENDITURE,
     INCOME,
+    BALANCE,
     ALL,
     ;
 
     companion object {
-        fun ordinalOf(ordinal: Int): AnalyticsIncomeExpenditureEnum? {
+        val size: Int
+            get() = entries.size
+
+        fun ordinalOf(ordinal: Int): AnalyticsBarTypeEnum? {
             return entries.firstOrNull { it.ordinal == ordinal }
         }
     }

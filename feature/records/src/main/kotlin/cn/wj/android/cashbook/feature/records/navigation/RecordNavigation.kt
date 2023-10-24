@@ -23,8 +23,7 @@ private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
 private const val ROUTE_EDIT_RECORD_KEY_TAG_ID = "tagId"
 
 /** 路由 - 数据分析 */
-private const val ROUTE_ANALYTICS =
-    "record/analytics?$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}&$ROUTE_EDIT_RECORD_KEY_TAG_ID={$ROUTE_EDIT_RECORD_KEY_TAG_ID}"
+private const val ROUTE_ANALYTICS = "record/analytics"
 
 /** 路由 - 编辑记录 */
 internal const val ROUTE_EDIT_RECORD =
@@ -39,18 +38,8 @@ private const val ROUTE_RECORD_CALENDAR = "record/calendar"
 /** 路由 - 搜索 */
 private const val ROUTE_RECORD_SEARCH = "record/search"
 
-fun NavController.naviToAnalytics(typeId: Long = -1L, tagId: Long = -1L) {
-    this.navigate(
-        ROUTE_ANALYTICS
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_TAG_ID}",
-                newValue = tagId.toString()
-            )
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_TYPE_ID}",
-                newValue = typeId.toString()
-            )
-    )
+fun NavController.naviToAnalytics() {
+    this.navigate(ROUTE_ANALYTICS)
 }
 
 fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
@@ -124,20 +113,8 @@ fun NavGraphBuilder.analyticsScreen(
 ) {
     composable(
         route = ROUTE_ANALYTICS,
-        arguments = listOf(
-            navArgument(ROUTE_EDIT_RECORD_KEY_TYPE_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-            navArgument(ROUTE_EDIT_RECORD_KEY_TAG_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-        ),
     ) {
         AnalyticsRoute(
-            typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
-            tagId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TAG_ID) ?: -1L,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }

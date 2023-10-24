@@ -4,6 +4,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.withContext
@@ -31,7 +32,7 @@ class GetAssetRecordViewsUseCase @Inject constructor(
             .sortedBy { it.recordTime }
             .reversed()
             .map {
-                recordModelTransToViewsUseCase(it)
+                recordModelTransToViewsUseCase(it).asEntity()
             }
     }
 }

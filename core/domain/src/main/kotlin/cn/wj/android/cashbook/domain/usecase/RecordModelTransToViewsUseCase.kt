@@ -8,13 +8,11 @@ import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
-import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
-import cn.wj.android.cashbook.core.model.transfer.asEntity
 import java.math.BigDecimal
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -32,7 +30,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
     private val tagRepository: TagRepository,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) {
-    suspend operator fun invoke(recordModel: RecordModel): RecordViewsEntity =
+    suspend operator fun invoke(recordModel: RecordModel): RecordViewsModel =
         withContext(coroutineContext) {
             val type = when (recordModel.typeId) {
                 RECORD_TYPE_BALANCE_INCOME.id -> RECORD_TYPE_BALANCE_INCOME
@@ -73,6 +71,6 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 relatedRecord = relatedRecord,
                 relatedAmount = totalRelated.decimalFormat(),
                 recordTime = recordModel.recordTime,
-            ).asEntity()
+            )
         }
 }

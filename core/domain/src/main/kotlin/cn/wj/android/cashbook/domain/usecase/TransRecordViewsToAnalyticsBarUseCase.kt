@@ -7,10 +7,9 @@ import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.yearMonth
-import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
-import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.inject.Inject
@@ -18,8 +17,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.withContext
 
 class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
-    private val recordRepository: RecordRepository,
-    private val recordModelTransToViewsUseCase: RecordModelTransToViewsUseCase,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) {
 
@@ -27,7 +24,7 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
         fromDate: LocalDate,
         toDate: LocalDate?,
         yearSelected: Boolean,
-        recordViewsList: List<RecordViewsEntity>
+        recordViewsList: List<RecordViewsModel>
     ): List<AnalyticsRecordBarEntity> = withContext(coroutineContext) {
         val result = mutableListOf<AnalyticsRecordBarEntity>()
         val dateList = mutableListOf<String>()
@@ -65,7 +62,7 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
                     it.recordTime.split(" ").first()
                 }
             }.forEach { record ->
-                when (record.typeCategory) {
+                when (record.type.typeCategory) {
                     RecordTypeCategoryEnum.EXPENDITURE -> {
                         // 支出
                         totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())

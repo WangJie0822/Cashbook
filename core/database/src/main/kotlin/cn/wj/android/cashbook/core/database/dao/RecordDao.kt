@@ -38,7 +38,10 @@ interface RecordDao {
 
     @Query(
         value = """
-            SELECT * FROM db_record WHERE books_id=:booksId AND record_time>=:startDate AND record_time<:endDate
+            SELECT * FROM db_record 
+            WHERE record_time>=:startDate 
+            AND record_time<:endDate
+            AND books_id=:booksId 
         """
     )
     suspend fun queryByBooksIdBetweenDate(

@@ -18,6 +18,10 @@ enum class RecordTypeCategoryEnum {
     ;
 
     companion object {
+
+        val size: Int
+            get() = entries.size
+
         fun ordinalOf(ordinal: Int): RecordTypeCategoryEnum {
             return entries.first { it.ordinal == ordinal }
         }

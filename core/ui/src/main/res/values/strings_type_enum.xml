@@ -2,6 +2,7 @@
 <resources>
     <string name="income">收入</string>
     <string name="expend">支出</string>
+    <string name="surplus">结余</string>
     <string name="all">全部</string>
     <string name="transfer">转账</string>
     <string name="money_management">理财</string>

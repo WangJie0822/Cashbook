@@ -5,7 +5,7 @@ import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
-import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -26,7 +26,7 @@ class GetRecordViewsBetweenDateUseCase @Inject constructor(
         fromDate: LocalDate,
         toDate: LocalDate?,
         yearSelected: Boolean
-    ): List<RecordViewsEntity> = withContext(coroutineContext) {
+    ): List<RecordViewsModel> = withContext(coroutineContext) {
         val from: String
         val to: String
         when {

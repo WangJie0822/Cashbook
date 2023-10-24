@@ -8,10 +8,13 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
+import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.ProgressDialogManager
 import cn.wj.android.cashbook.domain.usecase.GetRecordViewsBetweenDateUseCase
 import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCase
+import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -32,6 +35,7 @@ import kotlinx.coroutines.launch
 class AnalyticsViewModel @Inject constructor(
     getRecordViewsBetweenDateUseCase: GetRecordViewsBetweenDateUseCase,
     transRecordViewsToAnalyticsBarUseCase: TransRecordViewsToAnalyticsBarUseCase,
+    transRecordViewsToAnalyticsPieUseCase: TransRecordViewsToAnalyticsPieUseCase,
 ) : ViewModel() {
 
     var dialogState: DialogState by mutableStateOf(DialogState.Dismiss)
@@ -46,6 +50,25 @@ class AnalyticsViewModel @Inject constructor(
 
     val uiState = _recordListData.mapLatest { list ->
         val date = _dateData.first()
+        val crossYear: Boolean
+        val titleText: String
+        when {
+            date.year -> {
+                crossYear = false
+                titleText = date.from.year.toString()
+            }
+
+            date.to != null -> {
+                crossYear = date.from.year != date.to.year
+                titleText = "${date.from.year}-${date.from.monthValue}-${date.from.dayOfMonth}\n" +
+                        "${date.to.year}-${date.to.monthValue}-${date.to.dayOfMonth}"
+            }
+
+            else -> {
+                crossYear = false
+                titleText = "${date.from.year}-${date.from.monthValue}"
+            }
+        }
         var totalIncome = BigDecimal.ZERO
         var totalExpenditure = BigDecimal.ZERO
         var totalBalance = BigDecimal.ZERO
@@ -55,26 +78,23 @@ class AnalyticsViewModel @Inject constructor(
             totalExpenditure += it.expenditure.toBigDecimalOrZero()
             totalBalance += it.balance.toBigDecimalOrZero()
         }
+        val expenditurePieDataList =
+            transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.EXPENDITURE, list)
+        val incomePieDataList =
+            transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.INCOME, list)
+        val transferPieDataList =
+            transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.TRANSFER, list)
         val success = AnalyticsUiState.Success(
             year = date.year,
-            titleText = when {
-                date.year -> {
-                    date.from.year.toString()
-                }
-
-                date.to != null -> {
-                    "${date.from.year}-${date.from.monthValue}-${date.from.dayOfMonth}\n" +
-                            "${date.to.year}-${date.to.monthValue}-${date.to.dayOfMonth}"
-                }
-
-                else -> {
-                    "${date.from.year}-${date.from.monthValue}"
-                }
-            },
+            crossYear = crossYear,
+            titleText = titleText,
             totalIncome = totalIncome.decimalFormat(),
             totalExpenditure = totalExpenditure.decimalFormat(),
             totalBalance = totalBalance.decimalFormat(),
             barDataList = barList,
+            expenditurePieDataList = expenditurePieDataList,
+            incomePieDataList = incomePieDataList,
+            transferPieDataList = transferPieDataList,
         )
         ProgressDialogManager.dismiss()
         success
@@ -106,11 +126,15 @@ sealed interface AnalyticsUiState {
     data object Loading : AnalyticsUiState
     data class Success(
         val year: Boolean,
+        val crossYear: Boolean,
         val titleText: String,
         val totalIncome: String,
         val totalExpenditure: String,
         val totalBalance: String,
         val barDataList: List<AnalyticsRecordBarEntity>,
+        val expenditurePieDataList: List<AnalyticsRecordPieEntity>,
+        val incomePieDataList: List<AnalyticsRecordPieEntity>,
+        val transferPieDataList: List<AnalyticsRecordPieEntity>,
     ) : AnalyticsUiState
 }
 

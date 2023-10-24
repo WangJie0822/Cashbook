@@ -352,7 +352,7 @@ fun CashbookNavHost(
 
         // 我的标签
         myTagsScreen(
-            onRequestNaviToTagStatistic = { navController.naviToAnalytics(tagId = it) },
+            onRequestNaviToTagStatistic = { /*TODO 标签数据*/ },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
 
@@ -458,7 +458,7 @@ fun CashbookNavHost(
 
         // 我的分类
         myCategoriesScreen(
-            onRequestNaviToTypeStatistics = { navController.naviToAnalytics(typeId = it) },
+            onRequestNaviToTypeStatistics = { /*TODO 分类数据*/ },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
     }

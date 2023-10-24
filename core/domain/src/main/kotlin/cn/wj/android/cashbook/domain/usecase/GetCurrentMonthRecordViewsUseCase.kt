@@ -2,6 +2,7 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.transfer.asEntity
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +22,7 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
     operator fun invoke(year: String, month: String): Flow<List<RecordViewsEntity>> =
         recordRepository.queryRecordByYearMonth(year, month).mapLatest { list ->
             list.map {
-                recordModelTransToViewsUseCase(it)
+                recordModelTransToViewsUseCase(it).asEntity()
             }
         }
 
