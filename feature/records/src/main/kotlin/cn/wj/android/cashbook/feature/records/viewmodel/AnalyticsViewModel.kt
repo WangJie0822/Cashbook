@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
@@ -60,13 +61,13 @@ class AnalyticsViewModel @Inject constructor(
 
             date.to != null -> {
                 crossYear = date.from.year != date.to.year
-                titleText = "${date.from.year}-${date.from.monthValue}-${date.from.dayOfMonth}\n" +
-                        "${date.to.year}-${date.to.monthValue}-${date.to.dayOfMonth}"
+                titleText = "${date.from.year}-${date.from.monthValue.completeZero()}-${date.from.dayOfMonth.completeZero()}\n" +
+                        "${date.to.year}-${date.to.monthValue.completeZero()}-${date.to.dayOfMonth.completeZero()}"
             }
 
             else -> {
                 crossYear = false
-                titleText = "${date.from.year}-${date.from.monthValue}"
+                titleText = "${date.from.year}-${date.from.monthValue.completeZero()}"
             }
         }
         var totalIncome = BigDecimal.ZERO
@@ -88,6 +89,7 @@ class AnalyticsViewModel @Inject constructor(
             year = date.year,
             crossYear = crossYear,
             titleText = titleText,
+            noData = list.isEmpty(),
             totalIncome = totalIncome.decimalFormat(),
             totalExpenditure = totalExpenditure.decimalFormat(),
             totalBalance = totalBalance.decimalFormat(),
@@ -107,7 +109,14 @@ class AnalyticsViewModel @Inject constructor(
 
     fun showSelectDateDialog() {
         viewModelScope.launch {
-            dialogState = DialogState.Shown(_dateData.first())
+            dialogState = DialogState.Shown(ShowSelectDateDialogData.SelectDate(_dateData.first()))
+        }
+    }
+
+    fun showSelectDateRangeDialog() {
+        viewModelScope.launch {
+            dialogState =
+                DialogState.Shown(ShowSelectDateDialogData.SelectRangeDate(_dateData.first()))
         }
     }
 
@@ -131,6 +140,7 @@ sealed interface AnalyticsUiState {
         val totalIncome: String,
         val totalExpenditure: String,
         val totalBalance: String,
+        val noData: Boolean,
         val barDataList: List<AnalyticsRecordBarEntity>,
         val expenditurePieDataList: List<AnalyticsRecordPieEntity>,
         val incomePieDataList: List<AnalyticsRecordPieEntity>,
@@ -143,3 +153,8 @@ data class DateData(
     val to: LocalDate? = null,
     val year: Boolean = false,
 )
+
+sealed class ShowSelectDateDialogData(open val date: DateData) {
+    data class SelectDate(override val date: DateData) : ShowSelectDateDialogData(date)
+    data class SelectRangeDate(override val date: DateData) : ShowSelectDateDialogData(date)
+}

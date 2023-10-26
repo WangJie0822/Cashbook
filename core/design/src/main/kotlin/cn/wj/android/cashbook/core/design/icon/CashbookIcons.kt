@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Cancel
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Error
@@ -43,6 +45,7 @@ object CashbookIcons {
     val ArrowBack = Icons.Filled.ArrowBack
     val KeyboardArrowRight = Icons.Filled.KeyboardArrowRight
     val KeyboardArrowDown = Icons.Filled.KeyboardArrowDown
+    val ArrowDropDown = Icons.Filled.ArrowDropDown
     val Fingerprint = Icons.Filled.Fingerprint
     val Backspace = Icons.Filled.Backspace
     val Visibility = Icons.Filled.Visibility
@@ -69,4 +72,5 @@ object CashbookIcons {
     val ContentCopy = Icons.Filled.ContentCopy
     val DeleteForever = Icons.Filled.DeleteForever
     val Cancel = Icons.Filled.Cancel
+    val DateRange = Icons.Filled.DateRange
 }

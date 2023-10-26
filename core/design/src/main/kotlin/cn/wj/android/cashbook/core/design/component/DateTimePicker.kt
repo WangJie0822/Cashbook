@@ -4,13 +4,17 @@ import androidx.annotation.IntDef
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.util.Pair
 import androidx.fragment.app.FragmentActivity
+import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+private const val NOT_FRAGMENT_ACTIVITY_ERROR_TEXT = "Please show dialog in FragmentActivity scope"
 
 /**
  * 对 **Material** 中组件 [MaterialDatePicker] 进行封装，使用 **Compose** 方式实现
@@ -29,17 +33,17 @@ import java.util.Locale
 @Composable
 fun DatePickerDialog(
     onDismissRequest: () -> Unit,
-    onPositiveButtonClick: (String) -> Unit,
-    onNegativeButtonClick: () -> Unit,
+    onPositiveButtonClick: (Long) -> Unit,
     title: CharSequence? = null,
     positiveButton: CharSequence? = null,
     negativeButton: CharSequence? = null,
+    onNegativeButtonClick: () -> Unit = {},
     selection: Long? = null,
-    dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
+    dateFormat: SimpleDateFormat = SimpleDateFormat(DATE_FORMAT_DATE, Locale.getDefault()),
     @DateInputMode inputMode: Int = DATE_INPUT_MODE_CALENDAR,
 ) {
     val fm = (LocalContext.current as? FragmentActivity)?.supportFragmentManager
-        ?: throw RuntimeException("Please show dialog in FragmentActivity scope")
+        ?: throw RuntimeException(NOT_FRAGMENT_ACTIVITY_ERROR_TEXT)
     val dialog = MaterialDatePicker.Builder.datePicker()
         .setSelection(selection)
         .setInputMode(inputMode)
@@ -50,13 +54,51 @@ fun DatePickerDialog(
         .build().apply {
             addOnCancelListener { onDismissRequest() }
             addOnPositiveButtonClickListener {
-                onPositiveButtonClick(dateFormat.format(it))
+                onPositiveButtonClick(it)
             }
             addOnNegativeButtonClickListener { onNegativeButtonClick() }
         }
 
     DisposableEffect(dialog) {
         dialog.show(fm, "datePicker")
+
+        onDispose {
+            dialog.dismiss()
+        }
+    }
+}
+
+@Composable
+fun DateRangePickerDialog(
+    onDismissRequest: () -> Unit,
+    onPositiveButtonClick: (Pair<Long, Long>) -> Unit,
+    onNegativeButtonClick: () -> Unit,
+    title: CharSequence? = null,
+    positiveButton: CharSequence? = null,
+    negativeButton: CharSequence? = null,
+    selection: Pair<Long, Long>? = null,
+    dateFormat: SimpleDateFormat = SimpleDateFormat(DATE_FORMAT_DATE, Locale.getDefault()),
+    @DateInputMode inputMode: Int = DATE_INPUT_MODE_CALENDAR,
+) {
+    val fm = (LocalContext.current as? FragmentActivity)?.supportFragmentManager
+        ?: throw RuntimeException(NOT_FRAGMENT_ACTIVITY_ERROR_TEXT)
+    val dialog = MaterialDatePicker.Builder.dateRangePicker()
+        .setSelection(selection)
+        .setInputMode(inputMode)
+        .setTextInputFormat(dateFormat)
+        .setTitleText(title)
+        .setPositiveButtonText(positiveButton)
+        .setNegativeButtonText(negativeButton)
+        .build().apply {
+            addOnCancelListener { onDismissRequest() }
+            addOnPositiveButtonClickListener {
+                onPositiveButtonClick(it)
+            }
+            addOnNegativeButtonClickListener { onNegativeButtonClick() }
+        }
+
+    DisposableEffect(dialog) {
+        dialog.show(fm, "dateRangePicker")
 
         onDispose {
             dialog.dismiss()
@@ -93,7 +135,7 @@ fun TimePickerDialog(
     @TimeInputMode inputMode: Int = TIME_INPUT_MODE_CLOCK,
 ) {
     val fm = (LocalContext.current as? FragmentActivity)?.supportFragmentManager
-        ?: throw RuntimeException("Please show dialog in FragmentActivity scope")
+        ?: throw RuntimeException(NOT_FRAGMENT_ACTIVITY_ERROR_TEXT)
     val time = dateFormat.format(selection ?: System.currentTimeMillis())
     val dialog = MaterialTimePicker.Builder()
         .setTitleText(title)

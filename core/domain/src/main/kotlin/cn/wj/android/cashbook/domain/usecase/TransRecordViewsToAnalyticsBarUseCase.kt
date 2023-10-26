@@ -45,7 +45,7 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
             else -> {
                 var date = fromDate
                 while (date != toDate) {
-                    dateList.add("${fromDate.year}-${fromDate.monthValue.completeZero()}-${fromDate.dayOfMonth.completeZero()}")
+                    dateList.add("${date.year}-${date.monthValue.completeZero()}-${date.dayOfMonth.completeZero()}")
                     date = date.plusDays(1L)
                 }
                 dateList.add("${toDate.year}-${toDate.monthValue.completeZero()}-${toDate.dayOfMonth.completeZero()}")

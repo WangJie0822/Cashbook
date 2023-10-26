@@ -211,7 +211,7 @@ internal fun EditRecordScreen(
     dialogState: DialogState,
     onRequestDismissDialog: () -> Unit,
     onRecordTimeClick: () -> Unit,
-    onDatePickerConfirm: (String) -> Unit,
+    onDatePickerConfirm: (Long) -> Unit,
     onTimePickerConfirm: (String) -> Unit,
     selectedTypeCategory: RecordTypeCategoryEnum,
     onTypeCategorySelect: (RecordTypeCategoryEnum) -> Unit,

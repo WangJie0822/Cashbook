@@ -7,6 +7,17 @@
     <string name="month_income">月收入</string>
     <string name="month_expend">月支出</string>
     <string name="month_balance">月结余</string>
+    <string name="overview_of_revenue_and_expenditure">收支概览</string>
+    <string name="daily_statistics">每日统计</string>
+    <string name="monthly_statistics">每月统计</string>
+    <string name="daily_report">日报表</string>
+    <string name="monthly_report">月报表</string>
+    <string name="date">日期</string>
+    <string name="category_report">分类报表</string>
+    <string name="total_liabilities">总负债</string>
+    <string name="expenditure_percent">支出比例</string>
+    <string name="income_percent">收入比例</string>
+    <string name="transfer_percent">转账比例</string>
     <string name="year">年</string>
     <string name="month">月</string>
     <string name="day">日</string>

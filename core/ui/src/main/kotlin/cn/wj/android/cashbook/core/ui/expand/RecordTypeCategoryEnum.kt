@@ -28,3 +28,12 @@ val RecordTypeCategoryEnum.text: String
             RecordTypeCategoryEnum.TRANSFER -> R.string.transfer
         }
     )
+
+val RecordTypeCategoryEnum.percentText: String
+    @Composable get() = stringResource(
+        id = when (this) {
+            RecordTypeCategoryEnum.EXPENDITURE -> R.string.expenditure_percent
+            RecordTypeCategoryEnum.INCOME -> R.string.income_percent
+            RecordTypeCategoryEnum.TRANSFER -> R.string.transfer_percent
+        }
+    )

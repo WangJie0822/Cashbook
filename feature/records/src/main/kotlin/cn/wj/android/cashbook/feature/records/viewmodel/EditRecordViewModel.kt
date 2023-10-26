@@ -10,7 +10,9 @@ import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
+import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
@@ -398,8 +400,8 @@ class EditRecordViewModel @Inject constructor(
     private var dateTemp = ""
 
     /** 选择日期 */
-    fun pickDate(date: String) {
-        dateTemp = date
+    fun pickDate(dateMs: Long) {
+        dateTemp = dateMs.dateFormat(DATE_FORMAT_DATE)
         displayTimePickerDialog()
     }
 

@@ -33,6 +33,8 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
      */
     protected List<Integer> mValueColors = null;
 
+    protected List<Integer> mLabelColors = null;
+
     /**
      * label that describes the DataSet or the data the DataSet represents
      */
@@ -92,12 +94,14 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
      * Default constructor.
      */
     public BaseDataSet() {
-        mColors = new ArrayList<Integer>();
-        mValueColors = new ArrayList<Integer>();
+        mColors = new ArrayList<>();
+        mValueColors = new ArrayList<>();
+        mLabelColors = new ArrayList<>();
 
         // default color
         mColors.add(Color.rgb(140, 234, 255));
         mValueColors.add(Color.BLACK);
+        mLabelColors.add(Color.WHITE);
     }
 
     /**
@@ -141,6 +145,11 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
         return mColors.get(index % mColors.size());
     }
 
+    @Override
+    public int getLabelColor(int index) {
+        return mLabelColors.get(index % mColors.size());
+    }
+
     /**
      * ###### ###### COLOR SETTING RELATED METHODS ##### ######
      */
@@ -156,6 +165,10 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
      */
     public void setColors(List<Integer> colors) {
         this.mColors = colors;
+    }
+
+    public void setLabelColors(List<Integer> colors) {
+        this.mLabelColors = colors;
     }
 
     /**
@@ -200,8 +213,9 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
      * @param color
      */
     public void addColor(int color) {
-        if (mColors == null)
+        if (mColors == null) {
             mColors = new ArrayList<Integer>();
+        }
         mColors.add(color);
     }
 
@@ -275,17 +289,16 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
 
     @Override
     public void setValueFormatter(IValueFormatter f) {
-
-        if (f == null)
-            return;
-        else
+        if (f != null) {
             mValueFormatter = f;
+        }
     }
 
     @Override
     public IValueFormatter getValueFormatter() {
-        if (needsFormatter())
+        if (needsFormatter()) {
             return Utils.getDefaultValueFormatter();
+        }
         return mValueFormatter;
     }
 
@@ -432,8 +445,9 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
     public int getIndexInEntries(int xIndex) {
 
         for (int i = 0; i < getEntryCount(); i++) {
-            if (xIndex == getEntryForIndex(i).getX())
+            if (xIndex == getEntryForIndex(i).getX()) {
                 return i;
+            }
         }
 
         return -1;
@@ -446,8 +460,9 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
 
             T entry = getEntryForIndex(0);
             return removeEntry(entry);
-        } else
+        } else {
             return false;
+        }
     }
 
     @Override
@@ -457,8 +472,9 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
 
             T e = getEntryForIndex(getEntryCount() - 1);
             return removeEntry(e);
-        } else
+        } else {
             return false;
+        }
     }
 
     @Override
@@ -479,8 +495,9 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
     public boolean contains(T e) {
 
         for (int i = 0; i < getEntryCount(); i++) {
-            if (getEntryForIndex(i).equals(e))
+            if (getEntryForIndex(i).equals(e)) {
                 return true;
+            }
         }
 
         return false;

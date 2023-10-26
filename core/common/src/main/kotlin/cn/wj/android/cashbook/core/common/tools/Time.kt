@@ -6,6 +6,7 @@ package cn.wj.android.cashbook.core.common.tools
 import cn.wj.android.cashbook.core.common.ext.logger
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
@@ -33,6 +34,15 @@ const val DATE_FORMAT_TIME = "HH:mm"
 
 /** 没有秒的时间格式化 */
 const val DATE_FORMAT_NO_SECONDS = "yyyy-MM-dd HH:mm"
+
+/** 时间格式化 - 年 */
+const val DATE_FORMAT_YEAR = "yyyy"
+
+/** 时间格式化 - 月 */
+const val DATE_FORMAT_MONTH = "MM"
+
+/** 时间格式化 - 日 */
+const val DATE_FORMAT_DAY = "dd"
 
 /** 根据[format]格式化时间，[format]默认[DATE_FORMAT_DEFAULT] */
 @JvmOverloads
@@ -89,4 +99,10 @@ fun String.paresDate(format: String = DATE_FORMAT_DEFAULT): Date? {
 @JvmOverloads
 fun String?.toLongTime(format: String = DATE_FORMAT_DEFAULT): Long? {
     return this?.paresDate(format)?.time
+}
+
+fun Long.toLocalDate(): LocalDate {
+    return this.dateFormat(DATE_FORMAT_DATE).split("-").run {
+        LocalDate.of(this[0].toInt(), this[1].toInt(), this[2].toInt())
+    }
 }

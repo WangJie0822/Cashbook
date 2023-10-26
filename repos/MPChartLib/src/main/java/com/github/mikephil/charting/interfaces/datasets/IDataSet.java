@@ -294,6 +294,8 @@ public interface IDataSet<T extends Entry> {
      */
     int getColor(int index);
 
+    int getLabelColor(int index);
+
     /**
      * returns true if highlighting of values is enabled, false if not
      *
