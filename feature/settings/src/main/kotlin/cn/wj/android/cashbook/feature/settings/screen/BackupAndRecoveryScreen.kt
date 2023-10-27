@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,9 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.BACKUP_FILE_NAME
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_EMPTY
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_UNAUTHORIZED
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_WEBDAV
@@ -54,6 +57,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.CompatPasswordTextField
 import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
@@ -98,6 +102,7 @@ internal fun BackupAndRecoveryRoute(
         onRecoveryClick = viewModel::getRecoveryList,
         onAutoBackupClick = viewModel::displaySelectAutoBackupDialog,
         onAutoBackupModeSelected = viewModel::onAutoBackupModeSelected,
+        onKeepLatestBackupChanged = viewModel::changeKeepLatestBackup,
         onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
@@ -138,6 +143,7 @@ internal fun BackupAndRecoveryScreen(
     onBackupClick: () -> Unit,
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
+    onKeepLatestBackupChanged: (Boolean) -> Unit,
     onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
@@ -196,24 +202,35 @@ internal fun BackupAndRecoveryScreen(
                         }
 
                         is Int -> {
-                            AutoBackupModeDialog(
-                                autoBackupMode = uiState.autoBackup,
-                                onAutoBackupModeSelected = onAutoBackupModeSelected,
-                                onRequestDismissDialog = onRequestDismissDialog,
-                            )
+                            if (uiState is BackupAndRecoveryUiState.Success) {
+                                AutoBackupModeDialog(
+                                    autoBackupMode = uiState.autoBackup,
+                                    onAutoBackupModeSelected = onAutoBackupModeSelected,
+                                    onRequestDismissDialog = onRequestDismissDialog,
+                                )
+                            }
                         }
                     }
                 }
 
-                BackupAndRecoveryScaffoldContent(
-                    uiState = uiState,
-                    isConnected = isConnected,
-                    onConnectStateClick = onConnectStateClick,
-                    onBackupPathSelected = onBackupPathSelected,
-                    onBackupClick = onBackupClick,
-                    onRecoveryClick = onRecoveryClick,
-                    onAutoBackupClick = onAutoBackupClick,
-                )
+                when (uiState) {
+                    BackupAndRecoveryUiState.Loading -> {
+                        Loading(modifier = Modifier.align(Alignment.Center))
+                    }
+
+                    is BackupAndRecoveryUiState.Success -> {
+                        BackupAndRecoveryScaffoldContent(
+                            uiState = uiState,
+                            isConnected = isConnected,
+                            onConnectStateClick = onConnectStateClick,
+                            onBackupPathSelected = onBackupPathSelected,
+                            onBackupClick = onBackupClick,
+                            onRecoveryClick = onRecoveryClick,
+                            onAutoBackupClick = onAutoBackupClick,
+                            onKeepLatestBackupChanged = onKeepLatestBackupChanged,
+                        )
+                    }
+                }
             }
         },
     )
@@ -245,7 +262,10 @@ private fun BackupListDialog(
                 content = {
                     items(backupList) {
                         Text(
-                            text = it.name,
+                            text = it.name.replace(BACKUP_FILE_NAME, ""),
+                            softWrap = false,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .clickable { onBackupListItemClick(it.path) }
                                 .padding(vertical = 4.dp),
@@ -322,16 +342,17 @@ internal fun AutoBackupModeDialog(
  * @param onRecoveryClick 恢复点击回调
  * @param onAutoBackupClick 自动备份点击回调
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun BackupAndRecoveryScaffoldContent(
-    uiState: BackupAndRecoveryUiState,
+    uiState: BackupAndRecoveryUiState.Success,
     isConnected: Boolean,
     onConnectStateClick: (String, String, String) -> Unit,
     onBackupPathSelected: (String) -> Unit,
     onBackupClick: () -> Unit,
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
+    onKeepLatestBackupChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // 提示文本
@@ -521,6 +542,19 @@ internal fun BackupAndRecoveryScaffoldContent(
                 Text(text = uiState.autoBackup.text)
             },
             modifier = Modifier.clickable(onClick = onAutoBackupClick),
+        )
+
+        TransparentListItem(
+            headlineContent = { Text(text = stringResource(id = R.string.only_save_latest_backup)) },
+            supportingContent = {
+                Text(text = stringResource(id = R.string.only_save_latest_backup_hint))
+            },
+            trailingContent = {
+                Switch(
+                    checked = uiState.keepLatestBackup,
+                    onCheckedChange = onKeepLatestBackupChanged,
+                )
+            },
         )
     }
 }

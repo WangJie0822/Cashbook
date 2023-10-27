@@ -181,4 +181,9 @@ class SettingRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             appPreferencesDataSource.updateAutoBackupMode(autoBackupMode)
         }
+
+    override suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) =
+        withContext(coroutineContext) {
+            appPreferencesDataSource.updateKeepLatestBackup(keepLatestBackup)
+        }
 }

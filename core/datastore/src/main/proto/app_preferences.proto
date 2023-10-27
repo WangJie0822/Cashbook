@@ -31,4 +31,5 @@ message AppPreferences {
   int32 autoBackup = 24; // 自动备份
   sint64 lastBackupMs = 25; // 上次备份时间戳
   sint64 creditCardPaymentTypeId = 26; // 信用卡还款类型 id
+  bool keepLatestBackup = 27; // 是否仅保留本地最后一次备份
 }

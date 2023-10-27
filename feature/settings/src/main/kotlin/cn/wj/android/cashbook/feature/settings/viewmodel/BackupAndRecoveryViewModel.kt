@@ -1,19 +1,16 @@
 package cn.wj.android.cashbook.feature.settings.viewmodel
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.ProgressDialogManager
-import cn.wj.android.cashbook.core.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,8 +32,7 @@ import kotlinx.coroutines.launch
 class BackupAndRecoveryViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     private val backupRecoveryManager: BackupRecoveryManager,
-    application: Application,
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
@@ -45,18 +41,19 @@ class BackupAndRecoveryViewModel @Inject constructor(
     /** 界面 UI 状态 */
     val uiState = settingRepository.appDataMode
         .mapLatest {
-            BackupAndRecoveryUiState(
+            BackupAndRecoveryUiState.Success(
                 webDAVDomain = it.webDAVDomain,
                 webDAVAccount = it.webDAVAccount,
                 webDAVPassword = it.webDAVPassword,
                 backupPath = it.backupPath,
                 autoBackup = it.autoBackup,
+                keepLatestBackup = it.keepLatestBackup,
             )
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
-            initialValue = BackupAndRecoveryUiState(),
+            initialValue = BackupAndRecoveryUiState.Loading,
         )
 
     /** WebDAV 连接状态 */
@@ -73,16 +70,8 @@ class BackupAndRecoveryViewModel @Inject constructor(
             backupRecoveryManager.backupState,
             backupRecoveryManager.recoveryState
         ) { backup, recovery ->
-            if (backup == BackupRecoveryState.InProgress) {
-                ProgressDialogManager.show(
-                    hint = R.string.in_backup.string(getApplication()),
-                    cancelable = false,
-                )
-            } else if (recovery == BackupRecoveryState.InProgress) {
-                ProgressDialogManager.show(
-                    hint = R.string.in_recovery.string(getApplication()),
-                    cancelable = false,
-                )
+            if (recovery == BackupRecoveryState.InProgress || backup == BackupRecoveryState.InProgress) {
+                ProgressDialogManager.show(cancelable = false)
             } else {
                 ProgressDialogManager.dismiss()
             }
@@ -102,16 +91,18 @@ class BackupAndRecoveryViewModel @Inject constructor(
     fun saveWebDAV(domain: String, account: String, password: String) {
         viewModelScope.launch {
             val state = uiState.first()
-            if (state.webDAVDomain == domain && state.webDAVAccount == account && state.webDAVPassword == password) {
-                // 未做修改，尝试重连
-                backupRecoveryManager.refreshWebDAVConnected()
-            } else {
-                // 更新配置数据
-                settingRepository.updateWebDAV(
-                    domain = domain,
-                    account = account,
-                    password = password,
-                )
+            if (state is BackupAndRecoveryUiState.Success) {
+                if (state.webDAVDomain == domain && state.webDAVAccount == account && state.webDAVPassword == password) {
+                    // 未做修改，尝试重连
+                    backupRecoveryManager.refreshWebDAVConnected()
+                } else {
+                    // 更新配置数据
+                    settingRepository.updateWebDAV(
+                        domain = domain,
+                        account = account,
+                        password = password,
+                    )
+                }
             }
         }
     }
@@ -164,6 +155,12 @@ class BackupAndRecoveryViewModel @Inject constructor(
         }
     }
 
+    fun changeKeepLatestBackup(keep: Boolean) {
+        viewModelScope.launch {
+            settingRepository.updateKeepLatestBackup(keep)
+        }
+    }
+
     /** 隐藏提示 */
     fun dismissBookmark() {
         backupRecoveryManager.updateBackupState(BackupRecoveryState.None)
@@ -176,19 +173,14 @@ class BackupAndRecoveryViewModel @Inject constructor(
     }
 }
 
-/**
- * 备份恢复界面 UI 状态
- *
- * @param webDAVDomain webDAV 服务器地址
- * @param webDAVAccount webDAV 账号信息
- * @param webDAVPassword webDAV 密码数据
- * @param backupPath 本地备份路径
- * @param autoBackup 自动备份类型，取 [AutoBackupModeEnum]
- */
-data class BackupAndRecoveryUiState(
-    val webDAVDomain: String = "",
-    val webDAVAccount: String = "",
-    val webDAVPassword: String = "",
-    val backupPath: String = "",
-    val autoBackup: AutoBackupModeEnum = AutoBackupModeEnum.CLOSE,
-)
+sealed interface BackupAndRecoveryUiState {
+    data object Loading : BackupAndRecoveryUiState
+    data class Success(
+        val webDAVDomain: String,
+        val webDAVAccount: String,
+        val webDAVPassword: String,
+        val backupPath: String,
+        val autoBackup: AutoBackupModeEnum,
+        val keepLatestBackup: Boolean,
+    ) : BackupAndRecoveryUiState
+}

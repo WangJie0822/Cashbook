@@ -73,4 +73,6 @@ interface SettingRepository {
     suspend fun updateBackupMs(ms: Long)
 
     suspend fun updateAutoBackupMode(autoBackupMode: AutoBackupModeEnum)
+
+    suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean)
 }

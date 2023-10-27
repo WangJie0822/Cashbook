@@ -91,6 +91,8 @@
     <string name="each_week">每周一次</string>
     <string name="in_backup">备份中…</string>
     <string name="in_recovery">恢复中…</string>
+    <string name="only_save_latest_backup">仅保留最新备份</string>
+    <string name="only_save_latest_backup_hint">本地仅保留最新备份文件</string>
 
     <string name="please_select_backup_path_first">请先选择备份路径</string>
     <string name="unauthorized_path">未授权路径</string>

@@ -278,7 +278,7 @@ class BackupRecoveryManager @Inject constructor(
         if (list.isEmpty()) {
             updateRecoveryState(BackupRecoveryState.Failed(FAILED_BACKUP_PATH_EMPTY))
         }
-        list
+        list.sortedBy { it.name }.reversed()
     }
 
     private val String.backupPath: String
@@ -350,10 +350,14 @@ class BackupRecoveryManager @Inject constructor(
                 return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
             }
             val zippedFileName = zippedFile.name
+            val keepLatest = settingRepository.appDataMode.first().keepLatestBackup
             val backupFileUri = if (backupPath.startsWith("content://")) {
                 val documentFile = DocumentFile.fromTreeUri(context, Uri.parse(backupPath))
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
                 documentFile.findFile(zippedFileName)?.delete()
+                if (keepLatest) {
+                    documentFile.listFiles().forEach { it.delete() }
+                }
                 val backupFile = documentFile.createFile("application/zip", zippedFileName)
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
                 context.contentResolver.openOutputStream(backupFile.uri)?.use {
@@ -361,7 +365,14 @@ class BackupRecoveryManager @Inject constructor(
                 }
                 backupFile.uri
             } else {
-                val backupFile = File(backupPath, zippedFileName)
+                val backupDir = File(backupPath)
+                if (keepLatest) {
+                    backupDir.deleteAllFiles()
+                }
+                if (!backupDir.exists()) {
+                    backupDir.mkdirs()
+                }
+                val backupFile = File(backupDir, zippedFileName)
                 if (!backupFile.exists()) {
                     backupFile.createNewFile()
                 }
