@@ -59,6 +59,7 @@
     <string name="time">时间</string>
     <string name="related">已关联</string>
     <string name="refund_reimbursed">已退款|报销</string>
+    <string name="refund_reimbursed_simple">已退|报</string>
     <string name="refund_reimbursed_format">已退款|报销（%1$s）</string>
     <string name="record_saving">记录保存中…</string>
     <string name="record_removing">记录删除中…</string>

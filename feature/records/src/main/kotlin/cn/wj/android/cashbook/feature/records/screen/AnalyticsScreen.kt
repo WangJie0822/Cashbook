@@ -110,7 +110,10 @@ internal fun AnalyticsRoute(
         onRequestShowBottomSheet = viewModel::showSheet,
         onRequestDismissBottomSheet = viewModel::dismissSheet,
         uiState = uiState,
-        onRequestNaviToTypeAnalytics = onRequestNaviToTypeAnalytics,
+        onRequestNaviToTypeAnalytics = {
+            viewModel.dismissSheet()
+            onRequestNaviToTypeAnalytics(it)
+                                       },
         onRequestPopBackStack = onRequestPopBackStack,
         modifier = modifier,
     )

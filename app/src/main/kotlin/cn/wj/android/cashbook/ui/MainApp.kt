@@ -82,8 +82,10 @@ import cn.wj.android.cashbook.feature.records.navigation.naviToCalendar
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
 import cn.wj.android.cashbook.feature.records.navigation.naviToSearch
 import cn.wj.android.cashbook.feature.records.navigation.naviToSelectRelatedRecord
+import cn.wj.android.cashbook.feature.records.navigation.naviToTypedAnalytics
 import cn.wj.android.cashbook.feature.records.navigation.searchScreen
 import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
+import cn.wj.android.cashbook.feature.records.navigation.typedAnalyticsScreen
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
@@ -352,7 +354,7 @@ fun CashbookNavHost(
 
         // 我的标签
         myTagsScreen(
-            onRequestNaviToTagStatistic = { /*TODO 标签数据*/ },
+            onRequestNaviToTagStatistic = { navController.naviToTypedAnalytics(tagId = it) },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
 
@@ -407,7 +409,12 @@ fun CashbookNavHost(
         )
         // 数据分析
         analyticsScreen(
-            onRequestNaviToTypeAnalytics = {/*TODO*/},
+            onRequestNaviToTypeAnalytics = { navController.naviToTypedAnalytics(typeId = it) },
+            onRequestPopBackStack = navController::popBackStackSafety,
+        )
+        // 分类数据分析
+        typedAnalyticsScreen(
+            onRequestNaviToEditRecord = navController::naviToEditRecord,
             onRequestPopBackStack = navController::popBackStackSafety,
         )
 
@@ -459,7 +466,7 @@ fun CashbookNavHost(
 
         // 我的分类
         myCategoriesScreen(
-            onRequestNaviToTypeStatistics = { /*TODO 分类数据*/ },
+            onRequestNaviToTypeStatistics = { navController.naviToTypedAnalytics(typeId = it) },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
     }

@@ -592,7 +592,7 @@ internal fun RecordListItem(
                         Text(
                             text = stringResource(
                                 id = if (item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                                    R.string.refund_reimbursed
+                                    R.string.refund_reimbursed_simple
                                 } else {
                                     R.string.related
                                 }

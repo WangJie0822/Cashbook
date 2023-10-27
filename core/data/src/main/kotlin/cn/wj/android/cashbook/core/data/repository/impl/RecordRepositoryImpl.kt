@@ -96,6 +96,36 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun queryPagingRecordListByTypeId(
+        typeId: Long,
+        page: Int,
+        pageSize: Int
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryRecordByTypeId(
+            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            typeId = typeId,
+            pageNum = page * pageSize,
+            pageSize = pageSize,
+        ).map {
+            it.asModel()
+        }
+    }
+
+    override suspend fun queryPagingRecordListByTagId(
+        tagId: Long,
+        page: Int,
+        pageSize: Int
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryRecordByTagId(
+            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            tagId = tagId,
+            pageNum = page * pageSize,
+            pageSize = pageSize,
+        ).map {
+            it.asModel()
+        }
+    }
+
     override suspend fun queryPagingRecordListByKeyword(
         keyword: String,
         page: Int,

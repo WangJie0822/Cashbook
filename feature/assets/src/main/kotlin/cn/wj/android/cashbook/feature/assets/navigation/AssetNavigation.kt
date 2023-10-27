@@ -134,14 +134,14 @@ fun NavGraphBuilder.assetInfoScreen(
         AssetInfoRoute(
             assetId = assetId,
             assetRecordListContent = { topContent, onRecordItemClick ->
-                assetRecordListContent.invoke(
+                assetRecordListContent(
                     assetId,
                     topContent,
                     onRecordItemClick,
                 )
             },
             recordDetailSheetContent = recordDetailSheetContent,
-            onRequestNaviToEditAsset = { onRequestNaviToEditAsset.invoke(assetId) },
+            onRequestNaviToEditAsset = { onRequestNaviToEditAsset(assetId) },
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }

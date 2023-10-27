@@ -82,6 +82,34 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
+    /** 类型 id 为 [typeId] 的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query("SELECT * FROM db_record WHERE books_id=:booksId AND type_id=:typeId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
+    suspend fun queryRecordByTypeId(
+        booksId: Long,
+        typeId: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
+    /** 标签 id 为 [tagId] 的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query("""
+        SELECT * FROM db_record 
+        WHERE books_id=:booksId
+        AND id IN (
+            SELECT record_id FROM db_tag_with_record
+            WHERE tag_id=:tagId
+        ) 
+        ORDER BY record_time 
+        DESC LIMIT :pageSize 
+        OFFSET :pageNum
+    """)
+    suspend fun queryRecordByTagId(
+        booksId: Long,
+        tagId: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
     @Query(
         value = """
         SELECT * FROM db_record 

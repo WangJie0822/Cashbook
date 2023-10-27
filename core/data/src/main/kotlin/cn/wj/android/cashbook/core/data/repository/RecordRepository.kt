@@ -35,6 +35,18 @@ interface RecordRepository {
         pageSize: Int
     ): List<RecordModel>
 
+    suspend fun queryPagingRecordListByTypeId(
+        typeId: Long,
+        page: Int,
+        pageSize: Int
+    ): List<RecordModel>
+
+    suspend fun queryPagingRecordListByTagId(
+        tagId: Long,
+        page: Int,
+        pageSize: Int
+    ): List<RecordModel>
+
     suspend fun queryPagingRecordListByKeyword(
         keyword: String,
         page: Int,
