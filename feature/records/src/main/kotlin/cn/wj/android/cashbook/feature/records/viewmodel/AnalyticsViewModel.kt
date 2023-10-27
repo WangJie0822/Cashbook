@@ -8,13 +8,16 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.ProgressDialogManager
+import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.domain.usecase.GetRecordViewsBetweenDateUseCase
 import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCase
+import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieSecondUseCase
 import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
@@ -34,12 +37,17 @@ import kotlinx.coroutines.launch
  */
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
+    private val typeRepository: TypeRepository,
     getRecordViewsBetweenDateUseCase: GetRecordViewsBetweenDateUseCase,
     transRecordViewsToAnalyticsBarUseCase: TransRecordViewsToAnalyticsBarUseCase,
     transRecordViewsToAnalyticsPieUseCase: TransRecordViewsToAnalyticsPieUseCase,
+    private val transRecordViewsToAnalyticsPieSecondUseCase: TransRecordViewsToAnalyticsPieSecondUseCase,
 ) : ViewModel() {
 
     var dialogState: DialogState by mutableStateOf(DialogState.Dismiss)
+        private set
+
+    var sheetData: ShowSheetData? by mutableStateOf(null)
         private set
 
     /** 当前选择时间 */
@@ -61,8 +69,9 @@ class AnalyticsViewModel @Inject constructor(
 
             date.to != null -> {
                 crossYear = date.from.year != date.to.year
-                titleText = "${date.from.year}-${date.from.monthValue.completeZero()}-${date.from.dayOfMonth.completeZero()}\n" +
-                        "${date.to.year}-${date.to.monthValue.completeZero()}-${date.to.dayOfMonth.completeZero()}"
+                titleText =
+                    "${date.from.year}-${date.from.monthValue.completeZero()}-${date.from.dayOfMonth.completeZero()}\n" +
+                            "${date.to.year}-${date.to.monthValue.completeZero()}-${date.to.dayOfMonth.completeZero()}"
             }
 
             else -> {
@@ -120,14 +129,39 @@ class AnalyticsViewModel @Inject constructor(
         }
     }
 
-    fun onDateSelect(date: DateData) {
+    fun selectDate(date: DateData) {
         dismissDialog()
-        _dateData.tryEmit(date)
-        ProgressDialogManager.show()
+        viewModelScope.launch {
+            if (date != _dateData.first()) {
+                _dateData.tryEmit(date)
+                ProgressDialogManager.show()
+            }
+        }
     }
 
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
+    }
+
+    fun showSheet(typeId: Long) {
+        viewModelScope.launch {
+            runCatchWithProgress {
+                val type = typeRepository.getRecordTypeById(typeId) ?: return@runCatchWithProgress
+                val ls =
+                    transRecordViewsToAnalyticsPieSecondUseCase(typeId, _recordListData.first())
+                if (ls.isNotEmpty()) {
+                    sheetData = ShowSheetData(
+                        typeId = typeId,
+                        typeName = type.name,
+                        dataList = ls,
+                    )
+                }
+            }
+        }
+    }
+
+    fun dismissSheet() {
+        sheetData = null
     }
 }
 
@@ -152,6 +186,12 @@ data class DateData(
     val from: LocalDate,
     val to: LocalDate? = null,
     val year: Boolean = false,
+)
+
+data class ShowSheetData(
+    val typeId: Long,
+    val typeName: String,
+    val dataList: List<AnalyticsRecordPieEntity>,
 )
 
 sealed class ShowSelectDateDialogData(open val date: DateData) {

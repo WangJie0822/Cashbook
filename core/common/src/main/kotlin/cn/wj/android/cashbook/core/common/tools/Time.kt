@@ -6,7 +6,10 @@ package cn.wj.android.cashbook.core.common.tools
 import cn.wj.android.cashbook.core.common.ext.logger
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Date
 import java.util.Locale
 
@@ -102,7 +105,9 @@ fun String?.toLongTime(format: String = DATE_FORMAT_DEFAULT): Long? {
 }
 
 fun Long.toLocalDate(): LocalDate {
-    return this.dateFormat(DATE_FORMAT_DATE).split("-").run {
-        LocalDate.of(this[0].toInt(), this[1].toInt(), this[2].toInt())
-    }
+    return Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+}
+
+fun LocalDate.toMs(): Long {
+    return atStartOfDay(ZoneOffset.systemDefault()).toInstant().toEpochMilli()
 }

@@ -1,4 +1,4 @@
-// TODO: Finish and add to main activity list
+//  Finish and add to main activity list
 package com.xxmassdeveloper.mpchartexample;
 
 import android.Manifest;

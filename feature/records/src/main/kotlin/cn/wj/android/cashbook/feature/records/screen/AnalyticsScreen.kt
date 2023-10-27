@@ -1,6 +1,5 @@
 package cn.wj.android.cashbook.feature.records.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,18 +12,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,13 +31,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.util.Pair
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
@@ -48,16 +48,16 @@ import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.common.tools.toLocalDate
+import cn.wj.android.cashbook.core.common.tools.toMs
+import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.DateRangePickerDialog
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
-import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -66,27 +66,23 @@ import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
 import cn.wj.android.cashbook.core.ui.expand.colorInt
 import cn.wj.android.cashbook.core.ui.expand.percentText
 import cn.wj.android.cashbook.core.ui.expand.text
+import cn.wj.android.cashbook.feature.records.view.AnalyticsPieChart
+import cn.wj.android.cashbook.feature.records.view.AnalyticsPieListItem
 import cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.DateData
 import cn.wj.android.cashbook.feature.records.viewmodel.ShowSelectDateDialogData
+import cn.wj.android.cashbook.feature.records.viewmodel.ShowSheetData
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
-import com.github.mikephil.charting.formatter.PercentFormatter
-import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 /**
  * 数据分析界面
@@ -96,6 +92,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
  */
 @Composable
 internal fun AnalyticsRoute(
+    onRequestNaviToTypeAnalytics: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalyticsViewModel = hiltViewModel(),
@@ -108,8 +105,12 @@ internal fun AnalyticsRoute(
         onRequestShowSelectDateDialog = viewModel::showSelectDateDialog,
         onRequestShowSelectDateRangeDialog = viewModel::showSelectDateRangeDialog,
         onRequestDismissDialog = viewModel::dismissDialog,
-        onDateSelect = viewModel::onDateSelect,
+        onDateSelect = viewModel::selectDate,
+        sheetData = viewModel.sheetData,
+        onRequestShowBottomSheet = viewModel::showSheet,
+        onRequestDismissBottomSheet = viewModel::dismissSheet,
         uiState = uiState,
+        onRequestNaviToTypeAnalytics = onRequestNaviToTypeAnalytics,
         onRequestPopBackStack = onRequestPopBackStack,
         modifier = modifier,
     )
@@ -123,7 +124,11 @@ private fun AnalyticsScreen(
     onRequestShowSelectDateRangeDialog: () -> Unit,
     onRequestDismissDialog: () -> Unit,
     onDateSelect: (DateData) -> Unit,
+    sheetData: ShowSheetData?,
+    onRequestShowBottomSheet: (Long) -> Unit,
+    onRequestDismissBottomSheet: () -> Unit,
     uiState: AnalyticsUiState,
+    onRequestNaviToTypeAnalytics: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -189,6 +194,10 @@ private fun AnalyticsScreen(
                     } else {
                         DateRangePickerDialog(
                             onDismissRequest = onRequestDismissDialog,
+                            selection = Pair.create(
+                                date.from.toMs(),
+                                date.to?.toMs()
+                            ),
                             onPositiveButtonClick = { pair ->
                                 onDateSelect(
                                     DateData(
@@ -200,6 +209,89 @@ private fun AnalyticsScreen(
                             onNegativeButtonClick = onRequestDismissDialog
                         )
                     }
+                }
+
+                if (null != sheetData) {
+                    CashbookModalBottomSheet(
+                        onDismissRequest = onRequestDismissBottomSheet,
+                        sheetState = rememberModalBottomSheetState(
+                            confirmValueChange = {
+                                if (it == SheetValue.Hidden) {
+                                    onRequestDismissBottomSheet()
+                                }
+                                true
+                            },
+                        ),
+                        content = {
+                            ConstraintLayout(
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                val (title, icon) = createRefs()
+                                Text(
+                                    text = stringResource(id = R.string.category_report),
+                                    modifier = Modifier.constrainAs(title) {
+                                        centerTo(parent)
+                                    },
+                                )
+                                IconButton(
+                                    onClick = { onRequestNaviToTypeAnalytics(sheetData.typeId) },
+                                    modifier = Modifier.constrainAs(icon) {
+                                        end.linkTo(parent.end)
+                                        centerVerticallyTo(parent)
+                                    },
+                                ) {
+                                    Icon(
+                                        imageVector = CashbookIcons.DonutSmall,
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+
+                            val pieColorsCompose = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.secondary,
+                                MaterialTheme.colorScheme.secondaryContainer,
+                                MaterialTheme.colorScheme.tertiary,
+                                MaterialTheme.colorScheme.tertiaryContainer,
+                                LocalExtendedColors.current.quaternary,
+                                LocalExtendedColors.current.quaternaryContainer,
+                            )
+                            AnalyticsPieChart(
+                                barCenterText = sheetData.typeName,
+                                dataList = sheetData.dataList,
+                                pieColorsCompose = pieColorsCompose,
+                                onPieColorsCompose = listOf(
+                                    MaterialTheme.colorScheme.onPrimary,
+                                    MaterialTheme.colorScheme.onPrimaryContainer,
+                                    MaterialTheme.colorScheme.onSecondary,
+                                    MaterialTheme.colorScheme.onSecondaryContainer,
+                                    MaterialTheme.colorScheme.onTertiary,
+                                    MaterialTheme.colorScheme.onTertiaryContainer,
+                                    LocalExtendedColors.current.onQuaternary,
+                                    LocalExtendedColors.current.onQuaternaryContainer,
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                            )
+                            repeat(sheetData.dataList.size) { i ->
+                                val item = sheetData.dataList[i]
+                                AnalyticsPieListItem(
+                                    item = item,
+                                    tintColor = pieColorsCompose[i % pieColorsCompose.size],
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .defaultMinSize(minHeight = 70.dp)
+                                        .clickable {
+                                            onRequestNaviToTypeAnalytics(item.typeId)
+                                        }
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                )
+                            }
+                        },
+                    )
                 }
 
                 when (uiState) {
@@ -268,6 +360,7 @@ private fun AnalyticsScreen(
                                 item {
                                     AnalyticsPieChart(
                                         uiState = uiState,
+                                        onRequestShowSheet = onRequestShowBottomSheet,
                                         modifier = Modifier.padding(
                                             horizontal = 16.dp,
                                             vertical = 8.dp,
@@ -404,6 +497,7 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
 @Composable
 private fun AnalyticsPieChart(
     uiState: AnalyticsUiState.Success,
+    onRequestShowSheet: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
@@ -416,15 +510,7 @@ private fun AnalyticsPieChart(
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 8.dp),
         )
-        var tempUiState: AnalyticsUiState.Success? by remember {
-            mutableStateOf(null)
-        }
-        var selectedTab by remember {
-            mutableStateOf(RecordTypeCategoryEnum.EXPENDITURE)
-        }
-        var tempTab: RecordTypeCategoryEnum? by remember {
-            mutableStateOf(null)
-        }
+
         val pieColorsCompose = listOf(
             MaterialTheme.colorScheme.primary,
             MaterialTheme.colorScheme.primaryContainer,
@@ -435,101 +521,35 @@ private fun AnalyticsPieChart(
             LocalExtendedColors.current.quaternary,
             LocalExtendedColors.current.quaternaryContainer,
         )
-        val pieColors = pieColorsCompose.map { it.colorInt }
-        val onPieColors = listOf(
-            MaterialTheme.colorScheme.onPrimary.colorInt,
-            MaterialTheme.colorScheme.onPrimaryContainer.colorInt,
-            MaterialTheme.colorScheme.onSecondary.colorInt,
-            MaterialTheme.colorScheme.onSecondaryContainer.colorInt,
-            MaterialTheme.colorScheme.onTertiary.colorInt,
-            MaterialTheme.colorScheme.onTertiaryContainer.colorInt,
-            LocalExtendedColors.current.onQuaternary.colorInt,
-            LocalExtendedColors.current.onQuaternaryContainer.colorInt,
-        )
-        val expenditureCenterText = RecordTypeCategoryEnum.EXPENDITURE.percentText
-        val incomeCenterText = RecordTypeCategoryEnum.INCOME.percentText
-        val transferCenterText = RecordTypeCategoryEnum.TRANSFER.percentText
-        AndroidView(
+
+        var selectedTab by remember {
+            mutableStateOf(RecordTypeCategoryEnum.EXPENDITURE)
+        }
+
+        AnalyticsPieChart(
+            barCenterText = selectedTab.percentText,
+            dataList = when (selectedTab) {
+                RecordTypeCategoryEnum.EXPENDITURE -> uiState.expenditurePieDataList
+                RecordTypeCategoryEnum.INCOME -> uiState.incomePieDataList
+                RecordTypeCategoryEnum.TRANSFER -> uiState.transferPieDataList
+            },
+            pieColorsCompose = pieColorsCompose,
+            onPieColorsCompose = listOf(
+                MaterialTheme.colorScheme.onPrimary,
+                MaterialTheme.colorScheme.onPrimaryContainer,
+                MaterialTheme.colorScheme.onSecondary,
+                MaterialTheme.colorScheme.onSecondaryContainer,
+                MaterialTheme.colorScheme.onTertiary,
+                MaterialTheme.colorScheme.onTertiaryContainer,
+                LocalExtendedColors.current.onQuaternary,
+                LocalExtendedColors.current.onQuaternaryContainer,
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            factory = { context ->
-                PieChart(context).apply {
-                    setUsePercentValues(true)
-                    description.isEnabled = false
-                    setExtraOffsets(5f, 10f, 5f, 5f)
-                    dragDecelerationFrictionCoef = 0.95f
-                    isDrawHoleEnabled = true
-                    setHoleColor(Color.White.colorInt)
-                    setTransparentCircleColor(Color.White.colorInt)
-                    setTransparentCircleAlpha(110)
-                    holeRadius = 58f
-                    transparentCircleRadius = 61f
-                    setDrawCenterText(true)
-                    rotationAngle = 0f
-                    isRotationEnabled = true
-                    isHighlightPerTapEnabled = true
-
-                    with(legend) {
-                        verticalAlignment = Legend.LegendVerticalAlignment.TOP
-                        horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-                        orientation = Legend.LegendOrientation.VERTICAL
-                        setDrawInside(false)
-                        isEnabled = false
-                    }
-
-                    setOnChartValueSelectedListener(
-                        object : OnChartValueSelectedListener {
-                            private var tempCenterText: CharSequence = ""
-                            override fun onValueSelected(e: Entry, h: Highlight) {
-                                if (centerText == expenditureCenterText || centerText == incomeCenterText || centerText == transferCenterText) {
-                                    tempCenterText = centerText
-                                }
-                                (e.data as? AnalyticsRecordPieEntity)?.let { data ->
-                                    centerText = "${data.typeName}\n${data.totalAmount.withCNY()}"
-                                }
-                            }
-
-                            override fun onNothingSelected() {
-                                centerText = tempCenterText
-                            }
-                        })
-                }
-            },
-            update = { chart ->
-                if (uiState != tempUiState || selectedTab != tempTab) {
-                    tempUiState = uiState
-                    tempTab = selectedTab
-                    val pieEntryList = when (selectedTab) {
-                        RecordTypeCategoryEnum.EXPENDITURE -> uiState.expenditurePieDataList
-                        RecordTypeCategoryEnum.INCOME -> uiState.incomePieDataList
-                        RecordTypeCategoryEnum.TRANSFER -> uiState.transferPieDataList
-                    }.filter { it.percent > 0.03f }
-                        .map {
-                            PieEntry(it.percent, it.typeName, it)
-                        }
-                    chart.centerText = when (selectedTab) {
-                        RecordTypeCategoryEnum.EXPENDITURE -> expenditureCenterText
-                        RecordTypeCategoryEnum.INCOME -> incomeCenterText
-                        RecordTypeCategoryEnum.TRANSFER -> transferCenterText
-                    }
-                    chart.data = PieData(PieDataSet(pieEntryList, "").apply {
-                        sliceSpace = 3f
-                        selectionShift = 5f
-                        colors = pieColors
-                        setLabelColors(onPieColors)
-                        valueLinePart1OffsetPercentage = 80f
-                        valueLinePart1Length = 0.2f
-                        valueLinePart2Length = 0.4f
-                        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-                        valueFormatter = PercentFormatter()
-                    })
-                    chart.invalidate()
-                    chart.animateY(250)
-                }
-            }
         )
+
         TabRow(
             selectedTabIndex = selectedTab.ordinal,
             containerColor = Color.Unspecified,
@@ -562,59 +582,17 @@ private fun AnalyticsPieChart(
             }
             repeat(pieDataList.size) { i ->
                 val item = pieDataList[i]
-                val tintColor = pieColorsCompose[i % pieColorsCompose.size]
-                Color
-                Row(
+                AnalyticsPieListItem(
+                    item = item,
+                    tintColor = pieColorsCompose[i % pieColorsCompose.size],
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(minHeight = 70.dp)
                         .clickable {
-                            // TODO 展示二级分类
+                            onRequestShowSheet(item.typeId)
                         }
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterDrawableResource(idStr = item.typeIconResName),
-                        contentDescription = null,
-                        tint = tintColor,
-                        modifier = Modifier
-                            .background(
-                                color = tintColor.copy(alpha = 0.1f),
-                                shape = CircleShape
-                            )
-                            .padding(2.dp)
-                            .clip(CircleShape)
-                            .padding(4.dp)
-                    )
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 8.dp),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                        ) {
-                            Text(text = item.typeName)
-                            Text(
-                                text = (item.percent * 100f).decimalFormat("###,###,##0.0") + "%",
-                                color = LocalContentColor.current.copy(alpha = 0.5f),
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier
-                                    .padding(start = 4.dp)
-                                    .weight(1f),
-                            )
-                            Text(
-                                text = item.totalAmount.withCNY(),
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
-                        LinearProgressIndicator(
-                            progress = item.percent,
-                            color = tintColor,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                }
+                )
             }
         }
     }

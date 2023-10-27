@@ -109,12 +109,14 @@ fun NavGraphBuilder.editRecordScreen(
 }
 
 fun NavGraphBuilder.analyticsScreen(
+    onRequestNaviToTypeAnalytics: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(
         route = ROUTE_ANALYTICS,
     ) {
         AnalyticsRoute(
+            onRequestNaviToTypeAnalytics = onRequestNaviToTypeAnalytics,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }

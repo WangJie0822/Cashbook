@@ -407,6 +407,7 @@ fun CashbookNavHost(
         )
         // 数据分析
         analyticsScreen(
+            onRequestNaviToTypeAnalytics = {/*TODO*/},
             onRequestPopBackStack = navController::popBackStackSafety,
         )
 

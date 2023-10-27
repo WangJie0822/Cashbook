@@ -82,8 +82,21 @@ fun DateRangePickerDialog(
 ) {
     val fm = (LocalContext.current as? FragmentActivity)?.supportFragmentManager
         ?: throw RuntimeException(NOT_FRAGMENT_ACTIVITY_ERROR_TEXT)
+    val fixedSelection = selection?.run {
+        val fixedFirst = if (null == first) {
+            null
+        } else {
+            first + (1000L * 60L * 60L * 24)
+        }
+        val fixedSecond = if (null == second) {
+            null
+        } else {
+            second + (1000L * 60L * 60L * 24)
+        }
+        Pair.create(fixedFirst, fixedSecond)
+    }
     val dialog = MaterialDatePicker.Builder.dateRangePicker()
-        .setSelection(selection)
+        .setSelection(fixedSelection)
         .setInputMode(inputMode)
         .setTextInputFormat(dateFormat)
         .setTitleText(title)
