@@ -343,12 +343,12 @@ object Migration6To7 : Migration(6, 7) {
     private const val SQL_CREATE_TABLE_TYPE_7 = """
         CREATE TABLE IF NOT EXISTS `${TABLE_TYPE}` 
         (
-            `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
             `parent_id` INTEGER NOT NULL, 
             `name` TEXT NOT NULL, 
             `icon_name` TEXT NOT NULL, 
-            `type_level` TEXT NOT NULL, 
-            `type_category` TEXT NOT NULL, 
+            `type_level` INTEGER NOT NULL, 
+            `type_category` INTEGER NOT NULL, 
             `protected` INTEGER NOT NULL, 
             `sort` INTEGER NOT NULL
         )
