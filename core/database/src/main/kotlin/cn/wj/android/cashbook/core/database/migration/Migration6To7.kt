@@ -474,23 +474,26 @@ object Migration6To7 : Migration(6, 7) {
         // 从旧表中查询数据
         query(SQL_QUERY_ALL_FROM_RECORD_TEMP).use {
             while (it.moveToNext()) {
-                insert(
-                    table = TABLE_RECORD,
-                    conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE,
-                    values = ContentValues().apply {
-                        put("id", it.getLong(it.getColumnIndexOrThrow("id")))
-                        put("type_id", it.getLong(it.getColumnIndexOrThrow("type_id")))
-                        put("asset_id", it.getLong(it.getColumnIndexOrThrow("asset_id")))
-                        put("into_asset_id", it.getLong(it.getColumnIndexOrThrow("into_asset_id")))
-                        put("books_id", it.getLong(it.getColumnIndexOrThrow("books_id")))
-                        put("amount", it.getDouble(it.getColumnIndexOrThrow("amount")))
-                        put("concessions", 0.0)
-                        put("charge", it.getDouble(it.getColumnIndexOrThrow("charge")))
-                        put("remark", it.getString(it.getColumnIndexOrThrow("remark")))
-                        put("reimbursable", it.getInt(it.getColumnIndexOrThrow("reimbursable")))
-                        put("record_time", it.getString(it.getColumnIndexOrThrow("record_time")))
-                    },
-                )
+                val typeEnum = it.getString(it.getColumnIndexOrThrow("type_enum"))
+                if (typeEnum != "MODIFY_BALANCE") {
+                    insert(
+                        table = TABLE_RECORD,
+                        conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE,
+                        values = ContentValues().apply {
+                            put("id", it.getLong(it.getColumnIndexOrThrow("id")))
+                            put("type_id", it.getLong(it.getColumnIndexOrThrow("type_id")))
+                            put("asset_id", it.getLong(it.getColumnIndexOrThrow("asset_id")))
+                            put("into_asset_id", it.getLong(it.getColumnIndexOrThrow("into_asset_id")))
+                            put("books_id", it.getLong(it.getColumnIndexOrThrow("books_id")))
+                            put("amount", it.getDouble(it.getColumnIndexOrThrow("amount")))
+                            put("concessions", 0.0)
+                            put("charge", it.getDouble(it.getColumnIndexOrThrow("charge")))
+                            put("remark", it.getString(it.getColumnIndexOrThrow("remark")))
+                            put("reimbursable", it.getInt(it.getColumnIndexOrThrow("reimbursable")))
+                            put("record_time", it.getString(it.getColumnIndexOrThrow("record_time")))
+                        },
+                    )
+                }
             }
         }
     }
