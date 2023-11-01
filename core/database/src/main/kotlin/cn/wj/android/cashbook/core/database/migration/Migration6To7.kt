@@ -33,7 +33,7 @@ import org.intellij.lang.annotations.Language
  */
 object Migration6To7 : Migration(6, 7) {
 
-    override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
         migrateAsset()
         migrateBooks()
         migrateTag()

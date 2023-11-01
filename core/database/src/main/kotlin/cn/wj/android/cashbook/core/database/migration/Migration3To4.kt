@@ -26,7 +26,7 @@ object Migration3To4 : Migration(3, 4) {
         ALTER TABLE `${TABLE_TAG}` ADD `shared` INTEGER DEFAULT $SWITCH_INT_ON NOT NULL
     """
 
-    override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
         execSQL(SQL_ALTER_TABLE_TAG_ADD_BOOKS_ID)
         execSQL(SQL_ALTER_TABLE_TAG_ADD_SHARED)
     }

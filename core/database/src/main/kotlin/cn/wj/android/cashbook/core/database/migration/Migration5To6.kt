@@ -15,7 +15,7 @@ import org.intellij.lang.annotations.Language
  */
 object Migration5To6 : Migration(5, 6) {
 
-    override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
         migrateAsset()
         migrateRecord()
     }

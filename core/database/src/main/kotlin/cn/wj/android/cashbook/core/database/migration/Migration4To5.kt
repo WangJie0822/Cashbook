@@ -31,7 +31,7 @@ object Migration4To5 : Migration(4, 5) {
         ALTER TABLE `${TABLE_ASSET}` ADD `remark` TEXT DEFAULT '' NOT NULL
     """
 
-    override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
         execSQL(SQL_ALTER_TABLE_ASSET_ADD_OPEN_BACK)
         execSQL(SQL_ALTER_TABLE_ASSET_ADD_CARD_NO)
         execSQL(SQL_ALTER_TABLE_ASSET_ADD_REMARK)

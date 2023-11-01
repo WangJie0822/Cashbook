@@ -23,7 +23,7 @@ object Migration1To2 : Migration(1, 2) {
         )
     """
 
-    override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
         // 创建标签表
         execSQL(SQL_CREATE_TABLE_TAG_2)
     }
