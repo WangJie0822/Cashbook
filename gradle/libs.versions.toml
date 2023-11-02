@@ -48,6 +48,7 @@ androidx-hilt = "1.0.0"
 # 脱糖
 android-desugarJdkLibs = "2.0.3"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/com.android.application)
 android-gradle-plugin = "8.1.2"
 
 # Androidx

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -39,6 +40,7 @@ import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
 import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
+import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -144,12 +146,24 @@ internal fun CalendarScreen(
     CashbookScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(onBackClick = onBackClick, title = {
-                Text(
-                    text = "${selectedDate.year}-${selectedDate.monthValue.completeZero()}",
-                    modifier = Modifier.clickable(onClick = onDateClick),
-                )
-            })
+            CashbookTopAppBar(
+                onBackClick = onBackClick,
+                title = {
+                    Row(
+                        modifier = Modifier.clickable(onClick = onDateClick),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "${selectedDate.year}-${selectedDate.monthValue.completeZero()}",
+                            modifier = Modifier.clickable(onClick = onDateClick),
+                        )
+                        Icon(
+                            imageVector = CashbookIcons.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
+                },
+            )
         },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {

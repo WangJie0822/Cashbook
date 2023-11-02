@@ -1,13 +1,6 @@
 package cn.wj.android.cashbook.core.ui.expand
 
 import androidx.compose.ui.graphics.Color
-import kotlin.math.roundToInt
-
-fun generateDistinctColors(count: Int): List<Int> = mutableListOf<Int>().apply {
-    repeat(count) { i ->
-        add(android.graphics.Color.rgb(i % 256, (i * 7) % 256, (i * 13) % 256))
-    }
-}
 
 val Color.colorInt: Int
     get() = android.graphics.Color.argb(

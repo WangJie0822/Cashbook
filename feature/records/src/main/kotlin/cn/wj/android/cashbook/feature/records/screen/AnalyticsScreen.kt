@@ -113,7 +113,7 @@ internal fun AnalyticsRoute(
         onRequestNaviToTypeAnalytics = {
             viewModel.dismissSheet()
             onRequestNaviToTypeAnalytics(it)
-                                       },
+        },
         onRequestPopBackStack = onRequestPopBackStack,
         modifier = modifier,
     )
@@ -143,6 +143,7 @@ private fun AnalyticsScreen(
                 title = {
                     if (uiState is AnalyticsUiState.Success) {
                         Row(
+                            modifier = Modifier.clickable(onClick = onRequestShowSelectDateDialog),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             val titleText = uiState.titleText
@@ -153,7 +154,6 @@ private fun AnalyticsScreen(
                                 } else {
                                     MaterialTheme.typography.titleLarge
                                 },
-                                modifier = Modifier.clickable(onClick = onRequestShowSelectDateDialog),
                             )
                             Icon(
                                 imageVector = CashbookIcons.ArrowDropDown,

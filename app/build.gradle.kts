@@ -53,6 +53,9 @@ android {
         getByName(CashbookFlavor.Dev.name) {
             resValue("string", "app_name", "@string/app_name_dev")
         }
+        getByName(CashbookFlavor.Online.name) {
+            resValue("string", "app_name", "@string/app_name_online")
+        }
     }
 
     // 配置 APK 输出路径

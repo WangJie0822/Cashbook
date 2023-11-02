@@ -3,38 +3,35 @@ package cn.wj.android.cashbook.feature.types.screen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.types.viewmodel.EditRecordTypeListViewModel
 
@@ -95,8 +92,7 @@ internal fun EditRecordTypeListScreen(
     val typeColor = currentTypeCategory.typeColor
     LazyVerticalGrid(
         modifier = modifier
-            .background(color = MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp),
+            .background(color = MaterialTheme.colorScheme.surface),
         columns = GridCells.Fixed(RECORD_TYPE_COLUMNS),
         content = {
             // 分类列表
@@ -184,60 +180,23 @@ internal fun TypeItem(
         }
     }
     // 列表数据
-    ConstraintLayout(
+    Column(
         modifier = modifier
             .background(color = backgroundColor, shape = backgroundShape)
             .clickable(onClick = onTypeClick)
             .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // 约束条件
-        val (iconBg, iconMore, text) = createRefs()
         // 根据选中状态显示主要颜色
-        val color =
-            if (selected) typeColor else LocalContentColor.current.copy(alpha = 0.5f)
+        val color = if (selected) typeColor else LocalContentColor.current.copy(alpha = 0.5f)
         // 记录类型对应的图标，使用圆形边框
-        Icon(
+        TypeIcon(
             painter = iconPainter,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier
-                .size(32.dp)
-                .background(
-                    color = if (selected) color.copy(alpha = 0.1f) else Color.Unspecified,
-                    shape = CircleShape
-                )
-                .clip(CircleShape)
-                .padding(4.dp)
-                .constrainAs(iconBg) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
+            containerColor = color,
+            showMore = showMore,
         )
-        if (showMore) {
-            // 横向菜单标记，一级分类有二级分类时显示
-            Icon(
-                modifier = Modifier
-                    .size(12.dp)
-                    .background(color = color, shape = CircleShape)
-                    .clip(CircleShape)
-                    .constrainAs(iconMore) {
-                        bottom.linkTo(iconBg.bottom)
-                        end.linkTo(iconBg.end)
-                    },
-                imageVector = CashbookIcons.MoreHoriz,
-                contentDescription = null,
-                tint = backgroundColor
-            )
-        }
         // 类型名称
         Text(
-            modifier = Modifier.constrainAs(text) {
-                top.linkTo(iconBg.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom)
-            },
             text = title,
             color = color,
             style = MaterialTheme.typography.labelMedium,

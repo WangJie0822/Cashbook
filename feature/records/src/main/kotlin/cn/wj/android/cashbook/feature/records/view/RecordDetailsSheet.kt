@@ -39,6 +39,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
 import java.math.BigDecimal
@@ -190,23 +191,14 @@ internal fun RecordDetailsSheet(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
+                                TypeIcon(
                                     painter = painterDrawableResource(idStr = recordData.typeIconResName),
-                                    contentDescription = null,
-                                    tint = recordData.typeCategory.typeColor,
-                                    modifier = Modifier
-                                        .background(
-                                            color = recordData.typeCategory.typeColor.copy(alpha = 0.1f),
-                                            shape = CircleShape
-                                        )
-                                        .padding(2.dp)
-                                        .clip(CircleShape)
-                                        .padding(4.dp),
+                                    containerColor = recordData.typeCategory.typeColor,
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = recordData.typeName,
                                     style = MaterialTheme.typography.labelLarge,
+                                    modifier = Modifier.padding(start = 8.dp)
                                 )
                             }
                         },

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.Divider
@@ -37,7 +36,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -72,6 +70,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
+import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
@@ -288,10 +287,19 @@ internal fun LauncherTopBar(
             containerColor = Color.Transparent,
         ),
         title = {
-            Text(
-                text = dateStr,
+            Row(
                 modifier = Modifier.clickable(onClick = onDateClick),
-            )
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = dateStr,
+                    modifier = Modifier.clickable(onClick = onDateClick),
+                )
+                Icon(
+                    imageVector = CashbookIcons.ArrowDropDown,
+                    contentDescription = null
+                )
+            }
         },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
@@ -520,18 +528,9 @@ internal fun RecordListItem(
     TransparentListItem(
         modifier = modifier,
         leadingContent = {
-            Icon(
+            TypeIcon(
                 painter = painterDrawableResource(idStr = item.typeIconResName),
-                contentDescription = null,
-                tint = item.typeCategory.typeColor,
-                modifier = Modifier
-                    .background(
-                        color = item.typeCategory.typeColor.copy(alpha = 0.1f),
-                        shape = CircleShape
-                    )
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .padding(4.dp)
+                containerColor = item.typeCategory.typeColor,
             )
         },
         headlineContent = {

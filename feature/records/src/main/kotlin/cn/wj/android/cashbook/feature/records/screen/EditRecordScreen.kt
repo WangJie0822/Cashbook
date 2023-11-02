@@ -417,6 +417,7 @@ private fun EditRecordScaffoldContent(
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
+                        .padding(horizontal = 16.dp),
                 ) {
                     // 金额显示
                     Amount(
@@ -434,8 +435,6 @@ private fun EditRecordScaffoldContent(
 
                     // 类型列表
                     typeListContent()
-
-                    Divider()
 
                     // 备注文本
                     val remarkTextState = remember {

@@ -42,7 +42,7 @@ internal object AssetHelper {
         AssetClassificationEnum.OTHER_INVESTMENT_FINANCIAL -> R.drawable.vector_financial_circle_24
         AssetClassificationEnum.BORROW -> R.drawable.vector_borrow_circle_24
         AssetClassificationEnum.LEND -> R.drawable.vector_lend_circle_24
-        AssetClassificationEnum.DEBT -> R.drawable.vector_lend_circle_24
+        AssetClassificationEnum.DEBT -> R.drawable.vector_debt_circle_24
         AssetClassificationEnum.BANK_CARD_ZG -> R.drawable.vector_bank_zg_24
         AssetClassificationEnum.BANK_CARD_ZS -> R.drawable.vector_bank_zs_24
         AssetClassificationEnum.BANK_CARD_GS -> R.drawable.vector_bank_gs_24
@@ -83,7 +83,7 @@ internal object AssetHelper {
         AssetClassificationEnum.OTHER_INVESTMENT_FINANCIAL -> R.string.asset_classifications_other_investment_financial
         AssetClassificationEnum.BORROW -> R.string.asset_classifications_borrow
         AssetClassificationEnum.LEND -> R.string.asset_classifications_lend
-        AssetClassificationEnum.DEBT -> R.string.asset_classifications_debt_account
+        AssetClassificationEnum.DEBT -> R.string.asset_classifications_debt
         AssetClassificationEnum.BANK_CARD_ZG -> R.string.asset_classifications_bank_zg
         AssetClassificationEnum.BANK_CARD_ZS -> R.string.asset_classifications_bank_zs
         AssetClassificationEnum.BANK_CARD_GS -> R.string.asset_classifications_bank_gs

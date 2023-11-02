@@ -1,8 +1,13 @@
 package cn.wj.android.cashbook.core.design.theme
 
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
 
 /**
  * 拓展颜色数据类
@@ -29,3 +34,19 @@ data class ExtendedColors(
  * A composition local for [ExtendedColors].
  */
 val LocalExtendedColors = staticCompositionLocalOf { ExtendedColors() }
+
+@Composable
+fun fixedContentColorFor(backgroundColor: Color): Color {
+    return MaterialTheme.colorScheme.contentColorFor(backgroundColor).takeOrElse {
+        with(LocalExtendedColors.current) {
+            when (backgroundColor) {
+                quaternary -> onQuaternary
+                quaternaryContainer -> onQuaternaryContainer
+                income -> onIncome
+                expenditure -> onExpenditure
+                transfer -> onTransfer
+                else -> LocalContentColor.current
+            }
+        }
+    }
+}

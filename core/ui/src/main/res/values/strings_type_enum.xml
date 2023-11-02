@@ -398,6 +398,7 @@
     <string name="asset_classifications_other_investment_financial">其他理财</string>
 
     <string name="asset_classifications_debt_account">债务账户</string>
+    <string name="asset_classifications_debt">债务</string>
     <string name="asset_classifications_borrow">借入</string>
     <string name="asset_classifications_lend">借出</string>
 

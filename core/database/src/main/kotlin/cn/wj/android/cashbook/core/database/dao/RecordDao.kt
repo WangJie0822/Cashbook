@@ -83,7 +83,13 @@ interface RecordDao {
     ): List<RecordTable>
 
     /** 类型 id 为 [typeId] 的第 [pageNum] 页 [pageSize] 条记录 */
-    @Query("SELECT * FROM db_record WHERE books_id=:booksId AND type_id=:typeId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
+    @Query("""
+        SELECT * FROM db_record 
+        WHERE books_id=:booksId 
+        AND (type_id=:typeId 
+        OR type_id IN (SELECT id FROM db_type WHERE parent_id=:typeId))
+        ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
+    """)
     suspend fun queryRecordByTypeId(
         booksId: Long,
         typeId: Long,

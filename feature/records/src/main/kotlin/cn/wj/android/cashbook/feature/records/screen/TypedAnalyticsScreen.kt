@@ -32,7 +32,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsViewModel
 
 /**
  * 分类数据分析
- * - TODO 待完善
+ * - TODO 待完善，按日拆分，饼状图，日期
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/10/27
  */

@@ -68,6 +68,7 @@ import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.feature.types.enums.MyCategoriesBookmarkEnum
 import cn.wj.android.cashbook.feature.types.model.ExpandableRecordTypeModel
 import cn.wj.android.cashbook.feature.types.view.TypeIconGroupList
@@ -319,7 +320,7 @@ private fun EditTypeSheet(
                     Text(text = stringResource(id = R.string.save))
                 }
             }
-            val color = LocalExtendedColors.current.selected
+            val color = LocalExtendedColors.current.quaternaryContainer
             if (null != data.parentType) {
                 Row(
                     modifier = Modifier.padding(
@@ -336,18 +337,9 @@ private fun EditTypeSheet(
                             .weight(1f)
                             .padding(horizontal = 16.dp),
                     )
-                    Icon(
+                    TypeIcon(
                         painter = painterDrawableResource(idStr = data.parentType.iconName),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(bottom = 8.dp)
-                            .size(32.dp)
-                            .background(
-                                color = color.copy(alpha = 0.3f),
-                                shape = CircleShape
-                            )
-                            .clip(CircleShape)
-                            .padding(4.dp),
+                        containerColor = color,
                     )
                 }
             }
@@ -381,19 +373,9 @@ private fun EditTypeSheet(
                         .weight(1f)
                         .padding(horizontal = 16.dp),
                 )
-                Icon(
+                TypeIcon(
                     painter = painterDrawableResource(idStr = editTypeIcon),
-                    tint = color,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .size(32.dp)
-                        .background(
-                            color = color.copy(alpha = 0.3f),
-                            shape = CircleShape
-                        )
-                        .clip(CircleShape)
-                        .padding(4.dp),
+                    containerColor = color,
                 )
             }
             TypeIconGroupList(
