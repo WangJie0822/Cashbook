@@ -42,7 +42,9 @@ class BackupAndRecoveryViewModel @Inject constructor(
     val uiState = settingRepository.appDataMode
         .mapLatest {
             BackupAndRecoveryUiState.Success(
-                webDAVDomain = it.webDAVDomain,
+                webDAVDomain = it.webDAVDomain.ifBlank {
+                    "https://dav.jianguoyun.com/dav/"
+                },
                 webDAVAccount = it.webDAVAccount,
                 webDAVPassword = it.webDAVPassword,
                 backupPath = it.backupPath,

@@ -73,7 +73,7 @@ class SyncWorker @AssistedInject constructor(
             .build()
 
         fun startUpPeriodicSyncWork() =
-            PeriodicWorkRequestBuilder<DelegatingWorker>(Duration.ofDays(1))
+            PeriodicWorkRequestBuilder<DelegatingWorker>(Duration.ofDays(15))
                 .setConstraints(NetworkConstraints)
                 .setInputData(SyncWorker::class.delegatedData())
                 .build()
