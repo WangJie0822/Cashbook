@@ -17,7 +17,7 @@
 
     <application
         android:name=".MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -27,21 +27,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cashbook"
         android:usesCleartextTraffic="true"
-        tools:ignore="LockedOrientationActivity"
         tools:targetApi="o">
 
-        <!-- 全面屏适配 -->
-        <meta-data
-            android:name="android.max_aspect"
-            android:value="2.4" />
-        <!-- 适配华为（huawei）刘海屏 -->
-        <meta-data
-            android:name="android.notch_support"
-            android:value="true" />
-        <!-- 适配小米（xiaomi）刘海屏 -->
-        <meta-data
-            android:name="notch.config"
-            android:value="portrait|landscape" />
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Cashbook.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.MarkdownActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -53,165 +54,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <receiver
-            android:name=".receiver.EventReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="${applicationId}.EventReceiver" />
-            </intent-filter>
-        </receiver>
-
-        <!-- 闪屏界面 -->
-        <activity
-            android:name=".ui.main.activity.SplashActivity"
-            android:configChanges="screenSize"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Cashbook.Splash">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
-        </activity>
-
-        <!-- 主界面 -->
-        <activity
-            android:name=".ui.main.activity.MainActivity"
-            android:configChanges="screenSize"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
-
-        <!-- 关于我们界面 -->
-        <activity
-            android:name=".ui.main.activity.AboutUsActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- Markdown 显示 -->
-        <activity
-            android:name=".ui.main.activity.MarkdownActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 设置 -->
-        <activity
-            android:name=".ui.main.activity.SettingActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 备份 -->
-        <activity
-            android:name=".ui.main.activity.BackupActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 我的账本 -->
-        <activity
-            android:name=".ui.books.activity.MyBooksActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 编辑账本 -->
-        <activity
-            android:name=".ui.books.activity.EditBooksActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 编辑记录 -->
-        <activity
-            android:name=".ui.record.activity.EditRecordActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan|stateHidden" />
-
-        <!-- 选择关联记录 -->
-        <activity
-            android:name=".ui.record.activity.SelectAssociatedRecordActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 日历记录 -->
-        <activity
-            android:name=".ui.record.activity.CalendarActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 搜索记录 -->
-        <activity
-            android:name=".ui.record.activity.SearchRecordActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 分类记录数据 -->
-        <activity
-            android:name=".ui.record.activity.TypeRecordActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 标签记录数据 -->
-        <activity
-            android:name=".ui.record.activity.TagRecordActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 标签管理 -->
-        <activity
-            android:name=".ui.record.activity.TagManagerActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 编辑资产 -->
-        <activity
-            android:name=".ui.asset.activity.EditAssetActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 我的资产 -->
-        <activity
-            android:name=".ui.asset.activity.MyAssetActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 隐藏资产 -->
-        <activity
-            android:name=".ui.asset.activity.InvisibleAssetActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 资产信息 -->
-        <activity
-            android:name=".ui.asset.activity.AssetInfoActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 编辑分类列表 -->
-        <activity
-            android:name=".ui.type.activity.EditTypeListActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 编辑分类 -->
-        <activity
-            android:name=".ui.type.activity.EditTypeActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 替换分类 -->
-        <activity
-            android:name=".ui.type.activity.ReplaceTypeActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
-
-        <!-- 选择一级分类 -->
-        <activity
-            android:name=".ui.type.activity.SelectFirstTypeActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

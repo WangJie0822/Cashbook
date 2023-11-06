@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "cn.wj.android.cashbook.core.datastore";
+option java_multiple_files = true;
+
+/* 搜索历史 */
+message SearchHistory {
+  repeated string keywords = 1; // 搜索关键字列表
+}

@@ -1,5 +1,5 @@
 plugins {
-    id("cashbook.android.library")
+    alias(libs.plugins.cashbook.android.library)
 }
 
 android {
@@ -7,5 +7,5 @@ android {
 }
 
 dependencies {
-    implementation("androidx.annotation:annotation:1.6.0")
+    implementation(libs.androidx.annotation)
 }

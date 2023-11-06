@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "cn.wj.android.cashbook.core.datastore";
+option java_multiple_files = true;
+
+/* 云端仓库数据 */
+message GitInfos {
+  string latestVersionName = 1; // 最新版本版本名
+  string latestVersionInfo = 2; // 最新版本更新信息
+  string latestApkName = 3; // 最新版本 apk 名
+  string latestApkDownloadUrl = 4; // 最新版本下载地址
+
+  string changelogData = 5; // 修改日志数据
+  string privacyPolicyData = 6; // 用户协议及隐私政策数据
+}

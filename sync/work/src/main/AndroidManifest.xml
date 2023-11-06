@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="false"
+        android:supportsRtl="true">
+
+        <service
+            android:name=".service.SyncService"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="cn.wj.android.cashbook.sync.RETRY" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".service.UpgradeService"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="cn.wj.android.cashbook.upgrade.CANCEL_DOWNLOAD" />
+                <action android:name="cn.wj.android.cashbook.upgrade.RETRY_DOWNLOAD" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>

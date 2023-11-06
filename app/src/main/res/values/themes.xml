@@ -1,75 +1,34 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- 兼容夜间模式 -->
+    <style name="NightAdjusted.Theme.Cashbook" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+    </style>
+
+    <!-- 兼容 values-v 不同版本 -->
+    <style name="PlatformAdjusted.Theme.Cashbook" parent="NightAdjusted.Theme.Cashbook">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
     <!-- 应用主题 -->
-    <style name="Theme.Cashbook" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- 主要颜色 -->
-        <item name="colorPrimary">@color/color_primary</item>
-        <item name="colorPrimaryVariant">@color/color_primary_variant</item>
-        <item name="colorOnPrimary">@color/color_on_primary</item>
-        <!-- 次要颜色 -->
-        <item name="colorSecondary">@color/color_secondary</item>
-        <item name="colorSecondaryVariant">@color/color_secondary_variant</item>
-        <item name="colorOnSecondary">@color/color_on_secondary</item>
-        <!-- 材质颜色 -->
-        <item name="colorSurface">@color/color_surface</item>
-        <item name="colorOnSurface">@color/color_on_surface</item>
-        <item name="colorPrimarySurface">@color/color_primary_surface</item>
-        <item name="colorOnPrimarySurface">@color/color_on_primary_surface</item>
-        <!-- 错误颜色 -->
-        <item name="colorError">@color/color_error</item>
-        <item name="colorOnError">@color/color_on_error</item>
-        <!-- 状态栏颜色 -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
+    <style name="Theme.Cashbook" parent="PlatformAdjusted.Theme.Cashbook" />
 
-        <item name="android:textColorPrimary">@color/text_color_primary</item>
-        <item name="android:textColorSecondary">@color/text_color_secondary</item>
-
-        <!-- 字体设置 -->
-        <item name="textAppearanceLargePopupMenu">@style/TextAppearance.Cashbook.PopupMenu</item>
-
-        <!-- 窗口背景 -->
-        <item name="android:windowBackground">@color/color_window_background</item>
-
-        <!-- 动画相关 -->
-        <item name="android:windowActivityTransitions">true</item>
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowAllowEnterTransitionOverlap">true</item>
-        <item name="android:windowAllowReturnTransitionOverlap">true</item>
-        <item name="android:forceDarkAllowed" tools:targetApi="q">true</item>
+    <!-- 启动主题 -->
+    <style name="NightAdjusted.Theme.Splash" parent="Theme.SplashScreen">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
     </style>
 
-    <!-- 闪屏界面主题 -->
-    <style name="Theme.Cashbook.Splash">
-        <!-- 窗口背景 -->
-        <item name="android:windowBackground">@drawable/layer_splash_background</item>
+    <!-- 启动页主题 -->
+    <style name="Theme.Cashbook.Splash" parent="NightAdjusted.Theme.Splash">
+        <!-- 启动页背景 -->
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <!-- 启动页显示的图标 -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/layer_splash_background</item>
+        <!-- 显示时长，上限 1000ms -->
+        <item name="windowSplashScreenAnimationDuration">250</item>
+        <!-- 退出启动页后使用的主题 -->
+        <item name="postSplashScreenTheme">@style/Theme.Cashbook</item>
     </style>
-
-    <!-- 弹窗默认主题 -->
-    <style name="Theme.Cashbook.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog" />
-
-    <!-- 全半透明背景 -->
-    <style name="Theme.Cashbook.Dialog.Transparent">
-        <item name="android:windowBackground">@drawable/shape_window_background_transparent</item>
-    </style>
-
-    <!-- 底部抽屉弹窗 -->
-    <style name="Theme.Cashbook.Dialog.BottomSheet">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowAnimationStyle">
-            @style/Animation.MaterialComponents.BottomSheetDialog
-        </item>
-        <item name="bottomSheetStyle">@style/Widget.MaterialComponents.BottomSheet.Modal</item>
-    </style>
-
-    <!-- 警告弹窗 -->
-    <style name="Theme.Cashbook.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert" />
-
-    <!-- AppBar 样式 -->
-    <style name="Theme.Cashbook.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
-
-    <!-- Popup 样式 -->
-    <style name="Theme.Cashbook.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
-
-    <!-- PopupMenu 字体样式 -->
-    <style name="TextAppearance.Cashbook.PopupMenu" parent="android:TextAppearance.Material.Caption" />
 
 </resources>

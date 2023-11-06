@@ -1,12 +1,13 @@
+import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 
 plugins {
-    // Android Kotlin 应用
-    id("cashbook.android.application")
-    // Kotlin 注解处理
-    kotlin("kapt")
-    // Kotlin json 转换
-    kotlin("plugin.serialization")
+    alias(libs.plugins.cashbook.android.application)
+    alias(libs.plugins.cashbook.android.application.compose)
+    alias(libs.plugins.cashbook.android.application.flavors)
+    alias(libs.plugins.cashbook.android.application.jacoco)
+    alias(libs.plugins.cashbook.android.hilt)
+    alias(libs.plugins.kotlin.serialization)
     // Kotlin Parcelize 序列化
     id("kotlin-parcelize")
 }
@@ -17,36 +18,43 @@ android {
 
     defaultConfig {
         // 应用 id
-        applicationId = "cn.wj.android.cashbook"
+        applicationId = namespace
 
         // 开启 Dex 分包
         multiDexEnabled = true
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildFeatures {
-        dataBinding {
-            isEnabled = true
+        buildConfig = true
+        resValues = true
+    }
+
+    buildTypes {
+        getByName("debug") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = getByName("release").signingConfig
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
-    sourceSets {
-        getByName("Online") {
-            res.srcDirs("src/main/res-online")
+    productFlavors {
+        getByName(CashbookFlavor.Dev.name) {
+            resValue("string", "app_name", "@string/app_name_dev")
         }
-        getByName("Dev") {
-            res.srcDirs("src/main/res-dev")
-        }
-        getByName("androidTest") {
-            // room 测试使用资源
-            assets.srcDirs("$projectDir/schemas")
-        }
-    }
-
-    configurations {
-        all {
-            resolutionStrategy {
-                force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10") // 强制指定 kotlin 依赖版本
-            }
+        getByName(CashbookFlavor.Online.name) {
+            resValue("string", "app_name", "@string/app_name_online")
         }
     }
 
@@ -60,18 +68,6 @@ android {
         { variant, _ ->
             "Cashbook_${variant.versionName}.apk"
         })
-
-    lint {
-        // 出现错误不终止编译
-        abortOnError = false
-    }
-}
-
-kapt {
-    arguments {
-        arg("AROUTER_MODULE_NAME", project.name)
-        arg("room.schemaLocation", "$projectDir/schemas")
-    }
 }
 
 dependencies {
@@ -82,7 +78,7 @@ dependencies {
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.espressoCore)
+    androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     // Kotlin
@@ -90,73 +86,49 @@ dependencies {
     // 协程
     implementation(libs.kotlinx.coroutines.android)
     // Json 序列化
-    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
 
     // Dex 分包
     implementation(libs.androidx.multidex)
 
     // Androidx 基本依赖，包含 v4 v7 core-ktx activity-ktx fragment-ktx
-    implementation(libs.bundles.androidx.baseKtx)
+    implementation(libs.bundles.androidx.base.ktx)
 
-    // Android 基本控件，包含 recyclerview constraintlayout cardview material
-    implementation(libs.bundles.androidx.widget)
+    implementation(libs.google.material)
 
-    // Androidx LifeCycle 拓展组合，包含 runtime-ktx extensions viewmodel-ktx livedata-ktx
-    implementation(libs.bundles.androidx.lifecycleKtx)
+    // 功能
+    implementation(projects.feature.tags)
+    implementation(projects.feature.types)
+    implementation(projects.feature.books)
+    implementation(projects.feature.assets)
+    implementation(projects.feature.records)
+    implementation(projects.feature.settings)
 
-    // Room
-    implementation(libs.androidx.room.common)
-    implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    // 设计
+    implementation(projects.core.common)
+    implementation(projects.core.model)
+    implementation(projects.core.design)
+    implementation(projects.core.ui)
+    implementation(projects.core.data)
 
-    // Paging
-    implementation(libs.androidx.paging.runtimeKtx)
-
-    // WorkManager
-    implementation(libs.androidx.work.runtimeKtx)
-
-    // Logger
-    implementation(libs.orhanobut.logger)
-
-    // LiveEventBus
-    implementation(libs.jeremyliao.liveEventBus)
-
-    // Koin
-    implementation(libs.insert.koin.android)
-
-    // OkHttp
-    implementation(libs.squareup.okhttp3)
-
-    // Retrofit
-    implementation(libs.squareup.retrofit2)
-    implementation(libs.jakeWharton.retrofit2ConverterKotlin)
-
-    // Coil
-    implementation(libs.coil)
-
-    // 状态栏工具组合
-    implementation(libs.bundles.geyifeng.immersionbar)
-
-    // MMKV 数据存储
-    implementation(libs.tencent.mmkv)
-
-    // ARouter 路由
-    implementation(libs.alibaba.arouter.api)
-    kapt(libs.alibaba.arouter.compiler)
-
-    // DoraemonKit
-    debugImplementation(libs.didi.doraemonkit.debug)
-    releaseImplementation(libs.didi.doraemonkit.release)
+    // 数据同步
+    implementation(projects.sync.work)
 
     // Markdown 解析
     implementation(libs.noties.markwon)
 
-    // HTML 解析
-    implementation(libs.jsoup)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
 
-    // 日历控件
-    implementation(libs.haibin.calendarview)
+    implementation(libs.androidx.compose.material3.window.size)
 
-    // 图表控件
-    implementation(project(":repos:MPChartLib"))
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation(libs.androidx.activity.compose)
+
+    implementation(libs.androidx.core.splashscreen)
+
+    debugImplementation(libs.didi.dokit.core)
+    releaseImplementation(libs.didi.dokit.noop)
 }

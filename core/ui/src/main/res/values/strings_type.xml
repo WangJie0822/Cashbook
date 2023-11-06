@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="not_associated_asset">不关联资产</string>
+    <string name="type_no_data">暂无类型数据，点击右下角按钮添加</string>
+    <string name="click_arrow_expand_more">点击箭头展开更多</string>
+    <string name="change_to_first_type">修改为一级分类</string>
+    <string name="change_to_second_type">修改为二级分类</string>
+    <string name="add_second_type">添加二级分类</string>
+    <string name="move_to_another_first_type">移动到其它一级分类</string>
+    <string name="change_first_type_has_child_hint">当前分类下存在子分类，无法修改为二级分类</string>
+    <string name="delete_first_type_has_child_hint">当前分类下存在子分类，无法直接删除</string>
+    <string name="protected_type_hint">受保护分类，无法进行操作</string>
+    <string name="duplicate_type_name_hint">分类名称不能重复</string>
+    <string name="select_first_type_to_move">选择要移动到的一级分类</string>
+    <string name="select_type_to_move_before_delete_format">当前类型下有%1$s条记录，删除前需移动到其它类型</string>
+    <string name="delete_success">删除成功</string>
+    <string name="first_type">一级分类</string>
+    <string name="second_type">二级分类</string>
+    <string name="type_name_must_not_blank">类型名不能为空</string>
+    <string name="save">保存</string>
+    <string name="save_type_hint">请确认类型名称不会重复</string>
+    <string name="refund_type">退款类型</string>
+    <string name="set_refund_type">设置退款类型</string>
+    <string name="reimburse_type">报销类型</string>
+    <string name="set_reimburse_type">设置报销类型</string>
+    <string name="credit_card_payment_type">信用卡还款类型</string>
+    <string name="set_credit_card_payment_type">设置信用卡还款类型</string>
+</resources>

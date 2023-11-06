@@ -1,16 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    // Android Gradle 插件版本
-    val androidGradlePluginVersion = libs.versions.android.gradlePlugin.get()
-    // Kotlin 版本
-    val kotlinVersion = libs.versions.kotlin.get()
-
-    id("com.android.application") version androidGradlePluginVersion apply false
-    id("com.android.library") version androidGradlePluginVersion apply false
-    kotlin("android") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.google.devtools.ksp) apply false
+    alias(libs.plugins.google.hilt) apply false
 }
 
 tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory.asFile.get())
 }

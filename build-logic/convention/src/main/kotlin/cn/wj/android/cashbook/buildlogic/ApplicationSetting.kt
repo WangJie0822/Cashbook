@@ -1,20 +1,33 @@
 package cn.wj.android.cashbook.buildlogic
 
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 
 /**
  * 应用配置数据
  *
- * > [jiewang41](mailto:jiewang41@iflytek.com) 创建于 2022/9/5
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/7
  */
 object ApplicationSetting {
 
     object Config {
-        const val compileSdk = 33
-        const val minSdk = 21
-        const val targetSdk = 30
+        /** SDK 编译版本 */
+        const val COMPILE_SDK = 34
+
+        /** SDK 最小支持版本 */
+        const val MIN_SDK = 23
+
+        /** SDK 目标版本 */
+        const val TARGET_SDK = 30
+
+        /** 版本号，动态生成 */
         val versionCode = generateVersionCode()
-        val versionName = "v0.6.2_$versionCode"
+
+        /** 版本名，大版本号+版本号 */
+        val versionName = "v1.0.0_$versionCode"
+
+        /** 源码 jdk 版本 */
+        val javaVersion = JavaVersion.VERSION_11
 
         /** 根据日期时间获取对应版本号 */
         private fun generateVersionCode(): Int {
@@ -29,9 +42,18 @@ object ApplicationSetting {
     object Plugin {
         const val PLUGIN_ANDROID_APPLICATION = "com.android.application"
         const val PLUGIN_ANDROID_LIBRARY = "com.android.library"
+        const val PLUGIN_ANDROID_TEST = "com.android.test"
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
+        const val PLUGIN_KOTLIN_KAPT = "org.jetbrains.kotlin.kapt"
+        const val PLUGIN_KOTLIN_JVM = "org.jetbrains.kotlin.jvm"
+        const val PLUGIN_JACOCO = "org.gradle.jacoco"
+        const val PLUGIN_GOOGLE_KSP = "com.google.devtools.ksp"
+        const val PLUGIN_GOOGLE_HILT = "dagger.hilt.android.plugin"
     }
 }
+
+val JavaVersion.version: Int
+    get() = ordinal + 1
 
 /** 拓展变量数据存储集合 */
 private val kvMap: HashMap<String, Any> = HashMap()

@@ -1,0 +1,603 @@
+[versions]
+# 版本号
+junit = "4.13.2"
+
+# 代码覆盖率 [指南](https://www.jacoco.org/jacoco/)
+jacoco = "0.8.10"
+
+# kotlin [指南](https://kotlinlang.org/)
+# [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlin)
+kotlin = "1.9.10"
+
+# Kotlinx
+# 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
+# [Github](https://github.com/Kotlin/kotlinx.coroutines)
+# [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
+kotlinx-coroutines = "1.7.3"
+# 日期处理 [Github](https://github.com/Kotlin/kotlinx-datetime)
+kotlinx-datetime = "0.4.0"
+# json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
+kotlinx-serialization-json = "1.6.0"
+
+# Google 相关
+# Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
+google-material = "1.10.0"
+# zxing [Github](https://github.com/zxing/zxing)
+# [版本查询](https://mvnrepository.com/artifact/com.google.zxing)
+google-zxing = "3.5.1"
+# gson [Github](https://github.com/google/gson)
+# [版本查询](https://mvnrepository.com/artifact/com.google.code.gson)
+google-gson = "2.10.1"
+# accompanist 组件库 [指南](https://google.github.io/accompanist/)
+# [版本查询](https://mvnrepository.com/artifact/com.google.accompanist)
+google-accompanist = "0.32.0"
+# ksp 前缀版本需要和kotlin版本兼容 [Github](https://github.com/google/ksp)
+# [版本查询](https://mvnrepository.com/artifact/com.google.devtools.ksp)
+google-devtools-ksp = "1.9.10-1.0.13"
+# protobuf [Github](https://github.com/protocolbuffers/protobuf)
+# [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
+google-protobuf = "3.24.4"
+google-protobuf-plugin = "0.9.4"
+# hilt [指南](https://dagger.dev/hilt)
+# [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
+google-hilt = "2.48.1"
+# hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
+androidx-hilt = "1.0.0"
+
+# 脱糖
+android-desugarJdkLibs = "2.0.3"
+# Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/com.android.application)
+android-gradle-plugin = "8.1.2"
+
+# Androidx
+# legacy [指南](https://developer.android.google.cn/jetpack/androidx/releases/legacy?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.legacy)
+androidx-legacy = "1.0.0"
+# appcompat [指南](https://developer.android.google.cn/jetpack/androidx/releases/appcompat?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.appcompat)
+androidx-appcompat = "1.6.1"
+# recyclerview [指南](https://developer.android.google.cn/jetpack/androidx/releases/recyclerview?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.recyclerview)
+androidx-recyclerview = "1.3.2"
+# cardview [指南](https://developer.android.google.cn/jetpack/androidx/releases/cardview?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.cardview)
+androidx-cardview = "1.0.0"
+# viewpager2 [指南](https://developer.android.google.cn/jetpack/androidx/releases/viewpager2?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.viewpager2)
+androidx-viewpager2 = "1.0.0"
+# 约束性布局 [指南](https://developer.android.google.cn/jetpack/androidx/releases/constraintlayout?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.constraintlayout)
+androidx-constraintlayout = "2.1.4"
+androidx-constraintlayout-compose = "1.0.1"
+# multidex 分包 [指南](https://developer.android.google.cn/jetpack/androidx/releases/multidex?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.multidex)
+androidx-multidex = "2.0.1"
+# core 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/core?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.core)
+androidx-core = "1.12.0"
+androidx-core-splashscreen = "1.0.1"
+# Compose 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/compose?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.compose)
+androidx-compose-bom = "2023.10.01"
+# Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin?hl=zh-cn)
+androidx-compose-compiler = "1.5.3"
+# activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.activity)
+androidx-activity = "1.8.0"
+# Fragment 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/fragment?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.fragment)
+androidx-fragment = "1.6.1"
+# 生命周期相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/lifecycle?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.lifecycle)
+androidx-lifecycle = "2.6.2"
+# Room 数据库相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/room?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.room)
+androidx-room = "2.6.0"
+# Paging 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/paging?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.paging)
+androidx-paging = "3.2.1"
+# Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
+androidx-navigation = "2.7.4"
+# WorkManager 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/work?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.work)
+androidx-work = "2.8.1"
+# DataStore 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/datastore?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.datastore)
+androidx-datastore = "1.0.0"
+# Annotation [指南](https://developer.android.google.cn/jetpack/androidx/releases/annotation?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
+androidx-annotation = "1.7.0"
+# DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
+androidx-documentfile = "1.0.1"
+# palette [指南](https://developer.android.google.cn/jetpack/androidx/releases/palette?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.palette)
+androidx-palette = "1.0.0"
+# 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test?hl=zh-cn)
+# [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
+androidx-test-annotation = "1.0.1"
+androidx-test-core = "1.5.0"
+androidx-test-espresso = "3.5.1"
+androidx-test-ext-junit = "1.1.5"
+androidx-test-ext-truth = "1.5.0"
+androidx-test-monitor = "1.6.1"
+androidx-test-orchestrator = "1.4.2"
+androidx-test-runner = "1.5.2"
+androidx-test-rules = "1.5.0"
+androidx-test-services = "1.4.2"
+
+# Koin [Github](https://github.com/InsertKoinIO/koin) [指南](https://insert-koin.io/)
+insert-koin = "3.4.2"
+insert-koin-android = "3.4.2"
+insert-koin-androidx-compose = "3.4.5"
+insert-koin-ktor = "3.4.1"
+
+# Glide [Github](https://github.com/bumptech/glide)
+bumptech-glide = "4.15.1"
+
+# okio [Github](https://github.com/square/okio) [指南](https://square.github.io/okio/)
+squareup-okio = "3.3.0"
+# javapoet [Github](https://github.com/square/javapoet)
+squareup-javapoet = "1.13.0"
+# picasso [Github](https://github.com/square/picasso) [指南](https://square.github.io/picasso/)
+squareup-picasso = "2.8"
+# okhttp3 [Github](https://github.com/square/okhttp) [指南](https://square.github.io/okhttp)
+squareup-okhttp3-bom = "4.11.0"
+# Retrofit2 [Github](https://github.com/square/retrofit) [指南](https://square.github.io/retrofit/)
+squareup-retrofit2 = "2.9.0"
+# [Github](https://github.com/JakeWharton/retrofit2-kotlinx-serialization-converter)
+jakewharton-retrofit2-converter-kotlin = "1.0.0"
+
+# RxJava [Github](https://github.com/ReactiveX/RxJava)
+reactivex-rxjava2 = "2.2.21"
+reactivex-rxandroid2 = "2.1.1"
+reactivex-rxkotlin2 = "2.4.0"
+reactivex-rxjava3 = "3.1.5"
+reactivex-rxandroid3 = "3.0.0"
+reactivex-rxkotlin3 = "3.0.1"
+
+# EventBus [Github](https://github.com/greenrobot/EventBus)
+greenrobot-eventbus = "3.3.1"
+
+# SmartRefreshLayout [Github](https://github.com/scwang90/SmartRefreshLayout)
+scwang90-refresh = "2.0.6"
+
+# 状态栏工具 [Github](https://github.com/gyf-dev/ImmersionBar)
+geyifeng-immersionbar = "3.2.2"
+
+# Coil [Github](https://github.com/coil-kt/coil) [指南](https://coil-kt.github.io/coil)
+coil = "2.4.0"
+
+# 换肤 [Github](https://github.com/ximsfei/Android-skin-support)
+skin-support = "4.0.5"
+
+# Arouter [Github](https://github.com/alibaba/ARouter)
+alibaba-arouter = "1.5.2"
+# FastJson [Github](https://github.com/alibaba/fastjson)
+alibaba-fastjson = "2.0.28"
+# FastJson2 [Github](https://github.com/alibaba/fastjson2)
+alibaba-fastjson2 = "2.0.32"
+
+# 腾讯相关
+# MMKV [Github](https://github.com/tencent/mmkv)
+tencent-mmkv = "1.2.16"
+
+# 滴滴相关
+# 开发工具 [Github](https://github.com/Android-MI/DoraemonKit)
+didi-doraemonkit = "1.1.2"
+# 开发工具 [Github](https://github.com/didi/DoKit)
+didi-dokit = "3.7.1"
+
+# Markdown 解析 [Github](https://github.com/noties/Markwon) [指南](https://noties.io/Markwon/)
+noties-markwon = "4.6.2"
+
+# 日历控件 [Github](https://github.com/huanghaibin-dev/CalendarView)
+haibin-calendarview = "3.7.1"
+
+# Logger 日志打印 [Github](https://github.com/orhanobut/logger)
+orhanobut-logger = "2.2.0"
+
+# jsoup HTML 解析 [Github](https://github.com/jhy/jsoup)
+jsoup = "1.15.2"
+
+# LiveEventBus [Github](https://github.com/JeremyLiao/LiveEventBus)
+jeremyliao-liveEventBus = "1.8.0"
+
+# 图标控件 [Github](https://github.com/PhilJay/MPAndroidChart)
+philJay-mpAndroidChart = "v3.1.0"
+
+# WebDAV 客户端 [Github](https://github.com/lookfirst/sardine)
+lookfirst-sardine = "5.12"
+
+# WebDAV 客户端 [Github](https://github.com/thegrizzlylabs/sardine-android)
+thegrizzlylabs-sardine = "0.8"
+
+[libraries]
+# junit
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+# kotlin [指南](https://kotlinlang.org/)
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-jdk8", version.ref = "kotlin" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
+# Kotlinx
+# 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html) [Github](https://github.com/Kotlin/kotlinx.coroutines)
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
+# json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+
+# Google 相关
+# Material [版本查询](https://www.wanandroid.com/maven_pom/index?k=com.google.android.material)
+google-material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
+# zxing [Github](https://github.com/zxing/zxing)
+google-zxing-core = { group = "com.google.zxing", name = "core", version.ref = "google-zxing" }
+# gson [Github](https://github.com/google/gson)
+google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "google-gson" }
+# accompanist 组件库 [指南](https://google.github.io/accompanist/)
+google-accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "google-accompanist" }
+google-accompanist-navigation-material = { group = "com.google.accompanist", name = "accompanist-navigation-material", version.ref = "google-accompanist" }
+google-accompanist-drawablepainter = { group = "com.google.accompanist", name = "accompanist-drawablepainter", version.ref = "google-accompanist" }
+google-accompanist-adaptive = { group = "com.google.accompanist", name = "accompanist-adaptive", version.ref = "google-accompanist" }
+google-accompanist-testharness = { group = "com.google.accompanist", name = "accompanist-testharness", version.ref = "google-accompanist" }
+# 以下 accompanist 库最新版本已废弃，建议使用 foundation
+google-accompanist-flowlayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "google-accompanist" }
+google-accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "google-accompanist" }
+google-accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "google-accompanist" }
+google-accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "google-accompanist" }
+google-accompanist-placeholder = { group = "com.google.accompanist", name = "accompanist-placeholder", version.ref = "google-accompanist" }
+google-accompanist-placeholder-material = { group = "com.google.accompanist", name = "accompanist-placeholder-material", version.ref = "google-accompanist" }
+google-accompanist-insets-ui = { group = "com.google.accompanist", name = "accompanist-insets-ui", version.ref = "google-accompanist" }
+google-accompanist-navigation-animation = { group = "com.google.accompanist", name = "accompanist-navigation-animation", version.ref = "google-accompanist" }
+google-accompanist-webview = { group = "com.google.accompanist", name = "accompanist-webview", version.ref = "google-accompanist" }
+# ksp  [Github](https://github.com/google/ksp)
+google-devtools-ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "google-devtools-ksp" }
+# protobuf [Github](https://github.com/protocolbuffers/protobuf)
+google-protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "google-protobuf" }
+google-protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "google-protobuf" }
+# hilt [指南](https://dagger.dev/hilt)
+google-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "google-hilt" }
+google-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "google-hilt" }
+google-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "google-hilt" }
+# hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt" }
+androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidx-hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidx-hilt" }
+
+android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android-desugarJdkLibs" }
+# Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "android-gradle-plugin" }
+
+# Androidx
+# legacy [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/legacy?hl=zh-cn)
+androidx-legacy = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "androidx-legacy" }
+# appcompat [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/appcompat?hl=zh-cn)
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
+# recyclerview [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/recyclerview?hl=zh-cn)
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidx-recyclerview" }
+# cardview [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/cardview?hl=zh-cn)
+androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "androidx-cardview" }
+# viewpager2 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/viewpager2?hl=zh-cn)
+androidx-viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "androidx-viewpager2" }
+# 约束性布局 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/constraintlayout?hl=zh-cn)
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
+androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "androidx-constraintlayout-compose" }
+# multidex 分包 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/multidex?hl=zh-cn)
+androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "androidx-multidex" }
+# core 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/core?hl=zh-cn)
+androidx-core = { group = "androidx.core", name = "core", version.ref = "androidx-core" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-core-splashscreen" }
+# Compose 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/compose?hl=zh-cn)
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
+androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core" }
+androidx-compose-animation-graphics = { group = "androidx.compose.animation", name = "animation-graphics" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material" }
+androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-compose-material-ripple = { group = "androidx.compose.material", name = "material-ripple" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
+androidx-compose-runtime-rxjava2 = { group = "androidx.compose.runtime", name = "runtime-rxjava2" }
+androidx-compose-runtime-rxjava3 = { group = "androidx.compose.runtime", name = "runtime-rxjava3" }
+androidx-compose-runtime-saveable = { group = "androidx.compose.runtime", name = "runtime-saveable" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-geometry = { group = "androidx.compose.ui", name = "ui-geometry" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-data = { group = "androidx.compose.ui", name = "ui-tooling-data" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-unit = { group = "androidx.compose.ui", name = "ui-unit" }
+androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
+androidx-compose-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding" }
+androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text" }
+androidx-compose-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+# activity 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/activity?hl=zh-cn)
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "androidx-activity" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity" }
+# Fragment 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/fragment?hl=zh-cn)
+androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "androidx-fragment" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidx-fragment" }
+androidx-fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "androidx-fragment" }
+# 生命周期相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/lifecycle?hl=zh-cn)
+androidx-lifecycle-reactivestreams = { group = "androidx.lifecycle", name = "lifecycle-reactivestreams", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-reactivestreams-ktx = { group = "androidx.lifecycle", name = "lifecycle-reactivestreams-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-common = { group = "androidx.lifecycle", name = "lifecycle-common", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-common-java-8 = { group = "androidx.lifecycle", name = "lifecycle-common-java8", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-livedata-core = { group = "androidx.lifecycle", name = "lifecycle-livedata-core", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-livedata-core-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-core-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-testing = { group = "androidx.lifecycle", name = "lifecycle-runtime-testing", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-compiler = { group = "androidx.lifecycle", name = "lifecycle-compiler", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-savedstate = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+# Room 数据库相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/room?hl=zh-cn)
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
+androidx-room-compiler-processing = { group = "androidx.room", name = "room-compiler-processing", version.ref = "androidx-room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "androidx-room" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "androidx-room" }
+androidx-room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "androidx-room" }
+androidx-room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "androidx-room" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "androidx-room" }
+androidx-room-guava = { group = "androidx.room", name = "room-guava", version.ref = "androidx-room" }
+androidx-room-migration = { group = "androidx.room", name = "room-migration", version.ref = "androidx-room" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "androidx-room" }
+# Paging 相关 [版本查询(https://developer.android.google.cn/jetpack/androidx/releases/paging?hl=zh-cn)
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "androidx-paging" }
+androidx-paging-runtime-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "androidx-paging" }
+androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "androidx-paging" }
+androidx-paging-common-ktx = { group = "androidx.paging", name = "paging-common-ktx", version.ref = "androidx-paging" }
+androidx-paging-rxjava2 = { group = "androidx.paging", name = "paging-rxjava2", version.ref = "androidx-paging" }
+androidx-paging-rxjava-2-ktx = { group = "androidx.paging", name = "paging-rxjava2-ktx", version.ref = "androidx-paging" }
+androidx-paging-guava = { group = "androidx.paging", name = "paging-guava", version.ref = "androidx-paging" }
+androidx-paging-rxjava3 = { group = "androidx.paging", name = "paging-rxjava3", version.ref = "androidx-paging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
+# Navigation 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
+androidx-navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "androidx-navigation" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "androidx-navigation" }
+androidx-navigation-runtime = { group = "androidx.navigation", name = "navigation-runtime", version.ref = "androidx-navigation" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "androidx-navigation" }
+androidx-navigation-common = { group = "androidx.navigation", name = "navigation-common", version.ref = "androidx-navigation" }
+androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "androidx-navigation" }
+androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "androidx-navigation" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "androidx-navigation" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidx-navigation" }
+# WorkManager 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/work?hl=zh-cn)
+androidx-work-runtime = { group = "androidx.work", name = "work-runtime", version.ref = "androidx-work" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidx-work" }
+androidx-work-rxjava2 = { group = "androidx.work", name = "work-rxjava2", version.ref = "androidx-work" }
+androidx-work-rxjava3 = { group = "androidx.work", name = "work-rxjava3", version.ref = "androidx-work" }
+androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "androidx-work" }
+# DataStore 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/datastore?hl=zh-cn)
+androidx-datastore-proto = { group = "androidx.datastore", name = "datastore", version.ref = "androidx-datastore" }
+androidx-datastore-proto-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "androidx-datastore" }
+androidx-datastore-proto-rxjava2 = { group = "androidx.datastore", name = "datastore-rxjava2", version.ref = "androidx-datastore" }
+androidx-datastore-proto-rxjava3 = { group = "androidx.datastore", name = "datastore-rxjava3", version.ref = "androidx-datastore" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
+androidx-datastore-preferences-rxjava2 = { group = "androidx.datastore", name = "datastore-preferences-rxjava2", version.ref = "androidx-datastore" }
+androidx-datastore-preferences-rxjava3 = { group = "androidx.datastore", name = "datastore-preferences-rxjava3", version.ref = "androidx-datastore" }
+# Annotation [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/annotation?hl=zh-cn)
+androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidx-annotation" }
+# DocumentFile [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
+androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "androidx-documentfile" }
+# palette [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile?hl=zh-cn)
+androidx-palette = { group = "androidx.palette", name = "palette", version.ref = "androidx-palette" }
+# 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/test?hl=zh-cn)
+androidx-test-annotation = { group = "androidx.test", name = "annotation", version.ref = "androidx-test-annotation" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test-core" }
+androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidx-test-core" }
+androidx-test-espresso = { group = "androidx.test", name = "espresso", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-remote = { group = "androidx.test.espresso", name = "espresso-remote", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-web = { group = "androidx.test.espresso", name = "espresso-web", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-idling-resource = { group = "androidx.test.espresso", name = "espresso-idling-resource", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-idling-concurrent = { group = "androidx.test.espresso.idling", name = "idling-concurrent", version.ref = "androidx-test-espresso" }
+androidx-test-espresso-idling-net = { group = "androidx.test.espresso.idling", name = "idling-net", version.ref = "androidx-test-espresso" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
+androidx-test-ext-truth = { group = "androidx.test.ext", name = "truth", version.ref = "androidx-test-ext-truth" }
+androidx-test-monitor = { group = "androidx.test", name = "monitor", version.ref = "androidx-test-monitor" }
+androidx-test-orchestrator = { group = "androidx.test", name = "orchestrator", version.ref = "androidx-test-orchestrator" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidx-test-rules" }
+androidx-test-services = { group = "androidx.test", name = "services", version.ref = "androidx-test-services" }
+
+# Koin [Github](https://github.com/InsertKoinIO/koin) [指南](https://insert-koin.io/)
+insert-koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "insert-koin" }
+insert-koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "insert-koin" }
+insert-koin-test-junit = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "insert-koin" }
+insert-koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "insert-koin" }
+insert-koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "insert-koin-android" }
+insert-koin-android-compat = { group = "io.insert-koin", name = "koin-android-compat", version.ref = "insert-koin-android" }
+insert-koin-android-workmanager = { group = "io.insert-koin", name = "koin-android-workmanager", version.ref = "insert-koin-android" }
+insert-koin-android-navigation = { group = "io.insert-koin", name = "koin-android-navigation", version.ref = "insert-koin-android" }
+insert-koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "insert-koin-androidx-compose" }
+insert-koin-ktor = { group = "io.insert-koin", name = "koin-ktor", version.ref = "insert-koin-ktor" }
+insert-koin-logger-slf4j = { group = "io.insert-koin", name = "koin-logger-slf4j", version.ref = "insert-koin-ktor" }
+
+# Glide [Github](https://github.com/bumptech/glide)
+bumptech-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "bumptech-glide" }
+bumptech-glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "bumptech-glide" }
+
+# Suqareup 相关
+# okio [Github](https://github.com/square/okio)
+squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "squareup-okio" }
+# javapoet [Github](https://github.com/square/javapoet)
+squareup-javapoet = { group = "com.squareup", name = "javapoet", version.ref = "squareup-javapoet" }
+# picasso [Github](https://github.com/square/picasso)
+squareup-picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "squareup-picasso" }
+# okhttp3 [Github](https://github.com/square/okhttp) [指南](https://square.github.io/okhttp)
+squareup-okhttp3-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "squareup-okhttp3-bom" }
+squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp" }
+squareup-okhttp3-urlconnection = { group = "com.squareup.okhttp3", name = "okhttp-urlconnection" }
+squareup-okhttp3-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
+# Retrofit2 [Github](https://github.com/square/retrofit) [指南](https://square.github.io/retrofit/)
+squareup-retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "squareup-retrofit2" }
+squareup-retrofit-2-adapter-rxjava2 = { group = "com.squareup.retrofit2", name = "adapter-rxjava2", version.ref = "squareup-retrofit2" }
+squareup-retrofit-2-adapter-rxjava3 = { group = "com.squareup.retrofit2", name = "adapter-rxjava3", version.ref = "squareup-retrofit2" }
+squareup-retrofit-2-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "squareup-retrofit2" }
+squareup-retrofit-2-converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "squareup-retrofit2" }
+jakewharton-retrofit2-converter-kotlin = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "jakewharton-retrofit2-converter-kotlin" }
+
+# RxJava [Github](https://github.com/ReactiveX/RxJava)
+reactivex-rxjava2 = { group = "io.reactivex.rxjava2", name = "rxjava", version.ref = "reactivex-rxjava2" }
+reactivex-rxandroid2 = { group = "io.reactivex.rxjava2", name = "rxandroid", version.ref = "reactivex-rxandroid2" }
+reactivex-rxkotlin2 = { group = "io.reactivex.rxjava2", name = "rxkotlin", version.ref = "reactivex-rxkotlin2" }
+reactivex-rxjava3 = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "reactivex-rxjava3" }
+reactivex-rxandroid3 = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "reactivex-rxandroid3" }
+reactivex-rxkotlin3 = { group = "io.reactivex.rxjava3", name = "rxkotlin", version.ref = "reactivex-rxkotlin3" }
+
+# EventBus [Github](https://github.com/greenrobot/EventBus)
+greenrobot-eventbus = { group = "org.greenrobot", name = "eventbus", version.ref = "greenrobot-eventbus" }
+greenrobot-eventbus-java = { group = "org.greenrobot", name = "eventbus-java", version.ref = "greenrobot-eventbus" }
+
+# SmartRefreshLayout [Github](https://github.com/scwang90/SmartRefreshLayout)
+scwang90-refresh-layout = { group = "io.github.scwang90", name = "refresh-layout-kernel", version.ref = "scwang90-refresh" }
+scwang90-refresh-classics-header = { group = "io.github.scwang90", name = "refresh-header-classics", version.ref = "scwang90-refresh" }
+scwang90-refresh-classics-footer = { group = "io.github.scwang90", name = "refresh-footer-classics", version.ref = "scwang90-refresh" }
+
+# 状态栏工具 [Github](https://github.com/gyf-dev/ImmersionBar)
+geyifeng-immersionbar = { group = "com.geyifeng.immersionbar", name = "immersionbar", version.ref = "geyifeng-immersionbar" }
+geyifeng-immersionbar-ktx = { group = "com.geyifeng.immersionbar", name = "immersionbar-ktx", version.ref = "geyifeng-immersionbar" }
+
+# Coil [Github](https://github.com/coil-kt/coil) [指南](https://coil-kt.github.io/coil)
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil-base = { group = "io.coil-kt", name = "coil-base", version.ref = "coil" }
+coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
+coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
+coil-video = { group = "io.coil-kt", name = "coil-video", version.ref = "coil" }
+
+# 换肤 [Github](https://github.com/ximsfei/Android-skin-support)
+skin-support = { group = "skin.support", name = "skin-support", version.ref = "skin-support" }
+skin-support-appcompat = { group = "skin.support", name = "skin-support-appcompat", version.ref = "skin-support" }
+skin-support-design = { group = "skin.support", name = "skin-support-design", version.ref = "skin-support" }
+skin-support-cardview = { group = "skin.support", name = "skin-support-cardview", version.ref = "skin-support" }
+skin-support-constraintlayout = { group = "skin.support", name = "skin-support-constraint-layout", version.ref = "skin-support" }
+
+# 阿里相关
+# Arouter [Github](https://github.com/alibaba/ARouter)
+alibaba-arouter-api = { group = "com.alibaba", name = "arouter-api", version.ref = "alibaba-arouter" }
+alibaba-arouter-compiler = { group = "com.alibaba", name = "arouter-compiler", version.ref = "alibaba-arouter" }
+# FastJson [Github](https://github.com/alibaba/fastjson)
+alibaba-fastjson = { group = "com.alibaba.fastjson", name = "fastjson", version.ref = "alibaba-fastjson" }
+# FastJson2 [Github](https://github.com/alibaba/fastjson2)
+alibaba-fastjson2 = { group = "com.alibaba.fastjson2", name = "fastjson2", version.ref = "alibaba-fastjson2" }
+alibaba-fastjson2-kotlin = { group = "com.alibaba.fastjson2", name = "fastjson2-kotlin", version.ref = "alibaba-fastjson2" }
+alibaba-fastjson2-extension = { group = "com.alibaba.fastjson2", name = "fastjson2-extension", version.ref = "alibaba-fastjson2" }
+
+# 腾讯相关
+# MMKV [Github](https://github.com/tencent/mmkv)
+tencent-mmkv = { group = "com.tencent", name = "mmkv", version.ref = "tencent-mmkv" }
+
+# 滴滴相关
+# 开发工具 [Github](https://github.com/Android-MI/DoraemonKit)
+didi-doraemonkit-debug = { group = "com.didichuxing.doraemonkit", name = "doraemonkit", version.ref = "didi-doraemonkit" }
+didi-doraemonkit-release = { group = "com.didichuxing.doraemonkit", name = "doraemonkit-no-op", version.ref = "didi-doraemonkit" }
+# 开发工具 [Github](https://github.com/didi/DoKit)
+didi-dokit-core = { group = "io.github.didi.dokit", name = "dokitx", version.ref = "didi-dokit" }
+didi-dokit-ft = { group = "io.github.didi.dokit", name = "dokitx-ft", version.ref = "didi-dokit" }
+didi-dokit-mc = { group = "io.github.didi.dokit", name = "dokitx-mc", version.ref = "didi-dokit" }
+didi-dokit-weex = { group = "io.github.didi.dokit", name = "dokitx-weex", version.ref = "didi-dokit" }
+didi-dokit-noop = { group = "io.github.didi.dokit", name = "dokitx-no-op", version.ref = "didi-dokit" }
+
+# Markdown 解析 [Github](https://github.com/noties/Markwon) [指南](https://noties.io/Markwon/)
+noties-markwon = { group = "io.noties.markwon", name = "core", version.ref = "noties-markwon" }
+
+# 日历控件 [Github](https://github.com/huanghaibin-dev/CalendarView)
+haibin-calendarview = { group = "com.haibin", name = "calendarview", version.ref = "haibin-calendarview" }
+
+# Logger 日志打印 [Github](https://github.com/orhanobut/logger)
+orhanobut-logger = { group = "com.orhanobut", name = "logger", version.ref = "orhanobut-logger" }
+
+# jsoup HTML 解析 [Github](https://github.com/jhy/jsoup)
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
+
+# LiveEventBus [Github](https://github.com/JeremyLiao/LiveEventBus)
+jeremyliao-liveEventBus = { group = "io.github.jeremyliao", name = "live-event-bus", version.ref = "jeremyliao-liveEventBus" }
+
+# WebDAV 客户端 [Github](https://github.com/lookfirst/sardine)
+lookfirst-sardine = { group = "com.github.lookfirst", name = "sardine", version.ref = "lookfirst-sardine" }
+
+# WebDAV 客户端 [Github](https://github.com/thegrizzlylabs/sardine-android)
+thegrizzlylabs-sardine = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "thegrizzlylabs-sardine" }
+
+# 依赖组合
+[bundles]
+# Androidx 基本组合
+androidx-base = ["androidx-legacy", "androidx-appcompat", "androidx-core", "androidx-activity", "androidx-fragment"]
+# Androidx 基本组合 Kotlin 版本
+androidx-base-ktx = ["androidx-legacy", "androidx-appcompat", "androidx-core-ktx", "androidx-activity-ktx", "androidx-fragment-ktx"]
+# Androidx 基本控件组合
+androidx-widget = ["androidx-recyclerview", "androidx-constraintlayout", "google-material", "androidx-cardview"]
+# Androidx 生命周期组合
+androidx-lifecycle = ["androidx-lifecycle-runtime", "androidx-lifecycle-viewmodel", "androidx-lifecycle-livedata"]
+# Androidx 生命周期组合 Kotlin 版本
+androidx-lifecycle-ktx = ["androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-ktx", "androidx-lifecycle-livedata-ktx"]
+
+# 状态栏工具组合
+geyifeng-immersionbar = ["geyifeng-immersionbar", "geyifeng-immersionbar-ktx"]
+
+# 刷新控件组合
+scwang90-refresh = ["scwang90-refresh-layout", "scwang90-refresh-classics-header", "scwang90-refresh-classics-footer"]
+
+# 换肤组合
+skin-support = ["skin-support", "skin-support-appcompat", "skin-support-design", "skin-support-constraintlayout", "skin-support-cardview"]
+
+# 插件
+[plugins]
+# Android 应用
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+# Android 仓库
+android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+# Kotlin Android
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+# Kotlin kapt
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+# json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "google-devtools-ksp" }
+# protobuf [Github](https://github.com/protocolbuffers/protobuf)
+google-protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf-plugin" }
+# hilt [指南](https://dagger.dev/hilt)
+google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "google-hilt" }
+
+# 项目定义插件
+cashbook-jvm-library = { id = "cashbook.jvm.library", version = "unspecified" }
+cashbook-android-test = { id = "cashbook.android.test", version = "unspecified" }
+cashbook-android-hilt = { id = "cashbook.android.hilt", version = "unspecified" }
+cashbook-android-room = { id = "cashbook.android.room", version = "unspecified" }
+cashbook-android-application = { id = "cashbook.android.application", version = "unspecified" }
+cashbook-android-application-compose = { id = "cashbook.android.application.compose", version = "unspecified" }
+cashbook-android-application-jacoco = { id = "cashbook.android.application.jacoco", version = "unspecified" }
+cashbook-android-application-flavors = { id = "cashbook.android.application.flavors", version = "unspecified" }
+cashbook-android-library = { id = "cashbook.android.library", version = "unspecified" }
+cashbook-android-library-compose = { id = "cashbook.android.library.compose", version = "unspecified" }
+cashbook-android-library-jacoco = { id = "cashbook.android.library.jacoco", version = "unspecified" }
+cashbook-android-library-flavors = { id = "cashbook.android.library.flavors", version = "unspecified" }
+cashbook-android-library-feature = { id = "cashbook.android.library.feature", version = "unspecified" }
