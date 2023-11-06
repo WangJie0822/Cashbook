@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.compose.ui
+package cn.wj.android.cashbook.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

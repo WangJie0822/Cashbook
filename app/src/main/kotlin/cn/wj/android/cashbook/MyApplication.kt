@@ -1,10 +1,9 @@
 @file:Suppress("unused")
 
-package cn.wj.android.cashbook.compose
+package cn.wj.android.cashbook
 
 import android.app.Application
 import android.util.Log
-import cn.wj.android.cashbook.compose.BuildConfig
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.manager.AppManager

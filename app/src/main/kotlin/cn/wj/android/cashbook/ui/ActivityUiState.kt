@@ -1,4 +1,4 @@
-package cn.wj.android.cashbook.compose.ui
+package cn.wj.android.cashbook.ui
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.appcompat.app.AppCompatDelegate

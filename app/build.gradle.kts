@@ -14,7 +14,7 @@ plugins {
 
 android {
 
-    namespace = "cn.wj.android.cashbook.compose"
+    namespace = "cn.wj.android.cashbook"
 
     defaultConfig {
         // 应用 id
