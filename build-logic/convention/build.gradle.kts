@@ -74,9 +74,17 @@ gradlePlugin {
             id = "cashbook.android.application.flavors"
             implementationClass = "AndroidApplicationFlavorsConventionPlugin"
         }
+        register("androidApplicationGenerateFlavors") {
+            id = "cashbook.android.application.flavors.generate"
+            implementationClass = "AndroidApplicationGenerateFlavorsConventionPlugin"
+        }
         register("androidLibraryFlavors") {
             id = "cashbook.android.library.flavors"
             implementationClass = "AndroidLibraryFlavorsConventionPlugin"
+        }
+        register("androidLibraryGenerateFlavors") {
+            id = "cashbook.android.library.flavors.generate"
+            implementationClass = "AndroidLibraryGenerateFlavorsConventionPlugin"
         }
         register("jvmLibrary") {
             id = "cashbook.jvm.library"

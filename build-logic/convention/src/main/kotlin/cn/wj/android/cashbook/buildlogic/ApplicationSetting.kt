@@ -54,15 +54,3 @@ object ApplicationSetting {
 
 val JavaVersion.version: Int
     get() = ordinal + 1
-
-/** 拓展变量数据存储集合 */
-private val kvMap: HashMap<String, Any> = HashMap()
-
-/** 标记 - 是否生成枚举类文件 */
-var Project.generateFlavorFile: Boolean
-    get() {
-        return (kvMap["${this.name}-generateFlavorFileKey"] as? Boolean) ?: false
-    }
-    set(value) {
-        kvMap["${this.name}-generateFlavorFileKey"] = value
-    }

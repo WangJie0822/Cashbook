@@ -1,11 +1,7 @@
-import cn.wj.android.cashbook.buildlogic.generateFlavorFile
-
-generateFlavorFile = true
-
 plugins {
     alias(libs.plugins.cashbook.android.library)
     alias(libs.plugins.cashbook.android.library.jacoco)
-    alias(libs.plugins.cashbook.android.library.flavors)
+    alias(libs.plugins.cashbook.android.library.flavors.generate)
     alias(libs.plugins.cashbook.android.hilt)
 }
 

@@ -55,6 +55,12 @@ fun Project.configureFlavors(
     flavorConfigurationBlock: ProductFlavor.(flavor: CashbookFlavor) -> Unit = {}
 ) {
     commonExtension.apply {
+
+        if (this is BaseAppModuleExtension) {
+            // Application，配置签名
+            configureSigningConfigs(this)
+        }
+
         // 配置维度
         flavorDimensions += FlavorDimension.values().map { it.name }
         println("> Task :${project.name}:configureFlavors set dimensions: $flavorDimensions")
@@ -79,50 +85,27 @@ fun Project.configureFlavors(
                 }
             }
         }
-
-        println("> Task :${project.name}:configureFlavors generateFlavorFile: $generateFlavorFile")
-        if (this is BaseAppModuleExtension && generateFlavorFile) {
-            applicationVariants.all {
-                generateBuildConfigProvider?.get()?.let {
-                    it.doLast {
-                        println("> Task :${project.name}:afterGenerateBuildConfig generateFlavorFile-$generateFlavorFile")
-                        if (generateFlavorFile) {
-                            // 将枚举类生成到 BuildConfig 路径下
-                            val enumPath = it.sourceOutputDir.asFile.get().path
-                            val buildPkg = "${it.namespace.get()}.buildlogic"
-                            println("> Task :${project.name}:beforeGenerateBuildConfig:generateFlavor package-$buildPkg enumPath-$enumPath")
-                            generateFlavor(buildPkg, enumPath)
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
-/**
- * 配置多渠道
- *
- * - Library 使用，仅生成多渠道枚举类
- */
-fun Project.configureLibraryFlavors(
-    commonExtension: LibraryExtension
+fun Project.configureGenerateFlavors(
+    commonExtension: CommonExtension<*, *, *, *, *>,
 ) {
     commonExtension.apply {
-        libraryVariants.all {
-            println("> Task :${project.name}:configureLibraryFlavors generateFlavorFile: $generateFlavorFile")
-            if (generateFlavorFile) {
-                generateBuildConfigProvider?.get()?.let {
-                    it.doLast {
-                        println("> Task :${project.name}:afterGenerateBuildConfig generateFlavorFile-$generateFlavorFile")
-                        if (generateFlavorFile) {
-                            // 将枚举类生成到 BuildConfig 路径下
-                            val enumPath = it.sourceOutputDir.asFile.get().path
-                            val buildPkg = "${it.namespace.get()}.buildlogic"
-                            println("> Task :${project.name}:beforeGenerateBuildConfig:generateFlavor package-$buildPkg enumPath-$enumPath")
-                            generateFlavor(buildPkg, enumPath)
-                        }
-                    }
+        println("> Task :${project.name}:configureFlavors generateFlavorFile")
+        when (this) {
+            is BaseAppModuleExtension -> applicationVariants
+            is LibraryExtension -> libraryVariants
+            else -> null
+        }?.all {
+            generateBuildConfigProvider?.get()?.let {
+                it.doLast {
+                    println("> Task :${project.name}:afterGenerateBuildConfig generateFlavorFile")
+                    // 将枚举类生成到 BuildConfig 路径下
+                    val enumPath = it.sourceOutputDir.asFile.get().path
+                    val buildPkg = "${it.namespace.get()}.buildlogic"
+                    println("> Task :${project.name}:beforeGenerateBuildConfig:generateFlavor package-$buildPkg enumPath-$enumPath")
+                    generateFlavor(buildPkg, enumPath)
                 }
             }
         }
