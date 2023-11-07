@@ -31,6 +31,7 @@ import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -224,9 +225,19 @@ class EditRecordViewModel @Inject constructor(
             initialValue = ""
         )
 
+    private var amountSheetShowed = false
+
     /** 更新记录 [id]，刷新界面数据 */
     fun updateRecordId(id: Long) {
         _recordIdData.tryEmit(id)
+        if (id == -1L && !amountSheetShowed) {
+            // 新建，自动显示输入框
+            amountSheetShowed = true
+            viewModelScope.launch {
+                delay(1000L)
+                displayAmountSheet()
+            }
+        }
     }
 
     /** 更新记录大类为 [typeCategory] */
