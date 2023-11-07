@@ -20,8 +20,13 @@ object ApplicationInfo {
 
     var applicationId = ""
 
+    var debug = false
+
     val isDev: Boolean
         get() = flavor == CashbookFlavor.Dev
+
+    val isOffline: Boolean
+        get() = flavor == CashbookFlavor.Offline
 
     val infos: String
         get() = "${flavor.name},$isDev,$applicationId,$versionName,$dbVersion"

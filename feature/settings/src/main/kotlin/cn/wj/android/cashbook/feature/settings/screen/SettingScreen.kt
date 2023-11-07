@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
@@ -292,19 +293,22 @@ internal fun SettingContent(
         )
 
         LazyColumn {
-            item {
-                TransparentListItem(
-                    modifier = Modifier.padding(top = 16.dp),
-                    headlineContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
-                    trailingContent = {
-                        Switch(
-                            checked = uiState.mobileNetworkDownloadEnable,
-                            onCheckedChange = onMobileNetworkDownloadEnableChanged,
-                        )
-                    },
-                )
-                Divider(modifier = Modifier.padding(horizontal = 8.dp))
+            if (!ApplicationInfo.isOffline) {
+                item {
+                    TransparentListItem(
+                        modifier = Modifier.padding(top = 16.dp),
+                        headlineContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
+                        trailingContent = {
+                            Switch(
+                                checked = uiState.mobileNetworkDownloadEnable,
+                                onCheckedChange = onMobileNetworkDownloadEnableChanged,
+                            )
+                        },
+                    )
+                    Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                }
             }
+
             item {
                 TransparentListItem(
                     modifier = Modifier.padding(top = 16.dp),

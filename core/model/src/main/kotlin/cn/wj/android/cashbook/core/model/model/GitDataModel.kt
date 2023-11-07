@@ -10,6 +10,4 @@ data class GitDataModel(
     val latestVersionInfo: String,
     val latestApkName: String,
     val latestApkDownloadUrl: String,
-    val changelogData: String,
-    val privacyPolicyData: String,
 )

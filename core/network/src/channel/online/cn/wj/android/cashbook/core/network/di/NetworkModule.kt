@@ -35,7 +35,11 @@ object NetworkModule {
                 { message ->
                     funLogger("NET").d(message)
                 },
-                if (ApplicationInfo.isDev) LoggerInterceptor.LEVEL_BODY else LoggerInterceptor.LEVEL_NONE
+                if (ApplicationInfo.debug) {
+                    LoggerInterceptor.LEVEL_BODY
+                } else {
+                    LoggerInterceptor.LEVEL_NONE
+                }
             )
         )
         .build()

@@ -11,9 +11,11 @@ const val EMAIL_ADDRESS = "15555650921@163.com"
 
 /** Github 首页 */
 const val GITHUB_HOMEPAGE = "https://github.com/WangJie0822/Cashbook"
+const val GITHUB_LATEST = "https://github.com/WangJie0822/Cashbook/releases/latest"
 
 /** Gitee 首页 */
 const val GITEE_HOMEPAGE = "https://gitee.com/wangjie0822/Cashbook"
+const val GITEE_LATEST = "https://gitee.com/wangjie0822/Cashbook/releases/latest"
 
 /** Gitee 用户名 */
 const val GITEE_OWNER = "wangjie0822"

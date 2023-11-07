@@ -27,12 +27,12 @@ import org.jsoup.Jsoup
 class OkHttpWebDAVHandler @Inject constructor(
     private val callFactory: Call.Factory,
     @Dispatcher(CashbookDispatchers.IO) private val ioCoroutineContext: CoroutineContext,
-) {
+) : WebDAVHandler {
 
     private var account = ""
     private var password = ""
 
-    fun setCredentials(
+    override fun setCredentials(
         account: String,
         password: String,
     ) {
@@ -41,7 +41,7 @@ class OkHttpWebDAVHandler @Inject constructor(
     }
 
     @WorkerThread
-    fun exists(url: String): Boolean {
+    override fun exists(url: String): Boolean {
         if (url.isBlank()) {
             return false
         }
@@ -62,7 +62,7 @@ class OkHttpWebDAVHandler @Inject constructor(
     }
 
     @WorkerThread
-    fun createDirectory(url: String): Boolean {
+    override fun createDirectory(url: String): Boolean {
         if (url.isBlank()) {
             return false
         }
@@ -83,7 +83,7 @@ class OkHttpWebDAVHandler @Inject constructor(
     }
 
     @WorkerThread
-    fun put(url: String, dataStream: InputStream, contentType: String): Boolean {
+    override fun put(url: String, dataStream: InputStream, contentType: String): Boolean {
         if (url.isBlank()) {
             return false
         }
@@ -108,7 +108,7 @@ class OkHttpWebDAVHandler @Inject constructor(
     }
 
     @WorkerThread
-    fun put(url: String, file: File, contentType: String): Boolean {
+    override fun put(url: String, file: File, contentType: String): Boolean {
         if (url.isBlank()) {
             return false
         }
@@ -129,9 +129,9 @@ class OkHttpWebDAVHandler @Inject constructor(
     }
 
     @WorkerThread
-    suspend fun list(
+    override suspend fun list(
         url: String,
-        propsList: List<String> = emptyList()
+        propsList: List<String>,
     ): List<BackupModel> = withContext(ioCoroutineContext) {
         if (url.isBlank()) {
             return@withContext emptyList()
@@ -179,7 +179,7 @@ class OkHttpWebDAVHandler @Inject constructor(
     }
 
     @WorkerThread
-    suspend fun get(url: String): InputStream? = withContext(ioCoroutineContext) {
+    override suspend fun get(url: String): InputStream? = withContext(ioCoroutineContext) {
         if (url.isBlank()) {
             return@withContext null
         }

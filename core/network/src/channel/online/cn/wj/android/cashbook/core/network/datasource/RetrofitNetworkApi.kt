@@ -20,6 +20,12 @@ interface RetrofitNetworkApi {
         @Path("id") id: String
     ): GitReleaseEntity
 
+    @GET(UrlDefinition.GITEE_RELEASE_LIST)
+    suspend fun giteeQueryReleaseList(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+    ): List<GitReleaseEntity>
+
     /** 从 Gitee 中根据用户名 [owner] 仓库名 [repo] 获取 [path] 文件数据 */
     @GET(UrlDefinition.GITEE_FILE_CONTENTS)
     suspend fun giteeContents(
@@ -35,6 +41,12 @@ interface RetrofitNetworkApi {
         @Path("repo") repo: String,
         @Path("id") id: String
     ): GitReleaseEntity
+
+    @GET(UrlDefinition.GITHUB_RELEASE_LIST)
+    suspend fun githubQueryReleaseList(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+    ): List<GitReleaseEntity>
 
     /** 从 Github 中根据用户名 [owner] 仓库名 [repo] 获取 [path] 文件数据 */
     @GET(UrlDefinition.GITHUB_FILE_CONTENTS)

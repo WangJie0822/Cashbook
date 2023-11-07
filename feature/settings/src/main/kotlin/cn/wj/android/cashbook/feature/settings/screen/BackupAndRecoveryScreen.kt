@@ -9,6 +9,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.BACKUP_FILE_NAME
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_EMPTY
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_UNAUTHORIZED
@@ -384,65 +386,73 @@ internal fun BackupAndRecoveryScaffoldContent(
             .verticalScroll(state = rememberScrollState())
             .padding(vertical = 16.dp),
     ) {
-        Text(
-            text = stringResource(id = R.string.webdav_setting),
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 16.dp)
-        )
+        if (!ApplicationInfo.isOffline) {
+            Text(
+                text = stringResource(id = R.string.webdav_setting),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 16.dp)
+            )
 
-        CompatTextField(
-            textFieldState = webDAVDomainTextFieldState,
-            label = { Text(text = stringResource(id = R.string.webdav_domain)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .padding(horizontal = 16.dp),
-        )
-        CompatTextField(
-            textFieldState = webDAVAccountTextFieldState,
-            label = { Text(text = stringResource(id = R.string.webdav_account)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .padding(horizontal = 16.dp),
-        )
-        CompatPasswordTextField(
-            textFieldState = webDAVPasswordTextFieldState,
-            label = { Text(text = stringResource(id = R.string.webdav_password)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .padding(horizontal = 16.dp),
-        )
+            CompatTextField(
+                textFieldState = webDAVDomainTextFieldState,
+                label = { Text(text = stringResource(id = R.string.webdav_domain)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .padding(horizontal = 16.dp),
+            )
+            CompatTextField(
+                textFieldState = webDAVAccountTextFieldState,
+                label = { Text(text = stringResource(id = R.string.webdav_account)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .padding(horizontal = 16.dp),
+            )
+            CompatPasswordTextField(
+                textFieldState = webDAVPasswordTextFieldState,
+                label = { Text(text = stringResource(id = R.string.webdav_password)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .padding(horizontal = 16.dp),
+            )
 
-        FilledTonalButton(
-            onClick = {
-                if (webDAVDomainTextFieldState.isValid && webDAVAccountTextFieldState.isValid && webDAVPasswordTextFieldState.isValid) {
-                    // 参数可用
-                    onConnectStateClick(
-                        webDAVDomainTextFieldState.text,
-                        webDAVAccountTextFieldState.text,
-                        webDAVPasswordTextFieldState.text
+            FilledTonalButton(
+                onClick = {
+                    if (webDAVDomainTextFieldState.isValid && webDAVAccountTextFieldState.isValid && webDAVPasswordTextFieldState.isValid) {
+                        // 参数可用
+                        onConnectStateClick(
+                            webDAVDomainTextFieldState.text,
+                            webDAVAccountTextFieldState.text,
+                            webDAVPasswordTextFieldState.text
+                        )
+                    }
+                },
+                content = {
+                    Icon(
+                        imageVector = if (isConnected) CashbookIcons.CheckCircle else CashbookIcons.Error,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp),
                     )
-                }
-            },
-            content = {
-                Icon(
-                    imageVector = if (isConnected) CashbookIcons.CheckCircle else CashbookIcons.Error,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp),
-                )
-                Text(text = if (isConnected) "已连接" else "未连接")
-            },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(top = 8.dp, end = 16.dp),
-        )
+                    Text(text = if (isConnected) "已连接" else "未连接")
+                },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = 8.dp, end = 16.dp),
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp)
+            )
+        }
 
         Text(
             text = stringResource(id = R.string.backup_and_recovery),
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(top = 32.dp, start = 16.dp),
+            modifier = Modifier.padding(start = 16.dp),
         )
 
         val context = LocalContext.current
@@ -478,7 +488,17 @@ internal fun BackupAndRecoveryScaffoldContent(
         )
         TransparentListItem(
             headlineContent = { Text(text = stringResource(id = R.string.backup)) },
-            supportingContent = { Text(text = stringResource(id = R.string.backup_hint)) },
+            supportingContent = {
+                Text(
+                    text = stringResource(
+                        id = if (ApplicationInfo.isOffline) {
+                            R.string.backup_hint_offline
+                        } else {
+                            R.string.backup_hint
+                        }
+                    )
+                )
+            },
             modifier = Modifier.clickable {
                 if (uiState.backupPath.isBlank()) {
                     // 未设置备份路径，选择备份路径后进行备份
@@ -498,7 +518,17 @@ internal fun BackupAndRecoveryScaffoldContent(
             }
             TransparentListItem(
                 headlineContent = { Text(text = stringResource(id = R.string.recovery)) },
-                supportingContent = { Text(text = stringResource(id = R.string.recovery_hint)) },
+                supportingContent = {
+                    Text(
+                        text = stringResource(
+                            id = if (ApplicationInfo.isOffline) {
+                                R.string.recovery_hint_offline
+                            } else {
+                                R.string.recovery_hint
+                            }
+                        )
+                    )
+                },
                 modifier = Modifier.combinedClickable(onClick = {
                     onRecoveryClick(false, "")
                 }, onLongClick = {
@@ -507,7 +537,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             )
             DropdownMenu(expanded = expended, onDismissRequest = { expended = false }) {
                 DropdownMenuItem(
-                    text = { Text(text = "从备份路径恢复") },
+                    text = { Text(text = stringResource(id = R.string.recovery_from_backup_path)) },
                     onClick = {
                         expended = false
                         if (uiState.backupPath.isBlank()) {
@@ -523,7 +553,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text(text = "从自定义路径恢复") },
+                    text = { Text(text = stringResource(id = R.string.recovery_from_custom_path)) },
                     onClick = {
                         expended = false
                         // 选择自定义路径后恢复

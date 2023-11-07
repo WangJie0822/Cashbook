@@ -1,13 +1,29 @@
+import cn.wj.android.cashbook.buildlogic.CashbookFlavor
+
 plugins {
     alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.flavors)
     alias(libs.plugins.cashbook.android.library.jacoco)
     alias(libs.plugins.cashbook.android.hilt)
 }
 
 android {
     namespace = "cn.wj.android.cashbook.sync"
-}
 
+    sourceSets {
+        @Suppress("EnumValuesSoftDeprecate")
+        CashbookFlavor.values().forEach { flavor ->
+            val srcDir = if (flavor == CashbookFlavor.Offline) {
+                // 离线渠道
+                "src/channel/offline"
+            } else {
+                // 在线渠道
+                "src/channel/online"
+            }
+            getByName(flavor.name).java.srcDirs(srcDir)
+        }
+    }
+}
 
 dependencies {
 
@@ -27,5 +43,6 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
 
     // okhttp
-    implementation(libs.squareup.okhttp3)
+    OnlineImplementation(libs.squareup.okhttp3)
+    DevImplementation(libs.squareup.okhttp3)
 }

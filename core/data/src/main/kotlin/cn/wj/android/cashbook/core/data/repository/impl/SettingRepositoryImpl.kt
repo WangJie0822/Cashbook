@@ -1,5 +1,6 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
+import android.content.Context
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
@@ -9,10 +10,13 @@ import cn.wj.android.cashbook.core.datastore.datasource.GitInfosDataSource
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
-import cn.wj.android.cashbook.core.network.datasource.NetworkDataSource
+import cn.wj.android.cashbook.core.network.datasource.RemoteDataSource
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.InputStreamReader
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +31,8 @@ import kotlinx.coroutines.withContext
 class SettingRepositoryImpl @Inject constructor(
     private val appPreferencesDataSource: AppPreferencesDataSource,
     private val gitInfosDataSource: GitInfosDataSource,
-    private val networkDataSource: NetworkDataSource,
+    private val remoteDataSource: RemoteDataSource,
+    @ApplicationContext private val context: Context,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : SettingRepository {
 
@@ -116,40 +121,16 @@ class SettingRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun syncChangelog(): Boolean = withContext(coroutineContext) {
-        try {
-            val content =
-                networkDataSource.getChangelog(!appPreferencesDataSource.appData.first().useGithub)
-            gitInfosDataSource.updateChangelogData(content.content)
-            true
-        } catch (throwable: Throwable) {
-            this@SettingRepositoryImpl.logger().e(throwable, "syncChangelog()")
-            false
-        }
-    }
-
-    override suspend fun syncPrivacyPolicy(): Boolean = withContext(coroutineContext) {
-        try {
-            val content =
-                networkDataSource.getPrivacyPolicy(!appPreferencesDataSource.appData.first().useGithub)
-            gitInfosDataSource.updatePrivacyPolicyData(content.content)
-            true
-        } catch (throwable: Throwable) {
-            this@SettingRepositoryImpl.logger().e(throwable, "syncPrivacyPolicy()")
-            false
-        }
-    }
-
     override suspend fun syncLatestVersion(): Boolean = withContext(coroutineContext) {
         try {
             val release =
-                networkDataSource.checkUpdate(!appPreferencesDataSource.appData.first().useGithub)
-            val asset = release.assets?.firstOrNull {
-                it.name?.endsWith(".apk") ?: false
+                remoteDataSource.checkUpdate(!appPreferencesDataSource.appData.first().useGithub)
+            val asset = release?.assets?.firstOrNull {
+                it.name?.endsWith("online.apk") ?: false
             }
             gitInfosDataSource.updateLatestVersionData(
-                release.name.orEmpty(),
-                release.body.orEmpty(),
+                release?.name.orEmpty(),
+                release?.body.orEmpty(),
                 asset?.name.orEmpty(),
                 asset?.downloadUrl.orEmpty()
             )
@@ -185,5 +166,30 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) =
         withContext(coroutineContext) {
             appPreferencesDataSource.updateKeepLatestBackup(keepLatestBackup)
+        }
+
+    override suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String =
+        withContext(coroutineContext) {
+            when (type) {
+                MarkdownTypeEnum.CHANGELOG -> {
+                    context.assets.open("CHANGELOG.md").use { `is` ->
+                        InputStreamReader(`is`).use { isr ->
+                            isr.readText()
+                        }
+                    }
+                }
+
+                MarkdownTypeEnum.PRIVACY_POLICY -> {
+                    context.assets.open("PRIVACY_POLICY.md").use { `is` ->
+                        InputStreamReader(`is`).use { isr ->
+                            isr.readText()
+                        }
+                    }
+                }
+
+                else -> {
+                    "No selected type"
+                }
+            }
         }
 }

@@ -12,9 +12,6 @@ const val SHORTCUTS_RECORD = "cn.wj.android.cashbook.record"
 /** 快捷方式 - 资产 */
 const val SHORTCUTS_ASSET = "cn.wj.android.cashbook.asset"
 
-/** 重试同步 */
-const val SERVICE_ACTION_RETRY = "cn.wj.android.cashbook.sync.RETRY"
-
 /** 取消下载 */
 const val SERVICE_ACTION_CANCEL_DOWNLOAD = "cn.wj.android.cashbook.upgrade.CANCEL_DOWNLOAD"
 

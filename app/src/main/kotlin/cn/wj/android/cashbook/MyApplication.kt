@@ -29,6 +29,7 @@ class MyApplication : Application() {
         ApplicationInfo.setFlavor(BuildConfig.FLAVOR)
         ApplicationInfo.applicationId = BuildConfig.APPLICATION_ID
         ApplicationInfo.versionName = BuildConfig.VERSION_NAME
+        ApplicationInfo.debug = BuildConfig.DEBUG
 
         // 注册应用管理
         AppManager.register(this)

@@ -6,15 +6,6 @@
         android:supportsRtl="true">
 
         <service
-            android:name=".service.SyncService"
-            android:exported="false">
-
-            <intent-filter>
-                <action android:name="cn.wj.android.cashbook.sync.RETRY" />
-            </intent-filter>
-        </service>
-
-        <service
             android:name=".service.UpgradeService"
             android:exported="false">
 

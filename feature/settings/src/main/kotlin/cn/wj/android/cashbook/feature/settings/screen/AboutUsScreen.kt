@@ -1,6 +1,7 @@
 package cn.wj.android.cashbook.feature.settings.screen
 
 import android.text.Spanned
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -28,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,7 +40,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.EMAIL_ADDRESS
 import cn.wj.android.cashbook.core.common.GITEE_HOMEPAGE
+import cn.wj.android.cashbook.core.common.GITEE_LATEST
 import cn.wj.android.cashbook.core.common.GITHUB_HOMEPAGE
+import cn.wj.android.cashbook.core.common.GITHUB_LATEST
 import cn.wj.android.cashbook.core.common.tools.jumpBrowser
 import cn.wj.android.cashbook.core.common.tools.jumpSendEmail
 import cn.wj.android.cashbook.core.design.component.CashbookScaffold
@@ -200,17 +203,19 @@ internal fun AboutUsScreen(
                     onDismissClick = onRequestDismissNoWifiUpdateDialog,
                 )
             }
+            val pleaseSelectWebBrowserText = stringResource(id = R.string.please_select_web_browser)
             val currentContext = LocalContext.current
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 item {
-                    Icon(
-                        modifier = Modifier.padding(top = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_notification),
+                    Image(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(top = 16.dp),
+                        painter = painterResource(id = R.drawable.ic_launcher),
                         contentDescription = null,
-                        tint = Color.Unspecified,
                     )
                 }
                 item {
@@ -246,8 +251,6 @@ internal fun AboutUsScreen(
                     )
                 }
                 item {
-                    val pleaseSelectWebBrowserText =
-                        stringResource(id = R.string.please_select_web_browser)
                     Row(
                         modifier = Modifier.padding(bottom = 8.dp),
                     ) {
@@ -313,20 +316,32 @@ internal fun AboutUsScreen(
                             }
                         },
                     )
-                    // 自动检查更新
-                    TransparentListItem(
-                        headlineContent = { Text(text = stringResource(id = R.string.auto_check_update)) },
-                        trailingContent = {
-                            Switch(
-                                checked = uiState.autoCheckUpdate,
-                                onCheckedChange = onAutoCheckUpdateSwitch,
-                            )
-                        },
-                    )
+                    if (!ApplicationInfo.isOffline) {
+                        // 自动检查更新
+                        TransparentListItem(
+                            headlineContent = { Text(text = stringResource(id = R.string.auto_check_update)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = uiState.autoCheckUpdate,
+                                    onCheckedChange = onAutoCheckUpdateSwitch,
+                                )
+                            },
+                        )
+                    }
                     // 检查更新
                     val checkUpdateEnable = !inRequestUpdateData
                     val checkUpdateModifier = if (checkUpdateEnable) {
-                        Modifier.clickable { onCheckUpdateClick.invoke() }
+                        Modifier.clickable {
+                            if (ApplicationInfo.isOffline) {
+                                jumpBrowser(
+                                    url = if (uiState.useGitee) GITEE_LATEST else GITHUB_LATEST,
+                                    chooserTitle = pleaseSelectWebBrowserText,
+                                    context = currentContext,
+                                )
+                            } else {
+                                onCheckUpdateClick()
+                            }
+                        }
                     } else {
                         Modifier
                     }

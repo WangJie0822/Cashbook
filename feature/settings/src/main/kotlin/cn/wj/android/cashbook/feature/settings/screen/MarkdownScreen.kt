@@ -1,16 +1,11 @@
 package cn.wj.android.cashbook.feature.settings.screen
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,7 +42,6 @@ fun MarkdownRoute(
     }
 ) {
 
-    val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
     val markdownData by viewModel.markdownData.collectAsStateWithLifecycle()
 
     MarkdownScreen(
@@ -56,9 +50,7 @@ fun MarkdownRoute(
             MarkdownTypeEnum.PRIVACY_POLICY -> stringResource(id = R.string.user_agreement_and_privacy_policy)
             else -> stringResource(id = R.string.unknown_type)
         },
-        isSyncing = isSyncing,
         markdownData = markdownData,
-        onRetryClick = viewModel::onRetryClick,
         onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
@@ -68,18 +60,14 @@ fun MarkdownRoute(
  * Markdown 显示界面
  *
  * @param title 标题文本
- * @param isSyncing 数据是否正在同步
  * @param markdownData Markdown 显示数据
- * @param onRetryClick 重试点击回调
  * @param onBackClick 返回点击回调
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MarkdownScreen(
     title: String,
-    isSyncing: Boolean,
     markdownData: String,
-    onRetryClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -98,18 +86,6 @@ internal fun MarkdownScreen(
                 if (markdownData.isBlank()) {
                     Empty(
                         hintText = stringResource(id = R.string.markdown_no_data_hint),
-                        button = {
-                            FilledTonalButton(onClick = onRetryClick) {
-                                if (isSyncing) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .size(16.dp),
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                                Text(text = stringResource(id = R.string.retry))
-                            }
-                        },
                         modifier = Modifier.align(Alignment.TopCenter),
                     )
                 } else {

@@ -3,6 +3,7 @@ package cn.wj.android.cashbook.core.data.repository
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
@@ -60,10 +61,6 @@ interface SettingRepository {
     /** 检查更新 */
     suspend fun checkUpdate(): UpgradeInfoEntity
 
-    suspend fun syncChangelog(): Boolean
-
-    suspend fun syncPrivacyPolicy(): Boolean
-
     suspend fun syncLatestVersion(): Boolean
 
     suspend fun updateWebDAV(domain: String, account: String, password: String)
@@ -75,4 +72,6 @@ interface SettingRepository {
     suspend fun updateAutoBackupMode(autoBackupMode: AutoBackupModeEnum)
 
     suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean)
+
+    suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String
 }

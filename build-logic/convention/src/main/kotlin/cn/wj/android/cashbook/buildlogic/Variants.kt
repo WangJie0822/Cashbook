@@ -38,8 +38,11 @@ enum class CashbookFlavor(
     val applicationIdSuffix: String?,
     val versionNameSuffix: String?,
 ) {
-    /** 正式渠道 */
+    /** 在线渠道，需要网络请求 */
     Online(FlavorDimension.ContentType, Signing.Android, null, "_online"),
+
+    /** 离线渠道，无网络请求 */
+    Offline(FlavorDimension.ContentType, Signing.Android, null, "_offline"),
 
     /** 开发渠道 */
     Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev")
@@ -71,7 +74,7 @@ fun Project.configureFlavors(
                 create(it.name) {
                     dimension = it.dimension.name
                     flavorConfigurationBlock(this, it)
-                    if (this is ApplicationProductFlavor) {
+                    if (this@apply is BaseAppModuleExtension && this is ApplicationProductFlavor) {
                         it.applicationIdSuffix?.let { suffix ->
                             applicationIdSuffix = suffix
                         }

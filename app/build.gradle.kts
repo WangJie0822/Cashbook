@@ -50,11 +50,28 @@ android {
     }
 
     productFlavors {
-        getByName(CashbookFlavor.Dev.name) {
-            resValue("string", "app_name", "@string/app_name_dev")
-        }
-        getByName(CashbookFlavor.Online.name) {
-            resValue("string", "app_name", "@string/app_name_online")
+        @Suppress("EnumValuesSoftDeprecate")
+        CashbookFlavor.values().forEach { flavor ->
+            val value = if (flavor == CashbookFlavor.Dev) {
+                "@string/app_name_dev"
+            } else {
+                "@string/app_name_online"
+            }
+            val manifestPlaceholdersMap = if (flavor == CashbookFlavor.Offline) {
+                mapOf(
+                    "PERMISSION_1" to "NO_REQUEST_1",
+                    "PERMISSION_2" to "NO_REQUEST_2",
+                )
+            } else {
+                mapOf(
+                    "PERMISSION_1" to "android.permission.INTERNET",
+                    "PERMISSION_2" to "android.permission.ACCESS_NETWORK_STATE",
+                )
+            }
+            getByName(flavor.name) {
+                resValue("string", "app_name", value)
+                addManifestPlaceholders(manifestPlaceholdersMap)
+            }
         }
     }
 

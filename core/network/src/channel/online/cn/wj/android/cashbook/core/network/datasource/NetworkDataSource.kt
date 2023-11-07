@@ -1,11 +1,9 @@
 package cn.wj.android.cashbook.core.network.datasource
 
-import cn.wj.android.cashbook.core.common.CHANGELOG_FILE_PATH
 import cn.wj.android.cashbook.core.common.GITEE_OWNER
 import cn.wj.android.cashbook.core.common.GITHUB_OWNER
-import cn.wj.android.cashbook.core.common.PRIVACY_POLICY_FILE_PATH
 import cn.wj.android.cashbook.core.common.REPO_NAME
-import cn.wj.android.cashbook.core.network.entity.GitContentsEntity
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Inject
@@ -24,7 +22,7 @@ import retrofit2.Retrofit
 class NetworkDataSource @Inject constructor(
     networkJson: Json,
     okhttpCallFactory: Call.Factory,
-) {
+) : RemoteDataSource {
 
     /** 网络请求接口 */
     private val networkApi = Retrofit.Builder()
@@ -37,27 +35,17 @@ class NetworkDataSource @Inject constructor(
         .create(RetrofitNetworkApi::class.java)
 
     /** 根据是否使用 gitee [useGitee] 从不同数据源检查更新 */
-    suspend fun checkUpdate(useGitee: Boolean): GitReleaseEntity {
-        return if (useGitee) {
-            networkApi.giteeQueryRelease(GITEE_OWNER, REPO_NAME, "latest")
+    override suspend fun checkUpdate(useGitee: Boolean): GitReleaseEntity? {
+        val result = if (useGitee) {
+            networkApi.giteeQueryReleaseList(GITEE_OWNER, REPO_NAME)
         } else {
-            networkApi.githubQueryRelease(GITHUB_OWNER, REPO_NAME, "latest")
+            networkApi.githubQueryReleaseList(GITHUB_OWNER, REPO_NAME)
         }
-    }
-
-    suspend fun getChangelog(useGitee: Boolean): GitContentsEntity {
-        return getFileContent(useGitee, CHANGELOG_FILE_PATH)
-    }
-
-    suspend fun getPrivacyPolicy(useGitee: Boolean): GitContentsEntity {
-        return getFileContent(useGitee, PRIVACY_POLICY_FILE_PATH)
-    }
-
-    private suspend fun getFileContent(useGitee: Boolean, filePath: String): GitContentsEntity {
-        return if (useGitee) {
-            networkApi.giteeContents(GITEE_OWNER, REPO_NAME, filePath)
-        } else {
-            networkApi.githubContents(GITHUB_OWNER, REPO_NAME, filePath)
-        }
+        logger().i("checkUpdate(useGitee = <$useGitee>), result = <$result>")
+        val release = result.filter { it.name?.startsWith("Release") ?: false }
+            .sortedBy { it.id }
+            .firstOrNull()
+        logger().i("checkUpdate(useGitee = <$useGitee>), release = <$release>")
+        return release
     }
 }

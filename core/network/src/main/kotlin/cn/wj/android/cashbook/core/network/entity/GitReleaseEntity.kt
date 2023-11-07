@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class GitReleaseEntity(
+    val id: Long? = null,
     val name: String? = null,
     val body: String? = null,
     val assets: List<GitReleaseAssetEntity>? = null

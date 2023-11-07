@@ -25,18 +25,8 @@ class GitInfosDataSource @Inject constructor(
                 latestVersionInfo = it.latestVersionInfo,
                 latestApkName = it.latestApkName,
                 latestApkDownloadUrl = it.latestApkDownloadUrl,
-                changelogData = it.changelogData,
-                privacyPolicyData = it.privacyPolicyData,
             )
         }
-
-    suspend fun updateChangelogData(data: String) {
-        gitInfos.updateData { it.copy { this.changelogData = data } }
-    }
-
-    suspend fun updatePrivacyPolicyData(data: String) {
-        gitInfos.updateData { it.copy { this.privacyPolicyData = data } }
-    }
 
     suspend fun updateLatestVersionData(
         latestVersionName: String,

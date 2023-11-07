@@ -102,16 +102,18 @@ class AboutUsViewModel @Inject constructor(
                     return@launch
                 }
                 inRequestUpdateData = true
-                val upgradeInfoEntity = settingRepository.checkUpdate()
-                checkUpgradeFromInfo(
-                    info = upgradeInfoEntity,
-                    need = {
-                        _updateInfoData.tryEmit(upgradeInfoEntity)
-                    },
-                    noNeed = {
-                        shouldDisplayBookmark = AboutUsBookmarkEnum.NO_NEED_UPDATE
-                    },
-                )
+                if (settingRepository.syncLatestVersion()) {
+                    val upgradeInfoEntity = settingRepository.checkUpdate()
+                    checkUpgradeFromInfo(
+                        info = upgradeInfoEntity,
+                        need = {
+                            _updateInfoData.tryEmit(upgradeInfoEntity)
+                        },
+                        noNeed = {
+                            shouldDisplayBookmark = AboutUsBookmarkEnum.NO_NEED_UPDATE
+                        },
+                    )
+                }
             } catch (throwable: Throwable) {
                 logger().e(throwable, "checkUpdate()")
             } finally {
@@ -167,7 +169,11 @@ class AboutUsViewModel @Inject constructor(
         shouldDisplayBookmark = AboutUsBookmarkEnum.NONE
     }
 
-    private fun checkUpgradeFromInfo(info: UpgradeInfoEntity, need: () -> Unit, noNeed: () -> Unit) {
+    private fun checkUpgradeFromInfo(
+        info: UpgradeInfoEntity,
+        need: () -> Unit,
+        noNeed: () -> Unit
+    ) {
         logger().d("checkFromInfo info: $info")
         if (ApplicationInfo.isDev) {
             // Dev 环境，永远提示更新

@@ -1,5 +1,8 @@
+import cn.wj.android.cashbook.buildlogic.CashbookFlavor
+
 plugins {
     alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.flavors)
     alias(libs.plugins.cashbook.android.library.jacoco)
     alias(libs.plugins.cashbook.android.hilt)
     alias(libs.plugins.kotlin.serialization)
@@ -7,6 +10,20 @@ plugins {
 
 android {
     namespace = "cn.wj.android.cashbook.core.network"
+
+    sourceSets {
+        @Suppress("EnumValuesSoftDeprecate")
+        CashbookFlavor.values().forEach { flavor ->
+            val srcDir = if (flavor == CashbookFlavor.Offline) {
+                // 离线渠道
+                "src/channel/offline"
+            } else {
+                // 在线渠道
+                "src/channel/online"
+            }
+            getByName(flavor.name).java.srcDirs(srcDir)
+        }
+    }
 }
 
 dependencies {
@@ -20,11 +37,14 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // OkHttp
-    implementation(libs.squareup.okhttp3)
+    OnlineImplementation(libs.squareup.okhttp3)
+    DevImplementation(libs.squareup.okhttp3)
 
     // Retrofit
-    implementation(libs.squareup.retrofit2)
-    implementation(libs.jakewharton.retrofit2.converter.kotlin)
+    OnlineImplementation(libs.squareup.retrofit2)
+    OnlineImplementation(libs.jakewharton.retrofit2.converter.kotlin)
+    DevImplementation(libs.squareup.retrofit2)
+    DevImplementation(libs.jakewharton.retrofit2.converter.kotlin)
 
     // HTML 解析
     implementation(libs.jsoup)

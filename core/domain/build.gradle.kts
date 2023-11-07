@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.cashbook.android.library)
+    alias(libs.plugins.cashbook.android.library.flavors)
     alias(libs.plugins.cashbook.android.library.jacoco)
     alias(libs.plugins.cashbook.android.hilt)
 }

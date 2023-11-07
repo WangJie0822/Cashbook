@@ -46,11 +46,14 @@ class InitWorker @AssistedInject constructor(
         settingRepository.appDataMode.first().let { appDateModel ->
             WorkManager.getInstance(appContext).apply {
                 // 执行数据同步
-                enqueueUniquePeriodicWork(
-                    SyncWorkName,
-                    ExistingPeriodicWorkPolicy.UPDATE,
-                    SyncWorker.startUpPeriodicSyncWork(),
-                )
+                if (appDateModel.autoCheckUpdate) {
+                    // 自动检测更新
+                    enqueueUniquePeriodicWork(
+                        SyncWorkName,
+                        ExistingPeriodicWorkPolicy.UPDATE,
+                        SyncWorker.startUpPeriodicSyncWork(),
+                    )
+                }
                 // 自动备份
                 when (appDateModel.autoBackup) {
                     AutoBackupModeEnum.WHEN_LAUNCH -> {

@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
@@ -44,8 +42,6 @@ class SyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         this@SyncWorker.logger().i("doWork(), sync data")
         val syncedSuccessfully = awaitAll(
-            async { settingRepository.syncChangelog() },
-            async { settingRepository.syncPrivacyPolicy() },
             async { settingRepository.syncLatestVersion() },
         ).all { it }
         if (syncedSuccessfully) {
@@ -65,15 +61,8 @@ class SyncWorker @AssistedInject constructor(
 
     companion object {
 
-        /** 使用代理任务启动同步任务，以支持依赖注入 */
-        fun startUpOneTimeSyncWork() = OneTimeWorkRequestBuilder<DelegatingWorker>()
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setConstraints(NetworkConstraints)
-            .setInputData(SyncWorker::class.delegatedData())
-            .build()
-
         fun startUpPeriodicSyncWork() =
-            PeriodicWorkRequestBuilder<DelegatingWorker>(Duration.ofDays(15))
+            PeriodicWorkRequestBuilder<DelegatingWorker>(Duration.ofDays(1))
                 .setConstraints(NetworkConstraints)
                 .setInputData(SyncWorker::class.delegatedData())
                 .build()

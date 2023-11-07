@@ -34,7 +34,7 @@ import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
 import cn.wj.android.cashbook.core.model.model.BackupModel
-import cn.wj.android.cashbook.core.network.util.OkHttpWebDAVHandler
+import cn.wj.android.cashbook.core.network.util.WebDAVHandler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
@@ -64,7 +64,7 @@ import kotlinx.coroutines.withContext
 class BackupRecoveryManager @Inject constructor(
     networkMonitor: NetworkMonitor,
     private val settingRepository: SettingRepository,
-    private val okHttpWebDAVHandler: OkHttpWebDAVHandler,
+    private val webDAVHandler: WebDAVHandler,
     private val database: CashbookDatabase,
     @ApplicationContext private val context: Context,
     @Dispatcher(CashbookDispatchers.IO) private val ioCoroutineContext: CoroutineContext,
@@ -95,7 +95,7 @@ class BackupRecoveryManager @Inject constructor(
 
     private val onlineBackupListData = combine(connectedDataVersion, backupDataVersion) { _, _ ->
         val appDataMode = settingRepository.appDataMode.first()
-        okHttpWebDAVHandler.list(appDataMode.webDAVDomain.backupPath)
+        webDAVHandler.list(appDataMode.webDAVDomain.backupPath)
     }
 
     private val localBackupListData = settingRepository.appDataMode.mapLatest { appDataModel ->
@@ -298,11 +298,11 @@ class BackupRecoveryManager @Inject constructor(
 
 
     private suspend fun <T> withCredentials(
-        block: suspend OkHttpWebDAVHandler.(String) -> T
+        block: suspend WebDAVHandler.(String) -> T
     ): T = withContext(ioCoroutineContext) {
         val appDataMode = settingRepository.appDataMode.first()
-        okHttpWebDAVHandler.setCredentials(appDataMode.webDAVAccount, appDataMode.webDAVPassword)
-        okHttpWebDAVHandler.block(appDataMode.webDAVDomain.backupPath)
+        webDAVHandler.setCredentials(appDataMode.webDAVAccount, appDataMode.webDAVPassword)
+        webDAVHandler.block(appDataMode.webDAVDomain.backupPath)
     }
 
     private suspend fun startBackup(backupPath: String) {
