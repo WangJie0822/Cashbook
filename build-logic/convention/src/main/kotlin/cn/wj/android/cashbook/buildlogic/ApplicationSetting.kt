@@ -24,7 +24,7 @@ object ApplicationSetting {
         val versionCode = generateVersionCode()
 
         /** 版本名，大版本号+版本号 */
-        val versionName = "v1.0.0_$versionCode"
+        val versionName = "v1.0.1_$versionCode"
 
         /** 源码 jdk 版本 */
         val javaVersion = JavaVersion.VERSION_11
