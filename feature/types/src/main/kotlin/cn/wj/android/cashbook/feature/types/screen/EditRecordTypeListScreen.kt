@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
+import cn.wj.android.cashbook.core.design.theme.fixedContainerColorFor
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -188,7 +188,7 @@ internal fun TypeItem(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // 根据选中状态显示主要颜色
-        val color = if (selected) typeColor else LocalContentColor.current.copy(alpha = 0.5f)
+        val color = if (selected) typeColor else fixedContainerColorFor(color = typeColor)
         // 记录类型对应的图标，使用圆形边框
         TypeIcon(
             painter = iconPainter,
@@ -198,7 +198,6 @@ internal fun TypeItem(
         // 类型名称
         Text(
             text = title,
-            color = color,
             style = MaterialTheme.typography.labelMedium,
         )
     }

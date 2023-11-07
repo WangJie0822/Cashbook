@@ -13,6 +13,14 @@ val RecordTypeCategoryEnum.typeColor: Color
         RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
         RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
     }
+
+val RecordTypeCategoryEnum.typeContainerColor: Color
+    @Composable get() = when (this) {
+        RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.expenditure
+        RecordTypeCategoryEnum.INCOME -> LocalExtendedColors.current.income
+        RecordTypeCategoryEnum.TRANSFER -> LocalExtendedColors.current.transfer
+    }
+
 val RecordTypeCategoryEnum.onTypeColor: Color
     @Composable get() = when (this) {
         RecordTypeCategoryEnum.EXPENDITURE -> LocalExtendedColors.current.onExpenditure

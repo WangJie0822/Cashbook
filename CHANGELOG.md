@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Changed
+- 编辑记录界面，类型图标颜色调整，优化辨识度；
 
 ## [1.0.0_23110616]
 ### Changed
