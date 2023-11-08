@@ -16,10 +16,12 @@
 
 package cn.wj.android.cashbook.core.network.datasource
 
+import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.core.network.entity.GitContentsEntity
 import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 /**
  * Retrofit 网络请求接口
@@ -40,6 +42,9 @@ interface RetrofitNetworkApi {
     suspend fun giteeQueryReleaseList(
         @Path("owner") owner: String,
         @Path("repo") repo: String,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = DEFAULT_PAGE_SIZE,
+        @Query("direction") direction: String = "desc",
     ): List<GitReleaseEntity>
 
     /** 从 Gitee 中根据用户名 [owner] 仓库名 [repo] 获取 [path] 文件数据 */
@@ -62,6 +67,9 @@ interface RetrofitNetworkApi {
     suspend fun githubQueryReleaseList(
         @Path("owner") owner: String,
         @Path("repo") repo: String,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = DEFAULT_PAGE_SIZE,
+        @Query("direction") direction: String = "desc",
     ): List<GitReleaseEntity>
 
     /** 从 Github 中根据用户名 [owner] 仓库名 [repo] 获取 [path] 文件数据 */

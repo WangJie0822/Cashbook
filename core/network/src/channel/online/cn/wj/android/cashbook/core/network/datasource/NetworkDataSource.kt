@@ -58,9 +58,7 @@ class NetworkDataSource @Inject constructor(
             networkApi.githubQueryReleaseList(GITHUB_OWNER, REPO_NAME)
         }
         logger().i("checkUpdate(useGitee = <$useGitee>), result = <$result>")
-        val release = result.filter { it.name?.startsWith("Release") ?: false }
-            .sortedBy { it.id }
-            .firstOrNull()
+        val release = result.firstOrNull { it.name?.startsWith("Release") ?: false }
         logger().i("checkUpdate(useGitee = <$useGitee>), release = <$release>")
         return release
     }

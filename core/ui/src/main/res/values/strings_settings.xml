@@ -29,7 +29,7 @@
     <string name="github">Github</string>
     <string name="gitee">Gitee</string>
     <string name="switch_data_source">切换数据源</string>
-    <string name="data_source_hint">从不同的数据源获取版本、变更信息</string>
+    <string name="data_source_hint">从不同的数据源获取升级信息</string>
     <string name="auto_check_update">自动检查更新</string>
     <string name="check_update">检查更新</string>
     <string name="it_is_the_latest_version">已是最新版本</string>

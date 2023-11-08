@@ -203,7 +203,7 @@ internal fun AboutUsScreen(
             // 升级提示弹窗
             if (null != shouldDisplayUpdateDialog) {
                 val content = Markwon.create(LocalContext.current)
-                    .toMarkdown(shouldDisplayUpdateDialog.versionInfo)
+                    .toMarkdown(shouldDisplayUpdateDialog.displayVersionInfo)
                 UpdateHintDialog(
                     content = content,
                     ignoreUpdateVersion = uiState.ignoreUpdateVersion,

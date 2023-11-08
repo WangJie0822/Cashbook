@@ -31,4 +31,13 @@ data class UpgradeInfoEntity(
     val versionInfo: String,
     val apkName: String,
     val downloadUrl: String,
-)
+) {
+    val displayVersionInfo: String
+        get() = with(StringBuilder()) {
+            append("# ")
+            appendLine(versionName)
+            appendLine()
+            appendLine(versionInfo)
+            toString()
+        }
+}

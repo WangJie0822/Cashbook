@@ -57,7 +57,7 @@ const val NOTIFICATION_ID_UPDATE = 2021
 const val NOTIFICATION_ID_UPDATE_ERROR = 2022
 
 /** 默认 - 每页数据 */
-const val DEFAULT_PAGE_SIZE = 20
+const val DEFAULT_PAGE_SIZE = 50
 
 /** 备份文件夹 */
 const val BACKUP_DIR_NAME = "Cashbook_Backup"
