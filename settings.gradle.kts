@@ -33,8 +33,10 @@ dependencyResolutionManagement {
     // 配置 Version Catalogs
     versionCatalogs {
         // 签名配置信息
-        create("signingLibs") {
-            from(files("./gradle/signing.versions.toml"))
+        if (File("./gradle/signing.versions.toml").exists()) {
+            create("signingLibs") {
+                from(files("./gradle/signing.versions.toml"))
+            }
         }
     }
 }
