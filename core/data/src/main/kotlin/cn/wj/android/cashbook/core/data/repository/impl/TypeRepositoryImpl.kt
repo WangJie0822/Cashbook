@@ -28,12 +28,12 @@ import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 /**
  * 记录类型数据仓库
@@ -192,11 +192,8 @@ class TypeRepositoryImpl @Inject constructor(
                 sort = if (parentId == -1L) {
                     typeDao.countByLevel(TypeLevelEnum.FIRST.ordinal) + 1
                 } else {
-                    val parentSort = getRecordTypeById(parentId)?.sort ?: (
-                            typeDao.countByLevel(
-                                TypeLevelEnum.FIRST.ordinal,
-                            ) + 1
-                            )
+                    val parentSort = getRecordTypeById(parentId)?.sort
+                        ?: (typeDao.countByLevel(TypeLevelEnum.FIRST.ordinal) + 1)
                     parentSort * 1000 + typeDao.countByParentId(parentId)
                 }
             }

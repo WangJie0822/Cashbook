@@ -19,9 +19,9 @@ package cn.wj.android.cashbook.domain.usecase
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.transfer.asEntity
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
+import javax.inject.Inject
 
 /**
  * 获取当前月显示数据用例

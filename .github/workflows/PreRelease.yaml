@@ -2,10 +2,8 @@ name: GitHub Release with APKs
 
 on:
   push:
-    branches:
-      - develop
     tags:
-    - 'v*'
+    - 'pre_v*'
 
 jobs:
   build:
