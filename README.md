@@ -1,6 +1,8 @@
 # Cashbook
 
 [![Build](https://github.com/WangJie0822/Cashbook/actions/workflows/Build.yaml/badge.svg)](https://github.com/WangJie0822/Cashbook/actions/workflows/Build.yaml)
+[![GitHub](https://img.shields.io/github/license/WangJie0822/Cashbook)](http://www.apache.org/licenses/LICENSE-2.0)
+[![GitHub release (with filter)](https://img.shields.io/github/v/release/WangJie0822/Cashbook)](https://github.com/WangJie0822/Cashbook/releases/latest)
 
 ## ToDo 列表
 - [x] 基本记账功能；
