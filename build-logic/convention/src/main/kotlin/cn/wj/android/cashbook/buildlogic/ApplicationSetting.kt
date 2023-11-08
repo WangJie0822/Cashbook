@@ -23,10 +23,12 @@ object ApplicationSetting {
         private const val VERSION_NAME = "v1.0.1"
 
         /** 版本号，动态生成 */
-        val versionCode = getVersionCodeFromVersionName()
+        val versionCode: Int
+            get() = getVersionCodeFromVersionName()
 
-        /** 版本名，大版本号+版本号 */
-        val versionName = generateVersionName()
+        /** 版本名，大版本名+版本号 */
+        val versionName: String
+            get() = generateVersionName()
 
         /** 源码 jdk 版本 */
         val javaVersion = JavaVersion.VERSION_11
@@ -54,7 +56,7 @@ object ApplicationSetting {
             val versionCode = runCatching {
                 versionName.split("_")[1].toInt()
             }.getOrElse { generateVersionCode() }
-            println("> Task :build-logic:getVersionCodeFromVersionName versionCode: $versionCode")
+            println("> Task :build-logic:getVersionCodeFromVersionName versionName = <$versionName>, versionCode: $versionCode")
             return versionCode
         }
     }
