@@ -1,5 +1,7 @@
 # Cashbook
 
+[![Build](https://github.com/WangJie0822/Cashbook/actions/workflows/Build.yaml/badge.svg)](https://github.com/WangJie0822/Cashbook/actions/workflows/Build.yaml)
+
 ## ToDo 列表
 - [x] 基本记账功能；
 - [x] 资产管理功能；

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
 import androidx.compose.runtime.getValue
@@ -34,7 +32,7 @@ import cn.wj.android.cashbook.domain.usecase.SaveAssetUseCase
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
 import cn.wj.android.cashbook.feature.assets.enums.SelectDayEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -42,7 +40,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * 编辑资产 ViewModel
