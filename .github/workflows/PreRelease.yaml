@@ -27,7 +27,7 @@ jobs:
           java-version: 17
 
       - name: Set up Env
-        run: export BUILD_TAG_NAME=${{ github.ref }} ; echo $BUILD_TAG_NAME
+        run: export BUILD_TAG_NAME=${{ github.ref_name }} ; echo $BUILD_TAG_NAME
 
       - name: Build app
         run: ./gradlew :app:assembleDevRelease
