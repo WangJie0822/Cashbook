@@ -47,7 +47,7 @@ jobs:
           path: '**/build/outputs/apk/**/*.apk'
 
       - name: Run local tests
-        run: ./gradlew testDemoDebug testProdDebug
+        run: ./gradlew testOnlineDebug testOfflineDebug testDevDebug
 
   test:
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
       - name: Run all local screenshot tests (Roborazzi)
         id: screenshotsverify
         continue-on-error: true
-        run: ./gradlew verifyRoborazziDemoDebug
+        run: ./gradlew verifyRoborazziDevDebug
 
       - name: Prevent pushing new screenshots if this is a fork
         id: checkfork
@@ -93,7 +93,7 @@ jobs:
         id: screenshotsrecord
         if: steps.screenshotsverify.outcome == 'failure' && github.event_name == 'pull_request'
         run: |
-          ./gradlew recordRoborazziDemoDebug
+          ./gradlew recordRoborazziDevDebug
 
       - name: Push new screenshots if available
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -106,7 +106,7 @@ jobs:
       # Run local tests after screenshot tests to avoid wrong UP-TO-DATE. TODO: Ignore screenshots.
       - name: Run local tests
         if: always()
-        run: ./gradlew testDemoDebug testProdDebug
+        run: ./gradlew testDevDebug testOnlineDebug testOfflineDebug
 
       - name: Upload test results (XML)
         if: always()
@@ -150,7 +150,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Build AndroidTest apps
-        run: ./gradlew packageDemoDebug packageDemoDebugAndroidTest --daemon
+        run: ./gradlew packageDevDebug packageDevDebugAndroidTest --daemon
 
       - name: Run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -160,7 +160,7 @@ jobs:
           disable-animations: true
           disk-size: 6000M
           heap-size: 600M
-          script: ./gradlew connectedDemoDebugAndroidTest --daemon
+          script: ./gradlew connectedDevDebugAndroidTest --daemon
 
       - name: Upload test reports
         if: always()
