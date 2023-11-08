@@ -38,6 +38,8 @@ jobs:
         run: ./gradlew spotlessCheck --init-script gradle/init.gradle.kts --no-configuration-cache
 
       - name: Build all build type and flavor permutations
+        env:
+          TZ: Asia/Shanghai
         run: ./gradlew assemble
 
       - name: Upload build outputs (APKs)
