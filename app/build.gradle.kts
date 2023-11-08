@@ -8,8 +8,7 @@ plugins {
     alias(libs.plugins.cashbook.android.application.jacoco)
     alias(libs.plugins.cashbook.android.hilt)
     alias(libs.plugins.kotlin.serialization)
-    // Kotlin Parcelize 序列化
-    id("kotlin-parcelize")
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
