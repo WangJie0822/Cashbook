@@ -3,7 +3,7 @@ name: GitHub Pre Release with APKs
 on:
   push:
     tags:
-    - 'pre_v*'
+    - 'v**_pre'
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Pre ${{ github.ref }}
+          release_name: Pre Release ${{ github.ref }}
           draft: true
           prerelease: true
 
