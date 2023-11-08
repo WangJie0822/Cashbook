@@ -3,9 +3,9 @@ name: GitHub Release with APKs
 on:
   push:
     branches:
-      - main
+      - develop
     tags:
-      - 'v*'
+    - 'v*'
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
           java-version: 17
 
       - name: Build app
-        run: ./gradlew :app:assembleDemoRelease
+        run: ./gradlew :app:assembleDevRelease
 
       - name: Create Release
         id: create_release
@@ -38,9 +38,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          release_name: Pre ${{ github.ref }}
           draft: true
-          prerelease: false
+          prerelease: true
 
       - name: Upload app
         uses: actions/upload-release-asset@v1
