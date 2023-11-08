@@ -29,6 +29,27 @@ jobs:
       - name: Build app
         run: ./gradlew :app:assembleDevRelease
 
+      - name: Android Sign
+        # You may pin to the exact commit or the version.
+        uses: Tlaster/android-sign@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # The directory to find your release to sign
+          releaseDirectory: outputs/apk/
+          # The key used to sign your release in base64 encoded format
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          # The key alias
+          alias: ${{ secrets.ALIAS }}
+          # The password to the keystore
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          # The password for the key
+          keyPassword: ${{ secrets.KEY_PASSWORD }} # optional
+          # The working directory for action, default to build
+          # buildDirectory: # optional
+          # The output directory for sign, default to build/signed
+          output: outputs/signed_apk/ # optional
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -50,4 +71,13 @@ jobs:
           # The URL for uploading assets to the release
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           # A glob of assets to upload
-          targets: outputs/apk/*.apk
+          targets: outputs/signed_apk/*.apk
+
+      - name: Publish Release
+        # You may pin to the exact commit or the version.
+        uses: eregon/publish-release@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # The ID of the draft release to publish
+          release_id:  ${{ steps.create_release.outputs.id }}
