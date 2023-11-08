@@ -26,6 +26,9 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
+      - name: Set up Env
+        run: export BUILD_TAG_NAME ${{ github.ref }} ; echo $BUILD_TAG_NAME
+
       - name: Build app
         run: ./gradlew :app:assembleDevRelease
 
