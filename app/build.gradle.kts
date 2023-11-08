@@ -49,7 +49,6 @@ android {
     }
 
     productFlavors {
-        @Suppress("EnumValuesSoftDeprecate")
         CashbookFlavor.values().forEach { flavor ->
             val value = if (flavor == CashbookFlavor.Dev) {
                 "@string/app_name_dev"

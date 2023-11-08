@@ -26,7 +26,6 @@ android {
     namespace = "cn.wj.android.cashbook.sync"
 
     sourceSets {
-        @Suppress("EnumValuesSoftDeprecate")
         CashbookFlavor.values().forEach { flavor ->
             val srcDir = if (flavor == CashbookFlavor.Offline) {
                 // 离线渠道
