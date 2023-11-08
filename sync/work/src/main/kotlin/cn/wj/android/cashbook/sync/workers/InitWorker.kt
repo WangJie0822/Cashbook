@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.sync.workers
 
 import android.content.Context
@@ -20,10 +36,10 @@ import cn.wj.android.cashbook.sync.initializers.SyncWorkName
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.time.Duration
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.time.Duration
+import kotlin.coroutines.CoroutineContext
 
 /**
  * 初始化 [CoroutineWorker]，按照用户配置执行不同的任务
@@ -62,7 +78,7 @@ class InitWorker @AssistedInject constructor(
                         enqueueUniqueWork(
                             AutoBackupWorkName,
                             ExistingWorkPolicy.KEEP,
-                            AutoBackupWorker.startUpOneTimeBackupWork()
+                            AutoBackupWorker.startUpOneTimeBackupWork(),
                         )
                     }
 
@@ -71,7 +87,7 @@ class InitWorker @AssistedInject constructor(
                         enqueueUniquePeriodicWork(
                             AutoBackupWorkName,
                             ExistingPeriodicWorkPolicy.UPDATE,
-                            AutoBackupWorker.startUpPeriodicBackupWork(Duration.ofDays(1))
+                            AutoBackupWorker.startUpPeriodicBackupWork(Duration.ofDays(1)),
                         )
                     }
 
@@ -80,7 +96,7 @@ class InitWorker @AssistedInject constructor(
                         enqueueUniquePeriodicWork(
                             AutoBackupWorkName,
                             ExistingPeriodicWorkPolicy.UPDATE,
-                            AutoBackupWorker.startUpPeriodicBackupWork(Duration.ofDays(7))
+                            AutoBackupWorker.startUpPeriodicBackupWork(Duration.ofDays(7)),
                         )
                     }
 

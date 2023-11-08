@@ -32,13 +32,18 @@ rootProject {
     subprojects {
         apply<com.diffplug.gradle.spotless.SpotlessPlugin>()
         extensions.configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+            java {
+                target("**/*.java")
+                targetExclude("**/build/**/*.java")
+                licenseHeaderFile(rootProject.file("spotless/copyright.java"))
+            }
             kotlin {
                 target("**/*.kt")
                 targetExclude("**/build/**/*.kt")
                 ktlint(ktlintVersion).userData(mapOf("android" to "true"))
                 licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
             }
-            format("kts") {
+            kotlinGradle  {
                 target("**/*.kts")
                 targetExclude("**/build/**/*.kts")
                 // Look for the first line that doesn't have a block comment (assumed to be the license)

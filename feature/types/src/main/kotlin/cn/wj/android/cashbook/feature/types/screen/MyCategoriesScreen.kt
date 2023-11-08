@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.types.screen
 
 import androidx.compose.foundation.background
@@ -83,7 +99,6 @@ internal fun MyCategoriesRoute(
     modifier: Modifier = Modifier,
     viewModel: MyCategoriesViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MyCategoriesScreen(
@@ -183,7 +198,7 @@ internal fun MyCategoriesScreen(
         },
         snackbarHost = {
             SnackbarHost(snackbarHostState)
-        }
+        },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             (dialogState as? DialogState.Shown<*>)?.data?.let { data ->
@@ -284,18 +299,18 @@ private fun EditTypeSheet(
                         true
                     },
                     validator = { it.isNotBlank() },
-                    errorFor = { typeNameBlackHintText }
+                    errorFor = { typeNameBlackHintText },
                 )
             }
             var editTypeIcon by remember {
                 mutableStateOf(
-                    data.type?.iconName ?: "vector_type_three_meals_24"
+                    data.type?.iconName ?: "vector_type_three_meals_24",
                 )
             }
             Row(
                 modifier = Modifier.padding(
                     horizontal = 16.dp,
-                    vertical = 8.dp
+                    vertical = 8.dp,
                 ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -312,7 +327,7 @@ private fun EditTypeSheet(
                                 data.type?.id ?: -1L,
                                 data.parentType?.id ?: -1L,
                                 editTypeName.text,
-                                editTypeIcon
+                                editTypeIcon,
                             )
                         }
                     },
@@ -325,7 +340,7 @@ private fun EditTypeSheet(
                 Row(
                     modifier = Modifier.padding(
                         horizontal = 16.dp,
-                        vertical = 8.dp
+                        vertical = 8.dp,
                     ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -384,7 +399,7 @@ private fun EditTypeSheet(
                         editTypeName.text = name
                     }
                     editTypeIcon = iconName
-                }
+                },
             )
         },
     )
@@ -394,16 +409,16 @@ private fun EditTypeSheet(
 private fun DeleteTypeDialog(
     onRequestDismissDialog: () -> Unit,
     data: MyCategoriesDialogData.DeleteType,
-    changeRecordTypeBeforeDelete: (Long, Long) -> Unit
+    changeRecordTypeBeforeDelete: (Long, Long) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onRequestDismissDialog,
         title = {
             Text(
                 text = stringResource(id = R.string.select_type_to_move_before_delete_format).format(
-                    data.recordSize
+                    data.recordSize,
                 ),
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
             )
         },
         text = {
@@ -418,14 +433,15 @@ private fun DeleteTypeDialog(
             TextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
-        })
+        },
+    )
 }
 
 @Composable
 private fun SelectFirstTypeDialog(
     onRequestDismissDialog: () -> Unit,
     data: MyCategoriesDialogData.SelectFirstType,
-    changeFirstTypeToSecond: (Long, Long) -> Unit
+    changeFirstTypeToSecond: (Long, Long) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onRequestDismissDialog,
@@ -452,7 +468,8 @@ private fun SelectFirstTypeDialog(
             TextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
-        })
+        },
+    )
 }
 
 @Composable
@@ -535,7 +552,7 @@ private fun DialogExpandableTypeList(
                                         } else {
                                             CashbookIcons.KeyboardArrowRight
                                         },
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
                                 }
                             }
@@ -575,7 +592,7 @@ private fun DialogExpandableTypeList(
                                                             .size(32.dp)
                                                             .background(
                                                                 color = Color.Unspecified,
-                                                                shape = CircleShape
+                                                                shape = CircleShape,
                                                             )
                                                             .clip(CircleShape)
                                                             .padding(4.dp),
@@ -639,7 +656,7 @@ private fun FirstTypeItem(
                             } else {
                                 CashbookIcons.KeyboardArrowRight
                             },
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 }
@@ -688,8 +705,8 @@ private fun FirstTypeItem(
                                     R.string.refund_type
                                 } else {
                                     R.string.set_refund_type
-                                }
-                            )
+                                },
+                            ),
                         )
                     },
                     enabled = !first.refundType,
@@ -706,8 +723,8 @@ private fun FirstTypeItem(
                                     R.string.reimburse_type
                                 } else {
                                     R.string.set_reimburse_type
-                                }
-                            )
+                                },
+                            ),
                         )
                     },
                     enabled = !first.reimburseType,
@@ -726,8 +743,8 @@ private fun FirstTypeItem(
                                     R.string.credit_card_payment_type
                                 } else {
                                     R.string.set_credit_card_payment_type
-                                }
-                            )
+                                },
+                            ),
                         )
                     },
                     enabled = !first.creditCardPaymentType,
@@ -809,7 +826,7 @@ private fun SecondTypeItem(
     modifier: Modifier,
 ) {
     Box(
-        modifier = modifier
+        modifier = modifier,
     ) {
         var expandedMenu by remember {
             mutableStateOf(false)
@@ -890,8 +907,8 @@ private fun SecondTypeItem(
                                     R.string.refund_type
                                 } else {
                                     R.string.set_refund_type
-                                }
-                            )
+                                },
+                            ),
                         )
                     },
                     enabled = !second.refundType,
@@ -908,8 +925,8 @@ private fun SecondTypeItem(
                                     R.string.reimburse_type
                                 } else {
                                     R.string.set_reimburse_type
-                                }
-                            )
+                                },
+                            ),
                         )
                     },
                     enabled = !second.reimburseType,
@@ -928,8 +945,8 @@ private fun SecondTypeItem(
                                     R.string.credit_card_payment_type
                                 } else {
                                     R.string.set_credit_card_payment_type
-                                }
-                            )
+                                },
+                            ),
                         )
                     },
                     enabled = !second.creditCardPaymentType,
@@ -958,7 +975,7 @@ private val RecordTypeCategoryEnum.text: String
             RecordTypeCategoryEnum.EXPENDITURE -> R.string.expend
             RecordTypeCategoryEnum.INCOME -> R.string.income
             RecordTypeCategoryEnum.TRANSFER -> R.string.transfer
-        }
+        },
     )
 
 /**

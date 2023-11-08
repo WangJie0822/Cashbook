@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.design.component
 
 import androidx.annotation.IntDef
@@ -168,8 +184,6 @@ fun TimePickerDialog(
             addOnNegativeButtonClickListener { onNegativeButtonClick() }
         }
 
-
-
     DisposableEffect(dialog) {
         dialog.show(fm, "timePicker")
 
@@ -187,7 +201,7 @@ const val DATE_INPUT_MODE_TEXT = MaterialDatePicker.INPUT_MODE_TEXT
 
 @IntDef(value = [DATE_INPUT_MODE_CALENDAR, DATE_INPUT_MODE_TEXT])
 @Retention(
-    AnnotationRetention.SOURCE
+    AnnotationRetention.SOURCE,
 )
 annotation class DateInputMode
 
@@ -199,7 +213,7 @@ const val TIME_INPUT_MODE_KEYBOARD = MaterialTimePicker.INPUT_MODE_KEYBOARD
 
 @IntDef(value = [TIME_INPUT_MODE_CLOCK, TIME_INPUT_MODE_KEYBOARD])
 @Retention(
-    AnnotationRetention.SOURCE
+    AnnotationRetention.SOURCE,
 )
 internal annotation class TimeInputMode
 
@@ -211,6 +225,6 @@ const val TIME_FORMAT_CLOCK_24H = TimeFormat.CLOCK_24H
 
 @IntDef(value = [TIME_FORMAT_CLOCK_12H, TIME_FORMAT_CLOCK_24H])
 @Retention(
-    AnnotationRetention.SOURCE
+    AnnotationRetention.SOURCE,
 )
 internal annotation class PickerTimeFormat

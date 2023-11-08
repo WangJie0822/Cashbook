@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.ui
 
 import android.app.Activity
@@ -114,7 +130,6 @@ private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 fun MainApp(
     viewModel: MainAppViewModel = viewModel(),
 ) {
-
     CashbookGradientBackground {
         val navController = rememberNavController()
         val snackbarHostState = remember { SnackbarHostState() }
@@ -178,7 +193,7 @@ fun MainApp(
                     onPrivacyPolicyClick = {
                         MarkdownActivity.actionStart(
                             context,
-                            MarkdownTypeEnum.PRIVACY_POLICY
+                            MarkdownTypeEnum.PRIVACY_POLICY,
                         )
                     },
                     navController = navController,
@@ -206,7 +221,6 @@ private fun MainAppScreen(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-
         // 全局进度弹窗
         ProgressDialog()
 
@@ -242,14 +256,14 @@ private fun MainAppScreen(
                                             annotatedString.getStringAnnotations(
                                                 tag,
                                                 offset,
-                                                offset
+                                                offset,
                                             )
                                         annotations.firstOrNull()?.let {
                                             if (it.item == PRIVACY_POLICY_FILE_PATH) {
                                                 onPrivacyPolicyClick()
                                             }
                                         }
-                                    }
+                                    },
                                 )
                             },
                             confirmButton = {
@@ -300,7 +314,6 @@ fun CashbookNavHost(
         startDestination = START_DESTINATION,
         modifier = modifier,
     ) {
-
         // 启动页
         settingsLauncherScreen(
             onRequestNaviToMyAsset = navController::naviToMyAsset,
@@ -508,7 +521,7 @@ internal fun Verification(
                         cancelHint = stringResource(id = R.string.cancel),
                         userCancelHint = stringResource(id = R.string.user_cancel),
                         verificationFailedHint = stringResource(id = R.string.fingerprint_verification_failed),
-                    )
+                    ),
                 ) {
                     BiometricAuthenticate(
                         title = stringResource(id = R.string.verity_fingerprint),

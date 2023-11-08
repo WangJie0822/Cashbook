@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.viewmodel
 
 import androidx.compose.runtime.getValue
@@ -29,8 +45,6 @@ import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.math.BigDecimal
-import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +54,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import javax.inject.Inject
 
 /**
  * 编辑记录 ViewModel
@@ -114,7 +130,7 @@ class EditRecordViewModel @Inject constructor(
         combine(_displayRecordData, _relatedRecordTotalAmountData) { record, relatedAmount ->
             val assetText = assetRepository.getAssetById(record.assetId)?.let { asset ->
                 "${asset.name}(${
-                    if (asset.type.isCreditCard()) {
+                    if (asset.type.isCreditCard) {
                         (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
                     } else {
                         asset.balance
@@ -124,7 +140,7 @@ class EditRecordViewModel @Inject constructor(
             val relatedAssetText =
                 assetRepository.getAssetById(record.relatedAssetId)?.let { asset ->
                     "${asset.name}(${
-                        if (asset.type.isCreditCard()) {
+                        if (asset.type.isCreditCard) {
                             (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
                         } else {
                             asset.balance
@@ -145,7 +161,7 @@ class EditRecordViewModel @Inject constructor(
                 selectedTypeId = record.typeId,
                 needRelated = needRelated,
                 relatedCount = _relatedRecordListData.first().size,
-                relatedAmount = relatedAmount
+                relatedAmount = relatedAmount,
             )
         }
             .stateIn(
@@ -165,14 +181,13 @@ class EditRecordViewModel @Inject constructor(
     val selectedTypeCategoryData =
         combine(_mutableTypeCategoryData, _defaultRecordData) { mutable, defaultRecord ->
             mutable ?: typeRepository.getRecordTypeById(defaultRecord.typeId)?.typeCategory
-            ?: RecordTypeCategoryEnum.EXPENDITURE
+                ?: RecordTypeCategoryEnum.EXPENDITURE
         }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = RecordTypeCategoryEnum.EXPENDITURE,
             )
-
 
     /** 标签数据 */
     private val _mutableTagIdListData = MutableStateFlow<List<Long>>(emptyList())
@@ -222,7 +237,7 @@ class EditRecordViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
+            initialValue = "",
         )
 
     private var amountSheetShowed = false
@@ -399,9 +414,9 @@ class EditRecordViewModel @Inject constructor(
                     DialogState.Shown(
                         DateTimePickerModel.DatePicker(
                             currentState.dateTimeText.parseDateLong(
-                                format = DATE_FORMAT_NO_SECONDS
-                            )
-                        )
+                                format = DATE_FORMAT_NO_SECONDS,
+                            ),
+                        ),
                     )
             }
         }
@@ -425,9 +440,9 @@ class EditRecordViewModel @Inject constructor(
                     DialogState.Shown(
                         DateTimePickerModel.TimePicker(
                             currentState.dateTimeText.parseDateLong(
-                                format = DATE_FORMAT_NO_SECONDS
-                            )
-                        )
+                                format = DATE_FORMAT_NO_SECONDS,
+                            ),
+                        ),
                     )
             }
         }
@@ -438,7 +453,7 @@ class EditRecordViewModel @Inject constructor(
         dismissDialog()
         viewModelScope.launch {
             _mutableRecordData.tryEmit(
-                _displayRecordData.first().copy(recordTime = "$dateTemp $time")
+                _displayRecordData.first().copy(recordTime = "$dateTemp $time"),
             )
         }
     }

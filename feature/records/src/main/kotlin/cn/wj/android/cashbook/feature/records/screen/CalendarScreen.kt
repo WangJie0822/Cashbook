@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
@@ -67,7 +83,6 @@ internal fun CalendarRoute(
     modifier: Modifier = Modifier,
     viewModel: CalendarViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selectedDate by viewModel.dateData.collectAsStateWithLifecycle()
 
@@ -135,7 +150,8 @@ internal fun CalendarScreen(
     LaunchedEffect(shouldDisplayDeleteFailedBookmark) {
         if (shouldDisplayDeleteFailedBookmark > 0) {
             val result = onShowSnackbar.invoke(
-                deleteFailedFormatText.format(shouldDisplayDeleteFailedBookmark), null
+                deleteFailedFormatText.format(shouldDisplayDeleteFailedBookmark),
+                null,
             )
             if (SnackbarResult.Dismissed == result) {
                 onRequestDismissBookmark.invoke()
@@ -159,7 +175,7 @@ internal fun CalendarScreen(
                         )
                         Icon(
                             imageVector = CashbookIcons.ArrowDropDown,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 },
@@ -213,10 +229,11 @@ internal fun CalendarScreen(
                                                 text = it.dayIncome.withCNY(),
                                                 color = LocalExtendedColors.current.income,
                                                 style = MaterialTheme.typography.labelSmall.copy(
-                                                    fontSize = 8.sp
+                                                    fontSize = 8.sp,
                                                 ),
                                                 modifier = Modifier.padding(
-                                                    start = 4.dp, top = 4.dp
+                                                    start = 4.dp,
+                                                    top = 4.dp,
                                                 ),
                                             )
                                         }
@@ -225,7 +242,7 @@ internal fun CalendarScreen(
                                                 text = it.dayExpand.withCNY(),
                                                 color = LocalExtendedColors.current.expenditure,
                                                 style = MaterialTheme.typography.labelSmall.copy(
-                                                    fontSize = 8.sp
+                                                    fontSize = 8.sp,
                                                 ),
                                                 modifier = Modifier
                                                     .align(Alignment.BottomEnd)
@@ -261,24 +278,24 @@ internal fun CalendarScreen(
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(top = 16.dp)
+                                            .padding(top = 16.dp),
                                     ) {
                                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer) {
                                             ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
                                                 Text(
                                                     text = stringResource(id = R.string.month_income),
                                                     textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
+                                                    modifier = Modifier.weight(1f),
                                                 )
                                                 Text(
                                                     text = stringResource(id = R.string.month_expend),
                                                     textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
+                                                    modifier = Modifier.weight(1f),
                                                 )
                                                 Text(
                                                     text = stringResource(id = R.string.month_balance),
                                                     textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
+                                                    modifier = Modifier.weight(1f),
                                                 )
                                             }
                                         }
@@ -293,21 +310,21 @@ internal fun CalendarScreen(
                                                 text = uiState.monthIncome.withCNY(),
                                                 color = LocalExtendedColors.current.income,
                                                 textAlign = TextAlign.Center,
-                                                modifier = Modifier.weight(1f)
+                                                modifier = Modifier.weight(1f),
                                             )
                                             Text(
                                                 text = uiState.monthExpand.withCNY(),
                                                 color = LocalExtendedColors.current.expenditure,
                                                 textAlign = TextAlign.Center,
-                                                modifier = Modifier.weight(1f)
+                                                modifier = Modifier.weight(1f),
                                             )
                                             Text(
                                                 text = uiState.monthBalance.withCNY(),
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
-                                                    alpha = 0.5f
+                                                    alpha = 0.5f,
                                                 ),
                                                 textAlign = TextAlign.Center,
-                                                modifier = Modifier.weight(1f)
+                                                modifier = Modifier.weight(1f),
                                             )
                                         }
                                     }

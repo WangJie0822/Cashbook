@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.settings.screen
 
 import androidx.compose.foundation.clickable
@@ -76,9 +92,8 @@ internal fun SettingRoute(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
     supportFingerprint: Boolean = checkBiometric() == HW_AVAILABLE,
-    viewModel: SettingViewModel = hiltViewModel()
+    viewModel: SettingViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingScreen(
@@ -550,7 +565,7 @@ internal fun DialogContent(
                             cancelHint = stringResource(id = R.string.cancel),
                             userCancelHint = stringResource(id = R.string.user_cancel),
                             verificationFailedHint = stringResource(id = R.string.fingerprint_verification_failed),
-                        )
+                        ),
                     ) {
                         BiometricAuthenticate(
                             title = stringResource(id = R.string.verity_fingerprint),
@@ -597,7 +612,7 @@ internal fun CreatePasswordDialog(
                 } else {
                     passwordFormatErrorText
                 }
-            }
+            },
         )
     }
 
@@ -612,7 +627,7 @@ internal fun CreatePasswordDialog(
                     pwdState == SettingPasswordStateEnum.PASSWORD_ENCODE_FAILED -> passwordEncodeFailedText
                     else -> ""
                 }
-            }
+            },
         )
     }
 
@@ -681,9 +696,9 @@ internal fun ModifyPasswordDialog(
     val passwordOld = remember {
         TextFieldState(
             validator = {
-                it.isMatch(PASSWORD_REGEX)
-                        && pwdState != SettingPasswordStateEnum.PASSWORD_WRONG
-                        && pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                it.isMatch(PASSWORD_REGEX) &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {
@@ -693,7 +708,7 @@ internal fun ModifyPasswordDialog(
                     pwdState == SettingPasswordStateEnum.PASSWORD_WRONG -> passwordWrongText
                     else -> ""
                 }
-            }
+            },
         )
     }
 
@@ -708,7 +723,7 @@ internal fun ModifyPasswordDialog(
                     pwdState == SettingPasswordStateEnum.PASSWORD_ENCODE_FAILED -> passwordEncodeFailedText
                     else -> ""
                 }
-            }
+            },
         )
     }
 
@@ -777,9 +792,9 @@ internal fun VerityPasswordDialog(
     val password = remember {
         TextFieldState(
             validator = {
-                it.isMatch(PASSWORD_REGEX)
-                        && pwdState != SettingPasswordStateEnum.PASSWORD_WRONG
-                        && pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                it.isMatch(PASSWORD_REGEX) &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {
@@ -789,7 +804,7 @@ internal fun VerityPasswordDialog(
                     pwdState == SettingPasswordStateEnum.PASSWORD_WRONG -> passwordWrongText
                     else -> ""
                 }
-            }
+            },
         )
     }
 
@@ -851,9 +866,9 @@ internal fun ClearPasswordDialog(
     val password = remember {
         TextFieldState(
             validator = {
-                it.isMatch(PASSWORD_REGEX)
-                        && pwdState != SettingPasswordStateEnum.PASSWORD_WRONG
-                        && pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                it.isMatch(PASSWORD_REGEX) &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {
@@ -863,7 +878,7 @@ internal fun ClearPasswordDialog(
                     pwdState == SettingPasswordStateEnum.PASSWORD_WRONG -> passwordWrongText
                     else -> ""
                 }
-            }
+            },
         )
     }
 
@@ -929,10 +944,10 @@ internal fun VerificationModeDialog(
                             .selectable(
                                 selected = (enum == verificationMode),
                                 onClick = { onVerificationModeSelected.invoke(enum) },
-                                role = Role.RadioButton
+                                role = Role.RadioButton,
                             )
                             .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = enum == verificationMode, onClick = null)
                         Text(
@@ -980,10 +995,10 @@ internal fun DarkModeDialog(
                             .selectable(
                                 selected = (enum == darkMode),
                                 onClick = { onDarkModeSelected.invoke(enum) },
-                                role = Role.RadioButton
+                                role = Role.RadioButton,
                             )
                             .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = enum == darkMode, onClick = null)
                         Text(
@@ -1030,10 +1045,10 @@ internal fun DynamicColorDialog(
                         .selectable(
                             selected = dynamicColor,
                             onClick = { onDynamicColorSelected.invoke(true) },
-                            role = Role.RadioButton
+                            role = Role.RadioButton,
                         )
                         .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(selected = dynamicColor, onClick = null)
                     Text(
@@ -1049,10 +1064,10 @@ internal fun DynamicColorDialog(
                         .selectable(
                             selected = !dynamicColor,
                             onClick = { onDynamicColorSelected.invoke(false) },
-                            role = Role.RadioButton
+                            role = Role.RadioButton,
                         )
                         .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(selected = !dynamicColor, onClick = null)
                     Text(
@@ -1078,7 +1093,7 @@ internal val DarkModeEnum.text: String
             DarkModeEnum.FOLLOW_SYSTEM -> R.string.follow_system
             DarkModeEnum.LIGHT -> R.string.light_mode
             DarkModeEnum.DARK -> R.string.dark_mode
-        }
+        },
     )
 
 /** 枚举对应文本 */
@@ -1087,5 +1102,5 @@ internal val VerificationModeEnum.text: String
         id = when (this) {
             VerificationModeEnum.WHEN_LAUNCH -> R.string.each_launch
             VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
-        }
+        },
     )

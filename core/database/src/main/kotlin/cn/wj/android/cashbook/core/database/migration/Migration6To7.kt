@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.migration
 
 import android.content.ContentValues
@@ -17,8 +33,8 @@ import cn.wj.android.cashbook.core.database.table.TABLE_TYPE
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
-import java.math.BigDecimal
 import org.intellij.lang.annotations.Language
+import java.math.BigDecimal
 
 /**
  * 数据库升级 6 -> 7
@@ -46,7 +62,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 创建资产表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_ASSET_7 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_ASSET}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_ASSET` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT,
             `books_id` INTEGER NOT NULL,
@@ -129,8 +145,8 @@ object Migration6To7 : Migration(6, 7) {
                     query(
                         SQL_QUERY_RECORD_BY_ASSET_ID_AFTER_TIME.format(
                             assetId,
-                            lastModifyRecordTime
-                        )
+                            lastModifyRecordTime,
+                        ),
                     ).use { after ->
                         while (after.moveToNext()) {
                             val typeEnum = after.getString(after.getColumnIndexOrThrow("type_enum"))
@@ -170,8 +186,8 @@ object Migration6To7 : Migration(6, 7) {
                     query(
                         SQL_QUERY_TRANSFER_RECORD_BY_ASSET_ID_AFTER_TIME.format(
                             assetId,
-                            lastModifyRecordTime
-                        )
+                            lastModifyRecordTime,
+                        ),
                     ).use { transfer ->
                         while (transfer.moveToNext()) {
                             val typeEnum =
@@ -201,12 +217,12 @@ object Migration6To7 : Migration(6, 7) {
                         put("billing_date", it.getString(it.getColumnIndexOrThrow("billing_date")))
                         put(
                             "repayment_date",
-                            it.getString(it.getColumnIndexOrThrow("repayment_date"))
+                            it.getString(it.getColumnIndexOrThrow("repayment_date")),
                         )
                         put("type", type.ordinal)
                         put(
                             "classification",
-                            AssetClassificationEnum.valueOf(it.getString(it.getColumnIndexOrThrow("classification"))).ordinal
+                            AssetClassificationEnum.valueOf(it.getString(it.getColumnIndexOrThrow("classification"))).ordinal,
                         )
                         put("invisible", it.getInt(it.getColumnIndexOrThrow("invisible")))
                         put("open_bank", it.getString(it.getColumnIndexOrThrow("open_bank")))
@@ -225,7 +241,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 创建账本表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_BOOKS_7 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_BOOKS}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_BOOKS` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
             `name` TEXT NOT NULL, 
@@ -265,7 +281,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 创建标签表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_TAG_7 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_TAG}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_TAG` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
             `name` TEXT NOT NULL, 
@@ -276,7 +292,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 从标签临时表复制数据到新表 */
     @Language("SQL")
     private const val SQL_COPY_TABLE_TAG_FROM_6_7 = """
-        INSERT INTO `${TABLE_TAG}` 
+        INSERT INTO `$TABLE_TAG` 
         SELECT `id`, `name`, `books_id`
         FROM `${TABLE_TAG}_temp`
     """
@@ -299,7 +315,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 创建标签关联表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_TAG_RELATED_7 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_TAG_RELATED}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_TAG_RELATED` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
             `record_id` INTEGER NOT NULL, 
@@ -311,7 +327,7 @@ object Migration6To7 : Migration(6, 7) {
     @Language("SQL")
     private const val SQL_QUERY_TAG_IDS_FROM_RECORD_WHERE_TAG_IDS_NOT_EMPTY = """
         SELECT `id`, `tag_ids` 
-        FROM `${TABLE_RECORD}`
+        FROM `$TABLE_RECORD`
         WHERE `tag_ids` != ''
     """
 
@@ -331,7 +347,7 @@ object Migration6To7 : Migration(6, 7) {
                         values = ContentValues().apply {
                             put("record_id", recordId)
                             put("tag_id", tagId.toLong())
-                        }
+                        },
                     )
                 }
             }
@@ -341,7 +357,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 创建类型表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_TYPE_7 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_TYPE}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_TYPE` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT,
             `parent_id` INTEGER NOT NULL, 
@@ -376,11 +392,11 @@ object Migration6To7 : Migration(6, 7) {
                         put(
                             "icon_name",
                             it.getString(it.getColumnIndexOrThrow("icon_res_name"))
-                                .replace("@drawable/", "")
+                                .replace("@drawable/", ""),
                         )
                         put(
                             "type_level",
-                            TypeLevelEnum.valueOf(it.getString(it.getColumnIndexOrThrow("type"))).ordinal
+                            TypeLevelEnum.valueOf(it.getString(it.getColumnIndexOrThrow("type"))).ordinal,
                         )
                         put("type_category", it.getInt(it.getColumnIndexOrThrow("record_type")))
                         val refund = it.getInt(it.getColumnIndexOrThrow("refund"))
@@ -403,7 +419,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 创建记录关联表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_RECORD_RELATED_7 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_RECORD_RELATED}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_RECORD_RELATED` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
             `record_id` INTEGER NOT NULL, 
@@ -415,7 +431,7 @@ object Migration6To7 : Migration(6, 7) {
     @Language("SQL")
     private const val SQL_QUERY_RECORD_ID_FROM_RECORD_WHERE_RECORD_ID_NOT_EMPTY = """
         SELECT `id`, `record_id` 
-        FROM `${TABLE_RECORD}`
+        FROM `$TABLE_RECORD`
         WHERE `record_id` > 0
     """
 
@@ -445,7 +461,7 @@ object Migration6To7 : Migration(6, 7) {
     /** 创建记录表，版本 7 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_RECORD_7 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_RECORD}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_RECORD` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
             `type_id` INTEGER NOT NULL, 
@@ -485,7 +501,7 @@ object Migration6To7 : Migration(6, 7) {
                             put("asset_id", it.getLong(it.getColumnIndexOrThrow("asset_id")))
                             put(
                                 "into_asset_id",
-                                it.getLong(it.getColumnIndexOrThrow("into_asset_id"))
+                                it.getLong(it.getColumnIndexOrThrow("into_asset_id")),
                             )
                             put("books_id", it.getLong(it.getColumnIndexOrThrow("books_id")))
                             put("amount", it.getDouble(it.getColumnIndexOrThrow("amount")))
@@ -495,7 +511,7 @@ object Migration6To7 : Migration(6, 7) {
                             put("reimbursable", it.getInt(it.getColumnIndexOrThrow("reimbursable")))
                             put(
                                 "record_time",
-                                it.getString(it.getColumnIndexOrThrow("record_time"))
+                                it.getString(it.getColumnIndexOrThrow("record_time")),
                             )
                         },
                     )

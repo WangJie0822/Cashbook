@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 @file:Suppress("DEPRECATION", "unused")
 
 package cn.wj.android.cashbook.core.design.security.biometric
@@ -61,17 +77,18 @@ fun BiometricAuthenticate(
                     hint = hint,
                     cryptoCipher = cryptoCipher,
                     onSuccess = onSuccess,
-                    onError = onError
+                    onError = onError,
                 )
-            } else
+            } else {
                 BiometricAuthenticateM(
                     title = title,
                     subTitle = subTitle,
                     hint = hint,
                     cryptoCipher = cryptoCipher,
                     onSuccess = onSuccess,
-                    onError = onError
+                    onError = onError,
                 )
+            }
         }
     }
 }
@@ -139,7 +156,8 @@ internal fun BiometricAuthenticateQ(
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
                 onError.invoke(errorCode, errString.toString())
             }
-        })
+        },
+    )
 }
 
 @SuppressLint("ObsoleteSdkInt")
@@ -201,7 +219,7 @@ internal fun BiometricAuthenticateM(
                 onError.invoke(errorCode, errString.toString())
             }
         },
-        null
+        null,
     )
 }
 
@@ -265,14 +283,13 @@ val LocalBiometricAuthenticateHintData =
 @Composable
 fun ProvideBiometricAuthenticateHintData(
     hintData: BiometricAuthenticateHintData,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalBiometricAuthenticateHintData provides hintData,
-        content = content
+        content = content,
     )
 }
-
 
 /** 硬件可用 */
 const val HW_AVAILABLE = 0

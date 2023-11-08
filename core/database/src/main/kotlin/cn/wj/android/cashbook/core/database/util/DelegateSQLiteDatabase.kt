@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.util
 
 import android.app.ActivityManager
@@ -47,13 +63,13 @@ class DelegateSQLiteDatabase(
     }
 
     override fun beginTransactionWithListener(
-        transactionListener: SQLiteTransactionListener
+        transactionListener: SQLiteTransactionListener,
     ) {
         delegate.beginTransactionWithListener(transactionListener)
     }
 
     override fun beginTransactionWithListenerNonExclusive(
-        transactionListener: SQLiteTransactionListener
+        transactionListener: SQLiteTransactionListener,
     ) {
         delegate.beginTransactionWithListenerNonExclusive(transactionListener)
     }
@@ -107,7 +123,7 @@ class DelegateSQLiteDatabase(
         } else {
             throw UnsupportedOperationException(
                 "execPerConnectionSQL is not supported on a " +
-                        "SDK version lower than 30, current version is: " + Build.VERSION.SDK_INT
+                    "SDK version lower than 30, current version is: " + Build.VERSION.SDK_INT,
             )
         }
     }
@@ -128,38 +144,44 @@ class DelegateSQLiteDatabase(
 
     override fun query(query: SupportSQLiteQuery): Cursor {
         val cursorFactory = { _: SQLiteDatabase?,
-                              masterQuery: SQLiteCursorDriver?,
-                              editTable: String?,
-                              sqLiteQuery: SQLiteQuery? ->
+                masterQuery: SQLiteCursorDriver?,
+                editTable: String?,
+                sqLiteQuery: SQLiteQuery?, ->
             query.bindTo(
                 FrameworkSQLiteProgram(
-                    sqLiteQuery!!
-                )
+                    sqLiteQuery!!,
+                ),
             )
             SQLiteCursor(masterQuery, editTable, sqLiteQuery)
         }
 
         return delegate.rawQueryWithFactory(
-            cursorFactory, query.sql, EMPTY_STRING_ARRAY, null
+            cursorFactory,
+            query.sql,
+            EMPTY_STRING_ARRAY,
+            null,
         )
     }
 
     @RequiresApi(16)
     override fun query(
         query: SupportSQLiteQuery,
-        cancellationSignal: CancellationSignal?
+        cancellationSignal: CancellationSignal?,
     ): Cursor {
         return SupportSQLiteCompat.Api16Impl.rawQueryWithFactory(
-            delegate, query.sql,
-            EMPTY_STRING_ARRAY, null, cancellationSignal!!
+            delegate,
+            query.sql,
+            EMPTY_STRING_ARRAY,
+            null,
+            cancellationSignal!!,
         ) { _: SQLiteDatabase?,
-            masterQuery: SQLiteCursorDriver?,
-            editTable: String?,
-            sqLiteQuery: SQLiteQuery? ->
+                masterQuery: SQLiteCursorDriver?,
+                editTable: String?,
+                sqLiteQuery: SQLiteQuery?, ->
             query.bindTo(
                 FrameworkSQLiteProgram(
-                    sqLiteQuery!!
-                )
+                    sqLiteQuery!!,
+                ),
             )
             SQLiteCursor(masterQuery, editTable, sqLiteQuery)
         }
@@ -189,7 +211,7 @@ class DelegateSQLiteDatabase(
         conflictAlgorithm: Int,
         values: ContentValues,
         whereClause: String?,
-        whereArgs: Array<out Any?>?
+        whereArgs: Array<out Any?>?,
     ): Int {
         // taken from SQLiteDatabase class.
         require(values.size() != 0) { "Empty values" }
@@ -301,7 +323,7 @@ class DelegateSQLiteDatabase(
         fun execPerConnectionSQL(
             sQLiteDatabase: SQLiteDatabase,
             sql: String,
-            bindArgs: Array<out Any?>?
+            bindArgs: Array<out Any?>?,
         ) {
             sQLiteDatabase.execPerConnectionSQL(sql, bindArgs)
         }
@@ -315,14 +337,14 @@ class DelegateSQLiteDatabase(
                 " OR ABORT ",
                 " OR FAIL ",
                 " OR IGNORE ",
-                " OR REPLACE "
+                " OR REPLACE ",
             )
         private val EMPTY_STRING_ARRAY = arrayOfNulls<String>(0)
     }
 }
 
 open class FrameworkSQLiteProgram(
-    private val delegate: SQLiteProgram
+    private val delegate: SQLiteProgram,
 ) : SupportSQLiteProgram {
     override fun bindNull(index: Int) {
         delegate.bindNull(index)
@@ -354,10 +376,11 @@ open class FrameworkSQLiteProgram(
 }
 
 class FrameworkSQLiteStatement(
-    private val delegate: SQLiteStatement
+    private val delegate: SQLiteStatement,
 ) : FrameworkSQLiteProgram(
-    delegate
-), SupportSQLiteStatement {
+    delegate,
+),
+    SupportSQLiteStatement {
     override fun execute() {
         delegate.execute()
     }
@@ -448,11 +471,14 @@ class SupportSQLiteCompat private constructor() {
             selectionArgs: Array<out String?>,
             editTable: String?,
             cancellationSignal: CancellationSignal,
-            cursorFactory: SQLiteDatabase.CursorFactory
+            cursorFactory: SQLiteDatabase.CursorFactory,
         ): Cursor {
             return sQLiteDatabase.rawQueryWithFactory(
-                cursorFactory, sql, selectionArgs, editTable,
-                cancellationSignal
+                cursorFactory,
+                sql,
+                selectionArgs,
+                editTable,
+                cancellationSignal,
             )
         }
 
@@ -469,7 +495,7 @@ class SupportSQLiteCompat private constructor() {
         @JvmStatic
         fun setForeignKeyConstraintsEnabled(
             sQLiteDatabase: SQLiteDatabase,
-            enable: Boolean
+            enable: Boolean,
         ) {
             sQLiteDatabase.setForeignKeyConstraintsEnabled(enable)
         }
@@ -513,7 +539,7 @@ class SupportSQLiteCompat private constructor() {
         @JvmStatic
         fun setWriteAheadLoggingEnabled(
             sQLiteOpenHelper: SQLiteOpenHelper,
-            enabled: Boolean
+            enabled: Boolean,
         ) {
             sQLiteOpenHelper.setWriteAheadLoggingEnabled(enabled)
         }
@@ -617,7 +643,7 @@ class SupportSQLiteCompat private constructor() {
         fun setNotificationUris(
             cursor: Cursor,
             cr: ContentResolver,
-            uris: List<Uri?>
+            uris: List<Uri?>,
         ) {
             cursor.setNotificationUris(cr, uris)
         }

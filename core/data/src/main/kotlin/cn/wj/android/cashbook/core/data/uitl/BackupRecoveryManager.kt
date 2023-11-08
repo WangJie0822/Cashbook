@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.data.uitl
 
 import android.Manifest
@@ -36,6 +52,12 @@ import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
 import cn.wj.android.cashbook.core.model.model.BackupModel
 import cn.wj.android.cashbook.core.network.util.WebDAVHandler
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -49,12 +71,6 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.withContext
 
 /**
  * 备份恢复管理
@@ -74,17 +90,17 @@ class BackupRecoveryManager @Inject constructor(
     private val backupDataVersion = dataVersion()
 
     private val _backupState: MutableStateFlow<BackupRecoveryState> = MutableStateFlow(
-        BackupRecoveryState.None
+        BackupRecoveryState.None,
     )
     private val _recoveryState: MutableStateFlow<BackupRecoveryState> = MutableStateFlow(
-        BackupRecoveryState.None
+        BackupRecoveryState.None,
     )
 
     val isWebDAVConnected: Flow<Boolean> =
         combine(
             networkMonitor.isOnline,
             connectedDataVersion,
-            settingRepository.appDataMode
+            settingRepository.appDataMode,
         ) { isOnline, _, _ ->
             isOnline && refreshConnectedStatus()
         }
@@ -205,17 +221,17 @@ class BackupRecoveryManager @Inject constructor(
         } else {
             ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+            ) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                ) == PackageManager.PERMISSION_GRANTED
         }
     }
 
     private suspend fun getLocalBackupList(
-        path: String
+        path: String,
     ): List<BackupModel> = withContext(ioCoroutineContext) {
         if (!grantedPermissions(path)) {
             return@withContext emptyList()
@@ -243,9 +259,11 @@ class BackupRecoveryManager @Inject constructor(
                     file
                 } else {
                     file.listFiles(FileFilter { it.name == BACKUP_DIR_NAME })?.firstOrNull() ?: file
-                }.listFiles(FileFilter {
-                    it.name.startsWith(BACKUP_FILE_NAME) && it.name.endsWith(BACKUP_FILE_EXT)
-                })?.forEach {
+                }.listFiles(
+                    FileFilter {
+                        it.name.startsWith(BACKUP_FILE_NAME) && it.name.endsWith(BACKUP_FILE_EXT)
+                    },
+                )?.forEach {
                     result.add(BackupModel(it.name, it.path))
                 }
             }
@@ -255,7 +273,7 @@ class BackupRecoveryManager @Inject constructor(
 
     suspend fun getRecoveryList(
         onlyLocal: Boolean,
-        localPath: String
+        localPath: String,
     ): List<BackupModel> = withContext(ioCoroutineContext) {
         val list = if (!onlyLocal && isWebDAVConnected.first()) {
             // 使用云端数据
@@ -296,9 +314,8 @@ class BackupRecoveryManager @Inject constructor(
                 ""
             }
 
-
     private suspend fun <T> withCredentials(
-        block: suspend WebDAVHandler.(String) -> T
+        block: suspend WebDAVHandler.(String) -> T,
     ): T = withContext(ioCoroutineContext) {
         val appDataMode = settingRepository.appDataMode.first()
         webDAVHandler.setCredentials(appDataMode.webDAVAccount, appDataMode.webDAVPassword)
@@ -428,8 +445,8 @@ class BackupRecoveryManager @Inject constructor(
                 .i("startRecovery(), backupPath is blank")
             updateRecoveryState(
                 BackupRecoveryState.Failed(
-                    BackupRecoveryState.FAILED_BLANK_BACKUP_PATH
-                )
+                    BackupRecoveryState.FAILED_BLANK_BACKUP_PATH,
+                ),
             )
             return
         }
@@ -518,8 +535,8 @@ class BackupRecoveryManager @Inject constructor(
                 context.openOrCreateDatabase(
                     dbFile.absolutePath,
                     Context.MODE_PRIVATE,
-                    null
-                )
+                    null,
+                ),
             )
             val currentDatabase = database.openHelper.writableDatabase
             if (DatabaseMigrations.recoveryFromDb(backupDatabase, currentDatabase)) {

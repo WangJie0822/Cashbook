@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.settings.screen
 
 import androidx.compose.foundation.layout.Box
@@ -56,7 +72,6 @@ internal fun LauncherRoute(
     viewModel: LauncherViewModel = hiltViewModel(),
     content: @Composable (() -> Unit) -> Unit,
 ) {
-
     // 界面 UI 状态数据
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -137,7 +152,6 @@ internal fun LauncherScreen(
         },
     ),
 ) {
-
     // 控制抽屉菜单显示隐藏
     LaunchedEffect(shouldDisplayDrawerSheet) {
         if (shouldDisplayDrawerSheet) {
@@ -213,7 +227,7 @@ internal fun LauncherSheet(
             text = stringResource(id = R.string.sheet_title),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(24.dp),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_books)) },
@@ -253,7 +267,7 @@ internal fun LauncherSheet(
         Divider(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .height(1.dp)
+                .height(1.dp),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.settings)) },

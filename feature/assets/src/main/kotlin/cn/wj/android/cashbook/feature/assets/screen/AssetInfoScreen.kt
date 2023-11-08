@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.assets.screen
 
 import androidx.compose.foundation.layout.Box
@@ -69,7 +85,6 @@ internal fun AssetInfoRoute(
         setProgressDialogHintText(stringResource(id = R.string.asset_in_delete))
     },
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AssetInfoScreen(
@@ -128,9 +143,8 @@ internal fun AssetInfoScreen(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember {
         SnackbarHostState()
-    }
+    },
 ) {
-
     val copiedToClipboardText = stringResource(id = R.string.copied_to_clipboard)
     val assetDeleteFailedText = stringResource(id = R.string.asset_delete_failed)
     LaunchedEffect(bookmark) {
@@ -161,14 +175,14 @@ internal fun AssetInfoScreen(
                         IconButton(onClick = onDeleteAssetClick) {
                             Icon(
                                 imageVector = CashbookIcons.DeleteForever,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                         if (uiState.shouldDisplayMore) {
                             IconButton(onClick = onRequestShowMoreDialog) {
                                 Icon(
                                     imageVector = CashbookIcons.Info,
-                                    contentDescription = null
+                                    contentDescription = null,
                                 )
                             }
                         }
@@ -222,19 +236,19 @@ internal fun AssetInfoScreen(
                                                     )
                                                     Text(
                                                         text = uiState.openBank,
-                                                        modifier = Modifier.weight(1f)
+                                                        modifier = Modifier.weight(1f),
                                                     )
                                                     IconButton(onClick = {
                                                         clipboardManager.setText(
                                                             AnnotatedString(
-                                                                uiState.openBank
-                                                            )
+                                                                uiState.openBank,
+                                                            ),
                                                         )
                                                         onRequestDisplayBookmark()
                                                     }) {
                                                         Icon(
                                                             imageVector = CashbookIcons.ContentCopy,
-                                                            contentDescription = null
+                                                            contentDescription = null,
                                                         )
                                                     }
                                                 }
@@ -247,19 +261,19 @@ internal fun AssetInfoScreen(
                                                     )
                                                     Text(
                                                         text = uiState.cardNo,
-                                                        modifier = Modifier.weight(1f)
+                                                        modifier = Modifier.weight(1f),
                                                     )
                                                     IconButton(onClick = {
                                                         clipboardManager.setText(
                                                             AnnotatedString(
-                                                                uiState.cardNo
-                                                            )
+                                                                uiState.cardNo,
+                                                            ),
                                                         )
                                                         onRequestDisplayBookmark()
                                                     }) {
                                                         Icon(
                                                             imageVector = CashbookIcons.ContentCopy,
-                                                            contentDescription = null
+                                                            contentDescription = null,
                                                         )
                                                     }
                                                 }
@@ -272,7 +286,7 @@ internal fun AssetInfoScreen(
                                                     )
                                                     Text(
                                                         text = uiState.remark,
-                                                        modifier = Modifier.weight(1f)
+                                                        modifier = Modifier.weight(1f),
                                                     )
                                                 }
                                             }
@@ -290,7 +304,7 @@ internal fun AssetInfoScreen(
                                         TextButton(onClick = onRequestDismissDialog) {
                                             Text(text = stringResource(id = R.string.cancel))
                                         }
-                                    }
+                                    },
                                 )
                             }
                         }
@@ -310,7 +324,7 @@ internal fun AssetInfoScreen(
                                     TextButton(onClick = onRequestDismissDialog) {
                                         Text(text = stringResource(id = R.string.cancel))
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -353,7 +367,7 @@ private fun AssetInfoContent(
     balance: String,
     totalAmount: String,
     billingDate: String,
-    repaymentDate: String
+    repaymentDate: String,
 ) {
     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
         Card(
@@ -361,7 +375,7 @@ private fun AssetInfoContent(
                 .fillMaxWidth()
                 .padding(16.dp),
 
-            ) {
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -375,7 +389,7 @@ private fun AssetInfoContent(
                 )
                 Text(
                     text = balance.withCNY(),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 if (isCreditCard) {
                     Row(
@@ -390,7 +404,7 @@ private fun AssetInfoContent(
                                 text = stringResource(id = R.string.total_amount),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer.copy(
-                                    alpha = 0.7f
+                                    alpha = 0.7f,
                                 ),
                             )
                             Text(
@@ -407,7 +421,7 @@ private fun AssetInfoContent(
                                 text = stringResource(id = R.string.billing_date),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer.copy(
-                                    alpha = 0.7f
+                                    alpha = 0.7f,
                                 ),
                             )
                             val billingDateText = if (billingDate.isBlank()) {
@@ -429,7 +443,7 @@ private fun AssetInfoContent(
                                 text = stringResource(id = R.string.repayment_date),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer.copy(
-                                    alpha = 0.7f
+                                    alpha = 0.7f,
                                 ),
                             )
                             val repaymentDateText = if (repaymentDate.isBlank()) {

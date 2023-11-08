@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.books.screen
 
 import androidx.compose.foundation.layout.Box
@@ -44,7 +60,6 @@ internal fun EditBookRoute(
         updateBookId(bookId)
     },
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     EditBookScreen(
@@ -55,13 +70,12 @@ internal fun EditBookRoute(
             viewModel.onSaveClick(
                 name = name,
                 description = description,
-                onSuccess = onRequestPopBackStack
+                onSuccess = onRequestPopBackStack,
             )
         },
         onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +88,6 @@ internal fun EditBookScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     // 提示文本
     val blankNameHint = stringResource(id = R.string.please_enter_book_name)
     val nameDuplicatedHint = stringResource(id = R.string.book_name_exists)
@@ -121,7 +134,7 @@ internal fun EditBookScreen(
             }) {
                 Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
             }
-        }
+        },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             when (uiState) {

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.network.util
 
 import androidx.annotation.WorkerThread
@@ -6,10 +22,6 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.model.model.BackupModel
-import java.io.File
-import java.io.InputStream
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Credentials
@@ -18,6 +30,10 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import org.intellij.lang.annotations.Language
 import org.jsoup.Jsoup
+import java.io.File
+import java.io.InputStream
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 /**
  * 使用 OkHttp 实现的 WebDAV 操作
@@ -51,7 +67,7 @@ class OkHttpWebDAVHandler @Inject constructor(
                     .url(url)
                     .addHeader("Authorization", Credentials.basic(account, password))
                     .method("HEAD", null)
-                    .build()
+                    .build(),
             ).execute()
         }.getOrElse { throwable ->
             logger().e(throwable, "exists(url = <$url>)")
@@ -72,7 +88,7 @@ class OkHttpWebDAVHandler @Inject constructor(
                     .url(url)
                     .addHeader("Authorization", Credentials.basic(account, password))
                     .method("MKCOL", null)
-                    .build()
+                    .build(),
             ).execute()
         }.getOrElse { throwable ->
             logger().e(throwable, "createDirectory(url = <$url>)")
@@ -94,12 +110,12 @@ class OkHttpWebDAVHandler @Inject constructor(
                     .url(url)
                     .addHeader("Authorization", Credentials.basic(account, password))
                     .put(requestBody)
-                    .build()
+                    .build(),
             ).execute()
         }.getOrElse { throwable ->
             logger().e(
                 throwable,
-                "put(url = <$url>, dataStream = <$dataStream>, contentType = <$contentType>)"
+                "put(url = <$url>, dataStream = <$dataStream>, contentType = <$contentType>)",
             )
             null
         } ?: return false
@@ -118,7 +134,7 @@ class OkHttpWebDAVHandler @Inject constructor(
                     .url(url)
                     .addHeader("Authorization", Credentials.basic(account, password))
                     .put(RequestBody.create(MediaType.parse(contentType), file))
-                    .build()
+                    .build(),
             ).execute()
         }.getOrElse { throwable ->
             logger().e(throwable, "put(url = <$url>, file = <$file>, contentType = <$contentType>)")
@@ -139,12 +155,14 @@ class OkHttpWebDAVHandler @Inject constructor(
         val requestPropText = if (propsList.isEmpty()) {
             DAV_PROP.replace("%s", "")
         } else {
-            DAV_PROP.format(with(StringBuilder()) {
-                propsList.forEach {
-                    appendLine("<a:$it/>")
-                }
-                toString()
-            })
+            DAV_PROP.format(
+                with(StringBuilder()) {
+                    propsList.forEach {
+                        appendLine("<a:$it/>")
+                    }
+                    toString()
+                },
+            )
         }
         val response = runCatching {
             callFactory.newCall(
@@ -154,9 +172,9 @@ class OkHttpWebDAVHandler @Inject constructor(
                     .addHeader("Depth", "1")
                     .method(
                         "PROPFIND",
-                        RequestBody.create(MediaType.parse("text/plain"), requestPropText)
+                        RequestBody.create(MediaType.parse("text/plain"), requestPropText),
                     )
-                    .build()
+                    .build(),
             ).execute()
         }.getOrElse { throwable ->
             logger().e(throwable, "list(url = <$url>, propsList = <$propsList>)")
@@ -188,7 +206,7 @@ class OkHttpWebDAVHandler @Inject constructor(
                 Request.Builder()
                     .url(url)
                     .addHeader("Authorization", Credentials.basic(account, password))
-                    .build()
+                    .build(),
             ).execute()
         }.getOrElse { throwable ->
             logger().e(throwable, "get(url = <$url>)")

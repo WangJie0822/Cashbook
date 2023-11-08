@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.common.util
 
 /**
@@ -235,7 +251,7 @@ internal val LUNAR_MONTH_DAYS = intArrayOf(
     0x154a,
     0x136a5,
     0xda4,
-    0x15ac
+    0x15ac,
 )
 
 internal val SOLAR = intArrayOf(
@@ -463,7 +479,7 @@ internal val SOLAR = intArrayOf(
     0x10784c,
     0x107a3f,
     0x107c53,
-    0x107e48
+    0x107e48,
 )
 
 /**
@@ -487,7 +503,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x16554,
     0x056a0,
     0x09ad0,
-    0x055d2,  //1900-1909
+    0x055d2, // 1900-1909
     0x04ae0,
     0x0a5b6,
     0x0a4d0,
@@ -497,7 +513,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0d6a0,
     0x0ada2,
     0x095b0,
-    0x14977,  //1910-1919
+    0x14977, // 1910-1919
     0x04970,
     0x0a4b0,
     0x0b4b5,
@@ -507,7 +523,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x02b60,
     0x09570,
     0x052f2,
-    0x04970,  //1920-1929
+    0x04970, // 1920-1929
     0x06566,
     0x0d4a0,
     0x0ea50,
@@ -517,7 +533,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x186e3,
     0x092e0,
     0x1c8d7,
-    0x0c950,  //1930-1939
+    0x0c950, // 1930-1939
     0x0d4a0,
     0x1d8a6,
     0x0b550,
@@ -527,7 +543,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x092d0,
     0x0d2b2,
     0x0a950,
-    0x0b557,  //1940-1949
+    0x0b557, // 1940-1949
     0x06ca0,
     0x0b550,
     0x15355,
@@ -537,7 +553,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x052b0,
     0x0a9a8,
     0x0e950,
-    0x06aa0,  //1950-1959
+    0x06aa0, // 1950-1959
     0x0aea6,
     0x0ab50,
     0x04b60,
@@ -547,7 +563,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0f263,
     0x0d950,
     0x05b57,
-    0x056a0,  //1960-1969
+    0x056a0, // 1960-1969
     0x096d0,
     0x04dd5,
     0x04ad0,
@@ -557,7 +573,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0d558,
     0x0b540,
     0x0b6a0,
-    0x195a6,  //1970-1979
+    0x195a6, // 1970-1979
     0x095b0,
     0x049b0,
     0x0a974,
@@ -567,7 +583,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x06d40,
     0x0af46,
     0x0ab60,
-    0x09570,  //1980-1989
+    0x09570, // 1980-1989
     0x04af5,
     0x04970,
     0x064b0,
@@ -577,7 +593,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x055c0,
     0x0ab60,
     0x096d5,
-    0x092e0,  //1990-1999
+    0x092e0, // 1990-1999
     0x0c960,
     0x0d954,
     0x0d4a0,
@@ -587,7 +603,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0abb7,
     0x025d0,
     0x092d0,
-    0x0cab5,  //2000-2009
+    0x0cab5, // 2000-2009
     0x0a950,
     0x0b4a0,
     0x0baa4,
@@ -597,7 +613,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0a5b0,
     0x15176,
     0x052b0,
-    0x0a930,  //2010-2019
+    0x0a930, // 2010-2019
     0x07954,
     0x06aa0,
     0x0ad50,
@@ -607,7 +623,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0a4e0,
     0x0d260,
     0x0ea65,
-    0x0d530,  //2020-2029
+    0x0d530, // 2020-2029
     0x05aa0,
     0x076a3,
     0x096d0,
@@ -617,7 +633,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x1d0b6,
     0x0d250,
     0x0d520,
-    0x0dd45,  //2030-2039
+    0x0dd45, // 2030-2039
     0x0b5a0,
     0x056d0,
     0x055b2,
@@ -627,7 +643,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0aa50,
     0x1b255,
     0x06d20,
-    0x0ada0,  //2040-2049
+    0x0ada0, // 2040-2049
     0x14b63,
     0x09370,
     0x049f8,
@@ -637,7 +653,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x0ea50,
     0x06b20,
     0x1a6c4,
-    0x0aae0,  //2050-2059
+    0x0aae0, // 2050-2059
     0x0a2e0,
     0x0d2e3,
     0x0c960,
@@ -647,7 +663,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x05d55,
     0x056a0,
     0x0a6d0,
-    0x055d4,  //2060-2069
+    0x055d4, // 2060-2069
     0x052d0,
     0x0a9b8,
     0x0a950,
@@ -657,7 +673,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x055a0,
     0x0aba4,
     0x0a5b0,
-    0x052b0,  //2070-2079
+    0x052b0, // 2070-2079
     0x0b273,
     0x06930,
     0x07337,
@@ -667,7 +683,7 @@ internal val LUNAR_INFO = intArrayOf(
     0x04b60,
     0x0a570,
     0x054e4,
-    0x0d160,  //2080-2089
+    0x0d160, // 2080-2089
     0x0e968,
     0x0d520,
     0x0daa0,
@@ -677,8 +693,8 @@ internal val LUNAR_INFO = intArrayOf(
     0x0a9d4,
     0x0a2d0,
     0x0d150,
-    0x0f252,  //2090-2099
-    0x0d520
+    0x0f252, // 2090-2099
+    0x0d520,
 )
 
 /**
@@ -696,7 +712,7 @@ internal val MONTH_STR = arrayOf(
     "九月",
     "十月",
     "冬月",
-    "腊月"
+    "腊月",
 )
 
 /**
@@ -732,7 +748,7 @@ internal val DAY_STR = arrayOf(
     "廿七",
     "廿八",
     "廿九",
-    "三十"
+    "三十",
 )
 
 /**
@@ -745,7 +761,7 @@ internal val TRADITION_FESTIVAL_STR = arrayOf(
     "0505端午",
     "0707七夕",
     "0815中秋",
-    "0909重阳"
+    "0909重阳",
 )
 
 /** 公历节日数据 */
@@ -767,7 +783,7 @@ internal val GREGORIAN_FESTIVAL = arrayOf(
     "1031万圣节",
     "1111光棍节",
     "1224平安夜",
-    "1225圣诞节"
+    "1225圣诞节",
 )
 
 /**
@@ -776,5 +792,5 @@ internal val GREGORIAN_FESTIVAL = arrayOf(
 internal val SPECIAL_FESTIVAL_STR = arrayOf(
     "母亲节",
     "父亲节",
-    "感恩节"
+    "感恩节",
 )

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.migration
 
 import android.content.ContentValues
@@ -137,60 +153,60 @@ object DatabaseMigrations {
                     values = ContentValues().apply {
                         put(
                             TABLE_ASSET_ID,
-                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_ASSET_ID))
+                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_ASSET_ID)),
                         )
                         put(
                             TABLE_ASSET_BOOKS_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_ASSET_BOOKS_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_ASSET_BOOKS_ID)),
                         )
                         put(
                             TABLE_ASSET_NAME,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_NAME))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_NAME)),
                         )
                         put(
                             TABLE_ASSET_BALANCE,
-                            it.getDouble(it.getColumnIndexOrThrow(TABLE_ASSET_BALANCE))
+                            it.getDouble(it.getColumnIndexOrThrow(TABLE_ASSET_BALANCE)),
                         )
                         put(
                             TABLE_ASSET_TOTAL_AMOUNT,
-                            it.getDouble(it.getColumnIndexOrThrow(TABLE_ASSET_TOTAL_AMOUNT))
+                            it.getDouble(it.getColumnIndexOrThrow(TABLE_ASSET_TOTAL_AMOUNT)),
                         )
                         put(
                             TABLE_ASSET_BILLING_DATE,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_BILLING_DATE))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_BILLING_DATE)),
                         )
                         put(
                             TABLE_ASSET_REPAYMENT_DATE,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_REPAYMENT_DATE))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_REPAYMENT_DATE)),
                         )
                         put(
                             TABLE_ASSET_TYPE,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_TYPE))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_TYPE)),
                         )
                         put(
                             TABLE_ASSET_CLASSIFICATION,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_CLASSIFICATION))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_CLASSIFICATION)),
                         )
                         put(
                             TABLE_ASSET_INVISIBLE,
-                            it.getInt(it.getColumnIndexOrThrow(TABLE_ASSET_INVISIBLE))
+                            it.getInt(it.getColumnIndexOrThrow(TABLE_ASSET_INVISIBLE)),
                         )
                         put(
                             TABLE_ASSET_OPEN_BANK,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_OPEN_BANK))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_OPEN_BANK)),
                         )
                         put(
                             TABLE_ASSET_CARD_NO,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_CARD_NO))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_CARD_NO)),
                         )
                         put(
                             TABLE_ASSET_REMARK,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_REMARK))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_ASSET_REMARK)),
                         )
                         put(TABLE_ASSET_SORT, it.getInt(it.getColumnIndexOrThrow(TABLE_ASSET_SORT)))
                         put(
                             TABLE_ASSET_MODIFY_TIME,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_ASSET_MODIFY_TIME))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_ASSET_MODIFY_TIME)),
                         )
                     },
                 )
@@ -205,19 +221,19 @@ object DatabaseMigrations {
                     values = ContentValues().apply {
                         put(
                             TABLE_BOOKS_ID,
-                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_BOOKS_ID))
+                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_BOOKS_ID)),
                         )
                         put(
                             TABLE_BOOKS_NAME,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_BOOKS_NAME))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_BOOKS_NAME)),
                         )
                         put(
                             TABLE_BOOKS_DESCRIPTION,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_BOOKS_DESCRIPTION))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_BOOKS_DESCRIPTION)),
                         )
                         put(
                             TABLE_BOOKS_MODIFY_TIME,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_BOOKS_MODIFY_TIME))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_BOOKS_MODIFY_TIME)),
                         )
                     },
                 )
@@ -232,47 +248,47 @@ object DatabaseMigrations {
                     values = ContentValues().apply {
                         put(
                             TABLE_RECORD_ID,
-                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_RECORD_ID))
+                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_RECORD_ID)),
                         )
                         put(
                             TABLE_RECORD_TYPE_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_TYPE_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_TYPE_ID)),
                         )
                         put(
                             TABLE_RECORD_ASSET_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_ASSET_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_ASSET_ID)),
                         )
                         put(
                             TABLE_RECORD_INTO_ASSET_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_INTO_ASSET_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_INTO_ASSET_ID)),
                         )
                         put(
                             TABLE_RECORD_BOOKS_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_BOOKS_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_BOOKS_ID)),
                         )
                         put(
                             TABLE_RECORD_AMOUNT,
-                            it.getDouble(it.getColumnIndexOrThrow(TABLE_RECORD_AMOUNT))
+                            it.getDouble(it.getColumnIndexOrThrow(TABLE_RECORD_AMOUNT)),
                         )
                         put(
                             TABLE_RECORD_CONCESSIONS,
-                            it.getDouble(it.getColumnIndexOrThrow(TABLE_RECORD_CONCESSIONS))
+                            it.getDouble(it.getColumnIndexOrThrow(TABLE_RECORD_CONCESSIONS)),
                         )
                         put(
                             TABLE_RECORD_CHARGE,
-                            it.getDouble(it.getColumnIndexOrThrow(TABLE_RECORD_CHARGE))
+                            it.getDouble(it.getColumnIndexOrThrow(TABLE_RECORD_CHARGE)),
                         )
                         put(
                             TABLE_RECORD_REMARK,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_RECORD_REMARK))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_RECORD_REMARK)),
                         )
                         put(
                             TABLE_RECORD_REIMBURSABLE,
-                            it.getInt(it.getColumnIndexOrThrow(TABLE_RECORD_REIMBURSABLE))
+                            it.getInt(it.getColumnIndexOrThrow(TABLE_RECORD_REIMBURSABLE)),
                         )
                         put(
                             TABLE_RECORD_RECORD_TIME,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_RECORD_TIME))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_RECORD_TIME)),
                         )
                     },
                 )
@@ -287,17 +303,17 @@ object DatabaseMigrations {
                     values = ContentValues().apply {
                         put(
                             TABLE_RECORD_RELATED_ID,
-                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_RECORD_RELATED_ID))
+                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_RECORD_RELATED_ID)),
                         )
                         put(
                             TABLE_RECORD_RELATED_RECORD_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_RELATED_RECORD_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_RECORD_RELATED_RECORD_ID)),
                         )
                         put(
                             TABLE_RECORD_RELATED_RELATED_RECORD_ID,
                             it.getLong(
-                                it.getColumnIndexOrThrow(TABLE_RECORD_RELATED_RELATED_RECORD_ID)
-                            )
+                                it.getColumnIndexOrThrow(TABLE_RECORD_RELATED_RELATED_RECORD_ID),
+                            ),
                         )
                     },
                 )
@@ -312,15 +328,15 @@ object DatabaseMigrations {
                     values = ContentValues().apply {
                         put(
                             TABLE_TAG_ID,
-                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_TAG_ID))
+                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_TAG_ID)),
                         )
                         put(
                             TABLE_TAG_NAME,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_TAG_NAME))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_TAG_NAME)),
                         )
                         put(
                             TABLE_TAG_BOOKS_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_TAG_BOOKS_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_TAG_BOOKS_ID)),
                         )
                     },
                 )
@@ -335,15 +351,15 @@ object DatabaseMigrations {
                     values = ContentValues().apply {
                         put(
                             TABLE_TAG_RELATED_ID,
-                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_TAG_RELATED_ID))
+                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_TAG_RELATED_ID)),
                         )
                         put(
                             TABLE_TAG_RELATED_RECORD_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_TAG_RELATED_RECORD_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_TAG_RELATED_RECORD_ID)),
                         )
                         put(
                             TABLE_TAG_RELATED_TAG_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_TAG_RELATED_TAG_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_TAG_RELATED_TAG_ID)),
                         )
                     },
                 )
@@ -358,31 +374,31 @@ object DatabaseMigrations {
                     values = ContentValues().apply {
                         put(
                             TABLE_TYPE_ID,
-                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_TYPE_ID))
+                            it.getLongOrNull(it.getColumnIndexOrThrow(TABLE_TYPE_ID)),
                         )
                         put(
                             TABLE_TYPE_PARENT_ID,
-                            it.getLong(it.getColumnIndexOrThrow(TABLE_TYPE_PARENT_ID))
+                            it.getLong(it.getColumnIndexOrThrow(TABLE_TYPE_PARENT_ID)),
                         )
                         put(
                             TABLE_TYPE_NAME,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_NAME))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_NAME)),
                         )
                         put(
                             TABLE_TYPE_ICON_NAME,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_ICON_NAME))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_ICON_NAME)),
                         )
                         put(
                             TABLE_TYPE_TYPE_LEVEL,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_LEVEL))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_LEVEL)),
                         )
                         put(
                             TABLE_TYPE_TYPE_CATEGORY,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_CATEGORY))
+                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_CATEGORY)),
                         )
                         put(
                             TABLE_TYPE_PROTECTED,
-                            it.getInt(it.getColumnIndexOrThrow(TABLE_TYPE_PROTECTED))
+                            it.getInt(it.getColumnIndexOrThrow(TABLE_TYPE_PROTECTED)),
                         )
                         put(TABLE_TYPE_SORT, it.getInt(it.getColumnIndexOrThrow(TABLE_TYPE_SORT)))
                     },

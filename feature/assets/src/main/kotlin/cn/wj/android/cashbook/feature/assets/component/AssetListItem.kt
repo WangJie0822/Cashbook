@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.assets.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -56,7 +72,7 @@ internal fun AssetListItem(
             onLongClick = onItemLongClick,
         )
         .padding(horizontal = 16.dp, vertical = 8.dp)
-    if (type.isCreditCard()) {
+    if (type.isCreditCard) {
         // 信用卡
         CreditCardAssetListItem(
             iconPainter = iconPainter,
@@ -183,7 +199,7 @@ private fun CreditCardAssetListItem(
                 }
             LinearProgressIndicator(
                 progress = progress,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = 4.dp),
             )
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -214,7 +230,7 @@ private fun AssetListPreview() {
                     balance = "1000",
                     totalAmount = "",
                     onItemClick = {},
-                    name = "建设银行"
+                    name = "建设银行",
                 )
                 AssetListItem(
                     type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
@@ -222,7 +238,7 @@ private fun AssetListPreview() {
                     balance = "1000",
                     totalAmount = "2000",
                     onItemClick = {},
-                    name = "招商银行"
+                    name = "招商银行",
                 )
             }
         }

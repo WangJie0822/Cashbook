@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.navigation
 
 import androidx.compose.material3.SnackbarResult
@@ -52,12 +68,12 @@ fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
         ROUTE_EDIT_RECORD
             .replace(
                 oldValue = "{$ROUTE_EDIT_RECORD_KEY_RECORD_ID}",
-                newValue = recordId.toString()
+                newValue = recordId.toString(),
             )
             .replace(
                 oldValue = "{$ROUTE_EDIT_RECORD_KEY_TYPE_ID}",
-                newValue = typeId.toString()
-            )
+                newValue = typeId.toString(),
+            ),
     )
 }
 
@@ -66,12 +82,12 @@ fun NavController.naviToTypedAnalytics(tagId: Long = -1L, typeId: Long = -1L) {
         ROUTE_TYPED_ANALYTICS
             .replace(
                 oldValue = "{$ROUTE_EDIT_RECORD_KEY_TAG_ID}",
-                newValue = tagId.toString()
+                newValue = tagId.toString(),
             )
             .replace(
                 oldValue = "{$ROUTE_EDIT_RECORD_KEY_TYPE_ID}",
-                newValue = typeId.toString()
-            )
+                newValue = typeId.toString(),
+            ),
     )
 }
 

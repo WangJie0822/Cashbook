@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.design.component
 
 import android.content.res.Configuration
@@ -55,22 +71,26 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "1") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "1") },
+                ) {
                     Text(text = "1")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "4") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "4") },
+                ) {
                     Text(text = "4")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "7") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "7") },
+                ) {
                     Text(text = "7")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onBracketClick(text) }) {
+                    onClick = { text = CalculatorUtils.onBracketClick(text) },
+                ) {
                     Text(text = "()")
                 }
             }
@@ -79,27 +99,32 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
             ) {
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "÷") }) {
+                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "÷") },
+                ) {
                     Text(text = "÷")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "2") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "2") },
+                ) {
                     Text(text = "2")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "5") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "5") },
+                ) {
                     Text(text = "5")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "8") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "8") },
+                ) {
                     Text(text = "8")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "0") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "0") },
+                ) {
                     Text(text = "0")
                 }
             }
@@ -108,27 +133,32 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
             ) {
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "×") }) {
+                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "×") },
+                ) {
                     Text(text = "×")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "3") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "3") },
+                ) {
                     Text(text = "3")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "6") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "6") },
+                ) {
                     Text(text = "6")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onNumberClick(text, "9") }) {
+                    onClick = { text = CalculatorUtils.onNumberClick(text, "9") },
+                ) {
                     Text(text = "9")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onPointClick(text) }) {
+                    onClick = { text = CalculatorUtils.onPointClick(text) },
+                ) {
                     Text(text = ".")
                 }
             }
@@ -137,17 +167,20 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
             ) {
                 IconButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onBackPressed(text) }) {
+                    onClick = { text = CalculatorUtils.onBackPressed(text) },
+                ) {
                     Icon(imageVector = CashbookIcons.Backspace, contentDescription = null)
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "-") }) {
+                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "-") },
+                ) {
                     Text(text = "-")
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "+") }) {
+                    onClick = { text = CalculatorUtils.onComputeSignClick(text, "+") },
+                ) {
                     Text(text = "+")
                 }
                 TextButton(
@@ -162,7 +195,8 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                         } else {
                             onConfirmClick(text)
                         }
-                    }) {
+                    },
+                ) {
                     Text(
                         text = if (CalculatorUtils.needShowEqualSign(text)) "=" else "确认",
                         color = MaterialTheme.colorScheme.onPrimary,
