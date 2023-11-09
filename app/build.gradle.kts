@@ -78,7 +78,7 @@ android {
     applicationVariants.all {
         mergeAssetsProvider.get().doFirst {
             val buildTagName = System.getenv("BUILD_TAG_NAME")
-            if (buildTagName.isNotBlank()) {
+            if (!buildTagName.isNullOrBlank()) {
                 // CI 构建流程，生成 RELEASE.md
                 File(rootDir, "CHANGELOG.md").readText().lines().let { list ->
                     println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md")
