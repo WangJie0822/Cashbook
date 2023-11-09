@@ -249,7 +249,7 @@ class EditRecordViewModel @Inject constructor(
             // 新建，自动显示输入框
             amountSheetShowed = true
             viewModelScope.launch {
-                delay(1000L)
+                delay(500L)
                 displayAmountSheet()
             }
         }
