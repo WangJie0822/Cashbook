@@ -1,5 +1,6 @@
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
+import java.io.FileWriter
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.application)
@@ -44,7 +45,7 @@ android {
             isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -74,6 +75,53 @@ android {
         }
     }
 
+    applicationVariants.all {
+        mergeAssetsProvider.get().doFirst {
+            val buildTagName = System.getenv("BUILD_TAG_NAME")
+            if (buildTagName.isNotBlank()) {
+                // CI 构建流程，生成 RELEASE.md
+                File(rootDir, "CHANGELOG.md").readText().lines().let { list ->
+                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md")
+                    val start = if (buildTagName.endsWith("_pre")) {
+                        // 预发布版本，使用 [Unreleased] 作为发布说明
+                        list.indexOf("## [Unreleased]")
+                    } else {
+                        // 正式版本，使用 tag 对应版本作为发布说明
+                        list.indexOf("## [${buildTagName.drop(1)}]")
+                    }
+                    if (start < 0) {
+                        throw RuntimeException(
+                            "Release info not found, make sure file CHANGELOG.md " +
+                                    "contains '## [Unreleased]' if pre or contains " +
+                                    "'## [${buildTagName.drop(1)}]' if release",
+                        )
+                    }
+                    val content = with(StringBuilder()) {
+                        for (i in (start + 1) until list.size) {
+                            val line = list[i]
+                            if (line.startsWith("## [")) {
+                                break
+                            } else {
+                                appendLine(line)
+                            }
+                        }
+                        toString()
+                    }
+                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md content = <$content>")
+                    val releaseFile = File(rootDir, "RELEASE.md")
+                    if (releaseFile.exists()) {
+                        releaseFile.delete()
+                    }
+                    releaseFile.createNewFile()
+                    FileWriter(releaseFile).use {
+                        it.write(content)
+                        it.flush()
+                    }
+                }
+            }
+        }
+    }
+
     // 配置 APK 输出路径
     val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
     configureOutputs(
@@ -83,7 +131,8 @@ android {
         },
         { variant, _ ->
             "Cashbook_${variant.versionName}.apk"
-        })
+        },
+    )
 }
 
 dependencies {
