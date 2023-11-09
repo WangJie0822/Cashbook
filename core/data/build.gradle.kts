@@ -27,7 +27,7 @@ android {
     libraryVariants.all {
         mergeAssetsProvider.get().doFirst {
             val intoDir = File(projectDir, "/src/main/assets")
-            println("> Task :${project.name}:before mergeAssets copy .md files from $rootDir into $intoDir")
+            println("> Task :${project.name}:beforeMergeAssets copy .md files from $rootDir into $intoDir")
             delete(intoDir)
             copy {
                 from(rootDir)
