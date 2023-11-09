@@ -1,4 +1,4 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -9,8 +9,8 @@ class AndroidHiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_GOOGLE_HILT)
-                apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_KAPT)
+                apply(ProjectSetting.Plugin.PLUGIN_GOOGLE_HILT)
+                apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_KAPT)
             }
 
             val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")

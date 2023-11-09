@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 plugins {
-    alias(libs.plugins.cashbook.android.library.feature)
-    alias(libs.plugins.cashbook.android.library.flavors)
-    alias(libs.plugins.cashbook.android.library.compose)
-    alias(libs.plugins.cashbook.android.library.jacoco)
+    alias(conventionLibs.plugins.cashbook.android.library.feature)
+    alias(conventionLibs.plugins.cashbook.android.library.flavors)
+    alias(conventionLibs.plugins.cashbook.android.library.compose)
+    alias(conventionLibs.plugins.cashbook.android.library.jacoco)
+    alias(conventionLibs.plugins.cashbook.android.lint)
 }
 
 android {

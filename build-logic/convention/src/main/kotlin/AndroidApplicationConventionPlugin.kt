@@ -1,4 +1,4 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
 import cn.wj.android.cashbook.buildlogic.configurePrintApksTask
@@ -21,24 +21,24 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
-                apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
+                apply(ProjectSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
+                apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
             }
 
             extensions.configure<KotlinProjectExtension> {
-                jvmToolchain(ApplicationSetting.Config.javaVersion.version)
+                jvmToolchain(ProjectSetting.Config.javaVersion.version)
             }
 
             extensions.configure<ApplicationExtension> {
 
                 configureKotlinAndroid(this)
                 with(defaultConfig) {
-                    targetSdk = ApplicationSetting.Config.TARGET_SDK
+                    targetSdk = ProjectSetting.Config.TARGET_SDK
 
                     // 应用版本号
-                    versionCode = ApplicationSetting.Config.versionCode
+                    versionCode = ProjectSetting.Config.versionCode
                     // 应用版本名
-                    versionName = ApplicationSetting.Config.versionName
+                    versionName = ProjectSetting.Config.versionName
                 }
                 configureGradleManagedDevices(this)
             }

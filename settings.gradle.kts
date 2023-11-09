@@ -32,6 +32,10 @@ dependencyResolutionManagement {
     }
     // 配置 Version Catalogs
     versionCatalogs {
+        // 本地项目插件
+        create("conventionLibs") {
+            from(files("./gradle/convention.versions.toml"))
+        }
         // 签名配置信息
         if (File("./gradle/signing.versions.toml").exists()) {
             create("signingLibs") {
@@ -49,6 +53,8 @@ rootProject.name = "Cashbook"
 // 项目包含的 Module
 include(":app")
 include(":app-catalog")
+
+include(":lint")
 
 include(":feature:tags")
 include(":feature:types")

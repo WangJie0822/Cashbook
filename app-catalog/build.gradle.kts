@@ -1,7 +1,6 @@
 plugins {
-    alias(libs.plugins.cashbook.android.application)
-    alias(libs.plugins.cashbook.android.application.flavors)
-    alias(libs.plugins.cashbook.android.application.compose)
+    alias(conventionLibs.plugins.cashbook.android.application)
+    alias(conventionLibs.plugins.cashbook.android.application.compose)
 }
 
 android {

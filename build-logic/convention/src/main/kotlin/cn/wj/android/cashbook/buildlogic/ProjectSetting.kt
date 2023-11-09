@@ -3,11 +3,11 @@ package cn.wj.android.cashbook.buildlogic
 import org.gradle.api.JavaVersion
 
 /**
- * 应用配置数据
+ * 项目配置数据
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/7
  */
-object ApplicationSetting {
+object ProjectSetting {
 
     object Config {
         /** SDK 编译版本 */

@@ -1,4 +1,4 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import com.google.devtools.ksp.gradle.KspExtension
 import java.io.File
 import org.gradle.api.Plugin
@@ -16,7 +16,7 @@ class AndroidRoomConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply(ApplicationSetting.Plugin.PLUGIN_GOOGLE_KSP)
+            pluginManager.apply(ProjectSetting.Plugin.PLUGIN_GOOGLE_KSP)
 
             extensions.configure<KspExtension> {
                 // The schemas directory contains a schema file for each version of the Room database.

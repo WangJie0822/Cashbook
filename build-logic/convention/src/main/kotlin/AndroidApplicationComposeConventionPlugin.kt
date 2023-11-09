@@ -1,4 +1,4 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureAndroidCompose
 import cn.wj.android.cashbook.buildlogic.version
 import com.android.build.api.dsl.ApplicationExtension
@@ -19,7 +19,7 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             extensions.configure<KotlinProjectExtension> {
-                jvmToolchain(ApplicationSetting.Config.javaVersion.version)
+                jvmToolchain(ProjectSetting.Config.javaVersion.version)
             }
 
             val extension = extensions.getByType<ApplicationExtension>()

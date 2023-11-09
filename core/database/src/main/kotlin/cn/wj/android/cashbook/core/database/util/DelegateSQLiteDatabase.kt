@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package cn.wj.android.cashbook.core.database.util
 
 import android.app.ActivityManager
@@ -36,6 +38,7 @@ import android.os.Bundle
 import android.os.CancellationSignal
 import android.text.TextUtils
 import android.util.Pair
+import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -115,6 +118,7 @@ class DelegateSQLiteDatabase(
     }
 
     override val isExecPerConnectionSQLSupported: Boolean
+        @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.R)
         get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
     override fun execPerConnectionSQL(sql: String, bindArgs: Array<out Any?>?) {
@@ -143,10 +147,12 @@ class DelegateSQLiteDatabase(
     }
 
     override fun query(query: SupportSQLiteQuery): Cursor {
-        val cursorFactory = { _: SQLiteDatabase?,
+        val cursorFactory = {
+                _: SQLiteDatabase?,
                 masterQuery: SQLiteCursorDriver?,
                 editTable: String?,
-                sqLiteQuery: SQLiteQuery?, ->
+                sqLiteQuery: SQLiteQuery?,
+            ->
             query.bindTo(
                 FrameworkSQLiteProgram(
                     sqLiteQuery!!,
@@ -163,7 +169,6 @@ class DelegateSQLiteDatabase(
         )
     }
 
-    @RequiresApi(16)
     override fun query(
         query: SupportSQLiteQuery,
         cancellationSignal: CancellationSignal?,
@@ -174,10 +179,12 @@ class DelegateSQLiteDatabase(
             EMPTY_STRING_ARRAY,
             null,
             cancellationSignal!!,
-        ) { _: SQLiteDatabase?,
+        ) {
+                _: SQLiteDatabase?,
                 masterQuery: SQLiteCursorDriver?,
                 editTable: String?,
-                sqLiteQuery: SQLiteQuery?, ->
+                sqLiteQuery: SQLiteQuery?,
+            ->
             query.bindTo(
                 FrameworkSQLiteProgram(
                     sqLiteQuery!!,
@@ -282,7 +289,6 @@ class DelegateSQLiteDatabase(
         delegate.setMaxSqlCacheSize(cacheSize)
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     override fun setForeignKeyConstraintsEnabled(enabled: Boolean) {
         SupportSQLiteCompat.Api16Impl.setForeignKeyConstraintsEnabled(delegate, enabled)
     }
@@ -291,7 +297,6 @@ class DelegateSQLiteDatabase(
         return delegate.enableWriteAheadLogging()
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     override fun disableWriteAheadLogging() {
         SupportSQLiteCompat.Api16Impl.disableWriteAheadLogging(delegate)
     }
@@ -408,7 +413,6 @@ class SupportSQLiteCompat private constructor() {
      *
      * @hide
      */
-    @RequiresApi(16)
     object Api16Impl {
         /**
          * Cancels the operation and signals the cancellation listener. If the operation has not yet
@@ -456,7 +460,7 @@ class SupportSQLiteCompat private constructor() {
          * values will be bound as Strings.
          * @param editTable the name of the first table, which is editable
          * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
-         * If the operation is canceled, then [OperationCanceledException] will be thrown
+         * If the operation is canceled, then `OperationCanceledException` will be thrown
          * when the query is executed.
          * @param cursorFactory the cursor factory to use, or null for the default factory
          * @return A [Cursor] object, which is positioned before the first entry. Note that
@@ -550,7 +554,6 @@ class SupportSQLiteCompat private constructor() {
      *
      * @hide
      */
-    @RequiresApi(19)
     object Api19Impl {
         /**
          * Return the URI at which notifications of changes in this Cursor's data
@@ -586,7 +589,6 @@ class SupportSQLiteCompat private constructor() {
      *
      * @hide
      */
-    @RequiresApi(21)
     object Api21Impl {
         /**
          * Returns the absolute path to the directory on the filesystem.
@@ -607,7 +609,6 @@ class SupportSQLiteCompat private constructor() {
      *
      * @hide
      */
-    @RequiresApi(23)
     object Api23Impl {
         /**
          * Sets a [Bundle] that will be returned by [Cursor.getExtras].

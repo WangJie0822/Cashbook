@@ -2,11 +2,12 @@ import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 
 plugins {
-    alias(libs.plugins.cashbook.android.application)
-    alias(libs.plugins.cashbook.android.application.compose)
-    alias(libs.plugins.cashbook.android.application.flavors)
-    alias(libs.plugins.cashbook.android.application.jacoco)
-    alias(libs.plugins.cashbook.android.hilt)
+    alias(conventionLibs.plugins.cashbook.android.application)
+    alias(conventionLibs.plugins.cashbook.android.application.compose)
+    alias(conventionLibs.plugins.cashbook.android.application.flavors)
+    alias(conventionLibs.plugins.cashbook.android.application.jacoco)
+    alias(conventionLibs.plugins.cashbook.android.hilt)
+    alias(conventionLibs.plugins.cashbook.android.lint)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.takahirom.roborazzi)
 }
