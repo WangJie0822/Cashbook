@@ -17,7 +17,9 @@
 package cn.wj.android.cashbook.ui
 
 import android.app.Activity
+import android.text.Spanned
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -68,6 +71,7 @@ import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
+import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.LocalNavController
@@ -120,6 +124,7 @@ import cn.wj.android.cashbook.feature.tags.navigation.naviToMyTags
 import cn.wj.android.cashbook.feature.types.navigation.EditRecordTypeListContent
 import cn.wj.android.cashbook.feature.types.navigation.myCategoriesScreen
 import cn.wj.android.cashbook.feature.types.navigation.naviToMyCategories
+import io.noties.markwon.Markwon
 import javax.crypto.Cipher
 
 /** 开始默认显示路径 */
@@ -130,6 +135,19 @@ private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
 fun MainApp(
     viewModel: MainAppViewModel = viewModel(),
 ) {
+    // 监听生命周期
+    rememberLifecycleObserver {
+        onCreate {
+            // 在界面创建时自动检查更新
+            viewModel.checkUpdateAuto()
+        }
+
+        onStop {
+            // 在界面 onStop 时刷新安全认证状态
+            viewModel.refreshVerifyState()
+        }
+    }
+
     CashbookGradientBackground {
         val navController = rememberNavController()
         val snackbarHostState = remember { SnackbarHostState() }
@@ -147,16 +165,12 @@ fun MainApp(
                 snackbarHost = { SnackbarHost(snackbarHostState) },
             ) { paddingValues ->
 
-                // 监听生命周期，在界面 onStop 时刷新安全认证状态
-                rememberLifecycleObserver {
-                    onStop {
-                        viewModel.refreshVerifyState()
-                    }
-                }
-
                 // 提示文本
                 val passwordDecodeFailedText = stringResource(id = R.string.password_decode_failed)
                 val passwordWrongText = stringResource(id = R.string.password_wrong)
+                val isLatestVersionText = stringResource(id = R.string.it_is_the_latest_version)
+                val downloadingText = stringResource(id = R.string.update_downloading_hint)
+                val startDownloadText = stringResource(id = R.string.start_background_download)
                 // 显示及隐藏提示
                 LaunchedEffect(viewModel.shouldDisplayBookmark) {
                     if (viewModel.shouldDisplayBookmark != MainAppBookmarkEnum.NONE) {
@@ -164,6 +178,9 @@ fun MainApp(
                             MainAppBookmarkEnum.PASSWORD_DECODE_FAILED -> passwordDecodeFailedText
                             MainAppBookmarkEnum.PASSWORD_WRONG -> passwordWrongText
                             MainAppBookmarkEnum.ERROR -> viewModel.errorText
+                            MainAppBookmarkEnum.NO_NEED_UPDATE -> isLatestVersionText
+                            MainAppBookmarkEnum.UPDATE_DOWNLOADING -> downloadingText
+                            MainAppBookmarkEnum.START_DOWNLOAD -> startDownloadText
                             else -> ""
                         }
                         if (tipText.isNotBlank()) {
@@ -178,6 +195,9 @@ fun MainApp(
                 }
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val shouldDisplayUpdateDialog by viewModel.updateInfoData.collectAsStateWithLifecycle()
+                val shouldDisplayNoWifiUpdateDialog by viewModel.confirmUpdateInfoData.collectAsStateWithLifecycle()
+                val ignoreUpdateVersion by viewModel.ignoreUpdateVersionData.collectAsStateWithLifecycle()
 
                 val context = LocalContext.current
 
@@ -192,10 +212,17 @@ fun MainApp(
                     onFingerprintVerifyError = viewModel::onFingerprintVerifyError,
                     onPrivacyPolicyClick = {
                         MarkdownActivity.actionStart(
-                            context,
-                            MarkdownTypeEnum.PRIVACY_POLICY,
+                            context = context,
+                            type = MarkdownTypeEnum.PRIVACY_POLICY,
                         )
                     },
+                    ignoreUpdateVersion = ignoreUpdateVersion,
+                    shouldDisplayUpdateDialog = shouldDisplayUpdateDialog,
+                    onConfirmUpdateClick = viewModel::confirmUpdate,
+                    onRequestDismissUpdateDialog = viewModel::dismissUpdateDialog,
+                    shouldDisplayNoWifiUpdateDialog = shouldDisplayNoWifiUpdateDialog,
+                    onConfirmDownloadClick = viewModel::confirmDownload,
+                    onRequestDismissNoWifiUpdateDialog = viewModel::dismissNoWifiUpdateDialog,
                     navController = navController,
                     onShowSnackbar = onShowSnackbar,
                     modifier = Modifier.padding(paddingValues),
@@ -216,6 +243,13 @@ private fun MainAppScreen(
     onFingerprintVerifySuccess: (Cipher) -> Unit,
     onFingerprintVerifyError: (Int, String) -> Unit,
     onPrivacyPolicyClick: () -> Unit,
+    ignoreUpdateVersion: Boolean,
+    shouldDisplayUpdateDialog: UpgradeInfoEntity?,
+    onConfirmUpdateClick: () -> Unit,
+    onRequestDismissUpdateDialog: (Boolean) -> Unit,
+    shouldDisplayNoWifiUpdateDialog: UpgradeInfoEntity?,
+    onConfirmDownloadClick: (Boolean) -> Unit,
+    onRequestDismissNoWifiUpdateDialog: () -> Unit,
     navController: NavHostController,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -276,6 +310,24 @@ private fun MainAppScreen(
                                     Text(text = stringResource(id = R.string.cancel))
                                 }
                             },
+                        )
+                    }
+                    // 升级提示弹窗
+                    if (null != shouldDisplayUpdateDialog) {
+                        val content = Markwon.create(LocalContext.current)
+                            .toMarkdown(shouldDisplayUpdateDialog.displayVersionInfo)
+                        UpdateHintDialog(
+                            content = content,
+                            ignoreUpdateVersion = ignoreUpdateVersion,
+                            onConfirmClick = onConfirmUpdateClick,
+                            onDismissClick = onRequestDismissUpdateDialog,
+                        )
+                    }
+                    // 非WiFi下载提示弹窗
+                    if (null != shouldDisplayNoWifiUpdateDialog) {
+                        NoWifiUpdateHintDialog(
+                            onConfirmClick = onConfirmDownloadClick,
+                            onDismissClick = onRequestDismissNoWifiUpdateDialog,
                         )
                     }
                     if (needVerity) {
@@ -342,7 +394,6 @@ fun CashbookNavHost(
         )
         // 关于我们
         aboutUsScreen(
-            onShowSnackbar = onShowSnackbar,
             onRequestNaviToChangelog = {
                 // 版本信息
                 MarkdownActivity.actionStart(context, MarkdownTypeEnum.CHANGELOG)
@@ -632,4 +683,100 @@ internal fun Verification(
             }
         }
     }
+}
+
+/**
+ * 更新提示弹窗
+ *
+ * @param content 更新内容
+ * @param ignoreUpdateVersion 是否跳过此版本
+ * @param onConfirmClick 确认点击回调
+ * @param onDismissClick 取消点击回调，参数：(是否跳过此版本) -> [Unit]
+ */
+@Composable
+internal fun UpdateHintDialog(
+    content: Spanned,
+    ignoreUpdateVersion: Boolean,
+    onConfirmClick: () -> Unit,
+    onDismissClick: (Boolean) -> Unit,
+) {
+    var ignore by remember {
+        mutableStateOf(ignoreUpdateVersion)
+    }
+    AlertDialog(
+        onDismissRequest = { onDismissClick.invoke(false) },
+        text = {
+            Column {
+                Text(
+                    text = buildAnnotatedString {
+                        append(content)
+                    },
+                )
+                Row(
+                    modifier = Modifier
+                        .clickable { ignore = !ignore }
+                        .padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(checked = ignore, onCheckedChange = { ignore = it })
+                    Text(text = stringResource(id = R.string.ignore_this_version))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirmClick) {
+                Text(text = stringResource(id = R.string.update))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismissClick.invoke(ignore) }) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+    )
+}
+
+/**
+ * 未连接 WiFi 更新提示弹窗
+ *
+ * @param onConfirmClick 确认点击回调，参数：(是否不再提示) -> [Unit]
+ * @param onDismissClick 取消点击回调
+ */
+@Composable
+internal fun NoWifiUpdateHintDialog(
+    onConfirmClick: (Boolean) -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    var noMOrePrompt by remember {
+        mutableStateOf(false)
+    }
+    AlertDialog(
+        onDismissRequest = onDismissClick,
+        text = {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.no_wifi_download_available_hint),
+                )
+                Row(
+                    modifier = Modifier
+                        .clickable { noMOrePrompt = !noMOrePrompt }
+                        .padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(checked = noMOrePrompt, onCheckedChange = { noMOrePrompt = it })
+                    Text(text = stringResource(id = R.string.no_more_prompt))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirmClick.invoke(noMOrePrompt) }) {
+                Text(text = stringResource(id = R.string.update))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissClick) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+    )
 }

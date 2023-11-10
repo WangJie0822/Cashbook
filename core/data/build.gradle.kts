@@ -25,9 +25,9 @@ android {
     namespace = "cn.wj.android.cashbook.core.data"
 
     libraryVariants.all {
-        mergeAssetsProvider.get().doFirst {
+        preBuildProvider.get().doFirst {
             val intoDir = File(projectDir, "/src/main/assets")
-            println("> Task :${project.name}:beforeMergeAssets copy .md files from $rootDir into $intoDir")
+            println("> Task :${project.name}:beforePreBuild copy .md files from $rootDir into $intoDir")
             delete(intoDir)
             copy {
                 from(rootDir)

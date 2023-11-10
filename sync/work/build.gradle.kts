@@ -58,7 +58,5 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
 
     // okhttp
-    OnlineImplementation(libs.squareup.okhttp3)
-    CanaryImplementation(libs.squareup.okhttp3)
-    DevImplementation(libs.squareup.okhttp3)
+    implementation(libs.squareup.okhttp3)
 }

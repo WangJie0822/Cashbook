@@ -93,20 +93,17 @@ fun NavGraphBuilder.settingsLauncherScreen(
  * @param onRequestNaviToChangelog 导航到修改日志
  * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
  * @param onRequestPopBackStack 导航到上一级
- * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 fun NavGraphBuilder.aboutUsScreen(
     onRequestNaviToChangelog: () -> Unit,
     onRequestNaviToPrivacyPolicy: () -> Unit,
     onRequestPopBackStack: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     composable(route = ROUTE_SETTINGS_ABOUT_US) {
         AboutUsRoute(
             onRequestNaviToChangelog = onRequestNaviToChangelog,
             onRequestNaviToPrivacyPolicy = onRequestNaviToPrivacyPolicy,
             onRequestPopBackStack = onRequestPopBackStack,
-            onShowSnackbar = onShowSnackbar,
         )
     }
 }

@@ -52,17 +52,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // OkHttp
-    OnlineImplementation(libs.squareup.okhttp3)
-    CanaryImplementation(libs.squareup.okhttp3)
-    DevImplementation(libs.squareup.okhttp3)
+    implementation(libs.squareup.okhttp3)
 
     // Retrofit
-    OnlineImplementation(libs.squareup.retrofit2)
-    OnlineImplementation(libs.jakewharton.retrofit2.converter.kotlin)
-    CanaryImplementation(libs.squareup.retrofit2)
-    CanaryImplementation(libs.jakewharton.retrofit2.converter.kotlin)
-    DevImplementation(libs.squareup.retrofit2)
-    DevImplementation(libs.jakewharton.retrofit2.converter.kotlin)
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.jakewharton.retrofit2.converter.kotlin)
 
     // HTML 解析
     implementation(libs.jsoup)

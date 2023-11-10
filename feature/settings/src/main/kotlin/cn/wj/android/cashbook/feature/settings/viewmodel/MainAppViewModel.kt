@@ -21,14 +21,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_FINGERPRINT
 import cn.wj.android.cashbook.core.common.KEY_ALIAS_PASSWORD
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
+import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import cn.wj.android.cashbook.core.design.security.hexToBytes
 import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
+import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
@@ -36,6 +40,7 @@ import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
@@ -56,6 +61,8 @@ import javax.inject.Inject
 class MainAppViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     booksRepository: BooksRepository,
+    networkMonitor: NetworkMonitor,
+    private val appUpgradeManager: AppUpgradeManager,
 ) : ViewModel() {
 
     /** 标记 - 是否已认证 */
@@ -71,6 +78,39 @@ class MainAppViewModel @Inject constructor(
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
+
+    private val _isUpgradeDownloading = appUpgradeManager.isDownloading
+
+    /** 标记 - 是否正在获取更新数据 */
+    var inRequestUpdateData by mutableStateOf(false)
+        private set
+
+    /** 更新数据 */
+    private val _updateInfoData = MutableStateFlow<UpgradeInfoEntity?>(null)
+    val updateInfoData: StateFlow<UpgradeInfoEntity?> = _updateInfoData
+
+    /** 下载确认数据 */
+    private val _confirmUpdateInfoData = MutableStateFlow<UpgradeInfoEntity?>(null)
+    val confirmUpdateInfoData: StateFlow<UpgradeInfoEntity?> = _confirmUpdateInfoData
+
+    val ignoreUpdateVersionData =
+        combine(settingRepository.appDataMode, _updateInfoData) { appDataModel, updateInfoEntity ->
+            appDataModel.ignoreUpdateVersion.isNotBlank() && appDataModel.ignoreUpdateVersion == updateInfoEntity?.versionName
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = false,
+            )
+
+    /**
+     * 是否允许下载
+     * - WiFi或用户允许流量下载
+     */
+    private val _allowDownload =
+        combine(settingRepository.appDataMode, networkMonitor.isWifi) { appDataModel, isWifi ->
+            isWifi || appDataModel.mobileNetworkDownloadEnable
+        }
 
     /** 界面 UI 状态 */
     val uiState = combine(settingRepository.appDataMode, _verified) { appData, verified ->
@@ -207,9 +247,154 @@ class MainAppViewModel @Inject constructor(
         shouldDisplayBookmark = MainAppBookmarkEnum.NONE
     }
 
+    /** 检查更新 */
+    fun checkUpdateAuto() {
+        logger().i("checkUpdateAuto()")
+        viewModelScope.launch {
+            try {
+                val appDataModel = settingRepository.appDataMode.first()
+                if (!appDataModel.autoCheckUpdate) {
+                    return@launch
+                }
+                val upgradeInfoEntity = settingRepository.checkUpdate()
+                if (upgradeInfoEntity.versionName == appDataModel.ignoreUpdateVersion) {
+                    return@launch
+                }
+                checkUpgradeFromInfo(
+                    info = upgradeInfoEntity,
+                    need = {
+                        _updateInfoData.tryEmit(upgradeInfoEntity)
+                    },
+                    noNeed = {
+                        // empty block
+                    },
+                )
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "checkUpdateAuto()")
+            }
+        }
+    }
+
+    /** 检查更新 */
+    fun checkUpdate() {
+        logger().i("checkUpdate()")
+        viewModelScope.launch {
+            try {
+                if (_isUpgradeDownloading.first()) {
+                    shouldDisplayBookmark = MainAppBookmarkEnum.UPDATE_DOWNLOADING
+                    return@launch
+                }
+                inRequestUpdateData = true
+                if (settingRepository.syncLatestVersion()) {
+                    val upgradeInfoEntity = settingRepository.checkUpdate()
+                    checkUpgradeFromInfo(
+                        info = upgradeInfoEntity,
+                        need = {
+                            _updateInfoData.tryEmit(upgradeInfoEntity)
+                        },
+                        noNeed = {
+                            shouldDisplayBookmark = MainAppBookmarkEnum.NO_NEED_UPDATE
+                        },
+                    )
+                }
+            } catch (throwable: Throwable) {
+                logger().e(throwable, "checkUpdate()")
+            } finally {
+                inRequestUpdateData = false
+            }
+        }
+    }
+
+    /** 确认升级 */
+    fun confirmUpdate() {
+        val upgradeInfo = updateInfoData.value ?: return
+        _updateInfoData.tryEmit(null)
+        viewModelScope.launch {
+            if (_allowDownload.first()) {
+                // 允许直接下载
+                appUpgradeManager.startDownload(upgradeInfo)
+                shouldDisplayBookmark = MainAppBookmarkEnum.START_DOWNLOAD
+            } else {
+                // 未连接WiFi且未允许流量下载，弹窗提示
+                _confirmUpdateInfoData.tryEmit(upgradeInfo)
+            }
+        }
+    }
+
+    /** 隐藏升级弹窗 */
+    fun dismissUpdateDialog(ignore: Boolean) {
+        viewModelScope.launch {
+            settingRepository.updateIgnoreUpdateVersion(if (ignore) updateInfoData.value?.versionName.orEmpty() else "")
+            _updateInfoData.tryEmit(null)
+        }
+    }
+
+    /** 确认下载 */
+    fun confirmDownload(noMorePrompt: Boolean) {
+        val updateInfo = confirmUpdateInfoData.value ?: return
+        _confirmUpdateInfoData.tryEmit(null)
+        viewModelScope.launch {
+            // 更新是否允许流量下载属性
+            settingRepository.updateMobileNetworkDownloadEnable(noMorePrompt)
+            // 开始下载
+            appUpgradeManager.startDownload(updateInfo)
+            shouldDisplayBookmark = MainAppBookmarkEnum.START_DOWNLOAD
+        }
+    }
+
+    /** 隐藏无 WiFi 升级提示弹窗 */
+    fun dismissNoWifiUpdateDialog() {
+        _confirmUpdateInfoData.tryEmit(null)
+    }
+
     /** 隐藏弹窗 */
     private fun dismissDialog() {
         dialogState = DialogState.Dismiss
+    }
+
+    private fun checkUpgradeFromInfo(
+        info: UpgradeInfoEntity,
+        need: () -> Unit,
+        noNeed: () -> Unit,
+    ) {
+        logger().d("checkFromInfo info: $info")
+        if (ApplicationInfo.isDev) {
+            // Dev 环境，永远提示更新
+            need.invoke()
+            return
+        }
+        if (!needUpdate(info.versionName)) {
+            // 已是最新版本
+            noNeed.invoke()
+            return
+        }
+        // 不是最新版本
+        if (info.downloadUrl.isBlank()) {
+            // 没有下载资源
+            noNeed.invoke()
+            return
+        }
+        need.invoke()
+    }
+
+    /** 根据网络返回的版本信息判断是否需要更新 */
+    private fun needUpdate(versionName: String?): Boolean {
+        if (versionName.isNullOrBlank()) {
+            return false
+        }
+        val localSplits = ApplicationInfo.versionName.split("_")
+        val splits = versionName.split("_")
+        val localVersions = localSplits.first().replace("v", "").split(".")
+        val versions = splits.first().replace("v", "").split(".")
+        if (localSplits.first() == splits.first()) {
+            return splits[1].toInt() > localSplits[1].toInt()
+        }
+        for (i in localVersions.indices) {
+            if (versions[i] > localVersions[i]) {
+                return true
+            }
+        }
+        return false
     }
 }
 

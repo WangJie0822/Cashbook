@@ -29,4 +29,13 @@ enum class MainAppBookmarkEnum {
 
     /** 认证失败 */
     ERROR,
+
+    /** 更新下载中 */
+    UPDATE_DOWNLOADING,
+
+    /** 不需要更新 */
+    NO_NEED_UPDATE,
+
+    /** 开始下载 */
+    START_DOWNLOAD,
 }
