@@ -28,6 +28,7 @@ import retrofit2.http.Query
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/14
  */
+@Suppress("unused")
 interface RetrofitNetworkApi {
 
     /** 从 Gitee 中根据用户名 [owner] 仓库名 [repo] 以及 Release id [id] 查询相关 Release 信息 */

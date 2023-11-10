@@ -59,5 +59,6 @@ dependencies {
 
     // okhttp
     OnlineImplementation(libs.squareup.okhttp3)
+    CanaryImplementation(libs.squareup.okhttp3)
     DevImplementation(libs.squareup.okhttp3)
 }

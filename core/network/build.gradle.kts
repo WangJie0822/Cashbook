@@ -53,11 +53,14 @@ dependencies {
 
     // OkHttp
     OnlineImplementation(libs.squareup.okhttp3)
+    CanaryImplementation(libs.squareup.okhttp3)
     DevImplementation(libs.squareup.okhttp3)
 
     // Retrofit
     OnlineImplementation(libs.squareup.retrofit2)
     OnlineImplementation(libs.jakewharton.retrofit2.converter.kotlin)
+    CanaryImplementation(libs.squareup.retrofit2)
+    CanaryImplementation(libs.jakewharton.retrofit2.converter.kotlin)
     DevImplementation(libs.squareup.retrofit2)
     DevImplementation(libs.jakewharton.retrofit2.converter.kotlin)
 
