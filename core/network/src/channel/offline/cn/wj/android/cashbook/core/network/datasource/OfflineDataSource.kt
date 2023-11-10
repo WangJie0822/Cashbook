@@ -29,7 +29,7 @@ import javax.inject.Singleton
 class OfflineDataSource @Inject constructor() : RemoteDataSource {
 
     /** 根据是否使用 gitee [useGitee] 从不同数据源检查更新 */
-    override suspend fun checkUpdate(useGitee: Boolean): GitReleaseEntity? {
+    override suspend fun checkUpdate(useGitee: Boolean, canary: Boolean): GitReleaseEntity? {
         return null
     }
 }

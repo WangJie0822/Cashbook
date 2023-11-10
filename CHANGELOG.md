@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 新增实验性版本支持；
 ### Changed
 - 检查更新逻辑优化，Release列表降序，防止Release过多导致无法获取到最新的Release信息；
 - 升级弹窗添加版本名称显示；

@@ -26,5 +26,5 @@ import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
 interface RemoteDataSource {
 
     /** 根据是否使用 gitee [useGitee] 从不同数据源检查更新 */
-    suspend fun checkUpdate(useGitee: Boolean): GitReleaseEntity?
+    suspend fun checkUpdate(useGitee: Boolean, canary: Boolean): GitReleaseEntity?
 }

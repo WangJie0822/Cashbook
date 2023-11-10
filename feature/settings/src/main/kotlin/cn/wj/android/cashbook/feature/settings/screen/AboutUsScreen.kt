@@ -103,6 +103,7 @@ internal fun AboutUsRoute(
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         onRequestDismissBookmark = viewModel::dismissBookmark,
         onUseGiteeSwitch = viewModel::updateUseGitee,
+        onCanarySwitch = viewModel::updateCanary,
         onAutoCheckUpdateSwitch = viewModel::updateAutoCheckUpdate,
         onCheckUpdateClick = viewModel::checkUpdate,
         shouldDisplayUpdateDialog = shouldDisplayUpdateDialog,
@@ -148,6 +149,7 @@ internal fun AboutUsScreen(
     shouldDisplayBookmark: AboutUsBookmarkEnum,
     onRequestDismissBookmark: () -> Unit,
     onUseGiteeSwitch: (Boolean) -> Unit,
+    onCanarySwitch: (Boolean) -> Unit,
     onAutoCheckUpdateSwitch: (Boolean) -> Unit,
     onCheckUpdateClick: () -> Unit,
     shouldDisplayUpdateDialog: UpgradeInfoEntity?,
@@ -332,6 +334,17 @@ internal fun AboutUsScreen(
                         },
                     )
                     if (!ApplicationInfo.isOffline) {
+                        // 实验版本
+                        TransparentListItem(
+                            headlineContent = { Text(text = stringResource(id = R.string.canary_version)) },
+                            supportingContent = { Text(text = stringResource(id = R.string.canary_version_hint)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = uiState.canary,
+                                    onCheckedChange = onCanarySwitch,
+                                )
+                            },
+                        )
                         // 自动检查更新
                         TransparentListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.auto_check_update)) },

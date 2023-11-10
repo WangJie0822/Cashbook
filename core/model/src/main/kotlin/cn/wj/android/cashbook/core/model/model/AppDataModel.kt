@@ -53,4 +53,5 @@ data class AppDataModel(
     val lastBackupMs: Long,
     val creditCardPaymentTypeId: Long,
     val keepLatestBackup: Boolean,
+    val canary: Boolean,
 )

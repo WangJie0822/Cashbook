@@ -139,8 +139,8 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun syncLatestVersion(): Boolean = withContext(coroutineContext) {
         try {
-            val release =
-                remoteDataSource.checkUpdate(!appPreferencesDataSource.appData.first().useGithub)
+            val appData = appPreferencesDataSource.appData.first()
+            val release = remoteDataSource.checkUpdate(!appData.useGithub, appData.canary)
             val asset = release?.assets?.firstOrNull {
                 it.name?.endsWith("online.apk") ?: false
             }
@@ -182,6 +182,11 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) =
         withContext(coroutineContext) {
             appPreferencesDataSource.updateKeepLatestBackup(keepLatestBackup)
+        }
+
+    override suspend fun updateCanary(canary: Boolean) =
+        withContext(coroutineContext) {
+            appPreferencesDataSource.updateCanary(canary)
         }
 
     override suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String =

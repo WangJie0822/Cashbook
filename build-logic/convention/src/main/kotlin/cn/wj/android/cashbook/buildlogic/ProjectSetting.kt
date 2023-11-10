@@ -20,7 +20,7 @@ object ProjectSetting {
         const val TARGET_SDK = 30
 
         /** 大版本名 */
-        private const val VERSION_NAME = "v1.0.1"
+        private const val VERSION_NAME = "v1.0.2"
 
         /** 版本号，动态生成 */
         val versionCode: Int

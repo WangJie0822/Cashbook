@@ -76,6 +76,7 @@ class AboutUsViewModel @Inject constructor(
         combine(settingRepository.appDataMode, _updateInfoData) { appDataModel, updateInfoEntity ->
             AboutUsUiState.Success(
                 useGitee = !appDataModel.useGithub,
+                canary = appDataModel.canary,
                 autoCheckUpdate = appDataModel.autoCheckUpdate,
                 ignoreUpdateVersion = appDataModel.ignoreUpdateVersion.isNotBlank() && appDataModel.ignoreUpdateVersion == updateInfoEntity?.versionName,
             )
@@ -99,6 +100,13 @@ class AboutUsViewModel @Inject constructor(
     fun updateUseGitee(useGitee: Boolean) {
         viewModelScope.launch {
             settingRepository.updateUseGithub(!useGitee)
+        }
+    }
+
+    /** 更新是否支持实验版本 */
+    fun updateCanary(canary: Boolean) {
+        viewModelScope.launch {
+            settingRepository.updateCanary(canary)
         }
     }
 
@@ -240,6 +248,7 @@ class AboutUsViewModel @Inject constructor(
  */
 sealed class AboutUsUiState(
     open val useGitee: Boolean = false,
+    open val canary: Boolean = false,
     open val autoCheckUpdate: Boolean = false,
     open val ignoreUpdateVersion: Boolean = false,
 ) {
@@ -250,6 +259,7 @@ sealed class AboutUsUiState(
     data class Success(
         override val useGitee: Boolean,
         override val autoCheckUpdate: Boolean,
+        override val canary: Boolean,
         override val ignoreUpdateVersion: Boolean,
     ) : AboutUsUiState()
 }

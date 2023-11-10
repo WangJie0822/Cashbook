@@ -46,6 +46,9 @@ enum class CashbookFlavor(
     /** 离线渠道，无网络请求 */
     Offline(FlavorDimension.ContentType, Signing.Android, null, "_offline"),
 
+    /** 尝鲜渠道 */
+    Canary(FlavorDimension.ContentType, Signing.Android, null, "_canary"),
+
     /** 开发渠道 */
     Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev")
 }

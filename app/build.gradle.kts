@@ -31,7 +31,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-        resValues = true
     }
 
     buildTypes {
@@ -52,11 +51,7 @@ android {
 
     productFlavors {
         CashbookFlavor.values().forEach { flavor ->
-            val value = if (flavor == CashbookFlavor.Dev) {
-                "@string/app_name_dev"
-            } else {
-                "@string/app_name_online"
-            }
+            // 配置权限，Offline 渠道没有网络相关权限
             val manifestPlaceholdersMap = if (flavor == CashbookFlavor.Offline) {
                 mapOf(
                     "PERMISSION_1" to "NO_REQUEST_1",
@@ -69,8 +64,21 @@ android {
                 )
             }
             getByName(flavor.name) {
-                resValue("string", "app_name", value)
                 addManifestPlaceholders(manifestPlaceholdersMap)
+            }
+        }
+    }
+
+    sourceSets {
+        CashbookFlavor.values().forEach { flavor ->
+            // 配置资源路径
+            getByName(flavor.name) {
+                val srcDir = if (flavor == CashbookFlavor.Dev) {
+                    "src/channel/res_Dev"
+                } else {
+                    "src/channel/res"
+                }
+                res.srcDirs(srcDir)
             }
         }
     }

@@ -69,6 +69,7 @@ class AppPreferencesDataSource @Inject constructor(
                 lastBackupMs = it.lastBackupMs,
                 creditCardPaymentTypeId = it.creditCardPaymentTypeId,
                 keepLatestBackup = it.keepLatestBackup,
+                canary = it.canary,
             )
         }
 
@@ -192,6 +193,10 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) {
         appPreferences.updateData { it.copy { this.keepLatestBackup = keepLatestBackup } }
+    }
+
+    suspend fun updateCanary(canary: Boolean) {
+        appPreferences.updateData { it.copy { this.canary = canary } }
     }
 
     suspend fun needRelated(typeId: Long): Boolean {

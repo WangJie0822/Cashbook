@@ -30,6 +30,8 @@
     <string name="gitee">Gitee</string>
     <string name="switch_data_source">切换数据源</string>
     <string name="data_source_hint">从不同的数据源获取升级信息</string>
+    <string name="canary_version">实验版本</string>
+    <string name="canary_version_hint">开启后检查更新会包含实验版本，建议使用Github源，会自动构建生成，Gitee不定时更新</string>
     <string name="auto_check_update">自动检查更新</string>
     <string name="check_update">检查更新</string>
     <string name="it_is_the_latest_version">已是最新版本</string>

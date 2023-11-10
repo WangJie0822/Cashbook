@@ -51,14 +51,17 @@ class NetworkDataSource @Inject constructor(
         .create(RetrofitNetworkApi::class.java)
 
     /** 根据是否使用 gitee [useGitee] 从不同数据源检查更新 */
-    override suspend fun checkUpdate(useGitee: Boolean): GitReleaseEntity? {
+    override suspend fun checkUpdate(useGitee: Boolean, canary: Boolean): GitReleaseEntity? {
         val result = if (useGitee) {
             networkApi.giteeQueryReleaseList(GITEE_OWNER, REPO_NAME)
         } else {
             networkApi.githubQueryReleaseList(GITHUB_OWNER, REPO_NAME)
         }
         logger().i("checkUpdate(useGitee = <$useGitee>), result = <$result>")
-        val release = result.firstOrNull { it.name?.startsWith("Release") ?: false }
+        val release = result.firstOrNull {
+            val name = it.name ?: ""
+            name.startsWith("Release") || (canary && name.startsWith("Pre Release"))
+        }
         logger().i("checkUpdate(useGitee = <$useGitee>), release = <$release>")
         return release
     }

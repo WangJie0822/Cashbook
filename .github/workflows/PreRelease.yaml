@@ -27,7 +27,7 @@ jobs:
           java-version: 17
 
       - name: Build app
-        run: export BUILD_TAG_NAME=${{ github.ref_name }} ; echo $BUILD_TAG_NAME ; ./gradlew :app:assembleDevRelease
+        run: export BUILD_TAG_NAME=${{ github.ref_name }} ; echo $BUILD_TAG_NAME ; ./gradlew :app:assembleCanaryRelease
 
       - name: Android Sign
         # You may pin to the exact commit or the version.
