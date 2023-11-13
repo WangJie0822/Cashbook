@@ -11,9 +11,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  test_and_apk:
+    name: "Local tests and APKs"
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+
+    permissions:
+      contents: write
+
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
