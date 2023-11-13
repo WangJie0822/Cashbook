@@ -53,10 +53,12 @@ object Migration5To6 : Migration(5, 6) {
 
     private fun SupportSQLiteDatabase.migrateAsset() {
         query(SQL_QUERY_ID_TOTAL_AMOUNT_FROM_ASSET).use {
-            val assetId = it.getLong(it.getColumnIndexOrThrow("id"))
-            val totalAmount =
-                it.getFloat(it.getColumnIndexOrThrow("total_amount")).toString().toDoubleOrZero()
-            execSQL(SQL_UPDATE_TOTAL_AMOUNT_TO_ASSET.format(totalAmount, assetId))
+            while (it.moveToNext()) {
+                val assetId = it.getLong(it.getColumnIndexOrThrow("id"))
+                val totalAmount =
+                    it.getFloat(it.getColumnIndexOrThrow("total_amount")).toString().toDoubleOrZero()
+                execSQL(SQL_UPDATE_TOTAL_AMOUNT_TO_ASSET.format(totalAmount, assetId))
+            }
         }
     }
 
@@ -77,10 +79,12 @@ object Migration5To6 : Migration(5, 6) {
 
     private fun SupportSQLiteDatabase.migrateRecord() {
         query(SQL_QUERY_ID_AMOUNT_CHART_FROM_RECORD).use {
-            val recordId = it.getLong(it.getColumnIndexOrThrow("id"))
-            val amount = it.getFloat(it.getColumnIndexOrThrow("amount")).toString().toDoubleOrZero()
-            val charge = it.getFloat(it.getColumnIndexOrThrow("charge")).toString().toDoubleOrZero()
-            execSQL(SQL_UPDATE_AMOUNT_CHARGE_TO_RECORD.format(amount, charge, recordId))
+            while (it.moveToNext()) {
+                val recordId = it.getLong(it.getColumnIndexOrThrow("id"))
+                val amount = it.getFloat(it.getColumnIndexOrThrow("amount")).toString().toDoubleOrZero()
+                val charge = it.getFloat(it.getColumnIndexOrThrow("charge")).toString().toDoubleOrZero()
+                execSQL(SQL_UPDATE_AMOUNT_CHARGE_TO_RECORD.format(amount, charge, recordId))
+            }
         }
     }
 }
