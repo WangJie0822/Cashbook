@@ -7,7 +7,7 @@ jacoco = "0.8.10"
 
 # kotlin [指南](https://kotlinlang.org/)
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlin)
-kotlin = "1.9.10"
+kotlin = "1.9.20"
 
 # Kotlinx
 # 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
@@ -15,7 +15,7 @@ kotlin = "1.9.10"
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
 kotlinx-coroutines = "1.7.3"
 # 日期处理 [Github](https://github.com/Kotlin/kotlinx-datetime)
-kotlinx-datetime = "0.4.0"
+kotlinx-datetime = "0.4.1"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
 kotlinx-serialization-json = "1.6.0"
 
@@ -33,7 +33,7 @@ google-gson = "2.10.1"
 google-accompanist = "0.32.0"
 # ksp 前缀版本需要和kotlin版本兼容 [Github](https://github.com/google/ksp)
 # [版本查询](https://mvnrepository.com/artifact/com.google.devtools.ksp)
-google-devtools-ksp = "1.9.10-1.0.13"
+google-devtools-ksp = "1.9.20-1.0.14"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
 google-protobuf = "3.24.4"
@@ -43,7 +43,7 @@ google-protobuf-plugin = "0.9.4"
 google-hilt = "2.48.1"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
-androidx-hilt = "1.0.0"
+androidx-hilt = "1.1.0"
 
 # Roborazzi 测试工具 [Github](https://github.com/takahirom/roborazzi)
 # [版本查询](https://mvnrepository.com/artifact/io.github.takahirom.roborazzi)
@@ -53,7 +53,7 @@ takahirom-roborazzi = "1.6.0"
 android-desugarJdkLibs = "2.0.4"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
-android-gradle-plugin = "8.1.2"
+android-gradle-plugin = "8.1.3"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
 android-lint = "31.1.3"
@@ -89,7 +89,7 @@ androidx-core-splashscreen = "1.0.1"
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
 androidx-compose-bom = "2023.10.01"
 # Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin?hl=zh-cn)
-androidx-compose-compiler = "1.5.3"
+androidx-compose-compiler = "1.5.4"
 # activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/androidx.activity)
 androidx-activity = "1.8.0"
@@ -107,7 +107,7 @@ androidx-room = "2.6.0"
 androidx-paging = "3.2.1"
 # Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
-androidx-navigation = "2.7.4"
+androidx-navigation = "2.7.5"
 # WorkManager 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/work?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/androidx.work)
 androidx-work = "2.8.1"
@@ -146,7 +146,7 @@ insert-koin-ktor = "3.4.1"
 bumptech-glide = "4.15.1"
 
 # okio [Github](https://github.com/square/okio) [指南](https://square.github.io/okio/)
-squareup-okio = "3.3.0"
+squareup-okio = "3.6.0"
 # javapoet [Github](https://github.com/square/javapoet)
 squareup-javapoet = "1.13.0"
 # picasso [Github](https://github.com/square/picasso) [指南](https://square.github.io/picasso/)
@@ -213,7 +213,7 @@ jsoup = "1.15.2"
 # LiveEventBus [Github](https://github.com/JeremyLiao/LiveEventBus)
 jeremyliao-liveEventBus = "1.8.0"
 
-# 图标控件 [Github](https://github.com/PhilJay/MPAndroidChart)
+# 图表控件 [Github](https://github.com/PhilJay/MPAndroidChart)
 philJay-mpAndroidChart = "v3.1.0"
 
 # WebDAV 客户端 [Github](https://github.com/lookfirst/sardine)
@@ -603,35 +603,3 @@ google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "google-hil
 # Roborazzi 测试工具 [Github](https://github.com/takahirom/roborazzi)
 # [版本查询](https://mvnrepository.com/artifact/io.github.takahirom.roborazzi)
 takahirom-roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "takahirom-roborazzi" }
-
-# 项目自定义插件
-# JVM 项目
-cashbook-jvm-library = { id = "cashbook.jvm.library", version = "unspecified" }
-# Android 测试
-cashbook-android-test = { id = "cashbook.android.test", version = "unspecified" }
-# Hilt 依赖注入
-cashbook-android-hilt = { id = "cashbook.android.hilt", version = "unspecified" }
-# Room 数据库
-cashbook-android-room = { id = "cashbook.android.room", version = "unspecified" }
-# Android 应用
-cashbook-android-application = { id = "cashbook.android.application", version = "unspecified" }
-# Android Compose 配置
-cashbook-android-application-compose = { id = "cashbook.android.application.compose", version = "unspecified" }
-# Android jacoco 配置
-cashbook-android-application-jacoco = { id = "cashbook.android.application.jacoco", version = "unspecified" }
-# Android Flavors 配置
-cashbook-android-application-flavors = { id = "cashbook.android.application.flavors", version = "unspecified" }
-# Android Flavors 文件生成
-cashbook-android-application-flavors-generate = { id = "cashbook.android.application.flavors.generate", version = "unspecified" }
-# Android 仓库
-cashbook-android-library = { id = "cashbook.android.library", version = "unspecified" }
-# Android 仓库 Compose 配置
-cashbook-android-library-compose = { id = "cashbook.android.library.compose", version = "unspecified" }
-# Android 仓库 jacoco 配置
-cashbook-android-library-jacoco = { id = "cashbook.android.library.jacoco", version = "unspecified" }
-# Android 仓库 Flavors 配置
-cashbook-android-library-flavors = { id = "cashbook.android.library.flavors", version = "unspecified" }
-# Android 仓库 Flavors 文件生成
-cashbook-android-library-flavors-generate = { id = "cashbook.android.library.flavors.generate", version = "unspecified" }
-# Android 仓库 功能模块配置
-cashbook-android-library-feature = { id = "cashbook.android.library.feature", version = "unspecified" }

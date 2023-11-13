@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Changed
+- 三方依赖升级；
 
 ## [1.0.2_23111016]
 ### Add
