@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
@@ -89,7 +105,6 @@ internal fun EditRecordRoute(
         updateType(typeId)
     },
 ) {
-
     val savingHintText = stringResource(id = R.string.record_saving)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -126,7 +141,6 @@ internal fun EditRecordRoute(
                     viewModel::updateType,
                 )
             }
-
         },
         onRemarkChange = viewModel::updateRemark,
         onAssetClick = viewModel::displayAssetSheet,
@@ -137,7 +151,7 @@ internal fun EditRecordRoute(
                     selectedTypeId,
                     selectedAssetId,
                     false,
-                    viewModel::updateAsset
+                    viewModel::updateAsset,
                 )
             }
         },
@@ -147,7 +161,7 @@ internal fun EditRecordRoute(
                     selectedTypeId,
                     selectedAssetId,
                     true,
-                    viewModel::updateRelatedAsset
+                    viewModel::updateRelatedAsset,
                 )
             }
         },
@@ -239,7 +253,6 @@ internal fun EditRecordScreen(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = rememberSnackbarHostState(),
 ) {
-
     // 提示文本
     val amountMustNotBeNullText = stringResource(id = R.string.amount_must_not_be_zero)
     val typeErrorText = stringResource(id = R.string.please_select_type)
@@ -297,7 +310,7 @@ internal fun EditRecordScreen(
                                     onRequestDismissBottomSheet()
                                 }
                                 true
-                            }
+                            },
                         ),
                         dragHandle = if (bottomSheetType.isCalculator) {
                             null
@@ -316,7 +329,7 @@ internal fun EditRecordScreen(
                                 onConcessionsChange,
                                 selectAssetBottomSheetContent,
                                 selectRelatedAssetBottomSheetContent,
-                                selectTagBottomSheetContent
+                                selectTagBottomSheetContent,
                             )
                         },
                     )
@@ -548,18 +561,17 @@ private fun EditRecordScaffoldContent(
                                         text = if (hasRelated) {
                                             stringResource(id = R.string.related_record_display_format).format(
                                                 uiState.relatedCount,
-                                                uiState.relatedAmount.withCNY()
+                                                uiState.relatedAmount.withCNY(),
                                             )
                                         } else {
                                             stringResource(id = R.string.related_record)
-                                        }
+                                        },
                                     )
                                 },
                             )
                         }
                     }
                 }
-
             }
         }
     }
@@ -588,7 +600,7 @@ private fun EditRecordBottomSheetContent(
     onConcessionsChange: (String) -> Unit,
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
-    selectTagBottomSheetContent: @Composable () -> Unit
+    selectTagBottomSheetContent: @Composable () -> Unit,
 ) {
     when (bottomSheetType) {
         EditRecordBottomSheetEnum.AMOUNT -> {

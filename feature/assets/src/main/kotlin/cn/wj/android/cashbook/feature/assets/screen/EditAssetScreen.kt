@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.assets.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -80,7 +96,6 @@ internal fun EditAssetRoute(
         updateAssetId(assetId)
     },
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
@@ -137,22 +152,28 @@ internal fun EditAssetScreen(
 
     // 资产名
     val assetNameTextState = remember(uiState.assetName) {
-        TextFieldState(defaultText = uiState.assetName,
+        TextFieldState(
+            defaultText = uiState.assetName,
             validator = { it.isNotBlank() },
-            errorFor = { assetErrorText })
+            errorFor = { assetErrorText },
+        )
     }
     // 信用卡 - 总额度
     val totalAmountTextState = remember(uiState.totalAmount) {
-        TextFieldState(defaultText = uiState.totalAmount,
+        TextFieldState(
+            defaultText = uiState.totalAmount,
             validator = { it.isNotBlank() },
             filter = { it.matches(Regex(PATTERN_SIGN_MONEY)) },
-            errorFor = { totalAmountErrorText })
+            errorFor = { totalAmountErrorText },
+        )
     }
     // 余额 or 信用卡 - 已用额度
     val balanceTextState = remember(uiState.balance) {
-        TextFieldState(defaultText = uiState.balance,
+        TextFieldState(
+            defaultText = uiState.balance,
             filter = { it.matches(Regex(PATTERN_SIGN_MONEY)) },
-            errorFor = { totalAmountErrorText })
+            errorFor = { totalAmountErrorText },
+        )
     }
     // 开户行
     val openBankTextState = remember(uiState.openBank) {
@@ -188,7 +209,6 @@ internal fun EditAssetScreen(
                         // 不满足必要条件
                         assetNameTextState.requestErrors()
                         totalAmountTextState.requestErrors()
-
                     } else {
                         onSaveClick(
                             assetNameTextState.text,
@@ -255,7 +275,7 @@ internal fun EditAssetScreen(
                             headlineContent = {
                                 Text(
                                     text = stringResource(id = R.string.asset_classification),
-                                    modifier = Modifier.padding(start = 16.dp)
+                                    modifier = Modifier.padding(start = 16.dp),
                                 )
                             },
                             trailingContent = {
@@ -270,7 +290,7 @@ internal fun EditAssetScreen(
                                     Text(
                                         text = stringResource(id = uiState.classification.nameResId),
                                         style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.padding(horizontal = 8.dp)
+                                        modifier = Modifier.padding(horizontal = 8.dp),
                                     )
                                     if (uiState.typeEnable) {
                                         Icon(
@@ -284,7 +304,7 @@ internal fun EditAssetScreen(
 
                         CommonDivider(
                             modifier = Modifier.height(8.dp),
-                            color = DividerDefaults.color.copy(alpha = 0.1f)
+                            color = DividerDefaults.color.copy(alpha = 0.1f),
                         )
 
                         CompatTextField(
@@ -343,7 +363,8 @@ internal fun EditAssetScreen(
                                 textFieldState = cardNoTextState,
                                 label = { Text(text = stringResource(id = R.string.card_no)) },
                                 keyboardOptions = KeyboardOptions.Default.copy(
-                                    imeAction = ImeAction.Next, keyboardType = KeyboardType.Number
+                                    imeAction = ImeAction.Next,
+                                    keyboardType = KeyboardType.Number,
                                 ),
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -365,7 +386,7 @@ internal fun EditAssetScreen(
 
                         CommonDivider(
                             modifier = Modifier.height(8.dp),
-                            color = DividerDefaults.color.copy(alpha = 0.1f)
+                            color = DividerDefaults.color.copy(alpha = 0.1f),
                         )
 
                         if (uiState.isCreditCard) {
@@ -374,7 +395,7 @@ internal fun EditAssetScreen(
                                 headlineContent = {
                                     Text(
                                         text = stringResource(id = R.string.billing_date),
-                                        modifier = Modifier.padding(start = 16.dp)
+                                        modifier = Modifier.padding(start = 16.dp),
                                     )
                                 },
                                 trailingContent = {
@@ -389,7 +410,7 @@ internal fun EditAssetScreen(
                                         Text(
                                             text = billingDateText,
                                             style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.padding(horizontal = 8.dp)
+                                            modifier = Modifier.padding(horizontal = 8.dp),
                                         )
                                         Icon(
                                             imageVector = CashbookIcons.KeyboardArrowRight,
@@ -404,7 +425,7 @@ internal fun EditAssetScreen(
                                 headlineContent = {
                                     Text(
                                         text = stringResource(id = R.string.repayment_date),
-                                        modifier = Modifier.padding(start = 16.dp)
+                                        modifier = Modifier.padding(start = 16.dp),
                                     )
                                 },
                                 trailingContent = {
@@ -420,7 +441,7 @@ internal fun EditAssetScreen(
                                         Text(
                                             text = repaymentDateText,
                                             style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.padding(horizontal = 8.dp)
+                                            modifier = Modifier.padding(horizontal = 8.dp),
                                         )
                                         Icon(
                                             imageVector = CashbookIcons.KeyboardArrowRight,
@@ -435,13 +456,13 @@ internal fun EditAssetScreen(
                             headlineContent = {
                                 Text(
                                     text = stringResource(id = R.string.invisible_asset),
-                                    modifier = Modifier.padding(start = 16.dp)
+                                    modifier = Modifier.padding(start = 16.dp),
                                 )
                             },
                             supportingContent = {
                                 Text(
                                     text = stringResource(id = R.string.invisible_asset_hint),
-                                    modifier = Modifier.padding(start = 16.dp)
+                                    modifier = Modifier.padding(start = 16.dp),
                                 )
                             },
                             trailingContent = {
@@ -463,7 +484,7 @@ internal fun EditAssetScreen(
 @Composable
 internal fun EditAssetSheetContent(
     bottomSheet: EditAssetBottomSheetEnum,
-    onClassificationChange: (ClassificationTypeEnum?, AssetClassificationEnum) -> Unit
+    onClassificationChange: (ClassificationTypeEnum?, AssetClassificationEnum) -> Unit,
 ) {
     when (bottomSheet) {
         EditAssetBottomSheetEnum.CLASSIFICATION_TYPE -> {
@@ -493,7 +514,7 @@ internal fun SelectDayDialog(
         Column {
             for (c in 0 until 6) {
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     for (r in 0 until 5) {
                         val text = (c * 5 + r + 1).toString()
@@ -532,7 +553,7 @@ internal fun SelectAssetClassificationTypeSheet(onItemClick: (ClassificationType
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
         )
         CommonDivider()
 
@@ -547,7 +568,7 @@ internal fun SelectAssetClassificationTypeSheet(onItemClick: (ClassificationType
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.surface)
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                         )
                     }
                     items(type.array) {
@@ -574,7 +595,7 @@ internal fun SelectAssetClassificationSheet(onItemClick: (AssetClassificationEnu
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
         )
         CommonDivider()
 

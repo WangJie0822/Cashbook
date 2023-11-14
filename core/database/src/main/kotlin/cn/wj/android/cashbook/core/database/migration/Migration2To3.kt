@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.migration
 
 import androidx.room.migration.Migration
@@ -23,7 +39,7 @@ object Migration2To3 : Migration(2, 3) {
     /** 创建记录表，版本 3 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_RECORD_3 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_RECORD}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_RECORD` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
             `type_enum` TEXT NOT NULL, 
@@ -47,7 +63,7 @@ object Migration2To3 : Migration(2, 3) {
     /** 从旧表复制数据到新表 */
     @Language("SQL")
     private const val SQL_COPY_RECORD_FROM_TEMP = """
-        INSERT INTO `${TABLE_RECORD}` 
+        INSERT INTO `$TABLE_RECORD` 
         SELECT `id`, `type`, `first_type_id`, `asset_id`, `into_asset_id`, `books_id`, `record_id`, `amount`, `charge`, `remark`, `tag_ids`, `reimbursable`, `system`, `record_time`, `create_time`, `modify_time` 
         FROM `${TABLE_RECORD}_temp`
     """
@@ -66,7 +82,7 @@ object Migration2To3 : Migration(2, 3) {
     /** 创建类型表，版本 3 */
     @Language("SQL")
     private const val SQL_CREATE_TABLE_TYPE_3 = """
-        CREATE TABLE IF NOT EXISTS `${TABLE_TYPE}` 
+        CREATE TABLE IF NOT EXISTS `$TABLE_TYPE` 
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
             `parent_id` INTEGER NOT NULL, 
@@ -84,7 +100,7 @@ object Migration2To3 : Migration(2, 3) {
     /** 从旧表复制数据到新表 */
     @Language("SQL")
     private const val SQL_COPY_TYPE_FROM_TEMP = """
-        INSERT INTO `${TABLE_TYPE}` 
+        INSERT INTO `$TABLE_TYPE` 
         SELECT `id`, `parent_id`, `name`, `icon_res_name`, `type`, `record_type`, `child_enable`, `refund`, `reimburse`, `sort` 
         FROM `${TABLE_TYPE}_temp`
     """

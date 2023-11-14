@@ -32,9 +32,15 @@ dependencyResolutionManagement {
     }
     // 配置 Version Catalogs
     versionCatalogs {
+        // 本地项目插件
+        create("conventionLibs") {
+            from(files("./gradle/convention.versions.toml"))
+        }
         // 签名配置信息
-        create("signingLibs") {
-            from(files("./gradle/signing.versions.toml"))
+        if (File("./gradle/signing.versions.toml").exists()) {
+            create("signingLibs") {
+                from(files("./gradle/signing.versions.toml"))
+            }
         }
     }
 }
@@ -47,6 +53,8 @@ rootProject.name = "Cashbook"
 // 项目包含的 Module
 include(":app")
 include(":app-catalog")
+
+include(":lint")
 
 include(":feature:tags")
 include(":feature:types")
@@ -61,6 +69,7 @@ include(":core:domain")
 include(":core:data")
 include(":core:database")
 include(":core:datastore")
+include(":core:datastore-proto")
 include(":core:network")
 include(":core:testing")
 include(":core:design")

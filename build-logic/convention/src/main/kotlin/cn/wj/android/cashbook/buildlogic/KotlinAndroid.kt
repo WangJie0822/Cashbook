@@ -24,10 +24,10 @@ internal fun Project.configureKotlinAndroid(
 
     commonExtension.apply {
 
-        compileSdk = ApplicationSetting.Config.COMPILE_SDK
+        compileSdk = ProjectSetting.Config.COMPILE_SDK
 
         defaultConfig {
-            minSdk = ApplicationSetting.Config.MIN_SDK
+            minSdk = ProjectSetting.Config.MIN_SDK
         }
 
         packaging {
@@ -38,8 +38,8 @@ internal fun Project.configureKotlinAndroid(
         }
 
         compileOptions {
-            sourceCompatibility = ApplicationSetting.Config.javaVersion
-            targetCompatibility = ApplicationSetting.Config.javaVersion
+            sourceCompatibility = ProjectSetting.Config.javaVersion
+            targetCompatibility = ProjectSetting.Config.javaVersion
             isCoreLibraryDesugaringEnabled = true
         }
 
@@ -60,8 +60,8 @@ internal fun Project.configureKotlinJvm() {
     extensions.configure<JavaPluginExtension> {
         // Up to Java 11 APIs are available through desugaring
         // https://developer.android.com/studio/write/java11-minimal-support-table
-        sourceCompatibility = ApplicationSetting.Config.javaVersion
-        targetCompatibility = ApplicationSetting.Config.javaVersion
+        sourceCompatibility = ProjectSetting.Config.javaVersion
+        targetCompatibility = ProjectSetting.Config.javaVersion
     }
 
     configureKotlin()
@@ -72,7 +72,7 @@ private fun Project.configureKotlin() {
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
             // Set JVM target to [ApplicationSetting.Config.javaVersion]
-            jvmTarget = ApplicationSetting.Config.javaVersion.toString()
+            jvmTarget = ProjectSetting.Config.javaVersion.toString()
             // Treat all Kotlin warnings as errors (disabled by default)
             // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
             val warningsAsErrors: String? by project

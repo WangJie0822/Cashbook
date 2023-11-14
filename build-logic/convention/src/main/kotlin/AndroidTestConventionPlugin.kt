@@ -1,4 +1,4 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
 import com.android.build.gradle.TestExtension
@@ -16,13 +16,13 @@ class AndroidTestConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_ANDROID_TEST)
-                apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
+                apply(ProjectSetting.Plugin.PLUGIN_ANDROID_TEST)
+                apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
             }
 
             extensions.configure<TestExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = ApplicationSetting.Config.TARGET_SDK
+                defaultConfig.targetSdk = ProjectSetting.Config.TARGET_SDK
                 configureGradleManagedDevices(this)
             }
         }

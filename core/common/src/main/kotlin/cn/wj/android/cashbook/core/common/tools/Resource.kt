@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 @file:Suppress("unused")
 @file:JvmName("ResourceTools")
 
@@ -40,7 +56,7 @@ fun getColorById(@ColorRes colorResId: Int, context: Context): Int {
  */
 fun getColorStateListById(
     @ColorRes colorResId: Int,
-    context: Context
+    context: Context,
 ): ColorStateList? {
     return ContextCompat.getColorStateList(context, colorResId)
 }
@@ -59,7 +75,7 @@ fun getStringById(@StringRes resId: Int, context: Context): String {
  */
 fun getDrawableById(
     @DrawableRes resId: Int,
-    context: Context
+    context: Context,
 ): Drawable? {
     return ContextCompat.getDrawable(context, resId)
 }
@@ -134,7 +150,7 @@ fun fixFontScaleResources(resource: Resources?, context: Context? = null): Resou
  */
 fun getAssetsStreamByName(
     fileName: String,
-    context: Context
+    context: Context,
 ): InputStream? {
     return try {
         context.assets.open(fileName)
@@ -172,7 +188,7 @@ fun getAssetsStringByName(fileName: String, context: Context): String? {
  */
 fun getRawStreamById(
     @RawRes rawResId: Int,
-    context: Context
+    context: Context,
 ): InputStream? {
     return try {
         context.resources.openRawResource(rawResId)
@@ -192,7 +208,7 @@ fun getRawValue(
     @RawRes rawResId: Int,
     key: String,
     context: Context,
-    defaultValue: String = ""
+    defaultValue: String = "",
 ): String {
     val rawStream = getRawStreamById(rawResId, context)
     var result = defaultValue

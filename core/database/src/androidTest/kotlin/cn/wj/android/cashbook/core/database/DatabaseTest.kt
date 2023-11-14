@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database
 
 import android.content.ContentValues
@@ -26,11 +42,11 @@ import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_RECORD_TIME
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REIMBURSABLE
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REMARK
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_TYPE_ID
-import java.io.IOException
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class DatabaseTest {
@@ -49,7 +65,7 @@ class DatabaseTest {
         InstrumentationRegistry.getInstrumentation(),
         CashbookDatabase::class.java,
         emptyList(),
-        FrameworkSQLiteOpenHelperFactory()
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
@@ -71,7 +87,7 @@ class DatabaseTest {
                     put(TABLE_RECORD_REMARK, "备注1")
                     put(TABLE_RECORD_REIMBURSABLE, SWITCH_INT_OFF)
                     put(TABLE_RECORD_RECORD_TIME, System.currentTimeMillis())
-                }
+                },
             )
             to.query(SQL_QUERY_ALL_FROM_RECORD).use { cursor ->
                 while (cursor.moveToNext()) {
@@ -99,7 +115,7 @@ class DatabaseTest {
                         put(TABLE_RECORD_REMARK, "备注2")
                         put(TABLE_RECORD_REIMBURSABLE, SWITCH_INT_OFF)
                         put(TABLE_RECORD_RECORD_TIME, System.currentTimeMillis())
-                    }
+                    },
                 )
                 from.insert(
                     table = TABLE_RECORD,
@@ -116,7 +132,7 @@ class DatabaseTest {
                         put(TABLE_RECORD_REMARK, "备注3")
                         put(TABLE_RECORD_REIMBURSABLE, SWITCH_INT_OFF)
                         put(TABLE_RECORD_RECORD_TIME, System.currentTimeMillis())
-                    }
+                    },
                 )
                 from.query(SQL_QUERY_ALL_FROM_RECORD).use { cursor ->
                     while (cursor.moveToNext()) {
@@ -157,7 +173,7 @@ class DatabaseTest {
         helper.createDatabase(testDbName, 1).use { db ->
             db.query(
                 "SELECT * FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                arrayOf("table", "db_tag")
+                arrayOf("table", "db_tag"),
             ).use { cursor ->
                 val count = cursor.count
                 log("migrate1_2() count = [$count]")
@@ -169,7 +185,7 @@ class DatabaseTest {
             .use { db ->
                 db.query(
                     "SELECT * FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                    arrayOf("table", "db_tag")
+                    arrayOf("table", "db_tag"),
                 ).use { cursor ->
                     val count = cursor.count
                     log("migrate1_2() count = [$count]")
@@ -199,7 +215,7 @@ class DatabaseTest {
         helper.createDatabase(testDbName, 2).use { db ->
             db.query(
                 "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                arrayOf("table", "db_record")
+                arrayOf("table", "db_record"),
             ).use { cursor ->
                 cursor.moveToFirst()
                 val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -212,7 +228,7 @@ class DatabaseTest {
             }
             db.query(
                 "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                arrayOf("table", "db_type")
+                arrayOf("table", "db_type"),
             ).use { cursor ->
                 cursor.moveToFirst()
                 val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -220,25 +236,29 @@ class DatabaseTest {
                 hasSystem = sqlStr.contains("`system`")
             }
             // 插入数据
-            db.insert("db_record", SQLiteDatabase.CONFLICT_FAIL, ContentValues().apply {
-                put("id", 1L)
-                put("type", type)
-                put("first_type_id", firstTypeId)
-                put("second_type_id", 2L)
-                put("asset_id", 3L)
-                put("into_asset_id", 4L)
-                put("books_id", 5L)
-                put("record_id", 6L)
-                put("amount", 7f)
-                put("charge", 8f)
-                put("remark", "remark")
-                put("tag_ids", "tagIds")
-                put("reimbursable", 0)
-                put("system", 0)
-                put("record_time", System.currentTimeMillis())
-                put("create_time", System.currentTimeMillis())
-                put("modify_time", System.currentTimeMillis())
-            })
+            db.insert(
+                "db_record",
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("type", type)
+                    put("first_type_id", firstTypeId)
+                    put("second_type_id", 2L)
+                    put("asset_id", 3L)
+                    put("into_asset_id", 4L)
+                    put("books_id", 5L)
+                    put("record_id", 6L)
+                    put("amount", 7f)
+                    put("charge", 8f)
+                    put("remark", "remark")
+                    put("tag_ids", "tagIds")
+                    put("reimbursable", 0)
+                    put("system", 0)
+                    put("record_time", System.currentTimeMillis())
+                    put("create_time", System.currentTimeMillis())
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
         }
         Assert.assertEquals(false, hasTypeEnum)
         Assert.assertEquals(false, hasTypeId)
@@ -253,7 +273,7 @@ class DatabaseTest {
             .use { db ->
                 db.query(
                     "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                    arrayOf("table", "db_record")
+                    arrayOf("table", "db_record"),
                 ).use { cursor ->
                     cursor.moveToFirst()
                     val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -266,7 +286,7 @@ class DatabaseTest {
                 }
                 db.query(
                     "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                    arrayOf("table", "db_type")
+                    arrayOf("table", "db_type"),
                 ).use { cursor ->
                     cursor.moveToFirst()
                     val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -304,7 +324,7 @@ class DatabaseTest {
         helper.createDatabase(testDbName, 3).use { db ->
             db.query(
                 "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                arrayOf("table", "db_tag")
+                arrayOf("table", "db_tag"),
             ).use { cursor ->
                 cursor.moveToFirst()
                 val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -320,7 +340,7 @@ class DatabaseTest {
             .use { db ->
                 db.query(
                     "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                    arrayOf("table", "db_tag")
+                    arrayOf("table", "db_tag"),
                 ).use { cursor ->
                     cursor.moveToFirst()
                     val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -346,7 +366,7 @@ class DatabaseTest {
         helper.createDatabase(testDbName, 4).use { db ->
             db.query(
                 "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                arrayOf("table", "db_asset")
+                arrayOf("table", "db_asset"),
             ).use { cursor ->
                 cursor.moveToFirst()
                 val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -364,7 +384,7 @@ class DatabaseTest {
             .use { db ->
                 db.query(
                     "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
-                    arrayOf("table", "db_asset")
+                    arrayOf("table", "db_asset"),
                 ).use { cursor ->
                     cursor.moveToFirst()
                     val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
@@ -388,23 +408,27 @@ class DatabaseTest {
     fun migrate5_6() {
         var floatStr: String
         helper.createDatabase(testDbName, 5).use { db ->
-            db.insert("db_asset", SQLiteDatabase.CONFLICT_FAIL, ContentValues().apply {
-                put("id", 1L)
-                put("books_id", 1L)
-                put("name", "name")
-                put("total_amount", 1.09f)
-                put("billing_date", "2022-10-10")
-                put("repayment_date", "2022-10-10")
-                put("type", "type")
-                put("classification", "classification")
-                put("invisible", 1)
-                put("open_bank", "")
-                put("card_no", "")
-                put("remark", "")
-                put("sort", 1)
-                put("create_time", System.currentTimeMillis())
-                put("modify_time", System.currentTimeMillis())
-            })
+            db.insert(
+                "db_asset",
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("books_id", 1L)
+                    put("name", "name")
+                    put("total_amount", 1.09f)
+                    put("billing_date", "2022-10-10")
+                    put("repayment_date", "2022-10-10")
+                    put("type", "type")
+                    put("classification", "classification")
+                    put("invisible", 1)
+                    put("open_bank", "")
+                    put("card_no", "")
+                    put("remark", "")
+                    put("sort", 1)
+                    put("create_time", System.currentTimeMillis())
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
             db.query("SELECT * FROM `db_asset`").use { cursor ->
                 cursor.moveToFirst()
                 floatStr = cursor.getString(cursor.getColumnIndexOrThrow("total_amount"))

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.settings.navigation
 
 import androidx.compose.material3.SnackbarResult
@@ -77,20 +93,17 @@ fun NavGraphBuilder.settingsLauncherScreen(
  * @param onRequestNaviToChangelog 导航到修改日志
  * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
  * @param onRequestPopBackStack 导航到上一级
- * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 fun NavGraphBuilder.aboutUsScreen(
     onRequestNaviToChangelog: () -> Unit,
     onRequestNaviToPrivacyPolicy: () -> Unit,
     onRequestPopBackStack: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
     composable(route = ROUTE_SETTINGS_ABOUT_US) {
         AboutUsRoute(
             onRequestNaviToChangelog = onRequestNaviToChangelog,
             onRequestNaviToPrivacyPolicy = onRequestNaviToPrivacyPolicy,
             onRequestPopBackStack = onRequestPopBackStack,
-            onShowSnackbar = onShowSnackbar,
         )
     }
 }

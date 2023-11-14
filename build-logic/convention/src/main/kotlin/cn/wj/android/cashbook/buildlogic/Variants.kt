@@ -12,6 +12,8 @@ import com.squareup.javapoet.TypeSpec
 import java.io.File
 import javax.lang.model.element.Modifier
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.getByType
 
 /**
  * 维度枚举
@@ -44,6 +46,9 @@ enum class CashbookFlavor(
     /** 离线渠道，无网络请求 */
     Offline(FlavorDimension.ContentType, Signing.Android, null, "_offline"),
 
+    /** 尝鲜渠道 */
+    Canary(FlavorDimension.ContentType, Signing.Android, null, "_canary"),
+
     /** 开发渠道 */
     Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev")
 }
@@ -55,7 +60,7 @@ enum class CashbookFlavor(
  */
 fun Project.configureFlavors(
     commonExtension: CommonExtension<*, *, *, *, *>,
-    flavorConfigurationBlock: ProductFlavor.(flavor: CashbookFlavor) -> Unit = {}
+    flavorConfigurationBlock: ProductFlavor.(flavor: CashbookFlavor) -> Unit = {},
 ) {
     commonExtension.apply {
 
@@ -70,9 +75,15 @@ fun Project.configureFlavors(
 
         // 多渠道配置
         productFlavors {
+
+            val signingLibs = runCatching {
+                extensions.getByType<VersionCatalogsExtension>().named("signingLibs")
+            }.getOrNull()
+
             CashbookFlavor.values().forEach {
                 create(it.name) {
                     dimension = it.dimension.name
+                    println("> Task :${project.name}:configureFlavors set flavors: ${it.name}")
                     flavorConfigurationBlock(this, it)
                     if (this@apply is BaseAppModuleExtension && this is ApplicationProductFlavor) {
                         it.applicationIdSuffix?.let { suffix ->
@@ -83,7 +94,12 @@ fun Project.configureFlavors(
                             versionNameSuffix = suffix
                         }
 
-                        signingConfig = signingConfigs.findByName(it.signing.name)
+                        signingConfig = if (null != signingLibs) {
+                            signingConfigs.findByName(it.signing.name)
+                        } else {
+                            println("> Task :${project.name}:configureFlavors signing config not found, use debug signing")
+                            signingConfigs.findByName("debug")
+                        }
                     }
                 }
             }

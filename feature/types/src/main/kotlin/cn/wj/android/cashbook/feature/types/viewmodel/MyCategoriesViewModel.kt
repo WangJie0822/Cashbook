@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.types.viewmodel
 
 import androidx.compose.runtime.getValue
@@ -16,7 +32,6 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.types.enums.MyCategoriesBookmarkEnum
 import cn.wj.android.cashbook.feature.types.model.ExpandableRecordTypeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -24,6 +39,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * 我的类型 ViewModel
@@ -106,7 +122,7 @@ class MyCategoriesViewModel @Inject constructor(
                     MyCategoriesDialogData.SelectFirstType(
                         id = id,
                         typeList = typeListExcludeCurrent,
-                    )
+                    ),
                 )
             }
         }
@@ -133,7 +149,7 @@ class MyCategoriesViewModel @Inject constructor(
                 MyCategoriesDialogData.SelectFirstType(
                     id = id,
                     typeList = typeListExcludeCurrent,
-                )
+                ),
             )
         }
     }
@@ -147,9 +163,9 @@ class MyCategoriesViewModel @Inject constructor(
                         shouldDisplayBookmark = MyCategoriesBookmarkEnum.PROTECTED_TYPE
                     }
 
-                    type.typeLevel == TypeLevelEnum.FIRST
-                            && typeRepository.getSecondRecordTypeListByParentId(id)
-                        .isNotEmpty() -> {
+                    type.typeLevel == TypeLevelEnum.FIRST &&
+                        typeRepository.getSecondRecordTypeListByParentId(id)
+                            .isNotEmpty() -> {
                         // 一级分类下有二级分类，提示
                         shouldDisplayBookmark = MyCategoriesBookmarkEnum.DELETE_FIRST_TYPE_HAS_CHILD
                     }
@@ -161,33 +177,35 @@ class MyCategoriesViewModel @Inject constructor(
                             typeRepository.deleteById(id)
                         } else {
                             // 分类下有记录，提示移动到其它分类
-                            dialogState = DialogState.Shown(MyCategoriesDialogData.DeleteType(
-                                id = id,
-                                recordSize = recordSize,
-                                expandableTypeList = _currentTypeList.first()
-                                    .filter { it.id != id }
-                                    .map { first ->
-                                        ExpandableRecordTypeModel(
-                                            data = first,
-                                            list = typeRepository.getSecondRecordTypeListByParentId(
-                                                first.id
+                            dialogState = DialogState.Shown(
+                                MyCategoriesDialogData.DeleteType(
+                                    id = id,
+                                    recordSize = recordSize,
+                                    expandableTypeList = _currentTypeList.first()
+                                        .filter { it.id != id }
+                                        .map { first ->
+                                            ExpandableRecordTypeModel(
+                                                data = first,
+                                                list = typeRepository.getSecondRecordTypeListByParentId(
+                                                    first.id,
+                                                )
+                                                    .filter { it.id != id }
+                                                    .map { second ->
+                                                        ExpandableRecordTypeModel(
+                                                            data = second,
+                                                            list = emptyList(),
+                                                            reimburseType = false,
+                                                            refundType = false,
+                                                            creditCardPaymentType = false,
+                                                        )
+                                                    },
+                                                reimburseType = false,
+                                                refundType = false,
+                                                creditCardPaymentType = false,
                                             )
-                                                .filter { it.id != id }
-                                                .map { second ->
-                                                    ExpandableRecordTypeModel(
-                                                        data = second,
-                                                        list = emptyList(),
-                                                        reimburseType = false,
-                                                        refundType = false,
-                                                        creditCardPaymentType = false,
-                                                    )
-                                                },
-                                            reimburseType = false,
-                                            refundType = false,
-                                            creditCardPaymentType = false,
-                                        )
-                                    }
-                            ))
+                                        },
+                                ),
+                            )
                         }
                     }
                 }
@@ -209,7 +227,7 @@ class MyCategoriesViewModel @Inject constructor(
                 MyCategoriesDialogData.EditType(
                     type = typeRepository.getRecordTypeById(id),
                     parentType = typeRepository.getRecordTypeById(parentId),
-                )
+                ),
             )
         }
     }
@@ -226,17 +244,19 @@ class MyCategoriesViewModel @Inject constructor(
                 shouldDisplayBookmark = MyCategoriesBookmarkEnum.DUPLICATE_TYPE_NAME
             } else {
                 // 更新类型数据
-                val model = (recordTypeById ?: RecordTypeModel(
-                    id = id,
-                    parentId = parentId,
-                    name = name,
-                    iconName = iconName,
-                    typeLevel = if (parentId == -1L) TypeLevelEnum.FIRST else TypeLevelEnum.SECOND,
-                    typeCategory = _selectedTabData.first(),
-                    protected = false,
-                    sort = typeRepository.generateSortById(id, parentId),
-                    needRelated = false,
-                )).copy(
+                val model = (
+                    recordTypeById ?: RecordTypeModel(
+                        id = id,
+                        parentId = parentId,
+                        name = name,
+                        iconName = iconName,
+                        typeLevel = if (parentId == -1L) TypeLevelEnum.FIRST else TypeLevelEnum.SECOND,
+                        typeCategory = _selectedTabData.first(),
+                        protected = false,
+                        sort = typeRepository.generateSortById(id, parentId),
+                        needRelated = false,
+                    )
+                    ).copy(
                     id = id,
                     parentId = parentId,
                     name = name,

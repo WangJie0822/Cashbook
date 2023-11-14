@@ -1,4 +1,4 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureJacoco
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import org.gradle.api.Plugin
@@ -9,7 +9,7 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_JACOCO)
+                apply(ProjectSetting.Plugin.PLUGIN_JACOCO)
             }
             val extension = extensions.getByType<LibraryAndroidComponentsExtension>()
             configureJacoco(extension)

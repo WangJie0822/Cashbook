@@ -1,9 +1,21 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package androidx.compose.material3
 
-import androidx.compose.material.BackdropScaffold as M2BackdropScaffold
-import androidx.compose.material.BackdropScaffoldState as M2BackdropScaffoldState
-import androidx.compose.material.BackdropValue as M2BackdropValue
-import androidx.compose.material.rememberBackdropScaffoldState as rememberM2BackdropScaffoldState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.shape.CornerSize
@@ -15,6 +27,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.BackdropScaffold as M2BackdropScaffold
+import androidx.compose.material.BackdropScaffoldState as M2BackdropScaffoldState
+import androidx.compose.material.BackdropValue as M2BackdropValue
+import androidx.compose.material.rememberBackdropScaffoldState as rememberM2BackdropScaffoldState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -33,14 +49,13 @@ fun BackdropScaffold(
     backLayerContentColor: Color = contentColorFor(backLayerBackgroundColor),
     frontLayerShape: Shape = MaterialTheme.shapes.large.copy(
         topStart = CornerSize(16.dp),
-        topEnd = CornerSize(16.dp)
+        topEnd = CornerSize(16.dp),
     ),
     frontLayerElevation: Dp = BackdropScaffoldDefaults.FrontLayerElevation,
     frontLayerBackgroundColor: Color = MaterialTheme.colorScheme.surface,
     frontLayerContentColor: Color = contentColorFor(frontLayerBackgroundColor),
     frontLayerScrimColor: Color = MaterialTheme.colorScheme.surface.copy(alpha = 0.60f),
 ) {
-
     M2BackdropScaffold(
         appBar = appBar,
         backLayerContent = backLayerContent,
@@ -111,7 +126,7 @@ class BackdropScaffoldState(
             when (it) {
                 M2BackdropValue.Revealed -> BackdropValue.Revealed
                 M2BackdropValue.Concealed -> BackdropValue.Concealed
-            }
+            },
         )
     }
 
@@ -154,7 +169,7 @@ enum class BackdropValue {
     /**
      * Indicates the back layer is revealed and the front layer is inactive.
      */
-    Revealed
+    Revealed,
 }
 
 @Composable

@@ -1,12 +1,23 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 @file:Suppress("unused")
 
 package cn.wj.android.cashbook.core.network.okhttp
 
-import java.io.EOFException
-import java.io.IOException
-import java.nio.charset.StandardCharsets.UTF_8
-import java.util.TreeSet
-import java.util.concurrent.TimeUnit
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.Protocol
@@ -15,6 +26,11 @@ import okio.Buffer
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.EOFException
+import java.io.IOException
+import java.nio.charset.StandardCharsets.UTF_8
+import java.util.TreeSet
+import java.util.concurrent.TimeUnit
 
 /**
  * OkHttp 日志打印拦截器
@@ -33,7 +49,7 @@ class LoggerInterceptor
 @JvmOverloads
 constructor(
     private val logger: InterceptorLogger = DEFAULT_LOGGER,
-    private var level: Int = LEVEL_NONE
+    private var level: Int = LEVEL_NONE,
 ) : Interceptor {
 
     @Volatile
@@ -48,7 +64,6 @@ constructor(
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-
         // 获取请求对象
         val request = chain.request()
 
@@ -96,7 +111,7 @@ constructor(
                 url.queryParameterNames().maxByOrNull { it.length }?.length ?: 0
             for (name in url.queryParameterNames()) {
                 for (value in url.queryParameterValues(name)) {
-                    logStr.appendLine("\t${name.fixLength(parametersMaxLength)}\t: \t${value}")
+                    logStr.appendLine("\t${name.fixLength(parametersMaxLength)}\t: \t$value")
                 }
             }
             logStr.appendLine(">> END QueryParameters\n")
@@ -129,7 +144,7 @@ constructor(
 
                     logStr.appendLine()
                     if (isPlaintext(buffer)) {
-                        logStr.appendLine(">> ${contentType.toString()}")
+                        logStr.appendLine(">> $contentType")
                         logStr.appendLine("  |${buffer.readString(charset)}\n")
                         logStr.appendLine("--> END ${request.method()} (${requestBody.contentLength()}-byte body)")
                     } else {
@@ -157,14 +172,19 @@ constructor(
         if (responseBody != null) {
             logStr.appendLine(
                 "<-- ${response.code()} ${response.message()} ${response.request().url()}" +
-                        " (${tookMs}ms${
-                            if (!logHeaders)
-                                ", ${
-                                    if (responseBody.contentLength() != -1L) "$responseBody-byte"
-                                    else "unknown-length"
-                                } body"
-                            else ""
-                        })"
+                    " (${tookMs}ms${
+                        if (!logHeaders) {
+                            ", ${
+                                if (responseBody.contentLength() != -1L) {
+                                    "$responseBody-byte"
+                                } else {
+                                    "unknown-length"
+                                }
+                            } body"
+                        } else {
+                            ""
+                        }
+                    })",
             )
 
             if (logHeaders) {
@@ -201,17 +221,18 @@ constructor(
                             logStr.appendLine(json)
                             val jsonFormat = json.jsonFormat()
                             logStr.appendLine(
-                                if (jsonFormat.length > 200)
+                                if (jsonFormat.length > 200) {
                                     "${
                                         jsonFormat.substring(
                                             0,
-                                            100
+                                            100,
                                         )
                                     }\n\n The Json String was too long...\n\n ${
                                         jsonFormat.substring(jsonFormat.length - 100)
                                     }"
-                                else
+                                } else {
                                     "$jsonFormat\n"
+                                },
                             )
                         }
                         logStr.appendLine("<-- END HTTP (${buffer.size()}-byte body)")
@@ -262,7 +283,7 @@ constructor(
     private fun bodyHasUnknownEncoding(headers: Headers): Boolean {
         val contentEncoding = headers["Content-Encoding"] ?: return false
         return !contentEncoding.equals("identity", ignoreCase = true) &&
-                !contentEncoding.equals("gzip", ignoreCase = true)
+            !contentEncoding.equals("gzip", ignoreCase = true)
     }
 
     companion object {

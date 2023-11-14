@@ -1,4 +1,4 @@
-import cn.wj.android.cashbook.buildlogic.ApplicationSetting
+import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureKotlinJvm
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,7 +13,7 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply(ApplicationSetting.Plugin.PLUGIN_KOTLIN_JVM)
+                apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_JVM)
             }
             configureKotlinJvm()
         }

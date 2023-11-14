@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
@@ -40,7 +56,7 @@ interface TransactionDao {
     @Query(
         value = """
         DELETE FROM db_tag_with_record WHERE record_id=:recordId
-    """
+    """,
     )
     suspend fun deleteOldRelatedTags(recordId: Long)
 
@@ -53,28 +69,28 @@ interface TransactionDao {
     @Query(
         value = """
         SELECT * FROM db_asset WHERE id=:assetId
-    """
+    """,
     )
     suspend fun queryAssetById(assetId: Long): AssetTable?
 
     @Query(
         value = """
         SELECT * FROM db_type WHERE id=:typeId
-    """
+    """,
     )
     suspend fun queryTypeById(typeId: Long): TypeTable?
 
     @Query(
         value = """
         SELECT * FROM db_record WHERE id=:recordId
-    """
+    """,
     )
     suspend fun queryRecordById(recordId: Long): RecordTable?
 
     @Query(
         value = """
         DELETE FROM db_record_with_related WHERE record_id=:id OR related_record_id=:id
-    """
+    """,
     )
     suspend fun clearRelatedRecordById(id: Long)
 
@@ -109,9 +125,15 @@ interface TransactionDao {
         relatedRecordIdList: List<Long>,
     ) {
         val type =
-            (if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) TYPE_TABLE_BALANCE_EXPENDITURE
-            else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) TYPE_TABLE_BALANCE_INCOME
-            else queryTypeById(record.typeId))
+            (
+                if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) {
+                    TYPE_TABLE_BALANCE_EXPENDITURE
+                } else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) {
+                    TYPE_TABLE_BALANCE_INCOME
+                } else {
+                    queryTypeById(record.typeId)
+                }
+                )
                 ?: throw DataTransactionException("Type must not be null")
 
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
@@ -157,7 +179,6 @@ interface TransactionDao {
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 - 记录金额
                         asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
-
                     } else {
                         // 非信用卡账户，余额 + 记录金额
                         asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
@@ -170,19 +191,23 @@ interface TransactionDao {
         val recordId = insertRecord(record)
 
         // 插入新的关联标签
-        insertRelatedTags(tagIdList.map { tagId ->
-            TagWithRecordTable(id = null, recordId = recordId, tagId = tagId)
-        })
+        insertRelatedTags(
+            tagIdList.map { tagId ->
+                TagWithRecordTable(id = null, recordId = recordId, tagId = tagId)
+            },
+        )
 
         if (needRelated && relatedRecordIdList.isNotEmpty()) {
             // 更新关联记录
-            insertRelatedRecord(relatedRecordIdList.map { relatedRecordId ->
-                RecordWithRelatedTable(
-                    id = null,
-                    recordId = recordId,
-                    relatedRecordId = relatedRecordId,
-                )
-            })
+            insertRelatedRecord(
+                relatedRecordIdList.map { relatedRecordId ->
+                    RecordWithRelatedTable(
+                        id = null,
+                        recordId = recordId,
+                        relatedRecordId = relatedRecordId,
+                    )
+                },
+            )
         }
     }
 
@@ -203,10 +228,14 @@ interface TransactionDao {
     suspend fun deleteRecordTransaction(record: RecordTable) {
         val recordId = record.id ?: return
         val type =
-            if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) TYPE_TABLE_BALANCE_EXPENDITURE
-            else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) TYPE_TABLE_BALANCE_INCOME
-            else queryTypeById(record.typeId)
-                ?: throw DataTransactionException("Type must not be null")
+            if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) {
+                TYPE_TABLE_BALANCE_EXPENDITURE
+            } else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) {
+                TYPE_TABLE_BALANCE_INCOME
+            } else {
+                queryTypeById(record.typeId)
+                    ?: throw DataTransactionException("Type must not be null")
+            }
 
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
         // 计算之前记录涉及金额
@@ -251,7 +280,6 @@ interface TransactionDao {
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 + 记录金额
                         asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
-
                     } else {
                         // 非信用卡账户，余额 - 记录金额
                         asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
@@ -277,7 +305,7 @@ interface TransactionDao {
     @Query(
         value = """
         SELECT * FROM db_record WHERE books_id=:bookId
-    """
+    """,
     )
     suspend fun queryRecordListByBookId(bookId: Long): List<RecordTable>
 
@@ -285,7 +313,7 @@ interface TransactionDao {
         """
         DELETE FROM db_record_with_related
         WHERE record_id=:recordId OR related_record_id=:recordId
-    """
+    """,
     )
     suspend fun deleteRecordRelationByRecordId(recordId: Long)
 
@@ -293,7 +321,7 @@ interface TransactionDao {
         value = """
         DELETE FROM db_tag_with_record
         WHERE record_id=:recordId
-    """
+    """,
     )
     suspend fun deleteTagRelationByRecordId(recordId: Long)
 
@@ -301,7 +329,7 @@ interface TransactionDao {
         value = """
         DELETE FROM db_tag_with_record
         WHERE tag_id=:tagId
-    """
+    """,
     )
     suspend fun deleteTagRelationByTagId(tagId: Long)
 
@@ -309,7 +337,7 @@ interface TransactionDao {
         value = """
         DELETE FROM db_tag
         WHERE id=:tagId
-    """
+    """,
     )
     suspend fun deleteTagById(tagId: Long)
 
@@ -317,7 +345,7 @@ interface TransactionDao {
         value = """
        DELETE FROM db_books
         WHERE id=:bookId
-    """
+    """,
     )
     suspend fun deleteBookById(bookId: Long)
 
@@ -344,5 +372,4 @@ interface TransactionDao {
         deleteTagRelationByTagId(id)
         deleteTagById(id)
     }
-
 }

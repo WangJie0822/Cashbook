@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -13,10 +29,10 @@ import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import javax.inject.Inject
 
 /**
  * 资产信息页记录数据 ViewModel
@@ -27,7 +43,7 @@ import kotlinx.coroutines.flow.flatMapLatest
  */
 @HiltViewModel
 class AssetInfoContentViewModel @Inject constructor(
-    getAssetRecordViewsUseCase: GetAssetRecordViewsUseCase
+    getAssetRecordViewsUseCase: GetAssetRecordViewsUseCase,
 ) : ViewModel() {
 
     /** 资产 id 数据 */
@@ -41,7 +57,7 @@ class AssetInfoContentViewModel @Inject constructor(
             Pager(
                 config = PagingConfig(
                     pageSize = DEFAULT_PAGE_SIZE,
-                    initialLoadSize = DEFAULT_PAGE_SIZE
+                    initialLoadSize = DEFAULT_PAGE_SIZE,
                 ),
                 pagingSourceFactory = {
                     AssetRecordPagingSource(it, getAssetRecordViewsUseCase)
@@ -61,7 +77,7 @@ class AssetInfoContentViewModel @Inject constructor(
  */
 private class AssetRecordPagingSource(
     private val assetId: Long,
-    private val getAssetRecordViewsUseCase: GetAssetRecordViewsUseCase
+    private val getAssetRecordViewsUseCase: GetAssetRecordViewsUseCase,
 ) : PagingSource<Int, RecordViewsEntity>() {
     override fun getRefreshKey(state: PagingState<Int, RecordViewsEntity>): Int? = null
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.migration
 
 import cn.wj.android.cashbook.core.database.table.TABLE_ASSET
@@ -33,7 +49,7 @@ internal const val SQL_QUERY_ALL_FROM_TYPE = "SELECT * FROM `$TABLE_TYPE`"
 /** 重命名资产表 */
 @Language("SQL")
 internal const val SQL_RENAME_TABLE_ASSET_TO_TEMP = """
-    ALTER TABLE `${TABLE_ASSET}` RENAME TO `${TABLE_ASSET}_temp`
+    ALTER TABLE `$TABLE_ASSET` RENAME TO `${TABLE_ASSET}_temp`
 """
 
 /** 查询所有资产临时表数据 */
@@ -51,7 +67,7 @@ internal const val SQL_DROP_TABLE_ASSET_TEMP = """
 /** 重命名账本表 */
 @Language("SQL")
 internal const val SQL_RENAME_TABLE_BOOKS_TO_TEMP = """
-    ALTER TABLE `${TABLE_BOOKS}` RENAME TO `${TABLE_BOOKS}_temp`
+    ALTER TABLE `$TABLE_BOOKS` RENAME TO `${TABLE_BOOKS}_temp`
 """
 
 /** 查询所有账本临时表数据 */
@@ -69,7 +85,7 @@ internal const val SQL_DROP_TABLE_BOOKS_TEMP = """
 /** 重命名标签表 */
 @Language("SQL")
 internal const val SQL_RENAME_TABLE_TAG_TO_TEMP = """
-    ALTER TABLE `${TABLE_TAG}` RENAME TO `${TABLE_TAG}_temp`
+    ALTER TABLE `$TABLE_TAG` RENAME TO `${TABLE_TAG}_temp`
 """
 
 /** 查询所有标签临时表数据 */
@@ -87,7 +103,7 @@ internal const val SQL_DROP_TABLE_TAG_TEMP = """
 /** 重命名类型表 */
 @Language("SQL")
 internal const val SQL_RENAME_TABLE_TYPE_TO_TEMP = """
-    ALTER TABLE `${TABLE_TYPE}` RENAME TO `${TABLE_TYPE}_temp`
+    ALTER TABLE `$TABLE_TYPE` RENAME TO `${TABLE_TYPE}_temp`
 """
 
 /** 查询所有类型临时表数据 */
@@ -105,7 +121,7 @@ internal const val SQL_DROP_TABLE_TYPE_TEMP = """
 /** 重命名记录表 */
 @Language("SQL")
 internal const val SQL_RENAME_TABLE_RECORD_TO_TEMP = """
-    ALTER TABLE `${TABLE_RECORD}` RENAME TO `${TABLE_RECORD}_temp`
+    ALTER TABLE `$TABLE_RECORD` RENAME TO `${TABLE_RECORD}_temp`
 """
 
 /** 查询所有记录临时表数据 */

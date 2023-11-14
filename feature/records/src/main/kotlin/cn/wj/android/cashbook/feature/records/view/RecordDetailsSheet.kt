@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.view
 
 import androidx.compose.foundation.background
@@ -58,7 +74,6 @@ internal fun RecordDetailsSheet(
     onRequestDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     var dialogState: DialogState by remember {
         mutableStateOf(DialogState.Dismiss)
     }
@@ -73,7 +88,8 @@ internal fun RecordDetailsSheet(
                     onRequestDismissSheet()
                 }
             },
-            onDialogDismiss = { dialogState = DialogState.Dismiss })
+            onDialogDismiss = { dialogState = DialogState.Dismiss },
+        )
     }
 
     CashbookBackground {
@@ -189,7 +205,7 @@ internal fun RecordDetailsSheet(
                         headlineContent = { Text(text = stringResource(id = R.string.type)) },
                         trailingContent = {
                             Row(
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 TypeIcon(
                                     painter = painterDrawableResource(idStr = recordData.typeIconResName),
@@ -198,15 +214,17 @@ internal fun RecordDetailsSheet(
                                 Text(
                                     text = recordData.typeName,
                                     style = MaterialTheme.typography.labelLarge,
-                                    modifier = Modifier.padding(start = 8.dp)
+                                    modifier = Modifier.padding(start = 8.dp),
                                 )
                             }
                         },
                     )
 
-                    if (recordData.relatedRecord.isNotEmpty()
-                        && (recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE
-                                || recordData.typeCategory == RecordTypeCategoryEnum.INCOME)
+                    if (recordData.relatedRecord.isNotEmpty() &&
+                        (
+                            recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE ||
+                                recordData.typeCategory == RecordTypeCategoryEnum.INCOME
+                            )
                     ) {
                         // 有关联记录，且是收入、支出类型
                         val list = recordData.relatedRecord
@@ -222,7 +240,7 @@ internal fun RecordDetailsSheet(
                                         }
                                         stringResource(id = R.string.related_record_display_format).format(
                                             list.size,
-                                            total.decimalFormat().withCNY()
+                                            total.decimalFormat().withCNY(),
                                         )
                                     } else {
                                         // 支出类型，被退款 or 被报销，计算金额
@@ -231,7 +249,7 @@ internal fun RecordDetailsSheet(
                                             total += (it.amount.toBigDecimalOrZero() - it.charges.toBigDecimalOrZero())
                                         }
                                         stringResource(id = R.string.refund_reimbursed_format).format(
-                                            total.decimalFormat().withCNY()
+                                            total.decimalFormat().withCNY(),
                                         )
                                     }
                                 Text(
@@ -248,7 +266,7 @@ internal fun RecordDetailsSheet(
                             headlineContent = { Text(text = stringResource(id = R.string.asset)) },
                             trailingContent = {
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Icon(
                                         painter = painterResource(id = recordData.assetIconResId!!),
@@ -257,9 +275,9 @@ internal fun RecordDetailsSheet(
                                         modifier = Modifier
                                             .background(
                                                 color = MaterialTheme.colorScheme.primaryContainer.copy(
-                                                    alpha = 0.2f
+                                                    alpha = 0.2f,
                                                 ),
-                                                shape = CircleShape
+                                                shape = CircleShape,
                                             )
                                             .padding(2.dp)
                                             .clip(CircleShape)
@@ -318,7 +336,7 @@ internal fun RecordDetailsSheet(
                                     modifier = Modifier
                                         .background(
                                             color = MaterialTheme.colorScheme.secondaryContainer,
-                                            shape = MaterialTheme.shapes.small
+                                            shape = MaterialTheme.shapes.small,
                                         )
                                         .padding(horizontal = 4.dp),
                                 )

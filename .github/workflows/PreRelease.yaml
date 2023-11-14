@@ -1,0 +1,88 @@
+name: GitHub Pre Release with APKs
+
+on:
+  push:
+    tags:
+    - 'v**_pre'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4   
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - name: Build app
+        run: export BUILD_TAG_NAME=${{ github.ref_name }} ; echo $BUILD_TAG_NAME ; ./gradlew :app:assembleCanaryRelease
+
+      - name: Android Sign
+        # You may pin to the exact commit or the version.
+        uses: Tlaster/android-sign@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TZ: Asia/Shanghai
+        with:
+          # The directory to find your release to sign
+          releaseDirectory: outputs/apk/
+          # The key used to sign your release in base64 encoded format
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          # The key alias
+          alias: ${{ secrets.ALIAS }}
+          # The password to the keystore
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          # The password for the key
+          keyPassword: ${{ secrets.KEY_PASSWORD }} # optional
+          # The working directory for action, default to build
+          # buildDirectory: # optional
+          # The output directory for sign, default to build/signed
+          output: outputs/signed_apk/ # optional
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TZ: Asia/Shanghai
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Pre Release ${{ github.ref }}
+          body_path: RELEASE.md
+          draft: true
+          prerelease: true
+
+      - name: Upload Multiple Release Assets
+        # You may pin to the exact commit or the version.
+        # uses: NBTX/upload-release-assets@f68d1c91ca950f33ee35514883819c2bb053f487
+        uses: NBTX/upload-release-assets@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TZ: Asia/Shanghai
+        with:
+          # The URL for uploading assets to the release
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          # A glob of assets to upload
+          targets: outputs/signed_apk/*.apk
+
+      - name: Publish Release
+        # You may pin to the exact commit or the version.
+        uses: eregon/publish-release@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TZ: Asia/Shanghai
+        with:
+          # The ID of the draft release to publish
+          release_id:  ${{ steps.create_release.outputs.id }}

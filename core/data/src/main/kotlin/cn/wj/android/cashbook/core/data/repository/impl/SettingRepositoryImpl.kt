@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.data.repository.impl
 
 import android.content.Context
@@ -16,12 +32,12 @@ import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
 import cn.wj.android.cashbook.core.network.datasource.RemoteDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.InputStreamReader
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.io.InputStreamReader
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 /**
  * 设置相关数据仓库
@@ -62,14 +78,14 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean) =
         withContext(coroutineContext) {
             appPreferencesDataSource.updateNeedSecurityVerificationWhenLaunch(
-                needSecurityVerificationWhenLaunch
+                needSecurityVerificationWhenLaunch,
             )
         }
 
     override suspend fun updateEnableFingerprintVerification(enableFingerprintVerification: Boolean) =
         withContext(coroutineContext) {
             appPreferencesDataSource.updateEnableFingerprintVerification(
-                enableFingerprintVerification
+                enableFingerprintVerification,
             )
         }
 
@@ -123,8 +139,8 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun syncLatestVersion(): Boolean = withContext(coroutineContext) {
         try {
-            val release =
-                remoteDataSource.checkUpdate(!appPreferencesDataSource.appData.first().useGithub)
+            val appData = appPreferencesDataSource.appData.first()
+            val release = remoteDataSource.checkUpdate(!appData.useGithub, appData.canary)
             val asset = release?.assets?.firstOrNull {
                 it.name?.endsWith("online.apk") ?: false
             }
@@ -132,7 +148,7 @@ class SettingRepositoryImpl @Inject constructor(
                 release?.name.orEmpty(),
                 release?.body.orEmpty(),
                 asset?.name.orEmpty(),
-                asset?.downloadUrl.orEmpty()
+                asset?.downloadUrl.orEmpty(),
             )
             true
         } catch (throwable: Throwable) {
@@ -146,7 +162,7 @@ class SettingRepositoryImpl @Inject constructor(
             appPreferencesDataSource.updateWebDAV(
                 domain = domain,
                 account = account,
-                password = password
+                password = password,
             )
         }
 
@@ -166,6 +182,11 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) =
         withContext(coroutineContext) {
             appPreferencesDataSource.updateKeepLatestBackup(keepLatestBackup)
+        }
+
+    override suspend fun updateCanary(canary: Boolean) =
+        withContext(coroutineContext) {
+            appPreferencesDataSource.updateCanary(canary)
         }
 
     override suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String =

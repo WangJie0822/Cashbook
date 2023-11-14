@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.di
 
 import android.content.Context
@@ -5,13 +21,13 @@ import androidx.room.Room
 import cn.wj.android.cashbook.core.common.DB_FILE_NAME
 import cn.wj.android.cashbook.core.common.DB_INIT_FILE_NAME
 import cn.wj.android.cashbook.core.database.CashbookDatabase
-import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
+import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,37 +61,36 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun providesTypeDao(
-        database: CashbookDatabase
+        database: CashbookDatabase,
     ): TypeDao = database.typeDao()
 
     @Provides
     @Singleton
     fun providesAssetDao(
-        database: CashbookDatabase
+        database: CashbookDatabase,
     ): AssetDao = database.assetDao()
 
     @Provides
     @Singleton
     fun providesTagDao(
-        database: CashbookDatabase
+        database: CashbookDatabase,
     ): TagDao = database.tagDao()
 
     @Provides
     @Singleton
     fun providesRecordDao(
-        database: CashbookDatabase
+        database: CashbookDatabase,
     ): RecordDao = database.recordDao()
 
     @Provides
     @Singleton
     fun providesBooksDao(
-        database: CashbookDatabase
+        database: CashbookDatabase,
     ): BooksDao = database.booksDao()
 
     @Provides
     @Singleton
     fun providesTransactionDao(
-        database: CashbookDatabase
+        database: CashbookDatabase,
     ): TransactionDao = database.transactionDao()
-
 }

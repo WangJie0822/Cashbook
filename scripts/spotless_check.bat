@@ -1,0 +1,1 @@
+gradlew.bat spotlessCheck --init-script gradle/init.gradle.kts --no-configuration-cache

@@ -1,15 +1,16 @@
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
+import java.io.FileWriter
 
 plugins {
-    alias(libs.plugins.cashbook.android.application)
-    alias(libs.plugins.cashbook.android.application.compose)
-    alias(libs.plugins.cashbook.android.application.flavors)
-    alias(libs.plugins.cashbook.android.application.jacoco)
-    alias(libs.plugins.cashbook.android.hilt)
+    alias(conventionLibs.plugins.cashbook.android.application)
+    alias(conventionLibs.plugins.cashbook.android.application.compose)
+    alias(conventionLibs.plugins.cashbook.android.application.flavors)
+    alias(conventionLibs.plugins.cashbook.android.application.jacoco)
+    alias(conventionLibs.plugins.cashbook.android.hilt)
+    alias(conventionLibs.plugins.cashbook.android.lint)
     alias(libs.plugins.kotlin.serialization)
-    // Kotlin Parcelize 序列化
-    id("kotlin-parcelize")
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
@@ -30,7 +31,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-        resValues = true
     }
 
     buildTypes {
@@ -44,19 +44,14 @@ android {
             isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
 
     productFlavors {
-        @Suppress("EnumValuesSoftDeprecate")
         CashbookFlavor.values().forEach { flavor ->
-            val value = if (flavor == CashbookFlavor.Dev) {
-                "@string/app_name_dev"
-            } else {
-                "@string/app_name_online"
-            }
+            // 配置权限，Offline 渠道没有网络相关权限
             val manifestPlaceholdersMap = if (flavor == CashbookFlavor.Offline) {
                 mapOf(
                     "PERMISSION_1" to "NO_REQUEST_1",
@@ -69,8 +64,68 @@ android {
                 )
             }
             getByName(flavor.name) {
-                resValue("string", "app_name", value)
                 addManifestPlaceholders(manifestPlaceholdersMap)
+            }
+        }
+    }
+
+    sourceSets {
+        CashbookFlavor.values().forEach { flavor ->
+            // 配置资源路径
+            getByName(flavor.name) {
+                val srcDir = if (flavor == CashbookFlavor.Dev) {
+                    "src/channel/res_Dev"
+                } else {
+                    "src/channel/res"
+                }
+                res.srcDirs(srcDir)
+            }
+        }
+    }
+
+    applicationVariants.all {
+        mergeAssetsProvider.get().doFirst {
+            val buildTagName = System.getenv("BUILD_TAG_NAME")
+            if (!buildTagName.isNullOrBlank()) {
+                // CI 构建流程，生成 RELEASE.md
+                File(rootDir, "CHANGELOG.md").readText().lines().let { list ->
+                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md")
+                    val start = if (buildTagName.endsWith("_pre")) {
+                        // 预发布版本，使用 [Unreleased] 作为发布说明
+                        list.indexOf("## [Unreleased]")
+                    } else {
+                        // 正式版本，使用 tag 对应版本作为发布说明
+                        list.indexOf("## [${buildTagName.drop(1)}]")
+                    }
+                    if (start < 0) {
+                        throw RuntimeException(
+                            "Release info not found, make sure file CHANGELOG.md " +
+                                    "contains '## [Unreleased]' if pre or contains " +
+                                    "'## [${buildTagName.drop(1)}]' if release",
+                        )
+                    }
+                    val content = with(StringBuilder()) {
+                        for (i in (start + 1) until list.size) {
+                            val line = list[i]
+                            if (line.startsWith("## [")) {
+                                break
+                            } else {
+                                appendLine(line)
+                            }
+                        }
+                        toString()
+                    }
+                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md content = <$content>")
+                    val releaseFile = File(rootDir, "RELEASE.md")
+                    if (releaseFile.exists()) {
+                        releaseFile.delete()
+                    }
+                    releaseFile.createNewFile()
+                    FileWriter(releaseFile).use {
+                        it.write(content)
+                        it.flush()
+                    }
+                }
             }
         }
     }
@@ -84,7 +139,8 @@ android {
         },
         { variant, _ ->
             "Cashbook_${variant.versionName}.apk"
-        })
+        },
+    )
 }
 
 dependencies {

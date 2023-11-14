@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.ui.component
 
 import androidx.compose.foundation.background
@@ -36,7 +52,7 @@ fun SelectDateDialog(
     currentDate: YearMonth,
     yearSelectable: Boolean = false,
     yearSelected: Boolean = false,
-    onDateSelected: (YearMonth, Boolean) -> Unit
+    onDateSelected: (YearMonth, Boolean) -> Unit,
 ) {
     Dialog(onDismissRequest = onDialogDismiss) {
         Surface(
@@ -81,7 +97,7 @@ fun SelectDateDialog(
                                     )
                                     .padding(
                                         horizontal = 8.dp,
-                                        vertical = 4.dp
+                                        vertical = 4.dp,
                                     ),
                             )
                         }
@@ -113,8 +129,9 @@ fun SelectDateDialog(
                                                     onDateSelected(
                                                         YearMonth.of(
                                                             selectedYear,
-                                                            month
-                                                        ), false
+                                                            month,
+                                                        ),
+                                                        false,
                                                     )
                                                 }
                                                 .background(
@@ -125,7 +142,7 @@ fun SelectDateDialog(
                                                 .padding(vertical = 8.dp),
                                         )
                                     }
-                                }
+                                },
                             )
                         }
                     },
@@ -146,8 +163,9 @@ fun SelectDateDialog(
                                 onDateSelected(
                                     YearMonth.of(
                                         selectedYear,
-                                        1
-                                    ), true
+                                        1,
+                                    ),
+                                    true,
                                 )
                             }
                             .fillMaxWidth()

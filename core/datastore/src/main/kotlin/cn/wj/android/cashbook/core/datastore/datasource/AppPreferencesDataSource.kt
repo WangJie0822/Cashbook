@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
@@ -8,10 +24,10 @@ import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * 应用配置数据源
@@ -20,7 +36,7 @@ import kotlinx.coroutines.flow.map
  */
 @Singleton
 class AppPreferencesDataSource @Inject constructor(
-    private val appPreferences: DataStore<AppPreferences>
+    private val appPreferences: DataStore<AppPreferences>,
 ) {
 
     val appData = appPreferences.data
@@ -53,6 +69,7 @@ class AppPreferencesDataSource @Inject constructor(
                 lastBackupMs = it.lastBackupMs,
                 creditCardPaymentTypeId = it.creditCardPaymentTypeId,
                 keepLatestBackup = it.keepLatestBackup,
+                canary = it.canary,
             )
         }
 
@@ -176,6 +193,10 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) {
         appPreferences.updateData { it.copy { this.keepLatestBackup = keepLatestBackup } }
+    }
+
+    suspend fun updateCanary(canary: Boolean) {
+        appPreferences.updateData { it.copy { this.canary = canary } }
     }
 
     suspend fun needRelated(typeId: Long): Boolean {

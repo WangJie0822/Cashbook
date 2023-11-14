@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
@@ -11,10 +27,10 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.withContext
 
 class TransRecordViewsToAnalyticsPieUseCase @Inject constructor(
     private val typeRepository: TypeRepository,
@@ -23,7 +39,7 @@ class TransRecordViewsToAnalyticsPieUseCase @Inject constructor(
 
     suspend operator fun invoke(
         typeCategory: RecordTypeCategoryEnum,
-        recordViewsList: List<RecordViewsModel>
+        recordViewsList: List<RecordViewsModel>,
     ): List<AnalyticsRecordPieEntity> = withContext(coroutineContext) {
         val result = mutableListOf<AnalyticsRecordPieEntity>()
         val categoryList = recordViewsList.filter { it.type.typeCategory == typeCategory }
@@ -69,8 +85,8 @@ class TransRecordViewsToAnalyticsPieUseCase @Inject constructor(
                         typeIconResName = type.iconName,
                         typeCategory = type.typeCategory,
                         totalAmount = typeTotal.decimalFormat(),
-                        percent = (typeTotal / total).toFloat()
-                    )
+                        percent = (typeTotal / total).toFloat(),
+                    ),
                 )
             }
         }

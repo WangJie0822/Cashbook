@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.table
 
 import androidx.room.ColumnInfo
@@ -23,16 +39,17 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
  */
 @Entity(tableName = TABLE_TYPE)
 data class TypeTable(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = TABLE_TYPE_ID) val id: Long?,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = TABLE_TYPE_ID)
+    val id: Long?,
     @ColumnInfo(name = TABLE_TYPE_PARENT_ID) val parentId: Long,
     @ColumnInfo(name = TABLE_TYPE_NAME) val name: String,
     @ColumnInfo(name = TABLE_TYPE_ICON_NAME) val iconName: String,
     @ColumnInfo(name = TABLE_TYPE_TYPE_LEVEL) val typeLevel: Int,
     @ColumnInfo(name = TABLE_TYPE_TYPE_CATEGORY) val typeCategory: Int,
     @ColumnInfo(name = TABLE_TYPE_PROTECTED) val protected: Int,
-    @ColumnInfo(name = TABLE_TYPE_SORT) val sort: Int
+    @ColumnInfo(name = TABLE_TYPE_SORT) val sort: Int,
 )
-
 
 /** 固定类型 - 平账，支出 */
 val TYPE_TABLE_BALANCE_EXPENDITURE: TypeTable

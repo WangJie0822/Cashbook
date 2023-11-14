@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
@@ -97,7 +113,6 @@ internal fun AnalyticsRoute(
     modifier: Modifier = Modifier,
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AnalyticsScreen(
@@ -135,7 +150,6 @@ private fun AnalyticsScreen(
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     CashbookScaffold(
         modifier = modifier,
         topBar = {
@@ -157,7 +171,7 @@ private fun AnalyticsScreen(
                             )
                             Icon(
                                 imageVector = CashbookIcons.ArrowDropDown,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                     }
@@ -176,7 +190,6 @@ private fun AnalyticsScreen(
                     .padding(paddingValues)
                     .fillMaxSize(),
             ) {
-
                 ((dialogState as? DialogState.Shown<*>)?.data as? ShowSelectDateDialogData)?.let { data ->
                     val date = data.date
                     if (data is ShowSelectDateDialogData.SelectDate) {
@@ -189,27 +202,27 @@ private fun AnalyticsScreen(
                                 onDateSelect(
                                     DateData(
                                         from = ym.atDay(1),
-                                        year = year
-                                    )
+                                        year = year,
+                                    ),
                                 )
-                            }
+                            },
                         )
                     } else {
                         DateRangePickerDialog(
                             onDismissRequest = onRequestDismissDialog,
                             selection = Pair.create(
                                 date.from.toMs(),
-                                date.to?.toMs()
+                                date.to?.toMs(),
                             ),
                             onPositiveButtonClick = { pair ->
                                 onDateSelect(
                                     DateData(
                                         from = pair.first.toLocalDate(),
                                         to = pair.second.toLocalDate(),
-                                    )
+                                    ),
                                 )
                             },
-                            onNegativeButtonClick = onRequestDismissDialog
+                            onNegativeButtonClick = onRequestDismissDialog,
                         )
                     }
                 }
@@ -245,7 +258,7 @@ private fun AnalyticsScreen(
                                 ) {
                                     Icon(
                                         imageVector = CashbookIcons.DonutSmall,
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
                                 }
                             }
@@ -309,13 +322,13 @@ private fun AnalyticsScreen(
                                     modifier = Modifier.padding(
                                         horizontal = 16.dp,
                                         vertical = 8.dp,
-                                    )
+                                    ),
                                 ) {
                                     Column(
                                         modifier = Modifier.padding(
                                             horizontal = 16.dp,
                                             vertical = 8.dp,
-                                        )
+                                        ),
                                     ) {
                                         Text(
                                             text = stringResource(id = R.string.overview_of_revenue_and_expenditure),
@@ -414,8 +427,8 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
         Row(
             modifier = Modifier.padding(
                 horizontal = 16.dp,
-                vertical = 8.dp
-            )
+                vertical = 8.dp,
+            ),
         ) {
             Text(
                 text = stringResource(id = R.string.date),
@@ -455,8 +468,8 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
             Row(
                 modifier = Modifier.padding(
                     horizontal = 16.dp,
-                    vertical = 8.dp
-                )
+                    vertical = 8.dp,
+                ),
             ) {
                 val date = if (uiState.year) {
                     item.date.split("-")[1] + stringResource(id = R.string.month)
@@ -572,7 +585,7 @@ private fun AnalyticsPieChart(
                 ) {
                     Text(
                         text = enum.text,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(8.dp),
                     )
                 }
             }
@@ -713,8 +726,8 @@ private fun AnalyticsBarChart(
                                 Entry(
                                     (index + 1).toFloat(),
                                     expenditure * -1f,
-                                    entity
-                                )
+                                    entity,
+                                ),
                             )
                         }
                         val income = entity.income.toFloatOrZero()
@@ -723,8 +736,8 @@ private fun AnalyticsBarChart(
                                 Entry(
                                     (index + 1).toFloat(),
                                     income,
-                                    entity
-                                )
+                                    entity,
+                                ),
                             )
                         }
                         val balance = entity.balance.toFloatOrZero()
@@ -733,8 +746,8 @@ private fun AnalyticsBarChart(
                                 Entry(
                                     (index + 1).toFloat(),
                                     balance,
-                                    entity
-                                )
+                                    entity,
+                                ),
                             )
                         }
                     }
@@ -794,10 +807,12 @@ private fun AnalyticsBarChart(
                                 } else {
                                     axisMinimum = balanceLs.minOf { it.y } - spaceValue
                                     axisMaximum = balanceLs.maxOf { it.y } + spaceValue
-                                    addLimitLine(LimitLine(0f).apply {
-                                        lineWidth = 4f
-                                        enableDashedLine(10f, 10f, 0f)
-                                    })
+                                    addLimitLine(
+                                        LimitLine(0f).apply {
+                                            lineWidth = 4f
+                                            enableDashedLine(10f, 10f, 0f)
+                                        },
+                                    )
                                 }
                             }
                             if (balanceLs.isNotEmpty()) {
@@ -826,10 +841,12 @@ private fun AnalyticsBarChart(
                                 if (expenditureLs.isEmpty() && balanceLs.isEmpty()) {
                                     removeAllLimitLines()
                                 } else {
-                                    addLimitLine(LimitLine(0f).apply {
-                                        lineWidth = 4f
-                                        enableDashedLine(10f, 10f, 0f)
-                                    })
+                                    addLimitLine(
+                                        LimitLine(0f).apply {
+                                            lineWidth = 4f
+                                            enableDashedLine(10f, 10f, 0f)
+                                        },
+                                    )
                                 }
                             }
                             if (expenditureLs.isNotEmpty()) {
@@ -851,7 +868,7 @@ private fun AnalyticsBarChart(
                     chart.invalidate()
                     chart.animateY(250)
                 }
-            }
+            },
         )
         TabRow(
             selectedTabIndex = selectedTab.ordinal,

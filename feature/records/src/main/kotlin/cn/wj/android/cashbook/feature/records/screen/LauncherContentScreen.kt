@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -99,7 +115,6 @@ internal fun LauncherContentRoute(
     modifier: Modifier = Modifier,
     viewModel: LauncherContentViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val date by viewModel.dateData.collectAsStateWithLifecycle()
 
@@ -179,7 +194,8 @@ internal fun LauncherContentScreen(
     LaunchedEffect(shouldDisplayDeleteFailedBookmark) {
         if (shouldDisplayDeleteFailedBookmark > 0) {
             val result = onShowSnackbar.invoke(
-                deleteFailedFormatText.format(shouldDisplayDeleteFailedBookmark), null
+                deleteFailedFormatText.format(shouldDisplayDeleteFailedBookmark),
+                null,
             )
             if (SnackbarResult.Dismissed == result) {
                 onRequestDismissBookmark.invoke()
@@ -297,7 +313,7 @@ internal fun LauncherTopBar(
                 )
                 Icon(
                     imageVector = CashbookIcons.ArrowDropDown,
-                    contentDescription = null
+                    contentDescription = null,
                 )
             }
         },
@@ -417,7 +433,7 @@ private fun FrontLayerContent(
     onDateSelected: (YearMonth) -> Unit,
     onRequestDismissDialog: () -> Unit,
     recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
-    onRecordItemClick: (RecordViewsEntity) -> Unit
+    onRecordItemClick: (RecordViewsEntity) -> Unit,
 ) {
     CashbookGradientBackground {
         Box(
@@ -463,7 +479,7 @@ private fun FrontLayerContent(
                                         -1 -> stringResource(id = R.string.yesterday)
                                         -2 -> stringResource(id = R.string.before_yesterday)
                                         else -> "${key.day}${stringResource(id = R.string.day)}"
-                                    }
+                                    },
                                 )
                                 Text(
                                     text = buildString {
@@ -473,7 +489,7 @@ private fun FrontLayerContent(
                                         if (hasIncome) {
                                             append(
                                                 stringResource(id = R.string.income_with_colon) + totalIncome.decimalFormat()
-                                                    .withCNY()
+                                                    .withCNY(),
                                             )
                                         }
                                         if (totalExpenditure != 0.0) {
@@ -482,7 +498,7 @@ private fun FrontLayerContent(
                                             }
                                             append(
                                                 stringResource(id = R.string.expend_with_colon) + totalExpenditure.decimalFormat()
-                                                    .withCNY()
+                                                    .withCNY(),
                                             )
                                         }
                                     },
@@ -559,7 +575,7 @@ internal fun RecordListItem(
                             .padding(start = 8.dp)
                             .background(
                                 color = MaterialTheme.colorScheme.secondaryContainer,
-                                shape = MaterialTheme.shapes.small
+                                shape = MaterialTheme.shapes.small,
                             )
                             .padding(horizontal = 4.dp),
                     )
@@ -582,7 +598,7 @@ internal fun RecordListItem(
         },
         trailingContent = {
             Column(
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -594,7 +610,7 @@ internal fun RecordListItem(
                                     R.string.refund_reimbursed_simple
                                 } else {
                                     R.string.related
-                                }
+                                },
                             ) + "(${item.relatedAmount.withCNY()})",
                             color = LocalContentColor.current.copy(alpha = 0.7f),
                             style = MaterialTheme.typography.labelMedium,
@@ -608,36 +624,38 @@ internal fun RecordListItem(
                     )
                 }
                 item.assetName?.let { assetName ->
-                    Text(text = buildAnnotatedString {
-                        val hasCharges = item.charges.toDoubleOrZero() > 0.0
-                        val hasConcessions = item.concessions.toDoubleOrZero() > 0.0
-                        if (hasCharges || hasConcessions) {
-                            // 有手续费、优惠信息
-                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
-                                append("(")
-                            }
-                            if (hasCharges) {
-                                withStyle(style = SpanStyle(color = LocalExtendedColors.current.expenditure)) {
-                                    append("-${item.charges}".withCNY())
+                    Text(
+                        text = buildAnnotatedString {
+                            val hasCharges = item.charges.toDoubleOrZero() > 0.0
+                            val hasConcessions = item.concessions.toDoubleOrZero() > 0.0
+                            if (hasCharges || hasConcessions) {
+                                // 有手续费、优惠信息
+                                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                                    append("(")
                                 }
-                            }
-                            if (hasConcessions) {
                                 if (hasCharges) {
-                                    append(" ")
+                                    withStyle(style = SpanStyle(color = LocalExtendedColors.current.expenditure)) {
+                                        append("-${item.charges}".withCNY())
+                                    }
                                 }
-                                withStyle(style = SpanStyle(color = LocalExtendedColors.current.income)) {
-                                    append("+${item.concessions.withCNY()}")
+                                if (hasConcessions) {
+                                    if (hasCharges) {
+                                        append(" ")
+                                    }
+                                    withStyle(style = SpanStyle(color = LocalExtendedColors.current.income)) {
+                                        append("+${item.concessions.withCNY()}")
+                                    }
+                                }
+                                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                                    append(") ")
                                 }
                             }
-                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
-                                append(") ")
+                            append(assetName)
+                            if (item.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                                append(" -> ${item.relatedAssetName}")
                             }
-                        }
-                        append(assetName)
-                        if (item.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                            append(" -> ${item.relatedAssetName}")
-                        }
-                    })
+                        },
+                    )
                 }
             }
         },

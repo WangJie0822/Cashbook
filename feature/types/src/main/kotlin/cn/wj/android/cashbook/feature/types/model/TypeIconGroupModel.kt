@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.types.model
 
 import android.content.Context
@@ -14,7 +30,7 @@ import cn.wj.android.cashbook.core.ui.R
  */
 data class TypeIconGroupModel(
     val name: String,
-    val icons: List<TypeIconModel>
+    val icons: List<TypeIconModel>,
 )
 
 /**
@@ -25,713 +41,732 @@ data class TypeIconGroupModel(
  */
 data class TypeIconModel(
     val name: String,
-    val iconResIdStr: String
+    val iconResIdStr: String,
 )
 
 fun getTypeIconGroupList(context: Context): List<TypeIconGroupModel> {
     return listOf(
         // 收入
         TypeIconGroupModel(
-            R.string.income.string(context), listOf(
+            R.string.income.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_salary.string(context),
-                    R.string.type_icon_name_salary.drawableString(context)
+                    R.string.type_icon_name_salary.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_bonus.string(context),
-                    R.string.type_icon_name_bonus.drawableString(context)
+                    R.string.type_icon_name_bonus.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_royalty.string(context),
-                    R.string.type_icon_name_royalty.drawableString(context)
+                    R.string.type_icon_name_royalty.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_refund.string(context),
-                    R.string.type_icon_name_refund.drawableString(context)
+                    R.string.type_icon_name_refund.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_reimburse.string(context),
-                    R.string.type_icon_name_reimburse.drawableString(context)
+                    R.string.type_icon_name_reimburse.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_investment.string(context),
-                    R.string.type_icon_name_investment.drawableString(context)
+                    R.string.type_icon_name_investment.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_provident_fund.string(context),
-                    R.string.type_icon_name_provident_fund.drawableString(context)
+                    R.string.type_icon_name_provident_fund.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_medicare.string(context),
-                    R.string.type_icon_name_medicare.drawableString(context)
+                    R.string.type_icon_name_medicare.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_alimony.string(context),
-                    R.string.type_icon_name_alimony.drawableString(context)
+                    R.string.type_icon_name_alimony.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_pocket_money.string(context),
-                    R.string.type_icon_name_pocket_money.drawableString(context)
+                    R.string.type_icon_name_pocket_money.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_lucky_money.string(context),
-                    R.string.type_icon_name_lucky_money.drawableString(context)
+                    R.string.type_icon_name_lucky_money.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_convert_payment.string(context),
-                    R.string.type_icon_name_convert_payment.drawableString(context)
+                    R.string.type_icon_name_convert_payment.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_windfall.string(context),
-                    R.string.type_icon_name_windfall.drawableString(context)
+                    R.string.type_icon_name_windfall.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_rent.string(context),
-                    R.string.type_icon_name_rent.drawableString(context)
+                    R.string.type_icon_name_rent.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_tax_rebate.string(context),
-                    R.string.type_icon_name_tax_rebate.drawableString(context)
+                    R.string.type_icon_name_tax_rebate.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_dividend.string(context),
-                    R.string.type_icon_name_dividend.drawableString(context)
+                    R.string.type_icon_name_dividend.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_scholarship.string(context),
-                    R.string.type_icon_name_scholarship.drawableString(context)
+                    R.string.type_icon_name_scholarship.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_benefit.string(context),
-                    R.string.type_icon_name_benefit.drawableString(context)
+                    R.string.type_icon_name_benefit.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 转账
         TypeIconGroupModel(
-            R.string.transfer.string(context), listOf(
+            R.string.transfer.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_account_transfer.string(context),
-                    R.string.type_icon_name_account_transfer.drawableString(context)
+                    R.string.type_icon_name_account_transfer.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_credit_card_payment.string(context),
-                    R.string.type_icon_name_credit_card_payment.drawableString(context)
+                    R.string.type_icon_name_credit_card_payment.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_withdrawals.string(context),
-                    R.string.type_icon_name_withdrawals.drawableString(context)
+                    R.string.type_icon_name_withdrawals.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_deposit.string(context),
-                    R.string.type_icon_name_deposit.drawableString(context)
+                    R.string.type_icon_name_deposit.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_borrow.string(context),
-                    R.string.type_icon_name_borrow.drawableString(context)
+                    R.string.type_icon_name_borrow.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_lend.string(context),
-                    R.string.type_icon_name_lend.drawableString(context)
+                    R.string.type_icon_name_lend.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_repayment.string(context),
-                    R.string.type_icon_name_repayment.drawableString(context)
+                    R.string.type_icon_name_repayment.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_proceeds.string(context),
-                    R.string.type_icon_name_proceeds.drawableString(context)
+                    R.string.type_icon_name_proceeds.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 理财
         TypeIconGroupModel(
-            R.string.money_management.string(context), listOf(
+            R.string.money_management.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_stock.string(context),
-                    R.string.type_icon_name_stock.drawableString(context)
+                    R.string.type_icon_name_stock.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_fund.string(context),
-                    R.string.type_icon_name_fund.drawableString(context)
+                    R.string.type_icon_name_fund.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_money_management.string(context),
-                    R.string.type_icon_name_money_management.drawableString(context)
+                    R.string.type_icon_name_money_management.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_gold.string(context),
-                    R.string.type_icon_name_gold.drawableString(context)
+                    R.string.type_icon_name_gold.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_bond.string(context),
-                    R.string.type_icon_name_bond.drawableString(context)
+                    R.string.type_icon_name_bond.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_forex.string(context),
-                    R.string.type_icon_name_forex.drawableString(context)
+                    R.string.type_icon_name_forex.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_charge.string(context),
-                    R.string.type_icon_name_charge.drawableString(context)
+                    R.string.type_icon_name_charge.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 餐饮
         TypeIconGroupModel(
-            R.string.dining.string(context), listOf(
+            R.string.dining.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_dining.string(context),
-                    R.string.type_icon_name_dining.drawableString(context)
+                    R.string.type_icon_name_dining.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_three_meals.string(context),
-                    R.string.type_icon_name_three_meals.drawableString(context)
+                    R.string.type_icon_name_three_meals.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_breakfast.string(context),
-                    R.string.type_icon_name_breakfast.drawableString(context)
+                    R.string.type_icon_name_breakfast.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_lunch.string(context),
-                    R.string.type_icon_name_lunch.drawableString(context)
+                    R.string.type_icon_name_lunch.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_dinner.string(context),
-                    R.string.type_icon_name_dinner.drawableString(context)
+                    R.string.type_icon_name_dinner.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_supper.string(context),
-                    R.string.type_icon_name_supper.drawableString(context)
+                    R.string.type_icon_name_supper.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_takeaway.string(context),
-                    R.string.type_icon_name_takeaway.drawableString(context)
+                    R.string.type_icon_name_takeaway.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_food_ingredient.string(context),
-                    R.string.type_icon_name_food_ingredient.drawableString(context)
+                    R.string.type_icon_name_food_ingredient.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_fruit.string(context),
-                    R.string.type_icon_name_fruit.drawableString(context)
+                    R.string.type_icon_name_fruit.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_dessert.string(context),
-                    R.string.type_icon_name_dessert.drawableString(context)
+                    R.string.type_icon_name_dessert.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_snacks.string(context),
-                    R.string.type_icon_name_snacks.drawableString(context)
+                    R.string.type_icon_name_snacks.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_drinks.string(context),
-                    R.string.type_icon_name_drinks.drawableString(context)
+                    R.string.type_icon_name_drinks.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_at.string(context),
-                    R.string.type_icon_name_at.drawableString(context)
+                    R.string.type_icon_name_at.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_ats.string(context),
-                    R.string.type_icon_name_ats.drawableString(context)
+                    R.string.type_icon_name_ats.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 日常
         TypeIconGroupModel(
-            R.string.daily.string(context), listOf(
+            R.string.daily.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_daily_necessities.string(context),
-                    R.string.type_icon_name_daily_necessities.drawableString(context)
+                    R.string.type_icon_name_daily_necessities.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_kitchen_daily_necessities.string(context),
-                    R.string.type_icon_name_kitchen_daily_necessities.drawableString(context)
+                    R.string.type_icon_name_kitchen_daily_necessities.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_communication.string(context),
-                    R.string.type_icon_name_communication.drawableString(context)
+                    R.string.type_icon_name_communication.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_call_charge.string(context),
-                    R.string.type_icon_name_call_charge.drawableString(context)
+                    R.string.type_icon_name_call_charge.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_net_fee.string(context),
-                    R.string.type_icon_name_net_fee.drawableString(context)
+                    R.string.type_icon_name_net_fee.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_life.string(context),
-                    R.string.type_icon_name_life.drawableString(context)
+                    R.string.type_icon_name_life.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_clean.string(context),
-                    R.string.type_icon_name_clean.drawableString(context)
+                    R.string.type_icon_name_clean.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_haircut.string(context),
-                    R.string.type_icon_name_haircut.drawableString(context)
+                    R.string.type_icon_name_haircut.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_bath.string(context),
-                    R.string.type_icon_name_bath.drawableString(context)
+                    R.string.type_icon_name_bath.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_express.string(context),
-                    R.string.type_icon_name_express.drawableString(context)
+                    R.string.type_icon_name_express.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 购物
         TypeIconGroupModel(
-            R.string.shopping.string(context), listOf(
+            R.string.shopping.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_shopping.string(context),
-                    R.string.type_icon_name_shopping.drawableString(context)
+                    R.string.type_icon_name_shopping.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_digital_products.string(context),
-                    R.string.type_icon_name_digital_products.drawableString(context)
+                    R.string.type_icon_name_digital_products.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_daily.string(context),
-                    R.string.type_icon_name_daily.drawableString(context)
+                    R.string.type_icon_name_daily.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_electrical_appliances.string(context),
-                    R.string.type_icon_name_electrical_appliances.drawableString(context)
+                    R.string.type_icon_name_electrical_appliances.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_clothes.string(context),
-                    R.string.type_icon_name_clothes.drawableString(context)
+                    R.string.type_icon_name_clothes.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_furniture.string(context),
-                    R.string.type_icon_name_furniture.drawableString(context)
+                    R.string.type_icon_name_furniture.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_beauty.string(context),
-                    R.string.type_icon_name_beauty.drawableString(context)
+                    R.string.type_icon_name_beauty.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_body_hair.string(context),
-                    R.string.type_icon_name_body_hair.drawableString(context)
+                    R.string.type_icon_name_body_hair.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_souvenir.string(context),
-                    R.string.type_icon_name_souvenir.drawableString(context)
+                    R.string.type_icon_name_souvenir.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 服饰
         TypeIconGroupModel(
-            R.string.dress.string(context), listOf(
+            R.string.dress.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_hat.string(context),
-                    R.string.type_icon_name_hat.drawableString(context)
+                    R.string.type_icon_name_hat.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_coat.string(context),
-                    R.string.type_icon_name_coat.drawableString(context)
+                    R.string.type_icon_name_coat.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_pants.string(context),
-                    R.string.type_icon_name_pants.drawableString(context)
+                    R.string.type_icon_name_pants.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_underwear.string(context),
-                    R.string.type_icon_name_underwear.drawableString(context)
+                    R.string.type_icon_name_underwear.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_bag.string(context),
-                    R.string.type_icon_name_bag.drawableString(context)
+                    R.string.type_icon_name_bag.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_shoes.string(context),
-                    R.string.type_icon_name_shoes.drawableString(context)
+                    R.string.type_icon_name_shoes.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_socks.string(context),
-                    R.string.type_icon_name_socks.drawableString(context)
+                    R.string.type_icon_name_socks.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_accessories.string(context),
-                    R.string.type_icon_name_accessories.drawableString(context)
+                    R.string.type_icon_name_accessories.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 数码
         TypeIconGroupModel(
-            R.string.digital.string(context), listOf(
+            R.string.digital.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_mobile_phone.string(context),
-                    R.string.type_icon_name_mobile_phone.drawableString(context)
+                    R.string.type_icon_name_mobile_phone.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_mobile_phone_accessories.string(context),
-                    R.string.type_icon_name_mobile_phone_accessories.drawableString(context)
+                    R.string.type_icon_name_mobile_phone_accessories.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_member.string(context),
-                    R.string.type_icon_name_member.drawableString(context)
+                    R.string.type_icon_name_member.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_camera.string(context),
-                    R.string.type_icon_name_camera.drawableString(context)
+                    R.string.type_icon_name_camera.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 娱乐
         TypeIconGroupModel(
-            R.string.entertainment.string(context), listOf(
+            R.string.entertainment.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_amusement.string(context),
-                    R.string.type_icon_name_amusement.drawableString(context)
+                    R.string.type_icon_name_amusement.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_game.string(context),
-                    R.string.type_icon_name_game.drawableString(context)
+                    R.string.type_icon_name_game.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_party.string(context),
-                    R.string.type_icon_name_party.drawableString(context)
+                    R.string.type_icon_name_party.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_movie.string(context),
-                    R.string.type_icon_name_movie.drawableString(context)
+                    R.string.type_icon_name_movie.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_sing.string(context),
-                    R.string.type_icon_name_sing.drawableString(context)
+                    R.string.type_icon_name_sing.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_show.string(context),
-                    R.string.type_icon_name_show.drawableString(context)
+                    R.string.type_icon_name_show.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_travel.string(context),
-                    R.string.type_icon_name_travel.drawableString(context)
+                    R.string.type_icon_name_travel.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_tickets.string(context),
-                    R.string.type_icon_name_tickets.drawableString(context)
+                    R.string.type_icon_name_tickets.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_excursion_fare.string(context),
-                    R.string.type_icon_name_excursion_fare.drawableString(context)
+                    R.string.type_icon_name_excursion_fare.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_sport.string(context),
-                    R.string.type_icon_name_sport.drawableString(context)
+                    R.string.type_icon_name_sport.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 家庭
         TypeIconGroupModel(
-            R.string.family.string(context), listOf(
+            R.string.family.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_family.string(context),
-                    R.string.type_icon_name_family.drawableString(context)
+                    R.string.type_icon_name_family.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_parent.string(context),
-                    R.string.type_icon_name_parent.drawableString(context)
+                    R.string.type_icon_name_parent.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_love.string(context),
-                    R.string.type_icon_name_love.drawableString(context)
+                    R.string.type_icon_name_love.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_child.string(context),
-                    R.string.type_icon_name_child.drawableString(context)
+                    R.string.type_icon_name_child.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_pet.string(context),
-                    R.string.type_icon_name_pet.drawableString(context)
+                    R.string.type_icon_name_pet.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 育儿
         TypeIconGroupModel(
-            R.string.parenting.string(context), listOf(
+            R.string.parenting.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_parenting.string(context),
-                    R.string.type_icon_name_parenting.drawableString(context)
+                    R.string.type_icon_name_parenting.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_milk_powder.string(context),
-                    R.string.type_icon_name_milk_powder.drawableString(context)
+                    R.string.type_icon_name_milk_powder.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_feeder.string(context),
-                    R.string.type_icon_name_feeder.drawableString(context)
+                    R.string.type_icon_name_feeder.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_supplementary_food.string(context),
-                    R.string.type_icon_name_supplementary_food.drawableString(context)
+                    R.string.type_icon_name_supplementary_food.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_diapers.string(context),
-                    R.string.type_icon_name_diapers.drawableString(context)
+                    R.string.type_icon_name_diapers.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_kids.string(context),
-                    R.string.type_icon_name_kids.drawableString(context)
+                    R.string.type_icon_name_kids.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_toy.string(context),
-                    R.string.type_icon_name_toy.drawableString(context)
+                    R.string.type_icon_name_toy.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_early_education.string(context),
-                    R.string.type_icon_name_early_education.drawableString(context)
+                    R.string.type_icon_name_early_education.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_family_trip.string(context),
-                    R.string.type_icon_name_family_trip.drawableString(context)
+                    R.string.type_icon_name_family_trip.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_vaccination.string(context),
-                    R.string.type_icon_name_vaccination.drawableString(context)
+                    R.string.type_icon_name_vaccination.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 汽车
         TypeIconGroupModel(
-            R.string.car.string(context), listOf(
+            R.string.car.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_car.string(context),
-                    R.string.type_icon_name_car.drawableString(context)
+                    R.string.type_icon_name_car.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_refuel.string(context),
-                    R.string.type_icon_name_refuel.drawableString(context)
+                    R.string.type_icon_name_refuel.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_car_charge.string(context),
-                    R.string.type_icon_name_car_charge.drawableString(context)
+                    R.string.type_icon_name_car_charge.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_parking.string(context),
-                    R.string.type_icon_name_parking.drawableString(context)
+                    R.string.type_icon_name_parking.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_toll.string(context),
-                    R.string.type_icon_name_toll.drawableString(context)
+                    R.string.type_icon_name_toll.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_auto_parts.string(context),
-                    R.string.type_icon_name_auto_parts.drawableString(context)
+                    R.string.type_icon_name_auto_parts.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_repair.string(context),
-                    R.string.type_icon_name_repair.drawableString(context)
+                    R.string.type_icon_name_repair.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_car_maintenance.string(context),
-                    R.string.type_icon_name_car_maintenance.drawableString(context)
+                    R.string.type_icon_name_car_maintenance.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_car_wash.string(context),
-                    R.string.type_icon_name_car_wash.drawableString(context)
+                    R.string.type_icon_name_car_wash.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_illegal.string(context),
-                    R.string.type_icon_name_illegal.drawableString(context)
+                    R.string.type_icon_name_illegal.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_car_insurance.string(context),
-                    R.string.type_icon_name_car_insurance.drawableString(context)
+                    R.string.type_icon_name_car_insurance.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_car_inspection.string(context),
-                    R.string.type_icon_name_car_inspection.drawableString(context)
+                    R.string.type_icon_name_car_inspection.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_car_loan.string(context),
-                    R.string.type_icon_name_car_loan.drawableString(context)
+                    R.string.type_icon_name_car_loan.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 人情
         TypeIconGroupModel(
-            R.string.interpersonal.string(context), listOf(
+            R.string.interpersonal.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_interpersonal.string(context),
-                    R.string.type_icon_name_interpersonal.drawableString(context)
+                    R.string.type_icon_name_interpersonal.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_cash_gift.string(context),
-                    R.string.type_icon_name_cash_gift.drawableString(context)
+                    R.string.type_icon_name_cash_gift.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_gift.string(context),
-                    R.string.type_icon_name_gift.drawableString(context)
+                    R.string.type_icon_name_gift.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_treat.string(context),
-                    R.string.type_icon_name_treat.drawableString(context)
+                    R.string.type_icon_name_treat.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 交通
         TypeIconGroupModel(
-            R.string.traffic.string(context), listOf(
+            R.string.traffic.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_traffic.string(context),
-                    R.string.type_icon_name_traffic.drawableString(context)
+                    R.string.type_icon_name_traffic.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_bus.string(context),
-                    R.string.type_icon_name_bus.drawableString(context)
+                    R.string.type_icon_name_bus.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_subway.string(context),
-                    R.string.type_icon_name_subway.drawableString(context)
+                    R.string.type_icon_name_subway.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_train.string(context),
-                    R.string.type_icon_name_train.drawableString(context)
+                    R.string.type_icon_name_train.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_plane.string(context),
-                    R.string.type_icon_name_plane.drawableString(context)
+                    R.string.type_icon_name_plane.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_taxi.string(context),
-                    R.string.type_icon_name_taxi.drawableString(context)
+                    R.string.type_icon_name_taxi.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_ship.string(context),
-                    R.string.type_icon_name_ship.drawableString(context)
+                    R.string.type_icon_name_ship.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_bicycle.string(context),
-                    R.string.type_icon_name_bicycle.drawableString(context)
+                    R.string.type_icon_name_bicycle.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 住房
         TypeIconGroupModel(
-            R.string.housing.string(context), listOf(
+            R.string.housing.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_housing.string(context),
-                    R.string.type_icon_name_housing.drawableString(context)
+                    R.string.type_icon_name_housing.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_house_rent.string(context),
-                    R.string.type_icon_name_house_rent.drawableString(context)
+                    R.string.type_icon_name_house_rent.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_house_loan.string(context),
-                    R.string.type_icon_name_house_loan.drawableString(context)
+                    R.string.type_icon_name_house_loan.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_hotel.string(context),
-                    R.string.type_icon_name_hotel.drawableString(context)
+                    R.string.type_icon_name_hotel.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 医疗
         TypeIconGroupModel(
-            R.string.medical.string(context), listOf(
+            R.string.medical.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_medical.string(context),
-                    R.string.type_icon_name_medical.drawableString(context)
+                    R.string.type_icon_name_medical.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_medkit.string(context),
-                    R.string.type_icon_name_medkit.drawableString(context)
+                    R.string.type_icon_name_medkit.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_registration.string(context),
-                    R.string.type_icon_name_registration.drawableString(context)
+                    R.string.type_icon_name_registration.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_diagnose.string(context),
-                    R.string.type_icon_name_diagnose.drawableString(context)
+                    R.string.type_icon_name_diagnose.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_drug.string(context),
-                    R.string.type_icon_name_drug.drawableString(context)
+                    R.string.type_icon_name_drug.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_hospitalization.string(context),
-                    R.string.type_icon_name_hospitalization.drawableString(context)
+                    R.string.type_icon_name_hospitalization.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_hygiene.string(context),
-                    R.string.type_icon_name_hygiene.drawableString(context)
+                    R.string.type_icon_name_hygiene.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 校园
         TypeIconGroupModel(
-            R.string.campus.string(context), listOf(
+            R.string.campus.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_book_education.string(context),
-                    R.string.type_icon_name_book_education.drawableString(context)
+                    R.string.type_icon_name_book_education.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_tuition.string(context),
-                    R.string.type_icon_name_tuition.drawableString(context)
+                    R.string.type_icon_name_tuition.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_stationery.string(context),
-                    R.string.type_icon_name_stationery.drawableString(context)
+                    R.string.type_icon_name_stationery.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_exam.string(context),
-                    R.string.type_icon_name_exam.drawableString(context)
+                    R.string.type_icon_name_exam.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_books.string(context),
-                    R.string.type_icon_name_books.drawableString(context)
+                    R.string.type_icon_name_books.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_training.string(context),
-                    R.string.type_icon_name_training.drawableString(context)
+                    R.string.type_icon_name_training.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 物业
         TypeIconGroupModel(
-            R.string.tenement.string(context), listOf(
+            R.string.tenement.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_water_rate.string(context),
-                    R.string.type_icon_name_water_rate.drawableString(context)
+                    R.string.type_icon_name_water_rate.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_electricity.string(context),
-                    R.string.type_icon_name_electricity.drawableString(context)
+                    R.string.type_icon_name_electricity.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_gas_charge.string(context),
-                    R.string.type_icon_name_gas_charge.drawableString(context)
+                    R.string.type_icon_name_gas_charge.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_garbage_fee.string(context),
-                    R.string.type_icon_name_garbage_fee.drawableString(context)
+                    R.string.type_icon_name_garbage_fee.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_property_costs.string(context),
-                    R.string.type_icon_name_property_costs.drawableString(context)
+                    R.string.type_icon_name_property_costs.drawableString(context),
                 ),
                 TypeIconModel(
                     R.string.type_heating_fee.string(context),
-                    R.string.type_icon_name_heating_fee.drawableString(context)
+                    R.string.type_icon_name_heating_fee.drawableString(context),
                 ),
-            )
+            ),
         ),
         // 其它
         TypeIconGroupModel(
-            R.string.other.string(context), listOf(
+            R.string.other.string(context),
+            listOf(
                 TypeIconModel(
                     R.string.type_other.string(context),
-                    R.string.type_icon_name_other.drawableString(context)
+                    R.string.type_icon_name_other.drawableString(context),
                 ),
-            )
+            ),
         ),
     )
 }

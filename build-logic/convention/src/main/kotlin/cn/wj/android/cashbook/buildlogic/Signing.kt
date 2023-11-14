@@ -23,16 +23,20 @@ fun Project.configureSigningConfigs(
     commonExtension: ApplicationExtension,
 ) {
     commonExtension.apply {
-        val libs = extensions.getByType<VersionCatalogsExtension>().named("signingLibs")
+        val signingLibs = runCatching {
+            extensions.getByType<VersionCatalogsExtension>().named("signingLibs")
+        }.getOrNull()
 
-        signingConfigs {
-            // 签名配置
-            Signing.values().forEach {
-                create(it.name) {
-                    keyAlias = libs.findVersion("keyAlias").get().toString()
-                    keyPassword = libs.findVersion("keyPassword").get().toString()
-                    storeFile = file(libs.findVersion("storeFile").get().toString())
-                    storePassword = libs.findVersion("storePassword").get().toString()
+        if (null != signingLibs) {
+            signingConfigs {
+                // 签名配置
+                Signing.values().forEach {
+                    create(it.name) {
+                        keyAlias = signingLibs.findVersion("keyAlias").get().toString()
+                        keyPassword = signingLibs.findVersion("keyPassword").get().toString()
+                        storeFile = file(signingLibs.findVersion("storeFile").get().toString())
+                        storePassword = signingLibs.findVersion("storePassword").get().toString()
+                    }
                 }
             }
         }

@@ -1,0 +1,1 @@
+gradlew.bat :app:lintOnlineRelease :app:lintOfflineRelease :app:lintDevRelease :lint:lint

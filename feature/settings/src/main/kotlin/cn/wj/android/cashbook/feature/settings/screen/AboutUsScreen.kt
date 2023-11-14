@@ -1,42 +1,49 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.settings.screen
 
-import android.text.Spanned
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.EMAIL_ADDRESS
 import cn.wj.android.cashbook.core.common.GITEE_HOMEPAGE
@@ -50,12 +57,10 @@ import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
 import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.icon.CashbookIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.settings.enums.AboutUsBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsViewModel
-import io.noties.markwon.Markwon
+import cn.wj.android.cashbook.feature.settings.viewmodel.MainAppViewModel
 
 /**
  * 关于我们界面
@@ -63,7 +68,6 @@ import io.noties.markwon.Markwon
  * @param onRequestNaviToChangelog 导航到修改日志
  * @param onRequestNaviToPrivacyPolicy 导航到用户隐私协议
  * @param onRequestPopBackStack 导航到上一级
- * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/14
  */
@@ -73,33 +77,21 @@ internal fun AboutUsRoute(
     onRequestNaviToChangelog: () -> Unit,
     onRequestNaviToPrivacyPolicy: () -> Unit,
     onRequestPopBackStack: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     viewModel: AboutUsViewModel = hiltViewModel(),
+    mainViewModel: MainAppViewModel = viewModel(LocalContext.current as ViewModelStoreOwner),
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val shouldDisplayUpdateDialog by viewModel.updateInfoData.collectAsStateWithLifecycle()
-    val shouldDisplayNoWifiUpdateDialog by viewModel.confirmUpdateInfoData.collectAsStateWithLifecycle()
 
     AboutUsScreen(
         uiState = uiState,
-        inRequestUpdateData = viewModel.inRequestUpdateData,
-        shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
-        onRequestDismissBookmark = viewModel::dismissBookmark,
+        inRequestUpdateData = mainViewModel.inRequestUpdateData,
         onUseGiteeSwitch = viewModel::updateUseGitee,
+        onCanarySwitch = viewModel::updateCanary,
         onAutoCheckUpdateSwitch = viewModel::updateAutoCheckUpdate,
-        onCheckUpdateClick = viewModel::checkUpdate,
-        shouldDisplayUpdateDialog = shouldDisplayUpdateDialog,
-        onConfirmUpdateClick = viewModel::confirmUpdate,
-        onRequestDismissUpdateDialog = viewModel::dismissUpdateDialog,
-        shouldDisplayNoWifiUpdateDialog = shouldDisplayNoWifiUpdateDialog,
-        onConfirmDownloadClick = viewModel::confirmDownload,
-        onRequestDismissNoWifiUpdateDialog = viewModel::dismissNoWifiUpdateDialog,
+        onCheckUpdateClick = mainViewModel::checkUpdate,
         onVersionInfoClick = onRequestNaviToChangelog,
         onUserAgreementAndPrivacyPolicyClick = onRequestNaviToPrivacyPolicy,
         onBackClick = onRequestPopBackStack,
-        onShowSnackbar = onShowSnackbar,
         modifier = modifier,
     )
 }
@@ -109,68 +101,27 @@ internal fun AboutUsRoute(
  *
  * @param uiState 界面 UI 状态
  * @param inRequestUpdateData 标记，是否正在更新数据
- * @param shouldDisplayBookmark 是否显示提示
- * @param onRequestDismissBookmark 隐藏提示
  * @param onUseGiteeSwitch 数据源切换回调
  * @param onAutoCheckUpdateSwitch 自动检测更新开关切换回调
  * @param onCheckUpdateClick 检查更新点击
- * @param shouldDisplayUpdateDialog 是否显示升级弹窗
- * @param onConfirmUpdateClick 确认升级点击回调
- * @param onRequestDismissUpdateDialog 隐藏升级弹窗
- * @param shouldDisplayNoWifiUpdateDialog 是否显示非 WiFi 升级提示
- * @param onConfirmDownloadClick 确认下载点击回调
- * @param onRequestDismissNoWifiUpdateDialog 隐藏提示弹窗
  * @param onVersionInfoClick 版本信息点击回调
  * @param onUserAgreementAndPrivacyPolicyClick 用户隐私协议点击回调
  * @param onBackClick 返回点击回调
- * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AboutUsScreen(
     uiState: AboutUsUiState,
     inRequestUpdateData: Boolean,
-    shouldDisplayBookmark: AboutUsBookmarkEnum,
-    onRequestDismissBookmark: () -> Unit,
     onUseGiteeSwitch: (Boolean) -> Unit,
+    onCanarySwitch: (Boolean) -> Unit,
     onAutoCheckUpdateSwitch: (Boolean) -> Unit,
     onCheckUpdateClick: () -> Unit,
-    shouldDisplayUpdateDialog: UpgradeInfoEntity?,
-    onConfirmUpdateClick: () -> Unit,
-    onRequestDismissUpdateDialog: (Boolean) -> Unit,
-    shouldDisplayNoWifiUpdateDialog: UpgradeInfoEntity?,
-    onConfirmDownloadClick: (Boolean) -> Unit,
-    onRequestDismissNoWifiUpdateDialog: () -> Unit,
     onVersionInfoClick: () -> Unit,
     onUserAgreementAndPrivacyPolicyClick: () -> Unit,
     onBackClick: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-    // 提示文本
-    val isLatestVersionText = stringResource(id = R.string.it_is_the_latest_version)
-    val downloadingText = stringResource(id = R.string.update_downloading_hint)
-    val startDownloadText = stringResource(id = R.string.start_background_download)
-
-    LaunchedEffect(shouldDisplayBookmark) {
-        if (shouldDisplayBookmark != AboutUsBookmarkEnum.NONE) {
-            val tipsText = when (shouldDisplayBookmark) {
-                AboutUsBookmarkEnum.NO_NEED_UPDATE -> isLatestVersionText
-                AboutUsBookmarkEnum.UPDATE_DOWNLOADING -> downloadingText
-                AboutUsBookmarkEnum.START_DOWNLOAD -> startDownloadText
-                else -> ""
-            }
-            if (tipsText.isNotBlank()) {
-                val showSnackbarResult = onShowSnackbar(tipsText, null)
-                if (SnackbarResult.Dismissed == showSnackbarResult) {
-                    onRequestDismissBookmark()
-                }
-            } else {
-                onRequestDismissBookmark()
-            }
-        }
-    }
-
     CashbookScaffold(
         topBar = {
             CashbookTopAppBar(
@@ -185,24 +136,6 @@ internal fun AboutUsScreen(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
-            // 升级提示弹窗
-            if (null != shouldDisplayUpdateDialog) {
-                val content = Markwon.create(LocalContext.current)
-                    .toMarkdown(shouldDisplayUpdateDialog.versionInfo)
-                UpdateHintDialog(
-                    content = content,
-                    ignoreUpdateVersion = uiState.ignoreUpdateVersion,
-                    onConfirmClick = onConfirmUpdateClick,
-                    onDismissClick = onRequestDismissUpdateDialog,
-                )
-            }
-            // 非WiFi下载提示弹窗
-            if (null != shouldDisplayNoWifiUpdateDialog) {
-                NoWifiUpdateHintDialog(
-                    onConfirmClick = onConfirmDownloadClick,
-                    onDismissClick = onRequestDismissNoWifiUpdateDialog,
-                )
-            }
             val pleaseSelectWebBrowserText = stringResource(id = R.string.please_select_web_browser)
             val currentContext = LocalContext.current
             LazyColumn(
@@ -317,6 +250,17 @@ internal fun AboutUsScreen(
                         },
                     )
                     if (!ApplicationInfo.isOffline) {
+                        // 实验版本
+                        TransparentListItem(
+                            headlineContent = { Text(text = stringResource(id = R.string.canary_version)) },
+                            supportingContent = { Text(text = stringResource(id = R.string.canary_version_hint)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = uiState.canary,
+                                    onCheckedChange = onCanarySwitch,
+                                )
+                            },
+                        )
                         // 自动检查更新
                         TransparentListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.auto_check_update)) },
@@ -399,100 +343,4 @@ internal fun AboutUsScreen(
             }
         }
     }
-}
-
-/**
- * 更新提示弹窗
- *
- * @param content 更新内容
- * @param ignoreUpdateVersion 是否跳过此版本
- * @param onConfirmClick 确认点击回调
- * @param onDismissClick 取消点击回调，参数：(是否跳过此版本) -> [Unit]
- */
-@Composable
-internal fun UpdateHintDialog(
-    content: Spanned,
-    ignoreUpdateVersion: Boolean,
-    onConfirmClick: () -> Unit,
-    onDismissClick: (Boolean) -> Unit,
-) {
-    var ignore by remember {
-        mutableStateOf(ignoreUpdateVersion)
-    }
-    AlertDialog(
-        onDismissRequest = { onDismissClick.invoke(false) },
-        text = {
-            Column {
-                Text(
-                    text = buildAnnotatedString {
-                        append(content)
-                    },
-                )
-                Row(
-                    modifier = Modifier
-                        .clickable { ignore = !ignore }
-                        .padding(end = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(checked = ignore, onCheckedChange = { ignore = it })
-                    Text(text = stringResource(id = R.string.ignore_this_version))
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirmClick) {
-                Text(text = stringResource(id = R.string.update))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { onDismissClick.invoke(ignore) }) {
-                Text(text = stringResource(id = R.string.cancel))
-            }
-        },
-    )
-}
-
-/**
- * 未连接 WiFi 更新提示弹窗
- *
- * @param onConfirmClick 确认点击回调，参数：(是否不再提示) -> [Unit]
- * @param onDismissClick 取消点击回调
- */
-@Composable
-internal fun NoWifiUpdateHintDialog(
-    onConfirmClick: (Boolean) -> Unit,
-    onDismissClick: () -> Unit,
-) {
-    var noMOrePrompt by remember {
-        mutableStateOf(false)
-    }
-    AlertDialog(
-        onDismissRequest = onDismissClick,
-        text = {
-            Column {
-                Text(
-                    text = stringResource(id = R.string.no_wifi_download_available_hint),
-                )
-                Row(
-                    modifier = Modifier
-                        .clickable { noMOrePrompt = !noMOrePrompt }
-                        .padding(end = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(checked = noMOrePrompt, onCheckedChange = { noMOrePrompt = it })
-                    Text(text = stringResource(id = R.string.no_more_prompt))
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onConfirmClick.invoke(noMOrePrompt) }) {
-                Text(text = stringResource(id = R.string.update))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissClick) {
-                Text(text = stringResource(id = R.string.cancel))
-            }
-        },
-    )
 }

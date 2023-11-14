@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.feature.settings.screen
 
 import android.content.Intent
@@ -85,7 +101,6 @@ internal fun BackupAndRecoveryRoute(
     modifier: Modifier = Modifier,
     viewModel: BackupAndRecoveryViewModel = hiltViewModel(),
 ) {
-
     val shouldDisplayBookmark by viewModel.shouldDisplayBookmark.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
@@ -151,7 +166,6 @@ internal fun BackupAndRecoveryScreen(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
-
     // 提示文本
     val blankPathHint = stringResource(id = R.string.please_select_backup_path_first)
     val unauthorizedPathHint = stringResource(id = R.string.unauthorized_path)
@@ -307,14 +321,14 @@ internal fun AutoBackupModeDialog(
                             .selectable(
                                 selected = (enum == autoBackupMode),
                                 onClick = { onAutoBackupModeSelected.invoke(enum) },
-                                role = Role.RadioButton
+                                role = Role.RadioButton,
                             )
                             .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(
                             selected = enum == autoBackupMode,
-                            onClick = null
+                            onClick = null,
                         )
                         Text(
                             text = enum.text,
@@ -390,7 +404,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             Text(
                 text = stringResource(id = R.string.webdav_setting),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 16.dp)
+                modifier = Modifier.padding(start = 16.dp),
             )
 
             CompatTextField(
@@ -425,7 +439,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                         onConnectStateClick(
                             webDAVDomainTextFieldState.text,
                             webDAVAccountTextFieldState.text,
-                            webDAVPasswordTextFieldState.text
+                            webDAVPasswordTextFieldState.text,
                         )
                     }
                 },
@@ -445,7 +459,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(32.dp)
+                    .height(32.dp),
             )
         }
 
@@ -467,7 +481,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                         // 获取持久化授权
                         context.contentResolver.takePersistableUriPermission(
                             uri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
                         )
                         uri.toString()
                     } else {
@@ -475,7 +489,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                     }.orEmpty()
                     onSelectDirCallback?.invoke(path)
                 }
-            }
+            },
         )
 
         TransparentListItem(
@@ -495,8 +509,8 @@ internal fun BackupAndRecoveryScaffoldContent(
                             R.string.backup_hint_offline
                         } else {
                             R.string.backup_hint
-                        }
-                    )
+                        },
+                    ),
                 )
             },
             modifier = Modifier.clickable {
@@ -525,8 +539,8 @@ internal fun BackupAndRecoveryScaffoldContent(
                                 R.string.recovery_hint_offline
                             } else {
                                 R.string.recovery_hint
-                            }
-                        )
+                            },
+                        ),
                     )
                 },
                 modifier = Modifier.combinedClickable(onClick = {
@@ -597,7 +611,7 @@ internal val AutoBackupModeEnum.text: String
             AutoBackupModeEnum.WHEN_LAUNCH -> R.string.each_launch
             AutoBackupModeEnum.EACH_DAY -> R.string.each_day
             AutoBackupModeEnum.EACH_WEEK -> R.string.each_week
-        }
+        },
     )
 
 @DevicePreviews

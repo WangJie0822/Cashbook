@@ -1,4 +1,18 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
@@ -18,8 +32,6 @@ import cn.wj.android.cashbook.domain.usecase.SaveAssetUseCase
 import cn.wj.android.cashbook.feature.assets.enums.EditAssetBottomSheetEnum
 import cn.wj.android.cashbook.feature.assets.enums.SelectDayEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -27,6 +39,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * 编辑资产 ViewModel
@@ -117,7 +130,7 @@ class EditAssetViewModel @Inject constructor(
                         name = classificationName,
                         type = typeTemp,
                         classification = classification,
-                    )
+                    ),
                 )
             }
             dismissBottomSheet()
@@ -147,7 +160,6 @@ class EditAssetViewModel @Inject constructor(
             }
             dismissDialog()
         }
-
     }
 
     /** 更新隐藏状态 */
@@ -187,8 +199,8 @@ class EditAssetViewModel @Inject constructor(
                     cardNo = cardNo,
                     remark = remark,
                 )
-                if (_assetIdData.first() != -1L
-                    && _defaultAssetInfo.first().toString() == assetModel.toString()
+                if (_assetIdData.first() != -1L &&
+                    _defaultAssetInfo.first().toString() == assetModel.toString()
                 ) {
                     this@EditAssetViewModel.logger().i("save(), data no change, finish")
                     onSuccess()

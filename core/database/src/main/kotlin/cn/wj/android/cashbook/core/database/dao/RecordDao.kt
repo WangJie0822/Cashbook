@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
@@ -18,21 +34,21 @@ interface RecordDao {
     @Query(
         value = """
         SELECT * FROM db_record WHERE id=:recordId
-    """
+    """,
     )
     suspend fun queryById(recordId: Long): RecordTable?
 
     @Query(
         value = """
         SELECT * FROM db_record WHERE id IN (SELECT record_id FROM db_record_with_related WHERE record_id=:recordId)
-    """
+    """,
     )
     suspend fun queryRelatedById(recordId: Long): List<RecordTable>
 
     @Query(
         value = """
         SELECT * FROM db_record WHERE books_id=:booksId AND record_time>=:dateTime
-    """
+    """,
     )
     suspend fun queryByBooksIdAfterDate(booksId: Long, dateTime: Long): List<RecordTable>
 
@@ -42,18 +58,18 @@ interface RecordDao {
             WHERE record_time>=:startDate 
             AND record_time<:endDate
             AND books_id=:booksId 
-        """
+        """,
     )
     suspend fun queryByBooksIdBetweenDate(
         booksId: Long,
         startDate: Long,
-        endDate: Long
+        endDate: Long,
     ): List<RecordTable>
 
     @Query(
         value = """
         SELECT * FROM db_record WHERE books_id=:booksId AND reimbursable=$SWITCH_INT_ON AND record_time>=:dateTime
-    """
+    """,
     )
     suspend fun queryReimburseByBooksIdAfterDate(booksId: Long, dateTime: Long): List<RecordTable>
 
@@ -69,7 +85,7 @@ interface RecordDao {
         LEFT JOIN db_asset ON db_asset.id = db_record.asset_id
         LEFT JOIN db_asset AS related ON related.id = db_record.into_asset_id
         WHERE db_record.books_id = :booksId
-    """
+    """,
     )
     suspend fun query(booksId: Long): List<RecordViewsRelation>
 
@@ -83,13 +99,15 @@ interface RecordDao {
     ): List<RecordTable>
 
     /** 类型 id 为 [typeId] 的第 [pageNum] 页 [pageSize] 条记录 */
-    @Query("""
+    @Query(
+        """
         SELECT * FROM db_record 
         WHERE books_id=:booksId 
         AND (type_id=:typeId 
         OR type_id IN (SELECT id FROM db_type WHERE parent_id=:typeId))
         ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
-    """)
+    """,
+    )
     suspend fun queryRecordByTypeId(
         booksId: Long,
         typeId: Long,
@@ -98,7 +116,8 @@ interface RecordDao {
     ): List<RecordTable>
 
     /** 标签 id 为 [tagId] 的第 [pageNum] 页 [pageSize] 条记录 */
-    @Query("""
+    @Query(
+        """
         SELECT * FROM db_record 
         WHERE books_id=:booksId
         AND id IN (
@@ -108,7 +127,8 @@ interface RecordDao {
         ORDER BY record_time 
         DESC LIMIT :pageSize 
         OFFSET :pageNum
-    """)
+    """,
+    )
     suspend fun queryRecordByTagId(
         booksId: Long,
         tagId: Long,
@@ -127,7 +147,7 @@ interface RecordDao {
         ORDER BY record_time 
         DESC LIMIT :pageSize 
         OFFSET :pageNum
-    """
+    """,
     )
     suspend fun queryRecordByKeyword(
         booksId: Long,
@@ -155,12 +175,12 @@ interface RecordDao {
         AND type_id IN (SELECT id FROM db_type WHERE type_category=:incomeCategory)
         AND books_id=:booksId 
         ORDER BY record_time DESC LIMIT 50
-    """
+    """,
     )
     fun getExpenditureRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
-        incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal
+        incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
     ): List<RecordTable>
 
     @Query(
@@ -170,7 +190,7 @@ interface RecordDao {
         AND reimbursable=$SWITCH_INT_ON
         AND books_id=:booksId 
         ORDER BY record_time DESC LIMIT 50
-    """
+    """,
     )
     fun getExpenditureReimburseRecordListAfterTime(
         booksId: Long,
@@ -185,13 +205,13 @@ interface RecordDao {
         AND books_id=:booksId
         AND (remark LIKE :keyword OR amount LIKE :keyword)
         ORDER BY record_time DESC LIMIT 50
-    """
+    """,
     )
     fun getExpenditureRecordListByKeywordAfterTime(
         keyword: String,
         booksId: Long,
         recordTime: Long,
-        incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal
+        incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
     ): List<RecordTable>
 
     @Query(
@@ -199,7 +219,7 @@ interface RecordDao {
         SELECT COUNT(*) FROM db_record 
         WHERE record_time>=:recordTime 
         AND asset_id=:assetId
-    """
+    """,
     )
     fun getRecordCountByAssetIdAfterTime(
         assetId: Long,
@@ -214,7 +234,7 @@ interface RecordDao {
         AND books_id=:booksId 
         AND (remark LIKE :keyword OR amount LIKE :keyword)
         ORDER BY record_time DESC LIMIT 50
-    """
+    """,
     )
     fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
         keyword: String,
@@ -226,7 +246,7 @@ interface RecordDao {
         value = """
         DELETE FROM db_record
         WHERE asset_id=:assetId OR into_asset_id=:assetId
-    """
+    """,
     )
     fun deleteWithAsset(assetId: Long)
 
@@ -235,7 +255,7 @@ interface RecordDao {
         DELETE FROM db_record_with_related
         WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
         OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-    """
+    """,
     )
     fun deleteRelatedWithAsset(assetId: Long)
 }

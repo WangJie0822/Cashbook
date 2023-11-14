@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.core.design.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -32,13 +48,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.util.LunarUtils
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import kotlinx.coroutines.flow.collectLatest
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
-import kotlinx.coroutines.flow.collectLatest
 
 /**
  * 日历视图
@@ -68,7 +84,7 @@ fun CalendarView(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
         ) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                 for (w in weekStart.ordinal until weekStart.ordinal + 7) {
@@ -81,14 +97,13 @@ fun CalendarView(
                         Text(
                             text = week.getDisplayName(
                                 TextStyle.SHORT,
-                                Locale.getDefault()
+                                Locale.getDefault(),
                             ),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.align(Alignment.Center),
                         )
                     }
-
                 }
             }
         }
@@ -106,7 +121,8 @@ fun CalendarView(
             initialPageOffsetFraction = 0f,
             pageCount = {
                 yearMonthList.size
-            })
+            },
+        )
         var scrollDate: YearMonth? by remember {
             mutableStateOf(YearMonth.of(selectDate.year, selectDate.monthValue))
         }
@@ -219,7 +235,7 @@ internal fun MonthView(
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .padding(vertical = 12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = currentDate.dayOfMonth.toString(),

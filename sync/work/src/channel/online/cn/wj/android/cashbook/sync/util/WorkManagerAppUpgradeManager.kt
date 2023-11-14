@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.sync.util
 
 import android.app.NotificationManager
@@ -23,15 +39,15 @@ import cn.wj.android.cashbook.sync.initializers.noticeNotificationBuilder
 import cn.wj.android.cashbook.sync.initializers.upgradeNotificationBuilder
 import cn.wj.android.cashbook.sync.workers.ApkDownloadWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Singleton
 class WorkManagerAppUpgradeManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : AppUpgradeManager {
 
     private var upgradeInfo: UpgradeInfoEntity? = null
@@ -73,14 +89,14 @@ class WorkManagerAppUpgradeManager @Inject constructor(
                 context,
                 0,
                 Intent(SERVICE_ACTION_RETRY_DOWNLOAD),
-                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
         } else {
             PendingIntent.getService(
                 context,
                 0,
                 Intent(SERVICE_ACTION_RETRY_DOWNLOAD),
-                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
         }
 
@@ -93,7 +109,7 @@ class WorkManagerAppUpgradeManager @Inject constructor(
                     R.string.retry.string(context),
                     pendingIntent,
                 )
-                .build()
+                .build(),
         )
     }
 
@@ -139,25 +155,27 @@ class WorkManagerAppUpgradeManager @Inject constructor(
             context.upgradeNotificationBuilder()
                 .setContentText(R.string.update_progress_format.string(context).format(progress))
                 .setProgress(100, progress, false)
-                .build()
+                .build(),
         )
     }
 
     private fun install(file: File) {
         logger().d("install file: ${file.path}")
         try {
-            context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    //如果SDK版本>=24，即：Build.VERSION.SDK_INT >= 24
-                    val authority = "${ApplicationInfo.applicationId}.FileProvider"
-                    FileProvider.getUriForFile(context, authority, file)
-                } else {
-                    Uri.fromFile(file)
-                }
-                setDataAndType(uri, "application/vnd.android.package-archive")
-            })
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        // 如果SDK版本>=24，即：Build.VERSION.SDK_INT >= 24
+                        val authority = "${ApplicationInfo.applicationId}.FileProvider"
+                        FileProvider.getUriForFile(context, authority, file)
+                    } else {
+                        Uri.fromFile(file)
+                    }
+                    setDataAndType(uri, "application/vnd.android.package-archive")
+                },
+            )
         } catch (throwable: Throwable) {
             logger().e(throwable, "install")
         }
