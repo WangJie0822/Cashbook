@@ -18,42 +18,15 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
     alias(conventionLibs.plugins.cashbook.android.hilt)
     alias(conventionLibs.plugins.cashbook.android.lint)
-    alias(libs.plugins.google.protobuf)
 }
 
 android {
     namespace = "cn.wj.android.cashbook.core.datastore"
 }
 
-protobuf {
-    protoc {
-        artifact = libs.google.protobuf.protoc.get().toString()
-    }
-
-    generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                create("java") {
-                    option("lite")
-                }
-                create("kotlin") {
-                    option("lite")
-                }
-            }
-        }
-    }
-}
-
-androidComponents.beforeVariants {
-    android.sourceSets.getByName(it.name) {
-        val buildDir = layout.buildDirectory.get().asFile
-        java.srcDir(buildDir.resolve("generated/source/proto/${it.name}/java"))
-        kotlin.srcDir(buildDir.resolve("generated/source/proto/${it.name}/kotlin"))
-    }
-}
-
 dependencies {
 
+    api(projects.core.datastoreProto)
     implementation(projects.core.common)
     implementation(projects.core.model)
 
