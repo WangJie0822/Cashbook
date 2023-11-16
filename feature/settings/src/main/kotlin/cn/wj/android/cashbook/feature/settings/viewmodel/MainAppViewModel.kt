@@ -388,7 +388,9 @@ class MainAppViewModel @Inject constructor(
             return false
         }
         val localSplits = ApplicationInfo.versionName.split("_")
-        val splits = versionName.split("_")
+        val splits = versionName.replace("Pre Release ", "")
+            .replace("Release ", "")
+            .split("_")
         val localVersions = localSplits.first().replace("v", "").split(".")
         val versions = splits.first().replace("v", "").split(".")
         if (localSplits.first() == splits.first()) {
