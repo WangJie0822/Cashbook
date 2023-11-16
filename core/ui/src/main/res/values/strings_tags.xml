@@ -29,6 +29,7 @@
     <string name="allow_multiple_choices">允许多选</string>
     <string name="please_select_tags">请选择标签</string>
     <string name="add">添加</string>
+    <string name="done">完成</string>
     <string name="tag_saving">标签保存中…</string>
     <string name="tag_deleting">标签删除中…</string>
     <string name="tag_name_already_exist">存在相同名称的标签，请修改</string>

@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 编辑记录选择标签弹窗新增`完成`按钮，优化体验；
 ### Changed
 - 三方依赖升级；
 ### Fixed

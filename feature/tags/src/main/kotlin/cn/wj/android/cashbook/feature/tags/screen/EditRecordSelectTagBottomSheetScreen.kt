@@ -56,6 +56,7 @@ import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSh
 internal fun EditRecordSelectTagBottomSheetRoute(
     selectedTagIdList: List<Long>,
     onTagIdListChange: (List<Long>) -> Unit,
+    onRequestDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditRecordSelectTagBottomSheetViewModel = hiltViewModel<EditRecordSelectTagBottomSheetViewModel>().apply {
         updateSelectedTags(selectedTagIdList)
@@ -69,6 +70,7 @@ internal fun EditRecordSelectTagBottomSheetRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         tagList = tagList,
         onAddTagClick = viewModel::displayAddTagDialog,
+        onDoneClick = onRequestDismissSheet,
         onTagItemClick = { tagEntity ->
             viewModel.updateSelectedTagList(
                 id = tagEntity.id,
@@ -97,6 +99,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
     onRequestDismissDialog: () -> Unit,
     tagList: List<Selectable<TagModel>>,
     onAddTagClick: () -> Unit,
+    onDoneClick: () -> Unit,
     onTagItemClick: (TagModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -109,7 +112,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
                 ) {
-                    val (title, subTitle, add) = createRefs()
+                    val (title, subTitle, add, done) = createRefs()
                     Text(
                         text = stringResource(id = R.string.please_select_tags),
                         color = MaterialTheme.colorScheme.onSurface,
@@ -131,13 +134,26 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                     TextButton(
                         modifier = Modifier.constrainAs(add) {
                             top.linkTo(parent.top)
-                            end.linkTo(parent.end)
+                            end.linkTo(done.start)
                             bottom.linkTo(parent.bottom)
                         },
                         onClick = onAddTagClick,
                     ) {
                         Text(
                             text = stringResource(id = R.string.add),
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    TextButton(
+                        modifier = Modifier.constrainAs(done) {
+                            top.linkTo(parent.top)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        },
+                        onClick = onDoneClick,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.done),
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }

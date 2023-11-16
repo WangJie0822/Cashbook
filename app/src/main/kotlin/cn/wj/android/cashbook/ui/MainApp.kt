@@ -441,10 +441,11 @@ fun CashbookNavHost(
                     onRequestNaviToEditAsset = navController::naviToEditAsset,
                 )
             },
-            tagBottomSheetContent = { selectedTagIdList, onTagIdListChange ->
+            tagBottomSheetContent = { selectedTagIdList, onTagIdListChange, onRequestDismissSheet ->
                 EditRecordSelectTagBottomSheetContent(
                     selectedTagIdList = selectedTagIdList,
                     onTagIdListChange = onTagIdListChange,
+                    onRequestDismissSheet = onRequestDismissSheet,
                 )
             },
             onRequestNaviToSelectRelatedRecord = navController::naviToSelectRelatedRecord,
