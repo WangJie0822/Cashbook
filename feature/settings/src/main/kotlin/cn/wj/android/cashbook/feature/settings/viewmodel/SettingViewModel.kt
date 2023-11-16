@@ -98,6 +98,9 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    /** 标记 - 是否是开启开关 */
+    private var openSecurity = false
+
     fun onNeedSecurityVerificationWhenLaunchChanged(need: Boolean) {
         viewModelScope.launch {
             if (!need) {
@@ -111,6 +114,7 @@ class SettingViewModel @Inject constructor(
                 settingRepository.updateNeedSecurityVerificationWhenLaunch(true)
             } else {
                 // 没有密码，显示创建密码弹窗
+                openSecurity = true
                 onPasswordClick()
             }
         }
@@ -149,6 +153,10 @@ class SettingViewModel @Inject constructor(
             settingRepository.updatePasswordInfo(passwordInfo)
             // 保存密码向量信息
             settingRepository.updatePasswordIv(passwordIv)
+            if (openSecurity) {
+                // 打开验证开关拉起的创建密码，创建完自动开启认证
+                settingRepository.updateNeedSecurityVerificationWhenLaunch(true)
+            }
             // 隐藏弹窗
             dismissDialog()
         }
@@ -312,6 +320,7 @@ class SettingViewModel @Inject constructor(
     }
 
     fun dismissDialog() {
+        openSecurity = false
         dialogState = DialogState.Dismiss
     }
 

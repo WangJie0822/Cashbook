@@ -96,7 +96,7 @@ internal fun EditRecordRoute(
     typeId: Long,
     typeListContent: @Composable (RecordTypeCategoryEnum, Long, (Long) -> Unit) -> Unit,
     assetBottomSheetContent: @Composable (Long, Long, Boolean, (Long) -> Unit) -> Unit,
-    tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit) -> Unit,
+    tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit, () -> Unit) -> Unit,
     onRequestNaviToSelectRelatedRecord: () -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -168,7 +168,11 @@ internal fun EditRecordRoute(
         tagText = tagText,
         onTagClick = viewModel::displayTagSheet,
         selectTagBottomSheetContent = {
-            tagBottomSheetContent(selectedTagIdList, viewModel::updateTag)
+            tagBottomSheetContent(
+                selectedTagIdList,
+                viewModel::updateTag,
+                viewModel::dismissBottomSheet,
+            )
         },
         onReimbursableClick = viewModel::switchReimbursable,
         onRelatedRecordClick = onRequestNaviToSelectRelatedRecord,

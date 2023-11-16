@@ -57,9 +57,11 @@ fun NavGraphBuilder.myTagsScreen(
 fun EditRecordSelectTagBottomSheetContent(
     selectedTagIdList: List<Long>,
     onTagIdListChange: (List<Long>) -> Unit,
+    onRequestDismissSheet: () -> Unit,
 ) {
     EditRecordSelectTagBottomSheetRoute(
         selectedTagIdList = selectedTagIdList,
         onTagIdListChange = onTagIdListChange,
+        onRequestDismissSheet = onRequestDismissSheet,
     )
 }

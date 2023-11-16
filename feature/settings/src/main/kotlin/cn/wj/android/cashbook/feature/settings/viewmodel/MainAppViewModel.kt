@@ -114,9 +114,14 @@ class MainAppViewModel @Inject constructor(
 
     /** 界面 UI 状态 */
     val uiState = combine(settingRepository.appDataMode, _verified) { appData, verified ->
+        val needSecurityVerificationWhenLaunch = appData.needSecurityVerificationWhenLaunch
+        if (!needSecurityVerificationWhenLaunch) {
+            // 未开启安全认证，启动自动修改认证状态为已认证，防止开启认证开关时立即拉起认证
+            _verified.tryEmit(true)
+        }
         MainAppUiState.Success(
             needRequestProtocol = !appData.agreedProtocol,
-            needVerity = appData.needSecurityVerificationWhenLaunch && !verified,
+            needVerity = needSecurityVerificationWhenLaunch && !verified,
             supportFingerprint = appData.enableFingerprintVerification,
             currentBookName = booksRepository.currentBook.first().name,
         )
@@ -383,7 +388,9 @@ class MainAppViewModel @Inject constructor(
             return false
         }
         val localSplits = ApplicationInfo.versionName.split("_")
-        val splits = versionName.split("_")
+        val splits = versionName.replace("Pre Release ", "")
+            .replace("Release ", "")
+            .split("_")
         val localVersions = localSplits.first().replace("v", "").split(".")
         val versions = splits.first().replace("v", "").split(".")
         if (localSplits.first() == splits.first()) {
