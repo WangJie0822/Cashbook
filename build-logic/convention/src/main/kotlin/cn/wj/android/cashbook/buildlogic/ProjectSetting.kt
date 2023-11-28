@@ -39,6 +39,18 @@ object ProjectSetting {
         /** 从环境变量中获取版本名，若没有则根据当前时间生成 */
         private fun generateVersionName(): String {
             val buildTagName = System.getenv("BUILD_TAG_NAME") ?: ""
+            if (buildTagName.isNotBlank()) {
+                // CI 构建流程，判断 tag 名称是否合规
+                val dateString = buildTagName.split("_")[1]
+                runCatching {
+                    SimpleDateFormat("yyMMddHH", Locale.getDefault()).run {
+                        isLenient = false
+                        parse(dateString)
+                    }
+                }.getOrElse {
+                    throw RuntimeException("Tag name is off-spec, make sure it's date match 'yyMMddHH' pattern")
+                }
+            }
             val versionName = buildTagName.ifBlank {
                 "${VERSION_NAME}_${generateVersionCode()}"
             }.replace("_pre", "")
