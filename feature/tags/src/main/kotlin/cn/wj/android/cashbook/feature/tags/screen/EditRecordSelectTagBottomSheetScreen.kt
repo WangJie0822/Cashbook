@@ -70,15 +70,11 @@ internal fun EditRecordSelectTagBottomSheetRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         tagList = tagList,
         onAddTagClick = viewModel::displayAddTagDialog,
-        onDoneClick = onRequestDismissSheet,
-        onTagItemClick = { tagEntity ->
-            viewModel.updateSelectedTagList(
-                id = tagEntity.id,
-                onResult = { selectedList ->
-                    onTagIdListChange(selectedList)
-                },
-            )
+        onDoneClick = {
+            onRequestDismissSheet()
+            onTagIdListChange(tagList.filter { it.selected }.map { it.data.id })
         },
+        onTagItemClick = viewModel::updateSelectedTagList,
         modifier = modifier,
     )
 }
@@ -100,7 +96,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
     tagList: List<Selectable<TagModel>>,
     onAddTagClick: () -> Unit,
     onDoneClick: () -> Unit,
-    onTagItemClick: (TagModel) -> Unit,
+    onTagItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
@@ -177,7 +173,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                         tagList.forEach {
                             ElevatedFilterChip(
                                 selected = it.selected,
-                                onClick = { onTagItemClick(it.data) },
+                                onClick = { onTagItemClick(it.data.id) },
                                 label = { Text(text = it.data.name) },
                             )
                         }

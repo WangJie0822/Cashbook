@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Fixed
+- 修复选择标签 Sheet 弹窗反复弹出问题；
 
 ## [1.0.3_23110617]
 ### Add
