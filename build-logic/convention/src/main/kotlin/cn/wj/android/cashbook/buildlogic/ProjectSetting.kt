@@ -1,5 +1,8 @@
 package cn.wj.android.cashbook.buildlogic
 
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import org.gradle.api.JavaVersion
 
 /**
@@ -20,7 +23,7 @@ object ProjectSetting {
         const val TARGET_SDK = 30
 
         /** 大版本名 */
-        private const val VERSION_NAME = "v1.0.3"
+        private const val VERSION_NAME = "v1.0.4"
 
         /** 版本号，动态生成 */
         val versionCode: Int
@@ -45,8 +48,8 @@ object ProjectSetting {
 
         /** 根据日期时间获取对应版本号 */
         private fun generateVersionCode(): Int {
-            val sdf = java.text.SimpleDateFormat("yyMMddHH", java.util.Locale.CHINA)
-            val formatDate = sdf.format(java.util.Date())
+            val sdf = SimpleDateFormat("yyMMddHH", Locale.getDefault())
+            val formatDate = sdf.format(Date())
             val versionCode = formatDate.toIntOrNull() ?: 10001
             println("> Task :build-logic:generateVersionCode formatDate: $formatDate versionCode: $versionCode")
             return versionCode

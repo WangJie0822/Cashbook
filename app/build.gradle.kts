@@ -1,6 +1,8 @@
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 import java.io.FileWriter
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.application)
@@ -87,7 +89,14 @@ android {
         mergeAssetsProvider.get().doFirst {
             val buildTagName = System.getenv("BUILD_TAG_NAME")
             if (!buildTagName.isNullOrBlank()) {
-                // CI 构建流程，生成 RELEASE.md
+                // CI 构建流程，判断标签是否合规
+                val dateString = buildTagName.split("_")[1]
+                runCatching {
+                    SimpleDateFormat("yyMMddHH", Locale.getDefault()).parse(dateString)
+                }.getOrElse {
+                    throw RuntimeException("Tag name is off-spec, make sure it's date match 'yyMMddHH' pattern")
+                }
+                // 生成 RELEASE.md
                 File(rootDir, "CHANGELOG.md").readText().lines().let { list ->
                     println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md")
                     val start = if (buildTagName.endsWith("_pre")) {
