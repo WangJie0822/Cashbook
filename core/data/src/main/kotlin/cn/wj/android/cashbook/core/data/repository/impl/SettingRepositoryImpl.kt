@@ -142,7 +142,8 @@ class SettingRepositoryImpl @Inject constructor(
             val appData = appPreferencesDataSource.appData.first()
             val release = remoteDataSource.checkUpdate(!appData.useGithub, appData.canary)
             val asset = release?.assets?.firstOrNull {
-                it.name?.endsWith("online.apk") ?: false
+                val assetName = it.name.orEmpty()
+                assetName.endsWith(".apk") && (assetName.contains("_online") || assetName.contains("_canary"))
             }
             gitInfosDataSource.updateLatestVersionData(
                 release?.name.orEmpty(),
