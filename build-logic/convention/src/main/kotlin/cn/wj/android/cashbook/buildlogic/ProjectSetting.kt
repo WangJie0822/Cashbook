@@ -1,9 +1,29 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.buildlogic
 
+import org.gradle.api.JavaVersion
+import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalog
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.getByType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import org.gradle.api.JavaVersion
 
 /**
  * 项目配置数据
@@ -20,7 +40,7 @@ object ProjectSetting {
         const val MIN_SDK = 23
 
         /** SDK 目标版本 */
-        const val TARGET_SDK = 30
+        const val TARGET_SDK = 34
 
         /** 大版本名 */
         private const val VERSION_NAME = "v1.0.4"
@@ -80,14 +100,23 @@ object ProjectSetting {
         const val PLUGIN_ANDROID_APPLICATION = "com.android.application"
         const val PLUGIN_ANDROID_LIBRARY = "com.android.library"
         const val PLUGIN_ANDROID_TEST = "com.android.test"
+        const val PLUGIN_ANDROID_LINT = "com.android.lint"
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
-        const val PLUGIN_KOTLIN_KAPT = "org.jetbrains.kotlin.kapt"
         const val PLUGIN_KOTLIN_JVM = "org.jetbrains.kotlin.jvm"
         const val PLUGIN_JACOCO = "org.gradle.jacoco"
         const val PLUGIN_GOOGLE_KSP = "com.google.devtools.ksp"
         const val PLUGIN_GOOGLE_HILT = "dagger.hilt.android.plugin"
+        const val PLUGIN_TAKAHIROM_ROBORAZZI = "io.github.takahirom.roborazzi"
+        const val PLUGIN_DEPENDENCY_GUARD = "com.dropbox.dependency-guard"
+
+        const val PLUGIN_CASHBOOK_LIBRARY = "cashbook.android.library"
+        const val PLUGIN_CASHBOOK_LINT = "cashbook.android.lint"
+        const val PLUGIN_CASHBOOK_HILT = "cashbook.android.hilt"
     }
 }
 
 val JavaVersion.version: Int
     get() = ordinal + 1
+
+val Project.libs
+    get(): VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")

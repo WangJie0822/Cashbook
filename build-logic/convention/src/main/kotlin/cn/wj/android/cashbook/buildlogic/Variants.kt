@@ -1,4 +1,18 @@
-@file:Suppress("unused", "UnstableApiUsage", "UnusedReceiverParameter")
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package cn.wj.android.cashbook.buildlogic
 
@@ -9,11 +23,11 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
-import java.io.File
-import javax.lang.model.element.Modifier
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
+import java.io.File
+import javax.lang.model.element.Modifier
 
 /**
  * 维度枚举
@@ -21,7 +35,7 @@ import org.gradle.kotlin.dsl.getByType
  * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/2
  */
 enum class FlavorDimension {
-    ContentType
+    ContentType,
 }
 
 /**
@@ -50,7 +64,7 @@ enum class CashbookFlavor(
     Canary(FlavorDimension.ContentType, Signing.Android, null, "_canary"),
 
     /** 开发渠道 */
-    Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev")
+    Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev"),
 }
 
 /**
@@ -63,7 +77,6 @@ fun Project.configureFlavors(
     flavorConfigurationBlock: ProductFlavor.(flavor: CashbookFlavor) -> Unit = {},
 ) {
     commonExtension.apply {
-
         if (this is BaseAppModuleExtension) {
             // Application，配置签名
             configureSigningConfigs(this)
@@ -75,7 +88,6 @@ fun Project.configureFlavors(
 
         // 多渠道配置
         productFlavors {
-
             val signingLibs = runCatching {
                 extensions.getByType<VersionCatalogsExtension>().named("signingLibs")
             }.getOrNull()
