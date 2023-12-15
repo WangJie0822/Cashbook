@@ -26,6 +26,10 @@ plugins {
 android {
     namespace = "cn.wj.android.cashbook.sync"
 
+    defaultConfig {
+        testInstrumentationRunner = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
+    }
+
     sourceSets {
         CashbookFlavor.values().forEach { flavor ->
             val srcDir = if (flavor == CashbookFlavor.Offline) {
@@ -54,6 +58,7 @@ dependencies {
 
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // okhttp
     implementation(libs.squareup.okhttp3)

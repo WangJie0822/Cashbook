@@ -77,7 +77,7 @@ class DelegatingWorker(
             .hiltWorkerFactory()
             .createWorker(appContext, workerClassName, workerParams)
             as? CoroutineWorker
-            ?: throw IllegalArgumentException("Unable to find appropriate worker")
+            ?: throw IllegalArgumentException("Unable to find appropriate worker $workerClassName")
 
     override suspend fun getForegroundInfo(): ForegroundInfo =
         delegateWorker.getForegroundInfo()
