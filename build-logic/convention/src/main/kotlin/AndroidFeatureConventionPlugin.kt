@@ -35,8 +35,8 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 defaultConfig {
-//                FIXME    testInstrumentationRunner =
-//                        "com.google.samples.apps.nowinandroid.core.testing.NiaTestRunner"
+                    testInstrumentationRunner =
+                        "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
                 }
                 configureGradleManagedDevices(this)
             }

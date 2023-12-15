@@ -44,6 +44,7 @@ fun Project.configureSigningConfigs(
         if (null != signingLibs) {
             signingConfigs {
                 // 签名配置
+                @Suppress("EnumValuesSoftDeprecate")
                 Signing.values().forEach {
                     create(it.name) {
                         keyAlias = signingLibs.findVersion("keyAlias").get().toString()
