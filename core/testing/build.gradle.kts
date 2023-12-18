@@ -18,7 +18,6 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library.flavors)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.hilt)
-    alias(conventionLibs.plugins.cashbook.android.lint)
 }
 
 android {

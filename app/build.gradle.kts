@@ -8,7 +8,6 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.application.flavors)
     alias(conventionLibs.plugins.cashbook.android.application.jacoco)
     alias(conventionLibs.plugins.cashbook.android.hilt)
-    alias(conventionLibs.plugins.cashbook.android.lint)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.takahirom.roborazzi)
 }
