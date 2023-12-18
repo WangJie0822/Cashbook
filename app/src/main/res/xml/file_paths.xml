@@ -16,7 +16,7 @@
 -->
 
 <paths>
-    <root-path name="root_path" path="."/>
+    <!-- /sdcard/Download/ -->
     <external-path
         name="Download"
         path="Download/" />

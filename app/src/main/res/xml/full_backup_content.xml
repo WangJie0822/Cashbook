@@ -16,5 +16,24 @@
 -->
 
 <full-backup-content>
-    <!-- Exclude specific shared preferences that contain GCM registration Id -->
+    <!-- 文件系统上的目录，会存储属于此应用的所有不公开文件 -->
+    <exclude
+        domain="root"
+        path="." />
+    <!-- getFilesDir() 返回的目录 -->
+    <exclude
+        domain="file"
+        path="." />
+    <!-- getDatabasePath() 返回的目录。 使用 SQLiteOpenHelper 创建的数据库存储在此处 -->
+    <exclude
+        domain="database"
+        path="." />
+    <!-- 存储 SharedPreferences 的目录 -->
+    <exclude
+        domain="sharedpref"
+        path="." />
+    <!-- getExternalFilesDir() 返回的目录 -->
+    <exclude
+        domain="external"
+        path="." />
 </full-backup-content>

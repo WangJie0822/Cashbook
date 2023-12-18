@@ -35,16 +35,19 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="false"
-        android:fullBackupContent="@xml/backup_descriptor"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/full_backup_content"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:maxAspectRatio="2.4"
-        android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cashbook"
         android:usesCleartextTraffic="true"
-        tools:targetApi="o">
+        tools:targetApi="s">
+
+        <profileable
+            android:shell="true"
+            tools:targetApi="q" />
 
         <activity
             android:name=".ui.MainActivity"
