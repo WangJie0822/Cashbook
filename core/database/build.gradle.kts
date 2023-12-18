@@ -15,7 +15,6 @@
  */
 plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
-    alias(conventionLibs.plugins.cashbook.android.library.flavors)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
     alias(conventionLibs.plugins.cashbook.android.room)
     alias(conventionLibs.plugins.cashbook.android.hilt)

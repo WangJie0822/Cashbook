@@ -17,7 +17,6 @@ import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
-    alias(conventionLibs.plugins.cashbook.android.library.flavors)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
     alias(conventionLibs.plugins.cashbook.android.hilt)
     alias(libs.plugins.kotlin.serialization)
@@ -25,19 +24,6 @@ plugins {
 
 android {
     namespace = "cn.wj.android.cashbook.core.network"
-
-    sourceSets {
-        CashbookFlavor.values().forEach { flavor ->
-            val srcDir = if (flavor == CashbookFlavor.Offline) {
-                // 离线渠道
-                "src/channel/offline"
-            } else {
-                // 在线渠道
-                "src/channel/online"
-            }
-            getByName(flavor.name).java.srcDirs(srcDir)
-        }
-    }
 }
 
 dependencies {
