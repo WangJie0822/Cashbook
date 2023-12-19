@@ -1,0 +1,1 @@
+gradlew.bat :build-logic:convention:spotlessApply --init-script build-logic/gradle/init.gradle.kts --no-configuration-cache

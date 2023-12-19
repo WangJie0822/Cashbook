@@ -14,7 +14,6 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <data-extraction-rules>
     <cloud-backup disableIfNoEncryptionCapabilities="true">
         <!-- 文件系统上的目录，会存储属于此应用的所有不公开文件 -->

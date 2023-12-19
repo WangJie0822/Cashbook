@@ -14,7 +14,6 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <issues format="6" by="lint 8.2.0" type="baseline" client="gradle" dependencies="true" name="AGP (8.2.0)" variant="all" version="8.2.0">
 
     <issue
