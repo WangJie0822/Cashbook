@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.feature.records.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -48,7 +49,7 @@ class LauncherContentViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** 删除记录失败错误信息 */
-    var shouldDisplayDeleteFailedBookmark by mutableStateOf(0)
+    var shouldDisplayDeleteFailedBookmark by mutableIntStateOf(0)
         private set
 
     /** 弹窗状态 */

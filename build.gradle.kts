@@ -13,4 +13,7 @@ plugins {
 
 tasks.register("clean", Delete::class) {
     delete(rootProject.layout.buildDirectory.asFile.get())
+    delete("${rootProject.rootDir.path}/core/build")
+    delete("${rootProject.rootDir.path}/feature/build")
+    delete("${rootProject.rootDir.path}/sync/build")
 }

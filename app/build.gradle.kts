@@ -82,6 +82,10 @@ android {
         }
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     applicationVariants.all {
         mergeAssetsProvider.get().doFirst {
             val buildTagName = System.getenv("BUILD_TAG_NAME")

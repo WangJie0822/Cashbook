@@ -20,7 +20,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
 import androidx.work.ExistingWorkPolicy
@@ -166,13 +165,11 @@ class WorkManagerAppUpgradeManager @Inject constructor(
                 Intent(Intent.ACTION_VIEW).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        // 如果SDK版本>=24，即：Build.VERSION.SDK_INT >= 24
-                        val authority = "${ApplicationInfo.applicationId}.FileProvider"
-                        FileProvider.getUriForFile(context, authority, file)
-                    } else {
-                        Uri.fromFile(file)
-                    }
+                    val uri = FileProvider.getUriForFile(
+                        context,
+                        "${ApplicationInfo.applicationId}.FileProvider",
+                        file,
+                    )
                     setDataAndType(uri, "application/vnd.android.package-archive")
                 },
             )

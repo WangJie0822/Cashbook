@@ -17,13 +17,17 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
         android:allowBackup="false"
         android:supportsRtl="true">
 
         <service
             android:name=".service.UpgradeService"
-            android:exported="false">
+            android:exported="false"
+            android:foregroundServiceType="dataSync">
 
             <intent-filter>
                 <action android:name="cn.wj.android.cashbook.upgrade.CANCEL_DOWNLOAD" />

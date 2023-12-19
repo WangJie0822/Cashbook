@@ -1,0 +1,2361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright 2021 The Cashbook Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<issues format="6" by="lint 8.2.0" type="baseline" client="gradle" dependencies="true" name="AGP (8.2.0)" variant="all" version="8.2.0">
+
+    <issue
+        id="SuspiciousIndentation"
+        message="The indentation string here is different from on the previous line (`&quot; &quot;` vs `\t`)"
+        errorLine1="  for (int i = 0; i &lt; limitLines.size(); i++) {"
+        errorLine2="~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/renderer/XAxisRendererHorizontalBarChart.java"
+            line="247"
+            column="1"/>
+        <location
+            file="src/main/java/com/github/mikephil/charting/renderer/XAxisRendererHorizontalBarChart.java"
+            line="245"
+            column="1"
+            message="Previous line indentation here"/>
+    </issue>
+
+    <issue
+        id="SuspiciousIndentation"
+        message="The indentation string here is different from on the previous line (`&quot; &quot;` vs `\t`)"
+        errorLine1="   mLimitLinePaint.setStyle(Paint.Style.STROKE);"
+        errorLine2="~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/renderer/XAxisRendererHorizontalBarChart.java"
+            line="259"
+            column="1"/>
+        <location
+            file="src/main/java/com/github/mikephil/charting/renderer/XAxisRendererHorizontalBarChart.java"
+            line="257"
+            column="1"
+            message="Previous line indentation here"/>
+    </issue>
+
+    <issue
+        id="TrustAllX509TrustManager"
+        message="`checkClientTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers">
+        <location
+            file="../../../../.gradle/caches/transforms-3/7cd5d5203d5f318426144de58d3b42de/transformed/jetified-dokitx-3.7.1/jars/classes.jar"/>
+    </issue>
+
+    <issue
+        id="TrustAllX509TrustManager"
+        message="`checkServerTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers">
+        <location
+            file="../../../../.gradle/caches/transforms-3/7cd5d5203d5f318426144de58d3b42de/transformed/jetified-dokitx-3.7.1/jars/classes.jar"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 9"
+        errorLine1="    @TargetApi(Build.VERSION_CODES.GINGERBREAD)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/data/filter/Approximator.java"
+            line="32"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @TargetApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/BarLineChartBase.java"
+            line="731"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @TargetApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/BarLineChartBase.java"
+            line="892"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @TargetApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/BarLineChartBase.java"
+            line="954"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/Chart.java"
+            line="916"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/Chart.java"
+            line="932"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/Chart.java"
+            line="946"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/Chart.java"
+            line="960"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/Chart.java"
+            line="985"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/Chart.java"
+            line="998"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/charts/Chart.java"
+            line="1012"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="46"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="51"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="61"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="76"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="87"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="101"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="113"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="137"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="159"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="    @RequiresApi(11)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/ChartAnimator.java"
+            line="170"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 11"
+        errorLine1="@RequiresApi(11)"
+        errorLine2="~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/animation/Easing.java"
+            line="29"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 18"
+        errorLine1="    @TargetApi(18)"
+        errorLine2="    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/data/LineRadarDataSet.java"
+            line="91"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 24"
+        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/components/MarkerImage.java"
+            line="64"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 24"
+        errorLine1="            if (Build.VERSION.SDK_INT >= 18) {"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/renderer/PieChartRenderer.java"
+            line="805"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 24"
+        errorLine1="        if (Build.VERSION.SDK_INT >= 16)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/utils/Utils.java"
+            line="519"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (3149 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M344.8,285.7C345.7,284.9 346.8,284.2 347.8,283.4C368.5,283.2 389.3,283.4 410,283.3C412.4,283.4 415.1,283.1 417.2,284.7C418.6,286.1 419.8,287.7 420.8,289.4C439.4,326.3 458.1,363.1 476.7,400C484.5,415 492,430.2 498.5,445.8C500.4,449.9 502,454 504,458C505.3,454.8 506.7,451.6 508,448.4C509.5,445.6 510.7,442.8 511.9,439.9C514.2,434.9 516.5,429.9 518.8,424.9C520.3,421.7 521.4,418.3 523.1,415.1C523.8,412.9 525.1,411 525.8,408.9C527.7,405 529.3,401 531.3,397.1C533.3,392.3 535.7,387.7 537.6,382.9C538.5,381.3 539.2,379.6 539.9,377.9C542.2,373.4 544,368.7 546.2,364.1C548.3,359.3 550.8,354.7 552.7,349.9C553.5,348.3 554.2,346.7 555,345C556.1,342.3 557.5,339.6 558.7,336.9C559.7,334.6 560.8,332.3 561.8,329.9C563.8,325.5 565.8,321.2 567.7,316.8C569.7,312.5 571.8,308.3 573.6,303.9C574.5,302.3 575.2,300.6 575.8,298.9C578.1,294.7 579.5,290.1 582.1,286.1C583.5,284.2 585.7,283.1 588,283.4C608.3,283.3 628.7,283.3 649,283.4C651,283.2 653.1,283.8 654.5,285.3C655.5,286.4 656.4,287.6 657.3,288.8C658.2,291 658.7,293.4 657.9,295.6C656.3,300.3 653.3,304.4 651.1,308.9C621.1,364.5 591,420.1 561,475.7C579.7,476 598.3,475.8 617,475.9C621.4,475.9 625.8,475.6 630.1,476.3C631.3,476.8 632.5,477.5 633.5,478.4C637.1,481.6 636.5,486.6 636.6,491C636.1,501.3 637.1,511.6 636.2,521.9C634.6,525.4 631,528.3 627,528.3C597.1,528.3 567.3,528.2 537.4,528.3C537.4,536.8 537.5,545.2 537.4,553.7L537.8,553.7C551.8,554.7 565.9,554.1 580,554.3C594.7,554.3 609.4,554.3 624,554.3C626.7,554.3 629.4,554.6 632,555.2C632.4,555.5 633.1,556.2 633.5,556.5C633.9,556.9 634.5,557.6 634.9,558C637.1,561.2 636.6,565.3 636.7,569C636.5,578.3 636.9,587.7 636.5,597.1C636.5,601.9 631.7,606 627,605.8C610.3,606.2 593.7,605.5 577,605.9C569.7,605.7 562.3,605.7 555,605.9C549.1,605.8 543.2,605.5 537.4,606.2C537.5,639.8 537.4,673.4 537.4,707C537.8,711.8 534.1,715.6 530,717.4C512.7,717.7 495.4,717.4 478.1,717.5C475.1,717.6 472,717.4 469.3,716.1C466.2,713.8 464.3,710 464.4,706.1C464.5,675 464.3,643.8 464.5,612.7C464.5,611.9 464.5,610.5 464.5,609.7C464.5,608.4 464.5,607.1 464.5,605.8C457,605.9 449.5,605.7 442,605.9C427.3,605.7 412.7,605.8 398,605.9C393,605.8 388,605.7 383,605.9C378.2,605.6 372.6,606.8 368.9,603C366.2,600.1 365.1,595.8 366.2,592C365.3,586.4 366.1,580.7 365.9,575.1C365.9,572.1 365.4,569 366.2,566C365.4,564 366.4,561.9 366.7,559.9C368.4,557.1 370.7,554.8 373.9,553.8C404.1,553.5 434.4,553.8 464.6,553.6C464.3,547.7 464.5,541.7 464.5,535.8C464.5,534.5 464.5,533.3 464.5,532.1C464.5,531.2 464.5,529.3 464.5,528.4C438.4,528.2 412.2,528.3 386,528.3C381.6,528.2 377.1,528.6 372.8,527.8C370.3,527 368.5,524.9 367.1,522.9C366.5,521.3 366.1,519.7 365.8,518.1C365.8,508.1 365.8,498 365.8,488C365.8,485.6 366.2,483.3 367.1,481.1C368.8,478.7 371,476.6 373.9,475.8C396.3,475.9 418.6,475.8 441,475.8C440.7,474.3 440.1,473 439.3,471.7C439,471.2 438.5,470.3 438.3,469.8C431.7,458.3 425.4,446.6 418.9,435.1C413.5,425.4 408.2,415.7 402.8,406.1C391.2,385 379.5,364.1 367.8,343C365.5,338.8 363.1,334.5 360.7,330.2C354.8,319.5 348.8,308.8 342.9,298.1C341.5,294.1 341.3,288.7 344.8,285.7M465.3,527.9C464.8,536.7 465,545.5 465.2,554.3C466.9,551.5 465.7,548.1 465.9,545C465.6,539.3 467,533.4 465.3,527.9Z&quot; />"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_launcher_foreground.xml"
+            line="25"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (959 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M633.5,556.5C634.8,555.8 636.1,554.4 637.7,555.3C643.5,557.2 647.8,562.8 648,568.9C648.3,577.9 648,587 648.1,596C648.3,600.4 647.7,605.3 644.7,608.8C641.5,612.3 636.7,614.4 632,614.2C605.6,614.2 579.3,614.2 553,614.2C549.8,613.8 548.6,617.4 548.9,620C549.2,649.3 548.9,678.7 549,708C549.2,714.5 546.4,721.6 540,724.1C531.3,727.1 522,725.7 513,725.3C503.6,725.3 494.3,725.4 485,725.4C480.8,724.9 476,724.2 473,720.8C471.9,720.1 472,718.9 473.1,718.2C475.8,718.7 476.9,721.9 479.7,722.3C482.1,722.7 484.5,722.7 487,722.7C502.3,722.6 517.7,722.7 533,722.6C537.6,722.8 542.1,720.5 544.5,716.5C545.7,714.3 545.6,711.5 545.7,709C545.7,681 545.7,653 545.7,625C545.8,620.9 545,616.2 547.7,612.6C550.4,610.8 553.8,610.8 557,610.8C581.7,610.9 606.3,610.7 631,610.8C634.2,610.8 637.6,610.6 640.6,609.3C643,607.8 644.8,605 644.7,602.1C644.8,591.7 644.7,581.3 644.8,571C644.7,568 645,564.6 642.8,562.3C640.9,559.7 637.7,558.9 634.9,558C634.5,557.6 633.9,556.9 633.5,556.5Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_launcher_foreground.xml"
+            line="74"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (865 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M634.9,558C637.7,558.9 640.9,559.7 642.8,562.3C645,564.6 644.7,568 644.8,571C644.7,581.3 644.8,591.7 644.7,602.1C644.8,605 643,607.8 640.6,609.3C637.6,610.6 634.2,610.8 631,610.8C606.3,610.7 581.7,610.9 557,610.8C553.8,610.8 550.4,610.8 547.7,612.6C545,616.2 545.8,620.9 545.7,625C545.7,653 545.7,681 545.7,709C545.6,711.5 545.7,714.3 544.5,716.5C542.1,720.5 537.6,722.8 533,722.6C517.7,722.7 502.3,722.6 487,722.7C484.5,722.7 482.1,722.7 479.7,722.3C476.9,721.9 475.8,718.7 473.1,718.2C471.6,717.9 470.2,717.4 469.3,716.1C472,717.4 475.1,717.6 478.1,717.5C495.4,717.4 512.7,717.7 530,717.4C534.1,715.6 537.8,711.8 537.4,707C537.4,673.4 537.5,639.8 537.4,606.2C543.2,605.5 549.1,605.8 555,605.9C562.3,605.7 569.7,605.7 577,605.9C593.7,605.5 610.3,606.2 627,605.8C631.7,606 636.5,601.9 636.5,597.1C636.9,587.7 636.5,578.3 636.7,569C636.6,565.3 637.1,561.2 634.9,558Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_launcher_foreground.xml"
+            line="79"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.app_name_online` appears to be unused"
+        errorLine1="    &lt;string name=&quot;app_name_online&quot;>记账本&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="19"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.app_name_dev` appears to be unused"
+        errorLine1="    &lt;string name=&quot;app_name_dev&quot;>记账本-Dev&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="20"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.agree` appears to be unused"
+        errorLine1="    &lt;string name=&quot;agree&quot;>同意&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.error_hint` appears to be unused"
+        errorLine1="    &lt;string name=&quot;error_hint&quot;>格式错误&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings.xml"
+            line="23"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.unselect_asset` appears to be unused"
+        errorLine1="    &lt;string name=&quot;unselect_asset&quot;>不选择资产&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_assets.xml"
+            line="21"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.please_select` appears to be unused"
+        errorLine1="    &lt;string name=&quot;please_select&quot;>请选择&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_assets.xml"
+            line="39"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.current_month_income` appears to be unused"
+        errorLine1="    &lt;string name=&quot;current_month_income&quot;>本月收入&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="20"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.current_month_expend` appears to be unused"
+        errorLine1="    &lt;string name=&quot;current_month_expend&quot;>本月支出&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="21"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.current_month_balance` appears to be unused"
+        errorLine1="    &lt;string name=&quot;current_month_balance&quot;>本月结余&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.used_with_colon` appears to be unused"
+        errorLine1="    &lt;string name=&quot;used_with_colon&quot;>已用：&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="60"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.usable_with_colon` appears to be unused"
+        errorLine1="    &lt;string name=&quot;usable_with_colon&quot;>可用：&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="61"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.save_failure_format` appears to be unused"
+        errorLine1="    &lt;string name=&quot;save_failure_format&quot;>保存失败 code=%1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="65"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.delete_failed` appears to be unused"
+        errorLine1="    &lt;string name=&quot;delete_failed&quot;>删除失败&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="70"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.refund_reimbursed` appears to be unused"
+        errorLine1="    &lt;string name=&quot;refund_reimbursed&quot;>已退款|报销&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_records.xml"
+            line="77"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.please_confirm_password` appears to be unused"
+        errorLine1="    &lt;string name=&quot;please_confirm_password&quot;>请确认密码&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_settings.xml"
+            line="64"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.in_backup` appears to be unused"
+        errorLine1="    &lt;string name=&quot;in_backup&quot;>备份中…&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_settings.xml"
+            line="114"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.in_recovery` appears to be unused"
+        errorLine1="    &lt;string name=&quot;in_recovery&quot;>恢复中…&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_settings.xml"
+            line="115"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.tag_delete_failed` appears to be unused"
+        errorLine1="    &lt;string name=&quot;tag_delete_failed&quot;>标签删除失败&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_tags.xml"
+            line="37"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.type_coffee` appears to be unused"
+        errorLine1="    &lt;string name=&quot;type_coffee&quot;>咖啡&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_type_enum.xml"
+            line="213"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.type_icon_name_balance_adjustment` appears to be unused"
+        errorLine1="    &lt;string name=&quot;type_icon_name_balance_adjustment&quot; translatable=&quot;false&quot;>vector_type_balance_adjustment_24&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_type_enum.xml"
+            line="329"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.type_icon_name_coffee` appears to be unused"
+        errorLine1="    &lt;string name=&quot;type_icon_name_coffee&quot; translatable=&quot;false&quot;>vector_type_coffee_24&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../core/ui/src/main/res/values/strings_type_enum.xml"
+            line="353"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_balance_account` appears to be unused"
+        errorLine1="&lt;vector android:height=&quot;24dp&quot; android:viewportHeight=&quot;1024&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_balance_account.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_bank_anh_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_bank_anh_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_accessories_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_accessories_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_account_transfer_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_account_transfer_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_alimony_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_alimony_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_amusement_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_amusement_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_at_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_at_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_ats_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_ats_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_auto_parts_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_auto_parts_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_bag_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_bag_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_balance_adjustment_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_balance_adjustment_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_bath_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_bath_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_beauty_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_beauty_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_benefit_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_benefit_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_bicycle_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_bicycle_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_body_hair_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_body_hair_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_bond_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_bond_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_bonus_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_bonus_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_books_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_books_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_books_education_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_books_education_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_borrow_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_borrow_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_breakfast_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_breakfast_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_bus_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_bus_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_buy_food_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_buy_food_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_call_charge_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_call_charge_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_camera_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_camera_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_car_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_car_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_car_charge_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_car_charge_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_car_inspection_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_car_inspection_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_car_insurance_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_car_insurance_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_car_loan_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_car_loan_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_car_maintenance_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_car_maintenance_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_car_wash_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_car_wash_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_cash_gift_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_cash_gift_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_charge_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_charge_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_child_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_child_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_clean_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_clean_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_clothes_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_clothes_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_coat_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_coat_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_communication_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_communication_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_convert_payment_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_convert_payment_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_credit_card_payment_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_credit_card_payment_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_daily_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_daily_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_daily_necessities_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_daily_necessities_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_deposit_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_deposit_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_dessert_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_dessert_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_diagnose_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_diagnose_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_diapers_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_diapers_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_digital_product_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_digital_product_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_dining_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_dining_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_dinner_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_dinner_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_dividend_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_dividend_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_drinks_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_drinks_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_drug_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_drug_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_early_education_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_early_education_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_electrical_appliance_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_electrical_appliance_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_electricity_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_electricity_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_exam_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_exam_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_excursion_fare_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_excursion_fare_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_express_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_express_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_family_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_family_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_family_trip_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_family_trip_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_feeder_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_feeder_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_food_ingredient_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_food_ingredient_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_forex_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_forex_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_fruit_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_fruit_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_fund_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_fund_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_furniture_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_furniture_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_game_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_game_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_garbage_fee_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_garbage_fee_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_gas_charge_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_gas_charge_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_gift_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_gift_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_gold_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_gold_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_haircut_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_haircut_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_hat_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_hat_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_heating_fee_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_heating_fee_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_hospitalization_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_hospitalization_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_hotel_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_hotel_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_house_loan_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_house_loan_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_house_rent_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_house_rent_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_housing_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_housing_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_hygiene_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_hygiene_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_illegal_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_illegal_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_interpersonal_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_interpersonal_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_investment_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_investment_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_kids_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_kids_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_kitchen_daily_necessities_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_kitchen_daily_necessities_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_lend_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_lend_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_life_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_life_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_love_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_love_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_lucky_money_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_lucky_money_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_lunch_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_lunch_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_medical_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_medical_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_medicare_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_medicare_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_medkit_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_medkit_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_member_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_member_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_milk_powder_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_milk_powder_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_mobile_phone_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_mobile_phone_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_mobile_phone_accessories_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_mobile_phone_accessories_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_money_management_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_money_management_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_movie_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_movie_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_net_fee_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_net_fee_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_other_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_other_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_pants_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_pants_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_parent_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_parent_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_parenting_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_parenting_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_parking_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_parking_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_party_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_party_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_pet_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_pet_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_plane_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_plane_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_pocket_money_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_pocket_money_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_proceeds_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_proceeds_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_property_costs_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_property_costs_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_provident_fund_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_provident_fund_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_refuel_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_refuel_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_refund_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_refund_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_registration_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_registration_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_reimburse_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_reimburse_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_rent_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_rent_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_repair_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_repair_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_repayment_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_repayment_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_royalty_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_royalty_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_salary_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_salary_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_scholarship_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_scholarship_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_ship_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_ship_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_shoes_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_shoes_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_shopping_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_shopping_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_show_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_show_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_sing_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_sing_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_snacks_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_snacks_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_socks_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_socks_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_souvenir_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_souvenir_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_sport_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_sport_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_stationery_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_stationery_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_study_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_study_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_subway_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_subway_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_supper_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_supper_24.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_supplementary_food_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_supplementary_food_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_takeaway_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_takeaway_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_tax_rebate_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_tax_rebate_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_taxi_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_taxi_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_three_meals_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_three_meals_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_tickets_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_tickets_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_toll_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_toll_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_toy_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_toy_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_traffic_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_traffic_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_train_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_train_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_training_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_training_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_travel_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_travel_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_treat_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_treat_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_type_proceeds_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_type_proceeds_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_underwear_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_underwear_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_vaccination_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_vaccination_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_water_rate_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_water_rate_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_windfall_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_windfall_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.vector_type_withdrawals_24` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../core/ui/src/main/res/drawable/vector_type_withdrawals_24.xml"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="IconMissingDensityFolder"
+        message="Missing density variation folders in `src\main\res`: drawable-hdpi, drawable-mdpi, drawable-xxhdpi">
+        <location
+            file="src/main/res"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `MarkerView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="public class MarkerView extends RelativeLayout implements IMarker {"
+        errorLine2="             ~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/components/MarkerView.java"
+            line="39"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        message="`OnDrawLineChartTouchListener#onTouch` should call `View#performClick` when a click is detected"
+        errorLine1=" public boolean onTouch(View v, MotionEvent event) {"
+        errorLine2="                ~~~~~~~">
+        <location
+            file="src/main/java/com/github/mikephil/charting/listener/OnDrawLineChartTouchListener.java"
+            line="27"
+            column="17"/>
+    </issue>
+
+</issues>

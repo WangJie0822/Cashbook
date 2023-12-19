@@ -18,7 +18,6 @@ package cn.wj.android.cashbook.sync.service
 
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import cn.wj.android.cashbook.core.common.SERVICE_ACTION_CANCEL_DOWNLOAD
 import cn.wj.android.cashbook.core.common.SERVICE_ACTION_RETRY_DOWNLOAD
@@ -78,12 +77,7 @@ class UpgradeService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_DETACH)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(false)
-        }
+        stopForeground(STOP_FOREGROUND_DETACH)
         coroutineScope.cancel()
     }
 }
