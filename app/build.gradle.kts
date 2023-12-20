@@ -90,7 +90,7 @@ android {
         create("benchmarks") {
             initWith(release)
             matchingFallbacks.add("release")
-            applicationIdSuffix = CashbookBuildType.Release.applicationIdSuffix
+            applicationIdSuffix = CashbookBuildType.Benchmarks.applicationIdSuffix
             signingConfig = release.signingConfig
         }
         getByName("debug") {
@@ -230,6 +230,7 @@ dependencies {
 
     debugImplementation(libs.didi.dokit.core)
     releaseImplementation(libs.didi.dokit.noop)
+    add("benchmarksImplementation", libs.didi.dokit.noop)
 }
 
 baselineProfile {
