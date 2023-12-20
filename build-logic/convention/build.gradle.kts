@@ -33,9 +33,6 @@ tasks.withType<KotlinCompile>().configureEach {
         jvmTarget = javaVersion.toString()
     }
 }
-kotlin {
-    jvmToolchain(javaVersion.ordinal + 1)
-}
 
 dependencies {
     compileOnly(libs.android.gradle.plugin)
@@ -43,6 +40,7 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.google.devtools.ksp.gradle.plugin)
     compileOnly(libs.squareup.javapoet)
+    implementation(libs.google.truth)
 }
 
 tasks {

@@ -38,12 +38,16 @@ google-devtools-ksp = "1.9.21-1.0.15"
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
 google-protobuf = "3.24.4"
 google-protobuf-plugin = "0.9.4"
+# 测试断言 [Github](https://github.com/google/truth)
+# [版本查询](https://mvnrepository.com/artifact/com.google.truth)
+google-truth = "1.2.0"
 # hilt [指南](https://dagger.dev/hilt)
 # [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
 google-hilt = "2.48.1"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
 androidx-hilt = "1.1.0"
+
 
 # Roborazzi 测试工具 [Github](https://github.com/takahirom/roborazzi)
 # [版本查询](https://mvnrepository.com/artifact/io.github.takahirom.roborazzi)
@@ -283,6 +287,9 @@ google-protobuf-protoc = { group = "com.google.protobuf", name = "protoc", versi
 google-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "google-hilt" }
 google-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "google-hilt" }
 google-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "google-hilt" }
+# 测试断言 [Github](https://github.com/google/truth)
+# [版本查询](https://mvnrepository.com/artifact/com.google.truth)
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "google-truth" }
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
 androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidx-hilt" }

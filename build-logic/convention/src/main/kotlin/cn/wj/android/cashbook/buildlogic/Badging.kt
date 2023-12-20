@@ -20,8 +20,10 @@ import com.android.SdkConstants
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
+import com.google.common.truth.Truth
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -39,9 +41,6 @@ import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
-import java.io.File
-import java.nio.file.Files
-import javax.inject.Inject
 
 @CacheableTask
 abstract class GenerateBadgingTask : DefaultTask() {
@@ -98,17 +97,12 @@ abstract class CheckBadgingTask : DefaultTask() {
 
     @TaskAction
     fun taskAction() {
-        if (
-            Files.mismatch(
-                goldenBadging.get().asFile.toPath(),
-                generatedBadging.get().asFile.toPath(),
-            ) != -1L
-        ) {
-            throw GradleException(
-                "Generated badging is different from golden badging! " +
+        Truth.assertWithMessage(
+            "Generated badging is different from golden badging! " +
                     "If this change is intended, run ./gradlew ${updateBadgingTaskName.get()}",
-            )
-        }
+        )
+            .that(generatedBadging.get().asFile.readText())
+            .isEqualTo(goldenBadging.get().asFile.readText())
     }
 }
 
@@ -130,8 +124,8 @@ fun Project.configureBadgingTasks(
                     File(
                         baseExtension.sdkDirectory,
                         "${SdkConstants.FD_BUILD_TOOLS}/" +
-                            "${baseExtension.buildToolsVersion}/" +
-                            SdkConstants.FN_AAPT2,
+                                "${baseExtension.buildToolsVersion}/" +
+                                SdkConstants.FN_AAPT2,
                     ),
                 )
 

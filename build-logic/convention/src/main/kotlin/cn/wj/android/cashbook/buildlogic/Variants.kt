@@ -84,7 +84,6 @@ fun Project.configureFlavors(
 
         // 配置维度
         flavorDimensions += FlavorDimension.values().map { it.name }
-        println("> Task :${project.name}:configureFlavors set dimensions: $flavorDimensions")
 
         // 多渠道配置
         productFlavors {
@@ -95,7 +94,6 @@ fun Project.configureFlavors(
             CashbookFlavor.values().forEach {
                 create(it.name) {
                     dimension = it.dimension.name
-                    println("> Task :${project.name}:configureFlavors set flavors: ${it.name}")
                     flavorConfigurationBlock(this, it)
                     if (this@apply is BaseAppModuleExtension && this is ApplicationProductFlavor) {
                         it.applicationIdSuffix?.let { suffix ->
