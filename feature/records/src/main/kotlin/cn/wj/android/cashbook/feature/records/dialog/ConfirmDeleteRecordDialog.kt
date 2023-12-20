@@ -16,12 +16,12 @@
 
 package cn.wj.android.cashbook.feature.records.dialog
 
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.viewmodel.ConfirmDeleteRecordDialogViewModel
@@ -47,18 +47,18 @@ internal fun ConfirmDeleteRecordDialog(
     onDeleteRecordConfirm: () -> Unit,
     onDialogDismiss: () -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDialogDismiss,
         text = {
             Text(text = stringResource(id = R.string.record_delete_hint))
         },
         confirmButton = {
-            TextButton(onClick = onDeleteRecordConfirm) {
+            CbTextButton(onClick = onDeleteRecordConfirm) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDialogDismiss) {
+            CbTextButton(onClick = onDialogDismiss) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },

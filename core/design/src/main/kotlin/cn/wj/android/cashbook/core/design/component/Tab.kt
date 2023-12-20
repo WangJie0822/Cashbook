@@ -17,58 +17,57 @@
 package cn.wj.android.cashbook.core.design.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.FloatingActionButtonElevation
-import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.contentColorFor
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 
 @Composable
-fun CbFloatingActionButton(
+fun CbTab(
+    selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    shape: Shape = FloatingActionButtonDefaults.shape,
-    containerColor: Color = FloatingActionButtonDefaults.containerColor,
-    contentColor: Color = contentColorFor(containerColor),
-    elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    enabled: Boolean = true,
+    text: @Composable (() -> Unit)? = null,
+    icon: @Composable (() -> Unit)? = null,
+    selectedContentColor: Color = LocalContentColor.current,
+    unselectedContentColor: Color = selectedContentColor,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable () -> Unit,
 ) {
-    FloatingActionButton(
+    Tab(
+        selected = selected,
         onClick = onClick,
         modifier = modifier,
-        shape = shape,
-        containerColor = containerColor,
-        contentColor = contentColor,
-        elevation = elevation,
+        enabled = enabled,
+        text = text,
+        icon = icon,
+        selectedContentColor = selectedContentColor,
+        unselectedContentColor = unselectedContentColor,
         interactionSource = interactionSource,
-        content = content,
     )
 }
 
 @Composable
-fun CbSmallFloatingActionButton(
+fun CbTab(
+    selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    shape: Shape = FloatingActionButtonDefaults.smallShape,
-    containerColor: Color = FloatingActionButtonDefaults.containerColor,
-    contentColor: Color = contentColorFor(containerColor),
-    elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    enabled: Boolean = true,
+    selectedContentColor: Color = LocalContentColor.current,
+    unselectedContentColor: Color = selectedContentColor,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    SmallFloatingActionButton(
+    Tab(
+        selected = selected,
         onClick = onClick,
         modifier = modifier,
-        shape = shape,
-        containerColor = containerColor,
-        contentColor = contentColor,
-        elevation = elevation,
+        enabled = enabled,
+        selectedContentColor = selectedContentColor,
+        unselectedContentColor = unselectedContentColor,
         interactionSource = interactionSource,
         content = content,
     )

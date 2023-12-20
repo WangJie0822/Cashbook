@@ -55,7 +55,7 @@ import androidx.compose.material.icons.filled.WebAsset
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/10
  */
-object CashbookIcons {
+object CbIcons {
 
     val ArrowBack = Icons.Filled.ArrowBack
     val KeyboardArrowRight = Icons.Filled.KeyboardArrowRight

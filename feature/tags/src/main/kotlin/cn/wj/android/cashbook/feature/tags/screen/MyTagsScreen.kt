@@ -28,7 +28,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,10 +39,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -103,15 +103,15 @@ internal fun MyTagsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = R.string.my_tags)) },
                 actions = {
-                    IconButton(onClick = { onEditTagClick(null) }) {
-                        Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+                    CbIconButton(onClick = { onEditTagClick(null) }) {
+                        Icon(imageVector = CbIcons.Add, contentDescription = null)
                     }
                 },
             )

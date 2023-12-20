@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.fixedContentColorFor
 
 @Composable
@@ -65,7 +65,7 @@ fun TypeIcon(
                     .background(color = contentColor, shape = CircleShape)
                     .padding(1.dp)
                     .background(color = containerColor, shape = CircleShape),
-                imageVector = CashbookIcons.MoreHoriz,
+                imageVector = CbIcons.MoreHoriz,
                 contentDescription = null,
                 tint = contentColor,
             )

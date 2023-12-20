@@ -29,12 +29,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import com.xxmassdeveloper.mpchartexample.notimportant.MainActivity as ChartMainActivity
 
@@ -69,9 +69,9 @@ class MainActivity : AppCompatActivity() {
                 darkTheme = darkTheme,
                 disableDynamicTheming = false,
             ) {
-                CashbookScaffold(
+                CbScaffold(
                     topBar = {
-                        TopAppBar(title = { Text(text = "app-catalog") })
+                        CbTopAppBar(title = { Text(text = "app-catalog") })
                     },
                     content = { paddingValues ->
                         Column(
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                                 .fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            TextButton(
+                            CbTextButton(
                                 onClick = {
                                     startActivity(
                                         Intent(

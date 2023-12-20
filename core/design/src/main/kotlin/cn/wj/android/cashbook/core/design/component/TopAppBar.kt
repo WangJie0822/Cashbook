@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
@@ -32,7 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 
 /**
@@ -45,7 +44,7 @@ import cn.wj.android.cashbook.core.design.theme.CashbookTheme
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CashbookTopAppBar(
+fun CbTopAppBar(
     title: @Composable () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -54,13 +53,13 @@ fun CashbookTopAppBar(
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    CashbookTopAppBar(
+    CbTopAppBar(
         title = title,
         modifier = modifier,
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
+            CbIconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = CashbookIcons.ArrowBack,
+                    imageVector = CbIcons.ArrowBack,
                     contentDescription = null,
                 )
             }
@@ -74,7 +73,7 @@ fun CashbookTopAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CashbookTopAppBar(
+fun CbTopAppBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
@@ -102,10 +101,10 @@ fun CommonTopBarPreview() {
     CashbookTheme {
         CashbookGradientBackground {
             Column {
-                CashbookTopAppBar(title = { Text(text = "标题") }, onBackClick = { })
-                CashbookTopAppBar(title = { Text(text = "标题") }, onBackClick = { }, actions = {
-                    IconButton(onClick = { }) {
-                        Icon(imageVector = CashbookIcons.Menu, contentDescription = null)
+                CbTopAppBar(title = { Text(text = "标题") }, onBackClick = { })
+                CbTopAppBar(title = { Text(text = "标题") }, onBackClick = { }, actions = {
+                    CbIconButton(onClick = { }) {
+                        Icon(imageVector = CbIcons.Menu, contentDescription = null)
                     }
                 })
             }

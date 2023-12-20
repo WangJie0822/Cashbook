@@ -29,13 +29,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -45,12 +42,9 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,18 +62,24 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.CompatOutlinedTextField
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbElevatedCard
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbOutlinedTextField
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTab
+import cn.wj.android.cashbook.core.design.component.CbTabRow
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -182,7 +182,7 @@ internal fun MyCategoriesScreen(
         }
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
             MyCategoriesTopBar(
@@ -192,8 +192,8 @@ internal fun MyCategoriesScreen(
             )
         },
         floatingActionButton = {
-            CashbookFloatingActionButton(onClick = onRequestAddFirstType) {
-                Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+            CbFloatingActionButton(onClick = onRequestAddFirstType) {
+                Icon(imageVector = CbIcons.Add, contentDescription = null)
             }
         },
         snackbarHost = {
@@ -275,7 +275,7 @@ private fun EditTypeSheet(
     data: MyCategoriesDialogData.EditType,
     onRequestSaveRecordType: (Long, Long, String, String) -> Unit,
 ) {
-    CashbookModalBottomSheet(
+    CbModalBottomSheet(
         onDismissRequest = onRequestDismissDialog,
         sheetState = rememberModalBottomSheetState(
             confirmValueChange = {
@@ -320,7 +320,7 @@ private fun EditTypeSheet(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                 )
-                TextButton(
+                CbTextButton(
                     onClick = {
                         if (editTypeName.isValid) {
                             onRequestSaveRecordType(
@@ -371,7 +371,7 @@ private fun EditTypeSheet(
                     modifier = Modifier
                         .padding(bottom = 8.dp),
                 )
-                CompatOutlinedTextField(
+                CbOutlinedTextField(
                     textFieldState = editTypeName,
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -411,7 +411,7 @@ private fun DeleteTypeDialog(
     data: MyCategoriesDialogData.DeleteType,
     changeRecordTypeBeforeDelete: (Long, Long) -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onRequestDismissDialog,
         title = {
             Text(
@@ -430,7 +430,7 @@ private fun DeleteTypeDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = onRequestDismissDialog) {
+            CbTextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -443,29 +443,31 @@ private fun SelectFirstTypeDialog(
     data: MyCategoriesDialogData.SelectFirstType,
     changeFirstTypeToSecond: (Long, Long) -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onRequestDismissDialog,
         title = { Text(text = stringResource(id = R.string.select_first_type_to_move)) },
         text = {
-            LazyColumn(content = {
-                items(items = data.typeList) { first ->
-                    TransparentListItem(
-                        leadingContent = {
-                            Icon(
-                                painter = painterDrawableResource(idStr = first.iconName),
-                                contentDescription = null,
-                            )
-                        },
-                        headlineContent = { Text(text = first.name) },
-                        modifier = Modifier.clickable {
-                            changeFirstTypeToSecond(data.id, first.id)
-                        },
-                    )
-                }
-            })
+            LazyColumn(
+                content = {
+                    items(items = data.typeList) { first ->
+                        CbListItem(
+                            leadingContent = {
+                                Icon(
+                                    painter = painterDrawableResource(idStr = first.iconName),
+                                    contentDescription = null,
+                                )
+                            },
+                            headlineContent = { Text(text = first.name) },
+                            modifier = Modifier.clickable {
+                                changeFirstTypeToSecond(data.id, first.id)
+                            },
+                        )
+                    }
+                },
+            )
         },
         confirmButton = {
-            TextButton(onClick = onRequestDismissDialog) {
+            CbTextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -535,7 +537,7 @@ private fun DialogExpandableTypeList(
             typeList.forEach { first ->
                 val hasChild = first.list.isNotEmpty()
                 item {
-                    TransparentListItem(
+                    CbListItem(
                         leadingContent = {
                             Icon(
                                 painter = painterDrawableResource(idStr = first.data.iconName),
@@ -545,12 +547,12 @@ private fun DialogExpandableTypeList(
                         headlineContent = { Text(text = first.data.name) },
                         trailingContent = {
                             if (hasChild) {
-                                IconButton(onClick = { first.expanded = !first.expanded }) {
+                                CbIconButton(onClick = { first.expanded = !first.expanded }) {
                                     Icon(
                                         imageVector = if (first.expanded) {
-                                            CashbookIcons.KeyboardArrowDown
+                                            CbIcons.KeyboardArrowDown
                                         } else {
-                                            CashbookIcons.KeyboardArrowRight
+                                            CbIcons.KeyboardArrowRight
                                         },
                                         contentDescription = null,
                                     )
@@ -560,7 +562,7 @@ private fun DialogExpandableTypeList(
                         modifier = Modifier.clickable { onTypeItemClick(first.data.id) },
                     )
                     if (first.expanded && hasChild) {
-                        ElevatedCard(Modifier.padding(horizontal = 8.dp)) {
+                        CbElevatedCard(Modifier.padding(horizontal = 8.dp)) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 val col = if (first.list.size % RECORD_TYPE_COLUMNS == 0) {
                                     first.list.size / RECORD_TYPE_COLUMNS
@@ -636,7 +638,7 @@ private fun FirstTypeItem(
         var expandedMenu by remember {
             mutableStateOf(false)
         }
-        TransparentListItem(
+        CbListItem(
             colors = ListItemDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
             ),
@@ -649,12 +651,12 @@ private fun FirstTypeItem(
             headlineContent = { Text(text = first.data.name) },
             trailingContent = {
                 if (hasChild) {
-                    IconButton(onClick = { first.expanded = !first.expanded }) {
+                    CbIconButton(onClick = { first.expanded = !first.expanded }) {
                         Icon(
                             imageVector = if (first.expanded) {
-                                CashbookIcons.KeyboardArrowDown
+                                CbIcons.KeyboardArrowDown
                             } else {
-                                CashbookIcons.KeyboardArrowRight
+                                CbIcons.KeyboardArrowRight
                             },
                             contentDescription = null,
                         )
@@ -777,7 +779,7 @@ private fun SecondTypeList(
     onRequestSetReimburseType: (Long) -> Unit,
     onRequestSetCreditCardPaymentType: (Long) -> Unit,
 ) {
-    ElevatedCard(Modifier.padding(horizontal = 8.dp)) {
+    CbElevatedCard(Modifier.padding(horizontal = 8.dp)) {
         Column(modifier = Modifier.fillMaxWidth()) {
             val col = if (first.list.size % RECORD_TYPE_COLUMNS == 0) {
                 first.list.size / RECORD_TYPE_COLUMNS
@@ -992,12 +994,12 @@ internal fun MyCategoriesTopBar(
     onTabSelected: (RecordTypeCategoryEnum) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    CashbookTopAppBar(
+    CbTopAppBar(
         onBackClick = onBackClick,
         title = {
             if (uiState is MyCategoriesUiState.Success) {
                 val selectedTab = uiState.selectedTab
-                TabRow(
+                CbTabRow(
                     modifier = Modifier.fillMaxSize(),
                     selectedTabIndex = selectedTab.ordinal,
                     containerColor = Color.Unspecified,
@@ -1011,7 +1013,7 @@ internal fun MyCategoriesTopBar(
                     divider = {},
                 ) {
                     RecordTypeCategoryEnum.entries.forEach { enum ->
-                        Tab(
+                        CbTab(
                             selected = selectedTab == enum,
                             onClick = { onTabSelected(enum) },
                             text = { Text(text = enum.text) },

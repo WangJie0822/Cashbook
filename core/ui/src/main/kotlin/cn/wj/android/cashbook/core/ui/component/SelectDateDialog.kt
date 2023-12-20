@@ -41,7 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import cn.wj.android.cashbook.core.design.component.CommonDivider
+import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.ui.R
 import java.time.YearMonth
 import java.util.Calendar
@@ -103,7 +103,7 @@ fun SelectDateDialog(
                         }
                     },
                 )
-                CommonDivider(modifier = Modifier.fillMaxWidth())
+                CbDivider(modifier = Modifier.fillMaxWidth())
                 Column(
                     modifier = Modifier
                         .fillMaxWidth(),

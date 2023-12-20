@@ -36,16 +36,18 @@ import dagger.hilt.android.HiltAndroidApp
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/5/11
  */
 @HiltAndroidApp
-class MyApplication : Application() {
+class CashbookApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
 
         // 初始化应用信息
-        ApplicationInfo.setFlavor(BuildConfig.FLAVOR)
-        ApplicationInfo.applicationId = BuildConfig.APPLICATION_ID
-        ApplicationInfo.versionName = BuildConfig.VERSION_NAME
-        ApplicationInfo.debug = BuildConfig.DEBUG
+        with(ApplicationInfo) {
+            setFlavor(BuildConfig.FLAVOR)
+            applicationId = BuildConfig.APPLICATION_ID
+            versionName = BuildConfig.VERSION_NAME
+            debug = BuildConfig.DEBUG
+        }
 
         // 注册应用管理
         AppManager.register(this)
@@ -56,12 +58,14 @@ class MyApplication : Application() {
             .headerPriority(Log.WARN)
             .tag("CASHBOOK")
             .build()
-        Logger.addLogAdapter(object : AndroidLogAdapter(strategy) {
-            override fun isLoggable(priority: Int, tag: String?): Boolean {
-                return BuildConfig.DEBUG
-            }
-        })
-        logger().d("MyApplication onCreate ${BuildConfig.VERSION_NAME}")
+        Logger.addLogAdapter(
+            object : AndroidLogAdapter(strategy) {
+                override fun isLoggable(priority: Int, tag: String?): Boolean {
+                    return BuildConfig.DEBUG
+                }
+            },
+        )
+        logger().d("Application onCreate ${BuildConfig.VERSION_NAME}")
 
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             logger("UncaughtException").e(throwable, "UncaughtException $thread")

@@ -78,9 +78,25 @@ class DesignDetector : Detector(), Detector.UastScanner {
         // instead of hardcoded names.
         val METHOD_NAMES = mapOf(
             "MaterialTheme" to "CashbookTheme",
+            "TopAppBar" to "CbTopAppBar",
+            "Scaffold" to "CbScaffold",
+            "Divider" to "CbDivider",
+            "TextField" to "CbTextField",
+            "OutlinedTextField" to "CbOutlinedTextField",
+            "FloatingActionButton" to "CbFloatingActionButton",
+            "SmallFloatingActionButton" to "CbSmallFloatingActionButton",
+            "ListItem" to "CbListItem",
+            "ModalBottomSheet" to "CbModalBottomSheet",
+            "TextButton" to "CbTextButton",
+            "IconButton" to "CbIconButton",
+            "Card" to "CbCard",
+            "ElevatedCard" to "CbElevatedCard",
+            "AlertDialog" to "CbAlertDialog",
+            "Tab" to "CbTab",
+            "TabRow" to "CbTabRow",
         )
         val RECEIVER_NAMES = mapOf(
-            "Icons" to "CashbookIcons",
+            "Icons" to "CbIcons",
         )
 
         fun reportIssue(

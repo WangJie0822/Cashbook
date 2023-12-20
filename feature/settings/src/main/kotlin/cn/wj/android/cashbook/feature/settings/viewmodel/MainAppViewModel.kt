@@ -68,6 +68,9 @@ class MainAppViewModel @Inject constructor(
     /** 标记 - 是否已认证 */
     private val _verified = MutableStateFlow(false)
 
+    /** 认证结果 */
+    var verifyState by mutableStateOf(SettingPasswordStateEnum.SUCCESS)
+
     var firstOpen by mutableStateOf(true)
         private set
 
@@ -152,21 +155,21 @@ class MainAppViewModel @Inject constructor(
     private val _verificationMode = settingRepository.appDataMode
         .mapLatest { it.verificationModel }
 
-    /** 确认认证，使用 [pwd] 进行认证并将认证结果回调 [callback] */
-    fun onVerityConfirm(pwd: String, callback: (SettingPasswordStateEnum) -> Unit) {
+    /** 确认认证，使用 [pwd] 进行认证 */
+    fun onVerityConfirm(pwd: String) {
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
             val passwordIv = _passwordIv.first()
             val bytes = passwordIv.hexToBytes()
             if (null == bytes) {
-                callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
+                verifyState = SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
                 return@launch
             }
             val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, bytes)
             val pwdSha = cipher.doFinal(_passwordInfo.first().hexToBytes()).decodeToString()
             if (pwd.shaEncode() != pwdSha) {
                 // 密码错误，提示
-                callback.invoke(SettingPasswordStateEnum.PASSWORD_WRONG)
+                verifyState = SettingPasswordStateEnum.PASSWORD_WRONG
                 return@launch
             }
 

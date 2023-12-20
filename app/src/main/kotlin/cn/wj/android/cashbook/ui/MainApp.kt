@@ -28,16 +28,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -63,11 +59,16 @@ import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.PRIVACY_POLICY_FILE_PATH
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbPasswordTextField
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.component.PasswordTextField
+import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberLifecycleObserver
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
@@ -150,7 +151,7 @@ fun MainApp(
 
     CashbookGradientBackground {
         val navController = rememberNavController()
-        val snackbarHostState = remember { SnackbarHostState() }
+        val snackbarHostState = rememberSnackbarHostState()
 
         val onShowSnackbar: suspend (String, String?) -> SnackbarResult = { message, action ->
             snackbarHostState.showSnackbar(
@@ -160,7 +161,7 @@ fun MainApp(
         }
 
         CompositionLocalProvider(LocalNavController provides navController) {
-            CashbookScaffold(
+            CbScaffold(
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 snackbarHost = { SnackbarHost(snackbarHostState) },
             ) { paddingValues ->
@@ -205,8 +206,9 @@ fun MainApp(
                     uiState = uiState,
                     onAgreeProtocolClick = viewModel::agreeProtocol,
                     firstOpen = viewModel.firstOpen,
+                    verifyState = viewModel.verifyState,
                     dialogState = viewModel.dialogState,
-                    onVerifyConfirmClick = viewModel::onVerityConfirm,
+                    onRequestVerifyPassword = viewModel::onVerityConfirm,
                     onFingerprintClick = viewModel::showFingerprintVerify,
                     onFingerprintVerifySuccess = viewModel::onFingerprintVerifySuccess,
                     onFingerprintVerifyError = viewModel::onFingerprintVerifyError,
@@ -237,8 +239,9 @@ private fun MainAppScreen(
     uiState: MainAppUiState,
     onAgreeProtocolClick: () -> Unit,
     firstOpen: Boolean,
+    verifyState: SettingPasswordStateEnum,
     dialogState: DialogState,
-    onVerifyConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
+    onRequestVerifyPassword: (String) -> Unit,
     onFingerprintClick: () -> Unit,
     onFingerprintVerifySuccess: (Cipher) -> Unit,
     onFingerprintVerifyError: (Int, String) -> Unit,
@@ -269,7 +272,7 @@ private fun MainAppScreen(
                     if (needRequestProtocol) {
                         // 显示用户隐私协议
                         val currentActivity = LocalContext.current as? Activity
-                        AlertDialog(
+                        CbAlertDialog(
                             onDismissRequest = { currentActivity?.finish() },
                             title = { Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy)) },
                             text = {
@@ -301,12 +304,12 @@ private fun MainAppScreen(
                                 )
                             },
                             confirmButton = {
-                                TextButton(onClick = onAgreeProtocolClick) {
+                                CbTextButton(onClick = onAgreeProtocolClick) {
                                     Text(text = stringResource(id = R.string.confirm))
                                 }
                             },
                             dismissButton = {
-                                TextButton(onClick = { currentActivity?.finish() }) {
+                                CbTextButton(onClick = { currentActivity?.finish() }) {
                                     Text(text = stringResource(id = R.string.cancel))
                                 }
                             },
@@ -335,8 +338,9 @@ private fun MainAppScreen(
                         Verification(
                             firstOpen = firstOpen,
                             supportFingerprint = supportFingerprint,
+                            verifyState = verifyState,
                             dialogState = dialogState,
-                            onConfirmClick = onVerifyConfirmClick,
+                            onRequestVerifyPassword = onRequestVerifyPassword,
                             onFingerprintClick = onFingerprintClick,
                             onFingerprintVerifySuccess = onFingerprintVerifySuccess,
                             onFingerprintVerifyError = onFingerprintVerifyError,
@@ -543,7 +547,7 @@ fun CashbookNavHost(
  * @param firstOpen 是否是第一打开，用于支持指纹识别时自动拉起指纹认证
  * @param supportFingerprint 是否支持指纹识别
  * @param dialogState 弹窗状态
- * @param onConfirmClick 安全认证确认点击回调，参数：(密码, 认证回调(认证结果[SettingPasswordStateEnum] -> [Unit])) -> [Unit]
+ * @param onRequestVerifyPassword 安全认证确认点击回调，参数：(密码, 认证回调(认证结果[SettingPasswordStateEnum] -> [Unit])) -> [Unit]
  * @param onFingerprintClick 指纹识别点击回调
  * @param onFingerprintVerifySuccess 指纹认证成功回调，参数：(数据解码对象) -> [Unit]
  * @param onFingerprintVerifyError 指纹认证失败回调，参数：(错误码, 提示文本) -> [Unit]
@@ -552,8 +556,9 @@ fun CashbookNavHost(
 internal fun Verification(
     firstOpen: Boolean,
     supportFingerprint: Boolean,
+    verifyState: SettingPasswordStateEnum,
     dialogState: DialogState,
-    onConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
+    onRequestVerifyPassword: (String) -> Unit,
     onFingerprintClick: () -> Unit,
     onFingerprintVerifySuccess: (Cipher) -> Unit,
     onFingerprintVerifyError: (Int, String) -> Unit,
@@ -617,52 +622,35 @@ internal fun Verification(
                 val passwordDecodeFailedText =
                     stringResource(id = R.string.password_decode_failed)
 
-                var pwd by remember {
-                    mutableStateOf("")
-                }
-                var pwdError by remember {
-                    mutableStateOf(false)
-                }
-                var pwdSupportText by remember {
-                    mutableStateOf("")
+                val pwdTextFieldState = remember {
+                    TextFieldState(
+                        validator = {
+                            it.isNotBlank() && it.isMatch(PASSWORD_REGEX)
+                        },
+                        errorFor = {
+                            when {
+                                it.isBlank() -> passwordMustNotBeBlankText
+                                !it.isMatch(PASSWORD_REGEX) -> passwordFormatErrorText
+                                verifyState == SettingPasswordStateEnum.PASSWORD_WRONG -> passwordWrongText
+                                verifyState == SettingPasswordStateEnum.PASSWORD_DECODE_FAILED -> passwordDecodeFailedText
+                                else -> ""
+                            }
+                        },
+                    )
                 }
 
-                PasswordTextField(
+                CbPasswordTextField(
                     modifier = Modifier
                         .padding(vertical = 8.dp)
                         .weight(1f),
-                    initializedText = pwd,
-                    label = stringResource(id = R.string.please_enter_password),
-                    isError = pwdError,
-                    supportingText = pwdSupportText,
-                    onValueChange = { pwd = it },
+                    textFieldState = pwdTextFieldState,
+                    label = { Text(text = stringResource(id = R.string.please_enter_password)) },
                 )
 
-                TextButton(
+                CbTextButton(
                     onClick = {
-                        when {
-                            pwd.isBlank() -> {
-                                pwdError = true
-                                pwdSupportText = passwordMustNotBeBlankText
-                            }
-
-                            !pwd.isMatch(PASSWORD_REGEX) -> {
-                                pwdError = true
-                                pwdSupportText = passwordFormatErrorText
-                            }
-
-                            else -> {
-                                onConfirmClick.invoke(pwd) { result ->
-                                    if (result == SettingPasswordStateEnum.PASSWORD_WRONG) {
-                                        // 密码错误
-                                        pwdError = true
-                                        pwdSupportText = passwordWrongText
-                                    } else if (result == SettingPasswordStateEnum.PASSWORD_DECODE_FAILED) {
-                                        pwdError = true
-                                        pwdSupportText = passwordDecodeFailedText
-                                    }
-                                }
-                            }
+                        if (pwdTextFieldState.isValid) {
+                            onRequestVerifyPassword(pwdTextFieldState.text)
                         }
                     },
                     content = {
@@ -671,9 +659,9 @@ internal fun Verification(
                 )
             }
             if (supportFingerprint) {
-                IconButton(onClick = { onFingerprintClick() }) {
+                CbIconButton(onClick = { onFingerprintClick() }) {
                     Icon(
-                        imageVector = CashbookIcons.Fingerprint,
+                        imageVector = CbIcons.Fingerprint,
                         tint = MaterialTheme.colorScheme.primary,
                         contentDescription = null,
                     )
@@ -704,7 +692,7 @@ internal fun UpdateHintDialog(
     var ignore by remember {
         mutableStateOf(ignoreUpdateVersion)
     }
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = { onDismissClick.invoke(false) },
         text = {
             Column {
@@ -725,12 +713,12 @@ internal fun UpdateHintDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onConfirmClick) {
+            CbTextButton(onClick = onConfirmClick) {
                 Text(text = stringResource(id = R.string.update))
             }
         },
         dismissButton = {
-            TextButton(onClick = { onDismissClick.invoke(ignore) }) {
+            CbTextButton(onClick = { onDismissClick.invoke(ignore) }) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -751,7 +739,7 @@ internal fun NoWifiUpdateHintDialog(
     var noMOrePrompt by remember {
         mutableStateOf(false)
     }
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         text = {
             Column {
@@ -770,12 +758,12 @@ internal fun NoWifiUpdateHintDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirmClick.invoke(noMOrePrompt) }) {
+            CbTextButton(onClick = { onConfirmClick.invoke(noMOrePrompt) }) {
                 Text(text = stringResource(id = R.string.update))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },

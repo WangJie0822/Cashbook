@@ -27,8 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +34,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,12 +50,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.tools.isMatch
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.CompatPasswordTextField
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbPasswordTextField
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.component.TransparentListItem
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
@@ -198,9 +198,9 @@ internal fun SettingScreen(
         }
     }
 
-    CashbookScaffold(
+    CbScaffold(
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = R.string.settings)) },
             )
@@ -310,7 +310,7 @@ internal fun SettingContent(
         LazyColumn {
             if (!ApplicationInfo.isOffline) {
                 item {
-                    TransparentListItem(
+                    CbListItem(
                         modifier = Modifier.padding(top = 16.dp),
                         headlineContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
                         trailingContent = {
@@ -320,12 +320,12 @@ internal fun SettingContent(
                             )
                         },
                     )
-                    Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                    CbDivider(modifier = Modifier.padding(horizontal = 8.dp))
                 }
             }
 
             item {
-                TransparentListItem(
+                CbListItem(
                     modifier = Modifier.padding(top = 16.dp),
                     headlineContent = { Text(text = stringResource(id = R.string.need_security_verification_when_launch)) },
                     trailingContent = {
@@ -336,7 +336,7 @@ internal fun SettingContent(
                     },
                 )
                 if (uiState.needSecurityVerificationWhenLaunch) {
-                    TransparentListItem(
+                    CbListItem(
                         modifier = Modifier
                             .clickable { onVerificationModeClick.invoke() },
                         headlineContent = { Text(text = stringResource(id = R.string.verification_mode)) },
@@ -351,7 +351,7 @@ internal fun SettingContent(
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                                 Icon(
-                                    imageVector = CashbookIcons.KeyboardArrowRight,
+                                    imageVector = CbIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }
@@ -359,7 +359,7 @@ internal fun SettingContent(
                     )
                 }
                 if (uiState.needSecurityVerificationWhenLaunch && supportFingerprint) {
-                    TransparentListItem(
+                    CbListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.enable_fingerprint_verification)) },
                         trailingContent = {
                             Switch(
@@ -369,7 +369,7 @@ internal fun SettingContent(
                         },
                     )
                 }
-                TransparentListItem(
+                CbListItem(
                     modifier = Modifier.clickable { onPasswordClick.invoke() },
                     headlineContent = {
                         if (uiState.hasPassword) {
@@ -380,16 +380,16 @@ internal fun SettingContent(
                     },
                 )
                 if (uiState.hasPassword) {
-                    TransparentListItem(
+                    CbListItem(
                         modifier = Modifier.clickable { onClearPasswordClick.invoke() },
                         headlineContent = { Text(text = stringResource(id = R.string.clear_password)) },
                     )
                 }
-                Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                CbDivider(modifier = Modifier.padding(horizontal = 8.dp))
             }
 
             item {
-                TransparentListItem(
+                CbListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onDarkModeClick.invoke() },
@@ -405,14 +405,14 @@ internal fun SettingContent(
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                             Icon(
-                                imageVector = CashbookIcons.KeyboardArrowRight,
+                                imageVector = CbIcons.KeyboardArrowRight,
                                 contentDescription = null,
                             )
                         }
                     },
                 )
                 if (supportsDynamicTheming()) {
-                    TransparentListItem(
+                    CbListItem(
                         modifier = Modifier.clickable { onDynamicColorClick.invoke() },
                         headlineContent = { Text(text = stringResource(id = R.string.dynamic_color)) },
                         supportingContent = { Text(text = stringResource(id = R.string.dynamic_color_hint)) },
@@ -427,25 +427,25 @@ internal fun SettingContent(
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                                 Icon(
-                                    imageVector = CashbookIcons.KeyboardArrowRight,
+                                    imageVector = CbIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }
                         },
                     )
                 }
-                Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                CbDivider(modifier = Modifier.padding(horizontal = 8.dp))
             }
 
             item {
-                TransparentListItem(
+                CbListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .clickable { onBackupAndRecoveryClick.invoke() },
                     headlineContent = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
                     trailingContent = {
                         Icon(
-                            imageVector = CashbookIcons.KeyboardArrowRight,
+                            imageVector = CbIcons.KeyboardArrowRight,
                             contentDescription = null,
                         )
                     },
@@ -631,19 +631,19 @@ internal fun CreatePasswordDialog(
         )
     }
 
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         title = { Text(text = stringResource(id = R.string.create_password)) },
         text = {
             Column {
-                CompatPasswordTextField(
+                CbPasswordTextField(
                     textFieldState = password,
                     label = { Text(text = stringResource(id = R.string.new_password)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                 )
-                CompatPasswordTextField(
+                CbPasswordTextField(
                     textFieldState = passwordAgain,
                     label = { Text(text = stringResource(id = R.string.confirm_password)) },
                     modifier = Modifier
@@ -654,16 +654,18 @@ internal fun CreatePasswordDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                if (password.isValid && passwordAgain.isValid) {
-                    pwdState = onConfirmClick(password.text)
-                }
-            }) {
+            CbTextButton(
+                onClick = {
+                    if (password.isValid && passwordAgain.isValid) {
+                        pwdState = onConfirmClick(password.text)
+                    }
+                },
+            ) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -727,19 +729,19 @@ internal fun ModifyPasswordDialog(
         )
     }
 
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         title = { Text(text = stringResource(id = R.string.modify_password)) },
         text = {
             Column {
-                CompatPasswordTextField(
+                CbPasswordTextField(
                     textFieldState = passwordOld,
                     label = { Text(text = stringResource(id = R.string.old_password)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                 )
-                CompatPasswordTextField(
+                CbPasswordTextField(
                     textFieldState = passwordNew,
                     label = { Text(text = stringResource(id = R.string.new_password)) },
                     modifier = Modifier
@@ -750,18 +752,20 @@ internal fun ModifyPasswordDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                if (passwordOld.isValid && passwordNew.isValid) {
-                    onConfirmClick.invoke(passwordOld.text, passwordNew.text) { result ->
-                        pwdState = result
+            CbTextButton(
+                onClick = {
+                    if (passwordOld.isValid && passwordNew.isValid) {
+                        onConfirmClick.invoke(passwordOld.text, passwordNew.text) { result ->
+                            pwdState = result
+                        }
                     }
-                }
-            }) {
+                },
+            ) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -808,12 +812,12 @@ internal fun VerityPasswordDialog(
         )
     }
 
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         title = { Text(text = stringResource(id = R.string.verity_password)) },
         text = {
             Column {
-                CompatPasswordTextField(
+                CbPasswordTextField(
                     textFieldState = password,
                     label = { Text(text = stringResource(id = R.string.please_enter_password)) },
                     modifier = Modifier
@@ -824,18 +828,20 @@ internal fun VerityPasswordDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                if (password.isValid) {
-                    onConfirmClick(password.text) { result ->
-                        pwdState = result
+            CbTextButton(
+                onClick = {
+                    if (password.isValid) {
+                        onConfirmClick(password.text) { result ->
+                            pwdState = result
+                        }
                     }
-                }
-            }) {
+                },
+            ) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -882,12 +888,12 @@ internal fun ClearPasswordDialog(
         )
     }
 
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         title = { Text(text = stringResource(id = R.string.clear_password)) },
         text = {
             Column {
-                CompatPasswordTextField(
+                CbPasswordTextField(
                     textFieldState = password,
                     label = { Text(text = stringResource(id = R.string.please_enter_password)) },
                     modifier = Modifier
@@ -898,18 +904,20 @@ internal fun ClearPasswordDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                if (password.isValid) {
-                    onConfirmClick(password.text) { result ->
-                        pwdState = result
+            CbTextButton(
+                onClick = {
+                    if (password.isValid) {
+                        onConfirmClick(password.text) { result ->
+                            pwdState = result
+                        }
                     }
-                }
-            }) {
+                },
+            ) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
@@ -929,7 +937,7 @@ internal fun VerificationModeDialog(
     onVerificationModeSelected: (VerificationModeEnum) -> Unit,
     onDismissClick: () -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         title = { Text(text = stringResource(id = R.string.verification_mode)) },
         text = {
@@ -960,7 +968,7 @@ internal fun VerificationModeDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.close))
             }
         },
@@ -980,7 +988,7 @@ internal fun DarkModeDialog(
     onDarkModeSelected: (DarkModeEnum) -> Unit,
     onDismissClick: () -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         title = { Text(text = stringResource(id = R.string.dark_mode)) },
         text = {
@@ -1011,7 +1019,7 @@ internal fun DarkModeDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.close))
             }
         },
@@ -1031,7 +1039,7 @@ internal fun DynamicColorDialog(
     onDynamicColorSelected: (Boolean) -> Unit,
     onDismissClick: () -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onDismissClick,
         title = { Text(text = stringResource(id = R.string.dynamic_color)) },
         text = {
@@ -1079,7 +1087,7 @@ internal fun DynamicColorDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismissClick) {
+            CbTextButton(onClick = onDismissClick) {
                 Text(text = stringResource(id = R.string.close))
             }
         },

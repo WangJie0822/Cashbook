@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.ui.R
@@ -87,10 +87,10 @@ internal fun MarkdownScreen(
     modifier: Modifier = Modifier,
 ) {
     CashbookGradientBackground {
-        CashbookScaffold(
+        CbScaffold(
             modifier = modifier,
             topBar = {
-                CashbookTopAppBar(title = { Text(text = title) }, onBackClick = onBackClick)
+                CbTopAppBar(title = { Text(text = title) }, onBackClick = onBackClick)
             },
         ) { paddingValues ->
             Box(

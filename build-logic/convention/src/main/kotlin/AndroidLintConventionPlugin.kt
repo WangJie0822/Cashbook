@@ -26,31 +26,22 @@ class AndroidLintConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             when {
-                pluginManager.hasPlugin(ProjectSetting.Plugin.PLUGIN_ANDROID_APPLICATION) -> {
-                    configure<ApplicationExtension> {
-                        configureLint(lint)
-                    }
-                }
+                pluginManager.hasPlugin(ProjectSetting.Plugin.PLUGIN_ANDROID_APPLICATION) ->
+                    configure<ApplicationExtension> { lint(Lint::configure) }
 
-                pluginManager.hasPlugin(ProjectSetting.Plugin.PLUGIN_ANDROID_LIBRARY) -> {
-                    configure<LibraryExtension> { configureLint(lint) }
-                }
+                pluginManager.hasPlugin(ProjectSetting.Plugin.PLUGIN_ANDROID_LIBRARY) ->
+                    configure<LibraryExtension> { lint(Lint::configure) }
 
                 else -> {
                     pluginManager.apply(ProjectSetting.Plugin.PLUGIN_ANDROID_LINT)
-                    configure<Lint> {
-                        configureLint(this)
-                    }
+                    configure<Lint>(Lint::configure)
                 }
             }
         }
     }
 }
 
-private fun Project.configureLint(lint: Lint) {
-    with(lint) {
-        xmlReport = true
-        checkDependencies = true
-        baseline = file("lint-baseline.xml")
-    }
+private fun Lint.configure() {
+    xmlReport = true
+    checkDependencies = true
 }

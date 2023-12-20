@@ -36,7 +36,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,7 +46,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -71,14 +69,16 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILE
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BLANK_BACKUP_PATH
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_BACKUP
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_RECOVERY
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.CompatPasswordTextField
-import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbPasswordTextField
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTextField
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.component.TransparentListItem
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.model.BackupModel
@@ -196,10 +196,10 @@ internal fun BackupAndRecoveryScreen(
         }
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
             )
@@ -265,7 +265,7 @@ private fun BackupListDialog(
     onBackupListItemClick: (String) -> Unit,
     onRequestDismissDialog: () -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onRequestDismissDialog,
         confirmButton = {
             Text(
@@ -306,7 +306,7 @@ internal fun AutoBackupModeDialog(
     onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
     onRequestDismissDialog: () -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onRequestDismissDialog,
         title = { Text(text = stringResource(id = R.string.auto_backup)) },
         text = {
@@ -340,7 +340,7 @@ internal fun AutoBackupModeDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onRequestDismissDialog) {
+            CbTextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.close))
             }
         },
@@ -407,7 +407,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                 modifier = Modifier.padding(start = 16.dp),
             )
 
-            CompatTextField(
+            CbTextField(
                 textFieldState = webDAVDomainTextFieldState,
                 label = { Text(text = stringResource(id = R.string.webdav_domain)) },
                 modifier = Modifier
@@ -415,7 +415,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                     .padding(top = 8.dp)
                     .padding(horizontal = 16.dp),
             )
-            CompatTextField(
+            CbTextField(
                 textFieldState = webDAVAccountTextFieldState,
                 label = { Text(text = stringResource(id = R.string.webdav_account)) },
                 modifier = Modifier
@@ -423,7 +423,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                     .padding(top = 8.dp)
                     .padding(horizontal = 16.dp),
             )
-            CompatPasswordTextField(
+            CbPasswordTextField(
                 textFieldState = webDAVPasswordTextFieldState,
                 label = { Text(text = stringResource(id = R.string.webdav_password)) },
                 modifier = Modifier
@@ -445,7 +445,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                 },
                 content = {
                     Icon(
-                        imageVector = if (isConnected) CashbookIcons.CheckCircle else CashbookIcons.Error,
+                        imageVector = if (isConnected) CbIcons.CheckCircle else CbIcons.Error,
                         contentDescription = null,
                         modifier = Modifier.padding(end = 8.dp),
                     )
@@ -492,7 +492,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             },
         )
 
-        TransparentListItem(
+        CbListItem(
             headlineContent = { Text(text = stringResource(id = R.string.backup_path)) },
             supportingContent = { Text(text = uiState.backupPath.ifBlank { stringResource(id = R.string.click_to_select_backup_path) }) },
             modifier = Modifier.clickable {
@@ -500,7 +500,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                 selectDirLauncher.launch(null)
             },
         )
-        TransparentListItem(
+        CbListItem(
             headlineContent = { Text(text = stringResource(id = R.string.backup)) },
             supportingContent = {
                 Text(
@@ -530,7 +530,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             var expended by remember {
                 mutableStateOf(false)
             }
-            TransparentListItem(
+            CbListItem(
                 headlineContent = { Text(text = stringResource(id = R.string.recovery)) },
                 supportingContent = {
                     Text(
@@ -580,7 +580,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             }
         }
 
-        TransparentListItem(
+        CbListItem(
             headlineContent = { Text(text = stringResource(id = R.string.auto_backup)) },
             supportingContent = {
                 Text(text = uiState.autoBackup.text)
@@ -588,7 +588,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             modifier = Modifier.clickable(onClick = onAutoBackupClick),
         )
 
-        TransparentListItem(
+        CbListItem(
             headlineContent = { Text(text = stringResource(id = R.string.only_save_latest_backup)) },
             supportingContent = {
                 Text(text = stringResource(id = R.string.only_save_latest_backup_hint))

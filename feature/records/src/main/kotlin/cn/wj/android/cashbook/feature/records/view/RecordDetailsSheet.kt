@@ -28,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,9 +45,10 @@ import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
-import cn.wj.android.cashbook.core.design.component.CommonDivider
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
-import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
@@ -117,7 +117,7 @@ internal fun RecordDetailsSheet(
                             modifier = Modifier.weight(1f),
                         )
                         if (!recordData.isBalanceAccount) {
-                            TextButton(
+                            CbTextButton(
                                 onClick = {
                                     onRequestNaviToEditRecord(recordData.id)
                                     onRequestDismissSheet()
@@ -130,7 +130,7 @@ internal fun RecordDetailsSheet(
                             }
                         }
 
-                        TextButton(
+                        CbTextButton(
                             onClick = { dialogState = DialogState.Shown(0) },
                         ) {
                             Text(
@@ -139,10 +139,10 @@ internal fun RecordDetailsSheet(
                             )
                         }
                     }
-                    CommonDivider()
+                    CbDivider()
 
                     // 金额
-                    TransparentListItem(
+                    CbListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.amount)) },
                         trailingContent = {
                             Row(
@@ -174,7 +174,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordData.charges.toDoubleOrZero() > 0.0) {
                         // 手续费
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.charges)) },
                             trailingContent = {
                                 Text(
@@ -188,7 +188,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordData.typeCategory != RecordTypeCategoryEnum.INCOME && recordData.concessions.toDoubleOrZero() > 0.0) {
                         // 优惠
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.concessions)) },
                             trailingContent = {
                                 Text(
@@ -201,7 +201,7 @@ internal fun RecordDetailsSheet(
                     }
 
                     // 类型
-                    TransparentListItem(
+                    CbListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.type)) },
                         trailingContent = {
                             Row(
@@ -228,7 +228,7 @@ internal fun RecordDetailsSheet(
                     ) {
                         // 有关联记录，且是收入、支出类型
                         val list = recordData.relatedRecord
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.related_record)) },
                             trailingContent = {
                                 val text =
@@ -262,7 +262,7 @@ internal fun RecordDetailsSheet(
 
                     recordData.assetName?.let { assetName ->
                         // 资产
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.asset)) },
                             trailingContent = {
                                 Row(
@@ -313,7 +313,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordData.relatedTags.isNotEmpty()) {
                         // 标签
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.tags)) },
                             trailingContent = {
                                 val tagsText = with(StringBuilder()) {
@@ -346,7 +346,7 @@ internal fun RecordDetailsSheet(
 
                     if (recordData.remark.isNotBlank()) {
                         // 备注
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.remark)) },
                             trailingContent = {
                                 Text(
@@ -358,7 +358,7 @@ internal fun RecordDetailsSheet(
                     }
 
                     // 时间
-                    TransparentListItem(
+                    CbListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.time)) },
                         trailingContent = {
                             Text(

@@ -39,13 +39,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextField
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.books.enums.EditBookBookmarkEnum
 import cn.wj.android.cashbook.feature.books.viewmodel.EditBookUiState
@@ -115,10 +115,10 @@ internal fun EditBookScreen(
         TextFieldState(defaultText = data?.description.orEmpty())
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = R.string.edit_book)) },
             )
@@ -127,12 +127,12 @@ internal fun EditBookScreen(
             SnackbarHost(snackbarHostState)
         },
         floatingActionButton = {
-            CashbookFloatingActionButton(onClick = {
+            CbFloatingActionButton(onClick = {
                 if (nameTextFieldState.isValid) {
                     onSaveClick(nameTextFieldState.text, descriptionTextFieldState.text)
                 }
             }) {
-                Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
+                Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
             }
         },
     ) { paddingValues ->
@@ -144,7 +144,7 @@ internal fun EditBookScreen(
 
                 is EditBookUiState.Success -> {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        CompatTextField(
+                        CbTextField(
                             textFieldState = nameTextFieldState,
                             label = { Text(text = stringResource(id = R.string.book_name)) },
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
@@ -153,7 +153,7 @@ internal fun EditBookScreen(
                                 .padding(top = 8.dp)
                                 .padding(horizontal = 16.dp),
                         )
-                        CompatTextField(
+                        CbTextField(
                             textFieldState = descriptionTextFieldState,
                             label = { Text(text = stringResource(id = R.string.book_description)) },
                             modifier = Modifier

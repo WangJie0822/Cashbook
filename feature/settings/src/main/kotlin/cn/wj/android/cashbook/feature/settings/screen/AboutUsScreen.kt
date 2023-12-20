@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -52,10 +51,11 @@ import cn.wj.android.cashbook.core.common.GITHUB_HOMEPAGE
 import cn.wj.android.cashbook.core.common.GITHUB_LATEST
 import cn.wj.android.cashbook.core.common.tools.jumpBrowser
 import cn.wj.android.cashbook.core.common.tools.jumpSendEmail
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.TransparentListItem
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsUiState
@@ -122,9 +122,9 @@ internal fun AboutUsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookScaffold(
+    CbScaffold(
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = R.string.about_us)) },
             )
@@ -218,13 +218,13 @@ internal fun AboutUsScreen(
                     }
                 }
                 item {
-                    Divider(
+                    CbDivider(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth(),
                     )
                     // 数据源
-                    TransparentListItem(
+                    CbListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.switch_data_source)) },
                         supportingContent = { Text(text = stringResource(id = R.string.data_source_hint)) },
                         trailingContent = {
@@ -251,7 +251,7 @@ internal fun AboutUsScreen(
                     )
                     if (!ApplicationInfo.isOffline) {
                         // 实验版本
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.canary_version)) },
                             supportingContent = { Text(text = stringResource(id = R.string.canary_version_hint)) },
                             trailingContent = {
@@ -262,7 +262,7 @@ internal fun AboutUsScreen(
                             },
                         )
                         // 自动检查更新
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.auto_check_update)) },
                             trailingContent = {
                                 Switch(
@@ -294,7 +294,7 @@ internal fun AboutUsScreen(
                     } else {
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     }
-                    TransparentListItem(
+                    CbListItem(
                         modifier = checkUpdateModifier,
                         headlineContent = {
                             Text(
@@ -304,7 +304,7 @@ internal fun AboutUsScreen(
                         },
                     )
                     // 版本信息
-                    TransparentListItem(
+                    CbListItem(
                         modifier = Modifier.clickable { onVersionInfoClick.invoke() },
                         headlineContent = {
                             Text(text = stringResource(id = R.string.version_info))
@@ -320,21 +320,21 @@ internal fun AboutUsScreen(
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                                 Icon(
-                                    imageVector = CashbookIcons.KeyboardArrowRight,
+                                    imageVector = CbIcons.KeyboardArrowRight,
                                     contentDescription = null,
                                 )
                             }
                         },
                     )
                     // 用户协议和隐私政策
-                    TransparentListItem(
+                    CbListItem(
                         modifier = Modifier.clickable { onUserAgreementAndPrivacyPolicyClick.invoke() },
                         headlineContent = {
                             Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy))
                         },
                         trailingContent = {
                             Icon(
-                                imageVector = CashbookIcons.KeyboardArrowRight,
+                                imageVector = CbIcons.KeyboardArrowRight,
                                 contentDescription = null,
                             )
                         },

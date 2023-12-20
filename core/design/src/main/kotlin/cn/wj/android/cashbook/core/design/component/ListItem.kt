@@ -24,13 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 
-/**
- * 透明背景的列表 Item
- *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/26
- */
 @Composable
-fun TransparentListItem(
+fun CbListItem(
     headlineContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     overlineContent: @Composable (() -> Unit)? = null,

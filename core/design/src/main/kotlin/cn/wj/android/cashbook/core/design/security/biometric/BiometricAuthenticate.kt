@@ -26,15 +26,15 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import javax.crypto.Cipher
 
 /** 标记 - 是否支持 AndroidQ API */
@@ -70,7 +70,7 @@ fun BiometricAuthenticate(
 
         else -> {
             // 支持
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && biometricSupportQ) {
+            if (biometricSupportQ) {
                 BiometricAuthenticateQ(
                     title = title,
                     subTitle = subTitle,
@@ -160,8 +160,6 @@ internal fun BiometricAuthenticateQ(
     )
 }
 
-@SuppressLint("ObsoleteSdkInt")
-@RequiresApi(Build.VERSION_CODES.M)
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
 @Composable
 internal fun BiometricAuthenticateM(
@@ -177,7 +175,7 @@ internal fun BiometricAuthenticateM(
     cancellationSignal.setOnCancelListener {
         onError.invoke(ERROR_CANCELED, hintData.userCancelHint)
     }
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = { cancellationSignal.cancel() },
         title = { Text(text = title) },
         text = {
@@ -187,7 +185,7 @@ internal fun BiometricAuthenticateM(
             }
         },
         confirmButton = {
-            TextButton(onClick = { cancellationSignal.cancel() }) {
+            CbTextButton(onClick = { cancellationSignal.cancel() }) {
                 Text(text = "Cancel")
             }
         },
@@ -223,7 +221,6 @@ internal fun BiometricAuthenticateM(
     )
 }
 
-@SuppressLint("InlinedApi")
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
 @Composable
 fun checkBiometric(context: Context = LocalContext.current.applicationContext): Int {

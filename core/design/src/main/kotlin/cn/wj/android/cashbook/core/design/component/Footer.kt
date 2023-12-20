@@ -57,7 +57,7 @@ fun Footer(
 private fun FooterPreview() {
     CashbookTheme {
         CashbookGradientBackground {
-            CashbookScaffold { paddingValues ->
+            CbScaffold { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(paddingValues)) {
                     items(count = 20) {
                         Text(text = "item $it")

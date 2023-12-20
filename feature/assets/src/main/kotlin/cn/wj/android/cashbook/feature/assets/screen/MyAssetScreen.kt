@@ -31,7 +31,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -55,15 +54,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookSmallFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbSmallFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
@@ -145,10 +145,10 @@ internal fun MyAssetScreen(
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
 ) {
     Box {
-        CashbookScaffold(
+        CbScaffold(
             modifier = modifier,
             topBar = {
-                CashbookTopAppBar(
+                CbTopAppBar(
                     onBackClick = onBackClick,
                     title = {
                         Text(text = stringResource(id = R.string.my_assets))
@@ -156,9 +156,9 @@ internal fun MyAssetScreen(
                 )
             },
             floatingActionButton = {
-                CashbookFloatingActionButton(onClick = onRequestDisplayShowMoreDialog) {
+                CbFloatingActionButton(onClick = onRequestDisplayShowMoreDialog) {
                     Icon(
-                        imageVector = CashbookIcons.MoreVert,
+                        imageVector = CbIcons.MoreVert,
                         contentDescription = null,
                     )
                 }
@@ -230,13 +230,13 @@ private fun ShowMoreContent(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                CashbookSmallFloatingActionButton(
+                CbSmallFloatingActionButton(
                     onClick = {
                         onAddAssetClick.invoke()
                         onCloseClick.invoke()
                     },
                 ) {
-                    Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+                    Icon(imageVector = CbIcons.Add, contentDescription = null)
                 }
             }
 
@@ -260,23 +260,23 @@ private fun ShowMoreContent(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                CashbookSmallFloatingActionButton(
+                CbSmallFloatingActionButton(
                     onClick = {
                         onInvisibleAssetClick()
                         onCloseClick.invoke()
                     },
                 ) {
                     Icon(
-                        imageVector = CashbookIcons.VisibilityOff,
+                        imageVector = CbIcons.VisibilityOff,
                         contentDescription = null,
                     )
                 }
             }
 
-            CashbookFloatingActionButton(
+            CbFloatingActionButton(
                 onClick = onCloseClick,
             ) {
-                Icon(imageVector = CashbookIcons.Close, contentDescription = null)
+                Icon(imageVector = CbIcons.Close, contentDescription = null)
             }
         }
     }
@@ -375,12 +375,12 @@ internal fun AssetTypedInfoItem(
             style = MaterialTheme.typography.titleMedium,
         )
         Icon(
-            imageVector = if (expand) CashbookIcons.KeyboardArrowDown else CashbookIcons.KeyboardArrowRight,
+            imageVector = if (expand) CbIcons.KeyboardArrowDown else CbIcons.KeyboardArrowRight,
             contentDescription = null,
         )
     }
     if (expand) {
-        Divider(
+        CbDivider(
             modifier = Modifier.padding(horizontal = 16.dp),
             color = DividerDefaults.color.copy(0.5f),
         )
