@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
+
+import cn.wj.android.cashbook.buildlogic.CashbookBuildType
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.configureOutputs
+import com.android.build.gradle.api.ApplicationVariant
 import java.io.FileWriter
 
 plugins {
@@ -23,8 +27,10 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.application.flavors)
     alias(conventionLibs.plugins.cashbook.android.application.jacoco)
     alias(conventionLibs.plugins.cashbook.android.hilt)
+    alias(libs.plugins.androidx.baselineprofile)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.takahirom.roborazzi)
+    id("jacoco")
 }
 
 android {
@@ -38,6 +44,8 @@ android {
         // 开启 Dex 分包
         multiDexEnabled = true
 
+        testInstrumentationRunner = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -47,19 +55,49 @@ android {
         buildConfig = true
     }
 
-    buildTypes {
-        getByName("debug") {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            signingConfig = getByName("release").signingConfig
+    val signingLibs = runCatching {
+        extensions.getByType<VersionCatalogsExtension>().named("signingLibs")
+    }.getOrNull()
+
+    signingConfigs {
+        if (null != signingLibs) {
+            create("release") {
+                keyAlias = signingLibs.findVersion("keyAlias").get().toString()
+                keyPassword = signingLibs.findVersion("keyPassword").get().toString()
+                storeFile = file(signingLibs.findVersion("storeFile").get().toString())
+                storePassword = signingLibs.findVersion("storePassword").get().toString()
+            }
         }
-        getByName("release") {
+    }
+
+    buildTypes {
+        val release = getByName("release") {
             isMinifyEnabled = false
             isShrinkResources = false
+            applicationIdSuffix = CashbookBuildType.Release.applicationIdSuffix
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = if (null != signingLibs) {
+                signingConfigs.findByName("release")
+            } else {
+                signingConfigs.findByName("debug")
+            }
+            // Ensure Baseline Profile is fresh for release builds.
+            baselineProfile.automaticGenerationDuringBuild = true
+        }
+        create("benchmarks") {
+            initWith(release)
+            matchingFallbacks.add("release")
+            applicationIdSuffix = CashbookBuildType.Release.applicationIdSuffix
+            signingConfig = release.signingConfig
+        }
+        getByName("debug") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            applicationIdSuffix = CashbookBuildType.Debug.applicationIdSuffix
+            signingConfig = release.signingConfig
         }
     }
 
@@ -101,54 +139,8 @@ android {
         baseline = file("lint-baseline.xml")
     }
 
-    applicationVariants.all {
-        mergeAssetsProvider.get().doFirst {
-            val buildTagName = System.getenv("BUILD_TAG_NAME")
-            if (!buildTagName.isNullOrBlank()) {
-                // CI 构建流程，生成 RELEASE.md
-                File(rootDir, "CHANGELOG.md").readText().lines().let { list ->
-                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md")
-                    val start = if (buildTagName.endsWith("_pre")) {
-                        // 预发布版本，使用 [Unreleased] 作为发布说明
-                        list.indexOf("## [Unreleased]")
-                    } else {
-                        // 正式版本，使用 tag 对应版本作为发布说明
-                        list.indexOf("## [${buildTagName.drop(1)}]")
-                    }
-                    if (start < 0) {
-                        throw RuntimeException(
-                            "Release info not found, make sure file CHANGELOG.md " +
-                                    "contains '## [Unreleased]' if pre or contains " +
-                                    "'## [${buildTagName.drop(1)}]' if release",
-                        )
-                    }
-                    val content = with(StringBuilder()) {
-                        for (i in (start + 1) until list.size) {
-                            val line = list[i]
-                            if (line.startsWith("## [")) {
-                                break
-                            } else {
-                                appendLine(line)
-                            }
-                        }
-                        toString()
-                    }
-                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md content = <$content>")
-                    val releaseFile = File(rootDir, "RELEASE.md")
-                    if (releaseFile.exists()) {
-                        releaseFile.delete()
-                    }
-                    releaseFile.createNewFile()
-                    FileWriter(releaseFile).use {
-                        it.write(content)
-                        it.flush()
-                    }
-                }
-            }
-        }
-    }
+    configGenerateReleaseFile(applicationVariants)
 
-    // 配置 APK 输出路径
     val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
     configureOutputs(
         "${project.rootDir}${sep}outputs${sep}apk",
@@ -164,13 +156,29 @@ android {
 dependencies {
 
     // 测试
+    testImplementation(projects.core.testing)
+//    androidTestImplementation(projects.core.datastoreTest)
+//    androidTestImplementation(projects.core.dataTest)
+    testImplementation(projects.core.network)
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.navigation.testing)
+    testImplementation(libs.androidx.work.testing)
+    testImplementation(libs.google.accompanist.testharness)
+    testImplementation(kotlin("test"))
+    kspTest(libs.androidx.hilt.compiler)
+
+    androidTestImplementation(projects.core.testing)
+//    androidTestImplementation(projects.core.datastoreTest)
+//    androidTestImplementation(projects.core.dataTest)
+    androidTestImplementation(projects.core.network)
     androidTestImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.androidx.room.testing)
-    androidTestImplementation(libs.androidx.test.rules)
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.navigation.testing)
+    androidTestImplementation(libs.google.accompanist.testharness)
+    androidTestImplementation(kotlin("test"))
+//    debugImplementation(libs.androidx.compose.ui.test.manifest)
+//    debugImplementation(projects.uiTestHiltManifest)
+
+    baselineProfile(projects.benchmarks)
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
@@ -222,4 +230,67 @@ dependencies {
 
     debugImplementation(libs.didi.dokit.core)
     releaseImplementation(libs.didi.dokit.noop)
+}
+
+baselineProfile {
+    // Don't build on every iteration of a full assemble.
+    // Instead enable generation directly for the release build variant.
+    automaticGenerationDuringBuild = false
+}
+
+dependencyGuard {
+    configuration("CanaryReleaseRuntimeClasspath")
+    configuration("OfflineReleaseRuntimeClasspath")
+    configuration("OnlineReleaseRuntimeClasspath")
+}
+
+
+/** 配置 CI 构建生成 RELEASE.md */
+fun Project.configGenerateReleaseFile(applicationVariants: DomainObjectSet<ApplicationVariant>) {
+    applicationVariants.all {
+        mergeAssetsProvider.get().doFirst {
+            val buildTagName = System.getenv("BUILD_TAG_NAME")
+            if (!buildTagName.isNullOrBlank()) {
+                // CI 构建流程，生成 RELEASE.md
+                File(rootDir, "CHANGELOG.md").readText().lines().let { list ->
+                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md")
+                    val start = if (buildTagName.endsWith("_pre")) {
+                        // 预发布版本，使用 [Unreleased] 作为发布说明
+                        list.indexOf("## [Unreleased]")
+                    } else {
+                        // 正式版本，使用 tag 对应版本作为发布说明
+                        list.indexOf("## [${buildTagName.drop(1)}]")
+                    }
+                    if (start < 0) {
+                        throw RuntimeException(
+                            "Release info not found, make sure file CHANGELOG.md " +
+                                    "contains '## [Unreleased]' if pre or contains " +
+                                    "'## [${buildTagName.drop(1)}]' if release",
+                        )
+                    }
+                    val content = with(StringBuilder()) {
+                        for (i in (start + 1) until list.size) {
+                            val line = list[i]
+                            if (line.startsWith("## [")) {
+                                break
+                            } else {
+                                appendLine(line)
+                            }
+                        }
+                        toString()
+                    }
+                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md content = <$content>")
+                    val releaseFile = File(rootDir, "RELEASE.md")
+                    if (releaseFile.exists()) {
+                        releaseFile.delete()
+                    }
+                    releaseFile.createNewFile()
+                    FileWriter(releaseFile).use {
+                        it.write(content)
+                        it.flush()
+                    }
+                }
+            }
+        }
+    }
 }

@@ -24,7 +24,7 @@ android {
     namespace = "cn.wj.android.cashbook.core.database"
 
     defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
     }
 
     sourceSets {

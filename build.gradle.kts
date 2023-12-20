@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.androidx.baselineprofile) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.google.devtools.ksp) apply false
@@ -12,6 +13,8 @@ plugins {
 }
 
 tasks.register("clean", Delete::class) {
+    description = "Clean generate build directory"
+    group = JavaBasePlugin.BUILD_TASK_NAME
     delete(rootProject.layout.buildDirectory.asFile.get())
     delete("${rootProject.rootDir.path}/core/build")
     delete("${rootProject.rootDir.path}/feature/build")

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("EnumValuesSoftDeprecate")
+
 package cn.wj.android.cashbook.buildlogic
 
 import com.android.build.api.dsl.ApplicationProductFlavor
@@ -23,11 +25,15 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
-import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.lang.model.element.Modifier
+import org.gradle.api.Project
+
+enum class CashbookBuildType(val applicationIdSuffix: String?) {
+    Debug(applicationIdSuffix = null),
+    Release(applicationIdSuffix = null),
+    Benchmarks(applicationIdSuffix = ".benchmarks"),
+}
 
 /**
  * 维度枚举
@@ -42,7 +48,6 @@ enum class FlavorDimension {
  * 渠道枚举
  *
  * @param dimension 维度
- * @param signing 签名
  * @param applicationIdSuffix 应用 id 后缀
  * @param versionNameSuffix 版本名后缀
  *
@@ -50,21 +55,20 @@ enum class FlavorDimension {
  */
 enum class CashbookFlavor(
     val dimension: FlavorDimension,
-    val signing: Signing,
     val applicationIdSuffix: String?,
     val versionNameSuffix: String?,
 ) {
     /** 在线渠道，需要网络请求 */
-    Online(FlavorDimension.ContentType, Signing.Android, null, "_online"),
+    Online(FlavorDimension.ContentType, null, "_online"),
 
     /** 离线渠道，无网络请求 */
-    Offline(FlavorDimension.ContentType, Signing.Android, null, "_offline"),
+    Offline(FlavorDimension.ContentType, null, "_offline"),
 
     /** 尝鲜渠道 */
-    Canary(FlavorDimension.ContentType, Signing.Android, null, "_canary"),
+    Canary(FlavorDimension.ContentType, null, "_canary"),
 
     /** 开发渠道 */
-    Dev(FlavorDimension.ContentType, Signing.Android, ".dev", "_dev"),
+    Dev(FlavorDimension.ContentType, ".dev", "_dev"),
 }
 
 /**
@@ -77,20 +81,11 @@ fun Project.configureFlavors(
     flavorConfigurationBlock: ProductFlavor.(flavor: CashbookFlavor) -> Unit = {},
 ) {
     commonExtension.apply {
-        if (this is BaseAppModuleExtension) {
-            // Application，配置签名
-            configureSigningConfigs(this)
-        }
-
         // 配置维度
         flavorDimensions += FlavorDimension.values().map { it.name }
 
         // 多渠道配置
         productFlavors {
-            val signingLibs = runCatching {
-                extensions.getByType<VersionCatalogsExtension>().named("signingLibs")
-            }.getOrNull()
-
             CashbookFlavor.values().forEach {
                 create(it.name) {
                     dimension = it.dimension.name
@@ -102,13 +97,6 @@ fun Project.configureFlavors(
 
                         it.versionNameSuffix?.let { suffix ->
                             versionNameSuffix = suffix
-                        }
-
-                        signingConfig = if (null != signingLibs) {
-                            signingConfigs.findByName(it.signing.name)
-                        } else {
-                            println("> Task :${project.name}:configureFlavors signing config not found, use debug signing")
-                            signingConfigs.findByName("debug")
                         }
                     }
                 }

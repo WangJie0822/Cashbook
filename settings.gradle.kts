@@ -53,6 +53,7 @@ rootProject.name = "Cashbook"
 // 项目包含的 Module
 include(":app")
 include(":app-catalog")
+include(":benchmarks")
 
 include(":lint")
 
