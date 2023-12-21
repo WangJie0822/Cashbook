@@ -18,6 +18,7 @@
 import cn.wj.android.cashbook.buildlogic.CashbookBuildType
 import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureFlavors
+import com.android.build.api.dsl.ManagedVirtualDevice
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.test)
@@ -67,9 +68,9 @@ android {
     }
 
     testOptions.managedDevices.devices {
-        create<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6Api33") {
+        maybeCreate("pixel6Api34", ManagedVirtualDevice::class.java).apply {
             device = "Pixel 6"
-            apiLevel = 33
+            apiLevel = 34
             systemImageSource = "aosp"
         }
     }
@@ -80,7 +81,7 @@ android {
 
 baselineProfile {
     // This specifies the managed devices to use that you run the tests on.
-    managedDevices += "pixel6Api33"
+    managedDevices += "pixel6Api34"
 
     // Don't use a connected device but rely on a GMD for consistency between local and CI builds.
     useConnectedDevices = false

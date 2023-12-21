@@ -79,10 +79,10 @@ jobs:
 
       - name: Build all build type and flavor permutations
         run: ./gradlew :app:assemble :benchmarks:assemble
-          -x pixel6Api33OnlineNonMinifiedReleaseAndroidTest
-          -x pixel6Api33OnlineNonMinifiedBenchmarkAndroidTest
-          -x pixel6Api33OfflineNonMinifiedReleaseAndroidTest
-          -x pixel6Api33OfflineNonMinifiedBenchmarkAndroidTest
+          -x pixel6Api34OnlineNonMinifiedReleaseAndroidTest
+          -x pixel6Api34OnlineNonMinifiedBenchmarkAndroidTest
+          -x pixel6Api34OfflineNonMinifiedReleaseAndroidTest
+          -x pixel6Api34OfflineNonMinifiedBenchmarkAndroidTest
           -x collectOnlineNonMinifiedReleaseBaselineProfile
           -x collectOnlineNonMinifiedBenchmarkBaselineProfile
           -x collectOfflineNonMinifiedReleaseBaselineProfile
