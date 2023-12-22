@@ -15,7 +15,7 @@ kotlin = "1.9.21"
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
 kotlinx-coroutines = "1.7.3"
 # 日期处理 [Github](https://github.com/Kotlin/kotlinx-datetime)
-kotlinx-datetime = "0.4.1"
+kotlinx-datetime = "0.5.0"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
 kotlinx-serialization-json = "1.6.2"
 
@@ -33,7 +33,7 @@ google-gson = "2.10.1"
 google-accompanist = "0.32.0"
 # ksp 前缀版本需要和kotlin版本兼容 [Github](https://github.com/google/ksp)
 # [版本查询](https://mvnrepository.com/artifact/com.google.devtools.ksp)
-google-devtools-ksp = "1.9.21-1.0.15"
+google-devtools-ksp = "1.9.21-1.0.16"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
 google-protobuf = "3.24.4"
@@ -43,7 +43,7 @@ google-protobuf-plugin = "0.9.4"
 google-truth = "1.2.0"
 # hilt [指南](https://dagger.dev/hilt)
 # [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
-google-hilt = "2.48.1"
+google-hilt = "2.50"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt?hl=zh-cn)
 # [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
 androidx-hilt = "1.1.0"
@@ -152,6 +152,7 @@ androidx-test-runner = "1.5.2"
 androidx-test-rules = "1.5.0"
 androidx-test-services = "1.4.2"
 androidx-test-uiautomator = "2.2.0"
+androidx-profileinstaller = "1.3.1"
 
 # Koin [Github](https://github.com/InsertKoinIO/koin) [指南](https://insert-koin.io/)
 insert-koin = "3.4.2"
@@ -463,6 +464,7 @@ androidx-test-runner = { group = "androidx.test", name = "runner", version.ref =
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidx-test-rules" }
 androidx-test-services = { group = "androidx.test", name = "services", version.ref = "androidx-test-services" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidx-test-uiautomator" }
+androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidx-profileinstaller" }
 
 # Koin [Github](https://github.com/InsertKoinIO/koin) [指南](https://insert-koin.io/)
 insert-koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "insert-koin" }

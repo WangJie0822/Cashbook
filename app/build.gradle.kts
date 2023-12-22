@@ -84,14 +84,8 @@ android {
             } else {
                 signingConfigs.findByName("debug")
             }
-            // Ensure Baseline Profile is fresh for release builds.
+            // Release 版本自动构建使用最新基线配置
             baselineProfile.automaticGenerationDuringBuild = true
-        }
-        create("benchmarks") {
-            initWith(release)
-            matchingFallbacks.add("release")
-            applicationIdSuffix = CashbookBuildType.Benchmarks.applicationIdSuffix
-            signingConfig = release.signingConfig
         }
         getByName("debug") {
             isMinifyEnabled = false
@@ -178,7 +172,8 @@ dependencies {
 //    debugImplementation(libs.androidx.compose.ui.test.manifest)
 //    debugImplementation(projects.uiTestHiltManifest)
 
-    baselineProfile(projects.benchmarks)
+    baselineProfile(projects.baselineProfile)
+    implementation(libs.androidx.profileinstaller)
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
@@ -230,13 +225,13 @@ dependencies {
 
     debugImplementation(libs.didi.dokit.core)
     releaseImplementation(libs.didi.dokit.noop)
-    add("benchmarksImplementation", libs.didi.dokit.noop)
 }
 
 baselineProfile {
-    // Don't build on every iteration of a full assemble.
-    // Instead enable generation directly for the release build variant.
+    // 仅 Release 版本使用自动生成
     automaticGenerationDuringBuild = false
+    // 不区分多渠道，合并为一个基线配置
+    mergeIntoMain = true
 }
 
 dependencyGuard {

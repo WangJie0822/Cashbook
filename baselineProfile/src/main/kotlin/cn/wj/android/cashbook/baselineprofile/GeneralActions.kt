@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.benchmarks
+package cn.wj.android.cashbook.baselineprofile
 
 import android.Manifest
 import android.os.Build

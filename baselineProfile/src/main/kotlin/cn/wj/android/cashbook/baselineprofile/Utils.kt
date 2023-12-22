@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.benchmarks
+package cn.wj.android.cashbook.baselineprofile
 
 /** 用于提供正确的应用包名 */
 val PACKAGE_NAME = buildString {

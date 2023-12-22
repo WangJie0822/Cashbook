@@ -32,7 +32,6 @@ import org.gradle.api.Project
 enum class CashbookBuildType(val applicationIdSuffix: String?) {
     Debug(applicationIdSuffix = null),
     Release(applicationIdSuffix = null),
-    Benchmarks(applicationIdSuffix = null),
 }
 
 /**

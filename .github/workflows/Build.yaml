@@ -78,15 +78,7 @@ jobs:
         run: ./gradlew testOnlineDebug testOfflineDebug
 
       - name: Build all build type and flavor permutations
-        run: ./gradlew :app:assemble :benchmarks:assemble
-          -x pixel6Api34OnlineNonMinifiedReleaseAndroidTest
-          -x pixel6Api34OnlineNonMinifiedBenchmarkAndroidTest
-          -x pixel6Api34OfflineNonMinifiedReleaseAndroidTest
-          -x pixel6Api34OfflineNonMinifiedBenchmarkAndroidTest
-          -x collectOnlineNonMinifiedReleaseBaselineProfile
-          -x collectOnlineNonMinifiedBenchmarkBaselineProfile
-          -x collectOfflineNonMinifiedReleaseBaselineProfile
-          -x collectOfflineNonMinifiedBenchmarkBaselineProfile
+        run: ./gradlew :app:generateBaselineProfile :app:assemble
 
       - name: Upload build outputs (APKs)
         uses: actions/upload-artifact@v4
