@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -57,6 +58,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.PRIVACY_POLICY_FILE_PATH
+import cn.wj.android.cashbook.core.common.TestTag
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
@@ -304,7 +306,10 @@ private fun MainAppScreen(
                                 )
                             },
                             confirmButton = {
-                                CbTextButton(onClick = onAgreeProtocolClick) {
+                                CbTextButton(
+                                    onClick = onAgreeProtocolClick,
+                                    modifier = Modifier.testTag(TestTag.Launcher.LAUNCHER_PROTOCOL_CONFIRM),
+                                ) {
                                     Text(text = stringResource(id = R.string.confirm))
                                 }
                             },

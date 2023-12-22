@@ -30,7 +30,9 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import cn.wj.android.cashbook.core.common.TestTag
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 
@@ -84,7 +86,7 @@ fun CbTopAppBar(
 ) {
     TopAppBar(
         title = title,
-        modifier = modifier,
+        modifier = modifier.testTag(TestTag.CB_TOP_APP_BAR),
         navigationIcon = navigationIcon,
         actions = actions,
         windowInsets = windowInsets,

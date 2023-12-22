@@ -29,7 +29,7 @@ android {
     namespace = "cn.wj.android.cashbook.benchmarks"
 
     defaultConfig {
-        minSdk = ProjectSetting.Config.MIN_SDK
+        minSdk = 28
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "APP_BUILD_TYPE_SUFFIX", "\"\"")
@@ -96,4 +96,6 @@ dependencies {
     implementation(libs.androidx.test.rules)
     implementation(libs.androidx.test.runner)
     implementation(libs.androidx.test.uiautomator)
+
+    implementation(projects.core.common)
 }

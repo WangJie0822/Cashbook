@@ -53,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -62,6 +63,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.TestTag
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
@@ -304,7 +306,9 @@ internal fun LauncherTopBar(
         ),
         title = {
             Row(
-                modifier = Modifier.clickable(onClick = onDateClick),
+                modifier = Modifier
+                    .clickable(onClick = onDateClick)
+                    .testTag(TestTag.Launcher.LAUNCHER_TITLE),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -329,19 +333,19 @@ internal fun LauncherTopBar(
             CbIconButton(onClick = onSearchClick) {
                 Icon(
                     imageVector = CbIcons.Search,
-                    contentDescription = null,
+                    contentDescription = stringResource(id = R.string.cd_search),
                 )
             }
             CbIconButton(onClick = onCalendarClick) {
                 Icon(
                     imageVector = CbIcons.CalendarMonth,
-                    contentDescription = null,
+                    contentDescription = stringResource(id = R.string.cd_calendar),
                 )
             }
             CbIconButton(onClick = onAnalyticsClick) {
                 Icon(
                     imageVector = CbIcons.Analytics,
-                    contentDescription = null,
+                    contentDescription = stringResource(id = R.string.cd_analytics),
                 )
             }
         },
