@@ -82,6 +82,7 @@ class WorkManagerAppUpgradeManager @Inject constructor(
     }
 
     override suspend fun downloadFailed() {
+        _isDownloading.tryEmit(false)
         hideNotification()
         val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             PendingIntent.getForegroundService(
@@ -113,6 +114,7 @@ class WorkManagerAppUpgradeManager @Inject constructor(
     }
 
     override suspend fun downloadStopped() {
+        _isDownloading.tryEmit(false)
         hideNotification()
     }
 

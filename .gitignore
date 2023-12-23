@@ -87,5 +87,8 @@ lint/tmp/
 # 签名配置文件
 /gradle/signing.versions.toml
 
+# 生成的 RELEASE.md
+RELEASE.md
+
 # 输出路径
 /outputs
