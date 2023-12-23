@@ -61,6 +61,7 @@ abstract class GenerateBadgingTask : DefaultTask() {
 
     @TaskAction
     fun taskAction() {
+        println("> Task :${project.name}:GenerateBadgingTask")
         execOperations.exec {
             commandLine(
                 aapt2Executable.get().asFile.absolutePath,
@@ -106,6 +107,7 @@ abstract class CheckBadgingTask : DefaultTask() {
     }
 }
 
+@Suppress("UnstableApiUsage")
 fun Project.configureBadgingTasks(
     baseExtension: BaseExtension,
     componentsExtension: ApplicationAndroidComponentsExtension,

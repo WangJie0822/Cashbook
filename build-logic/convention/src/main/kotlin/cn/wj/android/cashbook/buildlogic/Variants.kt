@@ -25,9 +25,9 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
+import org.gradle.api.Project
 import java.io.File
 import javax.lang.model.element.Modifier
-import org.gradle.api.Project
 
 enum class CashbookBuildType(val applicationIdSuffix: String?) {
     Debug(applicationIdSuffix = null),
