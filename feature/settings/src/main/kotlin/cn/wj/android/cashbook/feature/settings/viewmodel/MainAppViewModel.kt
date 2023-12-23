@@ -318,6 +318,10 @@ class MainAppViewModel @Inject constructor(
         val upgradeInfo = updateInfoData.value ?: return
         _updateInfoData.tryEmit(null)
         viewModelScope.launch {
+            if (_isUpgradeDownloading.first()) {
+                // 正在下载，不做处理
+                this@MainAppViewModel.logger().i("confirmUpdate(), in downloading")
+            }
             if (_allowDownload.first()) {
                 // 允许直接下载
                 appUpgradeManager.startDownload(upgradeInfo)

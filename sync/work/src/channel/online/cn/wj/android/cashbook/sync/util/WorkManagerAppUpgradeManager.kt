@@ -84,18 +84,21 @@ class WorkManagerAppUpgradeManager @Inject constructor(
     override suspend fun downloadFailed() {
         _isDownloading.tryEmit(false)
         hideNotification()
-        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val retryIntent = Intent(SERVICE_ACTION_RETRY_DOWNLOAD).apply {
+            `package` = ApplicationInfo.applicationId
+        }
+        val retryPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             PendingIntent.getForegroundService(
                 context,
                 0,
-                Intent(SERVICE_ACTION_RETRY_DOWNLOAD),
+                retryIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
         } else {
             PendingIntent.getService(
                 context,
                 0,
-                Intent(SERVICE_ACTION_RETRY_DOWNLOAD),
+                retryIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
         }
@@ -107,7 +110,7 @@ class WorkManagerAppUpgradeManager @Inject constructor(
                 .addAction(
                     0,
                     R.string.retry.string(context),
-                    pendingIntent,
+                    retryPendingIntent,
                 )
                 .build(),
         )

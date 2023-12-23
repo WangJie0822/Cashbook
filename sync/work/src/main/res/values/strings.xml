@@ -16,7 +16,7 @@
 -->
 <resources>
 
-    <string name="sync_notification_title">记账本</string>
+    <string name="sync_notification_title">正在进行数据同步</string>
     <string name="sync_notification_channel_name">数据同步</string>
     <string name="sync_notification_channel_description">记账本后台任务，用于数据同步</string>
 

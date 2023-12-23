@@ -27,6 +27,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.Constraints
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.SERVICE_ACTION_CANCEL_DOWNLOAD
 import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.sync.R
@@ -130,18 +131,21 @@ internal fun Context.upgradeNotificationBuilder(): NotificationCompat.Builder {
         notificationManager?.createNotificationChannel(channel)
     }
 
-    val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    val cancelIntent = Intent(SERVICE_ACTION_CANCEL_DOWNLOAD).apply {
+        `package` = ApplicationInfo.applicationId
+    }
+    val cancelPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         PendingIntent.getForegroundService(
             this,
             0,
-            Intent(SERVICE_ACTION_CANCEL_DOWNLOAD),
+            cancelIntent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     } else {
         PendingIntent.getService(
             this,
             0,
-            Intent(SERVICE_ACTION_CANCEL_DOWNLOAD),
+            cancelIntent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
@@ -161,6 +165,6 @@ internal fun Context.upgradeNotificationBuilder(): NotificationCompat.Builder {
         .addAction(
             0,
             R.string.cancel.string(this),
-            pendingIntent,
+            cancelPendingIntent,
         )
 }
