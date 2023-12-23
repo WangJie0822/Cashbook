@@ -174,6 +174,8 @@ fun MainApp(
                 val isLatestVersionText = stringResource(id = R.string.it_is_the_latest_version)
                 val downloadingText = stringResource(id = R.string.update_downloading_hint)
                 val startDownloadText = stringResource(id = R.string.start_background_download)
+                val downloadFailedText = stringResource(id = R.string.download_failed)
+                val installFailedText = stringResource(id = R.string.install_failed)
                 // 显示及隐藏提示
                 LaunchedEffect(viewModel.shouldDisplayBookmark) {
                     if (viewModel.shouldDisplayBookmark != MainAppBookmarkEnum.NONE) {
@@ -184,6 +186,8 @@ fun MainApp(
                             MainAppBookmarkEnum.NO_NEED_UPDATE -> isLatestVersionText
                             MainAppBookmarkEnum.UPDATE_DOWNLOADING -> downloadingText
                             MainAppBookmarkEnum.START_DOWNLOAD -> startDownloadText
+                            MainAppBookmarkEnum.DOWNLOAD_FAILED -> downloadFailedText
+                            MainAppBookmarkEnum.INSTALL_FAILED -> installFailedText
                             else -> ""
                         }
                         if (tipText.isNotBlank()) {

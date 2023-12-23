@@ -33,13 +33,12 @@ import cn.wj.android.cashbook.core.design.security.hexToBytes
 import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
+import cn.wj.android.cashbook.core.model.enums.AppUpgradeStateEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.crypto.Cipher
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +47,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.crypto.Cipher
+import javax.inject.Inject
 
 /**
  * 首页 ViewModel
@@ -82,7 +83,18 @@ class MainAppViewModel @Inject constructor(
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
-    private val _isUpgradeDownloading = appUpgradeManager.isDownloading
+    /** 更新状态 */
+    private val _upgradeState = appUpgradeManager.upgradeState.apply {
+        viewModelScope.launch {
+            collect { state ->
+                if (state == AppUpgradeStateEnum.DOWNLOAD_FAILED) {
+                    shouldDisplayBookmark = MainAppBookmarkEnum.DOWNLOAD_FAILED
+                } else if (state == AppUpgradeStateEnum.INSTALL_FAILED) {
+                    shouldDisplayBookmark = MainAppBookmarkEnum.INSTALL_FAILED
+                }
+            }
+        }
+    }
 
     /** 标记 - 是否正在获取更新数据 */
     var inRequestUpdateData by mutableStateOf(false)
@@ -293,7 +305,7 @@ class MainAppViewModel @Inject constructor(
         logger().i("checkUpdate()")
         viewModelScope.launch {
             try {
-                if (_isUpgradeDownloading.first()) {
+                if (_upgradeState.first() != AppUpgradeStateEnum.NONE) {
                     shouldDisplayBookmark = MainAppBookmarkEnum.UPDATE_DOWNLOADING
                     return@launch
                 }
@@ -327,7 +339,7 @@ class MainAppViewModel @Inject constructor(
         val upgradeInfo = updateInfoData.value ?: return
         _updateInfoData.tryEmit(null)
         viewModelScope.launch {
-            if (_isUpgradeDownloading.first()) {
+            if (_upgradeState.first() != AppUpgradeStateEnum.NONE) {
                 // 正在下载，不做处理
                 this@MainAppViewModel.logger().i("confirmUpdate(), in downloading")
             }

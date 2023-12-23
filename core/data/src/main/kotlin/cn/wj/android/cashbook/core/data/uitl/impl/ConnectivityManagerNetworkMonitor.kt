@@ -25,12 +25,12 @@ import androidx.core.content.getSystemService
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
+import javax.inject.Inject
 
 /**
  * 网络状态监听

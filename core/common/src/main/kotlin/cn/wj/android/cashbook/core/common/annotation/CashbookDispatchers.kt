@@ -25,5 +25,6 @@ annotation class Dispatcher(val dispatcher: CashbookDispatchers)
 
 enum class CashbookDispatchers {
     Default,
+    Main,
     IO,
 }

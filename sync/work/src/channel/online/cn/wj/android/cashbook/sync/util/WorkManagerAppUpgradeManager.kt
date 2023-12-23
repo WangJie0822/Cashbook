@@ -30,6 +30,7 @@ import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
+import cn.wj.android.cashbook.core.model.enums.AppUpgradeStateEnum
 import cn.wj.android.cashbook.sync.R
 import cn.wj.android.cashbook.sync.initializers.ApkDownloadWorkName
 import cn.wj.android.cashbook.sync.initializers.NoticeNotificationId
@@ -38,6 +39,7 @@ import cn.wj.android.cashbook.sync.initializers.noticeNotificationBuilder
 import cn.wj.android.cashbook.sync.initializers.upgradeNotificationBuilder
 import cn.wj.android.cashbook.sync.workers.ApkDownloadWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
@@ -51,13 +53,13 @@ class WorkManagerAppUpgradeManager @Inject constructor(
 
     private var upgradeInfo: UpgradeInfoEntity? = null
 
-    private val _isDownloading = MutableStateFlow(false)
+    private val _upgradeState = MutableStateFlow(AppUpgradeStateEnum.NONE)
 
-    override val isDownloading: Flow<Boolean> = _isDownloading
+    override val upgradeState: Flow<AppUpgradeStateEnum> = _upgradeState
 
     override suspend fun startDownload(info: UpgradeInfoEntity) {
         upgradeInfo = info
-        _isDownloading.tryEmit(true)
+        _upgradeState.tryEmit(AppUpgradeStateEnum.DOWNLOADING)
         showNotification()
         WorkManager.getInstance(context).apply {
             enqueueUniqueWork(
@@ -76,13 +78,13 @@ class WorkManagerAppUpgradeManager @Inject constructor(
     }
 
     override suspend fun downloadComplete(apkFile: File) {
-        _isDownloading.tryEmit(false)
+        _upgradeState.tryEmit(AppUpgradeStateEnum.DOWNLOAD_SUCCESS)
         hideNotification()
         install(apkFile)
     }
 
     override suspend fun downloadFailed() {
-        _isDownloading.tryEmit(false)
+        _upgradeState.tryEmit(AppUpgradeStateEnum.DOWNLOAD_FAILED)
         hideNotification()
         val retryIntent = Intent(SERVICE_ACTION_RETRY_DOWNLOAD).apply {
             `package` = ApplicationInfo.applicationId
@@ -114,15 +116,17 @@ class WorkManagerAppUpgradeManager @Inject constructor(
                 )
                 .build(),
         )
+        delay(200L)
+        _upgradeState.tryEmit(AppUpgradeStateEnum.NONE)
     }
 
     override suspend fun downloadStopped() {
-        _isDownloading.tryEmit(false)
+        _upgradeState.tryEmit(AppUpgradeStateEnum.NONE)
         hideNotification()
     }
 
     override suspend fun cancelDownload() {
-        _isDownloading.tryEmit(false)
+        _upgradeState.tryEmit(AppUpgradeStateEnum.NONE)
         hideNotification()
         WorkManager.getInstance(context).cancelAllWorkByTag(ApkDownloadWorkName)
     }
@@ -163,8 +167,8 @@ class WorkManagerAppUpgradeManager @Inject constructor(
         )
     }
 
-    private fun install(file: File) {
-        logger().d("install file: ${file.path}")
+    private suspend fun install(file: File) {
+        this@WorkManagerAppUpgradeManager.logger().d("install file: ${file.path}")
         try {
             context.startActivity(
                 Intent(Intent.ACTION_VIEW).apply {
@@ -179,7 +183,11 @@ class WorkManagerAppUpgradeManager @Inject constructor(
                 },
             )
         } catch (throwable: Throwable) {
-            logger().e(throwable, "install")
+            this@WorkManagerAppUpgradeManager.logger().e(throwable, "install")
+            _upgradeState.tryEmit(AppUpgradeStateEnum.INSTALL_FAILED)
+        } finally {
+            delay(200L)
+            _upgradeState.tryEmit(AppUpgradeStateEnum.NONE)
         }
     }
 }

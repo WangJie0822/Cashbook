@@ -14,34 +14,17 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.feature.settings.enums
+package cn.wj.android.cashbook.core.model.enums
 
-enum class MainAppBookmarkEnum {
-
-    /** 无提示 */
+/**
+ * APP 升级状态枚举
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/12/23
+ */
+enum class AppUpgradeStateEnum {
     NONE,
-
-    /** 解密失败 */
-    PASSWORD_DECODE_FAILED,
-
-    /** 密码错误 */
-    PASSWORD_WRONG,
-
-    /** 认证失败 */
-    ERROR,
-
-    /** 更新下载中 */
-    UPDATE_DOWNLOADING,
-
-    /** 不需要更新 */
-    NO_NEED_UPDATE,
-
-    /** 开始下载 */
-    START_DOWNLOAD,
-
-    /** 下载失败 */
+    DOWNLOADING,
     DOWNLOAD_FAILED,
-
-    /** 安装失败 */
+    DOWNLOAD_SUCCESS,
     INSTALL_FAILED,
 }
