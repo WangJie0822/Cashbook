@@ -71,6 +71,7 @@ class UpgradeService : Service() {
                 }
             }
         }
+        stopSelf()
         return super.onStartCommand(intent, flags, startId)
     }
 
