@@ -75,7 +75,7 @@ interface SettingRepository {
     suspend fun updateAgreedProtocol(agreedProtocol: Boolean)
 
     /** 检查更新 */
-    suspend fun checkUpdate(): UpgradeInfoEntity
+    suspend fun getLatestUpdateInfo(): UpgradeInfoEntity
 
     suspend fun syncLatestVersion(): Boolean
 

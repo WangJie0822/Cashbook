@@ -38,6 +38,8 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.crypto.Cipher
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -46,8 +48,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.crypto.Cipher
-import javax.inject.Inject
 
 /**
  * 首页 ViewModel
@@ -61,7 +61,7 @@ import javax.inject.Inject
 class MainAppViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     booksRepository: BooksRepository,
-    networkMonitor: NetworkMonitor,
+    private val networkMonitor: NetworkMonitor,
     private val appUpgradeManager: AppUpgradeManager,
 ) : ViewModel() {
 
@@ -262,9 +262,14 @@ class MainAppViewModel @Inject constructor(
             try {
                 val appDataModel = settingRepository.appDataMode.first()
                 if (!appDataModel.autoCheckUpdate) {
+                    this@MainAppViewModel.logger().i("checkUpdateAuto(), autoCheckUpdate is off")
                     return@launch
                 }
-                val upgradeInfoEntity = settingRepository.checkUpdate()
+                if (!networkMonitor.isOnline.first()) {
+                    this@MainAppViewModel.logger().i("checkUpdateAuto(), network is not online")
+                    return@launch
+                }
+                val upgradeInfoEntity = settingRepository.getLatestUpdateInfo()
                 if (upgradeInfoEntity.versionName == appDataModel.ignoreUpdateVersion) {
                     return@launch
                 }
@@ -292,19 +297,23 @@ class MainAppViewModel @Inject constructor(
                     shouldDisplayBookmark = MainAppBookmarkEnum.UPDATE_DOWNLOADING
                     return@launch
                 }
-                inRequestUpdateData = true
-                if (settingRepository.syncLatestVersion()) {
-                    val upgradeInfoEntity = settingRepository.checkUpdate()
-                    checkUpgradeFromInfo(
-                        info = upgradeInfoEntity,
-                        need = {
-                            _updateInfoData.tryEmit(upgradeInfoEntity)
-                        },
-                        noNeed = {
-                            shouldDisplayBookmark = MainAppBookmarkEnum.NO_NEED_UPDATE
-                        },
-                    )
+                if (!networkMonitor.isOnline.first()) {
+                    this@MainAppViewModel.logger().i("checkUpdate(), network is not online")
+                    return@launch
                 }
+                inRequestUpdateData = true
+                val syncFromRemote = settingRepository.syncLatestVersion()
+                this@MainAppViewModel.logger().i("checkUpdate(), syncFromRemote = $syncFromRemote")
+                val upgradeInfoEntity = settingRepository.getLatestUpdateInfo()
+                checkUpgradeFromInfo(
+                    info = upgradeInfoEntity,
+                    need = {
+                        _updateInfoData.tryEmit(upgradeInfoEntity)
+                    },
+                    noNeed = {
+                        shouldDisplayBookmark = MainAppBookmarkEnum.NO_NEED_UPDATE
+                    },
+                )
             } catch (throwable: Throwable) {
                 logger().e(throwable, "checkUpdate()")
             } finally {

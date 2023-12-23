@@ -127,7 +127,7 @@ class SettingRepositoryImpl @Inject constructor(
             appPreferencesDataSource.updateAgreedProtocol(agreedProtocol)
         }
 
-    override suspend fun checkUpdate(): UpgradeInfoEntity = withContext(coroutineContext) {
+    override suspend fun getLatestUpdateInfo(): UpgradeInfoEntity = withContext(coroutineContext) {
         val gitDataModel = gitDataModel.first()
         UpgradeInfoEntity(
             versionName = gitDataModel.latestVersionName,
