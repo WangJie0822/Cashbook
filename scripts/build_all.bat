@@ -1,2 +1,2 @@
-gradlew.bat :app:generateBaselineProfile :app:assemble
+gradlew.bat :app:assemble
 

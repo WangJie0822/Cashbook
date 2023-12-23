@@ -55,8 +55,7 @@ class StartupBenchmarks {
     val rule = MacrobenchmarkRule()
 
     @Test
-    fun startupCompilationNone() =
-        benchmark(CompilationMode.None())
+    fun startupCompilationNone() = benchmark(CompilationMode.None())
 
     @Test
     fun startupCompilationBaselineProfiles() =
@@ -65,7 +64,7 @@ class StartupBenchmarks {
     private fun benchmark(compilationMode: CompilationMode) {
         // This example works only with the variant with application id `cn.wj.android.cashbook`."
         rule.measureRepeated(
-            packageName = "cn.wj.android.cashbook",
+            packageName = PACKAGE_NAME,
             metrics = listOf(StartupTimingMetric()),
             compilationMode = compilationMode,
             startupMode = StartupMode.COLD,

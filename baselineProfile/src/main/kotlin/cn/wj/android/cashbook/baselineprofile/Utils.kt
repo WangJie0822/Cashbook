@@ -20,5 +20,4 @@ package cn.wj.android.cashbook.baselineprofile
 val PACKAGE_NAME = buildString {
     append("cn.wj.android.cashbook")
     append(BuildConfig.APP_FLAVOR_SUFFIX)
-    append(BuildConfig.APP_BUILD_TYPE_SUFFIX)
 }

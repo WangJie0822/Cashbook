@@ -61,7 +61,7 @@ class BaselineProfileGenerator {
     fun generate() {
         // This example works only with the variant with application id `cn.wj.android.cashbook`."
         rule.collect(
-            packageName = "cn.wj.android.cashbook",
+            packageName = PACKAGE_NAME,
 
             // See: https://d.android.com/topic/performance/baselineprofiles/dex-layout-optimizations
             includeInStartupProfile = true,

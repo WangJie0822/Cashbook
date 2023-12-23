@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.api.dsl.ManagedVirtualDevice
+@file:Suppress("UnstableApiUsage")
+
 import cn.wj.android.cashbook.buildlogic.configureFlavors
+import com.android.build.api.dsl.ManagedVirtualDevice
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.test)
@@ -34,10 +36,14 @@ android {
     targetProjectPath = ":app"
     experimentalProperties["android.experimental.self-instrumenting"] = true
 
+    buildFeatures.buildConfig = true
+
     // Use the same flavor dimensions as the application to allow generating Baseline Profiles on prod,
     // which is more close to what will be shipped to users (no fake data), but has ability to run the
     // benchmarks on demo, so we benchmark on stable data.
-    configureFlavors(this)
+    configureFlavors(this) { flavor ->
+        buildConfigField("String", "APP_FLAVOR_SUFFIX", "\"${flavor.applicationIdSuffix ?: ""}\"")
+    }
 
     testOptions.managedDevices.devices {
         create<ManagedVirtualDevice>("pixel6Api34") {
