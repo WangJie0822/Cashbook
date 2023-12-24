@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
@@ -64,6 +65,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
                 webDAVAccount = it.webDAVAccount,
                 webDAVPassword = it.webDAVPassword,
                 backupPath = it.backupPath,
+                lastBackupTime = if (it.lastBackupMs <= 0L) "" else it.lastBackupMs.dateFormat(),
                 autoBackup = it.autoBackup,
                 keepLatestBackup = it.keepLatestBackup,
             )
@@ -198,6 +200,7 @@ sealed interface BackupAndRecoveryUiState {
         val webDAVAccount: String,
         val webDAVPassword: String,
         val backupPath: String,
+        val lastBackupTime: String,
         val autoBackup: AutoBackupModeEnum,
         val keepLatestBackup: Boolean,
     ) : BackupAndRecoveryUiState

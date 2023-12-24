@@ -102,6 +102,7 @@
     <string name="backup_path">备份路径</string>
     <string name="click_to_select_backup_path">点击选择备份路径</string>
     <string name="backup">备份</string>
+    <string name="last_backup_time_with_colon">上次备份时间：</string>
     <string name="backup_hint">本地和 WebDAV 一起备份</string>
     <string name="backup_hint_offline">仅本地备份</string>
     <string name="recovery">恢复</string>

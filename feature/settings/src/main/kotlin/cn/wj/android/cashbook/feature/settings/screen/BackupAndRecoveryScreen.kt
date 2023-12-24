@@ -41,6 +41,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarResult
@@ -501,6 +502,16 @@ internal fun BackupAndRecoveryScaffoldContent(
             },
         )
         CbListItem(
+            overlineContent = if (uiState.lastBackupTime.isBlank()) {
+                null
+            } else {
+                @Composable {
+                    Text(
+                        text = stringResource(id = R.string.last_backup_time_with_colon) + uiState.lastBackupTime,
+                        color = LocalContentColor.current.copy(0.5f),
+                    )
+                }
+            },
             headlineContent = { Text(text = stringResource(id = R.string.backup)) },
             supportingContent = {
                 Text(
@@ -543,11 +554,14 @@ internal fun BackupAndRecoveryScaffoldContent(
                         ),
                     )
                 },
-                modifier = Modifier.combinedClickable(onClick = {
-                    onRecoveryClick(false, "")
-                }, onLongClick = {
-                    expended = true
-                }),
+                modifier = Modifier.combinedClickable(
+                    onClick = {
+                        onRecoveryClick(false, "")
+                    },
+                    onLongClick = {
+                        expended = true
+                    },
+                ),
             )
             DropdownMenu(expanded = expended, onDismissRequest = { expended = false }) {
                 DropdownMenuItem(
