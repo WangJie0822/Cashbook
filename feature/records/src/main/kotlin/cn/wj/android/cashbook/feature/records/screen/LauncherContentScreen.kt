@@ -478,12 +478,14 @@ private fun FrontLayerContent(
                             ) {
                                 Text(
                                     modifier = Modifier.weight(1f),
-                                    text = when (key.dayType) {
-                                        0 -> stringResource(id = R.string.today)
-                                        -1 -> stringResource(id = R.string.yesterday)
-                                        -2 -> stringResource(id = R.string.before_yesterday)
-                                        else -> "${key.day}${stringResource(id = R.string.day)}"
-                                    },
+                                    text = "${key.day}${stringResource(id = R.string.day)}${
+                                        when (key.dayType) {
+                                            0 -> stringResource(id = R.string.today_with_brackets)
+                                            -1 -> stringResource(id = R.string.yesterday_with_brackets)
+                                            -2 -> stringResource(id = R.string.before_yesterday_with_brackets)
+                                            else -> ""
+                                        }
+                                    }",
                                 )
                                 Text(
                                     text = buildString {
@@ -517,6 +519,7 @@ private fun FrontLayerContent(
                         items(recordList, key = { it.id }) {
                             RecordListItem(
                                 item = it,
+                                showDate = false,
                                 modifier = Modifier.clickable {
                                     onRecordItemClick(it)
                                 },
@@ -544,6 +547,7 @@ internal fun RecordListItem(
     modifier: Modifier = Modifier,
     showTags: Boolean = true,
     showRemarks: Boolean = true,
+    showDate: Boolean = true,
 ) {
     CbListItem(
         modifier = modifier,
@@ -589,7 +593,11 @@ internal fun RecordListItem(
         supportingContent = {
             Text(
                 text = buildAnnotatedString {
-                    append(item.recordTime.split(" ").first())
+                    if (showDate) {
+                        append(item.recordTime)
+                    } else {
+                        append(item.recordTime.split(" ").last())
+                    }
                     if (showRemarks) {
                         withStyle(SpanStyle(color = LocalContentColor.current.copy(alpha = 0.7f))) {
                             append("  ${item.remark}")
@@ -598,6 +606,7 @@ internal fun RecordListItem(
                 },
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
+                style = MaterialTheme.typography.bodySmall,
             )
         },
         trailingContent = {

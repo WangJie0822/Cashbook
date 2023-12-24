@@ -341,6 +341,7 @@ internal fun CalendarScreen(
                                 items(uiState.recordList) {
                                     RecordListItem(
                                         item = it,
+                                        showDate = false,
                                         modifier = Modifier.clickable {
                                             onRecordItemClick(it)
                                         },

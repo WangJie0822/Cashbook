@@ -39,6 +39,9 @@
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
     <string name="before_yesterday">前天</string>
+    <string name="today_with_brackets">（今天）</string>
+    <string name="yesterday_with_brackets">（昨天）</string>
+    <string name="before_yesterday_with_brackets">（前天）</string>
     <string name="income_with_colon">收：</string>
     <string name="expend_with_colon">支：</string>
     <string name="launcher_no_data_hint">当前页仅显示本月数据</string>
