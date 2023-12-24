@@ -20,10 +20,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
+import cn.wj.android.cashbook.core.design.component.CbVerticalGrid
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.fixedContainerColorFor
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
@@ -106,60 +105,56 @@ internal fun EditRecordTypeListScreen(
     modifier: Modifier = Modifier,
 ) {
     val typeColor = currentTypeCategory.typeColor
-    LazyVerticalGrid(
-        modifier = modifier
-            .background(color = MaterialTheme.colorScheme.surface),
-        columns = GridCells.Fixed(RECORD_TYPE_COLUMNS),
-        content = {
-            // 分类列表
-            items(typeList, key = { it.id }) { type ->
-                if (type == RECORD_TYPE_SETTINGS) {
-                    // 设置项
-                    TypeItem(
-                        modifier = Modifier.animateItemPlacement(),
-                        first = true,
-                        shapeType = type.shapeType,
-                        iconPainter = painterResource(id = R.drawable.vector_baseline_settings_24),
-                        typeColor = typeColor,
-                        showMore = false,
-                        title = stringResource(id = R.string.settings),
-                        selected = true,
-                        onTypeClick = onTypeSettingClick,
-                    )
-                } else {
-                    TypeItem(
-                        modifier = Modifier.animateItemPlacement(),
-                        first = type.parentId == -1L,
-                        shapeType = type.shapeType,
-                        iconPainter = painterDrawableResource(idStr = type.iconResName),
-                        typeColor = typeColor,
-                        showMore = type.child.isNotEmpty(),
-                        title = type.name,
-                        selected = type.selected,
-                        onTypeClick = {
-                            val selected = if (!type.selected) {
-                                // 当前为选中，更新为选中
-                                type.copy(selected = true)
-                            } else {
-                                // 当前已选中，取消选中
-                                if (type.parentId != -1L) {
-                                    // 二级分类，选择父类型
-                                    (
-                                        typeList.firstOrNull { it.id == type.parentId }
-                                            ?: typeList.first()
-                                        ).copy(selected = true)
-                                } else {
-                                    // 一级分类，无法取消，不做处理
-                                    null
-                                }
-                            }
-                            selected?.let { onTypeSelect(it.id) }
-                        },
-                    )
-                }
-            }
-        },
-    )
+    CbVerticalGrid(
+        modifier = modifier,
+        columns = RECORD_TYPE_COLUMNS,
+        items = typeList,
+    ) { type ->
+        if (type == RECORD_TYPE_SETTINGS) {
+            // 设置项
+            TypeItem(
+                modifier = Modifier.fillMaxWidth(),
+                first = true,
+                shapeType = type.shapeType,
+                iconPainter = painterResource(id = R.drawable.vector_baseline_settings_24),
+                typeColor = typeColor,
+                showMore = false,
+                title = stringResource(id = R.string.settings),
+                selected = true,
+                onTypeClick = onTypeSettingClick,
+            )
+        } else {
+            TypeItem(
+                modifier = Modifier.fillMaxWidth(),
+                first = type.parentId == -1L,
+                shapeType = type.shapeType,
+                iconPainter = painterDrawableResource(idStr = type.iconResName),
+                typeColor = typeColor,
+                showMore = type.child.isNotEmpty(),
+                title = type.name,
+                selected = type.selected,
+                onTypeClick = {
+                    val selected = if (!type.selected) {
+                        // 当前为选中，更新为选中
+                        type.copy(selected = true)
+                    } else {
+                        // 当前已选中，取消选中
+                        if (type.parentId != -1L) {
+                            // 二级分类，选择父类型
+                            (
+                                typeList.firstOrNull { it.id == type.parentId }
+                                    ?: typeList.first()
+                                ).copy(selected = true)
+                        } else {
+                            // 一级分类，无法取消，不做处理
+                            null
+                        }
+                    }
+                    selected?.let { onTypeSelect(it.id) }
+                },
+            )
+        }
+    }
 }
 
 /**
