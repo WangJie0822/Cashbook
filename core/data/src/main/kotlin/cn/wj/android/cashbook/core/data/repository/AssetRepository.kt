@@ -48,6 +48,8 @@ interface AssetRepository {
     /** 当前不可见资产大类数据 */
     val currentInvisibleAssetTypeData: Flow<List<AssetTypeViewsModel>>
 
+    val topUpInTotalData: Flow<Boolean>
+
     /** 根据资产id [assetId] 获取对应资产数据并返回 */
     suspend fun getAssetById(assetId: Long): AssetModel?
 
@@ -60,6 +62,8 @@ interface AssetRepository {
     suspend fun deleteById(assetId: Long)
 
     suspend fun visibleAssetById(id: Long)
+
+    suspend fun updateTopUpInTotal(topUpInTotal: Boolean)
 }
 
 internal fun AssetTable.asModel(): AssetModel {

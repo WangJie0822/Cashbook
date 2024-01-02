@@ -68,6 +68,7 @@ class AssetRepositoryImpl @Inject constructor(
                     }
                     result.add(
                         AssetTypeViewsModel(
+                            type = type,
                             nameResId = AssetHelper.getNameResIdByType(type),
                             totalAmount = totalAmount.decimalFormat(),
                             assetList = assetList,
@@ -95,6 +96,7 @@ class AssetRepositoryImpl @Inject constructor(
                     }
                     result.add(
                         AssetTypeViewsModel(
+                            type = type,
                             nameResId = AssetHelper.getNameResIdByType(type),
                             totalAmount = totalAmount.decimalFormat(),
                             assetList = assetList,
@@ -104,6 +106,10 @@ class AssetRepositoryImpl @Inject constructor(
             }
             result
         }
+
+    override val topUpInTotalData: Flow<Boolean> = appPreferencesDataSource.appData.mapLatest {
+        it.topUpInTotal
+    }
 
     override suspend fun getAssetById(assetId: Long): AssetModel? = withContext(coroutineContext) {
         assetDao.queryAssetById(assetId)?.asModel()
@@ -143,5 +149,9 @@ class AssetRepositoryImpl @Inject constructor(
     override suspend fun visibleAssetById(id: Long) = withContext(coroutineContext) {
         assetDao.visibleById(id)
         assetDataVersion.updateVersion()
+    }
+
+    override suspend fun updateTopUpInTotal(topUpInTotal: Boolean) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateTopUpInTotal(topUpInTotal)
     }
 }

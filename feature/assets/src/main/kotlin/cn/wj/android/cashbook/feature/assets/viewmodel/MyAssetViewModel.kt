@@ -27,8 +27,9 @@ import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MyAssetViewModel @Inject constructor(
-    assetRepository: AssetRepository,
+    private val assetRepository: AssetRepository,
 ) : ViewModel() {
 
     /** 标记 - 是否显示更多弹窗 */
@@ -57,29 +58,40 @@ class MyAssetViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    val uiState = assetRepository.currentVisibleAssetListData
-        .mapLatest { list ->
-            var totalLiabilities = BigDecimal.ZERO
-            var totalAsset = BigDecimal.ZERO
-            list.forEach { assetModel ->
-                if (assetModel.type.isCreditCard || assetModel.classification == AssetClassificationEnum.BORROW) {
-                    // 信用卡和债务借入
-                    totalLiabilities += assetModel.balance.toBigDecimalOrZero()
-                } else {
+    val uiState = combine(
+        assetRepository.currentVisibleAssetListData,
+        assetRepository.topUpInTotalData,
+    ) { list, topUpInTotal ->
+        var totalLiabilities = BigDecimal.ZERO
+        var totalAsset = BigDecimal.ZERO
+        list.forEach { assetModel ->
+            if (assetModel.type.isCreditCard || assetModel.classification == AssetClassificationEnum.BORROW) {
+                // 信用卡和债务借入
+                totalLiabilities += assetModel.balance.toBigDecimalOrZero()
+            } else {
+                if (!assetModel.type.isTopUp || topUpInTotal) {
                     totalAsset += assetModel.balance.toBigDecimalOrZero()
                 }
             }
-            MyAssetUiState.Success(
-                totalAsset = totalAsset.decimalFormat(),
-                totalLiabilities = totalLiabilities.decimalFormat(),
-                netAsset = (totalAsset - totalLiabilities).decimalFormat(),
-            )
         }
+        MyAssetUiState.Success(
+            topUpInTotal = topUpInTotal,
+            totalAsset = totalAsset.decimalFormat(),
+            totalLiabilities = totalLiabilities.decimalFormat(),
+            netAsset = (totalAsset - totalLiabilities).decimalFormat(),
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
             initialValue = MyAssetUiState.Loading,
         )
+
+    fun updateTopUpInTotal(topUpInTotal: Boolean) {
+        viewModelScope.launch {
+            assetRepository.updateTopUpInTotal(topUpInTotal)
+        }
+    }
 
     fun displayShowMoreDialog() {
         showMoreDialog = true
@@ -93,6 +105,7 @@ class MyAssetViewModel @Inject constructor(
 sealed class MyAssetUiState {
     data object Loading : MyAssetUiState()
     data class Success(
+        val topUpInTotal: Boolean,
         val totalAsset: String,
         val totalLiabilities: String,
         val netAsset: String,

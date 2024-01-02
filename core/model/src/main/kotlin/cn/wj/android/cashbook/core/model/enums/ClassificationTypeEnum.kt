@@ -80,6 +80,9 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
     val isCreditCard: Boolean
         get() = this == CREDIT_CARD_ACCOUNT
 
+    val isTopUp: Boolean
+        get() = this == TOP_UP_ACCOUNT
+
     companion object {
         fun ordinalOf(ordinal: Int): ClassificationTypeEnum {
             return entries.first { it.ordinal == ordinal }

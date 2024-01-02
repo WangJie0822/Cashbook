@@ -33,4 +33,5 @@ message AppPreferences {
   sint64 creditCardPaymentTypeId = 26; // 信用卡还款类型 id
   bool keepLatestBackup = 27; // 是否仅保留本地最后一次备份
   bool canary = 28; // 是否支持实验版本
+  bool topUpInTotal = 29; // 充值账号是否计入总资产
 }
