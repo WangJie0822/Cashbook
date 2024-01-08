@@ -19,25 +19,34 @@ package cn.wj.android.cashbook.feature.settings.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
@@ -51,12 +60,16 @@ import cn.wj.android.cashbook.core.common.GITHUB_HOMEPAGE
 import cn.wj.android.cashbook.core.common.GITHUB_LATEST
 import cn.wj.android.cashbook.core.common.tools.jumpBrowser
 import cn.wj.android.cashbook.core.common.tools.jumpSendEmail
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.model.enums.LogcatState
+import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsViewModel
@@ -83,8 +96,12 @@ internal fun AboutUsRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AboutUsScreen(
+        logcatDialogState = viewModel.logcatDialogState,
+        onRequestUpdateLogcatState = viewModel::updateLogcatState,
+        onRequestDismissDialog = viewModel::dismissDialog,
         uiState = uiState,
         inRequestUpdateData = mainViewModel.inRequestUpdateData,
+        onNameClick = viewModel::countNameClicks,
         onUseGiteeSwitch = viewModel::updateUseGitee,
         onCanarySwitch = viewModel::updateCanary,
         onAutoCheckUpdateSwitch = viewModel::updateAutoCheckUpdate,
@@ -111,8 +128,12 @@ internal fun AboutUsRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AboutUsScreen(
+    logcatDialogState: DialogState,
+    onRequestUpdateLogcatState: (LogcatState) -> Unit,
+    onRequestDismissDialog: () -> Unit,
     uiState: AboutUsUiState,
     inRequestUpdateData: Boolean,
+    onNameClick: () -> Unit,
     onUseGiteeSwitch: (Boolean) -> Unit,
     onCanarySwitch: (Boolean) -> Unit,
     onAutoCheckUpdateSwitch: (Boolean) -> Unit,
@@ -136,6 +157,53 @@ internal fun AboutUsScreen(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
+            ((logcatDialogState as? DialogState.Shown<*>)?.data as? LogcatState)?.let { state ->
+                var logcatState: LogcatState by remember(state) {
+                    mutableStateOf(state)
+                }
+                CbAlertDialog(
+                    onDismissRequest = onRequestDismissDialog,
+                    title = { Text(text = stringResource(id = R.string.logcat_state)) },
+                    text = {
+                        Column(
+                            modifier = Modifier.selectableGroup(),
+                        ) {
+                            LogcatState.entries.forEach { enum ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp)
+                                        .selectable(
+                                            selected = (enum == logcatState),
+                                            onClick = { logcatState = enum },
+                                            role = Role.RadioButton,
+                                        )
+                                        .padding(horizontal = 16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    RadioButton(selected = enum == logcatState, onClick = null)
+                                    Text(
+                                        text = enum.text,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier.padding(start = 16.dp),
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        CbTextButton(onClick = { onRequestUpdateLogcatState(logcatState) }) {
+                            Text(text = stringResource(id = R.string.save))
+                        }
+                    },
+                    dismissButton = {
+                        CbTextButton(onClick = onRequestDismissDialog) {
+                            Text(text = stringResource(id = R.string.close))
+                        }
+                    },
+                )
+            }
+
             val pleaseSelectWebBrowserText = stringResource(id = R.string.please_select_web_browser)
             val currentContext = LocalContext.current
             LazyColumn(
@@ -153,7 +221,9 @@ internal fun AboutUsScreen(
                 }
                 item {
                     Text(
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .clickable(onClick = onNameClick),
                         text = stringResource(id = R.string.app_name_shown),
                         style = MaterialTheme.typography.headlineMedium,
                     )
@@ -344,3 +414,13 @@ internal fun AboutUsScreen(
         }
     }
 }
+
+/** 枚举对应文本 */
+internal val LogcatState.text: String
+    @Composable get() = stringResource(
+        id = when (this) {
+            LogcatState.NONE -> R.string.close
+            LogcatState.ONCE -> R.string.logcat_once
+            LogcatState.ALWAYS -> R.string.logcat_always
+        },
+    )

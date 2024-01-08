@@ -38,6 +38,8 @@ object ApplicationInfo {
 
     var debug = false
 
+    var logcatEnable = false
+
     val isDev: Boolean
         get() = flavor == CashbookFlavor.Dev
 

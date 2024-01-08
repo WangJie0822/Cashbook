@@ -55,4 +55,5 @@ data class AppDataModel(
     val keepLatestBackup: Boolean,
     val canary: Boolean,
     val topUpInTotal: Boolean,
+    val logcatInRelease: Boolean,
 )

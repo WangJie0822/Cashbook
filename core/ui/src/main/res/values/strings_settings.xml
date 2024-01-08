@@ -48,6 +48,9 @@
     <string name="user_agreement_and_privacy_policy_hint_start">欢迎使用记账本APP！我们非常尊重并保护所有使用服务用户的个人隐私权，在使用记账本各项服务前，请您务必仔细阅读、透彻理解并同意接受</string>
     <string name="user_agreement_and_privacy_policy_hint_end">后，再开始使用我们的服务。</string>
     <string name="user_agreement_and_privacy_policy_with_chevron">《用户协议和隐私政策》</string>
+    <string name="logcat_state">日志状态</string>
+    <string name="logcat_once">仅本次开启</string>
+    <string name="logcat_always">总是开启</string>
 
     <string name="retry">重试</string>
 

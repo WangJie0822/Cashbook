@@ -92,4 +92,6 @@ interface SettingRepository {
     suspend fun updateCanary(canary: Boolean)
 
     suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String
+
+    suspend fun updateLogcatInRelease(logcatInRelease: Boolean)
 }

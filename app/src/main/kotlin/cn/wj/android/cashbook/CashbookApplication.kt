@@ -20,15 +20,20 @@ package cn.wj.android.cashbook
 
 import android.app.Application
 import android.util.Log
+import cn.wj.android.cashbook.core.common.ApplicationCoroutineScope
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
+import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.sync.initializers.Sync
 import com.didichuxing.doraemonkit.DoKit
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * 全局应用
@@ -38,8 +43,22 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class CashbookApplication : Application() {
 
+    @Inject
+    lateinit var applicationScope: ApplicationCoroutineScope
+
+    @Inject
+    lateinit var settingsRepository: SettingRepository
+
+    private var logcatEnable = false
+
     override fun onCreate() {
         super.onCreate()
+
+        applicationScope.launch {
+            settingsRepository.appDataMode.collectLatest {
+                logcatEnable = it.logcatInRelease
+            }
+        }
 
         // 初始化应用信息
         with(ApplicationInfo) {
@@ -61,7 +80,7 @@ class CashbookApplication : Application() {
         Logger.addLogAdapter(
             object : AndroidLogAdapter(strategy) {
                 override fun isLoggable(priority: Int, tag: String?): Boolean {
-                    return BuildConfig.DEBUG
+                    return BuildConfig.DEBUG || ApplicationInfo.logcatEnable || logcatEnable
                 }
             },
         )

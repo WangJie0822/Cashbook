@@ -71,6 +71,7 @@ class AppPreferencesDataSource @Inject constructor(
                 keepLatestBackup = it.keepLatestBackup,
                 canary = it.canary,
                 topUpInTotal = it.topUpInTotal,
+                logcatInRelease = it.logcatInRelease,
             )
         }
 
@@ -207,5 +208,9 @@ class AppPreferencesDataSource @Inject constructor(
 
     suspend fun updateTopUpInTotal(topUpInTotal: Boolean) {
         appPreferences.updateData { it.copy { this.topUpInTotal = topUpInTotal } }
+    }
+
+    suspend fun updateLogcatInRelease(logcatInRelease: Boolean) {
+        appPreferences.updateData { it.copy { this.logcatInRelease = logcatInRelease } }
     }
 }

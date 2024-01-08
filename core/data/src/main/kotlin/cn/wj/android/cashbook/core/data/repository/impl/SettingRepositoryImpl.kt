@@ -214,4 +214,8 @@ class SettingRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun updateLogcatInRelease(logcatInRelease: Boolean) = withContext(coroutineContext) {
+        appPreferencesDataSource.updateLogcatInRelease(logcatInRelease)
+    }
 }
