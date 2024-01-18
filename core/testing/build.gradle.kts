@@ -29,16 +29,25 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.domain)
     implementation(projects.core.data)
+    implementation(projects.core.design)
 
     api(libs.junit)
-    api(libs.androidx.test.core)
+
     api(libs.kotlinx.coroutines.test)
 
+    api(libs.androidx.test.core)
     api(libs.androidx.test.espresso.core)
     api(libs.androidx.test.runner)
     api(libs.androidx.test.rules)
+
+    api(libs.androidx.activity.compose)
     api(libs.androidx.compose.ui.test.junit4)
+
     api(libs.google.hilt.android.testing)
+    api(libs.google.accompanist.testharness)
+
+    api(libs.takahirom.roborazzi)
+    api(libs.robolectric.shadows)
 
     debugApi(libs.androidx.compose.ui.test.manifest)
 }
