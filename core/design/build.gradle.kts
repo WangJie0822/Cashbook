@@ -21,6 +21,10 @@ plugins {
 
 android {
     namespace = "cn.wj.android.cashbook.core.design"
+
+    defaultConfig {
+        testInstrumentationRunner = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
+    }
 }
 
 dependencies {
