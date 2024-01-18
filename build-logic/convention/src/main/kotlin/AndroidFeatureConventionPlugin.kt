@@ -15,6 +15,7 @@
  */
 
 import cn.wj.android.cashbook.buildlogic.ProjectSetting
+import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.libs
 import com.android.build.gradle.LibraryExtension
@@ -35,8 +36,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 defaultConfig {
-                    testInstrumentationRunner =
-                        "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
+                    testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
                 }
                 configureGradleManagedDevices(this)
             }

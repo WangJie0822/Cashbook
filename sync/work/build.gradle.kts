@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
+import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
@@ -26,7 +27,7 @@ android {
     namespace = "cn.wj.android.cashbook.sync"
 
     defaultConfig {
-        testInstrumentationRunner = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
+        testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
     }
 
     sourceSets {

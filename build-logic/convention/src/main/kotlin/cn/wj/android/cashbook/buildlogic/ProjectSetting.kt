@@ -115,6 +115,9 @@ object ProjectSetting {
     }
 }
 
+/** Android 仪器化测试 Runner */
+const val TEST_INSTRUMENTATION_RUNNER = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
+
 val JavaVersion.version: Int
     get() = ordinal + 1
 

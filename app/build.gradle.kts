@@ -17,6 +17,7 @@
 
 import cn.wj.android.cashbook.buildlogic.CashbookBuildType
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
+import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 import com.android.build.gradle.api.ApplicationVariant
 import java.io.FileWriter
@@ -44,7 +45,7 @@ android {
         // 开启 Dex 分包
         multiDexEnabled = true
 
-        testInstrumentationRunner = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
+        testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
 
         vectorDrawables {
             useSupportLibrary = true
