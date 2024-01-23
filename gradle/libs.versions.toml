@@ -398,6 +398,7 @@ androidx-room-common = { group = "androidx.room", name = "room-common", version.
 androidx-room-guava = { group = "androidx.room", name = "room-guava", version.ref = "androidx-room" }
 androidx-room-migration = { group = "androidx.room", name = "room-migration", version.ref = "androidx-room" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "androidx-room" }
+androidx-room-gradle-plugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "androidx-room" }
 # Paging 相关 [版本查询(https://developer.android.google.cn/jetpack/androidx/releases/paging)
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "androidx-paging" }
 androidx-paging-runtime-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "androidx-paging" }
@@ -625,6 +626,8 @@ android-library = { id = "com.android.library", version.ref = "android-gradle-pl
 # Android 测试
 android-test = { id = "com.android.test", version.ref = "android-gradle-plugin" }
 androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidx-baselineprofile" }
+# Room 数据库
+androidx-room = { id = "androidx.room", version.ref = "androidx-room" }
 # Kotlin Android
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 # Kotlin kapt

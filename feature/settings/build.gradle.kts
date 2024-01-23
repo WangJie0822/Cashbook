@@ -26,6 +26,11 @@ android {
 
 dependencies {
 
+    // 架构
+    implementation(projects.core.model)
+    implementation(projects.core.common)
+    implementation(projects.core.data)
+
     // Markdown 解析
     implementation(libs.noties.markwon)
 

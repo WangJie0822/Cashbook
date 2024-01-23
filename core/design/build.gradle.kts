@@ -19,6 +19,7 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
@@ -50,4 +51,14 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.google.material)
+
+    testImplementation(libs.androidx.compose.ui.test.manifest)
+    testImplementation(libs.google.accompanist.testharness)
+    testImplementation(libs.google.hilt.android.testing)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.takahirom.roborazzi)
+    testImplementation(projects.core.testing)
+
+    androidTestImplementation(libs.androidx.compose.ui.test.manifest)
+    androidTestImplementation(projects.core.testing)
 }

@@ -26,5 +26,10 @@ android {
 
 dependencies {
 
+    // 架构
+    implementation(projects.core.model)
+    implementation(projects.core.common)
+    implementation(projects.core.data)
+
     implementation(libs.androidx.constraintlayout.compose)
 }

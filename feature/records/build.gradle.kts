@@ -26,8 +26,14 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.paging.compose)
+    // 架构
+    implementation(projects.core.model)
+    implementation(projects.core.common)
+    implementation(projects.core.domain)
+    implementation(projects.core.data)
 
     implementation(projects.repos.mpChartLib)
+
+    implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.androidx.paging.compose)
 }

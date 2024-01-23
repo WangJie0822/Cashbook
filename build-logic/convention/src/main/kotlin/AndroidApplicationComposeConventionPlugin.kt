@@ -31,7 +31,6 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply(ProjectSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
-            pluginManager.apply(ProjectSetting.Plugin.PLUGIN_TAKAHIROM_ROBORAZZI)
 
             val extension = extensions.getByType<ApplicationExtension>()
             configureAndroidCompose(extension)

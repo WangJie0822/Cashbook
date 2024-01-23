@@ -75,7 +75,7 @@ enum class CashbookFlavor(
  *
  * - Application 使用，配置多渠道并生成渠道枚举类
  */
-fun Project.configureFlavors(
+fun configureFlavors(
     commonExtension: CommonExtension<*, *, *, *, *>,
     flavorConfigurationBlock: ProductFlavor.(flavor: CashbookFlavor) -> Unit = {},
 ) {

@@ -101,6 +101,7 @@ object ProjectSetting {
         const val PLUGIN_ANDROID_LIBRARY = "com.android.library"
         const val PLUGIN_ANDROID_TEST = "com.android.test"
         const val PLUGIN_ANDROID_LINT = "com.android.lint"
+        const val PLUGIN_ANDROIDX_ROOM = "androidx.room"
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
         const val PLUGIN_KOTLIN_JVM = "org.jetbrains.kotlin.jvm"
         const val PLUGIN_JACOCO = "org.gradle.jacoco"

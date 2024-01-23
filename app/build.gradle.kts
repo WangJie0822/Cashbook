@@ -150,29 +150,22 @@ android {
 
 dependencies {
 
-    // 测试
-    testImplementation(projects.core.testing)
-//    androidTestImplementation(projects.core.datastoreTest)
-//    androidTestImplementation(projects.core.dataTest)
-    testImplementation(projects.core.network)
-    testImplementation(libs.junit)
-    testImplementation(libs.androidx.navigation.testing)
-    testImplementation(libs.androidx.work.testing)
-    testImplementation(libs.google.accompanist.testharness)
-    testImplementation(kotlin("test"))
-    kspTest(libs.androidx.hilt.compiler)
+    // 功能
+    implementation(projects.feature.tags)
+    implementation(projects.feature.types)
+    implementation(projects.feature.books)
+    implementation(projects.feature.assets)
+    implementation(projects.feature.records)
+    implementation(projects.feature.settings)
 
-    androidTestImplementation(projects.core.testing)
-//    androidTestImplementation(projects.core.datastoreTest)
-//    androidTestImplementation(projects.core.dataTest)
-    androidTestImplementation(projects.core.network)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.androidx.navigation.testing)
-    androidTestImplementation(libs.google.accompanist.testharness)
-    androidTestImplementation(kotlin("test"))
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-    debugImplementation(projects.uiTestHiltManifest)
+    // 架构
+    implementation(projects.core.common)
+    implementation(projects.core.model)
+    implementation(projects.core.design)
+    implementation(projects.core.ui)
+    implementation(projects.core.data)
 
+    // 基线配置
     baselineProfile(projects.baselineProfile)
     implementation(libs.androidx.profileinstaller)
 
@@ -190,21 +183,6 @@ dependencies {
     implementation(libs.bundles.androidx.base.ktx)
 
     implementation(libs.google.material)
-
-    // 功能
-    implementation(projects.feature.tags)
-    implementation(projects.feature.types)
-    implementation(projects.feature.books)
-    implementation(projects.feature.assets)
-    implementation(projects.feature.records)
-    implementation(projects.feature.settings)
-
-    // 设计
-    implementation(projects.core.common)
-    implementation(projects.core.model)
-    implementation(projects.core.design)
-    implementation(projects.core.ui)
-    implementation(projects.core.data)
 
     // 数据同步
     implementation(projects.sync.work)
@@ -226,6 +204,28 @@ dependencies {
 
     debugImplementation(libs.didi.dokit.core)
     releaseImplementation(libs.didi.dokit.noop)
+
+    // 测试相关
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(projects.uiTestHiltManifest)
+
+    kspTest(libs.androidx.hilt.compiler)
+
+//    testImplementation(projects.core.dataTest)
+    testImplementation(projects.core.testing)
+    testImplementation(libs.google.accompanist.testharness)
+    testImplementation(libs.google.hilt.android.testing)
+    testImplementation(libs.androidx.work.testing)
+
+    testImplementation(libs.robolectric)
+    testImplementation(libs.takahirom.roborazzi)
+
+    androidTestImplementation(projects.core.testing)
+//    androidTestImplementation(projects.core.dataTest)
+//    androidTestImplementation(projects.core.datastoreTest)
+    androidTestImplementation(libs.androidx.navigation.testing)
+    androidTestImplementation(libs.google.accompanist.testharness)
+    androidTestImplementation(libs.google.hilt.android.testing)
 }
 
 baselineProfile {

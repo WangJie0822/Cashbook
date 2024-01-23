@@ -19,7 +19,6 @@ import cn.wj.android.cashbook.buildlogic.configureBadgingTasks
 import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
 import cn.wj.android.cashbook.buildlogic.configurePrintApksTask
-import cn.wj.android.cashbook.buildlogic.version
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
@@ -27,7 +26,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 /**
  * Kotlin Android Application 插件
@@ -43,10 +41,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
                 apply(ProjectSetting.Plugin.PLUGIN_DEPENDENCY_GUARD)
                 apply(ProjectSetting.Plugin.PLUGIN_CASHBOOK_LINT)
-            }
-
-            extensions.configure<KotlinProjectExtension> {
-                jvmToolchain(ProjectSetting.Config.javaVersion.version)
             }
 
             extensions.configure<ApplicationExtension> {

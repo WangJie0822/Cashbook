@@ -40,13 +40,6 @@ internal fun Project.configureKotlinAndroid(
             minSdk = ProjectSetting.Config.MIN_SDK
         }
 
-        packaging {
-            resources {
-                excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-                excludes.add("/META-INF/{DEPENDENCIES,LICENSE.md,NOTICE.md,INDEX.LIST}")
-            }
-        }
-
         compileOptions {
             sourceCompatibility = ProjectSetting.Config.javaVersion
             targetCompatibility = ProjectSetting.Config.javaVersion
@@ -86,10 +79,8 @@ private fun Project.configureKotlin() {
             val warningsAsErrors: String? by project
             allWarningsAsErrors = warningsAsErrors.toBoolean()
             freeCompilerArgs = freeCompilerArgs + listOf(
-                "-opt-in=kotlin.RequiresOptIn",
                 // Enable experimental coroutines APIs, including Flow
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-opt-in=kotlinx.coroutines.FlowPreview",
             )
         }
     }

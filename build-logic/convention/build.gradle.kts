@@ -37,6 +37,7 @@ tasks.withType<KotlinCompile>().configureEach {
 dependencies {
     compileOnly(libs.android.gradle.plugin)
     compileOnly(libs.android.tools.common)
+    compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.google.devtools.ksp.gradle.plugin)
     compileOnly(libs.squareup.javapoet)

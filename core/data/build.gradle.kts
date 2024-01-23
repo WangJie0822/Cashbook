@@ -47,5 +47,5 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.documentfile)
-    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
 }
