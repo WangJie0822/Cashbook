@@ -170,8 +170,8 @@ dependencies {
     androidTestImplementation(libs.androidx.navigation.testing)
     androidTestImplementation(libs.google.accompanist.testharness)
     androidTestImplementation(kotlin("test"))
-//    debugImplementation(libs.androidx.compose.ui.test.manifest)
-//    debugImplementation(projects.uiTestHiltManifest)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(projects.uiTestHiltManifest)
 
     baselineProfile(projects.baselineProfile)
     implementation(libs.androidx.profileinstaller)
