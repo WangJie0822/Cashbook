@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - main
   pull_request:
 
 concurrency:
@@ -75,7 +76,7 @@ jobs:
       # Run local tests after screenshot tests to avoid wrong UP-TO-DATE. TODO: Ignore screenshots.
       - name: Run local tests
         if: always()
-        run: ./gradlew testOnlineDebug testOfflineDebug
+        run: ./gradlew testOnlineDebug testOfflineDebug :lint:test
 
       - name: Build all build type and flavor permutations
         run: ./gradlew :app:assemble
@@ -103,14 +104,25 @@ jobs:
           name: lint-reports
           path: '**/build/reports/lint-results-*.html'
 
+      # 每次构建都会修改版本号，因此无法对 badging 数据进行校验
+#      - name: Check badging
+#        run: ./gradlew :app:checkProdReleaseBadging
+
   androidTest:
-    runs-on: macOS-latest # enables hardware acceleration in the virtual machine
+    runs-on: ubuntu-latest
     timeout-minutes: 55
     strategy:
       matrix:
         api-level: [26, 30]
 
     steps:
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls /dev/kvm
+
       - name: Checkout
         uses: actions/checkout@v4
 
