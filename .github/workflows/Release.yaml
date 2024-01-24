@@ -53,6 +53,7 @@ jobs:
         uses: Tlaster/android-sign@v1.2.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_TOOLS_VERSION: "34.0.0"
           TZ: Asia/Shanghai
         with:
           # The directory to find your release to sign
