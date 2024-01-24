@@ -160,7 +160,7 @@ insert-koin-androidx-compose = "3.4.5"
 insert-koin-ktor = "3.4.1"
 
 # Glide [Github](https://github.com/bumptech/glide)
-bumptech-glide = "4.15.1"
+bumptech-glide = "4.16.0"
 
 # okio [Github](https://github.com/square/okio) [指南](https://square.github.io/okio/)
 squareup-okio = "3.6.0"
