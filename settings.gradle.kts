@@ -8,11 +8,6 @@ pluginManagement {
         google()
         mavenCentral()
         maven { setUrl("https://repo1.maven.org/maven2/") }
-        maven { setUrl("https://maven.aliyun.com/repository/central/") }
-        maven { setUrl("https://maven.aliyun.com/repository/public/") }
-        maven { setUrl("https://maven.aliyun.com/repository/google/") }
-        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin/") }
-        maven { setUrl("https://maven.aliyun.com/repository/apache-snapshots/") }
     }
 }
 
@@ -25,10 +20,6 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { setUrl("https://repo1.maven.org/maven2/") }
         maven { setUrl("https://jitpack.io") }
-        maven { setUrl("https://maven.aliyun.com/repository/central/") }
-        maven { setUrl("https://maven.aliyun.com/repository/public/") }
-        maven { setUrl("https://maven.aliyun.com/repository/google/") }
-        maven { setUrl("https://maven.aliyun.com/repository/apache-snapshots/") }
     }
     // 配置 Version Catalogs
     versionCatalogs {
