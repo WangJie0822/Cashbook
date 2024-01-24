@@ -120,12 +120,7 @@ android {
         CashbookFlavor.values().forEach { flavor ->
             // 配置资源路径
             getByName(flavor.name) {
-                val srcDir = if (flavor == CashbookFlavor.Dev) {
-                    "src/channel/res_Dev"
-                } else {
-                    "src/channel/res"
-                }
-                res.srcDirs(srcDir)
+                res.srcDirs("src/channel/res_${flavor.name}")
             }
         }
     }

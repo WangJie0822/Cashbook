@@ -215,7 +215,7 @@ internal fun AboutUsScreen(
                         modifier = Modifier
                             .size(100.dp)
                             .padding(top = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_launcher),
+                        painter = painterResource(id = R.drawable.ic_app_icon),
                         contentDescription = null,
                     )
                 }

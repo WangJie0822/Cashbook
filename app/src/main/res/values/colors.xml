@@ -15,5 +15,7 @@
      limitations under the License.
 -->
 <resources>
-    <color name="splash_background">#FF2196F3</color>
+    <color name="launcher_background_tint">#2196F3</color>
+    <color name="launcher_foreground_tint">#FFFFFF</color>
+    <color name="splash_background_tint">#2196F3</color>
 </resources>
