@@ -203,7 +203,7 @@ alibaba-arouter = "1.5.2"
 # FastJson [Github](https://github.com/alibaba/fastjson)
 alibaba-fastjson = "2.0.28"
 # FastJson2 [Github](https://github.com/alibaba/fastjson2)
-alibaba-fastjson2 = "2.0.32"
+alibaba-fastjson2 = "2.0.45"
 
 # 腾讯相关
 # MMKV [Github](https://github.com/tencent/mmkv)
