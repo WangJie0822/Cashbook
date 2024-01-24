@@ -213,7 +213,7 @@ tencent-mmkv = "1.2.16"
 # 开发工具 [Github](https://github.com/Android-MI/DoraemonKit)
 didi-doraemonkit = "1.1.2"
 # 开发工具 [Github](https://github.com/didi/DoKit)
-didi-dokit = "3.7.1"
+didi-dokit = "3.7.11"
 
 # Markdown 解析 [Github](https://github.com/noties/Markwon) [指南](https://noties.io/Markwon/)
 noties-markwon = "4.6.2"
