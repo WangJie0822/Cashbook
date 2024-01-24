@@ -157,7 +157,7 @@ androidx-profileinstaller = "1.3.1"
 insert-koin = "3.4.2"
 insert-koin-android = "3.4.2"
 insert-koin-androidx-compose = "3.4.5"
-insert-koin-ktor = "3.4.1"
+insert-koin-ktor = "3.5.3"
 
 # Glide [Github](https://github.com/bumptech/glide)
 bumptech-glide = "4.15.1"
