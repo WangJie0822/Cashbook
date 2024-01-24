@@ -197,9 +197,6 @@ dependencies {
 
     implementation(libs.androidx.core.splashscreen)
 
-    debugImplementation(libs.didi.dokit.core)
-    releaseImplementation(libs.didi.dokit.noop)
-
     // 测试相关
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(projects.uiTestHiltManifest)
