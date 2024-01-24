@@ -1,25 +1,43 @@
+/*
+ * Copyright 2021 The Cashbook Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.wj.android.cashbook.buildlogic
 
 import com.android.build.api.variant.AndroidComponentsExtension
-import java.util.Locale
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import java.util.Locale
 
 private val coverageExclusions = listOf(
     // Android
     "**/R.class",
     "**/R\$*.class",
     "**/BuildConfig.*",
-    "**/Manifest*.*"
+    "**/Manifest*.*",
 )
+
+private fun String.capitalize() = replaceFirstChar {
+    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+}
 
 /**
  * 配置 Jacoco
@@ -27,8 +45,6 @@ private val coverageExclusions = listOf(
 internal fun Project.configureJacoco(
     androidComponentsExtension: AndroidComponentsExtension<*, *, *>,
 ) {
-    val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
-
     configure<JacocoPluginExtension> {
         toolVersion = libs.findVersion("jacoco").get().toString()
     }
@@ -36,10 +52,10 @@ internal fun Project.configureJacoco(
     val jacocoTestReport = tasks.create("jacocoTestReport")
 
     androidComponentsExtension.onVariants { variant ->
-        val testTaskName = "test${variant.name.capitalizeFirst()}UnitTest"
+        val testTaskName = "test${variant.name.capitalize()}UnitTest"
 
         val reportTask =
-            tasks.register("jacoco${testTaskName.capitalizeFirst()}Report", JacocoReport::class) {
+            tasks.register("jacoco${testTaskName.capitalize()}Report", JacocoReport::class) {
                 dependsOn(testTaskName)
 
                 reports {
@@ -51,14 +67,14 @@ internal fun Project.configureJacoco(
                 classDirectories.setFrom(
                     fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
                         exclude(coverageExclusions)
-                    }
+                    },
                 )
 
                 sourceDirectories.setFrom(
                     files(
                         "$projectDir/src/main/java",
-                        "$projectDir/src/main/kotlin"
-                    )
+                        "$projectDir/src/main/kotlin",
+                    ),
                 )
                 executionData.setFrom(file("$buildDir/jacoco/$testTaskName.exec"))
             }
@@ -77,13 +93,5 @@ internal fun Project.configureJacoco(
             // https://github.com/gradle/gradle/issues/5184#issuecomment-391982009
             excludes = listOf("jdk.internal.*")
         }
-    }
-}
-
-private fun String.capitalizeFirst(): String {
-    return replaceFirstChar {
-        if (it.isLowerCase()) it.titlecase(
-            Locale.getDefault()
-        ) else it.toString()
     }
 }

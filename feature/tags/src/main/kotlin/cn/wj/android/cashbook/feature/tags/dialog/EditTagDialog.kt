@@ -20,12 +20,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -34,7 +32,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.R
@@ -97,13 +97,13 @@ private fun EditTagDialog(
             errorFor = { blankHintText },
         )
     }
-    AlertDialog(
+    CbAlertDialog(
         modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp - 80.dp),
         onDismissRequest = onRequestDismissDialog,
         title = { Text(text = title) },
         text = {
             Column {
-                CompatTextField(
+                CbTextField(
                     textFieldState = tagNameState,
                     label = {
                         Text(
@@ -118,7 +118,7 @@ private fun EditTagDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
+            CbTextButton(onClick = {
                 if (tagNameState.isValid) {
                     val model =
                         tagModel?.copy(name = tagNameState.text) ?: TagModel(-1L, tagNameState.text)
@@ -129,7 +129,7 @@ private fun EditTagDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onRequestDismissDialog) {
+            CbTextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },

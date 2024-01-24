@@ -18,7 +18,6 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library.flavors)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
-    alias(conventionLibs.plugins.cashbook.android.lint)
 }
 
 android {
@@ -26,6 +25,12 @@ android {
 }
 
 dependencies {
+
+    // 架构
+    implementation(projects.core.model)
+    implementation(projects.core.common)
+    implementation(projects.core.domain)
+    implementation(projects.core.data)
 
     implementation(libs.androidx.constraintlayout.compose)
 }

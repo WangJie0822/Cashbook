@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
+
 plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
-    alias(conventionLibs.plugins.cashbook.android.lint)
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
     namespace = "cn.wj.android.cashbook.core.design"
+
+    defaultConfig {
+        testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
+    }
 }
 
 dependencies {
@@ -45,4 +51,14 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.google.material)
+
+    testImplementation(libs.androidx.compose.ui.test.manifest)
+    testImplementation(libs.google.accompanist.testharness)
+    testImplementation(libs.google.hilt.android.testing)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.takahirom.roborazzi)
+    testImplementation(projects.core.testing)
+
+    androidTestImplementation(libs.androidx.compose.ui.test.manifest)
+    androidTestImplementation(projects.core.testing)
 }

@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.Dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CashbookModalBottomSheet(
+fun CbModalBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),

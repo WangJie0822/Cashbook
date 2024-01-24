@@ -30,8 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 
 /**
  * 字体排版
@@ -136,9 +136,9 @@ internal val CashbookTypography = Typography(
 private fun TypographyPreview() {
     CashbookTheme {
         CashbookGradientBackground {
-            CashbookScaffold(
+            CbScaffold(
                 topBar = {
-                    CashbookTopAppBar(onBackClick = {}, title = { Text(text = "titleLarge") })
+                    CbTopAppBar(onBackClick = {}, title = { Text(text = "titleLarge") })
                 },
             ) { paddingValues ->
                 Column(

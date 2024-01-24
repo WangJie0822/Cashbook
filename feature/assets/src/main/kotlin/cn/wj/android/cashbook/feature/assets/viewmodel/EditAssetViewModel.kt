@@ -179,6 +179,8 @@ class EditAssetViewModel @Inject constructor(
         dialogState = DialogState.Dismiss
     }
 
+    private var doSaving = false
+
     /** 保存资产 */
     fun save(
         assetName: String,
@@ -189,6 +191,10 @@ class EditAssetViewModel @Inject constructor(
         remark: String,
         onSuccess: () -> Unit,
     ) {
+        if (doSaving) {
+            return
+        }
+        doSaving = true
         viewModelScope.launch {
             try {
                 val assetModel = _displayAssetInfo.first().copy(
@@ -203,13 +209,13 @@ class EditAssetViewModel @Inject constructor(
                     _defaultAssetInfo.first().toString() == assetModel.toString()
                 ) {
                     this@EditAssetViewModel.logger().i("save(), data no change, finish")
-                    onSuccess()
                 } else {
                     saveAssetUseCase(assetModel)
-                    onSuccess()
                 }
+                onSuccess()
             } catch (throwable: Throwable) {
                 this@EditAssetViewModel.logger().e(throwable, "save()")
+                doSaving = true
             }
         }
     }

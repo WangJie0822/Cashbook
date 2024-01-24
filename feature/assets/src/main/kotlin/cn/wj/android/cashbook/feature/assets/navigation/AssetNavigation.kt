@@ -137,6 +137,7 @@ fun NavGraphBuilder.assetInfoScreen(
     assetRecordListContent: @Composable (Long, @Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
     onRequestNaviToEditAsset: (Long) -> Unit,
+    onRequestNaviToAddRecord: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(
@@ -160,6 +161,7 @@ fun NavGraphBuilder.assetInfoScreen(
             },
             recordDetailSheetContent = recordDetailSheetContent,
             onRequestNaviToEditAsset = { onRequestNaviToEditAsset(assetId) },
+            onRequestNaviToAddRecord = { onRequestNaviToAddRecord(assetId) },
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }

@@ -15,10 +15,8 @@
  */
 plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
-    alias(conventionLibs.plugins.cashbook.android.library.flavors)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
     alias(conventionLibs.plugins.cashbook.android.hilt)
-    alias(conventionLibs.plugins.cashbook.android.lint)
 }
 
 android {
@@ -49,5 +47,5 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.documentfile)
-    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
 }

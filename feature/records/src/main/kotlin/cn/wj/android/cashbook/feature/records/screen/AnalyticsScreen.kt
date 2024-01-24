@@ -28,16 +28,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -65,13 +60,18 @@ import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.common.tools.toLocalDate
 import cn.wj.android.cashbook.core.common.tools.toMs
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbElevatedCard
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTab
+import cn.wj.android.cashbook.core.design.component.CbTabRow
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.DateRangePickerDialog
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarTypeEnum
@@ -150,10 +150,10 @@ private fun AnalyticsScreen(
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 title = {
                     if (uiState is AnalyticsUiState.Success) {
                         Row(
@@ -170,7 +170,7 @@ private fun AnalyticsScreen(
                                 },
                             )
                             Icon(
-                                imageVector = CashbookIcons.ArrowDropDown,
+                                imageVector = CbIcons.ArrowDropDown,
                                 contentDescription = null,
                             )
                         }
@@ -178,8 +178,8 @@ private fun AnalyticsScreen(
                 },
                 onBackClick = onRequestPopBackStack,
                 actions = {
-                    IconButton(onClick = onRequestShowSelectDateRangeDialog) {
-                        Icon(imageVector = CashbookIcons.DateRange, contentDescription = null)
+                    CbIconButton(onClick = onRequestShowSelectDateRangeDialog) {
+                        Icon(imageVector = CbIcons.DateRange, contentDescription = null)
                     }
                 },
             )
@@ -228,7 +228,7 @@ private fun AnalyticsScreen(
                 }
 
                 if (null != sheetData) {
-                    CashbookModalBottomSheet(
+                    CbModalBottomSheet(
                         onDismissRequest = onRequestDismissBottomSheet,
                         sheetState = rememberModalBottomSheetState(
                             confirmValueChange = {
@@ -249,7 +249,7 @@ private fun AnalyticsScreen(
                                         centerTo(parent)
                                     },
                                 )
-                                IconButton(
+                                CbIconButton(
                                     onClick = { onRequestNaviToTypeAnalytics(sheetData.typeId) },
                                     modifier = Modifier.constrainAs(icon) {
                                         end.linkTo(parent.end)
@@ -257,7 +257,7 @@ private fun AnalyticsScreen(
                                     },
                                 ) {
                                     Icon(
-                                        imageVector = CashbookIcons.DonutSmall,
+                                        imageVector = CbIcons.DonutSmall,
                                         contentDescription = null,
                                     )
                                 }
@@ -316,77 +316,56 @@ private fun AnalyticsScreen(
                     }
 
                     is AnalyticsUiState.Success -> {
-                        LazyColumn(content = {
-                            item {
-                                ElevatedCard(
-                                    modifier = Modifier.padding(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp,
-                                    ),
-                                ) {
-                                    Column(
+                        LazyColumn(
+                            content = {
+                                item {
+                                    CbElevatedCard(
                                         modifier = Modifier.padding(
                                             horizontal = 16.dp,
                                             vertical = 8.dp,
                                         ),
                                     ) {
-                                        Text(
-                                            text = stringResource(id = R.string.overview_of_revenue_and_expenditure),
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(text = stringResource(id = R.string.total_income))
-                                        Text(
-                                            text = uiState.totalIncome.withCNY(),
-                                            fontWeight = FontWeight.Bold,
-                                        )
-                                        Spacer(modifier = Modifier.height(24.dp))
-                                        Row {
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text(text = stringResource(id = R.string.total_expenditure))
-                                                Text(
-                                                    text = uiState.totalExpenditure.withCNY(),
-                                                    fontWeight = FontWeight.Bold,
-                                                )
-                                            }
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text(text = stringResource(id = R.string.total_balance))
-                                                Text(
-                                                    text = uiState.totalBalance.withCNY(),
-                                                    fontWeight = FontWeight.Bold,
-                                                )
+                                        Column(
+                                            modifier = Modifier.padding(
+                                                horizontal = 16.dp,
+                                                vertical = 8.dp,
+                                            ),
+                                        ) {
+                                            Text(
+                                                text = stringResource(id = R.string.overview_of_revenue_and_expenditure),
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(text = stringResource(id = R.string.total_income))
+                                            Text(
+                                                text = uiState.totalIncome.withCNY(),
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Spacer(modifier = Modifier.height(24.dp))
+                                            Row {
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(text = stringResource(id = R.string.total_expenditure))
+                                                    Text(
+                                                        text = uiState.totalExpenditure.withCNY(),
+                                                        fontWeight = FontWeight.Bold,
+                                                    )
+                                                }
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(text = stringResource(id = R.string.total_balance))
+                                                    Text(
+                                                        text = uiState.totalBalance.withCNY(),
+                                                        fontWeight = FontWeight.Bold,
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
 
-                            if (!uiState.noData) {
-                                item {
-                                    AnalyticsBarChart(
-                                        uiState = uiState,
-                                        modifier = Modifier.padding(
-                                            horizontal = 16.dp,
-                                            vertical = 8.dp,
-                                        ),
-                                    )
-                                }
-
-                                item {
-                                    AnalyticsPieChart(
-                                        uiState = uiState,
-                                        onRequestShowSheet = onRequestShowBottomSheet,
-                                        modifier = Modifier.padding(
-                                            horizontal = 16.dp,
-                                            vertical = 8.dp,
-                                        ),
-                                    )
-                                }
-
-                                if (!uiState.crossYear) {
+                                if (!uiState.noData) {
                                     item {
-                                        SplitReports(
+                                        AnalyticsBarChart(
                                             uiState = uiState,
                                             modifier = Modifier.padding(
                                                 horizontal = 16.dp,
@@ -394,13 +373,36 @@ private fun AnalyticsScreen(
                                             ),
                                         )
                                     }
-                                }
-                            }
 
-                            item {
-                                Footer(hintText = stringResource(id = R.string.footer_hint_default))
-                            }
-                        })
+                                    item {
+                                        AnalyticsPieChart(
+                                            uiState = uiState,
+                                            onRequestShowSheet = onRequestShowBottomSheet,
+                                            modifier = Modifier.padding(
+                                                horizontal = 16.dp,
+                                                vertical = 8.dp,
+                                            ),
+                                        )
+                                    }
+
+                                    if (!uiState.crossYear) {
+                                        item {
+                                            SplitReports(
+                                                uiState = uiState,
+                                                modifier = Modifier.padding(
+                                                    horizontal = 16.dp,
+                                                    vertical = 8.dp,
+                                                ),
+                                            )
+                                        }
+                                    }
+                                }
+
+                                item {
+                                    Footer(hintText = stringResource(id = R.string.footer_hint_default))
+                                }
+                            },
+                        )
                     }
                 }
             }
@@ -410,7 +412,7 @@ private fun AnalyticsScreen(
 
 @Composable
 private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier = Modifier) {
-    ElevatedCard(
+    CbElevatedCard(
         modifier = modifier,
     ) {
         Text(
@@ -459,7 +461,7 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
                 modifier = Modifier.weight(1f),
             )
         }
-        Divider()
+        CbDivider()
         val barDataList = uiState.barDataList.filter {
             it.date.parseDateLong(DATE_FORMAT_DATE) <= System.currentTimeMillis()
         }.reversed()
@@ -516,7 +518,7 @@ private fun AnalyticsPieChart(
     onRequestShowSheet: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(
+    CbElevatedCard(
         modifier = modifier,
     ) {
         Text(
@@ -566,7 +568,7 @@ private fun AnalyticsPieChart(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         )
 
-        TabRow(
+        CbTabRow(
             selectedTabIndex = selectedTab.ordinal,
             containerColor = Color.Unspecified,
             contentColor = Color.Unspecified,
@@ -577,7 +579,7 @@ private fun AnalyticsPieChart(
             divider = {},
         ) {
             RecordTypeCategoryEnum.entries.forEach { enum ->
-                Tab(
+                CbTab(
                     selected = selectedTab == enum,
                     onClick = { selectedTab = enum },
                     selectedContentColor = MaterialTheme.colorScheme.primary,
@@ -619,7 +621,7 @@ private fun AnalyticsBarChart(
     uiState: AnalyticsUiState.Success,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(
+    CbElevatedCard(
         modifier = modifier,
     ) {
         Text(
@@ -870,7 +872,7 @@ private fun AnalyticsBarChart(
                 }
             },
         )
-        TabRow(
+        CbTabRow(
             selectedTabIndex = selectedTab.ordinal,
             containerColor = Color.Unspecified,
             contentColor = Color.Unspecified,
@@ -881,7 +883,7 @@ private fun AnalyticsBarChart(
             divider = {},
         ) {
             AnalyticsBarTypeEnum.entries.forEach { enum ->
-                Tab(
+                CbTab(
                     selected = selectedTab == enum,
                     onClick = { selectedTab = enum },
                     selectedContentColor = MaterialTheme.colorScheme.primary,

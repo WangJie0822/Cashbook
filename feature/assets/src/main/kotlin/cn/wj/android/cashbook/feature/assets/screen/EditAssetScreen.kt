@@ -32,7 +32,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,7 +39,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,17 +60,19 @@ import cn.wj.android.cashbook.core.common.ext.string
 import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.CommonDivider
-import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTextField
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.component.TransparentListItem
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -194,17 +194,17 @@ internal fun EditAssetScreen(
         )
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = if (isCreate) R.string.new_asset else R.string.edit_asset)) },
             )
         },
         floatingActionButton = {
             if (uiState is EditAssetUiState.Success) {
-                CashbookFloatingActionButton(onClick = {
+                CbFloatingActionButton(onClick = {
                     if (!assetNameTextState.isValid || (uiState.isCreditCard && !totalAmountTextState.isValid)) {
                         // 不满足必要条件
                         assetNameTextState.requestErrors()
@@ -221,7 +221,7 @@ internal fun EditAssetScreen(
                         )
                     }
                 }) {
-                    Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
+                    Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
                 }
             }
         },
@@ -232,7 +232,7 @@ internal fun EditAssetScreen(
                 .fillMaxSize(),
         ) {
             if (bottomSheet != EditAssetBottomSheetEnum.DISMISS) {
-                CashbookModalBottomSheet(
+                CbModalBottomSheet(
                     onDismissRequest = onBottomSheetDismiss,
                     sheetState = rememberModalBottomSheetState(
                         confirmValueChange = {
@@ -267,7 +267,7 @@ internal fun EditAssetScreen(
                     Column(
                         modifier = Modifier.verticalScroll(state = rememberScrollState()),
                     ) {
-                        TransparentListItem(
+                        CbListItem(
                             modifier = Modifier.clickable(
                                 enabled = uiState.typeEnable,
                                 onClick = onSelectClassificationClick,
@@ -294,7 +294,7 @@ internal fun EditAssetScreen(
                                     )
                                     if (uiState.typeEnable) {
                                         Icon(
-                                            imageVector = CashbookIcons.KeyboardArrowRight,
+                                            imageVector = CbIcons.KeyboardArrowRight,
                                             contentDescription = null,
                                         )
                                     }
@@ -302,12 +302,12 @@ internal fun EditAssetScreen(
                             },
                         )
 
-                        CommonDivider(
+                        CbDivider(
                             modifier = Modifier.height(8.dp),
                             color = DividerDefaults.color.copy(alpha = 0.1f),
                         )
 
-                        CompatTextField(
+                        CbTextField(
                             textFieldState = assetNameTextState,
                             label = { Text(text = stringResource(id = R.string.asset_name)) },
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
@@ -319,7 +319,7 @@ internal fun EditAssetScreen(
 
                         if (uiState.isCreditCard) {
                             // 信用卡账号，显示总额度
-                            CompatTextField(
+                            CbTextField(
                                 textFieldState = totalAmountTextState,
                                 label = { Text(text = stringResource(id = R.string.total_amount)) },
                                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -334,7 +334,7 @@ internal fun EditAssetScreen(
                         }
 
                         // 余额 or 信用卡-已用额度
-                        CompatTextField(
+                        CbTextField(
                             textFieldState = balanceTextState,
                             label = { Text(text = stringResource(id = if (uiState.isCreditCard) R.string.arrears else R.string.balance)) },
                             keyboardOptions = KeyboardOptions.Default.copy(
@@ -349,7 +349,7 @@ internal fun EditAssetScreen(
 
                         if (hasBankInfo) {
                             // 开户行
-                            CompatTextField(
+                            CbTextField(
                                 textFieldState = openBankTextState,
                                 label = { Text(text = stringResource(id = R.string.open_bank)) },
                                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
@@ -359,7 +359,7 @@ internal fun EditAssetScreen(
                                     .padding(horizontal = 16.dp),
                             )
                             // 卡号
-                            CompatTextField(
+                            CbTextField(
                                 textFieldState = cardNoTextState,
                                 label = { Text(text = stringResource(id = R.string.card_no)) },
                                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -374,7 +374,7 @@ internal fun EditAssetScreen(
                         }
 
                         // 备注
-                        CompatTextField(
+                        CbTextField(
                             textFieldState = remarkTextState,
                             label = { Text(text = stringResource(id = R.string.remark)) },
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
@@ -384,13 +384,13 @@ internal fun EditAssetScreen(
                                 .padding(horizontal = 16.dp),
                         )
 
-                        CommonDivider(
+                        CbDivider(
                             modifier = Modifier.height(8.dp),
                             color = DividerDefaults.color.copy(alpha = 0.1f),
                         )
 
                         if (uiState.isCreditCard) {
-                            TransparentListItem(
+                            CbListItem(
                                 modifier = Modifier.clickable(onClick = onBillingDateClick),
                                 headlineContent = {
                                     Text(
@@ -413,14 +413,14 @@ internal fun EditAssetScreen(
                                             modifier = Modifier.padding(horizontal = 8.dp),
                                         )
                                         Icon(
-                                            imageVector = CashbookIcons.KeyboardArrowRight,
+                                            imageVector = CbIcons.KeyboardArrowRight,
                                             contentDescription = null,
                                         )
                                     }
                                 },
                             )
 
-                            TransparentListItem(
+                            CbListItem(
                                 modifier = Modifier.clickable(onClick = onRepaymentDateClick),
                                 headlineContent = {
                                     Text(
@@ -444,7 +444,7 @@ internal fun EditAssetScreen(
                                             modifier = Modifier.padding(horizontal = 8.dp),
                                         )
                                         Icon(
-                                            imageVector = CashbookIcons.KeyboardArrowRight,
+                                            imageVector = CbIcons.KeyboardArrowRight,
                                             contentDescription = null,
                                         )
                                     }
@@ -452,7 +452,7 @@ internal fun EditAssetScreen(
                             )
                         }
 
-                        TransparentListItem(
+                        CbListItem(
                             headlineContent = {
                                 Text(
                                     text = stringResource(id = R.string.invisible_asset),
@@ -510,7 +510,7 @@ internal fun SelectDayDialog(
     onDismiss: () -> Unit,
     onDaySelect: (String) -> Unit,
 ) {
-    AlertDialog(onDismissRequest = onDismiss, text = {
+    CbAlertDialog(onDismissRequest = onDismiss, text = {
         Column {
             for (c in 0 until 6) {
                 Row(
@@ -531,11 +531,11 @@ internal fun SelectDayDialog(
             }
         }
     }, confirmButton = {
-        TextButton(onClick = { onDaySelect.invoke("") }) {
+        CbTextButton(onClick = { onDaySelect.invoke("") }) {
             Text(text = stringResource(id = R.string.clear))
         }
     }, dismissButton = {
-        TextButton(onClick = onDismiss) {
+        CbTextButton(onClick = onDismiss) {
             Text(text = stringResource(id = R.string.cancel))
         }
     })
@@ -555,7 +555,7 @@ internal fun SelectAssetClassificationTypeSheet(onItemClick: (ClassificationType
                 .fillMaxWidth()
                 .padding(16.dp),
         )
-        CommonDivider()
+        CbDivider()
 
         LazyColumn(
             content = {
@@ -597,7 +597,7 @@ internal fun SelectAssetClassificationSheet(onItemClick: (AssetClassificationEnu
                 .fillMaxWidth()
                 .padding(16.dp),
         )
-        CommonDivider()
+        CbDivider()
 
         LazyColumn(
             content = {

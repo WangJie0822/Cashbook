@@ -34,9 +34,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
@@ -90,10 +90,10 @@ private fun TypedAnalyticsScreen(
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(title = {
+            CbTopAppBar(title = {
                 if (uiState is TypedAnalyticsUiState.Success) {
                     Text(text = uiState.titleText)
                 }
@@ -102,7 +102,7 @@ private fun TypedAnalyticsScreen(
         content = { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 if (null != viewRecord) {
-                    CashbookModalBottomSheet(
+                    CbModalBottomSheet(
                         onDismissRequest = onRequestDismissBottomSheet,
                         sheetState = rememberModalBottomSheetState(
                             confirmValueChange = {

@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -52,11 +51,12 @@ import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.design.component.CalendarView
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbCard
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -159,10 +159,10 @@ internal fun CalendarScreen(
         }
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = {
                     Row(
@@ -174,7 +174,7 @@ internal fun CalendarScreen(
                             modifier = Modifier.clickable(onClick = onDateClick),
                         )
                         Icon(
-                            imageVector = CashbookIcons.ArrowDropDown,
+                            imageVector = CbIcons.ArrowDropDown,
                             contentDescription = null,
                         )
                     }
@@ -184,7 +184,7 @@ internal fun CalendarScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             if (null != sheetViewData) {
-                CashbookModalBottomSheet(
+                CbModalBottomSheet(
                     onDismissRequest = onRequestDismissSheet,
                     sheetState = rememberModalBottomSheetState(
                         confirmValueChange = {
@@ -268,7 +268,7 @@ internal fun CalendarScreen(
 
                         is CalendarUiState.Success -> {
                             item {
-                                Card(
+                                CbCard(
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -341,6 +341,7 @@ internal fun CalendarScreen(
                                 items(uiState.recordList) {
                                     RecordListItem(
                                         item = it,
+                                        showDate = false,
                                         modifier = Modifier.clickable {
                                             onRecordItemClick(it)
                                         },

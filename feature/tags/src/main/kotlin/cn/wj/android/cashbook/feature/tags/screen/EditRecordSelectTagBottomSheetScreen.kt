@@ -28,7 +28,6 @@ import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -37,7 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CommonDivider
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.model.Selectable
 import cn.wj.android.cashbook.core.model.model.TagModel
@@ -70,15 +70,11 @@ internal fun EditRecordSelectTagBottomSheetRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         tagList = tagList,
         onAddTagClick = viewModel::displayAddTagDialog,
-        onDoneClick = onRequestDismissSheet,
-        onTagItemClick = { tagEntity ->
-            viewModel.updateSelectedTagList(
-                id = tagEntity.id,
-                onResult = { selectedList ->
-                    onTagIdListChange(selectedList)
-                },
-            )
+        onDoneClick = {
+            onRequestDismissSheet()
+            onTagIdListChange(tagList.filter { it.selected }.map { it.data.id })
         },
+        onTagItemClick = viewModel::updateSelectedTagList,
         modifier = modifier,
     )
 }
@@ -100,7 +96,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
     tagList: List<Selectable<TagModel>>,
     onAddTagClick: () -> Unit,
     onDoneClick: () -> Unit,
-    onTagItemClick: (TagModel) -> Unit,
+    onTagItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
@@ -131,7 +127,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                             start.linkTo(parent.start)
                         },
                     )
-                    TextButton(
+                    CbTextButton(
                         modifier = Modifier.constrainAs(add) {
                             top.linkTo(parent.top)
                             end.linkTo(done.start)
@@ -144,7 +140,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }
-                    TextButton(
+                    CbTextButton(
                         modifier = Modifier.constrainAs(done) {
                             top.linkTo(parent.top)
                             end.linkTo(parent.end)
@@ -159,7 +155,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                     }
                 }
 
-                CommonDivider()
+                CbDivider()
 
                 if (tagList.isEmpty()) {
                     Empty(
@@ -177,7 +173,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                         tagList.forEach {
                             ElevatedFilterChip(
                                 selected = it.selected,
-                                onClick = { onTagItemClick(it.data) },
+                                onClick = { onTagItemClick(it.data.id) },
                                 label = { Text(text = it.data.name) },
                             )
                         }

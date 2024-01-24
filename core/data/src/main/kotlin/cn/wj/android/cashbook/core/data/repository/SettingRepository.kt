@@ -75,7 +75,7 @@ interface SettingRepository {
     suspend fun updateAgreedProtocol(agreedProtocol: Boolean)
 
     /** 检查更新 */
-    suspend fun checkUpdate(): UpgradeInfoEntity
+    suspend fun getLatestUpdateInfo(): UpgradeInfoEntity
 
     suspend fun syncLatestVersion(): Boolean
 
@@ -92,4 +92,6 @@ interface SettingRepository {
     suspend fun updateCanary(canary: Boolean)
 
     suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String
+
+    suspend fun updateLogcatInRelease(logcatInRelease: Boolean)
 }

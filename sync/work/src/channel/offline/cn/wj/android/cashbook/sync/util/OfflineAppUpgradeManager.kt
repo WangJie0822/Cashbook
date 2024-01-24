@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.sync.util
 
 import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
+import cn.wj.android.cashbook.core.model.enums.AppUpgradeStateEnum
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
@@ -27,7 +28,7 @@ import javax.inject.Singleton
 @Singleton
 class OfflineAppUpgradeManager @Inject constructor() : AppUpgradeManager {
 
-    override val isDownloading: Flow<Boolean> = MutableStateFlow(false)
+    override val upgradeState: Flow<AppUpgradeStateEnum> = MutableStateFlow(AppUpgradeStateEnum.NONE)
 
     override suspend fun startDownload(info: UpgradeInfoEntity) {
         // empty block

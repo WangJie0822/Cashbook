@@ -38,14 +38,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextField
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.navigation.ROUTE_EDIT_RECORD
@@ -90,21 +90,21 @@ internal fun SelectRelatedRecordScreen(
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onRequestPopBackStack,
                 title = { Text(text = "选择关联记录") },
             )
         },
         floatingActionButton = {
             if (uiState is SelectRelatedRecordUiState.Success) {
-                CashbookFloatingActionButton(onClick = {
+                CbFloatingActionButton(onClick = {
                     onRequestSaveRelatedRecord(uiState.relatedRecordList.map { it.id })
                     onRequestPopBackStack()
                 }) {
-                    Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
+                    Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
                 }
             }
         },
@@ -123,7 +123,7 @@ internal fun SelectRelatedRecordScreen(
                             afterTextChange = onKeywordChanged,
                         )
                     }
-                    CompatTextField(
+                    CbTextField(
                         textFieldState = keyword,
                         label = { Text(text = "搜索") },
                         placeholder = { Text(text = "对金额、备注进行搜索") },

@@ -16,12 +16,12 @@
 
 package cn.wj.android.cashbook.feature.tags.dialog
 
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.viewmodel.DeleteTagDialogViewModel
@@ -47,20 +47,22 @@ private fun DeleteTagDialog(
     onRequestDeleteTag: (TagModel) -> Unit,
     onRequestDismissDialog: () -> Unit,
 ) {
-    AlertDialog(
+    CbAlertDialog(
         onDismissRequest = onRequestDismissDialog,
         text = {
             Text(text = stringResource(id = R.string.tag_delete_hint_format).format(tagModel.name))
         },
         confirmButton = {
-            TextButton(onClick = {
-                onRequestDeleteTag(tagModel)
-            }) {
+            CbTextButton(
+                onClick = {
+                    onRequestDeleteTag(tagModel)
+                },
+            ) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onRequestDismissDialog) {
+            CbTextButton(onClick = onRequestDismissDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },

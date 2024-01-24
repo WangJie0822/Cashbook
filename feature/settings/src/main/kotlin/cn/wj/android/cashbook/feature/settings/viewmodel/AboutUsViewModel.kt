@@ -16,11 +16,20 @@
 
 package cn.wj.android.cashbook.feature.settings.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.model.enums.LogcatState
+import cn.wj.android.cashbook.core.ui.DialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -38,6 +47,9 @@ class AboutUsViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
 ) : ViewModel() {
 
+    /** 日志弹窗 */
+    var logcatDialogState: DialogState by mutableStateOf(DialogState.Dismiss)
+
     /** 界面 UI 状态 */
     val uiState = settingRepository.appDataMode.mapLatest { appDataModel ->
         AboutUsUiState.Success(
@@ -51,6 +63,61 @@ class AboutUsViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = AboutUsUiState.Loading,
         )
+
+    /** 点击次数，连续点击10词开启日志输出 */
+    private var counts = 0
+
+    private var countDownJob: Job? = null
+
+    /** 计算点击次数 */
+    fun countNameClicks() {
+        counts++
+        if (counts >= 10) {
+            // 连续点击 10 次，显示日志选择弹窗
+            viewModelScope.launch {
+                logcatDialogState = DialogState.Shown(
+                    when {
+                        settingRepository.appDataMode.first().logcatInRelease -> LogcatState.ALWAYS
+                        ApplicationInfo.logcatEnable -> LogcatState.ONCE
+                        else -> LogcatState.NONE
+                    },
+                )
+            }
+            // 取消倒计时
+            countDownJob?.cancel()
+            countDownJob = null
+        } else {
+            // 5s 未操作重置计数器
+            countDownJob?.cancel()
+            countDownJob = viewModelScope.launch {
+                delay(5 * 1000L)
+                counts = 0
+            }
+        }
+    }
+
+    /** 更新 logcat 状态 */
+    fun updateLogcatState(state: LogcatState) {
+        viewModelScope.launch {
+            when (state) {
+                LogcatState.ALWAYS -> {
+                    ApplicationInfo.logcatEnable = false
+                    settingRepository.updateLogcatInRelease(true)
+                }
+
+                LogcatState.ONCE -> {
+                    ApplicationInfo.logcatEnable = true
+                    settingRepository.updateLogcatInRelease(false)
+                }
+
+                LogcatState.NONE -> {
+                    ApplicationInfo.logcatEnable = false
+                    settingRepository.updateLogcatInRelease(false)
+                }
+            }
+            dismissDialog()
+        }
+    }
 
     /** 更新是否使用 Gitee 源 */
     fun updateUseGitee(useGitee: Boolean) {
@@ -71,6 +138,10 @@ class AboutUsViewModel @Inject constructor(
         viewModelScope.launch {
             settingRepository.updateAutoCheckUpdate(autoCheckUpdate)
         }
+    }
+
+    fun dismissDialog() {
+        logcatDialogState = DialogState.Dismiss
     }
 }
 

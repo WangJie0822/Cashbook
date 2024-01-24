@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 
 @Composable
-fun CashbookFloatingActionButton(
+fun CbFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     shape: Shape = FloatingActionButtonDefaults.shape,
@@ -52,7 +52,7 @@ fun CashbookFloatingActionButton(
 }
 
 @Composable
-fun CashbookSmallFloatingActionButton(
+fun CbSmallFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     shape: Shape = FloatingActionButtonDefaults.smallShape,

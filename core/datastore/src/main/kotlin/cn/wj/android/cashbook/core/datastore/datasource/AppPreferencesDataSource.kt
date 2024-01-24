@@ -70,6 +70,8 @@ class AppPreferencesDataSource @Inject constructor(
                 creditCardPaymentTypeId = it.creditCardPaymentTypeId,
                 keepLatestBackup = it.keepLatestBackup,
                 canary = it.canary,
+                topUpInTotal = it.topUpInTotal,
+                logcatInRelease = it.logcatInRelease,
             )
         }
 
@@ -202,5 +204,13 @@ class AppPreferencesDataSource @Inject constructor(
     suspend fun needRelated(typeId: Long): Boolean {
         val appDataModel = appData.first()
         return typeId == appDataModel.reimburseTypeId || typeId == appDataModel.refundTypeId
+    }
+
+    suspend fun updateTopUpInTotal(topUpInTotal: Boolean) {
+        appPreferences.updateData { it.copy { this.topUpInTotal = topUpInTotal } }
+    }
+
+    suspend fun updateLogcatInRelease(logcatInRelease: Boolean) {
+        appPreferences.updateData { it.copy { this.logcatInRelease = logcatInRelease } }
     }
 }

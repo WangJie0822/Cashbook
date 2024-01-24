@@ -23,11 +23,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
@@ -35,7 +32,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -51,11 +47,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbCard
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -70,6 +71,7 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
  * @param assetRecordListContent 资产记录列表，参数：(资产id, 列表头布局, 列表item点击回调) -> [Unit]
  * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
  * @param onRequestNaviToEditAsset 导航到编辑资产
+ * @param onRequestNaviToAddRecord 跳转添加记录
  * @param onRequestPopBackStack 导航到上一级
  */
 @Composable
@@ -78,6 +80,7 @@ internal fun AssetInfoRoute(
     assetRecordListContent: @Composable (@Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
     onRequestNaviToEditAsset: () -> Unit,
+    onRequestNaviToAddRecord: () -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AssetInfoViewModel = hiltViewModel<AssetInfoViewModel>().apply {
@@ -106,6 +109,7 @@ internal fun AssetInfoRoute(
         onDeleteAssetClick = viewModel::showDeleteConfirmDialog,
         onConfirmDeleteAsset = { viewModel.deleteAsset(onSuccess = onRequestPopBackStack) },
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
+        onAddRecordClick = onRequestNaviToAddRecord,
         onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
@@ -139,6 +143,7 @@ internal fun AssetInfoScreen(
     onDeleteAssetClick: () -> Unit,
     onConfirmDeleteAsset: () -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
+    onAddRecordClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember {
@@ -161,27 +166,27 @@ internal fun AssetInfoScreen(
         }
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = uiState.title) },
                 actions = {
                     if (uiState is AssetInfoUiState.Success) {
-                        IconButton(onClick = onEditAssetClick) {
-                            Icon(imageVector = CashbookIcons.EditNote, contentDescription = null)
+                        CbIconButton(onClick = onEditAssetClick) {
+                            Icon(imageVector = CbIcons.EditNote, contentDescription = null)
                         }
-                        IconButton(onClick = onDeleteAssetClick) {
+                        CbIconButton(onClick = onDeleteAssetClick) {
                             Icon(
-                                imageVector = CashbookIcons.DeleteForever,
+                                imageVector = CbIcons.DeleteForever,
                                 contentDescription = null,
                             )
                         }
                         if (uiState.shouldDisplayMore) {
-                            IconButton(onClick = onRequestShowMoreDialog) {
+                            CbIconButton(onClick = onRequestShowMoreDialog) {
                                 Icon(
-                                    imageVector = CashbookIcons.Info,
+                                    imageVector = CbIcons.Info,
                                     contentDescription = null,
                                 )
                             }
@@ -189,6 +194,11 @@ internal fun AssetInfoScreen(
                     }
                 },
             )
+        },
+        floatingActionButton = {
+            CbFloatingActionButton(onClick = onAddRecordClick) {
+                Icon(imageVector = CbIcons.Add, contentDescription = null)
+            }
         },
         snackbarHost = {
             SnackbarHost(snackbarHostState)
@@ -200,7 +210,7 @@ internal fun AssetInfoScreen(
                     .fillMaxSize(),
             ) {
                 if (null != viewRecord) {
-                    CashbookModalBottomSheet(
+                    CbModalBottomSheet(
                         onDismissRequest = onRequestDismissBottomSheet,
                         sheetState = rememberModalBottomSheetState(
                             confirmValueChange = {
@@ -221,7 +231,7 @@ internal fun AssetInfoScreen(
                         AssetInfoDialogEnum.MORE_INFO -> {
                             if (uiState is AssetInfoUiState.Success && uiState.shouldDisplayMore) {
                                 val clipboardManager = LocalClipboardManager.current
-                                AlertDialog(
+                                CbAlertDialog(
                                     onDismissRequest = onRequestDismissDialog,
                                     text = {
                                         Column(
@@ -238,16 +248,18 @@ internal fun AssetInfoScreen(
                                                         text = uiState.openBank,
                                                         modifier = Modifier.weight(1f),
                                                     )
-                                                    IconButton(onClick = {
-                                                        clipboardManager.setText(
-                                                            AnnotatedString(
-                                                                uiState.openBank,
-                                                            ),
-                                                        )
-                                                        onRequestDisplayBookmark()
-                                                    }) {
+                                                    CbIconButton(
+                                                        onClick = {
+                                                            clipboardManager.setText(
+                                                                AnnotatedString(
+                                                                    uiState.openBank,
+                                                                ),
+                                                            )
+                                                            onRequestDisplayBookmark()
+                                                        },
+                                                    ) {
                                                         Icon(
-                                                            imageVector = CashbookIcons.ContentCopy,
+                                                            imageVector = CbIcons.ContentCopy,
                                                             contentDescription = null,
                                                         )
                                                     }
@@ -263,16 +275,18 @@ internal fun AssetInfoScreen(
                                                         text = uiState.cardNo,
                                                         modifier = Modifier.weight(1f),
                                                     )
-                                                    IconButton(onClick = {
-                                                        clipboardManager.setText(
-                                                            AnnotatedString(
-                                                                uiState.cardNo,
-                                                            ),
-                                                        )
-                                                        onRequestDisplayBookmark()
-                                                    }) {
+                                                    CbIconButton(
+                                                        onClick = {
+                                                            clipboardManager.setText(
+                                                                AnnotatedString(
+                                                                    uiState.cardNo,
+                                                                ),
+                                                            )
+                                                            onRequestDisplayBookmark()
+                                                        },
+                                                    ) {
                                                         Icon(
-                                                            imageVector = CashbookIcons.ContentCopy,
+                                                            imageVector = CbIcons.ContentCopy,
                                                             contentDescription = null,
                                                         )
                                                     }
@@ -293,15 +307,17 @@ internal fun AssetInfoScreen(
                                         }
                                     },
                                     confirmButton = {
-                                        TextButton(onClick = {
-                                            clipboardManager.setText(AnnotatedString("${uiState.openBank}\n${uiState.cardNo}"))
-                                            onRequestDisplayBookmark()
-                                        }) {
+                                        CbTextButton(
+                                            onClick = {
+                                                clipboardManager.setText(AnnotatedString("${uiState.openBank}\n${uiState.cardNo}"))
+                                                onRequestDisplayBookmark()
+                                            },
+                                        ) {
                                             Text(text = stringResource(id = R.string.copy_all))
                                         }
                                     },
                                     dismissButton = {
-                                        TextButton(onClick = onRequestDismissDialog) {
+                                        CbTextButton(onClick = onRequestDismissDialog) {
                                             Text(text = stringResource(id = R.string.cancel))
                                         }
                                     },
@@ -311,17 +327,17 @@ internal fun AssetInfoScreen(
 
                         AssetInfoDialogEnum.DELETE_ASSET -> {
                             // 删除资产
-                            AlertDialog(
+                            CbAlertDialog(
                                 onDismissRequest = onRequestDismissDialog,
                                 title = { Text(text = stringResource(id = R.string.sure_to_delete_asset)) },
                                 text = { Text(text = stringResource(id = R.string.delete_asset_hint)) },
                                 confirmButton = {
-                                    TextButton(onClick = onConfirmDeleteAsset) {
+                                    CbTextButton(onClick = onConfirmDeleteAsset) {
                                         Text(text = stringResource(id = R.string.confirm))
                                     }
                                 },
                                 dismissButton = {
-                                    TextButton(onClick = onRequestDismissDialog) {
+                                    CbTextButton(onClick = onRequestDismissDialog) {
                                         Text(text = stringResource(id = R.string.cancel))
                                     }
                                 },
@@ -370,11 +386,10 @@ private fun AssetInfoContent(
     repaymentDate: String,
 ) {
     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-        Card(
+        CbCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-
         ) {
             Column(
                 modifier = Modifier

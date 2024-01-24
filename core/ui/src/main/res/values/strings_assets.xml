@@ -14,7 +14,6 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <resources>
     <string name="please_select_asset">请选择一个资产</string>
     <string name="unable_to_select_invisible_asset">无法选择隐藏资产</string>
@@ -47,6 +46,7 @@
     <string name="total_balance">总结余</string>
     <string name="asset_no_data">暂无资产数据，点击右下角按钮添加</string>
     <string name="add_asset">添加资产</string>
+    <string name="include_in_total">计入总资产</string>
     <string name="current_debt">当前欠款</string>
     <string name="un_set">未设置</string>
     <string name="clear">清除</string>

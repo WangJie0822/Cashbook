@@ -26,16 +26,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
-import androidx.compose.material3.Divider
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,15 +57,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookSmallFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbSmallFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
@@ -108,6 +111,7 @@ internal fun MyAssetRoute(
         onRequestDisplayShowMoreDialog = viewModel::displayShowMoreDialog,
         onRequestDismissShowMoreDialog = viewModel::dismissShowMoreDialog,
         assetTypedListData = assetTypedListData,
+        onTopUpInTotalChange = viewModel::updateTopUpInTotal,
         onAssetItemClick = onRequestNaviToAssetInfo,
         onAddAssetClick = onRequestNaviToAddAsset,
         onInvisibleAssetClick = onRequestNaviToInvisibleAsset,
@@ -137,6 +141,7 @@ internal fun MyAssetScreen(
     onRequestDisplayShowMoreDialog: () -> Unit,
     onRequestDismissShowMoreDialog: () -> Unit,
     assetTypedListData: List<AssetTypeViewsModel>,
+    onTopUpInTotalChange: (Boolean) -> Unit,
     onAssetItemClick: (Long) -> Unit,
     onAddAssetClick: () -> Unit,
     onInvisibleAssetClick: () -> Unit,
@@ -145,10 +150,10 @@ internal fun MyAssetScreen(
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
 ) {
     Box {
-        CashbookScaffold(
+        CbScaffold(
             modifier = modifier,
             topBar = {
-                CashbookTopAppBar(
+                CbTopAppBar(
                     onBackClick = onBackClick,
                     title = {
                         Text(text = stringResource(id = R.string.my_assets))
@@ -156,9 +161,9 @@ internal fun MyAssetScreen(
                 )
             },
             floatingActionButton = {
-                CashbookFloatingActionButton(onClick = onRequestDisplayShowMoreDialog) {
+                CbFloatingActionButton(onClick = onRequestDisplayShowMoreDialog) {
                     Icon(
-                        imageVector = CashbookIcons.MoreVert,
+                        imageVector = CbIcons.MoreVert,
                         contentDescription = null,
                     )
                 }
@@ -167,6 +172,7 @@ internal fun MyAssetScreen(
             MyAssetBackdropScaffold(
                 uiState = uiState,
                 assetTypedListData = assetTypedListData,
+                onTopUpInTotalChange = onTopUpInTotalChange,
                 onAssetItemClick = onAssetItemClick,
                 paddingValues = paddingValues,
                 scaffoldState = scaffoldState,
@@ -230,13 +236,13 @@ private fun ShowMoreContent(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                CashbookSmallFloatingActionButton(
+                CbSmallFloatingActionButton(
                     onClick = {
                         onAddAssetClick.invoke()
                         onCloseClick.invoke()
                     },
                 ) {
-                    Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+                    Icon(imageVector = CbIcons.Add, contentDescription = null)
                 }
             }
 
@@ -260,23 +266,23 @@ private fun ShowMoreContent(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                CashbookSmallFloatingActionButton(
+                CbSmallFloatingActionButton(
                     onClick = {
                         onInvisibleAssetClick()
                         onCloseClick.invoke()
                     },
                 ) {
                     Icon(
-                        imageVector = CashbookIcons.VisibilityOff,
+                        imageVector = CbIcons.VisibilityOff,
                         contentDescription = null,
                     )
                 }
             }
 
-            CashbookFloatingActionButton(
+            CbFloatingActionButton(
                 onClick = onCloseClick,
             ) {
-                Icon(imageVector = CashbookIcons.Close, contentDescription = null)
+                Icon(imageVector = CbIcons.Close, contentDescription = null)
             }
         }
     }
@@ -295,6 +301,7 @@ internal fun MyAssetBackdropScaffold(
     paddingValues: PaddingValues,
     uiState: MyAssetUiState,
     assetTypedListData: List<AssetTypeViewsModel>,
+    onTopUpInTotalChange: (Boolean) -> Unit,
     onAssetItemClick: (Long) -> Unit,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
 ) {
@@ -328,6 +335,8 @@ internal fun MyAssetBackdropScaffold(
                             assetTypedListData.forEach { assetTypedInfo ->
                                 AssetTypedInfoItem(
                                     assetTypedInfo = assetTypedInfo,
+                                    topUpInTotal = (uiState as? MyAssetUiState.Success)?.topUpInTotal,
+                                    onTopUpInTotalChange = onTopUpInTotalChange,
                                     onAssetItemClick = onAssetItemClick,
                                 )
                             }
@@ -352,6 +361,8 @@ internal fun AssetTypedInfoItem(
     assetTypedInfo: AssetTypeViewsModel,
     onAssetItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    topUpInTotal: Boolean? = null,
+    onTopUpInTotalChange: (Boolean) -> Unit = {},
     expandDefault: Boolean = true,
     onAssetItemLongClick: ((Long) -> Unit)? = null,
 ) {
@@ -365,22 +376,36 @@ internal fun AssetTypedInfoItem(
                 expand = !expand
             }
             .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.weight(1f),
             text = stringResource(id = assetTypedInfo.nameResId),
         )
+        if (assetTypedInfo.type.isTopUp && null != topUpInTotal) {
+            Checkbox(
+                checked = topUpInTotal,
+                onCheckedChange = onTopUpInTotalChange,
+                modifier = Modifier.size(24.dp),
+            )
+            Text(
+                text = stringResource(id = R.string.include_in_total),
+                style = MaterialTheme.typography.bodyMedium,
+                color = LocalContentColor.current.copy(0.5f),
+                modifier = Modifier.padding(start = 4.dp, end = 8.dp),
+            )
+        }
         Text(
             text = assetTypedInfo.totalAmount.withCNY(),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.bodyLarge,
         )
         Icon(
-            imageVector = if (expand) CashbookIcons.KeyboardArrowDown else CashbookIcons.KeyboardArrowRight,
+            imageVector = if (expand) CbIcons.KeyboardArrowDown else CbIcons.KeyboardArrowRight,
             contentDescription = null,
         )
     }
     if (expand) {
-        Divider(
+        CbDivider(
             modifier = Modifier.padding(horizontal = 16.dp),
             color = DividerDefaults.color.copy(0.5f),
         )

@@ -18,10 +18,10 @@ package cn.wj.android.cashbook.sync.service
 
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import cn.wj.android.cashbook.core.common.SERVICE_ACTION_CANCEL_DOWNLOAD
 import cn.wj.android.cashbook.core.common.SERVICE_ACTION_RETRY_DOWNLOAD
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
 import cn.wj.android.cashbook.sync.initializers.SyncNotificationId
 import cn.wj.android.cashbook.sync.initializers.syncWorkNotification
@@ -58,17 +58,20 @@ class UpgradeService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             SERVICE_ACTION_CANCEL_DOWNLOAD -> {
+                logger().i("onStartCommand(), cancel download")
                 coroutineScope.launch {
                     appUpgradeManager.cancelDownload()
                 }
             }
 
             SERVICE_ACTION_RETRY_DOWNLOAD -> {
+                logger().i("onStartCommand(), retry download")
                 coroutineScope.launch {
                     appUpgradeManager.retry()
                 }
             }
         }
+        stopSelf()
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -78,12 +81,7 @@ class UpgradeService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_DETACH)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(false)
-        }
+        stopForeground(STOP_FOREGROUND_DETACH)
         coroutineScope.cancel()
     }
 }

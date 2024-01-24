@@ -54,16 +54,12 @@ rootProject.name = "Cashbook"
 include(":app")
 include(":app-catalog")
 
-include(":lint")
-
 include(":feature:tags")
 include(":feature:types")
 include(":feature:books")
 include(":feature:assets")
 include(":feature:records")
 include(":feature:settings")
-
-include(":sync:work")
 
 include(":core:domain")
 include(":core:data")
@@ -78,4 +74,11 @@ include(":core:ui")
 include(":core:model")
 include(":core:common")
 
+include(":sync:work")
+
 include(":repos:MPChartLib")
+
+include(":baselineProfile")
+include(":lint")
+
+include(":ui-test-hilt-manifest")

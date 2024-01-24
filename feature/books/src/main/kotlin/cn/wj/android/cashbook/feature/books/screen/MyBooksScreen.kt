@@ -24,16 +24,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,11 +47,15 @@ import androidx.constraintlayout.compose.Visibility
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.tools.dateFormat
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbCard
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksUiState
@@ -102,17 +102,17 @@ internal fun MyBooksScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
-            CashbookTopAppBar(
+            CbTopAppBar(
                 onBackClick = onBackClick,
                 title = { Text(text = stringResource(id = R.string.my_books)) },
             )
         },
         floatingActionButton = {
-            CashbookFloatingActionButton(onClick = { onEditBookClick(-1L) }) {
-                Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+            CbFloatingActionButton(onClick = { onEditBookClick(-1L) }) {
+                Icon(imageVector = CbIcons.Add, contentDescription = null)
             }
         },
         content = { paddingValues ->
@@ -131,7 +131,6 @@ internal fun MyBooksScreen(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun MyBooksContent(
     modifier: Modifier,
     uiState: MyBooksUiState,
@@ -147,17 +146,17 @@ private fun MyBooksContent(
         content = {
             if (dialogState is DialogState.Shown<*>) {
                 (dialogState.data as? Long)?.let { bookId ->
-                    AlertDialog(
+                    CbAlertDialog(
                         onDismissRequest = onDismissDialog,
                         title = { Text(text = stringResource(id = R.string.delete_books)) },
                         text = { Text(text = stringResource(id = R.string.delete_books_confirm)) },
                         dismissButton = {
-                            TextButton(onClick = onDismissDialog) {
+                            CbTextButton(onClick = onDismissDialog) {
                                 Text(text = stringResource(id = R.string.cancel))
                             }
                         },
                         confirmButton = {
-                            TextButton(onClick = { onConfirmDelete(bookId) }) {
+                            CbTextButton(onClick = { onConfirmDelete(bookId) }) {
                                 Text(text = stringResource(id = R.string.confirm))
                             }
                         },
@@ -175,7 +174,7 @@ private fun MyBooksContent(
                         modifier = Modifier.fillMaxSize(),
                         content = {
                             items(uiState.booksList) { item ->
-                                Card(
+                                CbCard(
                                     modifier = Modifier
                                         .padding(horizontal = 16.dp)
                                         .padding(top = 8.dp)
@@ -196,7 +195,7 @@ private fun MyBooksContent(
                                         val (selected, name, description, time, more) = createRefs()
 
                                         Icon(
-                                            imageVector = CashbookIcons.CheckCircle,
+                                            imageVector = CbIcons.CheckCircle,
                                             contentDescription = null,
                                             modifier = Modifier.constrainAs(selected) {
                                                 visibility = if (item.selected) {
@@ -256,11 +255,11 @@ private fun MyBooksContent(
                                             var expanded by remember {
                                                 mutableStateOf(false)
                                             }
-                                            IconButton(
+                                            CbIconButton(
                                                 onClick = { expanded = true },
                                                 content = {
                                                     Icon(
-                                                        imageVector = CashbookIcons.MoreHoriz,
+                                                        imageVector = CbIcons.MoreHoriz,
                                                         contentDescription = null,
                                                     )
                                                 },

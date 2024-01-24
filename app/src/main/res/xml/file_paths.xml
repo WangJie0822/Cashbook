@@ -14,10 +14,13 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <paths>
-    <root-path name="root_path" path="."/>
+    <!-- /sdcard/Download/ -->
     <external-path
         name="Download"
         path="Download/" />
+    <!-- /storage/emulated/0/Android/data/**package**/files/Download -->
+    <external-files-path
+        name="Download"
+        path="Download" />
 </paths>

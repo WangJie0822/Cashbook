@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.core.data.uitl
 
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
+import cn.wj.android.cashbook.core.model.enums.AppUpgradeStateEnum
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -27,7 +28,7 @@ import java.io.File
  */
 interface AppUpgradeManager {
 
-    val isDownloading: Flow<Boolean>
+    val upgradeState: Flow<AppUpgradeStateEnum>
 
     suspend fun startDownload(info: UpgradeInfoEntity)
 

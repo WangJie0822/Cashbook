@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -32,7 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CommonDivider
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
@@ -112,7 +112,7 @@ internal fun EditRecordSelectAssetBottomSheetScreen(
                             start.linkTo(parent.start)
                         },
                     )
-                    TextButton(
+                    CbTextButton(
                         modifier = Modifier.constrainAs(add) {
                             top.linkTo(parent.top)
                             end.linkTo(parent.end)
@@ -126,7 +126,7 @@ internal fun EditRecordSelectAssetBottomSheetScreen(
                         )
                     }
                 }
-                CommonDivider()
+                CbDivider()
             }
             item {
                 NotAssociatedAssetListItem(

@@ -32,12 +32,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropValue
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
@@ -55,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -64,21 +63,24 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.TestTag
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.component.TransparentListItem
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
@@ -203,7 +205,7 @@ internal fun LauncherContentScreen(
         }
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
             LauncherTopBar(
@@ -216,15 +218,15 @@ internal fun LauncherContentScreen(
             )
         },
         floatingActionButton = {
-            CashbookFloatingActionButton(onClick = onAddClick) {
-                Icon(imageVector = CashbookIcons.Add, contentDescription = null)
+            CbFloatingActionButton(onClick = onAddClick) {
+                Icon(imageVector = CbIcons.Add, contentDescription = null)
             }
         },
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (null != viewRecord) {
                 // 显示记录详情底部抽屉
-                CashbookModalBottomSheet(
+                CbModalBottomSheet(
                     onDismissRequest = onRequestDismissSheet,
                     sheetState = rememberModalBottomSheetState(
                         confirmValueChange = {
@@ -298,13 +300,15 @@ internal fun LauncherTopBar(
     onCalendarClick: () -> Unit,
     onAnalyticsClick: () -> Unit,
 ) {
-    CashbookTopAppBar(
+    CbTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
         ),
         title = {
             Row(
-                modifier = Modifier.clickable(onClick = onDateClick),
+                modifier = Modifier
+                    .clickable(onClick = onDateClick)
+                    .testTag(TestTag.Launcher.LAUNCHER_TITLE),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -312,36 +316,36 @@ internal fun LauncherTopBar(
                     modifier = Modifier.clickable(onClick = onDateClick),
                 )
                 Icon(
-                    imageVector = CashbookIcons.ArrowDropDown,
+                    imageVector = CbIcons.ArrowDropDown,
                     contentDescription = null,
                 )
             }
         },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
+            CbIconButton(onClick = onMenuClick) {
                 Icon(
-                    imageVector = CashbookIcons.Menu,
+                    imageVector = CbIcons.Menu,
                     contentDescription = null,
                 )
             }
         },
         actions = {
-            IconButton(onClick = onSearchClick) {
+            CbIconButton(onClick = onSearchClick) {
                 Icon(
-                    imageVector = CashbookIcons.Search,
-                    contentDescription = null,
+                    imageVector = CbIcons.Search,
+                    contentDescription = stringResource(id = R.string.cd_search),
                 )
             }
-            IconButton(onClick = onCalendarClick) {
+            CbIconButton(onClick = onCalendarClick) {
                 Icon(
-                    imageVector = CashbookIcons.CalendarMonth,
-                    contentDescription = null,
+                    imageVector = CbIcons.CalendarMonth,
+                    contentDescription = stringResource(id = R.string.cd_calendar),
                 )
             }
-            IconButton(onClick = onAnalyticsClick) {
+            CbIconButton(onClick = onAnalyticsClick) {
                 Icon(
-                    imageVector = CashbookIcons.Analytics,
-                    contentDescription = null,
+                    imageVector = CbIcons.Analytics,
+                    contentDescription = stringResource(id = R.string.cd_analytics),
                 )
             }
         },
@@ -474,12 +478,14 @@ private fun FrontLayerContent(
                             ) {
                                 Text(
                                     modifier = Modifier.weight(1f),
-                                    text = when (key.dayType) {
-                                        0 -> stringResource(id = R.string.today)
-                                        -1 -> stringResource(id = R.string.yesterday)
-                                        -2 -> stringResource(id = R.string.before_yesterday)
-                                        else -> "${key.day}${stringResource(id = R.string.day)}"
-                                    },
+                                    text = "${key.day}${stringResource(id = R.string.day)}${
+                                        when (key.dayType) {
+                                            0 -> stringResource(id = R.string.today_with_brackets)
+                                            -1 -> stringResource(id = R.string.yesterday_with_brackets)
+                                            -2 -> stringResource(id = R.string.before_yesterday_with_brackets)
+                                            else -> ""
+                                        }
+                                    }",
                                 )
                                 Text(
                                     text = buildString {
@@ -505,7 +511,7 @@ private fun FrontLayerContent(
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
-                            Divider(
+                            CbDivider(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 color = DividerDefaults.color.copy(0.3f),
                             )
@@ -513,6 +519,7 @@ private fun FrontLayerContent(
                         items(recordList, key = { it.id }) {
                             RecordListItem(
                                 item = it,
+                                showDate = false,
                                 modifier = Modifier.clickable {
                                     onRecordItemClick(it)
                                 },
@@ -540,8 +547,9 @@ internal fun RecordListItem(
     modifier: Modifier = Modifier,
     showTags: Boolean = true,
     showRemarks: Boolean = true,
+    showDate: Boolean = true,
 ) {
-    TransparentListItem(
+    CbListItem(
         modifier = modifier,
         leadingContent = {
             TypeIcon(
@@ -585,7 +593,11 @@ internal fun RecordListItem(
         supportingContent = {
             Text(
                 text = buildAnnotatedString {
-                    append(item.recordTime.split(" ").first())
+                    if (showDate) {
+                        append(item.recordTime)
+                    } else {
+                        append(item.recordTime.split(" ").last())
+                    }
                     if (showRemarks) {
                         withStyle(SpanStyle(color = LocalContentColor.current.copy(alpha = 0.7f))) {
                             append("  ${item.remark}")
@@ -594,6 +606,7 @@ internal fun RecordListItem(
                 },
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
+                style = MaterialTheme.typography.bodySmall,
             )
         },
         trailingContent = {

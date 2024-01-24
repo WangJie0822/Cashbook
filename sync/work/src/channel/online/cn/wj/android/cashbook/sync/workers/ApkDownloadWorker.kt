@@ -40,6 +40,7 @@ import okhttp3.Request
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -56,7 +57,13 @@ class ApkDownloadWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     private val okhttpClient: OkHttpClient by lazy {
-        OkHttpClient.Builder().build()
+        val timeoutDuration = Duration.ofMinutes(5L)
+        OkHttpClient.Builder()
+            .callTimeout(timeoutDuration)
+            .connectTimeout(timeoutDuration)
+            .readTimeout(timeoutDuration)
+            .writeTimeout(timeoutDuration)
+            .build()
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo =

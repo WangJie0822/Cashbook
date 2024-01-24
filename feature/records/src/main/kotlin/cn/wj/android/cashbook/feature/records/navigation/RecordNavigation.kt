@@ -38,17 +38,22 @@ import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
 private const val ROUTE_EDIT_RECORD_KEY_RECORD_ID = "recordId"
 private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
 private const val ROUTE_EDIT_RECORD_KEY_TAG_ID = "tagId"
+private const val ROUTE_EDIT_RECORD_KEY_ASSET_ID = "assetId"
 
 /** 路由 - 数据分析 */
 private const val ROUTE_ANALYTICS = "record/analytics"
 
 /** 路由 - 分类数据分析 */
 private const val ROUTE_TYPED_ANALYTICS =
-    "record/typed_analytics?$ROUTE_EDIT_RECORD_KEY_TAG_ID={$ROUTE_EDIT_RECORD_KEY_TAG_ID}&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}"
+    "record/typed_analytics" +
+        "?$ROUTE_EDIT_RECORD_KEY_TAG_ID={$ROUTE_EDIT_RECORD_KEY_TAG_ID}" +
+        "&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}"
 
 /** 路由 - 编辑记录 */
 internal const val ROUTE_EDIT_RECORD =
-    "record/edit_record?$ROUTE_EDIT_RECORD_KEY_RECORD_ID={$ROUTE_EDIT_RECORD_KEY_RECORD_ID}&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}"
+    "record/edit_record" +
+        "?$ROUTE_EDIT_RECORD_KEY_RECORD_ID={$ROUTE_EDIT_RECORD_KEY_RECORD_ID}" +
+        "&$ROUTE_EDIT_RECORD_KEY_ASSET_ID={$ROUTE_EDIT_RECORD_KEY_ASSET_ID}"
 
 /** 路由 - 选择关联记录 */
 private const val ROUTE_SELECT_RELATED_RECORD = "record/select_related_record"
@@ -63,7 +68,7 @@ fun NavController.naviToAnalytics() {
     this.navigate(ROUTE_ANALYTICS)
 }
 
-fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
+fun NavController.naviToEditRecord(recordId: Long = -1L, assetId: Long = -1L) {
     this.navigate(
         ROUTE_EDIT_RECORD
             .replace(
@@ -71,8 +76,8 @@ fun NavController.naviToEditRecord(recordId: Long = -1L, typeId: Long = -1L) {
                 newValue = recordId.toString(),
             )
             .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_TYPE_ID}",
-                newValue = typeId.toString(),
+                oldValue = "{$ROUTE_EDIT_RECORD_KEY_ASSET_ID}",
+                newValue = assetId.toString(),
             ),
     )
 }
@@ -125,7 +130,7 @@ fun NavGraphBuilder.editRecordScreen(
                 type = NavType.LongType
                 defaultValue = -1L
             },
-            navArgument(ROUTE_EDIT_RECORD_KEY_TYPE_ID) {
+            navArgument(ROUTE_EDIT_RECORD_KEY_ASSET_ID) {
                 type = NavType.LongType
                 defaultValue = -1L
             },
@@ -133,7 +138,7 @@ fun NavGraphBuilder.editRecordScreen(
     ) {
         EditRecordRoute(
             recordId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_RECORD_ID) ?: -1L,
-            typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
+            assetId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_ASSET_ID) ?: -1L,
             typeListContent = typeListContent,
             assetBottomSheetContent = assetBottomSheetContent,
             tagBottomSheetContent = tagBottomSheetContent,

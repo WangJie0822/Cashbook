@@ -1,0 +1,2 @@
+gradlew.bat :app:assemble
+

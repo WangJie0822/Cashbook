@@ -27,8 +27,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,8 +39,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
@@ -58,17 +57,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.Calculator
-import cn.wj.android.cashbook.core.design.component.CashbookFloatingActionButton
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
-import cn.wj.android.cashbook.core.design.component.CashbookScaffold
-import cn.wj.android.cashbook.core.design.component.CashbookTopAppBar
-import cn.wj.android.cashbook.core.design.component.CompatTextField
+import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTab
+import cn.wj.android.cashbook.core.design.component.CbTabRow
+import cn.wj.android.cashbook.core.design.component.CbTextField
+import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.DatePickerDialog
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.TimePickerDialog
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -84,7 +86,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
  * 编辑记录
  *
  * @param recordId 记录id，`-1` 为新建
- * @param typeId 类型 id，默认为 `-1`
+ * @param assetId 资产 id，默认为 `-1`
  * @param typeListContent 类型列表布局，参数：(类型大类, 默认类型 id, 类型选择回调) -> [Unit]
  * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 已选择资产id, 是否是关联资产, 资产选择回调) -> [Unit]
  * @param tagBottomSheetContent 选择标签抽屉布局，参数：(已选择标签id列表, 标签id列表变化回调) -> [Unit]
@@ -93,7 +95,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 @Composable
 internal fun EditRecordRoute(
     recordId: Long,
-    typeId: Long,
+    assetId: Long,
     typeListContent: @Composable (RecordTypeCategoryEnum, Long, (Long) -> Unit) -> Unit,
     assetBottomSheetContent: @Composable (Long, Long, Boolean, (Long) -> Unit) -> Unit,
     tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit, () -> Unit) -> Unit,
@@ -102,7 +104,7 @@ internal fun EditRecordRoute(
     modifier: Modifier = Modifier,
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
         updateRecordId(recordId)
-        updateType(typeId)
+        updateAssetId(assetId)
     },
 ) {
     val savingHintText = stringResource(id = R.string.record_saving)
@@ -138,7 +140,7 @@ internal fun EditRecordRoute(
                 typeListContent(
                     selectedTypeCategory,
                     defaultTypeId,
-                    viewModel::updateType,
+                    viewModel::updateAssetId,
                 )
             }
         },
@@ -280,7 +282,7 @@ internal fun EditRecordScreen(
         }
     }
 
-    CashbookScaffold(
+    CbScaffold(
         modifier = modifier,
         topBar = {
             EditRecordTopBar(
@@ -293,10 +295,10 @@ internal fun EditRecordScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (uiState is EditRecordUiState.Success) {
-                CashbookFloatingActionButton(
+                CbFloatingActionButton(
                     onClick = onSaveClick,
                     content = {
-                        Icon(imageVector = CashbookIcons.SaveAs, contentDescription = null)
+                        Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
                     },
                 )
             }
@@ -306,7 +308,7 @@ internal fun EditRecordScreen(
                 modifier = Modifier.padding(paddingValues),
             ) {
                 if (bottomSheetType != EditRecordBottomSheetEnum.NONE) {
-                    CashbookModalBottomSheet(
+                    CbModalBottomSheet(
                         onDismissRequest = onRequestDismissBottomSheet,
                         sheetState = rememberModalBottomSheetState(
                             confirmValueChange = {
@@ -433,6 +435,7 @@ private fun EditRecordScaffoldContent(
                 Column(
                     modifier = modifier
                         .fillMaxWidth()
+                        .verticalScroll(state = rememberScrollState())
                         .padding(top = 8.dp)
                         .padding(horizontal = 16.dp),
                 ) {
@@ -442,7 +445,7 @@ private fun EditRecordScaffoldContent(
                         primaryColor = typeColor,
                         onAmountClick = onAmountClick,
                     )
-                    Divider()
+                    CbDivider()
                     Text(
                         text = stringResource(id = R.string.record_type),
                         color = MaterialTheme.colorScheme.onSurface,
@@ -465,7 +468,7 @@ private fun EditRecordScaffoldContent(
                     }
 
                     // 备注信息
-                    CompatTextField(
+                    CbTextField(
                         textFieldState = remarkTextState,
                         label = { Text(text = stringResource(id = R.string.remark)) },
                         colors = OutlinedTextFieldDefaults.colors(),
@@ -526,7 +529,7 @@ private fun EditRecordScaffoldContent(
                                 leadingIcon = {
                                     if (reimbursable) {
                                         Icon(
-                                            imageVector = CashbookIcons.Check,
+                                            imageVector = CbIcons.Check,
                                             contentDescription = null,
                                         )
                                     }
@@ -674,11 +677,11 @@ internal fun EditRecordTopBar(
     onTabSelected: (RecordTypeCategoryEnum) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    CashbookTopAppBar(
+    CbTopAppBar(
         onBackClick = onBackClick,
         title = {
             if (uiState is EditRecordUiState.Success) {
-                TabRow(
+                CbTabRow(
                     modifier = Modifier.fillMaxSize(),
                     selectedTabIndex = selectedTab.ordinal,
                     containerColor = Color.Unspecified,
@@ -692,7 +695,7 @@ internal fun EditRecordTopBar(
                     divider = {},
                 ) {
                     RecordTypeCategoryEnum.entries.forEach { enum ->
-                        Tab(
+                        CbTab(
                             selected = selectedTab == enum,
                             onClick = { onTabSelected(enum) },
                             text = { Text(text = enum.text) },

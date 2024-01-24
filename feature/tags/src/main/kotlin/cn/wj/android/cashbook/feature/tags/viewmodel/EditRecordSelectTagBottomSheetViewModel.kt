@@ -68,13 +68,18 @@ class EditRecordSelectTagBottomSheetViewModel @Inject constructor(
                 initialValue = emptyList(),
             )
 
+    private var firstSet = true
+
     /** 更新已选择标签数据 */
     fun updateSelectedTags(tagIdList: List<Long>) {
-        _selectedTagIdListData.tryEmit(tagIdList)
+        if (firstSet) {
+            firstSet = false
+            _selectedTagIdListData.tryEmit(tagIdList)
+        }
     }
 
     /** 更新已选择标签列表 */
-    fun updateSelectedTagList(id: Long, onResult: (List<Long>) -> Unit) {
+    fun updateSelectedTagList(id: Long) {
         viewModelScope.launch {
             val newList = _selectedTagIdListData.first().toMutableList()
             if (newList.contains(id)) {
@@ -83,7 +88,6 @@ class EditRecordSelectTagBottomSheetViewModel @Inject constructor(
                 newList.add(id)
             }
             _selectedTagIdListData.tryEmit(newList)
-            onResult(newList)
         }
     }
 

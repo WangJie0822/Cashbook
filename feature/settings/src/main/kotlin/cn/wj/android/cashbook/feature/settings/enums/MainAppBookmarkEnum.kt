@@ -38,4 +38,10 @@ enum class MainAppBookmarkEnum {
 
     /** 开始下载 */
     START_DOWNLOAD,
+
+    /** 下载失败 */
+    DOWNLOAD_FAILED,
+
+    /** 安装失败 */
+    INSTALL_FAILED,
 }

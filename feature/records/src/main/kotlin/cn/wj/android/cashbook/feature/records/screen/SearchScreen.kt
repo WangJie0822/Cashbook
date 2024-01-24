@@ -28,11 +28,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,10 +45,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import cn.wj.android.cashbook.core.design.component.CashbookModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
@@ -98,7 +98,7 @@ private fun SearchScreen(
     var active by remember { mutableStateOf(false) }
 
     if (null != viewRecord) {
-        CashbookModalBottomSheet(
+        CbModalBottomSheet(
             onDismissRequest = onRequestDismissBottomSheet,
             sheetState = rememberModalBottomSheetState(
                 confirmValueChange = {
@@ -131,7 +131,7 @@ private fun SearchScreen(
             onActiveChange = { active = it },
             placeholder = { Text(text = stringResource(id = R.string.record_search_hint)) },
             leadingIcon = {
-                IconButton(onClick = {
+                CbIconButton(onClick = {
                     if (active) {
                         active = false
                     } else {
@@ -139,15 +139,15 @@ private fun SearchScreen(
                     }
                 }) {
                     Icon(
-                        imageVector = CashbookIcons.ArrowBack,
+                        imageVector = CbIcons.ArrowBack,
                         contentDescription = null,
                     )
                 }
             },
             trailingIcon = {
                 if (active && text.isNotBlank()) {
-                    IconButton(onClick = { text = "" }) {
-                        Icon(imageVector = CashbookIcons.Cancel, contentDescription = null)
+                    CbIconButton(onClick = { text = "" }) {
+                        Icon(imageVector = CbIcons.Cancel, contentDescription = null)
                     }
                 }
             },
@@ -158,7 +158,7 @@ private fun SearchScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                     )
                 } else {
-                    TextButton(onClick = onRequestClearSearchHistory) {
+                    CbTextButton(onClick = onRequestClearSearchHistory) {
                         Text(text = stringResource(id = R.string.clear))
                     }
                     FlowRow(

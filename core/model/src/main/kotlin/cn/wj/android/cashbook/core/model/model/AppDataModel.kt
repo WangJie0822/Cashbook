@@ -54,4 +54,6 @@ data class AppDataModel(
     val creditCardPaymentTypeId: Long,
     val keepLatestBackup: Boolean,
     val canary: Boolean,
+    val topUpInTotal: Boolean,
+    val logcatInRelease: Boolean,
 )

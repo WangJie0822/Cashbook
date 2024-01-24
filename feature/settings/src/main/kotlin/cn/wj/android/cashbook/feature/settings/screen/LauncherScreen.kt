@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -41,8 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.design.component.Loading
-import cn.wj.android.cashbook.core.design.icon.CashbookIcons
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherUiState
@@ -231,7 +231,7 @@ internal fun LauncherSheet(
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_books)) },
-            icon = { Icon(imageVector = CashbookIcons.LibraryBooks, contentDescription = null) },
+            icon = { Icon(imageVector = CbIcons.LibraryBooks, contentDescription = null) },
             badge = {
                 Text(
                     text = currentBookName,
@@ -245,40 +245,40 @@ internal fun LauncherSheet(
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_assets)) },
-            icon = { Icon(imageVector = CashbookIcons.WebAsset, contentDescription = null) },
+            icon = { Icon(imageVector = CbIcons.WebAsset, contentDescription = null) },
             selected = false,
             onClick = onMyAssetClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_categories)) },
-            icon = { Icon(imageVector = CashbookIcons.Category, contentDescription = null) },
+            icon = { Icon(imageVector = CbIcons.Category, contentDescription = null) },
             selected = false,
             onClick = onMyCategoryClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_tags)) },
-            icon = { Icon(imageVector = CashbookIcons.Layers, contentDescription = null) },
+            icon = { Icon(imageVector = CbIcons.Layers, contentDescription = null) },
             selected = false,
             onClick = onMyTagClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
-        Divider(
+        CbDivider(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .height(1.dp),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.settings)) },
-            icon = { Icon(imageVector = CashbookIcons.Settings, contentDescription = null) },
+            icon = { Icon(imageVector = CbIcons.Settings, contentDescription = null) },
             selected = false,
             onClick = onSettingClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.about_us)) },
-            icon = { Icon(imageVector = CashbookIcons.Info, contentDescription = null) },
+            icon = { Icon(imageVector = CbIcons.Info, contentDescription = null) },
             selected = false,
             onClick = onAboutUsClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),

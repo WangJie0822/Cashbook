@@ -22,6 +22,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.core.content.getSystemService
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
@@ -45,7 +46,10 @@ class ConnectivityManagerNetworkMonitor @Inject constructor(
     override val isOnline: Flow<Boolean> = callbackFlow {
         val connectivityManager = context.getSystemService<ConnectivityManager>()
         if (connectivityManager == null) {
+            this@ConnectivityManagerNetworkMonitor.logger()
+                .i("isOnline, getConnectivityManager false")
             channel.trySend(false)
+            _isWifi.tryEmit(false)
             channel.close()
             return@callbackFlow
         }
@@ -59,23 +63,34 @@ class ConnectivityManagerNetworkMonitor @Inject constructor(
             private val networks = mutableSetOf<Network>()
 
             override fun onAvailable(network: Network) {
+                this@ConnectivityManagerNetworkMonitor.logger()
+                    .i("isOnline, onAvailable(network = <$network>)")
                 networks += network
                 channel.trySend(true)
             }
 
             override fun onLost(network: Network) {
                 networks -= network
-                channel.trySend(networks.isNotEmpty())
+                val hasNetwork = networks.isNotEmpty()
+                channel.trySend(hasNetwork)
+                this@ConnectivityManagerNetworkMonitor.logger()
+                    .i("isOnline, onLost(network = <$network>), hasNetwork = <$hasNetwork>")
             }
 
             override fun onCapabilitiesChanged(
                 network: Network,
                 networkCapabilities: NetworkCapabilities,
             ) {
+                this@ConnectivityManagerNetworkMonitor.logger()
+                    .i("isOnline, onCapabilitiesChanged(network = <$network>, networkCapabilities = <$networkCapabilities>)")
                 if (networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
                     if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        this@ConnectivityManagerNetworkMonitor.logger()
+                            .i("isOnline, onCapabilitiesChanged(network, networkCapabilities), WIFI connected")
                         _isWifi.tryEmit(true)
                     } else {
+                        this@ConnectivityManagerNetworkMonitor.logger()
+                            .i("isOnline, onCapabilitiesChanged(network, networkCapabilities), WIFI disconnected")
                         _isWifi.tryEmit(false)
                     }
                 }
@@ -90,7 +105,12 @@ class ConnectivityManagerNetworkMonitor @Inject constructor(
         /**
          * Sends the latest connectivity status to the underlying channel.
          */
-        channel.trySend(connectivityManager.isCurrentlyConnected())
+        val currentlyConnected = connectivityManager.isCurrentlyConnected()
+        val currentlyIsWifi = connectivityManager.isCurrentlyWifi()
+        channel.trySend(currentlyConnected)
+        _isWifi.tryEmit(currentlyIsWifi)
+        this@ConnectivityManagerNetworkMonitor.logger()
+            .i("currently network state, isConnected = <$currentlyConnected>, isWifi = <$currentlyIsWifi>")
 
         awaitClose {
             connectivityManager.unregisterNetworkCallback(callback)
@@ -103,5 +123,10 @@ class ConnectivityManagerNetworkMonitor @Inject constructor(
     private fun ConnectivityManager.isCurrentlyConnected() = activeNetwork
         ?.let(::getNetworkCapabilities)
         ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        ?: false
+
+    private fun ConnectivityManager.isCurrentlyWifi() = activeNetwork
+        ?.let(::getNetworkCapabilities)
+        ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
         ?: false
 }

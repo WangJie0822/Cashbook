@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.feature.records.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -54,7 +55,7 @@ class CalendarViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** 删除记录失败错误信息 */
-    var shouldDisplayDeleteFailedBookmark by mutableStateOf(0)
+    var shouldDisplayDeleteFailedBookmark by mutableIntStateOf(0)
         private set
 
     /** 记录详情数据 */
@@ -133,7 +134,7 @@ class CalendarViewModel @Inject constructor(
 }
 
 sealed interface CalendarUiState {
-    object Loading : CalendarUiState
+    data object Loading : CalendarUiState
     data class Success(
         val monthIncome: String,
         val monthExpand: String,

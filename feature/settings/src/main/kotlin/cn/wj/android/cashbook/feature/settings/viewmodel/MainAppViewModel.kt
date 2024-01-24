@@ -33,6 +33,7 @@ import cn.wj.android.cashbook.core.design.security.hexToBytes
 import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
+import cn.wj.android.cashbook.core.model.enums.AppUpgradeStateEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
@@ -61,12 +62,15 @@ import javax.inject.Inject
 class MainAppViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     booksRepository: BooksRepository,
-    networkMonitor: NetworkMonitor,
+    private val networkMonitor: NetworkMonitor,
     private val appUpgradeManager: AppUpgradeManager,
 ) : ViewModel() {
 
     /** 标记 - 是否已认证 */
     private val _verified = MutableStateFlow(false)
+
+    /** 认证结果 */
+    var verifyState by mutableStateOf(SettingPasswordStateEnum.SUCCESS)
 
     var firstOpen by mutableStateOf(true)
         private set
@@ -79,7 +83,18 @@ class MainAppViewModel @Inject constructor(
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
-    private val _isUpgradeDownloading = appUpgradeManager.isDownloading
+    /** 更新状态 */
+    private val _upgradeState = appUpgradeManager.upgradeState.apply {
+        viewModelScope.launch {
+            collect { state ->
+                if (state == AppUpgradeStateEnum.DOWNLOAD_FAILED) {
+                    shouldDisplayBookmark = MainAppBookmarkEnum.DOWNLOAD_FAILED
+                } else if (state == AppUpgradeStateEnum.INSTALL_FAILED) {
+                    shouldDisplayBookmark = MainAppBookmarkEnum.INSTALL_FAILED
+                }
+            }
+        }
+    }
 
     /** 标记 - 是否正在获取更新数据 */
     var inRequestUpdateData by mutableStateOf(false)
@@ -152,21 +167,21 @@ class MainAppViewModel @Inject constructor(
     private val _verificationMode = settingRepository.appDataMode
         .mapLatest { it.verificationModel }
 
-    /** 确认认证，使用 [pwd] 进行认证并将认证结果回调 [callback] */
-    fun onVerityConfirm(pwd: String, callback: (SettingPasswordStateEnum) -> Unit) {
+    /** 确认认证，使用 [pwd] 进行认证 */
+    fun onVerityConfirm(pwd: String) {
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
             val passwordIv = _passwordIv.first()
             val bytes = passwordIv.hexToBytes()
             if (null == bytes) {
-                callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
+                verifyState = SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
                 return@launch
             }
             val cipher = loadDecryptCipher(KEY_ALIAS_PASSWORD, bytes)
             val pwdSha = cipher.doFinal(_passwordInfo.first().hexToBytes()).decodeToString()
             if (pwd.shaEncode() != pwdSha) {
                 // 密码错误，提示
-                callback.invoke(SettingPasswordStateEnum.PASSWORD_WRONG)
+                verifyState = SettingPasswordStateEnum.PASSWORD_WRONG
                 return@launch
             }
 
@@ -259,9 +274,14 @@ class MainAppViewModel @Inject constructor(
             try {
                 val appDataModel = settingRepository.appDataMode.first()
                 if (!appDataModel.autoCheckUpdate) {
+                    this@MainAppViewModel.logger().i("checkUpdateAuto(), autoCheckUpdate is off")
                     return@launch
                 }
-                val upgradeInfoEntity = settingRepository.checkUpdate()
+                if (!networkMonitor.isOnline.first()) {
+                    this@MainAppViewModel.logger().i("checkUpdateAuto(), network is not online")
+                    return@launch
+                }
+                val upgradeInfoEntity = settingRepository.getLatestUpdateInfo()
                 if (upgradeInfoEntity.versionName == appDataModel.ignoreUpdateVersion) {
                     return@launch
                 }
@@ -285,23 +305,27 @@ class MainAppViewModel @Inject constructor(
         logger().i("checkUpdate()")
         viewModelScope.launch {
             try {
-                if (_isUpgradeDownloading.first()) {
+                if (_upgradeState.first() != AppUpgradeStateEnum.NONE) {
                     shouldDisplayBookmark = MainAppBookmarkEnum.UPDATE_DOWNLOADING
                     return@launch
                 }
-                inRequestUpdateData = true
-                if (settingRepository.syncLatestVersion()) {
-                    val upgradeInfoEntity = settingRepository.checkUpdate()
-                    checkUpgradeFromInfo(
-                        info = upgradeInfoEntity,
-                        need = {
-                            _updateInfoData.tryEmit(upgradeInfoEntity)
-                        },
-                        noNeed = {
-                            shouldDisplayBookmark = MainAppBookmarkEnum.NO_NEED_UPDATE
-                        },
-                    )
+                if (!networkMonitor.isOnline.first()) {
+                    this@MainAppViewModel.logger().i("checkUpdate(), network is not online")
+                    return@launch
                 }
+                inRequestUpdateData = true
+                val syncFromRemote = settingRepository.syncLatestVersion()
+                this@MainAppViewModel.logger().i("checkUpdate(), syncFromRemote = $syncFromRemote")
+                val upgradeInfoEntity = settingRepository.getLatestUpdateInfo()
+                checkUpgradeFromInfo(
+                    info = upgradeInfoEntity,
+                    need = {
+                        _updateInfoData.tryEmit(upgradeInfoEntity)
+                    },
+                    noNeed = {
+                        shouldDisplayBookmark = MainAppBookmarkEnum.NO_NEED_UPDATE
+                    },
+                )
             } catch (throwable: Throwable) {
                 logger().e(throwable, "checkUpdate()")
             } finally {
@@ -315,6 +339,10 @@ class MainAppViewModel @Inject constructor(
         val upgradeInfo = updateInfoData.value ?: return
         _updateInfoData.tryEmit(null)
         viewModelScope.launch {
+            if (_upgradeState.first() != AppUpgradeStateEnum.NONE) {
+                // 正在下载，不做处理
+                this@MainAppViewModel.logger().i("confirmUpdate(), in downloading")
+            }
             if (_allowDownload.first()) {
                 // 允许直接下载
                 appUpgradeManager.startDownload(upgradeInfo)

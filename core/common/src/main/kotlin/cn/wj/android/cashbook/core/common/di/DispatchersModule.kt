@@ -36,6 +36,10 @@ object DispatchersModule {
     fun providesDefaultCoroutineContext(): CoroutineContext = Dispatchers.Default
 
     @Provides
+    @Dispatcher(CashbookDispatchers.Main)
+    fun providesMainCoroutineContext(): CoroutineContext = Dispatchers.Main
+
+    @Provides
     @Dispatcher(CashbookDispatchers.IO)
     fun providesIOCoroutineContext(): CoroutineContext = Dispatchers.IO
 
