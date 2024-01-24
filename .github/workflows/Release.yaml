@@ -98,7 +98,7 @@ jobs:
 
       - name: Publish Release
         # You may pin to the exact commit or the version.
-        uses: eregon/publish-release@v1.0.3
+        uses: eregon/publish-release@v1.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TZ: Asia/Shanghai
