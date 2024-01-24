@@ -180,7 +180,7 @@ reactivex-rxjava2 = "2.2.21"
 reactivex-rxandroid2 = "2.1.1"
 reactivex-rxkotlin2 = "2.4.0"
 reactivex-rxjava3 = "3.1.5"
-reactivex-rxandroid3 = "3.0.0"
+reactivex-rxandroid3 = "3.0.2"
 reactivex-rxkotlin3 = "3.0.1"
 
 # EventBus [Github](https://github.com/greenrobot/EventBus)
