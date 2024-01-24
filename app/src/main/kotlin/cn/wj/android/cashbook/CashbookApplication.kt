@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("unused")
-
 package cn.wj.android.cashbook
 
 import android.app.Application
@@ -27,7 +25,6 @@ import cn.wj.android.cashbook.core.common.manager.AppManager
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.sync.initializers.Sync
-import com.didichuxing.doraemonkit.DoKit
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.HiltAndroidApp
@@ -93,8 +90,5 @@ class CashbookApplication : Application() {
 
         // 初始化同步服务
         Sync.initialize(this)
-
-        // 初始化 didi 开发工具
-        DoKit.Builder(this).build()
     }
 }
