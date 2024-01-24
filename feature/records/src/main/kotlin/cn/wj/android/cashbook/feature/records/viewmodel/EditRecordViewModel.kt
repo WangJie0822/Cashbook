@@ -241,9 +241,14 @@ class EditRecordViewModel @Inject constructor(
         )
 
     private var amountSheetShowed = false
+    private var recordIdInit = false
 
     /** 更新记录 [id]，刷新界面数据 */
     fun updateRecordId(id: Long) {
+        if (recordIdInit) {
+            return
+        }
+        recordIdInit = true
         _recordIdData.tryEmit(id)
         if (id == -1L && !amountSheetShowed) {
             // 新建，自动显示输入框
@@ -299,13 +304,19 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
+    private var assetIdInit = false
+
     /** 更新类型 */
-    fun updateType(typeId: Long) {
-        if (typeId == -1L) {
+    fun updateAssetId(assetId: Long) {
+        if (assetIdInit) {
+            return
+        }
+        assetIdInit = true
+        if (assetId == -1L) {
             return
         }
         viewModelScope.launch {
-            _mutableRecordData.tryEmit(_displayRecordData.first().copy(typeId = typeId))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(assetId = assetId))
         }
     }
 

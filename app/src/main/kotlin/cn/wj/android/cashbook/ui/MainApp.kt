@@ -525,6 +525,7 @@ fun CashbookNavHost(
                 )
             },
             onRequestNaviToEditAsset = navController::naviToEditAsset,
+            onRequestNaviToAddRecord = { assetId -> navController.naviToEditRecord(assetId = assetId) },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 编辑资产

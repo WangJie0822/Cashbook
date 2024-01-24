@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbCard
+import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
@@ -70,6 +71,7 @@ import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
  * @param assetRecordListContent 资产记录列表，参数：(资产id, 列表头布局, 列表item点击回调) -> [Unit]
  * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
  * @param onRequestNaviToEditAsset 导航到编辑资产
+ * @param onRequestNaviToAddRecord 跳转添加记录
  * @param onRequestPopBackStack 导航到上一级
  */
 @Composable
@@ -78,6 +80,7 @@ internal fun AssetInfoRoute(
     assetRecordListContent: @Composable (@Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
     onRequestNaviToEditAsset: () -> Unit,
+    onRequestNaviToAddRecord: () -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AssetInfoViewModel = hiltViewModel<AssetInfoViewModel>().apply {
@@ -106,6 +109,7 @@ internal fun AssetInfoRoute(
         onDeleteAssetClick = viewModel::showDeleteConfirmDialog,
         onConfirmDeleteAsset = { viewModel.deleteAsset(onSuccess = onRequestPopBackStack) },
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
+        onAddRecordClick = onRequestNaviToAddRecord,
         onBackClick = onRequestPopBackStack,
         modifier = modifier,
     )
@@ -139,6 +143,7 @@ internal fun AssetInfoScreen(
     onDeleteAssetClick: () -> Unit,
     onConfirmDeleteAsset: () -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
+    onAddRecordClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember {
@@ -189,6 +194,11 @@ internal fun AssetInfoScreen(
                     }
                 },
             )
+        },
+        floatingActionButton = {
+            CbFloatingActionButton(onClick = onAddRecordClick) {
+                Icon(imageVector = CbIcons.Add, contentDescription = null)
+            }
         },
         snackbarHost = {
             SnackbarHost(snackbarHostState)
@@ -380,7 +390,6 @@ private fun AssetInfoContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-
         ) {
             Column(
                 modifier = Modifier

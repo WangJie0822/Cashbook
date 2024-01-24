@@ -86,7 +86,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
  * 编辑记录
  *
  * @param recordId 记录id，`-1` 为新建
- * @param typeId 类型 id，默认为 `-1`
+ * @param assetId 资产 id，默认为 `-1`
  * @param typeListContent 类型列表布局，参数：(类型大类, 默认类型 id, 类型选择回调) -> [Unit]
  * @param assetBottomSheetContent 选择资产抽屉布局，参数：(已选择类型id, 已选择资产id, 是否是关联资产, 资产选择回调) -> [Unit]
  * @param tagBottomSheetContent 选择标签抽屉布局，参数：(已选择标签id列表, 标签id列表变化回调) -> [Unit]
@@ -95,7 +95,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 @Composable
 internal fun EditRecordRoute(
     recordId: Long,
-    typeId: Long,
+    assetId: Long,
     typeListContent: @Composable (RecordTypeCategoryEnum, Long, (Long) -> Unit) -> Unit,
     assetBottomSheetContent: @Composable (Long, Long, Boolean, (Long) -> Unit) -> Unit,
     tagBottomSheetContent: @Composable (List<Long>, (List<Long>) -> Unit, () -> Unit) -> Unit,
@@ -104,7 +104,7 @@ internal fun EditRecordRoute(
     modifier: Modifier = Modifier,
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
         updateRecordId(recordId)
-        updateType(typeId)
+        updateAssetId(assetId)
     },
 ) {
     val savingHintText = stringResource(id = R.string.record_saving)
@@ -140,7 +140,7 @@ internal fun EditRecordRoute(
                 typeListContent(
                     selectedTypeCategory,
                     defaultTypeId,
-                    viewModel::updateType,
+                    viewModel::updateAssetId,
                 )
             }
         },
