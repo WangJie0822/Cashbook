@@ -103,8 +103,8 @@ internal fun EditRecordRoute(
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditRecordViewModel = hiltViewModel<EditRecordViewModel>().apply {
-        updateRecordId(recordId)
-        updateAssetId(assetId)
+        initRecordId(recordId)
+        initAssetId(assetId)
     },
 ) {
     val savingHintText = stringResource(id = R.string.record_saving)
@@ -140,7 +140,7 @@ internal fun EditRecordRoute(
                 typeListContent(
                     selectedTypeCategory,
                     defaultTypeId,
-                    viewModel::updateAssetId,
+                    viewModel::updateType,
                 )
             }
         },
