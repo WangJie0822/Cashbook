@@ -244,7 +244,7 @@ class EditRecordViewModel @Inject constructor(
     private var recordIdInit = false
 
     /** 更新记录 [id]，刷新界面数据 */
-    fun updateRecordId(id: Long) {
+    fun initRecordId(id: Long) {
         if (recordIdInit) {
             return
         }
@@ -257,6 +257,22 @@ class EditRecordViewModel @Inject constructor(
                 delay(500L)
                 displayAmountSheet()
             }
+        }
+    }
+
+    private var assetIdInit = false
+
+    /** 更新类型 */
+    fun initAssetId(assetId: Long) {
+        if (assetIdInit) {
+            return
+        }
+        assetIdInit = true
+        if (assetId == -1L) {
+            return
+        }
+        viewModelScope.launch {
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(assetId = assetId))
         }
     }
 
@@ -304,19 +320,13 @@ class EditRecordViewModel @Inject constructor(
         }
     }
 
-    private var assetIdInit = false
-
     /** 更新类型 */
-    fun updateAssetId(assetId: Long) {
-        if (assetIdInit) {
-            return
-        }
-        assetIdInit = true
-        if (assetId == -1L) {
+    fun updateType(typeId: Long) {
+        if (typeId == -1L) {
             return
         }
         viewModelScope.launch {
-            _mutableRecordData.tryEmit(_displayRecordData.first().copy(assetId = assetId))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(typeId = typeId))
         }
     }
 
