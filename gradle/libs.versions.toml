@@ -134,7 +134,7 @@ androidx-annotation = "1.7.1"
 # DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.0.1"
-androidx-benchmark-macro = "1.2.2"
+androidx-benchmark-macro = "1.2.3"
 # palette [指南](https://developer.android.google.cn/jetpack/androidx/releases/palette)
 # [版本查询](https://mvnrepository.com/artifact/androidx.palette)
 androidx-palette = "1.0.0"
