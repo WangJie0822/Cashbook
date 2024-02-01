@@ -24,7 +24,7 @@ kotlinx-serialization-json = "1.6.2"
 google-material = "1.11.0"
 # zxing [Github](https://github.com/zxing/zxing)
 # [版本查询](https://mvnrepository.com/artifact/com.google.zxing)
-google-zxing = "3.5.1"
+google-zxing = "3.5.2"
 # gson [Github](https://github.com/google/gson)
 # [版本查询](https://mvnrepository.com/artifact/com.google.code.gson)
 google-gson = "2.10.1"
