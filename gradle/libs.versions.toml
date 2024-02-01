@@ -66,7 +66,7 @@ android-desugarJdkLibs = "2.0.4"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
 android-gradle-plugin = "8.2.2"
-android-tools = "31.2.1"
+android-tools = "31.2.2"
 androidx-baselineprofile = "1.2.2"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
