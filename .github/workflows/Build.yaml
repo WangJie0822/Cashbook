@@ -37,7 +37,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v2.12.0
 
       - name: Check build-logic
         run: ./gradlew check -p build-logic
@@ -135,7 +135,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v2.12.0
 
       - name: Build projects before running emulator
         run: ./gradlew packageOnlineDebug packageOnlineDebugAndroidTest
