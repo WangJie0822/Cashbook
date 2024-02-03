@@ -50,3 +50,7 @@ dependencies {
 
     implementation(projects.repos.mpChartLib)
 }
+
+dependencyGuard {
+    configuration("releaseRuntimeClasspath")
+}
