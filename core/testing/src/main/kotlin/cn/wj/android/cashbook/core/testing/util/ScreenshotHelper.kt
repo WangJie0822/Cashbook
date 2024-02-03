@@ -29,6 +29,7 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.RoborazziOptions.CompareOptions
 import com.github.takahirom.roborazzi.RoborazziOptions.RecordOptions
@@ -36,6 +37,7 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import com.google.accompanist.testharness.TestHarness
 import org.robolectric.RuntimeEnvironment
 
+@OptIn(ExperimentalRoborazziApi::class)
 val DefaultRoborazziOptions =
     RoborazziOptions(
         compareOptions = CompareOptions(changeThreshold = 0f), // Pixel-perfect matching

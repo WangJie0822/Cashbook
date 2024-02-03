@@ -16,20 +16,34 @@
 
 package cn.wj.android.cashbook.core.design.component
 
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun CbDivider(
+fun CbHorizontalDivider(
     modifier: Modifier = Modifier,
     thickness: Dp = DividerDefaults.Thickness,
     color: Color = DividerDefaults.color.copy(alpha = 0.3f),
 ) {
-    Divider(
+    HorizontalDivider(
+        modifier = modifier,
+        thickness = thickness,
+        color = color,
+    )
+}
+
+@Composable
+fun CbVerticalDivider(
+    modifier: Modifier = Modifier,
+    thickness: Dp = DividerDefaults.Thickness,
+    color: Color = DividerDefaults.color.copy(alpha = 0.3f),
+) {
+    VerticalDivider(
         modifier = modifier,
         thickness = thickness,
         color = color,

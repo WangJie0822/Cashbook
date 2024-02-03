@@ -17,11 +17,13 @@
 package cn.wj.android.cashbook.core.design.icon
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Category
@@ -37,9 +39,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Layers
-import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
@@ -57,19 +57,19 @@ import androidx.compose.material.icons.filled.WebAsset
  */
 object CbIcons {
 
-    val ArrowBack = Icons.Filled.ArrowBack
-    val KeyboardArrowRight = Icons.Filled.KeyboardArrowRight
+    val ArrowBack = Icons.AutoMirrored.Filled.ArrowBack
+    val KeyboardArrowRight = Icons.AutoMirrored.Filled.KeyboardArrowRight
     val KeyboardArrowDown = Icons.Filled.KeyboardArrowDown
     val ArrowDropDown = Icons.Filled.ArrowDropDown
     val Fingerprint = Icons.Filled.Fingerprint
-    val Backspace = Icons.Filled.Backspace
+    val Backspace = Icons.AutoMirrored.Filled.Backspace
     val Visibility = Icons.Filled.Visibility
     val VisibilityOff = Icons.Filled.VisibilityOff
     val MoreVert = Icons.Filled.MoreVert
     val MoreHoriz = Icons.Filled.MoreHoriz
     val Add = Icons.Filled.Add
     val Close = Icons.Filled.Close
-    val LibraryBooks = Icons.Filled.LibraryBooks
+    val LibraryBooks = Icons.AutoMirrored.Filled.LibraryBooks
     val WebAsset = Icons.Filled.WebAsset
     val Category = Icons.Filled.Category
     val Layers = Icons.Filled.Layers

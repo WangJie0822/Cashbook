@@ -57,8 +57,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.Calculator
-import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTab
@@ -445,7 +445,7 @@ private fun EditRecordScaffoldContent(
                         primaryColor = typeColor,
                         onAmountClick = onAmountClick,
                     )
-                    CbDivider()
+                    CbHorizontalDivider()
                     Text(
                         text = stringResource(id = R.string.record_type),
                         color = MaterialTheme.colorScheme.onSurface,
@@ -687,7 +687,7 @@ internal fun EditRecordTopBar(
                     containerColor = Color.Unspecified,
                     contentColor = Color.Unspecified,
                     indicator = { tabPositions ->
-                        TabRowDefaults.Indicator(
+                        TabRowDefaults.SecondaryIndicator(
                             modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.ordinal]),
                             color = selectedTab.typeColor,
                         )

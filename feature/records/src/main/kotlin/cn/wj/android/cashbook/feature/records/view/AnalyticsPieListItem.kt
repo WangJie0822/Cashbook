@@ -70,7 +70,7 @@ internal fun AnalyticsPieListItem(
                 )
             }
             LinearProgressIndicator(
-                progress = item.percent,
+                progress = { item.percent },
                 color = tintColor,
                 modifier = Modifier.padding(vertical = 4.dp),
             )

@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.model.Selectable
@@ -155,7 +155,7 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                     }
                 }
 
-                CbDivider()
+                CbHorizontalDivider()
 
                 if (tagList.isEmpty()) {
                     Empty(

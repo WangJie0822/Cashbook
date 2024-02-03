@@ -60,8 +60,8 @@ import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.common.tools.toLocalDate
 import cn.wj.android.cashbook.core.common.tools.toMs
-import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.design.component.CbElevatedCard
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
@@ -461,7 +461,7 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
                 modifier = Modifier.weight(1f),
             )
         }
-        CbDivider()
+        CbHorizontalDivider()
         val barDataList = uiState.barDataList.filter {
             it.date.parseDateLong(DATE_FORMAT_DATE) <= System.currentTimeMillis()
         }.reversed()
