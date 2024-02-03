@@ -699,8 +699,8 @@ internal fun ModifyPasswordDialog(
         TextFieldState(
             validator = {
                 it.isMatch(PASSWORD_REGEX) &&
-                        pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
-                        pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {
@@ -797,8 +797,8 @@ internal fun VerityPasswordDialog(
         TextFieldState(
             validator = {
                 it.isMatch(PASSWORD_REGEX) &&
-                        pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
-                        pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {
@@ -873,8 +873,8 @@ internal fun ClearPasswordDialog(
         TextFieldState(
             validator = {
                 it.isMatch(PASSWORD_REGEX) &&
-                        pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
-                        pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {

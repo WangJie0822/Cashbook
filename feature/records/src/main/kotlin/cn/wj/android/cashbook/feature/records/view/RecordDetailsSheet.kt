@@ -222,9 +222,9 @@ internal fun RecordDetailsSheet(
 
                     if (recordData.relatedRecord.isNotEmpty() &&
                         (
-                                recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE ||
-                                        recordData.typeCategory == RecordTypeCategoryEnum.INCOME
-                                )
+                            recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE ||
+                                recordData.typeCategory == RecordTypeCategoryEnum.INCOME
+                            )
                     ) {
                         // 有关联记录，且是收入、支出类型
                         val list = recordData.relatedRecord
