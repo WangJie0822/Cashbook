@@ -174,8 +174,9 @@ dependencies {
     // Dex 分包
     implementation(libs.androidx.multidex)
 
-    // Androidx 基本依赖，包含 v4 v7 core-ktx activity-ktx fragment-ktx
-    implementation(libs.bundles.androidx.base.ktx)
+    // Androidx 基本依赖
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.ktx)
 
     implementation(libs.google.material)
 
