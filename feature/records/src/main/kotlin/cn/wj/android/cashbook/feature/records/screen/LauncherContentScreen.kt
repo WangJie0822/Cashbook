@@ -69,8 +69,8 @@ import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
@@ -511,7 +511,7 @@ private fun FrontLayerContent(
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
-                            CbDivider(
+                            CbHorizontalDivider(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 color = DividerDefaults.color.copy(0.3f),
                             )

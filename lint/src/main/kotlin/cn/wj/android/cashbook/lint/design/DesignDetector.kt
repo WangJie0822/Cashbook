@@ -80,7 +80,7 @@ class DesignDetector : Detector(), Detector.UastScanner {
             "MaterialTheme" to "CashbookTheme",
             "TopAppBar" to "CbTopAppBar",
             "Scaffold" to "CbScaffold",
-            "Divider" to "CbDivider",
+            "Divider" to "CbHorizontalDivider or CbVerticalDivider",
             "TextField" to "CbTextField",
             "OutlinedTextField" to "CbOutlinedTextField",
             "FloatingActionButton" to "CbFloatingActionButton",
@@ -92,6 +92,7 @@ class DesignDetector : Detector(), Detector.UastScanner {
             "Card" to "CbCard",
             "ElevatedCard" to "CbElevatedCard",
             "AlertDialog" to "CbAlertDialog",
+            "BaseAlterDialog" to "CbBaseAlterDialog",
             "Tab" to "CbTab",
             "TabRow" to "CbTabRow",
         )

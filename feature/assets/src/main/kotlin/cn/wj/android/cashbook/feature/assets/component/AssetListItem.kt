@@ -198,7 +198,7 @@ private fun CreditCardAssetListItem(
                     1f - (balanceDecimal / totalAmountDecimal).toFloat()
                 }
             LinearProgressIndicator(
-                progress = progress,
+                progress = { progress },
                 modifier = Modifier.padding(vertical = 4.dp),
             )
             Box(

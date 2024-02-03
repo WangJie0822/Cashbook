@@ -28,17 +28,17 @@ import androidx.compose.ui.graphics.Color
 fun CbTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = TabRowDefaults.containerColor,
-    contentColor: Color = TabRowDefaults.contentColor,
+    containerColor: Color = TabRowDefaults.primaryContainerColor,
+    contentColor: Color = TabRowDefaults.primaryContentColor,
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         if (selectedTabIndex < tabPositions.size) {
-            TabRowDefaults.Indicator(
+            TabRowDefaults.SecondaryIndicator(
                 Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
             )
         }
     },
     divider: @Composable () -> Unit = @Composable {
-        CbDivider()
+        CbHorizontalDivider()
     },
     tabs: @Composable () -> Unit,
 ) {

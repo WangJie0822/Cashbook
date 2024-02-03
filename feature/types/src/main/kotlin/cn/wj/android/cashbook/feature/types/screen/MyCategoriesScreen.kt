@@ -1005,7 +1005,7 @@ internal fun MyCategoriesTopBar(
                     containerColor = Color.Unspecified,
                     contentColor = Color.Unspecified,
                     indicator = { tabPositions ->
-                        TabRowDefaults.Indicator(
+                        TabRowDefaults.SecondaryIndicator(
                             modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.ordinal]),
                             color = MaterialTheme.colorScheme.onTertiaryContainer,
                         )

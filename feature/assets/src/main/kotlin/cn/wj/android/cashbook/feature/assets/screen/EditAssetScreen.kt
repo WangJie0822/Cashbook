@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -61,8 +60,8 @@ import cn.wj.android.cashbook.core.data.helper.assetClassificationEnumBanks
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
-import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
@@ -204,23 +203,25 @@ internal fun EditAssetScreen(
         },
         floatingActionButton = {
             if (uiState is EditAssetUiState.Success) {
-                CbFloatingActionButton(onClick = {
-                    if (!assetNameTextState.isValid || (uiState.isCreditCard && !totalAmountTextState.isValid)) {
-                        // 不满足必要条件
-                        assetNameTextState.requestErrors()
-                        totalAmountTextState.requestErrors()
-                    } else {
-                        onSaveClick(
-                            assetNameTextState.text,
-                            totalAmountTextState.text,
-                            balanceTextState.text,
-                            openBankTextState.text,
-                            cardNoTextState.text,
-                            remarkTextState.text,
-                            onBackClick,
-                        )
-                    }
-                }) {
+                CbFloatingActionButton(
+                    onClick = {
+                        if (!assetNameTextState.isValid || (uiState.isCreditCard && !totalAmountTextState.isValid)) {
+                            // 不满足必要条件
+                            assetNameTextState.requestErrors()
+                            totalAmountTextState.requestErrors()
+                        } else {
+                            onSaveClick(
+                                assetNameTextState.text,
+                                totalAmountTextState.text,
+                                balanceTextState.text,
+                                openBankTextState.text,
+                                cardNoTextState.text,
+                                remarkTextState.text,
+                                onBackClick,
+                            )
+                        }
+                    },
+                ) {
                     Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
                 }
             }
@@ -302,8 +303,8 @@ internal fun EditAssetScreen(
                             },
                         )
 
-                        CbDivider(
-                            modifier = Modifier.height(8.dp),
+                        CbHorizontalDivider(
+                            thickness = 8.dp,
                             color = DividerDefaults.color.copy(alpha = 0.1f),
                         )
 
@@ -384,8 +385,8 @@ internal fun EditAssetScreen(
                                 .padding(horizontal = 16.dp),
                         )
 
-                        CbDivider(
-                            modifier = Modifier.height(8.dp),
+                        CbHorizontalDivider(
+                            thickness = 8.dp,
                             color = DividerDefaults.color.copy(alpha = 0.1f),
                         )
 
@@ -494,9 +495,11 @@ internal fun EditAssetSheetContent(
         }
 
         EditAssetBottomSheetEnum.ASSET_CLASSIFICATION -> {
-            SelectAssetClassificationSheet(onItemClick = { classification ->
-                onClassificationChange.invoke(null, classification)
-            })
+            SelectAssetClassificationSheet(
+                onItemClick = { classification ->
+                    onClassificationChange.invoke(null, classification)
+                },
+            )
         }
 
         EditAssetBottomSheetEnum.DISMISS -> {
@@ -510,35 +513,40 @@ internal fun SelectDayDialog(
     onDismiss: () -> Unit,
     onDaySelect: (String) -> Unit,
 ) {
-    CbAlertDialog(onDismissRequest = onDismiss, text = {
-        Column {
-            for (c in 0 until 6) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    for (r in 0 until 5) {
-                        val text = (c * 5 + r + 1).toString()
-                        Text(
-                            modifier = Modifier
-                                .clickable { onDaySelect.invoke(text) }
-                                .weight(1f)
-                                .padding(vertical = 8.dp),
-                            text = text,
-                            textAlign = TextAlign.Center,
-                        )
+    CbAlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Column {
+                for (c in 0 until 6) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        for (r in 0 until 5) {
+                            val text = (c * 5 + r + 1).toString()
+                            Text(
+                                modifier = Modifier
+                                    .clickable { onDaySelect.invoke(text) }
+                                    .weight(1f)
+                                    .padding(vertical = 8.dp),
+                                text = text,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
             }
-        }
-    }, confirmButton = {
-        CbTextButton(onClick = { onDaySelect.invoke("") }) {
-            Text(text = stringResource(id = R.string.clear))
-        }
-    }, dismissButton = {
-        CbTextButton(onClick = onDismiss) {
-            Text(text = stringResource(id = R.string.cancel))
-        }
-    })
+        },
+        confirmButton = {
+            CbTextButton(onClick = { onDaySelect.invoke("") }) {
+                Text(text = stringResource(id = R.string.clear))
+            }
+        },
+        dismissButton = {
+            CbTextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -555,7 +563,7 @@ internal fun SelectAssetClassificationTypeSheet(onItemClick: (ClassificationType
                 .fillMaxWidth()
                 .padding(16.dp),
         )
-        CbDivider()
+        CbHorizontalDivider()
 
         LazyColumn(
             content = {
@@ -597,7 +605,7 @@ internal fun SelectAssetClassificationSheet(onItemClick: (AssetClassificationEnu
                 .fillMaxWidth()
                 .padding(16.dp),
         )
-        CbDivider()
+        CbHorizontalDivider()
 
         LazyColumn(
             content = {

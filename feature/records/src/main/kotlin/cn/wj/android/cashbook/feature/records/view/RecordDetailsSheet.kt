@@ -45,7 +45,7 @@ import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
-import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
@@ -139,7 +139,7 @@ internal fun RecordDetailsSheet(
                             )
                         }
                     }
-                    CbDivider()
+                    CbHorizontalDivider()
 
                     // 金额
                     CbListItem(
@@ -222,9 +222,9 @@ internal fun RecordDetailsSheet(
 
                     if (recordData.relatedRecord.isNotEmpty() &&
                         (
-                            recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE ||
-                                recordData.typeCategory == RecordTypeCategoryEnum.INCOME
-                            )
+                                recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE ||
+                                        recordData.typeCategory == RecordTypeCategoryEnum.INCOME
+                                )
                     ) {
                         // 有关联记录，且是收入、支出类型
                         val list = recordData.relatedRecord

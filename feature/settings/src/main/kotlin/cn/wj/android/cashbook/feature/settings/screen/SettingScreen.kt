@@ -51,7 +51,7 @@ import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
-import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbPasswordTextField
 import cn.wj.android.cashbook.core.design.component.CbScaffold
@@ -320,7 +320,7 @@ internal fun SettingContent(
                             )
                         },
                     )
-                    CbDivider(modifier = Modifier.padding(horizontal = 8.dp))
+                    CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
                 }
             }
 
@@ -385,7 +385,7 @@ internal fun SettingContent(
                         headlineContent = { Text(text = stringResource(id = R.string.clear_password)) },
                     )
                 }
-                CbDivider(modifier = Modifier.padding(horizontal = 8.dp))
+                CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
             }
 
             item {
@@ -434,7 +434,7 @@ internal fun SettingContent(
                         },
                     )
                 }
-                CbDivider(modifier = Modifier.padding(horizontal = 8.dp))
+                CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
             }
 
             item {
@@ -699,8 +699,8 @@ internal fun ModifyPasswordDialog(
         TextFieldState(
             validator = {
                 it.isMatch(PASSWORD_REGEX) &&
-                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
-                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                        pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                        pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {
@@ -797,8 +797,8 @@ internal fun VerityPasswordDialog(
         TextFieldState(
             validator = {
                 it.isMatch(PASSWORD_REGEX) &&
-                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
-                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                        pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                        pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {
@@ -873,8 +873,8 @@ internal fun ClearPasswordDialog(
         TextFieldState(
             validator = {
                 it.isMatch(PASSWORD_REGEX) &&
-                    pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
-                    pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
+                        pwdState != SettingPasswordStateEnum.PASSWORD_WRONG &&
+                        pwdState != SettingPasswordStateEnum.PASSWORD_DECODE_FAILED
             },
             errorFor = {
                 when {

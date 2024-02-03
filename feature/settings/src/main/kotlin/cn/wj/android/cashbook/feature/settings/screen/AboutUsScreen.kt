@@ -61,7 +61,7 @@ import cn.wj.android.cashbook.core.common.GITHUB_LATEST
 import cn.wj.android.cashbook.core.common.tools.jumpBrowser
 import cn.wj.android.cashbook.core.common.tools.jumpSendEmail
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
-import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTextButton
@@ -288,11 +288,7 @@ internal fun AboutUsScreen(
                     }
                 }
                 item {
-                    CbDivider(
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth(),
-                    )
+                    CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
                     // 数据源
                     CbListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.switch_data_source)) },

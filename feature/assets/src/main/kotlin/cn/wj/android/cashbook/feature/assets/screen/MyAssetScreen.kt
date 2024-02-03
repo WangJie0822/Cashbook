@@ -58,8 +58,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.CbDivider
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbSmallFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
@@ -405,8 +405,8 @@ internal fun AssetTypedInfoItem(
         )
     }
     if (expand) {
-        CbDivider(
-            modifier = Modifier.padding(horizontal = 16.dp),
+        CbHorizontalDivider(
+            thickness = 16.dp,
             color = DividerDefaults.color.copy(0.5f),
         )
         assetTypedInfo.assetList.forEach { assetModel ->

@@ -18,7 +18,6 @@ package cn.wj.android.cashbook.feature.settings.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -40,7 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.design.component.CbDivider
+import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.ui.BackPressHandler
@@ -264,11 +263,7 @@ internal fun LauncherSheet(
             onClick = onMyTagClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
-        CbDivider(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .height(1.dp),
-        )
+        CbHorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.settings)) },
             icon = { Icon(imageVector = CbIcons.Settings, contentDescription = null) },
