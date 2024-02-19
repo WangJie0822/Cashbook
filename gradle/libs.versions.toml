@@ -14,7 +14,7 @@ kotlin = "1.9.22"
 # 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
 # [Github](https://github.com/Kotlin/kotlinx.coroutines)
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
-kotlinx-coroutines = "1.7.3"
+kotlinx-coroutines = "1.8.0"
 # 日期处理 [Github](https://github.com/Kotlin/kotlinx-datetime)
 kotlinx-datetime = "0.5.0"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
