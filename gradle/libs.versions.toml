@@ -221,7 +221,7 @@ androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", versi
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core" }
 androidx-compose-animation-android = { group = "androidx.compose.animation", name = "animation-android" }
-androidx-3compose-animation-core-android = { group = "androidx.compose.animation", name = "animation-core-android" }
+androidx-compose-animation-core-android = { group = "androidx.compose.animation", name = "animation-core-android" }
 androidx-compose-animation-graphics = { group = "androidx.compose.animation", name = "animation-graphics" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
@@ -229,8 +229,7 @@ androidx-compose-material = { group = "androidx.compose.material", name = "mater
 androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material-ripple = { group = "androidx.compose.material", name = "material-ripple" }
-# FIXME: compose bom 2024.01.00 版本中的 material3 版本异常，单独指定版本，后续 bom 版本升级修复此问题需恢复
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.2.0" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
