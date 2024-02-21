@@ -18,7 +18,7 @@ kotlinx-coroutines = "1.7.3"
 # 日期处理 [Github](https://github.com/Kotlin/kotlinx-datetime)
 kotlinx-datetime = "0.5.0"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
-kotlinx-serialization-json = "1.6.2"
+kotlinx-serialization-json = "1.6.3"
 
 # Google 相关
 # Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
@@ -31,11 +31,11 @@ google-accompanist = "0.34.0"
 google-devtools-ksp = "1.9.22-1.0.17"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
-google-protobuf = "3.25.2"
+google-protobuf = "3.25.3"
 google-protobuf-plugin = "0.9.4"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
-google-truth = "1.3.0"
+google-truth = "1.4.1"
 # hilt [指南](https://dagger.dev/hilt)
 # [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
 google-hilt = "2.50"
@@ -45,7 +45,7 @@ androidx-hilt = "1.1.0"
 
 # Roborazzi 测试工具 [Github](https://github.com/takahirom/roborazzi)
 # [版本查询](https://mvnrepository.com/artifact/io.github.takahirom.roborazzi)
-takahirom-roborazzi = "1.9.0"
+takahirom-roborazzi = "1.10.1"
 
 # Robolectric UI 测试工具 [Github](https://github.com/robolectric/robolectric)
 # [版本查询](https://mvnrepository.com/artifact/org.robolectric)
@@ -53,7 +53,7 @@ robolectric = "4.11.1"
 
 # dependency guard 依赖保护 [Github](https://github.com/dropbox/dependency-guard)
 # [版本查询](https://mvnrepository.com/artifact/com.dropbox.dependency-guard)
-dropbox-dependency-guard = "0.4.3"
+dropbox-dependency-guard = "0.5.0"
 
 # 脱糖 [版本查询](https://mvnrepository.com/artifact/com.android.tools/desugar_jdk_libs)
 android-desugarJdkLibs = "2.0.4"
@@ -82,7 +82,7 @@ androidx-core = "1.12.0"
 androidx-core-splashscreen = "1.0.1"
 # Compose 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/compose)
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
-androidx-compose-bom = "2024.01.00"
+androidx-compose-bom = "2024.02.00"
 # Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin)
 androidx-compose-compiler = "1.5.8"
 # activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity)
@@ -99,7 +99,7 @@ androidx-room = "2.6.1"
 androidx-paging = "3.2.1"
 # Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
-androidx-navigation = "2.7.6"
+androidx-navigation = "2.7.7"
 # WorkManager 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/work)
 # [版本查询](https://mvnrepository.com/artifact/androidx.work)
 androidx-work = "2.9.0"
