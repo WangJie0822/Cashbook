@@ -41,7 +41,7 @@ google-truth = "1.4.1"
 google-hilt = "2.50"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt)
 # [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
-androidx-hilt = "1.1.0"
+androidx-hilt = "1.2.0"
 
 # Roborazzi 测试工具 [Github](https://github.com/takahirom/roborazzi)
 # [版本查询](https://mvnrepository.com/artifact/io.github.takahirom.roborazzi)
