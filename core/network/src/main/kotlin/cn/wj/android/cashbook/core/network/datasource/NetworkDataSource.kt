@@ -28,6 +28,7 @@ import okhttp3.MediaType
 import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Singleton
+import okhttp3.MediaType.Companion.toMediaType
 
 /**
  * 网络数据源
@@ -45,7 +46,7 @@ class NetworkDataSource @Inject constructor(
         .baseUrl(UrlDefinition.BASE_URL)
         .callFactory(okhttpCallFactory)
         .addConverterFactory(
-            networkJson.asConverterFactory(MediaType.get("application/json")),
+            networkJson.asConverterFactory("application/json".toMediaType()),
         )
         .build()
         .create(RetrofitNetworkApi::class.java)
