@@ -85,7 +85,7 @@ class ApkDownloadWorker @AssistedInject constructor(
                 logger().d("doWork save path: ${saveFile.path}")
 
                 // 文件总大小
-                val total = response.body()!!.contentLength()
+                val total = response.body!!.contentLength()
 
                 if (saveFile.exists()) {
                     // 文件已存在
@@ -104,7 +104,7 @@ class ApkDownloadWorker @AssistedInject constructor(
                 var sum = 0L
 
                 var fos: FileOutputStream? = FileOutputStream(saveFile)
-                response.body()!!.byteStream().use { inputStream ->
+                response.body!!.byteStream().use { inputStream ->
                     while (inputStream.read(buf).also { len = it } != -1) {
                         if (!isActive) {
                             // 已停止

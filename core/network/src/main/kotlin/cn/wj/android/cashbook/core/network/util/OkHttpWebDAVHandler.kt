@@ -25,9 +25,10 @@ import cn.wj.android.cashbook.core.model.model.BackupModel
 import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Credentials
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.intellij.lang.annotations.Language
 import org.jsoup.Jsoup
 import java.io.File
@@ -103,7 +104,9 @@ class OkHttpWebDAVHandler @Inject constructor(
         if (url.isBlank()) {
             return false
         }
-        val requestBody = RequestBody.create(MediaType.parse(contentType), dataStream.readBytes())
+        val readBytes = dataStream.readBytes()
+        val requestBody =
+            readBytes.toRequestBody(contentType.toMediaTypeOrNull(), 0, readBytes.size)
         val response = runCatching {
             callFactory.newCall(
                 Request.Builder()
@@ -133,7 +136,7 @@ class OkHttpWebDAVHandler @Inject constructor(
                 Request.Builder()
                     .url(url)
                     .addHeader("Authorization", Credentials.basic(account, password))
-                    .put(RequestBody.create(MediaType.parse(contentType), file))
+                    .put(file.asRequestBody(contentType.toMediaTypeOrNull()))
                     .build(),
             ).execute()
         }.getOrElse { throwable ->
@@ -172,7 +175,7 @@ class OkHttpWebDAVHandler @Inject constructor(
                     .addHeader("Depth", "1")
                     .method(
                         "PROPFIND",
-                        RequestBody.create(MediaType.parse("text/plain"), requestPropText),
+                        requestPropText.toRequestBody("text/plain".toMediaTypeOrNull()),
                     )
                     .build(),
             ).execute()
@@ -180,8 +183,8 @@ class OkHttpWebDAVHandler @Inject constructor(
             logger().e(throwable, "list(url = <$url>, propsList = <$propsList>)")
             null
         } ?: return@withContext emptyList()
-        logger().i("list(url = <$url>, propsList = <$propsList>), response = <${response.code()}>")
-        val responseString = response.body()?.string() ?: return@withContext emptyList()
+        logger().i("list(url = <$url>, propsList = <$propsList>), response = <${response.code}>")
+        val responseString = response.body?.string() ?: return@withContext emptyList()
         val result = arrayListOf<BackupModel>()
         Jsoup.parse(responseString).getElementsByTag("d:response").forEach {
             val href = it.getElementsByTag("d:href")[0].text()
@@ -212,8 +215,8 @@ class OkHttpWebDAVHandler @Inject constructor(
             logger().e(throwable, "get(url = <$url>)")
             null
         } ?: return@withContext null
-        logger().i("get(url = <$url>), response = <${response.code()}>")
-        response.body()?.byteStream()
+        logger().i("get(url = <$url>), response = <${response.code}>")
+        response.body?.byteStream()
     }
 
     companion object {

@@ -28,6 +28,6 @@ typealias InterceptorLogger = (String) -> Unit
 /** 默认日志打印接口 */
 val DEFAULT_LOGGER: InterceptorLogger by lazy(LazyThreadSafetyMode.NONE) {
     { msg ->
-        Platform.get().log(Log.DEBUG, msg, null)
+        Platform.get().log(msg, Log.DEBUG, null)
     }
 }
