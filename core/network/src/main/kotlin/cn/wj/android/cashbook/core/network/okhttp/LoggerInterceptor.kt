@@ -18,11 +18,6 @@
 
 package cn.wj.android.cashbook.core.network.okhttp
 
-import java.io.EOFException
-import java.io.IOException
-import java.nio.charset.StandardCharsets.UTF_8
-import java.util.TreeSet
-import java.util.concurrent.TimeUnit
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.Protocol
@@ -31,6 +26,11 @@ import okio.Buffer
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.EOFException
+import java.io.IOException
+import java.nio.charset.StandardCharsets.UTF_8
+import java.util.TreeSet
+import java.util.concurrent.TimeUnit
 
 /**
  * OkHttp 日志打印拦截器
@@ -172,19 +172,19 @@ constructor(
         if (responseBody != null) {
             logStr.appendLine(
                 "<-- ${response.code} ${response.message} ${response.request.url}" +
-                        " (${tookMs}ms${
-                            if (!logHeaders) {
-                                ", ${
-                                    if (responseBody.contentLength() != -1L) {
-                                        "$responseBody-byte"
-                                    } else {
-                                        "unknown-length"
-                                    }
-                                } body"
-                            } else {
-                                ""
-                            }
-                        })",
+                    " (${tookMs}ms${
+                        if (!logHeaders) {
+                            ", ${
+                                if (responseBody.contentLength() != -1L) {
+                                    "$responseBody-byte"
+                                } else {
+                                    "unknown-length"
+                                }
+                            } body"
+                        } else {
+                            ""
+                        }
+                    })",
             )
 
             if (logHeaders) {
@@ -283,7 +283,7 @@ constructor(
     private fun bodyHasUnknownEncoding(headers: Headers): Boolean {
         val contentEncoding = headers["Content-Encoding"] ?: return false
         return !contentEncoding.equals("identity", ignoreCase = true) &&
-                !contentEncoding.equals("gzip", ignoreCase = true)
+            !contentEncoding.equals("gzip", ignoreCase = true)
     }
 
     companion object {

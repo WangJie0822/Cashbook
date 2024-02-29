@@ -24,11 +24,10 @@ import cn.wj.android.cashbook.core.network.entity.GitReleaseEntity
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.Call
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Singleton
-import okhttp3.MediaType.Companion.toMediaType
 
 /**
  * 网络数据源
