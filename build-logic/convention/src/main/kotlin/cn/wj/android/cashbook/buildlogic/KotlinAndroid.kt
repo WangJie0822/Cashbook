@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * - 统一版本号及 Java、Kotlin 等配置
  */
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     commonExtension.apply {
         compileSdk = ProjectSetting.Config.COMPILE_SDK

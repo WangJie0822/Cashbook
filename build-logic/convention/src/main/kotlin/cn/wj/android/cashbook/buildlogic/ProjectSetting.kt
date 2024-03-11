@@ -45,13 +45,27 @@ object ProjectSetting {
         /** 大版本名 */
         private const val VERSION_NAME = "v1.0.5"
 
+        private var versionCodeTemp = -1
+
         /** 版本号，动态生成 */
         val versionCode: Int
-            get() = getVersionCodeFromVersionName()
+            get() {
+                if (versionCodeTemp == -1) {
+                    versionCodeTemp = getVersionCodeFromVersionName()
+                }
+                return versionCodeTemp
+            }
+
+        private var versionNameTemp = ""
 
         /** 版本名，大版本名+版本号 */
         val versionName: String
-            get() = generateVersionName()
+            get() {
+                if (versionNameTemp.isBlank()) {
+                    versionNameTemp = generateVersionName()
+                }
+                return versionNameTemp
+            }
 
         /** 源码 jdk 版本 */
         val javaVersion = JavaVersion.VERSION_11
