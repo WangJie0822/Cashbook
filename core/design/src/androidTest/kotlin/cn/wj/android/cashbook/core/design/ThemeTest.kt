@@ -38,9 +38,9 @@ import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.design.theme.LocalGradientColors
 import cn.wj.android.cashbook.core.design.theme.LocalTintTheme
 import cn.wj.android.cashbook.core.design.theme.TintTheme
+import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import kotlin.test.assertEquals
 
 /**
  * 验证不同配置下应用主题是否符合预期
