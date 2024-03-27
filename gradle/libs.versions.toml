@@ -82,7 +82,7 @@ androidx-core-splashscreen = "1.0.1"
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
 androidx-compose-bom = "2024.02.02"
 # Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin)
-androidx-compose-compiler = "1.5.8"
+androidx-compose-compiler = "1.5.11"
 # activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity)
 # [版本查询](https://mvnrepository.com/artifact/androidx.activity)
 androidx-activity = "1.8.2"
