@@ -16,6 +16,8 @@
 
 package cn.wj.android.cashbook.core.data.repository
 
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
+import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.table.TagTable
 import cn.wj.android.cashbook.core.model.model.TagModel
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +43,7 @@ internal fun TagTable.asModel(): TagModel {
     return TagModel(
         id = this.id ?: -1L,
         name = this.name,
+        invisible = this.invisible == SWITCH_INT_ON,
     )
 }
 
@@ -49,5 +52,6 @@ internal fun TagModel.asTable(): TagTable {
         id = if (this.id == -1L) null else this.id,
         name = this.name,
         booksId = -1L,
+        invisible = if (this.invisible) SWITCH_INT_ON else SWITCH_INT_OFF,
     )
 }

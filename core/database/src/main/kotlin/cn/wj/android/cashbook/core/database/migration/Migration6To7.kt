@@ -41,9 +41,8 @@ import java.math.BigDecimal
  * - db_asset：新增 balance 字段，移除 create_time 字段
  * - db_books：移除 image_url、currency、selected、createTime 字段
  * - db_record：移除 type_enum、record_id、tag_ids、system、create_time、modify_time，新增 concessions 字段
- * - db_type：移除 shared 字段
- * - db_tag_with_record：新增表
  * - db_type：移除 child_enable、refund、reimburse 字段，新增 protected 字段，重命名 icon_res_name->icon_name、type->type_level、record_type->type_category
+ * - db_tag_with_record：新增表
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/8/1
  */

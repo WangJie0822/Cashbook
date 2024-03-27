@@ -94,6 +94,7 @@ object DatabaseMigrations {
             Migration4To5,
             Migration5To6,
             Migration6To7,
+            Migration7To8,
         )
 
     /** 在数据库升级列表中找到开始版本为 [db] 版本号的迁移类，对数据库进行升级后返回升级后的版本 */
@@ -120,7 +121,7 @@ object DatabaseMigrations {
     /** 从 [from] 数据库恢复数据到 [to] 数据库，恢复前会将数据库版本升级到一致 */
     @WorkerThread
     fun recoveryFromDb(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase): Boolean {
-        val targetVersion = ApplicationInfo.dbVersion
+        val targetVersion = ApplicationInfo.DB_VERSION
         val toVersion = to.version
         var currentVersion = from.version
         logger().i("recoveryFromDb(from = <$from>), fromVersion = <$currentVersion>, targetVersion = <$targetVersion>, toVersion = <$toVersion>")
