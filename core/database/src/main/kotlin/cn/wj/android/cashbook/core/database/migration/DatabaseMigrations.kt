@@ -391,11 +391,11 @@ object DatabaseMigrations {
                         )
                         put(
                             TABLE_TYPE_TYPE_LEVEL,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_LEVEL)),
+                            it.getInt(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_LEVEL)),
                         )
                         put(
                             TABLE_TYPE_TYPE_CATEGORY,
-                            it.getString(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_CATEGORY)),
+                            it.getInt(it.getColumnIndexOrThrow(TABLE_TYPE_TYPE_CATEGORY)),
                         )
                         put(
                             TABLE_TYPE_PROTECTED,
