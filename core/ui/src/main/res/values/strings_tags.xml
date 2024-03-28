@@ -34,4 +34,6 @@
     <string name="tag_name_already_exist">存在相同名称的标签，请修改</string>
     <string name="tag_save_failed">标签保存失败</string>
     <string name="tag_delete_failed">标签删除失败</string>
+    <string name="invisible_tag">隐藏标签</string>
+    <string name="visible_tag">显示标签</string>
 </resources>

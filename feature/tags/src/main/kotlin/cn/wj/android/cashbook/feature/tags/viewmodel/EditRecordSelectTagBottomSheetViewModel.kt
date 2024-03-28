@@ -25,6 +25,7 @@ import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.model.Selectable
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.domain.usecase.GetSelectableVisibleTagListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,24 +44,26 @@ import javax.inject.Inject
 @HiltViewModel
 class EditRecordSelectTagBottomSheetViewModel @Inject constructor(
     private val tagRepository: TagRepository,
+    private val getSelectableVisibleTagListUseCase: GetSelectableVisibleTagListUseCase,
 ) : ViewModel() {
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
+    private val selectedTagIdList: MutableList<Long> = mutableListOf()
+
     /** 已选择标签 id 列表数据 */
     private val _selectedTagIdListData: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
 
     /** 标签数据列表 */
     val tagListData: StateFlow<List<Selectable<TagModel>>> =
-        combine(_selectedTagIdListData, tagRepository.tagListData) { ids, list ->
-            list.map {
-                Selectable(
-                    data = it,
-                    selected = it.id in ids,
-                )
-            }
+        combine(tagRepository.tagListData, _selectedTagIdListData) { tagList, inSelectTagIdList ->
+            getSelectableVisibleTagListUseCase(
+                tagList = tagList,
+                selectedTagIdList = selectedTagIdList,
+                inSelectTagIdList = inSelectTagIdList,
+            )
         }
             .stateIn(
                 scope = viewModelScope,
@@ -74,6 +77,7 @@ class EditRecordSelectTagBottomSheetViewModel @Inject constructor(
     fun updateSelectedTags(tagIdList: List<Long>) {
         if (firstSet) {
             firstSet = false
+            selectedTagIdList.addAll(tagIdList)
             _selectedTagIdListData.tryEmit(tagIdList)
         }
     }

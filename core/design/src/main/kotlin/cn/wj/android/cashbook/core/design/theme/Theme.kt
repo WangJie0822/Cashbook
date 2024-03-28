@@ -20,8 +20,6 @@ import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SignalCellularNodata
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -30,13 +28,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
-import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainter
-import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHint
 
 /**
  * 应用主题
@@ -248,19 +241,3 @@ fun CashbookTheme(
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
 fun supportsDynamicTheming() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-
-@Composable
-fun PreviewTheme(
-    defaultEmptyImagePainter: Painter = rememberVectorPainter(image = Icons.Filled.SignalCellularNodata),
-    content: @Composable () -> Unit,
-) {
-    CashbookTheme {
-        CashbookGradientBackground {
-            CompositionLocalProvider(
-                LocalDefaultEmptyImagePainter provides defaultEmptyImagePainter,
-                LocalDefaultLoadingHint provides "数据加载中",
-                content = content,
-            )
-        }
-    }
-}

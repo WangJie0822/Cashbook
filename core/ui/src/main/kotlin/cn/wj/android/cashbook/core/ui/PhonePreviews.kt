@@ -21,7 +21,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 
 /**
- * 用于展示控件在不同设备、不同主题预览效果的注解
+ * 用于展示控件在不同主题预览效果的注解
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/11
  */
@@ -35,16 +35,4 @@ import androidx.compose.ui.tooling.preview.Preview
     device = "spec:shape=Normal,width=360,height=640,unit=dp,dpi=480",
     uiMode = UI_MODE_NIGHT_YES,
 )
-@Preview(
-    name = "landscape",
-    device = "spec:shape=Normal,width=640,height=360,unit=dp,dpi=480",
-)
-@Preview(
-    name = "foldable",
-    device = "spec:shape=Normal,width=673,height=841,unit=dp,dpi=480",
-)
-@Preview(
-    name = "tablet",
-    device = "spec:shape=Normal,width=1280,height=800,unit=dp,dpi=480",
-)
-annotation class DevicePreviews
+annotation class PhonePreviews
