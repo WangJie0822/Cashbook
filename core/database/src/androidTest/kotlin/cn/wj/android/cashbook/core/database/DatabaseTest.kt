@@ -18,11 +18,14 @@ package cn.wj.android.cashbook.core.database
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
+import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.migration.Migration1To2
 import cn.wj.android.cashbook.core.database.migration.Migration2To3
@@ -46,7 +49,10 @@ import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REMARK
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_TYPE_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG_INVISIBLE
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,13 +78,25 @@ class DatabaseTest {
         FrameworkSQLiteOpenHelperFactory(),
     )
 
+    @Before
+    fun beforeTest() {
+        // 初始化 Logger 日志打印
+        val strategy = MyFormatStrategy.newBuilder()
+            .borderPriority(Log.WARN)
+            .headerPriority(Log.WARN)
+            .tag("CB_TEST")
+            .logStrategy { priority, tag, message -> println("${tag ?: "NO_TAG"}:$priority $message") }
+            .build()
+        Logger.addLogAdapter(AndroidLogAdapter(strategy))
+    }
+
     /**
      * 测试从数据库文件恢复备份
      */
     @Test
     fun recovery_from_database() {
         var resultCount = 0
-        helper.createDatabase("to", 7).use { to ->
+        helper.createDatabase("to", ApplicationInfo.DB_VERSION).use { to ->
             to.insert(
                 table = TABLE_RECORD,
                 conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE,
@@ -106,7 +124,7 @@ class DatabaseTest {
                     log(sb.toString())
                 }
             }
-            helper.createDatabase("from", 7).use { from ->
+            helper.createDatabase("from", ApplicationInfo.DB_VERSION).use { from ->
                 from.insert(
                     table = TABLE_RECORD,
                     conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE,
