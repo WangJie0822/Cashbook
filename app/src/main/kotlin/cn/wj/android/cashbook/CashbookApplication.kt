@@ -77,7 +77,8 @@ class CashbookApplication : Application() {
         Logger.addLogAdapter(
             object : AndroidLogAdapter(strategy) {
                 override fun isLoggable(priority: Int, tag: String?): Boolean {
-                    return BuildConfig.DEBUG || ApplicationInfo.logcatEnable || logcatEnable
+                    // debug版本、非产线版本或通过后门开启日志，有日志输出
+                    return BuildConfig.DEBUG || !ApplicationInfo.isProduction || ApplicationInfo.logcatEnable || logcatEnable
                 }
             },
         )

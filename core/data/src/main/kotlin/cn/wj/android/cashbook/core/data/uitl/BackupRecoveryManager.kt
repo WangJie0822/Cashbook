@@ -355,7 +355,7 @@ class BackupRecoveryManager @Inject constructor(
             ZipOutputStream(FileOutputStream(zippedPath)).use { zos ->
                 BufferedInputStream(FileInputStream(databaseCacheFile)).use { bis ->
                     val entry = ZipEntry(databaseCacheFile.name)
-                    entry.comment = ApplicationInfo.infos
+                    entry.comment = ApplicationInfo.applicationInfo
                     zos.putNextEntry(entry)
                     zos.write(bis.readBytes())
                     zos.closeEntry()
