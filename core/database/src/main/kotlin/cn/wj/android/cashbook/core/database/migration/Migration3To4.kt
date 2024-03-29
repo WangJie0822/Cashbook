@@ -19,6 +19,7 @@ package cn.wj.android.cashbook.core.database.migration
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG
 import org.intellij.lang.annotations.Language
 
@@ -42,8 +43,11 @@ object Migration3To4 : Migration(3, 4) {
         ALTER TABLE `$TABLE_TAG` ADD `shared` INTEGER DEFAULT $SWITCH_INT_ON NOT NULL
     """
 
-    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
-        execSQL(SQL_ALTER_TABLE_TAG_ADD_BOOKS_ID)
-        execSQL(SQL_ALTER_TABLE_TAG_ADD_SHARED)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        logger().i("migrate(db)")
+        with(db) {
+            execSQL(SQL_ALTER_TABLE_TAG_ADD_BOOKS_ID)
+            execSQL(SQL_ALTER_TABLE_TAG_ADD_SHARED)
+        }
     }
 }

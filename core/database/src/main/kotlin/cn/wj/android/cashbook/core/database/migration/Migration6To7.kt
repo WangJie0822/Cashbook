@@ -22,6 +22,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.database.table.TABLE_ASSET
 import cn.wj.android.cashbook.core.database.table.TABLE_BOOKS
@@ -48,14 +49,18 @@ import java.math.BigDecimal
  */
 object Migration6To7 : Migration(6, 7) {
 
-    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
-        migrateAsset()
-        migrateBooks()
-        migrateTag()
-        migrateTagRelated()
-        migrateType()
-        migrateRecordRelated()
-        migrateRecord()
+    override fun migrate(db: SupportSQLiteDatabase) {
+        logger().i("migrate(db)")
+        with(db) {
+            logger().i("migrate(db)")
+            migrateAsset()
+            migrateBooks()
+            migrateTag()
+            migrateTagRelated()
+            migrateType()
+            migrateRecordRelated()
+            migrateRecord()
+        }
     }
 
     /** 创建资产表，版本 7 */

@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.database.table.TABLE_ASSET
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
@@ -31,9 +32,12 @@ import org.intellij.lang.annotations.Language
  */
 object Migration5To6 : Migration(5, 6) {
 
-    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
-        migrateAsset()
-        migrateRecord()
+    override fun migrate(db: SupportSQLiteDatabase) {
+        logger().i("migrate(db)")
+        with(db) {
+            migrateAsset()
+            migrateRecord()
+        }
     }
 
     /** 查询资产列表中的资产和余额 */
@@ -56,7 +60,8 @@ object Migration5To6 : Migration(5, 6) {
             while (it.moveToNext()) {
                 val assetId = it.getLong(it.getColumnIndexOrThrow("id"))
                 val totalAmount =
-                    it.getFloat(it.getColumnIndexOrThrow("total_amount")).toString().toDoubleOrZero()
+                    it.getFloat(it.getColumnIndexOrThrow("total_amount")).toString()
+                        .toDoubleOrZero()
                 execSQL(SQL_UPDATE_TOTAL_AMOUNT_TO_ASSET.format(totalAmount, assetId))
             }
         }
@@ -81,8 +86,10 @@ object Migration5To6 : Migration(5, 6) {
         query(SQL_QUERY_ID_AMOUNT_CHART_FROM_RECORD).use {
             while (it.moveToNext()) {
                 val recordId = it.getLong(it.getColumnIndexOrThrow("id"))
-                val amount = it.getFloat(it.getColumnIndexOrThrow("amount")).toString().toDoubleOrZero()
-                val charge = it.getFloat(it.getColumnIndexOrThrow("charge")).toString().toDoubleOrZero()
+                val amount =
+                    it.getFloat(it.getColumnIndexOrThrow("amount")).toString().toDoubleOrZero()
+                val charge =
+                    it.getFloat(it.getColumnIndexOrThrow("charge")).toString().toDoubleOrZero()
                 execSQL(SQL_UPDATE_AMOUNT_CHARGE_TO_RECORD.format(amount, charge, recordId))
             }
         }

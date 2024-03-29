@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG
 import org.intellij.lang.annotations.Language
 
@@ -39,8 +40,11 @@ object Migration1To2 : Migration(1, 2) {
         )
     """
 
-    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
-        // 创建标签表
-        execSQL(SQL_CREATE_TABLE_TAG_2)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        logger().i("migrate(db)")
+        with(db) {
+            // 创建标签表
+            execSQL(SQL_CREATE_TABLE_TAG_2)
+        }
     }
 }
