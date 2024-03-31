@@ -59,6 +59,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.SearchViewModel
 @Composable
 internal fun SearchRoute(
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
@@ -75,6 +76,7 @@ internal fun SearchRoute(
         recordList = recordList,
         onKeywordChange = viewModel::onKeywordChange,
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+        onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
         onRequestPopBackStack = onRequestPopBackStack,
         modifier = modifier,
     )
@@ -91,6 +93,7 @@ private fun SearchScreen(
     recordList: LazyPagingItems<RecordViewsEntity>,
     onKeywordChange: (String) -> Unit,
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -112,6 +115,7 @@ private fun SearchScreen(
                 RecordDetailsSheet(
                     recordData = viewRecord,
                     onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+                    onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
                     onRequestDismissSheet = onRequestDismissBottomSheet,
                 )
             },

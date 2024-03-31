@@ -393,6 +393,7 @@ fun CashbookNavHost(
                         RecordDetailSheetContent(
                             recordEntity = recordEntity,
                             onRequestNaviToEditRecord = navController::naviToEditRecord,
+                            onRequestNaviToAssetInfo = navController::naviToAssetInfo,
                             onRequestDismissSheet = onRequestDismissSheet,
                         )
                     },
@@ -474,6 +475,7 @@ fun CashbookNavHost(
                 RecordDetailSheetContent(
                     recordEntity = recordEntity,
                     onRequestNaviToEditRecord = navController::naviToEditRecord,
+                    onRequestNaviToAssetInfo = navController::naviToAssetInfo,
                     onRequestDismissSheet = onRequestDismissSheet,
                 )
             },
@@ -483,6 +485,7 @@ fun CashbookNavHost(
         // 搜索记录
         searchScreen(
             onRequestNaviToEditRecord = navController::naviToEditRecord,
+            onRequestNaviToAssetInfo = navController::naviToAssetInfo,
             onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 数据分析
@@ -493,6 +496,7 @@ fun CashbookNavHost(
         // 分类数据分析
         typedAnalyticsScreen(
             onRequestNaviToEditRecord = navController::naviToEditRecord,
+            onRequestNaviToAssetInfo = navController::naviToAssetInfo,
             onRequestPopBackStack = navController::popBackStackSafety,
         )
 
@@ -521,6 +525,7 @@ fun CashbookNavHost(
                 RecordDetailSheetContent(
                     recordEntity = recordEntity,
                     onRequestNaviToEditRecord = navController::naviToEditRecord,
+                    onRequestNaviToAssetInfo = navController::naviToAssetInfo,
                     onRequestDismissSheet = onRequestDismissSheet,
                 )
             },

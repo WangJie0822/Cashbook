@@ -17,12 +17,14 @@
 package cn.wj.android.cashbook.feature.records.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -35,10 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
@@ -50,6 +54,7 @@ import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
+import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -58,6 +63,7 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
+import cn.wj.android.cashbook.feature.records.preview.RecordDetailsSheetPreviewParameterProvider
 import java.math.BigDecimal
 
 /**
@@ -65,12 +71,14 @@ import java.math.BigDecimal
  *
  * @param recordData 显示的记录数据
  * @param onRequestNaviToEditRecord 导航到编辑记录
+ * @param onRequestNaviToAssetInfo 导航到资产信息
  * @param onRequestDismissSheet 隐藏 sheet
  */
 @Composable
 internal fun RecordDetailsSheet(
     recordData: RecordViewsEntity?,
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -88,7 +96,7 @@ internal fun RecordDetailsSheet(
                     onRequestDismissSheet()
                 }
             },
-            onDialogDismiss = { dialogState = DialogState.Dismiss },
+            onDismissRequest = { dialogState = DialogState.Dismiss },
         )
     }
 
@@ -211,20 +219,18 @@ internal fun RecordDetailsSheet(
                                     painter = painterDrawableResource(idStr = recordData.typeIconResName),
                                     containerColor = recordData.typeCategory.typeColor,
                                 )
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = recordData.typeName,
                                     style = MaterialTheme.typography.labelLarge,
-                                    modifier = Modifier.padding(start = 8.dp),
                                 )
                             }
                         },
                     )
 
                     if (recordData.relatedRecord.isNotEmpty() &&
-                        (
-                            recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE ||
-                                recordData.typeCategory == RecordTypeCategoryEnum.INCOME
-                            )
+                        (recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE
+                                || recordData.typeCategory == RecordTypeCategoryEnum.INCOME)
                     ) {
                         // 有关联记录，且是收入、支出类型
                         val list = recordData.relatedRecord
@@ -268,25 +274,12 @@ internal fun RecordDetailsSheet(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Icon(
+                                    AssetIconText(
                                         painter = painterResource(id = recordData.assetIconResId!!),
-                                        contentDescription = null,
-                                        tint = Color.Unspecified,
-                                        modifier = Modifier
-                                            .background(
-                                                color = MaterialTheme.colorScheme.primaryContainer.copy(
-                                                    alpha = 0.2f,
-                                                ),
-                                                shape = CircleShape,
-                                            )
-                                            .padding(2.dp)
-                                            .clip(CircleShape)
-                                            .padding(4.dp),
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = assetName,
-                                        style = MaterialTheme.typography.labelLarge,
+                                        assetName = assetName,
+                                        modifier = Modifier.clickable {
+                                            // TODO onRequestNaviToAssetInfo()
+                                        },
                                     )
                                     // 关联资产
                                     recordData.relatedAssetName?.let { relatedName ->
@@ -295,15 +288,12 @@ internal fun RecordDetailsSheet(
                                             style = MaterialTheme.typography.labelLarge,
                                             modifier = Modifier.padding(horizontal = 8.dp),
                                         )
-                                        Icon(
+                                        AssetIconText(
                                             painter = painterResource(id = recordData.relatedAssetIconResId!!),
-                                            contentDescription = null,
-                                            tint = Color.Unspecified,
-                                            modifier = Modifier.padding(end = 8.dp),
-                                        )
-                                        Text(
-                                            text = relatedName,
-                                            style = MaterialTheme.typography.labelLarge,
+                                            assetName = relatedName,
+                                            modifier = Modifier.clickable {
+                                                // TODO onRequestNaviToAssetInfo()
+                                            },
                                         )
                                     }
                                 }
@@ -370,5 +360,70 @@ internal fun RecordDetailsSheet(
                 }
             }
         }
+    }
+}
+
+/**
+ * 资产图标文本控件
+ *
+ * @param painter 图标
+ * @param assetName 资产名
+ */
+@Composable
+private fun AssetIconText(
+    painter: Painter,
+    assetName: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painter,
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(32.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(
+                        alpha = 0.5f,
+                    ),
+                    shape = CircleShape,
+                )
+                .padding(6.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = assetName,
+            style = MaterialTheme.typography.labelLarge,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun RecordDetailsSheetAssetIconText() {
+    PreviewTheme {
+        AssetIconText(
+            painter = painterResource(id = R.drawable.vector_wechat_circle_24),
+            assetName = "微信",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun RecordDetailsSheetWithData(
+    @PreviewParameter(RecordDetailsSheetPreviewParameterProvider::class)
+    recordData: RecordViewsEntity?,
+) {
+    PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)) {
+        RecordDetailsSheet(
+            recordData = recordData,
+            onRequestNaviToEditRecord = {},
+            onRequestNaviToAssetInfo = {},
+            onRequestDismissSheet = {},
+        )
     }
 }

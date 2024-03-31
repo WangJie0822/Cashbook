@@ -54,7 +54,7 @@ fun TypeIcon(
             tint = contentColor,
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(16.dp),
+                .size(20.dp),
         )
         if (showMore) {
             // 横向菜单标记，一级分类有二级分类时显示

@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,7 +53,6 @@ import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.core.ui.PhonePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.dialog.DeleteTagDialogRoute
 import cn.wj.android.cashbook.feature.tags.dialog.EditTagDialogRoute
@@ -158,7 +158,7 @@ internal fun MyTagsScreen(
                 // 空布局
                 Empty(
                     hintText = stringResource(id = R.string.tags_empty_hint),
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                 )
             } else {
                 // 标签列表
@@ -263,30 +263,11 @@ private fun TagDropdownMenuContent(
 
 @DevicePreviews
 @Composable
-fun MyTagsScreenNoTags() {
-    PreviewTheme(
-        defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),
-    ) {
-        MyTagsScreen(
-            dialogState = DialogState.Dismiss,
-            onRequestDismissDialog = {},
-            tagList = emptyList(),
-            onRequestSwitchTagInvisible = {},
-            onRequestShowEditTagDialog = {},
-            onRequestShowDeleteTagDialog = {},
-            onRequestNaviToTagStatistic = {},
-            onRequestPopBackStack = {},
-        )
-    }
-}
-
-@DevicePreviews
-@Composable
 fun MyTagsScreenWithList(
     @PreviewParameter(MyTagsListPreviewParameterProvider::class)
     tagList: List<TagModel>,
 ) {
-    PreviewTheme {
+    PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),) {
         MyTagsScreen(
             dialogState = DialogState.Dismiss,
             onRequestDismissDialog = {},
@@ -300,7 +281,7 @@ fun MyTagsScreenWithList(
     }
 }
 
-@PhonePreviews
+@PreviewLightDark
 @Composable
 fun MyTagsScreenTagDropDownMenu() {
     PreviewTheme {

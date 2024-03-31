@@ -24,6 +24,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 
+/**
+ * 自定义列表项组件
+ *
+ * - 修改默认背景颜色为透明
+ *
+ * ```
+ * |----------------------------------------|
+ * |            | overline      |           |
+ * | leading    | headline      | trailing  |
+ * |            | supporting    |           |
+ * |----------------------------------------|
+ * ```
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2024/3/31
+ */
 @Composable
 fun CbListItem(
     headlineContent: @Composable () -> Unit,

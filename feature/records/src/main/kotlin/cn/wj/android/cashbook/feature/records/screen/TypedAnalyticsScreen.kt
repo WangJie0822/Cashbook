@@ -57,6 +57,7 @@ internal fun TypedAnalyticsRoute(
     typeId: Long,
     tagId: Long,
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TypedAnalyticsViewModel = hiltViewModel<TypedAnalyticsViewModel>().apply {
@@ -73,6 +74,7 @@ internal fun TypedAnalyticsRoute(
         uiState = uiState,
         recordList = recordList,
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+        onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
         onRequestPopBackStack = onRequestPopBackStack,
         modifier = modifier,
     )
@@ -87,6 +89,7 @@ private fun TypedAnalyticsScreen(
     uiState: TypedAnalyticsUiState,
     recordList: LazyPagingItems<RecordViewsEntity>,
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -116,6 +119,7 @@ private fun TypedAnalyticsScreen(
                             RecordDetailsSheet(
                                 recordData = viewRecord,
                                 onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+                                onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
                                 onRequestDismissSheet = onRequestDismissBottomSheet,
                             )
                         },
