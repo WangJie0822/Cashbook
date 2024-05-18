@@ -36,7 +36,7 @@ google-protobuf-plugin = "0.9.4"
 google-truth = "1.4.2"
 # hilt [指南](https://dagger.dev/hilt)
 # [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
-google-hilt = "2.51"
+google-hilt = "2.51.1"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt)
 # [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
 androidx-hilt = "1.2.0"
