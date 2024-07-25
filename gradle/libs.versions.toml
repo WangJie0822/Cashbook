@@ -62,7 +62,7 @@ android-tools = "31.5.0"
 androidx-baselineprofile = "1.2.3"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
-android-lint = "31.3.1"
+android-lint = "31.3.2"
 
 # Androidx
 # appcompat [指南](https://developer.android.google.cn/jetpack/androidx/releases/appcompat)
