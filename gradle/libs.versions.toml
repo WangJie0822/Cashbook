@@ -88,7 +88,7 @@ androidx-compose-compiler = "1.5.11"
 androidx-activity = "1.8.2"
 # 生命周期相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/lifecycle)
 # [版本查询](https://mvnrepository.com/artifact/androidx.lifecycle)
-androidx-lifecycle = "2.7.0"
+androidx-lifecycle = "2.8.4"
 # Room 数据库相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/room)
 # [版本查询](https://mvnrepository.com/artifact/androidx.room)
 androidx-room = "2.6.1"
