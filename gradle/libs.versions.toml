@@ -16,7 +16,7 @@ kotlin = "1.9.23"
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
 kotlinx-coroutines = "1.8.1"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
-kotlinx-serialization-json = "1.6.3"
+kotlinx-serialization-json = "1.7.1"
 
 # Google 相关
 # Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
