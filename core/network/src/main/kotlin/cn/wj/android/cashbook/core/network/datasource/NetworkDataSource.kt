@@ -57,7 +57,7 @@ class NetworkDataSource @Inject constructor(
         } else {
             networkApi.githubQueryReleaseList(GITHUB_OWNER, REPO_NAME)
         }
-        logger().i("checkUpdate(useGitee = <$useGitee>), result = <$result>")
+        logger().d("checkUpdate(useGitee = <$useGitee>), result = <$result>")
         val release = result.firstOrNull {
             val name = it.name ?: ""
             name.startsWith("Release") || (canary && name.startsWith("Pre Release"))

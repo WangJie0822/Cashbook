@@ -16,8 +16,13 @@
 
 package cn.wj.android.cashbook.buildlogic
 
+import com.android.build.api.artifact.ScopedArtifact
 import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ScopedArtifacts
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
@@ -33,6 +38,8 @@ private val coverageExclusions = listOf(
     "**/R\$*.class",
     "**/BuildConfig.*",
     "**/Manifest*.*",
+    "**/*_Hilt*.class",
+    "**/Hilt_*.class",
 )
 
 private fun String.capitalize() = replaceFirstChar {
@@ -49,44 +56,60 @@ internal fun Project.configureJacoco(
         toolVersion = libs.findVersion("jacoco").get().toString()
     }
 
-    val jacocoTestReport = tasks.create("jacocoTestReport")
-
     androidComponentsExtension.onVariants { variant ->
-        val testTaskName = "test${variant.name.capitalize()}UnitTest"
-
+        val myObjFactory = project.objects
+        val buildDir = layout.buildDirectory.get().asFile
+        val allJars: ListProperty<RegularFile> = myObjFactory.listProperty(RegularFile::class.java)
+        val allDirectories: ListProperty<Directory> =
+            myObjFactory.listProperty(Directory::class.java)
         val reportTask =
-            tasks.register("jacoco${testTaskName.capitalize()}Report", JacocoReport::class) {
-                dependsOn(testTaskName)
-
+            tasks.register(
+                "create${variant.name.capitalize()}CombinedCoverageReport",
+                JacocoReport::class,
+            ) {
+                classDirectories.setFrom(
+                    allJars,
+                    allDirectories.map { dirs ->
+                        dirs.map { dir ->
+                            myObjFactory.fileTree().setDir(dir).exclude(coverageExclusions)
+                        }
+                    },
+                )
                 reports {
                     xml.required.set(true)
                     html.required.set(true)
                 }
 
-                val buildDir = rootProject.layout.buildDirectory.get().asFile
-                classDirectories.setFrom(
-                    fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
-                        exclude(coverageExclusions)
-                    },
-                )
-
+                // TODO: This is missing files in src/debug/, src/prod, src/demo, src/demoDebug...
                 sourceDirectories.setFrom(
                     files(
                         "$projectDir/src/main/java",
                         "$projectDir/src/main/kotlin",
                     ),
                 )
-                executionData.setFrom(file("$buildDir/jacoco/$testTaskName.exec"))
+
+                executionData.setFrom(
+                    project.fileTree("$buildDir/outputs/unit_test_code_coverage/${variant.name}UnitTest")
+                        .matching { include("**/*.exec") },
+
+                    project.fileTree("$buildDir/outputs/code_coverage/${variant.name}AndroidTest")
+                        .matching { include("**/*.ec") },
+                )
             }
 
-        jacocoTestReport.dependsOn(reportTask)
+        variant.artifacts.forScope(ScopedArtifacts.Scope.PROJECT)
+            .use(reportTask)
+            .toGet(
+                ScopedArtifact.CLASSES,
+                { _ -> allJars },
+                { _ -> allDirectories },
+            )
     }
 
     tasks.withType<Test>().configureEach {
         configure<JacocoTaskExtension> {
             // Required for JaCoCo + Robolectric
             // https://github.com/robolectric/robolectric/issues/2230
-            // Consider removing if not we don't add Robolectric
             isIncludeNoLocationClasses = true
 
             // Required for JDK 11 with the above

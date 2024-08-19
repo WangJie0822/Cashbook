@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
-    alias(conventionLibs.plugins.cashbook.android.library.flavors)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
     alias(conventionLibs.plugins.cashbook.android.hilt)
 }
@@ -28,19 +26,6 @@ android {
 
     defaultConfig {
         testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
-    }
-
-    sourceSets {
-        CashbookFlavor.values().forEach { flavor ->
-            val srcDir = if (flavor == CashbookFlavor.Offline) {
-                // 离线渠道
-                "src/channel/offline"
-            } else {
-                // 在线渠道
-                "src/channel/online"
-            }
-            getByName(flavor.name).java.srcDirs(srcDir)
-        }
     }
 }
 

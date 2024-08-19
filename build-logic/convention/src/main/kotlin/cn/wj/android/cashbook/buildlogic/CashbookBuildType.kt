@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-import cn.wj.android.cashbook.buildlogic.configureFlavors
-import com.android.build.gradle.LibraryExtension
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
+package cn.wj.android.cashbook.buildlogic
 
 /**
- * 多渠道配置插件
+ * 编译类型枚举
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/13
+ * @param applicationIdSuffix 应用 id 后缀
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2024/8/19
  */
-class AndroidLibraryFlavorsConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            extensions.configure<LibraryExtension> {
-                configureFlavors(this)
-            }
-        }
-    }
+enum class CashbookBuildType(val applicationIdSuffix: String?) {
+    Debug(applicationIdSuffix = null),
+    Release(applicationIdSuffix = null),
 }

@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import cn.wj.android.cashbook.buildlogic.ProjectSetting
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import cn.wj.android.cashbook.buildlogic.configureKotlinJvm
 
 plugins {
     `java-library`
@@ -22,18 +21,8 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.lint)
 }
 
-java {
-    // Up to Java 11 APIs are available through desugaring
-    // https://developer.android.com/studio/write/java11-minimal-support-table
-    sourceCompatibility = ProjectSetting.Config.javaVersion
-    targetCompatibility = ProjectSetting.Config.javaVersion
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = ProjectSetting.Config.javaVersion.toString()
-    }
-}
+// 配置 Kotlin JVM 环境
+configureKotlinJvm()
 
 dependencies {
     compileOnly(libs.kotlin.stdlib)

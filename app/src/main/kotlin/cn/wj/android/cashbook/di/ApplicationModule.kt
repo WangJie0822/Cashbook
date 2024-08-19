@@ -14,21 +14,36 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.sync.di
+package cn.wj.android.cashbook.di
 
+import android.content.Context
+import cn.wj.android.cashbook.BuildConfig
 import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
+import cn.wj.android.cashbook.sync.util.OfflineAppUpgradeManager
 import cn.wj.android.cashbook.sync.util.WorkManagerAppUpgradeManager
-import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
+/**
+ * 应用全局依赖注入
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2024/8/19
+ */
 @Module
 @InstallIn(SingletonComponent::class)
-interface SyncModule {
+object ApplicationModule {
 
-    @Binds
-    fun bindAppUpgradeManager(
-        workManagerAppUpgradeManager: WorkManagerAppUpgradeManager,
-    ): AppUpgradeManager
+    @Provides
+    @Singleton
+    fun providesAppUpgradeManager(
+        @ApplicationContext context: Context,
+    ): AppUpgradeManager = if (BuildConfig.FLAVOR.contains("offline", true)) {
+        OfflineAppUpgradeManager()
+    } else {
+        WorkManagerAppUpgradeManager(context)
+    }
 }
