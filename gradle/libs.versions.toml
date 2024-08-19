@@ -114,7 +114,7 @@ androidx-benchmark-macro = "1.2.3"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
 androidx-test-core = "1.5.0"
-androidx-test-espresso = "3.5.1"
+androidx-test-espresso = "3.6.1"
 androidx-test-ext-junit = "1.2.1"
 androidx-test-runner = "1.5.2"
 androidx-test-rules = "1.6.1"
