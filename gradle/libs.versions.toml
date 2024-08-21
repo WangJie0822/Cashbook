@@ -106,7 +106,7 @@ androidx-work = "2.9.0"
 androidx-datastore = "1.0.0"
 # Annotation [指南](https://developer.android.google.cn/jetpack/androidx/releases/annotation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
-androidx-annotation = "1.7.1"
+androidx-annotation = "1.8.2"
 # DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.0.1"
