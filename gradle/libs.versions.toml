@@ -20,7 +20,7 @@ kotlinx-serialization-json = "1.7.1"
 
 # Google 相关
 # Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
-google-material = "1.11.0"
+google-material = "1.12.0"
 # accompanist 组件库 [指南](https://google.github.io/accompanist/)
 # [版本查询](https://mvnrepository.com/artifact/com.google.accompanist)
 google-accompanist = "0.34.0"
@@ -57,17 +57,17 @@ dropbox-dependency-guard = "0.5.0"
 android-desugarJdkLibs = "2.0.4"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
-android-gradle-plugin = "8.5.1"
-android-tools = "31.5.0"
+android-gradle-plugin = "8.5.2"
+android-tools = "31.5.2"
 androidx-baselineprofile = "1.2.4"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
-android-lint = "31.5.1"
+android-lint = "31.5.2"
 
 # Androidx
 # appcompat [指南](https://developer.android.google.cn/jetpack/androidx/releases/appcompat)
 # [版本查询](https://mvnrepository.com/artifact/androidx.appcompat)
-androidx-appcompat = "1.6.1"
+androidx-appcompat = "1.7.0"
 # 约束性布局 [指南](https://developer.android.google.cn/jetpack/androidx/releases/constraintlayout)
 # [版本查询](https://mvnrepository.com/artifact/androidx.constraintlayout)
 androidx-constraintlayout-compose = "1.0.1"
@@ -76,13 +76,11 @@ androidx-constraintlayout-compose = "1.0.1"
 androidx-multidex = "2.0.1"
 # core 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/core)
 # [版本查询](https://mvnrepository.com/artifact/androidx.core)
-androidx-core = "1.12.0"
+androidx-core = "1.13.1"
 androidx-core-splashscreen = "1.0.1"
 # Compose 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/compose)
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
-androidx-compose-bom = "2024.03.00"
-# Compose 编译器，版本需要与kotlin兼容 [kotlin版本对应关系](https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin)
-androidx-compose-compiler = "1.5.11"
+androidx-compose-bom = "2024.06.00"
 # activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity)
 # [版本查询](https://mvnrepository.com/artifact/androidx.activity)
 androidx-activity = "1.9.1"
@@ -94,26 +92,26 @@ androidx-lifecycle = "2.8.4"
 androidx-room = "2.6.1"
 # Paging 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/paging)
 # [版本查询](https://mvnrepository.com/artifact/androidx.paging)
-androidx-paging = "3.2.1"
+androidx-paging = "3.3.2"
 # Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
 androidx-navigation = "2.7.7"
 # WorkManager 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/work)
 # [版本查询](https://mvnrepository.com/artifact/androidx.work)
-androidx-work = "2.9.0"
+androidx-work = "2.9.1"
 # DataStore 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/datastore)
 # [版本查询](https://mvnrepository.com/artifact/androidx.datastore)
-androidx-datastore = "1.0.0"
+androidx-datastore = "1.1.1"
 # Annotation [指南](https://developer.android.google.cn/jetpack/androidx/releases/annotation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
 androidx-annotation = "1.8.2"
 # DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.0.1"
-androidx-benchmark-macro = "1.2.3"
+androidx-benchmark-macro = "1.2.4"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
-androidx-test-core = "1.5.0"
+androidx-test-core = "1.6.1"
 androidx-test-espresso = "3.6.1"
 androidx-test-ext-junit = "1.2.1"
 androidx-test-runner = "1.6.2"

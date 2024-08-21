@@ -267,7 +267,7 @@ fun MyTagsScreenWithList(
     @PreviewParameter(MyTagsListPreviewParameterProvider::class)
     tagList: List<TagModel>,
 ) {
-    PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200),) {
+    PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)) {
         MyTagsScreen(
             dialogState = DialogState.Dismiss,
             onRequestDismissDialog = {},
