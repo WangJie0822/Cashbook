@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+
+## [1.0.6_24082118]
 ### Add
 - 新增隐藏标签功能；
 ### Fixed
