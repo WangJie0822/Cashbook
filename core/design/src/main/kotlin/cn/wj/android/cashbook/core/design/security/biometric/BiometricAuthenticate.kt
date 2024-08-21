@@ -94,7 +94,8 @@ fun BiometricAuthenticate(
 }
 
 internal val fingerprintManager: FingerprintManagerCompat
-    @SuppressLint("RestrictedApi") @Composable
+    @SuppressLint("RestrictedApi")
+    @Composable
     get() = FingerprintManagerCompat.from(LocalContext.current.applicationContext)
 
 @RequiresApi(Build.VERSION_CODES.P)
