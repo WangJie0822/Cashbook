@@ -20,6 +20,15 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/**
+ * 记录标签关联关系表
+ *
+ * @param id 主键自增长
+ * @param recordId 关联记录id
+ * @param tagId 关联标签id
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/3/6
+ */
 @Entity(tableName = TABLE_TAG_RELATED)
 class TagWithRecordTable(
     @PrimaryKey(autoGenerate = true)

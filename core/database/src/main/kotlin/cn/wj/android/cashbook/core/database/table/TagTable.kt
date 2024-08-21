@@ -26,6 +26,7 @@ import androidx.room.PrimaryKey
  * @param id 主键自增长
  * @param name 标签名称
  * @param booksId 所属账本主键
+ * @param invisible 是否隐藏
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/23
  */
@@ -36,4 +37,5 @@ data class TagTable(
     val id: Long?,
     @ColumnInfo(name = TABLE_TAG_NAME) val name: String,
     @ColumnInfo(name = TABLE_TAG_BOOKS_ID) val booksId: Long,
+    @ColumnInfo(name = TABLE_TAG_INVISIBLE) val invisible: Int,
 )

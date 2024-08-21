@@ -46,6 +46,9 @@ internal const val SQL_QUERY_ALL_FROM_TAG_RELATED = "SELECT * FROM `$TABLE_TAG_R
 @Language("SQL")
 internal const val SQL_QUERY_ALL_FROM_TYPE = "SELECT * FROM `$TABLE_TYPE`"
 
+@Language("SQL")
+internal const val SQL_QUERY_ALL_FROM_TABLE_FORMAT = "SELECT * FROM `%1${"$"}s`"
+
 /** 重命名资产表 */
 @Language("SQL")
 internal const val SQL_RENAME_TABLE_ASSET_TO_TEMP = """

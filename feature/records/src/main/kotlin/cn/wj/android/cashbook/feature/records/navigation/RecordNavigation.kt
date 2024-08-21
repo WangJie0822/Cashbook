@@ -164,6 +164,7 @@ fun NavGraphBuilder.analyticsScreen(
 
 fun NavGraphBuilder.typedAnalyticsScreen(
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(
@@ -183,6 +184,7 @@ fun NavGraphBuilder.typedAnalyticsScreen(
             typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
             tagId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TAG_ID) ?: -1L,
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+            onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }
@@ -223,11 +225,13 @@ fun NavGraphBuilder.calendarScreen(
 
 fun NavGraphBuilder.searchScreen(
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(route = ROUTE_RECORD_SEARCH) {
         SearchRoute(
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+            onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }
@@ -290,17 +294,20 @@ fun AssetInfoContent(
  *
  * @param recordEntity 显示的记录数据
  * @param onRequestNaviToEditRecord 导航到编辑记录
+ * @param onRequestNaviToAssetInfo 导航到资产信息
  * @param onRequestDismissSheet 隐藏 sheet
  */
 @Composable
 fun RecordDetailSheetContent(
     recordEntity: RecordViewsEntity?,
     onRequestNaviToEditRecord: (Long) -> Unit,
+    onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestDismissSheet: () -> Unit,
 ) {
     RecordDetailsSheet(
         recordData = recordEntity,
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
+        onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
         onRequestDismissSheet = onRequestDismissSheet,
     )
 }

@@ -118,13 +118,23 @@ private fun EditTagDialog(
             }
         },
         confirmButton = {
-            CbTextButton(onClick = {
-                if (tagNameState.isValid) {
-                    val model =
-                        tagModel?.copy(name = tagNameState.text) ?: TagModel(-1L, tagNameState.text)
-                    onRequestSaveTag(model)
-                }
-            }) {
+            CbTextButton(
+                onClick = {
+                    if (tagNameState.isValid) {
+                        val model =
+                            tagModel?.copy(
+                                name = tagNameState.text,
+                                /* TODO 添加隐藏逻辑 */
+                                invisible = false,
+                            ) ?: TagModel(
+                                id = -1L,
+                                name = tagNameState.text,
+                                invisible = false,
+                            )
+                        onRequestSaveTag(model)
+                    }
+                },
+            ) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         },

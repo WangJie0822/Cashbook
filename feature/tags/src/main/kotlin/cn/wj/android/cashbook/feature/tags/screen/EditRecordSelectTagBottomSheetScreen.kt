@@ -25,13 +25,14 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedFilterChip
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,11 +40,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
+import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.model.model.Selectable
 import cn.wj.android.cashbook.core.model.model.TagModel
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.dialog.EditTagDialogRoute
+import cn.wj.android.cashbook.feature.tags.preview.EditRecordSelectTagBottomSheetListPreviewParameterProvider
 import cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModel
 
 /**
@@ -88,7 +92,7 @@ internal fun EditRecordSelectTagBottomSheetRoute(
  * @param onAddTagClick 添加标签点击回调
  * @param onTagItemClick 标签列表 item 点击回调
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun EditRecordSelectTagBottomSheetScreen(
     dialogState: DialogState,
@@ -100,6 +104,13 @@ internal fun EditRecordSelectTagBottomSheetScreen(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
+        if (dialogState is DialogState.Shown<*>) {
+            EditTagDialogRoute(
+                tagModel = null,
+                onRequestDismissDialog = onRequestDismissDialog,
+            )
+        }
+
         Column(
             modifier = Modifier.fillMaxWidth(),
             content = {
@@ -181,11 +192,38 @@ internal fun EditRecordSelectTagBottomSheetScreen(
                 }
             },
         )
-        if (dialogState is DialogState.Shown<*>) {
-            EditTagDialogRoute(
-                tagModel = null,
-                onRequestDismissDialog = onRequestDismissDialog,
-            )
-        }
+    }
+}
+
+@DevicePreviews
+@Composable
+fun EditRecordSelectTagBottomSheetScreenNoTags() {
+    PreviewTheme(defaultEmptyImagePainter = painterResource(id = R.drawable.vector_no_data_200)) {
+        EditRecordSelectTagBottomSheetScreen(
+            dialogState = DialogState.Dismiss,
+            onRequestDismissDialog = {},
+            tagList = emptyList(),
+            onAddTagClick = {},
+            onDoneClick = {},
+            onTagItemClick = {},
+        )
+    }
+}
+
+@DevicePreviews
+@Composable
+fun EditRecordSelectTagBottomSheetScreenWithList(
+    @PreviewParameter(EditRecordSelectTagBottomSheetListPreviewParameterProvider::class)
+    tagList: List<Selectable<TagModel>>,
+) {
+    PreviewTheme {
+        EditRecordSelectTagBottomSheetScreen(
+            dialogState = DialogState.Dismiss,
+            onRequestDismissDialog = {},
+            tagList = tagList,
+            onAddTagClick = {},
+            onDoneClick = {},
+            onTagItemClick = {},
+        )
     }
 }

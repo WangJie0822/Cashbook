@@ -66,6 +66,7 @@ const val TABLE_TAG = "db_tag"
 const val TABLE_TAG_ID = "id"
 const val TABLE_TAG_NAME = "name"
 const val TABLE_TAG_BOOKS_ID = "books_id"
+const val TABLE_TAG_INVISIBLE = "invisible"
 
 /* 标签关联关系 */
 const val TABLE_TAG_RELATED = "db_tag_with_record"

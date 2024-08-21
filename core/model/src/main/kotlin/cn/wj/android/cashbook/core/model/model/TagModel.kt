@@ -16,7 +16,17 @@
 
 package cn.wj.android.cashbook.core.model.model
 
+/**
+ * 标签数据实体类
+ *
+ * @param id 标签主键
+ * @param name 标签名
+ * @param invisible 是否隐藏
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/3/1
+ */
 data class TagModel(
     val id: Long,
     val name: String,
+    val invisible: Boolean,
 )

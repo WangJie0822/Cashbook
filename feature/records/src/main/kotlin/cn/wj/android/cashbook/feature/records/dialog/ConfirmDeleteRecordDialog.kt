@@ -30,7 +30,7 @@ import cn.wj.android.cashbook.feature.records.viewmodel.ConfirmDeleteRecordDialo
 internal fun ConfirmDeleteRecordDialogRoute(
     recordId: Long,
     onResult: (ResultModel) -> Unit,
-    onDialogDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     viewModel: ConfirmDeleteRecordDialogViewModel = hiltViewModel(),
 ) {
     val recordRemovingText = stringResource(id = R.string.record_removing)
@@ -38,17 +38,17 @@ internal fun ConfirmDeleteRecordDialogRoute(
         onDeleteRecordConfirm = {
             viewModel.onDeleteRecordConfirm(recordRemovingText, recordId, onResult)
         },
-        onDialogDismiss = onDialogDismiss,
+        onDismissRequest = onDismissRequest,
     )
 }
 
 @Composable
 internal fun ConfirmDeleteRecordDialog(
     onDeleteRecordConfirm: () -> Unit,
-    onDialogDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     CbAlertDialog(
-        onDismissRequest = onDialogDismiss,
+        onDismissRequest = onDismissRequest,
         text = {
             Text(text = stringResource(id = R.string.record_delete_hint))
         },
@@ -58,7 +58,7 @@ internal fun ConfirmDeleteRecordDialog(
             }
         },
         dismissButton = {
-            CbTextButton(onClick = onDialogDismiss) {
+            CbTextButton(onClick = onDismissRequest) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },

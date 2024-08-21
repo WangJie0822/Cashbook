@@ -28,18 +28,22 @@ import cn.wj.android.cashbook.feature.tags.model.TagDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * 我的标签 ViewModel
  *
+ * @param tagRepository 标签数据仓库
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/11
  */
 @HiltViewModel
 class MyTagsViewModel @Inject constructor(
-    tagRepository: TagRepository,
+    private val tagRepository: TagRepository,
 ) : ViewModel() {
 
+    /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
         private set
 
@@ -51,14 +55,24 @@ class MyTagsViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    fun showEditTagDialog(tag: TagModel? = null) {
+    /** 切换标签 [tag] 的隐藏状态 */
+    fun switchInvisibleState(tag: TagModel) {
+        viewModelScope.launch {
+            tagRepository.updateTag(tag.copy(invisible = !tag.invisible))
+        }
+    }
+
+    /** 显示编辑标签弹窗，[tag] 为 `null` 是为创建标签 */
+    fun showEditTagDialog(tag: TagModel?) {
         dialogState = DialogState.Shown(TagDialogState.Edit(tag))
     }
 
+    /** 显示删除标签 [tag] 的确认弹窗 */
     fun showDeleteTagDialog(tag: TagModel) {
         dialogState = DialogState.Shown(TagDialogState.Delete(tag))
     }
 
+    /** 隐藏弹窗 */
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }

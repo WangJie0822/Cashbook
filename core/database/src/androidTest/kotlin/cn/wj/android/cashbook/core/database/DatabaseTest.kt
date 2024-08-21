@@ -18,18 +18,23 @@ package cn.wj.android.cashbook.core.database
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
+import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.migration.Migration1To2
 import cn.wj.android.cashbook.core.database.migration.Migration2To3
 import cn.wj.android.cashbook.core.database.migration.Migration3To4
 import cn.wj.android.cashbook.core.database.migration.Migration4To5
 import cn.wj.android.cashbook.core.database.migration.Migration5To6
+import cn.wj.android.cashbook.core.database.migration.Migration7To8
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_RECORD
+import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_TAG
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_AMOUNT
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ASSET_ID
@@ -42,7 +47,12 @@ import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_RECORD_TIME
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REIMBURSABLE
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REMARK
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_TYPE_ID
+import cn.wj.android.cashbook.core.database.table.TABLE_TAG
+import cn.wj.android.cashbook.core.database.table.TABLE_TAG_INVISIBLE
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,10 +78,25 @@ class DatabaseTest {
         FrameworkSQLiteOpenHelperFactory(),
     )
 
+    @Before
+    fun beforeTest() {
+        // 初始化 Logger 日志打印
+        val strategy = MyFormatStrategy.newBuilder()
+            .borderPriority(Log.WARN)
+            .headerPriority(Log.WARN)
+            .tag("CB_TEST")
+            .logStrategy { priority, tag, message -> println("${tag ?: "NO_TAG"}:$priority $message") }
+            .build()
+        Logger.addLogAdapter(AndroidLogAdapter(strategy))
+    }
+
+    /**
+     * 测试从数据库文件恢复备份
+     */
     @Test
     fun recovery_from_database() {
         var resultCount = 0
-        helper.createDatabase("to", 7).use { to ->
+        helper.createDatabase("to", ApplicationInfo.DB_VERSION).use { to ->
             to.insert(
                 table = TABLE_RECORD,
                 conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE,
@@ -99,7 +124,7 @@ class DatabaseTest {
                     log(sb.toString())
                 }
             }
-            helper.createDatabase("from", 7).use { from ->
+            helper.createDatabase("from", ApplicationInfo.DB_VERSION).use { from ->
                 from.insert(
                     table = TABLE_RECORD,
                     conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE,
@@ -401,7 +426,7 @@ class DatabaseTest {
 
     /**
      * 测试数据库从 5 升级到 6
-     * -
+     * - db_asset、db_record 表金额类型由 float 修改为 double
      */
     @Test
     @Throws(IOException::class)
@@ -445,6 +470,71 @@ class DatabaseTest {
             }
         log("$floatStr - $doubleStr")
         Assert.assertEquals(floatStr, doubleStr)
+    }
+
+    /**
+     * 测试数据库从 6 升级到 7
+     * - db_asset：新增 balance 字段，移除 create_time 字段
+     * - db_books：移除 image_url、currency、selected、createTime 字段
+     * - db_record：移除 type_enum、record_id、tag_ids、system、create_time、modify_time，新增 concessions 字段
+     * - db_type：移除 child_enable、refund、reimburse 字段，新增 protected 字段，重命名 icon_res_name->icon_name、type->type_level、record_type->type_category
+     * - db_tag_with_record：新增表
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate6_7() {
+    }
+
+    /**
+     * 测试数据库从 7 升级到 8
+     * - db_tag：新增 invisible 字段
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate7_8() {
+        var hasInvisible: Boolean
+        helper.createDatabase(testDbName, 7).use { db ->
+            db.query(
+                "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                arrayOf("table", TABLE_TAG),
+            ).use { cursor ->
+                cursor.moveToFirst()
+                val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                log("migrate7_8() sqlStr = [$sqlStr]")
+                hasInvisible = sqlStr.contains("`invisible`")
+            }
+            db.insert(
+                TABLE_TAG,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("name", "name")
+                    put("books_id", 1L)
+                },
+            )
+        }
+        Assert.assertEquals(false, hasInvisible)
+
+        var invisible: Int
+        helper.runMigrationsAndValidate(testDbName, 8, true, Migration7To8)
+            .use { db ->
+                db.query(
+                    "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                    arrayOf("table", TABLE_TAG),
+                ).use { cursor ->
+                    cursor.moveToFirst()
+                    val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                    log("migrate7_8() sqlStr = [$sqlStr]")
+                    hasInvisible = sqlStr.contains("`invisible`")
+                }
+                db.query(SQL_QUERY_ALL_FROM_TAG).use { cursor ->
+                    cursor.moveToFirst()
+                    invisible = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_TAG_INVISIBLE))
+                    log("migrate7_8() invisible = [$invisible]")
+                }
+            }
+        Assert.assertEquals(true, hasInvisible)
+        Assert.assertEquals(SWITCH_INT_OFF, invisible)
     }
 
     @Test

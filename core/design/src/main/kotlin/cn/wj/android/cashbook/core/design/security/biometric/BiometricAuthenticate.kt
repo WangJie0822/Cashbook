@@ -94,6 +94,7 @@ fun BiometricAuthenticate(
 }
 
 internal val fingerprintManager: FingerprintManagerCompat
+    @SuppressLint("RestrictedApi")
     @Composable
     get() = FingerprintManagerCompat.from(LocalContext.current.applicationContext)
 
@@ -160,6 +161,7 @@ internal fun BiometricAuthenticateQ(
     )
 }
 
+@SuppressLint("RestrictedApi")
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
 @Composable
 internal fun BiometricAuthenticateM(
@@ -195,9 +197,9 @@ internal fun BiometricAuthenticateM(
         0,
         cancellationSignal,
         object : FingerprintManagerCompat.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
+            override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult) {
                 try {
-                    val cipher = result?.cryptoObject?.cipher
+                    val cipher = result.cryptoObject.cipher
                         ?: throw RuntimeException("cipher is null!")
                     onSuccess.invoke(cipher)
                 } catch (throwable: Throwable) {
@@ -205,7 +207,7 @@ internal fun BiometricAuthenticateM(
                 }
             }
 
-            override fun onAuthenticationHelp(helpCode: Int, helpString: CharSequence?) {
+            override fun onAuthenticationHelp(helpCode: Int, helpString: CharSequence) {
                 onError.invoke(helpCode, helpString.toString())
             }
 
@@ -213,7 +215,7 @@ internal fun BiometricAuthenticateM(
                 onError.invoke(ERROR_FAILED, hintData.verificationFailedHint)
             }
 
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 onError.invoke(errorCode, errString.toString())
             }
         },
@@ -227,6 +229,7 @@ fun checkBiometric(context: Context = LocalContext.current.applicationContext): 
     return checkBiometricUpM(context)
 }
 
+@SuppressLint("RestrictedApi")
 @RequiresPermission(android.Manifest.permission.USE_FINGERPRINT)
 @Composable
 private fun checkBiometricUpM(context: Context): Int {

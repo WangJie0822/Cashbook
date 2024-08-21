@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
 import cn.wj.android.cashbook.core.database.table.TABLE_TYPE
 import org.intellij.lang.annotations.Language
@@ -31,9 +32,12 @@ import org.intellij.lang.annotations.Language
  */
 object Migration2To3 : Migration(2, 3) {
 
-    override fun migrate(db: SupportSQLiteDatabase) = with(db) {
-        migrateRecord()
-        migrateType()
+    override fun migrate(db: SupportSQLiteDatabase) {
+        logger().i("migrate(db)")
+        with(db) {
+            migrateRecord()
+            migrateType()
+        }
     }
 
     /** 创建记录表，版本 3 */

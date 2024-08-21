@@ -20,6 +20,11 @@ import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 
+/**
+ * 用于展示控件在不同设备、不同主题预览效果的注解
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/11
+ */
 @Preview(
     name = "phone-light",
     device = "spec:shape=Normal,width=360,height=640,unit=dp,dpi=480",

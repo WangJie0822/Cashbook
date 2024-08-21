@@ -43,7 +43,7 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
         BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class,
         TagWithRecordTable::class, RecordWithRelatedTable::class,
     ],
-    version = ApplicationInfo.dbVersion,
+    version = ApplicationInfo.DB_VERSION,
 )
 abstract class CashbookDatabase : RoomDatabase() {
 
