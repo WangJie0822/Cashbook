@@ -58,6 +58,7 @@ class WorkManagerAppUpgradeManager @Inject constructor(
     override val upgradeState: Flow<AppUpgradeStateEnum> = _upgradeState
 
     override suspend fun startDownload(info: UpgradeInfoEntity) {
+        logger().i("startDownload(info = <$info>)")
         upgradeInfo = info
         _upgradeState.tryEmit(AppUpgradeStateEnum.DOWNLOADING)
         showNotification()
@@ -74,16 +75,19 @@ class WorkManagerAppUpgradeManager @Inject constructor(
     }
 
     override suspend fun updateDownloadProgress(progress: Int) {
+        logger().i("updateDownloadProgress(progress = <$progress>)")
         updateProgress(progress)
     }
 
     override suspend fun downloadComplete(apkFile: File) {
+        logger().i("downloadComplete(apkFile = <$apkFile>)")
         _upgradeState.tryEmit(AppUpgradeStateEnum.DOWNLOAD_SUCCESS)
         hideNotification()
         install(apkFile)
     }
 
     override suspend fun downloadFailed() {
+        logger().i("downloadFailed()")
         _upgradeState.tryEmit(AppUpgradeStateEnum.DOWNLOAD_FAILED)
         hideNotification()
         val retryIntent = Intent(SERVICE_ACTION_RETRY_DOWNLOAD).apply {
@@ -121,17 +125,20 @@ class WorkManagerAppUpgradeManager @Inject constructor(
     }
 
     override suspend fun downloadStopped() {
+        logger().i("downloadStopped()")
         _upgradeState.tryEmit(AppUpgradeStateEnum.NONE)
         hideNotification()
     }
 
     override suspend fun cancelDownload() {
+        logger().i("cancelDownload()")
         _upgradeState.tryEmit(AppUpgradeStateEnum.NONE)
         hideNotification()
         WorkManager.getInstance(context).cancelAllWorkByTag(ApkDownloadWorkName)
     }
 
     override suspend fun retry() {
+        logger().i("retry()")
         upgradeInfo?.let { startDownload(it) }
     }
 

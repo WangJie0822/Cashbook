@@ -23,7 +23,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.project
 
 class AndroidFeatureConventionPlugin : Plugin<Project> {
@@ -42,20 +41,14 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("implementation", project(":core:design"))
-                add("implementation", project(":core:ui"))
+                "implementation"(project(":core:design"))
+                "implementation"(project(":core:ui"))
 
-                add("testImplementation", kotlin("test"))
-                add("testImplementation", project(":core:testing"))
-                add("androidTestImplementation", kotlin("test"))
-                add("androidTestImplementation", project(":core:testing"))
+                "implementation"(libs.findLibrary("androidx-hilt-navigation-compose").get())
+                "implementation"(libs.findLibrary("androidx-lifecycle-runtime-compose").get())
+                "implementation"(libs.findLibrary("androidx-lifecycle-viewmodel-compose").get())
 
-                add("implementation", libs.findLibrary("androidx-hilt-navigation-compose").get())
-                add("implementation", libs.findLibrary("androidx-lifecycle-runtime-compose").get())
-                add(
-                    "implementation",
-                    libs.findLibrary("androidx-lifecycle-viewmodel-compose").get(),
-                )
+                "androidTestImplementation"(libs.findLibrary("androidx-lifecycle-runtime-testing").get())
             }
         }
     }

@@ -8,15 +8,15 @@ jacoco = "0.8.11"
 
 # kotlin [指南](https://kotlinlang.org/)
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlin)
-kotlin = "1.9.23"
+kotlin = "2.0.10"
 
 # Kotlinx
 # 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
 # [Github](https://github.com/Kotlin/kotlinx.coroutines)
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
-kotlinx-coroutines = "1.8.0"
+kotlinx-coroutines = "1.8.1"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
-kotlinx-serialization-json = "1.6.3"
+kotlinx-serialization-json = "1.7.1"
 
 # Google 相关
 # Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
@@ -26,28 +26,28 @@ google-material = "1.11.0"
 google-accompanist = "0.34.0"
 # ksp 前缀版本需要和kotlin版本兼容 [Github](https://github.com/google/ksp)
 # [版本查询](https://mvnrepository.com/artifact/com.google.devtools.ksp)
-google-devtools-ksp = "1.9.23-1.0.19"
+google-devtools-ksp = "2.0.10-1.0.24"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
-google-protobuf = "4.26.0"
+google-protobuf = "4.27.3"
 google-protobuf-plugin = "0.9.4"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
 google-truth = "1.4.2"
 # hilt [指南](https://dagger.dev/hilt)
 # [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
-google-hilt = "2.51"
+google-hilt = "2.52"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt)
 # [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
 androidx-hilt = "1.2.0"
 
 # Roborazzi 测试工具 [Github](https://github.com/takahirom/roborazzi)
 # [版本查询](https://mvnrepository.com/artifact/io.github.takahirom.roborazzi)
-takahirom-roborazzi = "1.11.0"
+takahirom-roborazzi = "1.26.0"
 
 # Robolectric UI 测试工具 [Github](https://github.com/robolectric/robolectric)
 # [版本查询](https://mvnrepository.com/artifact/org.robolectric)
-robolectric = "4.11.1"
+robolectric = "4.12.1"
 
 # dependency guard 依赖保护 [Github](https://github.com/dropbox/dependency-guard)
 # [版本查询](https://mvnrepository.com/artifact/com.dropbox.dependency-guard)
@@ -57,12 +57,12 @@ dropbox-dependency-guard = "0.5.0"
 android-desugarJdkLibs = "2.0.4"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
-android-gradle-plugin = "8.3.1"
-android-tools = "31.3.1"
-androidx-baselineprofile = "1.2.3"
+android-gradle-plugin = "8.5.1"
+android-tools = "31.5.0"
+androidx-baselineprofile = "1.2.4"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
-android-lint = "31.3.1"
+android-lint = "31.5.1"
 
 # Androidx
 # appcompat [指南](https://developer.android.google.cn/jetpack/androidx/releases/appcompat)
@@ -85,10 +85,10 @@ androidx-compose-bom = "2024.03.00"
 androidx-compose-compiler = "1.5.11"
 # activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity)
 # [版本查询](https://mvnrepository.com/artifact/androidx.activity)
-androidx-activity = "1.8.2"
+androidx-activity = "1.9.1"
 # 生命周期相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/lifecycle)
 # [版本查询](https://mvnrepository.com/artifact/androidx.lifecycle)
-androidx-lifecycle = "2.7.0"
+androidx-lifecycle = "2.8.4"
 # Room 数据库相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/room)
 # [版本查询](https://mvnrepository.com/artifact/androidx.room)
 androidx-room = "2.6.1"
@@ -106,7 +106,7 @@ androidx-work = "2.9.0"
 androidx-datastore = "1.0.0"
 # Annotation [指南](https://developer.android.google.cn/jetpack/androidx/releases/annotation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
-androidx-annotation = "1.7.1"
+androidx-annotation = "1.8.2"
 # DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.0.1"
@@ -114,10 +114,10 @@ androidx-benchmark-macro = "1.2.3"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
 androidx-test-core = "1.5.0"
-androidx-test-espresso = "3.5.1"
-androidx-test-ext-junit = "1.1.5"
-androidx-test-runner = "1.5.2"
-androidx-test-rules = "1.5.0"
+androidx-test-espresso = "3.6.1"
+androidx-test-ext-junit = "1.2.1"
+androidx-test-runner = "1.6.2"
+androidx-test-rules = "1.6.1"
 androidx-test-uiautomator = "2.3.0"
 androidx-profileinstaller = "1.3.1"
 
@@ -126,7 +126,7 @@ squareup-javapoet = "1.13.0"
 # okhttp3 [Github](https://github.com/square/okhttp) [指南](https://square.github.io/okhttp)
 squareup-okhttp3 = "4.12.0"
 # Retrofit2 [Github](https://github.com/square/retrofit) [指南](https://square.github.io/retrofit/)
-squareup-retrofit2 = "2.10.0"
+squareup-retrofit2 = "2.11.0"
 # [Github](https://github.com/JakeWharton/retrofit2-kotlinx-serialization-converter)
 jakewharton-retrofit2-converter-kotlin = "1.0.0"
 
@@ -170,6 +170,7 @@ google-protobuf-protoc = { group = "com.google.protobuf", name = "protoc", versi
 google-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "google-hilt" }
 google-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "google-hilt" }
 google-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "google-hilt" }
+google-hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "google-hilt" }
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
 google-truth = { group = "com.google.truth", name = "truth", version.ref = "google-truth" }
@@ -187,6 +188,8 @@ android-tools-common = { group = "com.android.tools", name = "common", version.r
 android-lint-api = { group = "com.android.tools.lint", name = "lint-api", version.ref = "android-lint" }
 android-lint-checks = { group = "com.android.tools.lint", name = "lint-checks", version.ref = "android-lint" }
 android-lint-tests = { group = "com.android.tools.lint", name = "lint-tests", version.ref = "android-lint" }
+# compose Gradle plugin
+kotlin-compose-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
 # Androidx
 # appcompat [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/appcompat)
@@ -221,6 +224,7 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-testing = { group = "androidx.lifecycle", name = "lifecycle-runtime-testing", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 # Room 数据库相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/room)
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "androidx-room" }
@@ -294,6 +298,7 @@ androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "and
 androidx-room = { id = "androidx.room", version.ref = "androidx-room" }
 # Kotlin Android
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 # ksp

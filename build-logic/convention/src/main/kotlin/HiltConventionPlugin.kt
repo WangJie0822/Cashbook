@@ -16,21 +16,26 @@
 
 import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.libs
+import com.android.build.gradle.api.AndroidBasePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
-class AndroidHiltConventionPlugin : Plugin<Project> {
+class HiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            with(pluginManager) {
-                apply(ProjectSetting.Plugin.PLUGIN_GOOGLE_HILT)
-                apply(ProjectSetting.Plugin.PLUGIN_GOOGLE_KSP)
+            pluginManager.apply(ProjectSetting.Plugin.PLUGIN_GOOGLE_KSP)
+            dependencies {
+                "ksp"(libs.findLibrary("google-hilt-compiler").get())
+                "implementation"(libs.findLibrary("google-hilt-core").get())
             }
 
-            dependencies {
-                add("implementation", libs.findLibrary("google-hilt-android").get())
-                add("ksp", libs.findLibrary("google-hilt-compiler").get())
+            /** Add support for Android modules, based on [AndroidBasePlugin] */
+            pluginManager.withPlugin(ProjectSetting.Plugin.PLUGIN_ANDROID_BASE) {
+                pluginManager.apply(ProjectSetting.Plugin.PLUGIN_GOOGLE_HILT)
+                dependencies {
+                    "implementation"(libs.findLibrary("google-hilt-android").get())
+                }
             }
         }
     }

@@ -26,49 +26,9 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
 import java.io.File
 import javax.lang.model.element.Modifier
-
-enum class CashbookBuildType(val applicationIdSuffix: String?) {
-    Debug(applicationIdSuffix = null),
-    Release(applicationIdSuffix = null),
-}
-
-/**
- * 维度枚举
- *
- * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/2
- */
-enum class FlavorDimension {
-    ContentType,
-}
-
-/**
- * 渠道枚举
- *
- * @param dimension 维度
- * @param applicationIdSuffix 应用 id 后缀
- * @param versionNameSuffix 版本名后缀
- *
- * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/2
- */
-enum class CashbookFlavor(
-    val dimension: FlavorDimension,
-    val applicationIdSuffix: String?,
-    val versionNameSuffix: String?,
-) {
-    /** 在线渠道，需要网络请求 */
-    Online(FlavorDimension.ContentType, null, "_online"),
-
-    /** 离线渠道，无网络请求 */
-    Offline(FlavorDimension.ContentType, null, "_offline"),
-
-    /** 尝鲜渠道 */
-    Canary(FlavorDimension.ContentType, null, "_canary"),
-
-    /** 开发渠道 */
-    Dev(FlavorDimension.ContentType, ".dev", "_dev"),
-}
 
 /**
  * 配置多渠道
@@ -81,7 +41,7 @@ fun configureFlavors(
 ) {
     commonExtension.apply {
         // 配置维度
-        flavorDimensions += FlavorDimension.values().map { it.name }
+        flavorDimensions += CashbookFlavorDimension.values().map { it.name }
 
         // 多渠道配置
         productFlavors {
@@ -104,16 +64,14 @@ fun configureFlavors(
     }
 }
 
-fun Project.configureGenerateFlavors(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
-) {
-    commonExtension.apply {
+inline fun <reified T : CommonExtension<*, *, *, *, *, *>> Project.configureGenerateFlavors() =
+    configure<T> {
         println("> Task :${project.name}:configureFlavors generateFlavorFile")
         when (this) {
             is BaseAppModuleExtension -> applicationVariants
             is LibraryExtension -> libraryVariants
-            else -> null
-        }?.all {
+            else -> throw RuntimeException("Unsupported project extension $this ${T::class}")
+        }.all {
             generateBuildConfigProvider?.get()?.let {
                 it.doLast {
                     println("> Task :${project.name}:afterGenerateBuildConfig generateFlavorFile")
@@ -126,10 +84,9 @@ fun Project.configureGenerateFlavors(
             }
         }
     }
-}
 
 /** 将多渠道枚举类生成到指定路径 [path] [pkg] 包下 */
-private fun generateFlavor(pkg: String, path: String) {
+fun generateFlavor(pkg: String, path: String) {
     val flavor = TypeSpec.enumBuilder(CashbookFlavor::class.java.simpleName).apply {
         addModifiers(Modifier.PUBLIC)
         CashbookFlavor.values().forEach {

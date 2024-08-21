@@ -53,6 +53,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     // 应用版本名
                     versionName = ProjectSetting.Config.versionName
                 }
+                @Suppress("UnstableApiUsage")
+                testOptions.animationsDisabled = true
                 configureGradleManagedDevices(this)
             }
 

@@ -45,6 +45,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = ProjectSetting.Config.TARGET_SDK
+                defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+                testOptions.animationsDisabled = true
                 configureGradleManagedDevices(this)
             }
 
@@ -54,7 +56,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("testImplementation", kotlin("test"))
+                "androidTestImplementation"(kotlin("test"))
+                "testImplementation"(kotlin("test"))
             }
         }
     }

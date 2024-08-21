@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.sync.di
+package cn.wj.android.cashbook.buildlogic
 
-import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
-import cn.wj.android.cashbook.sync.util.OfflineAppUpgradeManager
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-
-@Module
-@InstallIn(SingletonComponent::class)
-interface SyncModule {
-
-    @Binds
-    fun bindAppUpgradeManager(
-        offlineAppUpgradeManager: OfflineAppUpgradeManager,
-    ): AppUpgradeManager
+/**
+ * 维度枚举
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2022/9/2
+ */
+enum class CashbookFlavorDimension {
+    ContentType,
 }

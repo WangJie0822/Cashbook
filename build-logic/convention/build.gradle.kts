@@ -39,6 +39,7 @@ dependencies {
     compileOnly(libs.android.tools.common)
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.kotlin.compose.gradle.plugin)
     compileOnly(libs.google.devtools.ksp.gradle.plugin)
     compileOnly(libs.squareup.javapoet)
     implementation(libs.google.truth)
@@ -75,7 +76,7 @@ gradlePlugin {
         }
         register("androidHilt") {
             id = "cashbook.android.hilt"
-            implementationClass = "AndroidHiltConventionPlugin"
+            implementationClass = "HiltConventionPlugin"
         }
         register("androidRoom") {
             id = "cashbook.android.room"
@@ -101,17 +102,9 @@ gradlePlugin {
             id = "cashbook.android.application.flavors"
             implementationClass = "AndroidApplicationFlavorsConventionPlugin"
         }
-        register("androidApplicationGenerateFlavors") {
-            id = "cashbook.android.application.flavors.generate"
-            implementationClass = "AndroidApplicationGenerateFlavorsConventionPlugin"
-        }
-        register("androidLibraryFlavors") {
-            id = "cashbook.android.library.flavors"
-            implementationClass = "AndroidLibraryFlavorsConventionPlugin"
-        }
-        register("androidLibraryGenerateFlavors") {
-            id = "cashbook.android.library.flavors.generate"
-            implementationClass = "AndroidLibraryGenerateFlavorsConventionPlugin"
+        register("androidGenerateFlavors") {
+            id = "cashbook.android.flavors.generate"
+            implementationClass = "AndroidGenerateFlavorsConventionPlugin"
         }
         register("jvmLibrary") {
             id = "cashbook.jvm.library"

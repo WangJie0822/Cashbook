@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.sync.util
 
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.uitl.AppUpgradeManager
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AppUpgradeStateEnum
@@ -32,29 +33,36 @@ class OfflineAppUpgradeManager @Inject constructor() : AppUpgradeManager {
 
     override suspend fun startDownload(info: UpgradeInfoEntity) {
         // empty block
+        logger().i("startDownload(info = <$info>)")
     }
 
     override suspend fun updateDownloadProgress(progress: Int) {
         // empty block
+        logger().i("updateDownloadProgress(progress = <$progress>)")
     }
 
     override suspend fun downloadComplete(apkFile: File) {
         // empty block
+        logger().i("downloadComplete(apkFile = <$apkFile>)")
     }
 
     override suspend fun downloadFailed() {
         // empty block
+        logger().i("downloadFailed()")
     }
 
     override suspend fun downloadStopped() {
         // empty block
+        logger().i("downloadStopped()")
     }
 
     override suspend fun cancelDownload() {
         // empty block
+        logger().i("cancelDownload()")
     }
 
     override suspend fun retry() {
         // empty block
+        logger().i("retry()")
     }
 }

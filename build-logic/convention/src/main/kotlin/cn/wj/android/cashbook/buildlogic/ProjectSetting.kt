@@ -21,6 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -92,7 +93,7 @@ object ProjectSetting {
             return versionName
         }
 
-        /** 根据日期时间获取对应版本号 */
+        /** 根据日期时间生成对应版本号 */
         private fun generateVersionCode(): Int {
             val sdf = SimpleDateFormat("yyMMddHH", Locale.getDefault())
             val formatDate = sdf.format(Date())
@@ -101,6 +102,7 @@ object ProjectSetting {
             return versionCode
         }
 
+        /** 从版本名中获取版本号 */
         private fun getVersionCodeFromVersionName(): Int {
             val versionCode = runCatching {
                 versionName.split("_")[1].toInt()
@@ -110,22 +112,54 @@ object ProjectSetting {
         }
     }
 
+    /** 插件 id */
     object Plugin {
+        /** Android 基本插件 */
+        const val PLUGIN_ANDROID_BASE = "com.android.base"
+
+        /** Android 应用插件 */
         const val PLUGIN_ANDROID_APPLICATION = "com.android.application"
+
+        /** Android 仓库插件 */
         const val PLUGIN_ANDROID_LIBRARY = "com.android.library"
+
+        /** Android 测试插件 */
         const val PLUGIN_ANDROID_TEST = "com.android.test"
+
+        /** Android lint 代码检查插件 */
         const val PLUGIN_ANDROID_LINT = "com.android.lint"
+
+        /** Androidx room 数据库插件 */
         const val PLUGIN_ANDROIDX_ROOM = "androidx.room"
+
+        /** Kotlin Android 支持插件 */
         const val PLUGIN_KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
+
+        /** Kotlin jvm 支持插件 */
         const val PLUGIN_KOTLIN_JVM = "org.jetbrains.kotlin.jvm"
+
+        /** Kotlin compose 支持插件 */
+        const val PLUGIN_KOTLIN_COMPOSE = "org.jetbrains.kotlin.plugin.compose"
+
+        /** jacoco 代码格式检查、格式化插件 */
         const val PLUGIN_JACOCO = "org.gradle.jacoco"
+
+        /** Google ksp 注解处理插件 */
         const val PLUGIN_GOOGLE_KSP = "com.google.devtools.ksp"
+
+        /** Google hilt 依赖注入插件 */
         const val PLUGIN_GOOGLE_HILT = "dagger.hilt.android.plugin"
-        const val PLUGIN_TAKAHIROM_ROBORAZZI = "io.github.takahirom.roborazzi"
+
+        /** 依赖清单生成、检查插件 */
         const val PLUGIN_DEPENDENCY_GUARD = "com.dropbox.dependency-guard"
 
+        /** 自定义 仓库插件 */
         const val PLUGIN_CASHBOOK_LIBRARY = "cashbook.android.library"
+
+        /** 自定义 lint 插件 */
         const val PLUGIN_CASHBOOK_LINT = "cashbook.android.lint"
+
+        /** 自定义 hilt 依赖注入插件 */
         const val PLUGIN_CASHBOOK_HILT = "cashbook.android.hilt"
     }
 }
@@ -133,8 +167,19 @@ object ProjectSetting {
 /** Android 仪器化测试 Runner */
 const val TEST_INSTRUMENTATION_RUNNER = "cn.wj.android.cashbook.core.testing.CashbookTestRunner"
 
+/** 从 [JavaVersion] 获取版本号 */
 val JavaVersion.version: Int
     get() = ordinal + 1
 
+/** 从 [JavaVersion] 获取 [JvmTarget] */
+val JavaVersion.target: JvmTarget
+    get() = when (this) {
+        JavaVersion.VERSION_1_8 -> JvmTarget.JVM_1_8
+        JavaVersion.VERSION_11 -> JvmTarget.JVM_11
+        JavaVersion.VERSION_17 -> JvmTarget.JVM_17
+        else -> JvmTarget.DEFAULT
+    }
+
+/** 名称为 `libs` 的 [VersionCatalogsExtension] */
 val Project.libs
     get(): VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
