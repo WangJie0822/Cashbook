@@ -37,7 +37,10 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3.5.0
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          validate-wrappers: true
+          gradle-home-cache-cleanup: true
 
       - name: Check build-logic
         run: ./gradlew check -p build-logic
@@ -142,6 +145,17 @@ jobs:
         api-level: [26, 30]
 
     steps:
+      - name: Delete unnecessary tools 🔧
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          android: false # Don't remove Android tools
+          tool-cache: true # Remove image tool cache - rm -rf "$AGENT_TOOLSDIRECTORY"
+          dotnet: true # rm -rf /usr/share/dotnet
+          haskell: true # rm -rf /opt/ghc...
+          swap-storage: true # rm -f /mnt/swapfile (4GiB)
+          docker-images: false # Takes 16s, enable if needed in the future
+          large-packages: false # includes google-cloud-sdk and it's slow
+
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -162,12 +176,12 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3.5.0
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          validate-wrappers: true
+          gradle-home-cache-cleanup: true
 
-      - name: Build projects before running emulator
-        run: ./gradlew packageOnlineDebug packageOnlineDebugAndroidTest
-
-      - name: Run instrumentation tests
+      - name: Build projects and run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -175,7 +189,17 @@ jobs:
           disable-animations: true
           disk-size: 6000M
           heap-size: 600M
-          script: ./gradlew connectedOnlineDebugAndroidTest --daemon
+          script: ./gradlew connectedDevDebugAndroidTest --daemon
+
+      - name: Run local tests (including Roborazzi) for the combined coverage report (only API 30)
+        if: matrix.api-level == 30
+        # There is no need to verify Roborazzi tests to generate coverage.
+        run: ./gradlew testDevDebugUnitTest -Proborazzi.test.verify=false # Add other flavor if we ever add JVM tests for
+
+      # Add `createOnlineDebugUnitTestCoverageReport` if we ever add JVM tests for online
+      - name: Generate coverage reports for Debug variants (only API 30)
+        if: matrix.api-level == 30
+        run: ./gradlew createDevDebugCombinedCoverageReport
 
       - name: Upload test reports
         if: always()
@@ -183,3 +207,25 @@ jobs:
         with:
           name: test-reports-${{ matrix.api-level }}
           path: '**/build/reports/androidTests'
+
+      - name: Display local test coverage (only API 30)
+        if: matrix.api-level == 30
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          title: Combined test coverage report
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/**/*Report.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload local coverage reports (XML + HTML) (only API 30)
+        if: matrix.api-level == 30
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          if-no-files-found: error
+          compression-level: 1
+          overwrite: false
+          path: '**/build/reports/jacoco/'
