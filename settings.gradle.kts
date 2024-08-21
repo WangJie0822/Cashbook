@@ -4,10 +4,15 @@ pluginManagement {
     includeBuild("build-logic")
     // 配置插件仓库
     repositories {
+        maven { setUrl("https://repo1.maven.org/maven2") }
+        maven { setUrl("https://mvnrepository.com/repos/central") }
+        maven { setUrl("https://mvnrepository.com/repos/space-kotlin-dev") }
+        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }
+        maven { setUrl("https://maven.aliyun.com/repository/public") }
+        maven { setUrl("https://maven.aliyun.com/repository/google") }
         gradlePluginPortal()
         google()
         mavenCentral()
-        maven { setUrl("https://repo1.maven.org/maven2/") }
     }
 }
 
@@ -16,10 +21,14 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     // 配置三方依赖仓库
     repositories {
+        maven { setUrl("https://repo1.maven.org/maven2") }
+        maven { setUrl("https://mvnrepository.com/repos/central") }
+        maven { setUrl("https://mvnrepository.com/repos/space-kotlin-dev") }
+        maven { setUrl("https://maven.aliyun.com/repository/public") }
+        maven { setUrl("https://maven.aliyun.com/repository/google") }
+        maven { setUrl("https://jitpack.io") }
         google()
         mavenCentral()
-        maven { setUrl("https://repo1.maven.org/maven2/") }
-        maven { setUrl("https://jitpack.io") }
     }
     // 配置 Version Catalogs
     versionCatalogs {
