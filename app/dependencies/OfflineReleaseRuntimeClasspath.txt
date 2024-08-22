@@ -175,4 +175,4 @@ org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.1
 org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.1
 org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1
 org.jetbrains:annotations:23.0.0
-org.jsoup:jsoup:1.17.2
+org.jsoup:jsoup:1.18.1
