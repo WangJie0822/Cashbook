@@ -54,7 +54,7 @@ robolectric = "4.13"
 dropbox-dependency-guard = "0.5.0"
 
 # 脱糖 [版本查询](https://mvnrepository.com/artifact/com.android.tools/desugar_jdk_libs)
-android-desugarJdkLibs = "2.0.4"
+android-desugarJdkLibs = "2.1.0"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
 android-gradle-plugin = "8.5.2"
