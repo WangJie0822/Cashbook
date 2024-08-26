@@ -8,7 +8,7 @@ jacoco = "0.8.11"
 
 # kotlin [指南](https://kotlinlang.org/)
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlin)
-kotlin = "2.0.10"
+kotlin = "2.0.20"
 
 # Kotlinx
 # 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html)
@@ -26,7 +26,7 @@ google-material = "1.12.0"
 google-accompanist = "0.34.0"
 # ksp 前缀版本需要和kotlin版本兼容 [Github](https://github.com/google/ksp)
 # [版本查询](https://mvnrepository.com/artifact/com.google.devtools.ksp)
-google-devtools-ksp = "2.0.10-1.0.24"
+google-devtools-ksp = "2.0.20-1.0.24"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
 google-protobuf = "4.27.3"
