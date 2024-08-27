@@ -80,7 +80,7 @@ androidx-core = "1.13.1"
 androidx-core-splashscreen = "1.0.1"
 # Compose 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/compose)
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
-androidx-compose-bom = "2024.06.00"
+androidx-compose-bom = "2024.08.00"
 # activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity)
 # [版本查询](https://mvnrepository.com/artifact/androidx.activity)
 androidx-activity = "1.9.1"
