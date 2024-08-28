@@ -40,6 +40,15 @@ import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.util.CalculatorUtils
 
+/**
+ * 计算器组件
+ *
+ * @param defaultText 默认文本
+ * @param primaryColor 主要颜色
+ * @param onConfirmClick 确认点击事件
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/3/7
+ */
 @Composable
 fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String) -> Unit) {
     var text: String by remember { mutableStateOf(defaultText.ifBlank { "0" }) }
