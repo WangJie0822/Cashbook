@@ -53,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -250,7 +251,9 @@ internal fun LauncherContentScreen(
                 is LauncherContentUiState.Success -> {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Image(
+                            modifier = Modifier.fillMaxWidth(),
                             painter = painterResource(R.drawable.im_top_background),
+                            contentScale = ContentScale.FillBounds,
                             contentDescription = null,
                         )
                         BackdropScaffold(

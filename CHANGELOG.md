@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Fixed
+- 修复宽屏设备下，首页图片显示不完整问题；
 ### Changed
 - 将DatePicker、TimePicker替换为Compose版本实现;
 
