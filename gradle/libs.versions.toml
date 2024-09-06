@@ -16,7 +16,7 @@ kotlin = "2.0.20"
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
 kotlinx-coroutines = "1.8.1"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
-kotlinx-serialization-json = "1.7.1"
+kotlinx-serialization-json = "1.7.2"
 
 # Google 相关
 # Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
@@ -29,7 +29,7 @@ google-accompanist = "0.34.0"
 google-devtools-ksp = "2.0.20-1.0.24"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
-google-protobuf = "4.27.3"
+google-protobuf = "4.28.0"
 google-protobuf-plugin = "0.9.4"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
@@ -54,15 +54,15 @@ robolectric = "4.13"
 dropbox-dependency-guard = "0.5.0"
 
 # 脱糖 [版本查询](https://mvnrepository.com/artifact/com.android.tools/desugar_jdk_libs)
-android-desugarJdkLibs = "2.1.0"
+android-desugarJdkLibs = "2.1.1"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
-android-gradle-plugin = "8.5.2"
-android-tools = "31.5.2"
+android-gradle-plugin = "8.6.0"
+android-tools = "31.6.0"
 androidx-baselineprofile = "1.3.0"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
-android-lint = "31.5.2"
+android-lint = "31.6.0"
 
 # Androidx
 # appcompat [指南](https://developer.android.google.cn/jetpack/androidx/releases/appcompat)
