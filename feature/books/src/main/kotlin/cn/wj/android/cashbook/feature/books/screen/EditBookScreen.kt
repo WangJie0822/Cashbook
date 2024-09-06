@@ -233,7 +233,6 @@ internal fun EditBookScreen(
                                         style = MaterialTheme.typography.titleMedium,
                                     )
                                 }
-
                             }
                         }
 
