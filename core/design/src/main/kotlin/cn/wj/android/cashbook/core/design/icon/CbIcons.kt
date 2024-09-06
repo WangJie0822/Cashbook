@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DateRange
@@ -89,4 +90,5 @@ object CbIcons {
     val Cancel = Icons.Filled.Cancel
     val DateRange = Icons.Filled.DateRange
     val DonutSmall = Icons.Filled.DonutSmall
+    val CleaningServices = Icons.Filled.CleaningServices
 }

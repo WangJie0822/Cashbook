@@ -32,4 +32,6 @@ dependencies {
     implementation(projects.core.data)
 
     implementation(libs.androidx.constraintlayout.compose)
+
+    implementation(libs.coil.kt.compose)
 }

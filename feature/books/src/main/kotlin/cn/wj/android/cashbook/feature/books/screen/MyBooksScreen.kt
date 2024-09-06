@@ -18,9 +18,9 @@ package cn.wj.android.cashbook.feature.books.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,6 +30,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,10 +57,16 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.preview.PreviewTheme
+import cn.wj.android.cashbook.core.model.model.BooksModel
+import cn.wj.android.cashbook.core.model.model.Selectable
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.expand.bookImageRatio
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksUiState
 import cn.wj.android.cashbook.feature.books.viewmodel.MyBooksViewModel
+import coil.compose.AsyncImage
 
 /**
  * 我的账本
@@ -140,6 +147,7 @@ private fun MyBooksContent(
     dialogState: DialogState,
     onConfirmDelete: (Long) -> Unit,
     onDismissDialog: () -> Unit,
+    windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
 ) {
     Box(
         modifier = modifier,
@@ -178,24 +186,34 @@ private fun MyBooksContent(
                                     modifier = Modifier
                                         .padding(horizontal = 16.dp)
                                         .padding(top = 8.dp)
-                                        .fillMaxWidth(),
+                                        .fillMaxWidth()
+                                        .aspectRatio(windowAdaptiveInfo.bookImageRatio),
                                     onClick = {
                                         onBookSelected(item.data.id)
                                     },
                                 ) {
                                     ConstraintLayout(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(200.dp)
-                                            .paint(
-                                                painter = painterResource(id = R.drawable.im_top_background),
-                                                contentScale = ContentScale.Crop,
-                                            ),
+                                        modifier = Modifier.fillMaxSize(),
                                     ) {
-                                        val (selected, name, description, time, more) = createRefs()
+                                        val (bg, selected, name, description, time, more) = createRefs()
+
+                                        AsyncImage(
+                                            modifier = Modifier
+                                                .constrainAs(bg) {
+                                                    centerTo(parent)
+                                                }
+                                                .fillMaxSize(),
+                                            model = null,
+                                            placeholder = painterResource(id = R.drawable.im_top_background),
+                                            error = painterResource(id = R.drawable.im_top_background),
+                                            fallback = painterResource(id = R.drawable.im_top_background),
+                                            contentScale = ContentScale.FillBounds,
+                                            contentDescription = null,
+                                        )
 
                                         Icon(
                                             imageVector = CbIcons.CheckCircle,
+                                            tint = MaterialTheme.colorScheme.primaryContainer,
                                             contentDescription = null,
                                             modifier = Modifier.constrainAs(selected) {
                                                 visibility = if (item.selected) {
@@ -212,22 +230,40 @@ private fun MyBooksContent(
                                             text = item.data.name,
                                             style = MaterialTheme.typography.titleMedium,
                                             modifier = Modifier
-                                                .padding(horizontal = 16.dp)
                                                 .constrainAs(name) {
-                                                    centerHorizontallyTo(parent)
-                                                    top.linkTo(selected.bottom, 24.dp)
-                                                },
+                                                    centerTo(parent)
+                                                    verticalChainWeight = 0.4f
+                                                }
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.primaryContainer.copy(
+                                                        alpha = 0.7f,
+                                                    ),
+                                                    shape = MaterialTheme.shapes.small,
+                                                )
+                                                .padding(horizontal = 16.dp, vertical = 8.dp),
                                         )
 
                                         Text(
                                             text = item.data.description,
                                             style = MaterialTheme.typography.bodyMedium,
                                             modifier = Modifier
-                                                .padding(horizontal = 16.dp)
                                                 .constrainAs(description) {
                                                     centerHorizontallyTo(parent)
                                                     top.linkTo(name.bottom, 8.dp)
-                                                },
+                                                    visibility =
+                                                        if (item.data.description.isBlank()) {
+                                                            Visibility.Invisible
+                                                        } else {
+                                                            Visibility.Visible
+                                                        }
+                                                }
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.primaryContainer.copy(
+                                                        alpha = 0.7f,
+                                                    ),
+                                                    shape = MaterialTheme.shapes.small,
+                                                )
+                                                .padding(horizontal = 8.dp, vertical = 4.dp),
                                         )
 
                                         Text(
@@ -296,4 +332,42 @@ private fun MyBooksContent(
             }
         },
     )
+}
+
+@DevicePreviews
+@Composable
+private fun MyBooksScreenPreview() {
+    PreviewTheme {
+        MyBooksScreen(
+            uiState = MyBooksUiState.Success(
+                listOf(
+                    Selectable(
+                        BooksModel(
+                            -1,
+                            "默认账本",
+                            "描述描述描述",
+                            System.currentTimeMillis(),
+                        ),
+                        true,
+                    ),
+                    Selectable(
+                        BooksModel(
+                            -2,
+                            "默认账本2",
+                            "",
+                            System.currentTimeMillis(),
+                        ),
+                        false,
+                    ),
+                ),
+            ),
+            onBookSelected = { },
+            onEditBookClick = { },
+            onDeleteBookClick = { },
+            dialogState = DialogState.Dismiss,
+            onConfirmDelete = { },
+            onDismissDialog = { },
+            onBackClick = { },
+        )
+    }
 }

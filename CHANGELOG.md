@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 账本添加自定义背景功能；
 ### Fixed
 - 修复宽屏设备下，首页图片显示不完整问题；
 ### Changed

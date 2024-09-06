@@ -16,40 +16,61 @@
 
 package cn.wj.android.cashbook.feature.books.screen
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.design.component.CbCard
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
+import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.preview.PreviewTheme
+import cn.wj.android.cashbook.core.model.model.BooksModel
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.expand.bookImageRatio
 import cn.wj.android.cashbook.feature.books.enums.EditBookBookmarkEnum
 import cn.wj.android.cashbook.feature.books.viewmodel.EditBookUiState
 import cn.wj.android.cashbook.feature.books.viewmodel.EditBookViewModel
+import coil.compose.AsyncImage
 
 @Composable
 internal fun EditBookRoute(
@@ -86,6 +107,7 @@ internal fun EditBookScreen(
     uiState: EditBookUiState,
     onSaveClick: (String, String) -> Unit,
     onBackClick: () -> Unit,
+    windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
     modifier: Modifier = Modifier,
 ) {
     // 提示文本
@@ -127,11 +149,13 @@ internal fun EditBookScreen(
             SnackbarHost(snackbarHostState)
         },
         floatingActionButton = {
-            CbFloatingActionButton(onClick = {
-                if (nameTextFieldState.isValid) {
-                    onSaveClick(nameTextFieldState.text, descriptionTextFieldState.text)
-                }
-            }) {
+            CbFloatingActionButton(
+                onClick = {
+                    if (nameTextFieldState.isValid) {
+                        onSaveClick(nameTextFieldState.text, descriptionTextFieldState.text)
+                    }
+                },
+            ) {
                 Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
             }
         },
@@ -144,6 +168,75 @@ internal fun EditBookScreen(
 
                 is EditBookUiState.Success -> {
                     Column(modifier = Modifier.fillMaxSize()) {
+                        CbCard(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 8.dp)
+                                .fillMaxWidth()
+                                .aspectRatio(windowAdaptiveInfo.bookImageRatio),
+                        ) {
+                            ConstraintLayout(
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                var imageUri: Uri? by remember { mutableStateOf(null) }
+                                val launcher =
+                                    rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+                                        imageUri = it
+                                    }
+
+                                val (bg, clear, pickImage) = createRefs()
+
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .constrainAs(bg) {
+                                            centerTo(parent)
+                                        }
+                                        .fillMaxSize(),
+                                    model = imageUri,
+                                    placeholder = painterResource(id = R.drawable.im_top_background),
+                                    error = painterResource(id = R.drawable.im_top_background),
+                                    fallback = painterResource(id = R.drawable.im_top_background),
+                                    contentScale = ContentScale.FillBounds,
+                                    contentDescription = null,
+                                )
+
+                                CbIconButton(
+                                    modifier = Modifier.constrainAs(clear) {
+                                        top.linkTo(parent.top, 8.dp)
+                                        end.linkTo(parent.end, 8.dp)
+                                    },
+                                    onClick = { imageUri = null },
+                                ) {
+                                    Icon(
+                                        imageVector = CbIcons.CleaningServices,
+                                        tint = MaterialTheme.colorScheme.primaryContainer,
+                                        contentDescription = null,
+                                    )
+                                }
+
+                                CbTextButton(
+                                    modifier = Modifier
+                                        .constrainAs(pickImage) {
+                                            centerTo(parent)
+                                            verticalChainWeight = 0.4f
+                                        }
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primaryContainer.copy(
+                                                alpha = 0.7f,
+                                            ),
+                                            shape = MaterialTheme.shapes.small,
+                                        ),
+                                    onClick = { launcher.launch(arrayOf("image/*")) },
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.click_to_select_book_background),
+                                        style = MaterialTheme.typography.titleMedium,
+                                    )
+                                }
+
+                            }
+                        }
+
                         CbTextField(
                             textFieldState = nameTextFieldState,
                             label = { Text(text = stringResource(id = R.string.book_name)) },
@@ -165,5 +258,26 @@ internal fun EditBookScreen(
                 }
             }
         }
+    }
+}
+
+@DevicePreviews
+@Composable
+private fun EditBookScreenPreview() {
+    PreviewTheme {
+        EditBookScreen(
+            shouldDisplayBookmark = EditBookBookmarkEnum.NONE,
+            onDismissBookmark = {},
+            uiState = EditBookUiState.Success(
+                data = BooksModel(
+                    id = -1L,
+                    name = "测试",
+                    description = "描述",
+                    modifyTime = System.currentTimeMillis(),
+                ),
+            ),
+            onSaveClick = { _, _ -> },
+            onBackClick = {},
+        )
     }
 }
