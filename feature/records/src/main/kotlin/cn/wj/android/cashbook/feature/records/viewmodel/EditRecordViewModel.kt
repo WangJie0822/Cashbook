@@ -447,7 +447,7 @@ class EditRecordViewModel @Inject constructor(
     private var dateTemp = ""
 
     /** 选择日期 */
-    fun pickDate(dateMs: Long) {
+    fun onDateSelected(dateMs: Long) {
         dateTemp = dateMs.dateFormat(DATE_FORMAT_DATE)
         displayTimePickerDialog()
     }
@@ -470,7 +470,7 @@ class EditRecordViewModel @Inject constructor(
     }
 
     /** 选择时间 */
-    fun pickTime(time: String) {
+    fun onTimeSelected(time: String) {
         dismissDialog()
         viewModelScope.launch {
             _mutableRecordData.tryEmit(

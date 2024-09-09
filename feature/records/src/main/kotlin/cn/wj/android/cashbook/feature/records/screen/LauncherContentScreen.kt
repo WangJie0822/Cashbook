@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +45,8 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberBackdropScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -53,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -81,14 +85,17 @@ import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
+import cn.wj.android.cashbook.core.ui.expand.bookImageRatio
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
@@ -188,6 +195,7 @@ internal fun LauncherContentScreen(
     onRequestDismissDialog: () -> Unit,
     onRequestDismissSheet: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
     modifier: Modifier = Modifier,
 ) {
     // 提示文本
@@ -250,7 +258,11 @@ internal fun LauncherContentScreen(
                 is LauncherContentUiState.Success -> {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Image(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(windowAdaptiveInfo.bookImageRatio),
                             painter = painterResource(R.drawable.im_top_background),
+                            contentScale = ContentScale.FillBounds,
                             contentDescription = null,
                         )
                         BackdropScaffold(
@@ -675,4 +687,31 @@ internal fun RecordListItem(
             }
         },
     )
+}
+
+@Composable
+@DevicePreviews
+private fun LauncherContentScreenPreview() {
+    PreviewTheme {
+        LauncherContentScreen(
+            shouldDisplayDeleteFailedBookmark = 0,
+            onRequestDismissBookmark = { },
+            recordDetailSheetContent = { },
+            viewRecord = null,
+            date = YearMonth.now(),
+            onMenuClick = { },
+            onDateClick = { },
+            onDateSelected = { },
+            onSearchClick = { },
+            onCalendarClick = { },
+            onAnalyticsClick = { },
+            onAddClick = { },
+            uiState = LauncherContentUiState.Success("", "", "", emptyMap()),
+            onRecordItemClick = { },
+            dialogState = DialogState.Dismiss,
+            onRequestDismissDialog = { },
+            onRequestDismissSheet = { },
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+        )
+    }
 }

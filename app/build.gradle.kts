@@ -201,6 +201,8 @@ dependencies {
 
     implementation(libs.androidx.core.splashscreen)
 
+    implementation(libs.coil.kt)
+
     // 测试相关
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(projects.uiTestHiltManifest)

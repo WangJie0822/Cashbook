@@ -23,4 +23,5 @@
     <string name="book_name_exists">账本名已存在</string>
     <string name="book_name">账本名</string>
     <string name="book_description">账本说明</string>
+    <string name="click_to_select_book_background">点击选择背景图片</string>
 </resources>

@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetDefaults
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -30,11 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * 自定义底部抽屉
  * - [dragHandle] 统一添加状态栏 padding
- * - [windowInsets] 默认覆盖全屏
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,26 +44,30 @@ fun CbModalBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
+    sheetMaxWidth: Dp = BottomSheetDefaults.SheetMaxWidth,
     shape: Shape = BottomSheetDefaults.ExpandedShape,
     containerColor: Color = BottomSheetDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
-    tonalElevation: Dp = BottomSheetDefaults.Elevation,
+    tonalElevation: Dp = 0.dp,
     scrimColor: Color = BottomSheetDefaults.ScrimColor,
     dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle(modifier = Modifier.statusBarsPadding()) },
-    windowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
+    contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
+    properties: ModalBottomSheetProperties = ModalBottomSheetDefaults.properties,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         sheetState = sheetState,
+        sheetMaxWidth = sheetMaxWidth,
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
         tonalElevation = tonalElevation,
         scrimColor = scrimColor,
         dragHandle = dragHandle,
-        windowInsets = windowInsets,
+        contentWindowInsets = contentWindowInsets,
+        properties = properties,
         content = content,
     )
 }

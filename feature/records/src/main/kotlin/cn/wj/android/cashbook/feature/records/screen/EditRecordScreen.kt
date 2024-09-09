@@ -30,6 +30,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,7 +44,10 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,20 +60,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.Symbol
+import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.Calculator
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTab
 import cn.wj.android.cashbook.core.design.component.CbTabRow
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
-import cn.wj.android.cashbook.core.design.component.DatePickerDialog
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
-import cn.wj.android.cashbook.core.design.component.TimePickerDialog
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -81,6 +87,7 @@ import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
+import java.util.Calendar
 
 /**
  * 编辑记录
@@ -120,8 +127,8 @@ internal fun EditRecordRoute(
         dialogState = viewModel.dialogState,
         onRequestDismissDialog = viewModel::dismissDialog,
         onRecordTimeClick = viewModel::displayDatePickerDialog,
-        onDatePickerConfirm = viewModel::pickDate,
-        onTimePickerConfirm = viewModel::pickTime,
+        onDateSelected = viewModel::onDateSelected,
+        onTimeSelected = viewModel::onTimeSelected,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         onRequestDismissBookmark = viewModel::dismissBookmark,
         onBackClick = onRequestPopBackStack,
@@ -197,8 +204,8 @@ internal fun EditRecordRoute(
  * @param dialogState 弹窗状态
  * @param onRequestDismissDialog 隐藏弹窗
  * @param onRecordTimeClick 记录时间点击回调
- * @param onDatePickerConfirm 日期选择确认回调
- * @param onTimePickerConfirm 时间选择确认回调
+ * @param onDateSelected 日期选择确认回调
+ * @param onTimeSelected 时间选择确认回调
  * @param selectedTypeCategory 已选择大类
  * @param onTypeCategorySelect 记录大类修改回调
  * @param bottomSheetType 底部抽屉类型
@@ -231,8 +238,8 @@ internal fun EditRecordScreen(
     dialogState: DialogState,
     onRequestDismissDialog: () -> Unit,
     onRecordTimeClick: () -> Unit,
-    onDatePickerConfirm: (Long) -> Unit,
-    onTimePickerConfirm: (String) -> Unit,
+    onDateSelected: (Long) -> Unit,
+    onTimeSelected: (String) -> Unit,
     selectedTypeCategory: RecordTypeCategoryEnum,
     onTypeCategorySelect: (RecordTypeCategoryEnum) -> Unit,
     bottomSheetType: EditRecordBottomSheetEnum,
@@ -344,20 +351,62 @@ internal fun EditRecordScreen(
                 ((dialogState as? DialogState.Shown<*>)?.data as? DateTimePickerModel)?.let { model ->
                     when (model) {
                         is DateTimePickerModel.DatePicker -> {
+                            val datePickerState = rememberDatePickerState(model.dateMs)
                             DatePickerDialog(
                                 onDismissRequest = onRequestDismissDialog,
-                                onPositiveButtonClick = onDatePickerConfirm,
-                                onNegativeButtonClick = onRequestDismissDialog,
-                                selection = model.dateMs,
-                            )
+                                confirmButton = {
+                                    CbTextButton(
+                                        onClick = {
+                                            val selectedDateMillis =
+                                                datePickerState.selectedDateMillis
+                                            if (null == selectedDateMillis) {
+                                                onRequestDismissDialog()
+                                            } else {
+                                                onDateSelected(selectedDateMillis)
+                                            }
+                                        },
+                                    ) {
+                                        Text(text = stringResource(id = R.string.confirm))
+                                    }
+                                },
+                                dismissButton = {
+                                    CbTextButton(onClick = onRequestDismissDialog) {
+                                        Text(text = stringResource(id = R.string.cancel))
+                                    }
+                                },
+                            ) {
+                                DatePicker(state = datePickerState)
+                            }
                         }
 
                         is DateTimePickerModel.TimePicker -> {
-                            TimePickerDialog(
+                            val currentTime = Calendar.getInstance().apply {
+                                timeInMillis = model.timeMs
+                            }
+                            val timePickerState = rememberTimePickerState(
+                                initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
+                                initialMinute = currentTime.get(Calendar.MINUTE),
+                                is24Hour = true,
+                            )
+                            CbAlertDialog(
                                 onDismissRequest = onRequestDismissDialog,
-                                onPositiveButtonClick = onTimePickerConfirm,
-                                onNegativeButtonClick = onRequestDismissDialog,
-                                selection = model.timeMs,
+                                confirmButton = {
+                                    CbTextButton(
+                                        onClick = {
+                                            onTimeSelected("${timePickerState.hour.completeZero()}:${timePickerState.minute.completeZero()}")
+                                        },
+                                    ) {
+                                        Text(text = stringResource(id = R.string.confirm))
+                                    }
+                                },
+                                dismissButton = {
+                                    CbTextButton(onClick = onRequestDismissDialog) {
+                                        Text(text = stringResource(id = R.string.cancel))
+                                    }
+                                },
+                                text = {
+                                    TimePicker(state = timePickerState)
+                                },
                             )
                         }
                     }
@@ -404,7 +453,7 @@ internal fun EditRecordScreen(
  * @param onRecordTimeClick 记录时间点击回调
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 private fun EditRecordScaffoldContent(
     uiState: EditRecordUiState,
     typeListContent: @Composable () -> Unit,

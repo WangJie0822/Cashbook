@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    alias(conventionLibs.plugins.cashbook.android.library.feature)
-    alias(conventionLibs.plugins.cashbook.android.library.compose)
-    alias(conventionLibs.plugins.cashbook.android.library.jacoco)
-}
 
-android {
-    namespace = "cn.wj.android.cashbook.feature.books"
-}
+package cn.wj.android.cashbook.core.ui.expand
 
-dependencies {
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.window.core.layout.WindowWidthSizeClass
 
-    // 架构
-    implementation(projects.core.model)
-    implementation(projects.core.common)
-    implementation(projects.core.domain)
-    implementation(projects.core.data)
+/** 账本背景尺寸比例 */
+val WindowAdaptiveInfo.bookImageRatio: Float
+    get() = this.windowSizeClass.windowWidthSizeClass.bookImageRatio
 
-    implementation(libs.androidx.constraintlayout.compose)
+/** 账本背景尺寸比例 */
+val WindowWidthSizeClass.bookImageRatio: Float
+    get() = when (this) {
+        WindowWidthSizeClass.EXPANDED -> {
+            4f
+        }
 
-    implementation(libs.coil.kt.compose)
-}
+        WindowWidthSizeClass.MEDIUM -> {
+            2.5f
+        }
+
+        else -> {
+            1.5f
+        }
+    }
