@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,10 +45,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,7 +57,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
-import cn.wj.android.cashbook.core.common.PRIVACY_POLICY_FILE_PATH
 import cn.wj.android.cashbook.core.common.TestTag
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
@@ -282,30 +281,24 @@ private fun MainAppScreen(
                             onDismissRequest = { currentActivity?.finish() },
                             title = { Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy)) },
                             text = {
-                                val tag = "TAG_URL"
-                                val annotatedString = buildAnnotatedString {
-                                    append(stringResource(id = R.string.user_agreement_and_privacy_policy_hint_start))
-                                    pushStringAnnotation(tag, PRIVACY_POLICY_FILE_PATH)
-                                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                                Text(
+                                    text = buildAnnotatedString {
+                                        val tag = "TAG_URL"
+                                        append(stringResource(id = R.string.user_agreement_and_privacy_policy_hint_start))
+                                        val start = this.length
                                         append(stringResource(id = R.string.user_agreement_and_privacy_policy_with_chevron))
-                                    }
-                                    pop()
-                                    append(stringResource(id = R.string.user_agreement_and_privacy_policy_hint_end))
-                                }
-                                ClickableText(
-                                    text = annotatedString,
-                                    onClick = { offset ->
-                                        val annotations =
-                                            annotatedString.getStringAnnotations(
+                                        val end = this.length
+                                        addLink(
+                                            LinkAnnotation.Clickable(
                                                 tag,
-                                                offset,
-                                                offset,
-                                            )
-                                        annotations.firstOrNull()?.let {
-                                            if (it.item == PRIVACY_POLICY_FILE_PATH) {
+                                                TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.primary)),
+                                            ) {
                                                 onPrivacyPolicyClick()
-                                            }
-                                        }
+                                            },
+                                            start,
+                                            end,
+                                        )
+                                        append(stringResource(id = R.string.user_agreement_and_privacy_policy_hint_end))
                                     },
                                 )
                             },

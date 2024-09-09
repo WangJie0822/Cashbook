@@ -29,6 +29,7 @@ import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -97,9 +98,6 @@ private fun SearchScreen(
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var text by remember { mutableStateOf("") }
-    var active by remember { mutableStateOf(false) }
-
     if (null != viewRecord) {
         CbModalBottomSheet(
             onDismissRequest = onRequestDismissBottomSheet,
@@ -122,39 +120,51 @@ private fun SearchScreen(
         )
     }
 
+    var query by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
+        val onExpandedChange: (Boolean) -> Unit = { expanded = it }
         SearchBar(
+            inputField = {
+                SearchBarDefaults.InputField(
+                    modifier = Modifier.fillMaxWidth(),
+                    query = query,
+                    onQueryChange = { query = it },
+                    onSearch = {
+                        onKeywordChange(it)
+                        expanded = false
+                    },
+                    expanded = expanded,
+                    onExpandedChange = onExpandedChange,
+                    placeholder = { Text(text = stringResource(id = R.string.record_search_hint)) },
+                    leadingIcon = {
+                        CbIconButton(
+                            onClick = {
+                                if (expanded) {
+                                    expanded = false
+                                } else {
+                                    onRequestPopBackStack()
+                                }
+                            },
+                        ) {
+                            Icon(
+                                imageVector = CbIcons.ArrowBack,
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        if (expanded && query.isNotBlank()) {
+                            CbIconButton(onClick = { query = "" }) {
+                                Icon(imageVector = CbIcons.Cancel, contentDescription = null)
+                            }
+                        }
+                    },
+                )
+            },
+            expanded = expanded,
+            onExpandedChange = onExpandedChange,
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            query = text,
-            onQueryChange = { text = it },
-            onSearch = {
-                onKeywordChange(it)
-                active = false
-            },
-            active = active,
-            onActiveChange = { active = it },
-            placeholder = { Text(text = stringResource(id = R.string.record_search_hint)) },
-            leadingIcon = {
-                CbIconButton(onClick = {
-                    if (active) {
-                        active = false
-                    } else {
-                        onRequestPopBackStack()
-                    }
-                }) {
-                    Icon(
-                        imageVector = CbIcons.ArrowBack,
-                        contentDescription = null,
-                    )
-                }
-            },
-            trailingIcon = {
-                if (active && text.isNotBlank()) {
-                    CbIconButton(onClick = { text = "" }) {
-                        Icon(imageVector = CbIcons.Cancel, contentDescription = null)
-                    }
-                }
-            },
             content = {
                 if (searchHistoryList.isEmpty()) {
                     Empty(
@@ -175,7 +185,7 @@ private fun SearchScreen(
                     ) {
                         searchHistoryList.forEach {
                             ElevatedSuggestionChip(
-                                onClick = { text = it },
+                                onClick = { query = it },
                                 label = { Text(text = it) },
                             )
                         }
