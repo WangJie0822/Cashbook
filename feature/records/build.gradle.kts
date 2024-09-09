@@ -35,4 +35,6 @@ dependencies {
 
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.paging.compose)
+
+    implementation(libs.coil.kt.compose)
 }

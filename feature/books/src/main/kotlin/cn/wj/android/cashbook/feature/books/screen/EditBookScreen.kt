@@ -87,10 +87,11 @@ internal fun EditBookRoute(
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         onDismissBookmark = viewModel::onDismissBookmark,
         uiState = uiState,
-        onSaveClick = { name, description ->
+        onSaveClick = { name, description, bgUri ->
             viewModel.onSaveClick(
                 name = name,
                 description = description,
+                bgUri = bgUri,
                 onSuccess = onRequestPopBackStack,
             )
         },
@@ -105,7 +106,7 @@ internal fun EditBookScreen(
     shouldDisplayBookmark: EditBookBookmarkEnum,
     onDismissBookmark: () -> Unit,
     uiState: EditBookUiState,
-    onSaveClick: (String, String) -> Unit,
+    onSaveClick: (name: String, description: String, bgUri: Uri?) -> Unit,
     onBackClick: () -> Unit,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
     modifier: Modifier = Modifier,
@@ -113,12 +114,20 @@ internal fun EditBookScreen(
     // 提示文本
     val blankNameHint = stringResource(id = R.string.please_enter_book_name)
     val nameDuplicatedHint = stringResource(id = R.string.book_name_exists)
+    val bgImgTypeErrorHint = stringResource(id = R.string.bg_img_type_error)
+    val bgImgSaveFailedHint = stringResource(id = R.string.bg_img_save_failed)
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(shouldDisplayBookmark) {
-        if (shouldDisplayBookmark == EditBookBookmarkEnum.NAME_DUPLICATED) {
-            val result = snackbarHostState.showSnackbar(nameDuplicatedHint)
+        val hintText = when (shouldDisplayBookmark) {
+            EditBookBookmarkEnum.NAME_DUPLICATED -> nameDuplicatedHint
+            EditBookBookmarkEnum.BG_IMG_TYPE_ERROR -> bgImgTypeErrorHint
+            EditBookBookmarkEnum.BG_IMG_SAVE_FAILED -> bgImgSaveFailedHint
+            else -> ""
+        }
+        if (hintText.isNotBlank()) {
+            val result = snackbarHostState.showSnackbar(hintText)
             if (result == SnackbarResult.Dismissed) {
                 onDismissBookmark()
             }
@@ -136,6 +145,9 @@ internal fun EditBookScreen(
     val descriptionTextFieldState = remember(uiState) {
         TextFieldState(defaultText = data?.description.orEmpty())
     }
+    var bgUri: Uri? by remember(uiState) {
+        mutableStateOf(if (data?.bgUri.isNullOrBlank()) null else Uri.parse(data!!.bgUri))
+    }
 
     CbScaffold(
         modifier = modifier,
@@ -152,7 +164,7 @@ internal fun EditBookScreen(
             CbFloatingActionButton(
                 onClick = {
                     if (nameTextFieldState.isValid) {
-                        onSaveClick(nameTextFieldState.text, descriptionTextFieldState.text)
+                        onSaveClick(nameTextFieldState.text, descriptionTextFieldState.text, bgUri)
                     }
                 },
             ) {
@@ -178,10 +190,9 @@ internal fun EditBookScreen(
                             ConstraintLayout(
                                 modifier = Modifier.fillMaxSize(),
                             ) {
-                                var imageUri: Uri? by remember { mutableStateOf(null) }
                                 val launcher =
                                     rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
-                                        imageUri = it
+                                        bgUri = it
                                     }
 
                                 val (bg, clear, pickImage) = createRefs()
@@ -192,7 +203,7 @@ internal fun EditBookScreen(
                                             centerTo(parent)
                                         }
                                         .fillMaxSize(),
-                                    model = imageUri,
+                                    model = bgUri,
                                     placeholder = painterResource(id = R.drawable.im_top_background),
                                     error = painterResource(id = R.drawable.im_top_background),
                                     fallback = painterResource(id = R.drawable.im_top_background),
@@ -205,7 +216,7 @@ internal fun EditBookScreen(
                                         top.linkTo(parent.top, 8.dp)
                                         end.linkTo(parent.end, 8.dp)
                                     },
-                                    onClick = { imageUri = null },
+                                    onClick = { bgUri = null },
                                 ) {
                                     Icon(
                                         imageVector = CbIcons.CleaningServices,
@@ -272,10 +283,11 @@ private fun EditBookScreenPreview() {
                     id = -1L,
                     name = "测试",
                     description = "描述",
+                    bgUri = "",
                     modifyTime = System.currentTimeMillis(),
                 ),
             ),
-            onSaveClick = { _, _ -> },
+            onSaveClick = { _, _, _ -> },
             onBackClick = {},
         )
     }

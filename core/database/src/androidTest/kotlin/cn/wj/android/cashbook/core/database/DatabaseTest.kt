@@ -33,8 +33,12 @@ import cn.wj.android.cashbook.core.database.migration.Migration3To4
 import cn.wj.android.cashbook.core.database.migration.Migration4To5
 import cn.wj.android.cashbook.core.database.migration.Migration5To6
 import cn.wj.android.cashbook.core.database.migration.Migration7To8
+import cn.wj.android.cashbook.core.database.migration.Migration8To9
+import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_BOOKS
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_RECORD
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_TAG
+import cn.wj.android.cashbook.core.database.table.TABLE_BOOKS
+import cn.wj.android.cashbook.core.database.table.TABLE_BOOKS_BG_URI
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_AMOUNT
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ASSET_ID
@@ -535,6 +539,59 @@ class DatabaseTest {
             }
         Assert.assertEquals(true, hasInvisible)
         Assert.assertEquals(SWITCH_INT_OFF, invisible)
+    }
+
+    /**
+     * 测试数据库从 8 升级到 0
+     * - db_books：新增 bg_uri 字段
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate8_9() {
+        var hasBgUri: Boolean
+        helper.createDatabase(testDbName, 8).use { db ->
+            db.query(
+                "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                arrayOf("table", TABLE_BOOKS),
+            ).use { cursor ->
+                cursor.moveToFirst()
+                val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                log("migrate8_9() sqlStr = [$sqlStr]")
+                hasBgUri = sqlStr.contains("`bg_uri`")
+            }
+            db.insert(
+                TABLE_BOOKS,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("name", "name")
+                    put("description", "description")
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
+        }
+        Assert.assertEquals(false, hasBgUri)
+
+        var bgUri: String
+        helper.runMigrationsAndValidate(testDbName, 9, true, Migration8To9)
+            .use { db ->
+                db.query(
+                    "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                    arrayOf("table", TABLE_BOOKS),
+                ).use { cursor ->
+                    cursor.moveToFirst()
+                    val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                    log("migrate8_9() sqlStr = [$sqlStr]")
+                    hasBgUri = sqlStr.contains("`bg_uri`")
+                }
+                db.query(SQL_QUERY_ALL_FROM_BOOKS).use { cursor ->
+                    cursor.moveToFirst()
+                    bgUri = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_BOOKS_BG_URI))
+                    log("migrate8_9() bgUri = <$bgUri>")
+                }
+            }
+        Assert.assertEquals(true, hasBgUri)
+        Assert.assertEquals(true, bgUri.isBlank())
     }
 
     @Test

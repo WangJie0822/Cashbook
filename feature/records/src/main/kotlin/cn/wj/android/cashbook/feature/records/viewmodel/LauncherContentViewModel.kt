@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -33,9 +34,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -44,6 +45,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LauncherContentViewModel @Inject constructor(
+    booksRepository: BooksRepository,
     getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
     getCurrentMonthRecordViewsMapUseCase: GetCurrentMonthRecordViewsMapUseCase,
 ) : ViewModel() {
@@ -70,22 +72,22 @@ class LauncherContentViewModel @Inject constructor(
     }
 
     /** 界面 UI 状态 */
-    val uiState = _currentMonthRecordListData
-        .mapLatest { list ->
-            val recordMap = getCurrentMonthRecordViewsMapUseCase(list)
-            var totalIncome = BigDecimal.ZERO
-            var totalExpenditure = BigDecimal.ZERO
-            recordMap.keys.forEach {
-                totalIncome += it.dayIncome.toBigDecimalOrZero()
-                totalExpenditure += it.dayExpand.toBigDecimalOrZero()
-            }
-            LauncherContentUiState.Success(
-                monthIncome = totalIncome.decimalFormat(),
-                monthExpand = totalExpenditure.decimalFormat(),
-                monthBalance = (totalIncome - totalExpenditure).decimalFormat(),
-                recordMap = recordMap,
-            )
+    val uiState = combine(_currentMonthRecordListData, booksRepository.currentBook) { list, book ->
+        val recordMap = getCurrentMonthRecordViewsMapUseCase(list)
+        var totalIncome = BigDecimal.ZERO
+        var totalExpenditure = BigDecimal.ZERO
+        recordMap.keys.forEach {
+            totalIncome += it.dayIncome.toBigDecimalOrZero()
+            totalExpenditure += it.dayExpand.toBigDecimalOrZero()
         }
+        LauncherContentUiState.Success(
+            topBgUri = book.bgUri,
+            monthIncome = totalIncome.decimalFormat(),
+            monthExpand = totalExpenditure.decimalFormat(),
+            monthBalance = (totalIncome - totalExpenditure).decimalFormat(),
+            recordMap = recordMap,
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -142,6 +144,7 @@ sealed interface LauncherContentUiState {
      * @param recordMap 记录列表数据
      */
     data class Success(
+        val topBgUri: String,
         val monthIncome: String,
         val monthExpand: String,
         val monthBalance: String,

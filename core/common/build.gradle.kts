@@ -32,4 +32,5 @@ dependencies {
     api(libs.orhanobut.logger)
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.documentfile)
 }

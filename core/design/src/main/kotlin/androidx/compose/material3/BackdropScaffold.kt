@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package androidx.compose.material3
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.BackdropScaffold as M2BackdropScaffold
@@ -32,7 +35,6 @@ import androidx.compose.material.BackdropScaffoldState as M2BackdropScaffoldStat
 import androidx.compose.material.BackdropValue as M2BackdropValue
 import androidx.compose.material.rememberBackdropScaffoldState as rememberM2BackdropScaffoldState
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BackdropScaffold(
     appBar: @Composable () -> Unit,
@@ -109,9 +111,9 @@ object BackdropScaffoldDefaults {
         @Composable get() = androidx.compose.material.MaterialTheme.colors.surface.copy(alpha = 0.60f)
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 class BackdropScaffoldState(
     initialValue: BackdropValue,
+    private val density: Density,
     private val animationSpec: AnimationSpec<Float> = SpringSpec(),
     private val confirmStateChange: (BackdropValue) -> Boolean = { true },
 ) {
@@ -137,6 +139,7 @@ class BackdropScaffoldState(
             if (null == _proxy) {
                 _proxy = M2BackdropScaffoldState(
                     m2InitialValue,
+                    density,
                     animationSpec,
                     m2ConfirmStateChange,
                 )
@@ -175,12 +178,14 @@ enum class BackdropValue {
 @Composable
 fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
+    density: Density = LocalDensity.current,
     animationSpec: AnimationSpec<Float> = SpringSpec(),
     confirmStateChange: (BackdropValue) -> Boolean = { true },
 ): BackdropScaffoldState {
     val state = remember {
         BackdropScaffoldState(
             initialValue = initialValue,
+            density = density,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange,
         )

@@ -16,8 +16,8 @@
 
 package cn.wj.android.cashbook.feature.records.screen
 
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BackdropScaffold
+import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -99,6 +100,7 @@ import cn.wj.android.cashbook.core.ui.expand.bookImageRatio
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
+import coil.compose.AsyncImage
 import java.time.YearMonth
 
 /**
@@ -195,6 +197,7 @@ internal fun LauncherContentScreen(
     onRequestDismissDialog: () -> Unit,
     onRequestDismissSheet: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
     modifier: Modifier = Modifier,
 ) {
@@ -217,6 +220,7 @@ internal fun LauncherContentScreen(
         modifier = modifier,
         topBar = {
             LauncherTopBar(
+                scaffoldState = scaffoldState,
                 dateStr = "${date.year}-${date.monthValue.completeZero()}",
                 onMenuClick = onMenuClick,
                 onDateClick = onDateClick,
@@ -257,16 +261,19 @@ internal fun LauncherContentScreen(
 
                 is LauncherContentUiState.Success -> {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        Image(
+                        AsyncImage(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(windowAdaptiveInfo.bookImageRatio),
-                            painter = painterResource(R.drawable.im_top_background),
+                            model = Uri.parse(uiState.topBgUri),
+                            placeholder = painterResource(id = R.drawable.im_top_background),
+                            error = painterResource(id = R.drawable.im_top_background),
+                            fallback = painterResource(id = R.drawable.im_top_background),
                             contentScale = ContentScale.FillBounds,
                             contentDescription = null,
                         )
                         BackdropScaffold(
-                            scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
+                            scaffoldState = scaffoldState,
                             appBar = { /* 使用上层 topBar 处理 */ },
                             peekHeight = paddingValues.calculateTopPadding(),
                             backLayerBackgroundColor = Color.Transparent,
@@ -311,6 +318,7 @@ internal fun LauncherContentScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherTopBar(
+    scaffoldState: BackdropScaffoldState,
     dateStr: String,
     onMenuClick: () -> Unit,
     onDateClick: () -> Unit,
@@ -320,7 +328,13 @@ internal fun LauncherTopBar(
 ) {
     CbTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
+            containerColor = if (scaffoldState.isRevealed) {
+                Color.Transparent
+            } else {
+                MaterialTheme.colorScheme.primaryContainer.copy(
+                    alpha = 0.7f,
+                )
+            },
         ),
         title = {
             Row(
@@ -691,7 +705,7 @@ internal fun RecordListItem(
 
 @Composable
 @DevicePreviews
-private fun LauncherContentScreenPreview() {
+private fun LauncherContentScreenPreviewRevealed() {
     PreviewTheme {
         LauncherContentScreen(
             shouldDisplayDeleteFailedBookmark = 0,
@@ -706,12 +720,53 @@ private fun LauncherContentScreenPreview() {
             onCalendarClick = { },
             onAnalyticsClick = { },
             onAddClick = { },
-            uiState = LauncherContentUiState.Success("", "", "", emptyMap()),
+            uiState = LauncherContentUiState.Success(
+                "",
+                "300",
+                "200",
+                "100",
+                emptyMap(),
+            ),
             onRecordItemClick = { },
             dialogState = DialogState.Dismiss,
             onRequestDismissDialog = { },
             onRequestDismissSheet = { },
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+            scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
+        )
+    }
+}
+
+@Composable
+@DevicePreviews
+private fun LauncherContentScreenPreviewConcealed() {
+    PreviewTheme {
+        LauncherContentScreen(
+            shouldDisplayDeleteFailedBookmark = 0,
+            onRequestDismissBookmark = { },
+            recordDetailSheetContent = { },
+            viewRecord = null,
+            date = YearMonth.now(),
+            onMenuClick = { },
+            onDateClick = { },
+            onDateSelected = { },
+            onSearchClick = { },
+            onCalendarClick = { },
+            onAnalyticsClick = { },
+            onAddClick = { },
+            uiState = LauncherContentUiState.Success(
+                "",
+                "300",
+                "200",
+                "100",
+                emptyMap(),
+            ),
+            onRecordItemClick = { },
+            dialogState = DialogState.Dismiss,
+            onRequestDismissDialog = { },
+            onRequestDismissSheet = { },
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+            scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed),
         )
     }
 }

@@ -37,6 +37,7 @@ object FakeBooksRepository : BooksRepository {
                 1L,
                 "默认账本1",
                 "默认账本1说明",
+                "",
                 System.currentTimeMillis(),
             ),
         ),
@@ -54,6 +55,14 @@ object FakeBooksRepository : BooksRepository {
         _selectedBookId.tryEmit(id)
     }
 
+    override suspend fun insertBook(book: BooksModel): Long = withContext(coroutineContext) {
+        val id = System.currentTimeMillis()
+        val currentList = ArrayList(_booksList.first())
+        currentList.add(book.copy(id = id))
+        _booksList.tryEmit(currentList.filter { it.id != id })
+        id
+    }
+
     override suspend fun deleteBook(id: Long): Boolean = withContext(coroutineContext) {
         val currentList = _booksList.first()
         _booksList.tryEmit(currentList.filter { it.id != id })
@@ -65,6 +74,7 @@ object FakeBooksRepository : BooksRepository {
             id = id,
             name = "",
             description = "",
+            bgUri = "",
             modifyTime = System.currentTimeMillis(),
         )
     }
@@ -91,24 +101,5 @@ object FakeBooksRepository : BooksRepository {
             newList.add(newBook)
             _booksList.tryEmit(newList)
         }
-    }
-
-    fun initData() {
-        _booksList.tryEmit(
-            listOf(
-                BooksModel(
-                    1L,
-                    "默认账本1",
-                    "默认账本1说明",
-                    System.currentTimeMillis(),
-                ),
-                BooksModel(
-                    2L,
-                    "默认账本2",
-                    "默认账本2说明默认账本2说明默认账本2说明默认账本2说明默认账本2说明",
-                    System.currentTimeMillis(),
-                ),
-            ),
-        )
     }
 }
