@@ -38,6 +38,7 @@ const val TABLE_ASSET_MODIFY_TIME = "modify_time"
 const val TABLE_BOOKS = "db_books"
 const val TABLE_BOOKS_ID = "id"
 const val TABLE_BOOKS_NAME = "name"
+const val TABLE_BOOKS_BG_URI = "bg_uri"
 const val TABLE_BOOKS_DESCRIPTION = "description"
 const val TABLE_BOOKS_MODIFY_TIME = "modify_time"
 

@@ -28,6 +28,8 @@ interface BooksRepository {
 
     suspend fun selectBook(id: Long)
 
+    suspend fun insertBook(book: BooksModel): Long
+
     suspend fun deleteBook(id: Long): Boolean
 
     suspend fun getDefaultBook(id: Long): BooksModel
@@ -42,15 +44,17 @@ internal fun BooksTable.asModel(): BooksModel {
         id = this.id ?: -1L,
         name = this.name,
         description = this.description,
+        bgUri = this.bgUri,
         modifyTime = this.modifyTime,
     )
 }
 
 internal fun BooksModel.asTable(): BooksTable {
     return BooksTable(
-        if (this.id == -1L) null else this.id,
-        this.name,
-        this.description,
-        this.modifyTime,
+        id = if (this.id == -1L) null else this.id,
+        name = this.name,
+        description = this.description,
+        bgUri = this.bgUri,
+        modifyTime = this.modifyTime,
     )
 }

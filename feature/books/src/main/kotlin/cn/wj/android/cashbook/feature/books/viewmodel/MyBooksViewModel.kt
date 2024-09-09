@@ -82,7 +82,7 @@ class MyBooksViewModel @Inject constructor(
 
 sealed interface MyBooksUiState {
 
-    object Loading : MyBooksUiState
+    data object Loading : MyBooksUiState
 
     data class Success(
         val booksList: List<Selectable<BooksModel>>,

@@ -37,6 +37,9 @@ interface BooksDao {
     )
     suspend fun queryAll(): List<BooksTable>
 
+    @Insert
+    suspend fun insert(book: BooksTable): Long
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrReplace(book: BooksTable)
 }

@@ -24,4 +24,6 @@
     <string name="book_name">账本名</string>
     <string name="book_description">账本说明</string>
     <string name="click_to_select_book_background">点击选择背景图片</string>
+    <string name="bg_img_type_error">背景图片格式错误，请重新选择</string>
+    <string name="bg_img_save_failed">背景图片保存失败，请重试</string>
 </resources>

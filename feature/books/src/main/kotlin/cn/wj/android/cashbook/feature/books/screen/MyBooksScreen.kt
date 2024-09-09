@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.books.screen
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -203,7 +204,7 @@ private fun MyBooksContent(
                                                     centerTo(parent)
                                                 }
                                                 .fillMaxSize(),
-                                            model = null,
+                                            model = Uri.parse(item.data.bgUri),
                                             placeholder = painterResource(id = R.drawable.im_top_background),
                                             error = painterResource(id = R.drawable.im_top_background),
                                             fallback = painterResource(id = R.drawable.im_top_background),
@@ -346,6 +347,7 @@ private fun MyBooksScreenPreview() {
                             -1,
                             "默认账本",
                             "描述描述描述",
+                            "",
                             System.currentTimeMillis(),
                         ),
                         true,
@@ -354,6 +356,7 @@ private fun MyBooksScreenPreview() {
                         BooksModel(
                             -2,
                             "默认账本2",
+                            "",
                             "",
                             System.currentTimeMillis(),
                         ),

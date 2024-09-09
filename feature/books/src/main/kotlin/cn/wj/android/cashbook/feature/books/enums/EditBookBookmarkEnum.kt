@@ -16,9 +16,22 @@
 
 package cn.wj.android.cashbook.feature.books.enums
 
+/**
+ * 编辑账本界面提示语枚举
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2023/8/3
+ */
 enum class EditBookBookmarkEnum {
 
+    /** 无提示 */
     NONE,
 
+    /** 账本名称重复 */
     NAME_DUPLICATED,
+
+    /** 背景图片类型错误 */
+    BG_IMG_TYPE_ERROR,
+
+    /** 背景图片保存失败 */
+    BG_IMG_SAVE_FAILED,
 }

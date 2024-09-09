@@ -16,11 +16,14 @@
 
 package cn.wj.android.cashbook.feature.books.viewmodel
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.enums.MimeType
+import cn.wj.android.cashbook.core.common.manager.DocumentOperationManager
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.model.model.BooksModel
 import cn.wj.android.cashbook.feature.books.enums.EditBookBookmarkEnum
@@ -41,6 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditBookViewModel @Inject constructor(
     private val booksRepository: BooksRepository,
+    private val dom: DocumentOperationManager,
 ) : ViewModel() {
 
     var shouldDisplayBookmark by mutableStateOf(EditBookBookmarkEnum.NONE)
@@ -67,19 +71,45 @@ class EditBookViewModel @Inject constructor(
         _bookIdData.tryEmit(bookId)
     }
 
-    fun onSaveClick(name: String, description: String, onSuccess: () -> Unit) {
+    fun onSaveClick(name: String, description: String, bgUri: Uri?, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            val book = _defaultBookData.first().copy(
+            var book = _defaultBookData.first().copy(
                 name = name,
                 description = description,
                 modifyTime = System.currentTimeMillis(),
             )
             if (booksRepository.isDuplicated(book)) {
                 shouldDisplayBookmark = EditBookBookmarkEnum.NAME_DUPLICATED
-            } else {
-                booksRepository.updateBook(book)
-                onSuccess()
+                return@launch
             }
+
+            if (null != bgUri) {
+                // 复制背景文件
+                var targetName = "${System.currentTimeMillis()}_${dom.getFileNameByUri(bgUri)}"
+                val mimeType = dom.getMimeTypeByUri(bgUri)
+                if (mimeType?.isImage == true) {
+                    targetName = if (targetName.endsWith(MimeType.Image.PNG.subtype)) {
+                        targetName
+                    } else {
+                        targetName + ".${MimeType.Image.PNG.subtype}"
+                    }
+                    val uri = dom.copyFileToFilesDir(bgUri, targetName, mimeType)
+                    if (null == uri) {
+                        shouldDisplayBookmark = EditBookBookmarkEnum.BG_IMG_SAVE_FAILED
+                        return@launch
+                    } else {
+                        book = book.copy(bgUri = uri.toString())
+                    }
+                } else {
+                    shouldDisplayBookmark = EditBookBookmarkEnum.BG_IMG_TYPE_ERROR
+                    return@launch
+                }
+            } else {
+                book = book.copy(bgUri = "")
+            }
+
+            booksRepository.updateBook(book)
+            onSuccess()
         }
     }
 
@@ -89,7 +119,7 @@ class EditBookViewModel @Inject constructor(
 }
 
 sealed interface EditBookUiState {
-    object Loading : EditBookUiState
+    data object Loading : EditBookUiState
     data class Success(
         val data: BooksModel,
     ) : EditBookUiState

@@ -62,6 +62,10 @@ class BooksRepositoryImpl @Inject constructor(
         appPreferencesDataSource.updateCurrentBookId(id)
     }
 
+    override suspend fun insertBook(book: BooksModel): Long = withContext(coroutineContext) {
+        booksDao.insert(book.asTable())
+    }
+
     override suspend fun deleteBook(id: Long): Boolean = withContext(coroutineContext) {
         val result = runCatching {
             transactionDao.deleteBookTransaction(id)
@@ -82,6 +86,7 @@ class BooksRepositoryImpl @Inject constructor(
             id = id,
             name = "",
             description = "",
+            bgUri = "",
             modifyTime = System.currentTimeMillis(),
         )
     }
