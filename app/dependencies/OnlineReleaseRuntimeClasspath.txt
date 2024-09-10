@@ -146,7 +146,7 @@ androidx.work:work-runtime-ktx:2.9.1
 androidx.work:work-runtime:2.9.1
 com.atlassian.commonmark:commonmark:0.13.0
 com.google.accompanist:accompanist-drawablepainter:0.32.0
-com.google.accompanist:accompanist-permissions:0.34.0
+com.google.accompanist:accompanist-permissions:0.36.0
 com.google.android.material:material:1.12.0
 com.google.code.findbugs:jsr305:3.0.2
 com.google.dagger:dagger-lint-aar:2.52
