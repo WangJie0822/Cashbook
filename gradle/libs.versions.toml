@@ -140,7 +140,7 @@ orhanobut-logger = "2.2.0"
 jsoup = "1.18.1"
 
 # Coil 图片加载框架 [指南](https://coil-kt.github.io/coil/)
-coil = "2.6.0"
+coil = "2.7.0"
 
 [libraries]
 # junit
