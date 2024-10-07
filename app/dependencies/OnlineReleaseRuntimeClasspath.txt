@@ -120,7 +120,7 @@ androidx.paging:paging-common:3.3.2
 androidx.paging:paging-compose-android:3.3.2
 androidx.paging:paging-compose:3.3.2
 androidx.print:print:1.0.0
-androidx.profileinstaller:profileinstaller:1.3.1
+androidx.profileinstaller:profileinstaller:1.4.1
 androidx.recyclerview:recyclerview:1.1.0
 androidx.resourceinspection:resourceinspection-annotation:1.0.1
 androidx.room:room-common:2.6.1
