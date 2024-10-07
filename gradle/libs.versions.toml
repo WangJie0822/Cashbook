@@ -97,7 +97,7 @@ androidx-room = "2.6.1"
 androidx-paging = "3.3.2"
 # Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
-androidx-navigation = "2.8.1"
+androidx-navigation = "2.8.2"
 # WorkManager 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/work)
 # [版本查询](https://mvnrepository.com/artifact/androidx.work)
 androidx-work = "2.9.1"
