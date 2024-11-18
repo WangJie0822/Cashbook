@@ -111,11 +111,11 @@ androidx.lifecycle:lifecycle-viewmodel:2.8.7
 androidx.loader:loader:1.0.0
 androidx.localbroadcastmanager:localbroadcastmanager:1.0.0
 androidx.multidex:multidex:2.0.1
-androidx.navigation:navigation-common-ktx:2.8.3
-androidx.navigation:navigation-common:2.8.3
-androidx.navigation:navigation-compose:2.8.3
-androidx.navigation:navigation-runtime-ktx:2.8.3
-androidx.navigation:navigation-runtime:2.8.3
+androidx.navigation:navigation-common-ktx:2.8.4
+androidx.navigation:navigation-common:2.8.4
+androidx.navigation:navigation-compose:2.8.4
+androidx.navigation:navigation-runtime-ktx:2.8.4
+androidx.navigation:navigation-runtime:2.8.4
 androidx.paging:paging-common-android:3.3.2
 androidx.paging:paging-common:3.3.2
 androidx.paging:paging-compose-android:3.3.2
