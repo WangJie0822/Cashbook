@@ -47,7 +47,7 @@ takahirom-roborazzi = "1.32.2"
 
 # Robolectric UI 测试工具 [Github](https://github.com/robolectric/robolectric)
 # [版本查询](https://mvnrepository.com/artifact/org.robolectric)
-robolectric = "4.13"
+robolectric = "4.14.1"
 
 # dependency guard 依赖保护 [Github](https://github.com/dropbox/dependency-guard)
 # [版本查询](https://mvnrepository.com/artifact/com.dropbox.dependency-guard)
