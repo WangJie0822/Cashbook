@@ -46,6 +46,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteProgram
 import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteStatement
+import cn.wj.android.cashbook.core.database.util.SupportSQLiteCompat.Api29Impl.setNotificationUris
 import java.io.File
 import java.io.IOException
 import java.util.Locale
@@ -127,7 +128,7 @@ class DelegateSQLiteDatabase(
         } else {
             throw UnsupportedOperationException(
                 "execPerConnectionSQL is not supported on a " +
-                    "SDK version lower than 30, current version is: " + Build.VERSION.SDK_INT,
+                        "SDK version lower than 30, current version is: " + Build.VERSION.SDK_INT,
             )
         }
     }
@@ -165,7 +166,7 @@ class DelegateSQLiteDatabase(
             cursorFactory,
             query.sql,
             EMPTY_STRING_ARRAY,
-            null,
+            "",
         )
     }
 
@@ -177,7 +178,7 @@ class DelegateSQLiteDatabase(
             delegate,
             query.sql,
             EMPTY_STRING_ARRAY,
-            null,
+            "",
             cancellationSignal!!,
         ) {
                 _: SQLiteDatabase?,
@@ -473,7 +474,7 @@ class SupportSQLiteCompat private constructor() {
             sQLiteDatabase: SQLiteDatabase,
             sql: String,
             selectionArgs: Array<out String?>,
-            editTable: String?,
+            editTable: String,
             cancellationSignal: CancellationSignal,
             cursorFactory: SQLiteDatabase.CursorFactory,
         ): Cursor {

@@ -35,13 +35,13 @@ object ProjectSetting {
 
     object Config {
         /** SDK 编译版本 */
-        const val COMPILE_SDK = 34
+        const val COMPILE_SDK = 35
 
         /** SDK 最小支持版本 */
         const val MIN_SDK = 24
 
         /** SDK 目标版本 */
-        const val TARGET_SDK = 34
+        const val TARGET_SDK = 35
 
         /** 大版本名 */
         private const val VERSION_NAME = "v1.0.7"
