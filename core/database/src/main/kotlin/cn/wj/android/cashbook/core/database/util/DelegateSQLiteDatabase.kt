@@ -128,7 +128,7 @@ class DelegateSQLiteDatabase(
         } else {
             throw UnsupportedOperationException(
                 "execPerConnectionSQL is not supported on a " +
-                        "SDK version lower than 30, current version is: " + Build.VERSION.SDK_INT,
+                    "SDK version lower than 30, current version is: " + Build.VERSION.SDK_INT,
             )
         }
     }
