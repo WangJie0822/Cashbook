@@ -100,7 +100,7 @@ androidx-paging = "3.3.5"
 androidx-navigation = "2.8.5"
 # WorkManager 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/work)
 # [版本查询](https://mvnrepository.com/artifact/androidx.work)
-androidx-work = "2.9.1"
+androidx-work = "2.10.0"
 # DataStore 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/datastore)
 # [版本查询](https://mvnrepository.com/artifact/androidx.datastore)
 androidx-datastore = "1.1.1"
