@@ -50,7 +50,7 @@ private const val ROUTE_TYPED_ANALYTICS =
         "&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}"
 
 /** 路由 - 编辑记录 */
-internal const val ROUTE_EDIT_RECORD =
+const val ROUTE_EDIT_RECORD =
     "record/edit_record" +
         "?$ROUTE_EDIT_RECORD_KEY_RECORD_ID={$ROUTE_EDIT_RECORD_KEY_RECORD_ID}" +
         "&$ROUTE_EDIT_RECORD_KEY_ASSET_ID={$ROUTE_EDIT_RECORD_KEY_ASSET_ID}"

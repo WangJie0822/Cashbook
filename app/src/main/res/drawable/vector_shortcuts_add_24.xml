@@ -14,14 +14,12 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">记账本</string>
-
-    <!-- 快捷方式 -->
-    <string name="shortcuts_add_id">cn.wj.android.cashbook.shortcuts.add</string>
-    <string name="shortcuts_add_short">记一笔</string>
-    <string name="shortcuts_add_long">新建记录</string>
-    <string name="shortcuts_asset_id">cn.wj.android.cashbook.shortcuts.asset</string>
-    <string name="shortcuts_asset_short">资产</string>
-    <string name="shortcuts_asset_long">我的资产</string>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/launcher_background_tint"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13h-4v4h-2v-4L7,13v-2h4L11,7h2v4h4v2z" />
+</vector>

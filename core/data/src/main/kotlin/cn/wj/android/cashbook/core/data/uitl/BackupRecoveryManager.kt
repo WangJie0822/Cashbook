@@ -281,7 +281,7 @@ class BackupRecoveryManager @Inject constructor(
             onlineBackupListData.first().map {
                 // 云端路径不包含服务器地址，完善地址
                 if (!it.path.startsWith(webDAVDomain)) {
-                    it.copy(path = webDAVDomain + it.path)
+                    it.copy(path = webDAVDomain.fixedDavDomain + it.path.fixedDavPath)
                 } else {
                     it
                 }
@@ -298,6 +298,22 @@ class BackupRecoveryManager @Inject constructor(
         }
         list.sortedBy { it.name }.reversed()
     }
+
+    /** 修复 dav 路径，坚果云新版本路径中会添加 /dav */
+    private val String.fixedDavDomain: String
+        get() = if (this.endsWith("/")) {
+            this.dropLast(1)
+        } else {
+            this
+        }
+
+    /** 修复 dav 路径，坚果云新版本路径中会添加 /dav */
+    private val String.fixedDavPath: String
+        get() = if (this.startsWith("/dav")) {
+            this.drop(4)
+        } else {
+            this
+        }
 
     private val String.backupPath: String
         get() = runCatching {
@@ -373,7 +389,13 @@ class BackupRecoveryManager @Inject constructor(
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
                 documentFile.findFile(zippedFileName)?.delete()
                 if (keepLatest) {
-                    documentFile.listFiles().forEach { it.delete() }
+                    documentFile.listFiles()
+                        .filter {
+                            // 仅删除备份文件
+                            val name = it.name.orEmpty()
+                            name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)
+                        }
+                        .forEach { it.delete() }
                 }
                 val backupFile = documentFile.createFile("application/zip", zippedFileName)
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
@@ -384,7 +406,12 @@ class BackupRecoveryManager @Inject constructor(
             } else {
                 val backupDir = File(backupPath)
                 if (keepLatest) {
-                    backupDir.deleteAllFiles()
+                    backupDir.listFiles {
+                        // 仅删除备份文件
+                        val name = it.name.orEmpty()
+                        name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)
+                    }
+                        ?.forEach { it.delete() }
                 }
                 if (!backupDir.exists()) {
                     backupDir.mkdirs()

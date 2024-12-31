@@ -32,7 +32,7 @@ import cn.wj.android.cashbook.feature.assets.screen.MyAssetRoute
 private const val ROUTE_KEY_ASSET_ID = "assetId"
 
 /** 我的资产 */
-private const val ROUTE_MY_ASSET = "asset/my"
+const val ROUTE_MY_ASSET = "asset/my"
 
 /** 不可见资产 */
 private const val ROUTE_ASSET_INVISIBLE = "asset/invisible"

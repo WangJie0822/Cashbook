@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -24,12 +25,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import cn.wj.android.cashbook.core.common.SHORTCUTS_TYPE
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -41,9 +45,16 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    /** 快捷入口打开类型 */
+    private var shortcutsType by mutableIntStateOf(-1)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // 获取快捷方式类型
+        shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
+        logger().i("onCreate(), shortcutsType = <$shortcutsType>")
 
         var uiState: ActivityUiState by mutableStateOf(ActivityUiState.Loading)
 
@@ -94,10 +105,16 @@ class MainActivity : AppCompatActivity() {
                 ProvideLocalState(
                     onBackPressedDispatcher = this.onBackPressedDispatcher,
                 ) {
-                    MainApp()
+                    MainApp(shortcutsType = shortcutsType)
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
+        logger().i("onNewIntent(), shortcutsType = <$shortcutsType>")
     }
 }
 
