@@ -389,7 +389,13 @@ class BackupRecoveryManager @Inject constructor(
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
                 documentFile.findFile(zippedFileName)?.delete()
                 if (keepLatest) {
-                    documentFile.listFiles().forEach { it.delete() }
+                    documentFile.listFiles()
+                        .filter {
+                            // 仅删除备份文件
+                            val name = it.name.orEmpty()
+                            name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)
+                        }
+                        .forEach { it.delete() }
                 }
                 val backupFile = documentFile.createFile("application/zip", zippedFileName)
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
@@ -400,7 +406,12 @@ class BackupRecoveryManager @Inject constructor(
             } else {
                 val backupDir = File(backupPath)
                 if (keepLatest) {
-                    backupDir.deleteAllFiles()
+                    backupDir.listFiles {
+                        // 仅删除备份文件
+                        val name = it.name.orEmpty()
+                        name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)
+                    }
+                        ?.forEach { it.delete() }
                 }
                 if (!backupDir.exists()) {
                     backupDir.mkdirs()
