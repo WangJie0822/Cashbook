@@ -61,3 +61,12 @@ const val ACTION_DOWNLOAD_URL = "action_download_url"
 
 /** APK 名称 */
 const val ACTION_APK_NAME = "action_apk_name"
+
+/** 快捷方式类型 */
+const val SHORTCUTS_TYPE = "shortcuts_type"
+
+/** 快捷方式类型 - 记一笔 */
+const val SHORTCUTS_TYPE_ADD = 0
+
+/** 快捷方式类型 - 资产 */
+const val SHORTCUTS_TYPE_ASSET = 1
