@@ -3,6 +3,7 @@
 [![Build](https://github.com/WangJie0822/Cashbook/actions/workflows/Build.yaml/badge.svg)](https://github.com/WangJie0822/Cashbook/actions/workflows/Build.yaml)
 [![GitHub](https://img.shields.io/github/license/WangJie0822/Cashbook)](http://www.apache.org/licenses/LICENSE-2.0)
 [![GitHub release (with filter)](https://img.shields.io/github/v/release/WangJie0822/Cashbook)](https://github.com/WangJie0822/Cashbook/releases/latest)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/WangJie0822/Cashbook/total)
 
 ## ToDo 列表
 - [x] 基本记账功能；
@@ -19,14 +20,14 @@
 - [x] 离线版本；
 - [x] 资产详情添加新建记录入口；
 - [x] 标签可隐藏（特定时间使用之后不会再使用的标签隐藏，防止选择标签列表太过繁琐）；
+- [x] 快捷进入菜单；
+- [x] 使用本地图片作为账单背景；
 - [ ] 导入导出为 csv；
-- [ ] 使用本地图片作为账单背景；
 - [ ] 多主题支持；
 - [ ] proto 拆分，减少设置项修改导致的无意义刷新数据；
 - [ ] 数据加载速度慢优化；
 - [ ] 选择账单类型后，资产选择优化；
 - [ ] markdown中链接点击事件；
-- [ ] 快捷进入菜单；
 - [ ] 记录金额显示优化，只显示最终金额；
 - [ ] 记录详情添加跳转资产功能；
 - [ ] 信用卡账单日提醒及最后还款日提醒；
