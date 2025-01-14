@@ -158,8 +158,8 @@ com.google.dagger:hilt-android:2.55
 com.google.dagger:hilt-core:2.55
 com.google.errorprone:error_prone_annotations:2.15.0
 com.google.guava:listenablefuture:1.0
-com.google.protobuf:protobuf-javalite:4.29.2
-com.google.protobuf:protobuf-kotlin-lite:4.29.2
+com.google.protobuf:protobuf-javalite:4.29.3
+com.google.protobuf:protobuf-kotlin-lite:4.29.3
 com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0
 com.orhanobut:logger:2.2.0
 com.squareup.okhttp3:okhttp:4.12.0
