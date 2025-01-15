@@ -25,33 +25,35 @@ import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 
 fun RecordModel.asEntity(): RecordEntity {
     return RecordEntity(
-        this.id,
-        this.booksId,
-        this.typeId,
-        this.assetId,
-        this.relatedAssetId,
-        this.amount,
-        this.charges,
-        this.concessions,
-        this.remark,
-        this.reimbursable,
-        this.recordTime,
+        id = this.id,
+        booksId = this.booksId,
+        typeId = this.typeId,
+        assetId = this.assetId,
+        relatedAssetId = this.relatedAssetId,
+        amount = this.amount,
+        finalAmount = this.finalAmount,
+        charges = this.charges,
+        concessions = this.concessions,
+        remark = this.remark,
+        reimbursable = this.reimbursable,
+        recordTime = this.recordTime,
     )
 }
 
 fun RecordEntity.asModel(): RecordModel {
     return RecordModel(
-        this.id,
-        this.booksId,
-        this.typeId,
-        this.assetId,
-        this.relatedAssetId,
-        this.amount,
-        this.charges,
-        this.concessions,
-        this.remark,
-        this.reimbursable,
-        this.recordTime,
+        id = this.id,
+        booksId = this.booksId,
+        typeId = this.typeId,
+        assetId = this.assetId,
+        relatedAssetId = this.relatedAssetId,
+        amount = this.amount,
+        finalAmount = this.finalAmount,
+        charges = this.charges,
+        concessions = this.concessions,
+        remark = this.remark,
+        reimbursable = this.reimbursable,
+        recordTime = this.recordTime,
     )
 }
 

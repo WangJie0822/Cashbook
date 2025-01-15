@@ -42,7 +42,7 @@ object RecordDetailsSheetData {
     )
 
     private val relatedRecordList = listOf(
-        RecordModel(1L, 1L, 1L, 1L, 1L, "20", "", "", "", false, "2024-01-01"),
+        RecordModel(1L, 1L, 1L, 1L, 1L, "20", "", "", "", "", false, "2024-01-01"),
     )
 
     private val nullRecordViewsData: RecordViewsEntity? = null

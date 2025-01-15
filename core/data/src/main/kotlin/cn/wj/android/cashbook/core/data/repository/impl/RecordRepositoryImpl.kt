@@ -206,6 +206,7 @@ class RecordRepositoryImpl @Inject constructor(
                 assetId = appDataModel.lastAssetId,
                 relatedAssetId = -1L,
                 amount = "0",
+                finalAmount = "0",
                 charges = "",
                 concessions = "",
                 remark = "",

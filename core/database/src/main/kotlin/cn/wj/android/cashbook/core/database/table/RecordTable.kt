@@ -29,6 +29,7 @@ import androidx.room.PrimaryKey
  * @param intoAssetId 转账转入资产 id
  * @param booksId 关联账本 id
  * @param amount 金额
+ * @param finalAmount 最终金额
  * @param concessions 优惠
  * @param charge 手续费
  * @param remark 备注
@@ -47,6 +48,7 @@ data class RecordTable(
     @ColumnInfo(name = TABLE_RECORD_INTO_ASSET_ID) val intoAssetId: Long,
     @ColumnInfo(name = TABLE_RECORD_BOOKS_ID) val booksId: Long,
     @ColumnInfo(name = TABLE_RECORD_AMOUNT) val amount: Double,
+    @ColumnInfo(name = TABLE_RECORD_FINAL_AMOUNT) val finalAmount: Double,
     @ColumnInfo(name = TABLE_RECORD_CONCESSIONS) val concessions: Double,
     @ColumnInfo(name = TABLE_RECORD_CHARGE) val charge: Double,
     @ColumnInfo(name = TABLE_RECORD_REMARK) val remark: String,

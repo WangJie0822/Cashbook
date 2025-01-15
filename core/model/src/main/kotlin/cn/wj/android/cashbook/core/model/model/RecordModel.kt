@@ -25,6 +25,7 @@ package cn.wj.android.cashbook.core.model.model
  * @param assetId 关联资产
  * @param relatedAssetId 转账关联资产
  * @param amount 记录金额
+ * @param finalAmount 最终金额
  * @param charges 手续费
  * @param concessions 优惠
  * @param remark 备注
@@ -40,6 +41,7 @@ data class RecordModel(
     val assetId: Long,
     val relatedAssetId: Long,
     val amount: String,
+    val finalAmount: String,
     val charges: String,
     val concessions: String,
     val remark: String,
