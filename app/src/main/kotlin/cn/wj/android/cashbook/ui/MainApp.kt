@@ -16,8 +16,8 @@
 
 package cn.wj.android.cashbook.ui
 
-import android.app.Activity
 import android.text.Spanned
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -305,7 +305,7 @@ private fun MainAppScreen(
                 with(uiState) {
                     if (needRequestProtocol) {
                         // 显示用户隐私协议
-                        val currentActivity = LocalContext.current as? Activity
+                        val currentActivity = LocalActivity.current
                         CbAlertDialog(
                             onDismissRequest = { currentActivity?.finish() },
                             title = { Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy)) },
