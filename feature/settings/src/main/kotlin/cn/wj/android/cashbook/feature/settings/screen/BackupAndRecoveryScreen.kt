@@ -121,6 +121,7 @@ internal fun BackupAndRecoveryRoute(
         onAutoBackupClick = viewModel::displaySelectAutoBackupDialog,
         onAutoBackupModeSelected = viewModel::onAutoBackupModeSelected,
         onKeepLatestBackupChanged = viewModel::changeKeepLatestBackup,
+        onDbMigrateClick = viewModel::refreshDbMigrate,
         onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
@@ -163,6 +164,7 @@ internal fun BackupAndRecoveryScreen(
     onAutoBackupClick: () -> Unit,
     onKeepLatestBackupChanged: (Boolean) -> Unit,
     onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
+    onDbMigrateClick: () -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -245,6 +247,7 @@ internal fun BackupAndRecoveryScreen(
                             onRecoveryClick = onRecoveryClick,
                             onAutoBackupClick = onAutoBackupClick,
                             onKeepLatestBackupChanged = onKeepLatestBackupChanged,
+                            onDbMigrateClick = onDbMigrateClick,
                         )
                     }
                 }
@@ -370,6 +373,7 @@ internal fun BackupAndRecoveryScaffoldContent(
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
     onKeepLatestBackupChanged: (Boolean) -> Unit,
+    onDbMigrateClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // 提示文本
@@ -613,6 +617,14 @@ internal fun BackupAndRecoveryScaffoldContent(
                     onCheckedChange = onKeepLatestBackupChanged,
                 )
             },
+        )
+
+        CbListItem(
+            headlineContent = { Text(text = stringResource(id = R.string.db_data_migrate)) },
+            supportingContent = {
+                Text(text = stringResource(id = R.string.db_data_migrate_hint))
+            },
+            modifier = Modifier.clickable(onClick = onDbMigrateClick),
         )
     }
 }

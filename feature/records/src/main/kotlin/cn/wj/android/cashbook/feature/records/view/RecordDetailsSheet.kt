@@ -149,6 +149,18 @@ internal fun RecordDetailsSheet(
                     }
                     CbHorizontalDivider()
 
+                    // 实际金额
+                    CbListItem(
+                        headlineContent = { Text(text = stringResource(id = R.string.final_amount)) },
+                        trailingContent = {
+                            Text(
+                                text = recordData.finalAmount.withCNY(),
+                                color = recordData.typeCategory.typeColor,
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        },
+                    )
+
                     // 金额
                     CbListItem(
                         headlineContent = { Text(text = stringResource(id = R.string.amount)) },

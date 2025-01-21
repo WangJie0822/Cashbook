@@ -25,6 +25,8 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
+import cn.wj.android.cashbook.core.data.repository.RecordRepository
+import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -46,6 +48,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LauncherContentViewModel @Inject constructor(
     booksRepository: BooksRepository,
+    settingRepository: SettingRepository,
+    recordRepository: RecordRepository,
     getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
     getCurrentMonthRecordViewsMapUseCase: GetCurrentMonthRecordViewsMapUseCase,
 ) : ViewModel() {
@@ -72,21 +76,27 @@ class LauncherContentViewModel @Inject constructor(
     }
 
     /** 界面 UI 状态 */
-    val uiState = combine(_currentMonthRecordListData, booksRepository.currentBook) { list, book ->
-        val recordMap = getCurrentMonthRecordViewsMapUseCase(list)
-        var totalIncome = BigDecimal.ZERO
-        var totalExpenditure = BigDecimal.ZERO
-        recordMap.keys.forEach {
-            totalIncome += it.dayIncome.toBigDecimalOrZero()
-            totalExpenditure += it.dayExpand.toBigDecimalOrZero()
+    val uiState = combine(_currentMonthRecordListData, booksRepository.currentBook, settingRepository.tempKeysModel) { list, book, temp ->
+        if (!temp.db9To10DataMigrated) {
+            // 升级后数据迁移
+            recordRepository.migrateAfter9To10()
+            LauncherContentUiState.Loading
+        } else {
+            val recordMap = getCurrentMonthRecordViewsMapUseCase(list)
+            var totalIncome = BigDecimal.ZERO
+            var totalExpenditure = BigDecimal.ZERO
+            recordMap.keys.forEach {
+                totalIncome += it.dayIncome.toBigDecimalOrZero()
+                totalExpenditure += it.dayExpand.toBigDecimalOrZero()
+            }
+            LauncherContentUiState.Success(
+                topBgUri = book.bgUri,
+                monthIncome = totalIncome.decimalFormat(),
+                monthExpand = totalExpenditure.decimalFormat(),
+                monthBalance = (totalIncome - totalExpenditure).decimalFormat(),
+                recordMap = recordMap,
+            )
         }
-        LauncherContentUiState.Success(
-            topBgUri = book.bgUri,
-            monthIncome = totalIncome.decimalFormat(),
-            monthExpand = totalExpenditure.decimalFormat(),
-            monthBalance = (totalIncome - totalExpenditure).decimalFormat(),
-            recordMap = recordMap,
-        )
     }
         .stateIn(
             scope = viewModelScope,

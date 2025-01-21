@@ -20,15 +20,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_AMOUNT
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_CHARGE
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_CONCESSIONS
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_FINAL_AMOUNT
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ID
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_TYPE_ID
-import cn.wj.android.cashbook.core.database.table.TABLE_TYPE
-import cn.wj.android.cashbook.core.database.table.TABLE_TYPE_TYPE_CATEGORY
-import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import org.intellij.lang.annotations.Language
 
 /**
@@ -43,7 +35,6 @@ object Migration9To10 : Migration(9, 10) {
         logger().i("migrate(db)")
         with(db) {
             migrateRecord()
-            refreshFinalAmount()
         }
     }
 
@@ -60,27 +51,5 @@ object Migration9To10 : Migration(9, 10) {
     private fun SupportSQLiteDatabase.migrateRecord() {
         // 添加 final_amount 字段
         execSQL(SQL_ALTER_TABLE_RECORD_ADD_FINAL_AMOUNT)
-    }
-
-    /** 查询转账记录数据 */
-    @Language("SQL")
-    private val SQL_QUERY_TRANSFER_RECORD_FROM_RECORD_WHERE = """
-        SELECT `$TABLE_RECORD_ID`, `$TABLE_RECORD_TYPE_ID`, `$TABLE_RECORD_AMOUNT`, `$TABLE_RECORD_CONCESSIONS`, `$TABLE_RECORD_CHARGE`
-        FROM `$TABLE_RECORD`
-        WHERE `type_id` IN (
-            SELECT `id`
-            FROM `$TABLE_TYPE`
-            WHERE `$TABLE_TYPE_TYPE_CATEGORY` = ${RecordTypeCategoryEnum.TRANSFER.ordinal}
-        )
-    """
-
-    /**
-     * TODO 刷新已有数据中的 final_amount 字段
-     */
-    private fun SupportSQLiteDatabase.refreshFinalAmount() {
-        query(SQL_QUERY_TRANSFER_RECORD_FROM_RECORD_WHERE).use { cursor ->
-            val id = cursor.getLong(cursor.getColumnIndexOrThrow(TABLE_RECORD_ID))
-            val amount = cursor.getDouble(cursor.getColumnIndexOrThrow(TABLE_RECORD_AMOUNT))
-        }
     }
 }

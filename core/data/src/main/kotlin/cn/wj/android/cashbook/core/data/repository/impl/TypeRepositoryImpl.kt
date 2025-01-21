@@ -24,7 +24,7 @@ import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.TypeDao
-import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
+import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
@@ -42,7 +42,7 @@ import kotlin.coroutines.CoroutineContext
  */
 class TypeRepositoryImpl @Inject constructor(
     private val typeDao: TypeDao,
-    private val appPreferencesDataSource: AppPreferencesDataSource,
+    private val combineProtoDataSource: CombineProtoDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : TypeRepository {
 
@@ -62,7 +62,7 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun getRecordTypeById(typeId: Long): RecordTypeModel? =
         withContext(coroutineContext) {
-            typeDao.queryById(typeId)?.asModel(appPreferencesDataSource.needRelated(typeId))
+            typeDao.queryById(typeId)?.asModel(combineProtoDataSource.needRelated(typeId))
         }
 
     override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel =
@@ -73,14 +73,14 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun getNoNullDefaultRecordType(): RecordTypeModel =
         withContext(coroutineContext) {
-            getNoNullRecordTypeById(appPreferencesDataSource.appData.first().defaultTypeId)
+            getNoNullRecordTypeById(combineProtoDataSource.appData.first().defaultTypeId)
         }
 
     private suspend fun getFirstRecordTypeList(): List<RecordTypeModel> =
         withContext(coroutineContext) {
             val result = typeDao.queryByLevel(TypeLevelEnum.FIRST.ordinal)
                 .map {
-                    it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
+                    it.asModel(combineProtoDataSource.needRelated(it.id ?: -1L))
                 }
             result
         }
@@ -89,18 +89,18 @@ class TypeRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             typeDao.queryByParentId(parentId)
                 .map {
-                    it.asModel(appPreferencesDataSource.needRelated(it.id ?: -1L))
+                    it.asModel(combineProtoDataSource.needRelated(it.id ?: -1L))
                 }
         }
 
     override suspend fun needRelated(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = appPreferencesDataSource.appData.first()
+        val appDataModel = combineProtoDataSource.appData.first()
         val refundTypeId = if (appDataModel.refundTypeId > 0L) {
             appDataModel.refundTypeId
         } else {
             val id = typeDao.queryByName("退款")?.id ?: 0L
             if (id > 0L) {
-                appPreferencesDataSource.updateRefundTypeId(id)
+                combineProtoDataSource.updateRefundTypeId(id)
             }
             id
         }
@@ -109,7 +109,7 @@ class TypeRepositoryImpl @Inject constructor(
         } else {
             val id = typeDao.queryByName("报销")?.id ?: 0L
             if (id > 0L) {
-                appPreferencesDataSource.updateReimburseTypeId(id)
+                combineProtoDataSource.updateReimburseTypeId(id)
             }
             id
         }
@@ -117,13 +117,13 @@ class TypeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isReimburseType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = appPreferencesDataSource.appData.first()
+        val appDataModel = combineProtoDataSource.appData.first()
         val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
             appDataModel.reimburseTypeId
         } else {
             val id = typeDao.queryByName("报销")?.id ?: 0L
             if (id > 0L) {
-                appPreferencesDataSource.updateReimburseTypeId(id)
+                combineProtoDataSource.updateReimburseTypeId(id)
             }
             id
         }
@@ -131,13 +131,13 @@ class TypeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isRefundType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = appPreferencesDataSource.appData.first()
+        val appDataModel = combineProtoDataSource.appData.first()
         val refundTypeId = if (appDataModel.refundTypeId > 0L) {
             appDataModel.refundTypeId
         } else {
             val id = typeDao.queryByName("退款")?.id ?: 0L
             if (id > 0L) {
-                appPreferencesDataSource.updateRefundTypeId(id)
+                combineProtoDataSource.updateRefundTypeId(id)
             }
             id
         }
@@ -145,11 +145,11 @@ class TypeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setReimburseType(typeId: Long): Unit = withContext(coroutineContext) {
-        appPreferencesDataSource.updateReimburseTypeId(typeId)
+        combineProtoDataSource.updateReimburseTypeId(typeId)
     }
 
     override suspend fun setRefundType(typeId: Long): Unit = withContext(coroutineContext) {
-        appPreferencesDataSource.updateRefundTypeId(typeId)
+        combineProtoDataSource.updateRefundTypeId(typeId)
     }
 
     override suspend fun changeTypeToSecond(id: Long, parentId: Long): Unit =
@@ -202,13 +202,13 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun isCreditPaymentType(typeId: Long): Boolean =
         withContext(coroutineContext) {
-            val appDataModel = appPreferencesDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.appData.first()
             val creditCardPaymentTypeId = if (appDataModel.creditCardPaymentTypeId > 0L) {
                 appDataModel.creditCardPaymentTypeId
             } else {
                 val id = typeDao.queryByName("还信用卡")?.id ?: 0L
                 if (id > 0L) {
-                    appPreferencesDataSource.updateCreditCardPaymentTypeId(id)
+                    combineProtoDataSource.updateCreditCardPaymentTypeId(id)
                 }
                 id
             }
@@ -216,6 +216,6 @@ class TypeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun setCreditPaymentType(typeId: Long): Unit = withContext(coroutineContext) {
-        appPreferencesDataSource.updateCreditCardPaymentTypeId(typeId)
+        combineProtoDataSource.updateCreditCardPaymentTypeId(typeId)
     }
 }

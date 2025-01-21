@@ -35,6 +35,7 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
 import cn.wj.android.cashbook.core.database.throwable.DataTransactionException
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import java.math.BigDecimal
 
 /**
  * 事务数据库操作类
@@ -94,6 +95,20 @@ interface TransactionDao {
     )
     suspend fun clearRelatedRecordById(id: Long)
 
+    @Query(
+        value = """
+        SELECT * FROM db_record_with_related WHERE related_record_id=:id
+    """,
+    )
+    suspend fun queryRelatedByRelatedRecordId(id: Long): List<RecordWithRelatedTable>
+
+    @Query(
+        value = """
+        SELECT * FROM db_record_with_related WHERE record_id=:id
+    """,
+    )
+    suspend fun queryRelatedByRecordId(id: Long): List<RecordWithRelatedTable>
+
     @Insert
     suspend fun insertRelatedRecord(related: List<RecordWithRelatedTable>)
 
@@ -116,6 +131,17 @@ interface TransactionDao {
         )
     }
 
+    /**
+     * 插入记录
+     *
+     * - 计算最终金额
+     * - 更新关联资产金额
+     * - 转账类型更新目标资产金额
+     * - 插入关联的标签数据
+     * - 插入关联记录数据
+     * - 更新关联记录的最终金额
+     * - 更新记录的最终金额
+     */
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun insertRecordTransaction(
@@ -124,17 +150,19 @@ interface TransactionDao {
         needRelated: Boolean,
         relatedRecordIdList: List<Long>,
     ) {
-        val type =
-            (
-                if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) {
-                    TYPE_TABLE_BALANCE_EXPENDITURE
-                } else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) {
-                    TYPE_TABLE_BALANCE_INCOME
-                } else {
-                    queryTypeById(record.typeId)
-                }
-                )
-                ?: throw DataTransactionException("Type must not be null")
+        val type = when (record.typeId) {
+            TYPE_TABLE_BALANCE_EXPENDITURE.id -> {
+                TYPE_TABLE_BALANCE_EXPENDITURE
+            }
+
+            TYPE_TABLE_BALANCE_INCOME.id -> {
+                TYPE_TABLE_BALANCE_INCOME
+            }
+
+            else -> {
+                queryTypeById(record.typeId)
+            }
+        } ?: throw DataTransactionException("Type must not be null")
 
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
         // 计算记录涉及金额
@@ -188,7 +216,7 @@ interface TransactionDao {
             }
         }
 
-        val recordId = insertRecord(record)
+        val recordId = insertRecord(record.copy(finalAmount = recordAmount.toDouble()))
 
         // 插入新的关联标签
         insertRelatedTags(
@@ -208,6 +236,18 @@ interface TransactionDao {
                     )
                 },
             )
+
+            // 更新关联记录的金额
+            var relatedAmount = BigDecimal.ZERO
+            relatedRecordIdList.mapNotNull { relatedRecordId ->
+                queryRecordById(relatedRecordId)
+            }.forEach { relatedRecord ->
+                relatedAmount += relatedRecord.finalAmount.toBigDecimalOrZero()
+            }
+            relatedRecordIdList.forEach { relatedRecordId ->
+                updateRecordFinalAmountById(relatedRecordId, 0.0)
+            }
+            updateRecordFinalAmountById(recordId, (recordAmount - relatedAmount).toDouble())
         }
     }
 
@@ -223,19 +263,32 @@ interface TransactionDao {
         deleteRecordTransaction(record)
     }
 
+    /**
+     * 删除已有记录
+     *
+     * - 计算金额（非finalAmount）后更新资产金额
+     * - 转账类型更新目标资产金额
+     * - 移除和记录关联的所有标签数据
+     * - 更新与记录关联的所有记录 finalAmount 字段
+     * - 移除和记录关联的所有关联记录数据
+     */
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteRecordTransaction(record: RecordTable) {
         val recordId = record.id ?: return
-        val type =
-            if (record.typeId == TYPE_TABLE_BALANCE_EXPENDITURE.id) {
+        val type = when (record.typeId) {
+            TYPE_TABLE_BALANCE_EXPENDITURE.id -> {
                 TYPE_TABLE_BALANCE_EXPENDITURE
-            } else if (record.typeId == TYPE_TABLE_BALANCE_INCOME.id) {
-                TYPE_TABLE_BALANCE_INCOME
-            } else {
-                queryTypeById(record.typeId)
-                    ?: throw DataTransactionException("Type must not be null")
             }
+
+            TYPE_TABLE_BALANCE_INCOME.id -> {
+                TYPE_TABLE_BALANCE_INCOME
+            }
+
+            else -> {
+                queryTypeById(record.typeId)
+            }
+        } ?: throw DataTransactionException("Type must not be null")
 
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
         // 计算之前记录涉及金额
@@ -292,6 +345,37 @@ interface TransactionDao {
         // 移除关联标签
         deleteOldRelatedTags(recordId)
 
+        // 更新关联记录的 finalAmount
+        if (category == RecordTypeCategoryEnum.EXPENDITURE) {
+            // 删除支出记录，需要更新报销、退款记录，最终金额为 关联最终金额 + 支出记录的finalAmount
+            queryRelatedByRelatedRecordId(recordId).mapNotNull { related ->
+                queryRecordById(related.recordId)
+            }.forEach { relatedRecord ->
+                val relatedRecordId = relatedRecord.id
+                if (null != relatedRecordId) {
+                    updateRecordFinalAmountById(
+                        relatedRecordId,
+                        (relatedRecord.finalAmount.toBigDecimalOrZero() + oldRecordAmount).decimalFormat()
+                            .toDoubleOrZero(),
+                    )
+                }
+            }
+        } else if (category == RecordTypeCategoryEnum.INCOME) {
+            // 删除收入记录，需要更新被关联的支出记录，最终金额需重新计算
+            queryRelatedByRecordId(recordId).mapNotNull { related ->
+                queryRecordById(related.relatedRecordId)
+            }.forEach { relatedRecord ->
+                val relatedRecordId = relatedRecord.id
+                if (null != relatedRecordId) {
+                    updateRecordFinalAmountById(
+                        relatedRecordId,
+                        (relatedRecord.amount.toBigDecimalOrZero() - relatedRecord.concessions.toBigDecimalOrZero() + relatedRecord.charge.toBigDecimalOrZero()).decimalFormat()
+                            .toDoubleOrZero(),
+                    )
+                }
+            }
+        }
+
         // 移除关联记录
         clearRelatedRecordById(recordId)
 
@@ -301,6 +385,13 @@ interface TransactionDao {
             throw DataTransactionException("Record delete failed!")
         }
     }
+
+    @Query(
+        value = """
+        UPDATE db_record SET final_amount=:finalAmount WHERE id=:id
+    """,
+    )
+    suspend fun updateRecordFinalAmountById(id: Long, finalAmount: Double)
 
     @Query(
         value = """

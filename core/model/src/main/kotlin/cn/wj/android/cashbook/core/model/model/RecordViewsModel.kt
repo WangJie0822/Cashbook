@@ -40,6 +40,7 @@ data class RecordViewsModel(
     val asset: AssetModel?,
     val relatedAsset: AssetModel?,
     val amount: String,
+    val finalAmount: String,
     val charges: String,
     val concessions: String,
     val remark: String,

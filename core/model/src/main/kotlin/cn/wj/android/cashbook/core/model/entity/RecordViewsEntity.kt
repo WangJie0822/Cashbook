@@ -44,6 +44,7 @@ data class RecordViewsEntity(
     val relatedAssetName: String?,
     val relatedAssetIconResId: Int?,
     val amount: String,
+    val finalAmount: String,
     val charges: String,
     val concessions: String,
     val remark: String,

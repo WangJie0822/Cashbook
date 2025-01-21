@@ -85,6 +85,7 @@ fun RecordViewsModel.asEntity(): RecordViewsEntity {
         relatedAssetName = this.relatedAsset?.name,
         relatedAssetIconResId = this.relatedAsset?.iconResId,
         amount = this.amount,
+        finalAmount = this.finalAmount,
         charges = this.charges,
         concessions = this.concessions,
         remark = this.remark,

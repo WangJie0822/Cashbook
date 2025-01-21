@@ -98,6 +98,10 @@ interface RecordRepository {
     suspend fun addSearchHistory(keyword: String)
 
     suspend fun clearSearchHistory()
+
+    suspend fun migrateAfter9To10()
+
+    suspend fun queryRelatedRecordCountById(id: Long): Int
 }
 
 internal fun RecordTable.asModel(): RecordModel {

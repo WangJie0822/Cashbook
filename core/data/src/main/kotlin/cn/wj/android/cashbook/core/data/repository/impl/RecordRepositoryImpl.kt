@@ -33,8 +33,8 @@ import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
-import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
-import cn.wj.android.cashbook.core.datastore.datasource.SearchHistoryDataSource
+import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -48,13 +48,12 @@ import kotlin.coroutines.CoroutineContext
 class RecordRepositoryImpl @Inject constructor(
     private val recordDao: RecordDao,
     private val transactionDao: TransactionDao,
-    private val appPreferencesDataSource: AppPreferencesDataSource,
-    private val searchHistoryDataSource: SearchHistoryDataSource,
+    private val combineProtoDataSource: CombineProtoDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : RecordRepository {
 
     override val searchHistoryListData: Flow<List<String>> =
-        searchHistoryDataSource.searchHistoryData.mapLatest { it.keywords }
+        combineProtoDataSource.searchHistoryData.mapLatest { it.keywords }
 
     override suspend fun queryById(recordId: Long): RecordModel? = withContext(coroutineContext) {
         recordDao.queryById(recordId)?.asModel()
@@ -88,7 +87,7 @@ class RecordRepositoryImpl @Inject constructor(
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
         // 更新上次使用的默认数据
-        appPreferencesDataSource.updateLastAssetId(record.assetId)
+        combineProtoDataSource.updateLastAssetId(record.assetId)
     }
 
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
@@ -103,7 +102,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByAssetId(
-            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.appData.first().currentBookId,
             assetId = assetId,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -118,7 +117,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByTypeId(
-            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.appData.first().currentBookId,
             typeId = typeId,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -133,7 +132,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByTagId(
-            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.appData.first().currentBookId,
             tagId = tagId,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -148,7 +147,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByKeyword(
-            booksId = appPreferencesDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.appData.first().currentBookId,
             keyword = keyword,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -172,7 +171,7 @@ class RecordRepositoryImpl @Inject constructor(
         }
         val startDate = "$yearInt-${monthInt.completeZero()}-01 00:00:00"
         val endDate = "$nextYearInt-${nextMonthInt.completeZero()}-01 00:00:00"
-        return combine(recordDataVersion, appPreferencesDataSource.appData) { _, appData ->
+        return combine(recordDataVersion, combineProtoDataSource.appData) { _, appData ->
             recordDao.queryByBooksIdBetweenDate(
                 appData.currentBookId,
                 startDate.parseDateLong(),
@@ -188,7 +187,7 @@ class RecordRepositoryImpl @Inject constructor(
             this@RecordRepositoryImpl.logger()
                 .i("queryRecordListBetweenDate(from = <$from>, to = <$to>)")
             recordDao.queryByBooksIdBetweenDate(
-                appPreferencesDataSource.appData.first().currentBookId,
+                combineProtoDataSource.appData.first().currentBookId,
                 from.parseDateLong(),
                 to.parseDateLong(),
             ).map {
@@ -198,7 +197,7 @@ class RecordRepositoryImpl @Inject constructor(
 
     override suspend fun getDefaultRecord(typeId: Long): RecordModel =
         withContext(coroutineContext) {
-            val appDataModel = appPreferencesDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.appData.first()
             RecordModel(
                 id = -1L,
                 booksId = appDataModel.currentBookId,
@@ -238,7 +237,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = appPreferencesDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.appData.first()
             recordDao.getExpenditureRecordListAfterTime(
                 booksId = appDataModel.currentBookId,
                 recordTime = startDate,
@@ -252,7 +251,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = appPreferencesDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.appData.first()
             recordDao.getExpenditureReimburseRecordListAfterTime(
                 booksId = appDataModel.currentBookId,
                 recordTime = startDate,
@@ -266,7 +265,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = appPreferencesDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.appData.first()
             recordDao.getExpenditureRecordListByKeywordAfterTime(
                 keyword = keyword,
                 booksId = appDataModel.currentBookId,
@@ -291,7 +290,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = appPreferencesDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.appData.first()
             recordDao.getLastThreeMonthExpenditureReimburseRecordListByKeyword(
                 keyword = keyword,
                 booksId = appDataModel.currentBookId,
@@ -322,10 +321,67 @@ class RecordRepositoryImpl @Inject constructor(
         if (currentList.size > 10) {
             currentList = currentList.subList(0, 10)
         }
-        searchHistoryDataSource.updateKeywords(currentList)
+        combineProtoDataSource.updateKeywords(currentList)
     }
 
     override suspend fun clearSearchHistory(): Unit = withContext(coroutineContext) {
-        searchHistoryDataSource.updateKeywords(emptyList())
+        combineProtoDataSource.updateKeywords(emptyList())
     }
+
+    override suspend fun migrateAfter9To10() = withContext(coroutineContext) {
+        // 更新转账记录
+        val transferCount = recordDao.updateRecord(
+            recordDao.queryByTypeCategory(RecordTypeCategoryEnum.TRANSFER.ordinal).map {
+                // 转账记录最终金额计算为 优惠 - 手续费
+                it.copy(finalAmount = it.concessions - it.charge)
+            },
+        )
+        this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), transferCount $transferCount")
+        val relatedRecordList = recordDao.queryRelatedRecord()
+        val expandList =
+            recordDao.queryByTypeCategory(RecordTypeCategoryEnum.EXPENDITURE.ordinal).map {
+                if (relatedRecordList.count { related -> related.relatedRecordId == it.id } > 0) {
+                    // 已退款、已报销记录，最终金额为 0
+                    it.copy(finalAmount = 0.0)
+                } else {
+                    // 普通支出，最终金额为 金额 + 手续费 - 优惠
+                    it.copy(finalAmount = it.amount + it.charge - it.concessions)
+                }
+            }
+        // 更新支出记录
+        val expandCount = recordDao.updateRecord(expandList)
+        this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), expandCount $expandCount")
+        val appData = combineProtoDataSource.appData.first()
+        val incomeCount = recordDao.updateRecord(
+            recordDao.queryByTypeCategory(RecordTypeCategoryEnum.INCOME.ordinal).map {
+                if (it.typeId == appData.refundTypeId || it.typeId == appData.reimburseTypeId) {
+                    // 退款、报销类型
+                    val relatedIdList =
+                        relatedRecordList.filter { related -> related.recordId == it.id }
+                            .map { related -> related.relatedRecordId }
+                    if (relatedIdList.isNotEmpty()) {
+                        // 已关联记录，最终金额为 金额 - 手续费 - 关联记录金额
+                        var expandAmount = 0.0
+                        expandList.filter { expand -> expand.id in relatedIdList }
+                            .forEach { expand -> expandAmount += (expand.amount + expand.charge - expand.concessions) }
+                        it.copy(finalAmount = it.amount - it.charge - expandAmount)
+                    } else {
+                        // 未关联记录，最终金额计算为 金额 - 手续费
+                        it.copy(finalAmount = it.amount - it.charge)
+                    }
+                } else {
+                    // 其它收入记录，最终金额计算为 金额 - 手续费
+                    it.copy(finalAmount = it.amount - it.charge)
+                }
+            },
+        )
+        this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), incomeCount $incomeCount")
+        // 标记已完成迁移
+        combineProtoDataSource.updateDb9To10DataMigrated(true)
+    }
+
+    override suspend fun queryRelatedRecordCountById(id: Long): Int =
+        withContext(coroutineContext) {
+            recordDao.queryRelatedRecordCountByID(id)
+        }
 }

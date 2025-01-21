@@ -27,7 +27,7 @@ import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.AssetDao
-import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
+import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
@@ -47,12 +47,12 @@ import kotlin.coroutines.CoroutineContext
  */
 class AssetRepositoryImpl @Inject constructor(
     private val assetDao: AssetDao,
-    private val appPreferencesDataSource: AppPreferencesDataSource,
+    private val combineProtoDataSource: CombineProtoDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : AssetRepository {
 
     override val currentVisibleAssetListData: Flow<List<AssetModel>> =
-        combine(assetDataVersion, appPreferencesDataSource.appData) { _, appData ->
+        combine(assetDataVersion, combineProtoDataSource.appData) { _, appData ->
             getVisibleAssetsByBookId(appData.currentBookId)
         }
 
@@ -80,7 +80,7 @@ class AssetRepositoryImpl @Inject constructor(
         }
 
     override val currentInvisibleAssetListData: Flow<List<AssetModel>> =
-        combine(assetDataVersion, appPreferencesDataSource.appData) { _, appData ->
+        combine(assetDataVersion, combineProtoDataSource.appData) { _, appData ->
             getInvisibleAssetsByBookId(appData.currentBookId)
         }
 
@@ -107,7 +107,7 @@ class AssetRepositoryImpl @Inject constructor(
             result
         }
 
-    override val topUpInTotalData: Flow<Boolean> = appPreferencesDataSource.appData.mapLatest {
+    override val topUpInTotalData: Flow<Boolean> = combineProtoDataSource.appData.mapLatest {
         it.topUpInTotal
     }
 
@@ -130,7 +130,7 @@ class AssetRepositoryImpl @Inject constructor(
     override suspend fun updateAsset(asset: AssetModel) = withContext(coroutineContext) {
         var table = asset.asTable()
         if (table.booksId <= 0) {
-            table = table.copy(booksId = appPreferencesDataSource.appData.first().currentBookId)
+            table = table.copy(booksId = combineProtoDataSource.appData.first().currentBookId)
         }
         if (null == table.id) {
             // 插入
@@ -152,6 +152,6 @@ class AssetRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateTopUpInTotal(topUpInTotal: Boolean) = withContext(coroutineContext) {
-        appPreferencesDataSource.updateTopUpInTotal(topUpInTotal)
+        combineProtoDataSource.updateTopUpInTotal(topUpInTotal)
     }
 }

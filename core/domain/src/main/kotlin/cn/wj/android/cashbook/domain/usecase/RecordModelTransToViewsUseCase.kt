@@ -79,6 +79,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 asset = assetRepository.getAssetById(recordModel.assetId),
                 relatedAsset = assetRepository.getAssetById(recordModel.relatedAssetId),
                 amount = recordModel.amount,
+                finalAmount = recordModel.finalAmount,
                 charges = recordModel.charges,
                 concessions = recordModel.concessions,
                 remark = recordModel.remark,

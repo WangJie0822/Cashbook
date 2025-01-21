@@ -26,7 +26,7 @@ import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
-import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
+import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.model.BooksModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -39,7 +39,7 @@ import kotlin.coroutines.CoroutineContext
 class BooksRepositoryImpl @Inject constructor(
     private val booksDao: BooksDao,
     private val transactionDao: TransactionDao,
-    private val appPreferencesDataSource: AppPreferencesDataSource,
+    private val combineProtoDataSource: CombineProtoDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : BooksRepository {
 
@@ -48,18 +48,18 @@ class BooksRepositoryImpl @Inject constructor(
             .mapLatest { getAllBooksList() }
 
     override val currentBook: Flow<BooksModel> =
-        combine(booksListData, appPreferencesDataSource.appData) { list, appData ->
+        combine(booksListData, combineProtoDataSource.appData) { list, appData ->
             var selected = list.firstOrNull { it.id == appData.currentBookId }
             if (null == selected) {
                 // 没有找到当前账本，默认选择第一个
                 selected = list.first()
-                appPreferencesDataSource.updateCurrentBookId(selected.id)
+                combineProtoDataSource.updateCurrentBookId(selected.id)
             }
             selected
         }
 
     override suspend fun selectBook(id: Long): Unit = withContext(coroutineContext) {
-        appPreferencesDataSource.updateCurrentBookId(id)
+        combineProtoDataSource.updateCurrentBookId(id)
     }
 
     override suspend fun insertBook(book: BooksModel): Long = withContext(coroutineContext) {

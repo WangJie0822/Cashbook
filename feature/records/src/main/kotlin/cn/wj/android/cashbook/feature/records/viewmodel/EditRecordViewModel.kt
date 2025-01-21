@@ -226,7 +226,7 @@ class EditRecordViewModel @Inject constructor(
         .mapLatest { list ->
             StringBuilder().run {
                 list.forEach { tag ->
-                    if (!isBlank()) {
+                    if (isNotBlank()) {
                         append(",")
                     }
                     append(tag.name)

@@ -25,9 +25,11 @@ import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.GitInfos
 import cn.wj.android.cashbook.core.datastore.SearchHistory
+import cn.wj.android.cashbook.core.datastore.TempKeys
 import cn.wj.android.cashbook.core.datastore.serializer.AppPreferencesSerializer
 import cn.wj.android.cashbook.core.datastore.serializer.GitInfosSerializer
 import cn.wj.android.cashbook.core.datastore.serializer.SearchHistorySerializer
+import cn.wj.android.cashbook.core.datastore.serializer.TempKeysSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -82,5 +84,19 @@ object DataStoreModule {
             scope = CoroutineScope(ioDispatcher + SupervisorJob()),
         ) {
             context.dataStoreFile("search_history.pb")
+        }
+
+    @Provides
+    @Singleton
+    fun providesTempKeysDataStore(
+        @ApplicationContext context: Context,
+        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineContext,
+        tempKeysSerializer: TempKeysSerializer,
+    ): DataStore<TempKeys> =
+        DataStoreFactory.create(
+            serializer = tempKeysSerializer,
+            scope = CoroutineScope(ioDispatcher + SupervisorJob()),
+        ) {
+            context.dataStoreFile("temp_keys.pb")
         }
 }
