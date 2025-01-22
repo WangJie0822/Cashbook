@@ -26,7 +26,7 @@ import cn.wj.android.cashbook.core.common.buildlogic.CashbookFlavor
 object ApplicationInfo {
 
     /** 数据库版本 */
-    const val DB_VERSION = 9
+    const val DB_VERSION = 10
 
     /** 渠道信息 */
     private var _flavor: CashbookFlavor? = null

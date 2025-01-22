@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.tools.dateFormat
+import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
@@ -48,6 +49,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BackupAndRecoveryViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
+    private val recordRepository: RecordRepository,
     private val backupRecoveryManager: BackupRecoveryManager,
 ) : ViewModel() {
 
@@ -178,6 +180,14 @@ class BackupAndRecoveryViewModel @Inject constructor(
     fun changeKeepLatestBackup(keep: Boolean) {
         viewModelScope.launch {
             settingRepository.updateKeepLatestBackup(keep)
+        }
+    }
+
+    fun refreshDbMigrate() {
+        viewModelScope.launch {
+            ProgressDialogManager.show()
+            recordRepository.migrateAfter9To10()
+            ProgressDialogManager.dismiss()
         }
     }
 

@@ -18,9 +18,11 @@ package cn.wj.android.cashbook.core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Update
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 
 /**
@@ -158,6 +160,30 @@ interface RecordDao {
 
     @Query("SELECT * FROM db_record WHERE type_id=:id")
     fun queryByTypeId(id: Long): List<RecordTable>
+
+    @Query(
+        """
+        SELECT * 
+        FROM db_record 
+        WHERE type_id IN (
+            SELECT id 
+            FROM db_type 
+            WHERE type_category=:typeCategoryId
+        )
+    """,
+    )
+    fun queryByTypeCategory(
+        typeCategoryId: Int,
+    ): List<RecordTable>
+
+    @Query("SELECT * FROM db_record_with_related")
+    fun queryRelatedRecord(): List<RecordWithRelatedTable>
+
+    @Query("SELECT COUNT(*) FROM db_record_with_related WHERE related_record_id=:id OR record_id=:id")
+    fun queryRelatedRecordCountByID(id: Long): Int
+
+    @Update
+    suspend fun updateRecord(list: List<RecordTable>): Int
 
     @Query("UPDATE db_record SET type_id=:toId WHERE type_id=:fromId")
     suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long)

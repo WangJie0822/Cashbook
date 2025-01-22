@@ -19,24 +19,33 @@ package cn.wj.android.cashbook.core.datastore.datasource
 import androidx.datastore.core.DataStore
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.datastore.AppPreferences
+import cn.wj.android.cashbook.core.datastore.GitInfos
+import cn.wj.android.cashbook.core.datastore.SearchHistory
+import cn.wj.android.cashbook.core.datastore.TempKeys
 import cn.wj.android.cashbook.core.datastore.copy
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
+import cn.wj.android.cashbook.core.model.model.GitDataModel
+import cn.wj.android.cashbook.core.model.model.SearchHistoryModel
+import cn.wj.android.cashbook.core.model.model.TempKeysModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 应用配置数据源
+ * Proto 组合数据源
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/21
+ * > [王杰](mailto:15555650921@163.com) 创建于 2025/1/20
  */
 @Singleton
-class AppPreferencesDataSource @Inject constructor(
+class CombineProtoDataSource @Inject constructor(
     private val appPreferences: DataStore<AppPreferences>,
+    private val gitInfos: DataStore<GitInfos>,
+    private val searchHistory: DataStore<SearchHistory>,
+    private val tempKeys: DataStore<TempKeys>,
 ) {
 
     val appData = appPreferences.data
@@ -74,6 +83,59 @@ class AppPreferencesDataSource @Inject constructor(
                 logcatInRelease = it.logcatInRelease,
             )
         }
+
+    val gitData = gitInfos.data
+        .map {
+            GitDataModel(
+                latestVersionName = it.latestVersionName,
+                latestVersionInfo = it.latestVersionInfo,
+                latestApkName = it.latestApkName,
+                latestApkDownloadUrl = it.latestApkDownloadUrl,
+            )
+        }
+
+    val searchHistoryData = searchHistory.data
+        .map {
+            SearchHistoryModel(
+                keywords = it.keywordsList,
+            )
+        }
+
+    val tempKeysData = tempKeys.data
+        .map {
+            TempKeysModel(
+                db9To10DataMigrated = it.db9To10DataMigrated,
+            )
+        }
+
+    suspend fun updateDb9To10DataMigrated(db9To10DataMigrated: Boolean) {
+        tempKeys.updateData { it.copy { this.db9To10DataMigrated = db9To10DataMigrated } }
+    }
+
+    suspend fun updateKeywords(keywords: List<String>) {
+        searchHistory.updateData {
+            it.copy {
+                this.keywords.clear()
+                this.keywords.addAll(keywords)
+            }
+        }
+    }
+
+    suspend fun updateLatestVersionData(
+        latestVersionName: String,
+        latestVersionInfo: String,
+        latestApkName: String,
+        latestApkDownloadUrl: String,
+    ) {
+        gitInfos.updateData {
+            it.copy {
+                this.latestVersionName = latestVersionName
+                this.latestVersionInfo = latestVersionInfo
+                this.latestApkName = latestApkName
+                this.latestApkDownloadUrl = latestApkDownloadUrl
+            }
+        }
+    }
 
     suspend fun updateCurrentBookId(bookId: Long) {
         appPreferences.updateData { it.copy { this.currentBookId = bookId } }

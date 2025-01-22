@@ -81,6 +81,9 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 
+# .kotlin
+*/.kotlin/*
+
 # keystore
 *.jks
 

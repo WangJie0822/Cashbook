@@ -21,8 +21,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
-import cn.wj.android.cashbook.core.datastore.datasource.AppPreferencesDataSource
-import cn.wj.android.cashbook.core.datastore.datasource.GitInfosDataSource
+import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
@@ -30,6 +29,7 @@ import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
+import cn.wj.android.cashbook.core.model.model.TempKeysModel
 import cn.wj.android.cashbook.core.network.datasource.RemoteDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -45,86 +45,87 @@ import kotlin.coroutines.CoroutineContext
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/14
  */
 class SettingRepositoryImpl @Inject constructor(
-    private val appPreferencesDataSource: AppPreferencesDataSource,
-    private val gitInfosDataSource: GitInfosDataSource,
+    private val combineProtoDataSource: CombineProtoDataSource,
     private val remoteDataSource: RemoteDataSource,
     @ApplicationContext private val context: Context,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : SettingRepository {
 
-    override val appDataMode: Flow<AppDataModel> = appPreferencesDataSource.appData
+    override val appDataMode: Flow<AppDataModel> = combineProtoDataSource.appData
 
-    override val gitDataModel: Flow<GitDataModel> = gitInfosDataSource.gitData
+    override val gitDataModel: Flow<GitDataModel> = combineProtoDataSource.gitData
+
+    override val tempKeysModel: Flow<TempKeysModel> = combineProtoDataSource.tempKeysData
 
     override suspend fun updateUseGithub(useGithub: Boolean) = withContext(coroutineContext) {
-        appPreferencesDataSource.updateUseGithub(useGithub)
+        combineProtoDataSource.updateUseGithub(useGithub)
     }
 
     override suspend fun updateAutoCheckUpdate(autoCheckUpdate: Boolean) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateAutoCheckUpdate(autoCheckUpdate)
+            combineProtoDataSource.updateAutoCheckUpdate(autoCheckUpdate)
         }
 
     override suspend fun updateIgnoreUpdateVersion(ignoreUpdateVersion: String) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateIgnoreUpdateVersion(ignoreUpdateVersion)
+            combineProtoDataSource.updateIgnoreUpdateVersion(ignoreUpdateVersion)
         }
 
     override suspend fun updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable: Boolean) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable)
+            combineProtoDataSource.updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable)
         }
 
     override suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateNeedSecurityVerificationWhenLaunch(
+            combineProtoDataSource.updateNeedSecurityVerificationWhenLaunch(
                 needSecurityVerificationWhenLaunch,
             )
         }
 
     override suspend fun updateEnableFingerprintVerification(enableFingerprintVerification: Boolean) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateEnableFingerprintVerification(
+            combineProtoDataSource.updateEnableFingerprintVerification(
                 enableFingerprintVerification,
             )
         }
 
     override suspend fun updatePasswordIv(iv: String) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updatePasswordIv(iv)
+            combineProtoDataSource.updatePasswordIv(iv)
         }
 
     override suspend fun updateFingerprintIv(iv: String) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateFingerprintIv(iv)
+            combineProtoDataSource.updateFingerprintIv(iv)
         }
 
     override suspend fun updatePasswordInfo(passwordInfo: String) = withContext(coroutineContext) {
-        appPreferencesDataSource.updatePasswordInfo(passwordInfo)
+        combineProtoDataSource.updatePasswordInfo(passwordInfo)
     }
 
     override suspend fun updateFingerprintPasswordInfo(fingerprintPasswordInfo: String) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateFingerprintPasswordInfo(fingerprintPasswordInfo)
+            combineProtoDataSource.updateFingerprintPasswordInfo(fingerprintPasswordInfo)
         }
 
     override suspend fun updateDarkMode(darkModeEnum: DarkModeEnum) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateDarkMode(darkModeEnum)
+            combineProtoDataSource.updateDarkMode(darkModeEnum)
         }
 
     override suspend fun updateDynamicColor(dynamicColor: Boolean) = withContext(coroutineContext) {
-        appPreferencesDataSource.updateDynamicColor(dynamicColor)
+        combineProtoDataSource.updateDynamicColor(dynamicColor)
     }
 
     override suspend fun updateVerificationMode(verificationMode: VerificationModeEnum) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateVerificationMode(verificationMode)
+            combineProtoDataSource.updateVerificationMode(verificationMode)
         }
 
     override suspend fun updateAgreedProtocol(agreedProtocol: Boolean) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateAgreedProtocol(agreedProtocol)
+            combineProtoDataSource.updateAgreedProtocol(agreedProtocol)
         }
 
     override suspend fun getLatestUpdateInfo(): UpgradeInfoEntity = withContext(coroutineContext) {
@@ -139,13 +140,13 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun syncLatestVersion(): Boolean = withContext(coroutineContext) {
         try {
-            val appData = appPreferencesDataSource.appData.first()
+            val appData = combineProtoDataSource.appData.first()
             val release = remoteDataSource.checkUpdate(!appData.useGithub, appData.canary)
             val asset = release?.assets?.firstOrNull {
                 val assetName = it.name.orEmpty()
                 assetName.endsWith(".apk") && (assetName.contains("_online") || assetName.contains("_canary"))
             }
-            gitInfosDataSource.updateLatestVersionData(
+            combineProtoDataSource.updateLatestVersionData(
                 release?.name.orEmpty(),
                 release?.body.orEmpty(),
                 asset?.name.orEmpty(),
@@ -160,7 +161,7 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun updateWebDAV(domain: String, account: String, password: String) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateWebDAV(
+            combineProtoDataSource.updateWebDAV(
                 domain = domain,
                 account = account,
                 password = password,
@@ -168,26 +169,26 @@ class SettingRepositoryImpl @Inject constructor(
         }
 
     override suspend fun updateBackupPath(path: String) = withContext(coroutineContext) {
-        appPreferencesDataSource.updateBackupPath(path)
+        combineProtoDataSource.updateBackupPath(path)
     }
 
     override suspend fun updateBackupMs(ms: Long) = withContext(coroutineContext) {
-        appPreferencesDataSource.updateBackupMs(ms)
+        combineProtoDataSource.updateBackupMs(ms)
     }
 
     override suspend fun updateAutoBackupMode(autoBackupMode: AutoBackupModeEnum) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateAutoBackupMode(autoBackupMode)
+            combineProtoDataSource.updateAutoBackupMode(autoBackupMode)
         }
 
     override suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateKeepLatestBackup(keepLatestBackup)
+            combineProtoDataSource.updateKeepLatestBackup(keepLatestBackup)
         }
 
     override suspend fun updateCanary(canary: Boolean) =
         withContext(coroutineContext) {
-            appPreferencesDataSource.updateCanary(canary)
+            combineProtoDataSource.updateCanary(canary)
         }
 
     override suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String =
@@ -215,7 +216,8 @@ class SettingRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun updateLogcatInRelease(logcatInRelease: Boolean) = withContext(coroutineContext) {
-        appPreferencesDataSource.updateLogcatInRelease(logcatInRelease)
-    }
+    override suspend fun updateLogcatInRelease(logcatInRelease: Boolean) =
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateLogcatInRelease(logcatInRelease)
+        }
 }

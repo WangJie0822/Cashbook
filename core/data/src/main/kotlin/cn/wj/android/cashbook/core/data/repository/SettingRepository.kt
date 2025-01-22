@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppDataModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
+import cn.wj.android.cashbook.core.model.model.TempKeysModel
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -37,6 +38,9 @@ interface SettingRepository {
 
     /** 远程仓库数据源 */
     val gitDataModel: Flow<GitDataModel>
+
+    /** 临时开关数据 */
+    val tempKeysModel: Flow<TempKeysModel>
 
     /** 更新使用 github 配置 */
     suspend fun updateUseGithub(useGithub: Boolean)

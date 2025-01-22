@@ -217,7 +217,7 @@ class BackupRecoveryManager @Inject constructor(
 
     private fun grantedPermissions(backupPath: String): Boolean {
         return if (backupPath.isContentUri) {
-            DocumentFile.fromTreeUri(context, Uri.parse(backupPath))?.canRead() == true
+            DocumentFile.fromTreeUri(context, backupPath.toUri())?.canRead() == true
         } else {
             ContextCompat.checkSelfPermission(
                 context,
@@ -238,7 +238,7 @@ class BackupRecoveryManager @Inject constructor(
         }
         val result = arrayListOf<BackupModel>()
         if (path.isContentUri) {
-            DocumentFile.fromTreeUri(context, Uri.parse(path))?.let { df ->
+            DocumentFile.fromTreeUri(context, path.toUri())?.let { df ->
                 if (df.name == BACKUP_DIR_NAME || null == df.findFile(BACKUP_DIR_NAME)) {
                     // 备份路径为指定名称或路径下找不到指定名称，使用当前路径
                     df
@@ -385,7 +385,7 @@ class BackupRecoveryManager @Inject constructor(
             val zippedFileName = zippedFile.name
             val keepLatest = settingRepository.appDataMode.first().keepLatestBackup
             val backupFileUri = if (backupPath.startsWith("content://")) {
-                val documentFile = DocumentFile.fromTreeUri(context, Uri.parse(backupPath))
+                val documentFile = DocumentFile.fromTreeUri(context, backupPath.toUri())
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
                 documentFile.findFile(zippedFileName)?.delete()
                 if (keepLatest) {
@@ -406,12 +406,10 @@ class BackupRecoveryManager @Inject constructor(
             } else {
                 val backupDir = File(backupPath)
                 if (keepLatest) {
-                    backupDir.listFiles {
+                    backupDir.listFiles { _, name ->
                         // 仅删除备份文件
-                        val name = it.name.orEmpty()
                         name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)
-                    }
-                        ?.forEach { it.delete() }
+                    }?.forEach { it.delete() }
                 }
                 if (!backupDir.exists()) {
                     backupDir.mkdirs()
@@ -496,7 +494,7 @@ class BackupRecoveryManager @Inject constructor(
 
             val backupZippedCacheFile: File
             if (localPath.startsWith("content://")) {
-                DocumentFile.fromSingleUri(context, Uri.parse(localPath))!!.let { df ->
+                DocumentFile.fromSingleUri(context, localPath.toUri())!!.let { df ->
                     val name = df.name
                         ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
                     if (name.startsWith(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)) {
@@ -504,7 +502,7 @@ class BackupRecoveryManager @Inject constructor(
                         if (!backupZippedCacheFile.exists()) {
                             backupZippedCacheFile.createNewFile()
                         }
-                        context.contentResolver.openInputStream(Uri.parse(localPath))!!.use {
+                        context.contentResolver.openInputStream(localPath.toUri())!!.use {
                             backupZippedCacheFile.writeBytes(it.readBytes())
                         }
                     } else {

@@ -16,7 +16,6 @@
 
 package cn.wj.android.cashbook.feature.records.screen
 
-import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -66,6 +65,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.TestTag
@@ -179,6 +179,7 @@ internal fun LauncherContentRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherContentScreen(
+    modifier: Modifier = Modifier,
     shouldDisplayDeleteFailedBookmark: Int,
     onRequestDismissBookmark: () -> Unit,
     viewRecord: RecordViewsEntity?,
@@ -199,7 +200,6 @@ internal fun LauncherContentScreen(
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
-    modifier: Modifier = Modifier,
 ) {
     // 提示文本
     val deleteFailedFormatText = stringResource(id = R.string.delete_failed_format)
@@ -265,7 +265,7 @@ internal fun LauncherContentScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(windowAdaptiveInfo.bookImageRatio),
-                            model = Uri.parse(uiState.topBgUri),
+                            model = uiState.topBgUri.toUri(),
                             placeholder = painterResource(id = R.drawable.im_top_background),
                             error = painterResource(id = R.drawable.im_top_background),
                             fallback = painterResource(id = R.drawable.im_top_background),
@@ -659,7 +659,7 @@ internal fun RecordListItem(
                         )
                     }
                     Text(
-                        text = item.amount.withCNY(),
+                        text = item.finalAmount.withCNY(),
                         color = item.typeCategory.typeColor,
                         style = MaterialTheme.typography.labelLarge,
                     )

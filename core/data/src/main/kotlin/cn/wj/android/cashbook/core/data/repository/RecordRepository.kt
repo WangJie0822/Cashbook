@@ -98,6 +98,10 @@ interface RecordRepository {
     suspend fun addSearchHistory(keyword: String)
 
     suspend fun clearSearchHistory()
+
+    suspend fun migrateAfter9To10()
+
+    suspend fun queryRelatedRecordCountById(id: Long): Int
 }
 
 internal fun RecordTable.asModel(): RecordModel {
@@ -108,6 +112,7 @@ internal fun RecordTable.asModel(): RecordModel {
         assetId = this.assetId,
         relatedAssetId = this.intoAssetId,
         amount = this.amount.toString(),
+        finalAmount = this.finalAmount.toString(),
         charges = this.charge.toString(),
         concessions = this.concessions.toString(),
         remark = this.remark,
@@ -124,6 +129,7 @@ internal fun RecordModel.asTable(): RecordTable {
         assetId = this.assetId,
         intoAssetId = this.relatedAssetId,
         amount = this.amount.toDoubleOrZero(),
+        finalAmount = this.finalAmount.toDoubleOrZero(),
         charge = this.charges.toDoubleOrZero(),
         concessions = this.concessions.toDoubleOrZero(),
         remark = this.remark,

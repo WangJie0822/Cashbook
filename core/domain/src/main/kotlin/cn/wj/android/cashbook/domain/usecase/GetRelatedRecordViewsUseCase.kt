@@ -60,6 +60,8 @@ class GetRelatedRecordViewsUseCase @Inject constructor(
                 } else {
                     recordRepository.getLastThreeMonthRefundableRecordListByKeyword("%$keyword%")
                 }
+            }.filter {
+                recordRepository.queryRelatedRecordCountById(it.id) <= 0
             }.map {
                 recordModelTransToViewsUseCase(it).asEntity()
             }

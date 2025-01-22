@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "cn.wj.android.cashbook.core.datastore";
+option java_multiple_files = true;
+
+/* 临时开关配置 */
+message TempKeys {
+  bool db9To10dataMigrated = 1; // 数据库版本9升级到10之后是否进行数据迁移
+}

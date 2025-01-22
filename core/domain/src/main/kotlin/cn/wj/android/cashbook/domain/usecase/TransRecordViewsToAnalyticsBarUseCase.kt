@@ -21,13 +21,12 @@ import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -68,8 +67,8 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
             }
         }
         dateList.forEach { date ->
-            var totalExpenditure = BigDecimal.ZERO
-            var totalIncome = BigDecimal.ZERO
+            var totalExpenditure = 0.0
+            var totalIncome = 0.0
             recordViewsList.filter {
                 date == if (yearSelected) {
                     val dateArray = it.recordTime.split(" ").first().split("-")
@@ -81,18 +80,18 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
                 when (record.type.typeCategory) {
                     RecordTypeCategoryEnum.EXPENDITURE -> {
                         // 支出
-                        totalExpenditure += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
+                        totalExpenditure += record.finalAmount.toDoubleOrZero()
                     }
 
                     RecordTypeCategoryEnum.INCOME -> {
                         // 收入
-                        totalIncome += (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
+                        totalIncome += record.finalAmount.toDoubleOrZero()
                     }
 
                     RecordTypeCategoryEnum.TRANSFER -> {
                         // 转账
-                        totalExpenditure += record.charges.toBigDecimalOrZero()
-                        totalIncome += record.concessions.toBigDecimalOrZero()
+                        totalExpenditure += record.charges.toDoubleOrZero()
+                        totalIncome += record.concessions.toDoubleOrZero()
                     }
                 }
             }

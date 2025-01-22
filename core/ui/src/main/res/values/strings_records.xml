@@ -68,6 +68,7 @@
     <string name="record_details">记录详情</string>
     <string name="edit">编辑</string>
     <string name="amount">金额</string>
+    <string name="final_amount">实际金额</string>
     <string name="record_delete_hint">确认要删除这条记录吗？</string>
     <string name="delete_failed">删除失败</string>
     <string name="delete_failed_format">删除失败 code=%1$s</string>
