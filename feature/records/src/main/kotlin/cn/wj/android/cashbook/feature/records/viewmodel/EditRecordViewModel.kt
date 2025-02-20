@@ -407,7 +407,7 @@ class EditRecordViewModel @Inject constructor(
                 shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_NOT_MATCH_CATEGORY
                 return@launch
             }
-            runCatchWithProgress(hint = hintText, cancelable = false) {
+            val result = runCatchWithProgress(hint = hintText, cancelable = false) {
                 saveRecordUseCase(
                     recordModel = recordEntity.copy(
                         relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
@@ -417,11 +417,15 @@ class EditRecordViewModel @Inject constructor(
                     tagIdList = displayTagIdListData.first(),
                     relatedRecordIdList = _relatedRecordIdData.first(),
                 )
-                onSuccess()
+                Result.success(null)
             }.getOrElse { throwable ->
                 // 保存失败
                 this@EditRecordViewModel.logger().e(throwable, "onSaveClick()")
                 shouldDisplayBookmark = EditRecordBookmarkEnum.SAVE_FAILED
+                Result.failure<Any>(throwable)
+            }
+            if (result.isSuccess) {
+                onSuccess.invoke()
             }
         }
     }
