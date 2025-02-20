@@ -189,27 +189,38 @@ class EditRecordViewModel @Inject constructor(
                 initialValue = RecordTypeCategoryEnum.EXPENDITURE,
             )
 
-    /** 标签数据 */
+    /** 标记 - 是否修改过标签，用于控制界面标签显示 */
+    private val _tagChanged = MutableStateFlow(false)
+
+    /** 可变标签id列表数据 - 用户手动设置 */
     private val _mutableTagIdListData = MutableStateFlow<List<Long>>(emptyList())
-    private val _tagListData = _mutableTagIdListData.mapLatest { list ->
+
+    /** 可变标签信息列表数据 - 根据可变标签id列表数据获取对于数据 */
+    private val _mutableTagListData = _mutableTagIdListData.mapLatest { list ->
         mutableListOf<TagModel>().apply {
             list.map { tagId ->
                 tagRepository.getTagById(tagId)?.let { tagModel -> add(tagModel) }
             }
         }
     }
+
+    /** 默认标签列表数据 - 已保存的数据，新建记录为空 */
     private val _defaultTagListData = _recordIdData
         .mapLatest {
             tagRepository.getRelatedTag(it)
         }
+
+    /** 最终用于显示的标签数据 */
     private val _displayTagListData =
-        combine(_tagListData, _defaultTagListData) { mutable, default ->
-            if (mutable.isEmpty()) {
+        combine(_mutableTagListData, _defaultTagListData, _tagChanged) { mutable, default, isTagChanged ->
+            if (mutable.isEmpty() && !isTagChanged) {
                 default
             } else {
                 mutable
             }
         }
+
+    /** 实际显示的标签id列表数据，用于控制选择标签Sheet中标签的选中状态 */
     val displayTagIdListData = _displayTagListData
         .mapLatest { list ->
             list.map {
@@ -222,6 +233,7 @@ class EditRecordViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
+    /** 标签显示文本 */
     val tagTextData = _displayTagListData
         .mapLatest { list ->
             StringBuilder().run {
@@ -370,6 +382,7 @@ class EditRecordViewModel @Inject constructor(
 
     /** 更新标签 */
     fun updateTag(tags: List<Long>) {
+        _tagChanged.tryEmit(true)
         _mutableTagIdListData.tryEmit(tags)
     }
 
