@@ -203,6 +203,9 @@ dependencies {
 
     implementation(libs.coil.kt)
 
+    debugImplementation(libs.didi.dokit.core)
+    releaseImplementation(libs.didi.dokit.core.noOp)
+
     // 测试相关
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(projects.uiTestHiltManifest)

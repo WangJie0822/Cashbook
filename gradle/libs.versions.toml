@@ -142,6 +142,9 @@ jsoup = "1.18.3"
 # Coil 图片加载框架 [指南](https://coil-kt.github.io/coil/)
 coil = "2.7.0"
 
+# 滴滴开发者工具 [Github](https://github.com/didi/DoKit) [指南](https://xingyun.xiaojukeji.com/docs/dokit/#/intro)
+didi-dokit = "3.5.0.1"
+
 [libraries]
 # junit
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -298,6 +301,10 @@ robolectric-shadows = { group = "org.robolectric", name = "shadows-framework", v
 coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
+
+# 滴滴开发者工具 [Github](https://github.com/didi/DoKit) [指南](https://xingyun.xiaojukeji.com/docs/dokit/#/intro)
+didi-dokit-core = { group = "io.github.didi.dokit", name = "dokitx", version.ref = "didi-dokit"}
+didi-dokit-core-noOp = { group = "io.github.didi.dokit", name = "dokitx-no-op", version.ref = "didi-dokit"}
 
 # 插件
 [plugins]
