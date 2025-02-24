@@ -35,6 +35,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -102,6 +103,21 @@ class EditRecordViewModel @Inject constructor(
         combine(_mutableRecordData, _defaultRecordData) { mutable, default ->
             mutable ?: default
         }
+
+    /** 关联图片 */
+    private val _mutableImageData = MutableStateFlow<List<ImageModel>?>(null)
+    private val _defaultImageData = _recordIdData.mapLatest {
+        recordRepository.queryImagesByRecordId(it)
+    }
+    val displayImageData =
+        combine(_mutableImageData, _defaultImageData) { mutable, default ->
+            mutable ?: default
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList(),
+            )
 
     /** 关联记录 */
     private val _mutableRelatedRecordIdData = MutableStateFlow<List<Long>?>(null)
@@ -189,17 +205,18 @@ class EditRecordViewModel @Inject constructor(
                 initialValue = RecordTypeCategoryEnum.EXPENDITURE,
             )
 
-    /** 标记 - 是否修改过标签，用于控制界面标签显示 */
-    private val _tagChanged = MutableStateFlow(false)
-
     /** 可变标签id列表数据 - 用户手动设置 */
-    private val _mutableTagIdListData = MutableStateFlow<List<Long>>(emptyList())
+    private val _mutableTagIdListData = MutableStateFlow<List<Long>?>(null)
 
     /** 可变标签信息列表数据 - 根据可变标签id列表数据获取对于数据 */
     private val _mutableTagListData = _mutableTagIdListData.mapLatest { list ->
-        mutableListOf<TagModel>().apply {
-            list.map { tagId ->
-                tagRepository.getTagById(tagId)?.let { tagModel -> add(tagModel) }
+        if (null == list) {
+            null
+        } else {
+            mutableListOf<TagModel>().apply {
+                list.map { tagId ->
+                    tagRepository.getTagById(tagId)?.let { tagModel -> add(tagModel) }
+                }
             }
         }
     }
@@ -212,12 +229,8 @@ class EditRecordViewModel @Inject constructor(
 
     /** 最终用于显示的标签数据 */
     private val _displayTagListData =
-        combine(_mutableTagListData, _defaultTagListData, _tagChanged) { mutable, default, isTagChanged ->
-            if (mutable.isEmpty() && !isTagChanged) {
-                default
-            } else {
-                mutable
-            }
+        combine(_mutableTagListData, _defaultTagListData) { mutable, default ->
+            mutable ?: default
         }
 
     /** 实际显示的标签id列表数据，用于控制选择标签Sheet中标签的选中状态 */
@@ -382,8 +395,16 @@ class EditRecordViewModel @Inject constructor(
 
     /** 更新标签 */
     fun updateTag(tags: List<Long>) {
-        _tagChanged.tryEmit(true)
         _mutableTagIdListData.tryEmit(tags)
+    }
+
+    /** 显示选择照片抽屉 */
+    fun displayImageSheet() {
+        bottomSheetType = EditRecordBottomSheetEnum.IMAGES
+    }
+
+    fun updateImageData(list: List<ImageModel>) {
+        _mutableImageData.tryEmit(list)
     }
 
     /** 切换可报销状态 */

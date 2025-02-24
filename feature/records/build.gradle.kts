@@ -37,4 +37,7 @@ dependencies {
     implementation(libs.androidx.paging.compose)
 
     implementation(libs.coil.kt.compose)
+
+    // 权限申请
+    implementation(libs.google.accompanist.permissions)
 }

@@ -85,4 +85,8 @@
     <string name="record_search_hint">输入金额/备注进行搜索</string>
     <string name="record_search_no_data_hint">未搜索到记录，请修改关键字搜索</string>
     <string name="record_search_no_history">还没有搜索记录</string>
+    <string name="please_select_images">请选择图片</string>
+    <string name="take_picture">拍照</string>
+    <string name="pick_image">相册</string>
+    <string name="image_empty_hint">还没有照片，点击右上角添加</string>
 </resources>

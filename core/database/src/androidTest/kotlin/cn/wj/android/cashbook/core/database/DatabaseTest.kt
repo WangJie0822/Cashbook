@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
+import cn.wj.android.cashbook.core.database.migration.Migration10To11
 import cn.wj.android.cashbook.core.database.migration.Migration1To2
 import cn.wj.android.cashbook.core.database.migration.Migration2To3
 import cn.wj.android.cashbook.core.database.migration.Migration3To4
@@ -34,17 +35,20 @@ import cn.wj.android.cashbook.core.database.migration.Migration4To5
 import cn.wj.android.cashbook.core.database.migration.Migration5To6
 import cn.wj.android.cashbook.core.database.migration.Migration7To8
 import cn.wj.android.cashbook.core.database.migration.Migration8To9
+import cn.wj.android.cashbook.core.database.migration.Migration9To10
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_BOOKS
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_RECORD
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_TAG
 import cn.wj.android.cashbook.core.database.table.TABLE_BOOKS
 import cn.wj.android.cashbook.core.database.table.TABLE_BOOKS_BG_URI
+import cn.wj.android.cashbook.core.database.table.TABLE_IMAGE_RELATED
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_AMOUNT
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ASSET_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_BOOKS_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_CHARGE
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_CONCESSIONS
+import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_FINAL_AMOUNT
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_INTO_ASSET_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_RECORD_TIME
@@ -542,7 +546,7 @@ class DatabaseTest {
     }
 
     /**
-     * 测试数据库从 8 升级到 0
+     * 测试数据库从 8 升级到 9
      * - db_books：新增 bg_uri 字段
      */
     @Test
@@ -592,6 +596,101 @@ class DatabaseTest {
             }
         Assert.assertEquals(true, hasBgUri)
         Assert.assertEquals(true, bgUri.isBlank())
+    }
+
+    /**
+     * 测试数据库从 9 升级到 10
+     * - db_record：新增 final_amount 字段
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate9_10() {
+        var hasFinalAmount: Boolean
+        helper.createDatabase(testDbName, 9).use { db ->
+            db.query(
+                "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                arrayOf("table", TABLE_RECORD),
+            ).use { cursor ->
+                cursor.moveToFirst()
+                val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                log("migrate9_10() sqlStr = [$sqlStr]")
+                hasFinalAmount = sqlStr.contains("`final_amount`")
+            }
+            db.insert(
+                TABLE_RECORD,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("type_id", 1L)
+                    put("asset_id", 1L)
+                    put("into_asset_id", 1L)
+                    put("books_id", 1L)
+                    put("amount", 0.0)
+                    put("concessions", 0.0)
+                    put("charge", 0.0)
+                    put("remark", "remark")
+                    put("reimbursable", 0)
+                    put("record_time", System.currentTimeMillis())
+                },
+            )
+        }
+        Assert.assertEquals(false, hasFinalAmount)
+
+        var finalAmount: Double
+        helper.runMigrationsAndValidate(testDbName, 10, true, Migration9To10)
+            .use { db ->
+                db.query(
+                    "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                    arrayOf("table", TABLE_RECORD),
+                ).use { cursor ->
+                    cursor.moveToFirst()
+                    val sqlStr = cursor.getString(cursor.getColumnIndex(columnNameSql))
+                    log("migrate9_10() sqlStr = [$sqlStr]")
+                    hasFinalAmount = sqlStr.contains("`final_amount`")
+                }
+                db.query(SQL_QUERY_ALL_FROM_RECORD).use { cursor ->
+                    cursor.moveToFirst()
+                    finalAmount =
+                        cursor.getDouble(cursor.getColumnIndexOrThrow(TABLE_RECORD_FINAL_AMOUNT))
+                    log("migrate9_10() finalAmount = <$finalAmount>")
+                }
+            }
+        Assert.assertEquals(true, hasFinalAmount)
+        Assert.assertEquals(0.0, finalAmount, 0.0)
+    }
+
+    /**
+     * 测试数据库从 10 升级到 11
+     * - 新增 db_image_with_related 表
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate10_11() {
+        var hasImageTable: Boolean
+        helper.createDatabase(testDbName, 10).use { db ->
+            db.query(
+                "SELECT * FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                arrayOf("table", TABLE_IMAGE_RELATED),
+            ).use { cursor ->
+                val count = cursor.count
+                log("migrate10_11() count = [$count]")
+                hasImageTable = count > 0
+            }
+        }
+        Assert.assertEquals(false, hasImageTable)
+
+        helper.runMigrationsAndValidate(testDbName, 11, true, Migration10To11)
+            .use { db ->
+                db.query(
+                    "SELECT * FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                    arrayOf("table", TABLE_IMAGE_RELATED),
+                ).use { cursor ->
+                    val count = cursor.count
+                    log("migrate10_11() count = [$count]")
+                    hasImageTable = count > 0
+                }
+            }
+        Assert.assertEquals(true, hasImageTable)
     }
 
     @Test

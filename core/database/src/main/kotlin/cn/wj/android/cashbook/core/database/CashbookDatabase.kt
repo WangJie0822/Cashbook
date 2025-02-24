@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.BooksTable
+import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.TagTable
@@ -40,8 +41,14 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
  */
 @Database(
     entities = [
-        BooksTable::class, AssetTable::class, TypeTable::class, RecordTable::class, TagTable::class,
-        TagWithRecordTable::class, RecordWithRelatedTable::class,
+        BooksTable::class,
+        AssetTable::class,
+        TypeTable::class,
+        RecordTable::class,
+        TagTable::class,
+        TagWithRecordTable::class,
+        RecordWithRelatedTable::class,
+        ImageWithRelatedTable::class,
     ],
     version = ApplicationInfo.DB_VERSION,
 )

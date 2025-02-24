@@ -50,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CbCard
@@ -84,6 +85,7 @@ internal fun EditBookRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     EditBookScreen(
+        modifier = modifier,
         shouldDisplayBookmark = viewModel.shouldDisplayBookmark,
         onDismissBookmark = viewModel::onDismissBookmark,
         uiState = uiState,
@@ -96,20 +98,19 @@ internal fun EditBookRoute(
             )
         },
         onBackClick = onRequestPopBackStack,
-        modifier = modifier,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditBookScreen(
+    modifier: Modifier = Modifier,
     shouldDisplayBookmark: EditBookBookmarkEnum,
     onDismissBookmark: () -> Unit,
     uiState: EditBookUiState,
     onSaveClick: (name: String, description: String, bgUri: Uri?) -> Unit,
     onBackClick: () -> Unit,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
-    modifier: Modifier = Modifier,
 ) {
     // 提示文本
     val blankNameHint = stringResource(id = R.string.please_enter_book_name)
@@ -146,7 +147,7 @@ internal fun EditBookScreen(
         TextFieldState(defaultText = data?.description.orEmpty())
     }
     var bgUri: Uri? by remember(uiState) {
-        mutableStateOf(if (data?.bgUri.isNullOrBlank()) null else Uri.parse(data!!.bgUri))
+        mutableStateOf(if (data?.bgUri.isNullOrBlank()) null else data!!.bgUri.toUri())
     }
 
     CbScaffold(

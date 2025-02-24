@@ -14,40 +14,21 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.feature.records.enums
+package cn.wj.android.cashbook.core.model.model
 
 /**
- * 底部菜单类型
+ * 图片数据实体类
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/27
+ * @param id 主键自增长
+ * @param recordId 关联的记录 id
+ * @param path 图片路径
+ * @param bytes 图片数据
+ *
+ * > [王杰](mailto:15555650921@163.com) 创建于 2025/2/24
  */
-enum class EditRecordBottomSheetEnum {
-
-    /** 不显示 */
-    NONE,
-
-    /** 金额 */
-    AMOUNT,
-
-    /** 手续费 */
-    CHARGES,
-
-    /** 优惠 */
-    CONCESSIONS,
-
-    /** 资产列表 */
-    ASSETS,
-
-    /** 关联资产列表 */
-    RELATED_ASSETS,
-
-    /** 标签 */
-    TAGS,
-
-    /** 图片 */
-    IMAGES,
-    ;
-
-    val isCalculator: Boolean
-        get() = this == AMOUNT || this == CHARGES || this == CONCESSIONS
-}
+data class ImageModel(
+    val id: Long,
+    val recordId: Long,
+    val path: String,
+    val bytes: ByteArray,
+)

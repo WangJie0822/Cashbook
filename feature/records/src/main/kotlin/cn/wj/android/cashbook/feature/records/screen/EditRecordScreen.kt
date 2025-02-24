@@ -16,6 +16,12 @@
 
 package cn.wj.android.cashbook.feature.records.screen
 
+import android.net.Uri
+import android.os.Environment
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +33,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.DatePicker
@@ -54,11 +64,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
@@ -73,11 +90,13 @@ import cn.wj.android.cashbook.core.design.component.CbTabRow
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
+import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.expand.text
@@ -87,6 +106,11 @@ import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
+import coil.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import java.io.File
 import java.util.Calendar
 
 /**
@@ -120,6 +144,7 @@ internal fun EditRecordRoute(
     val defaultTypeId by viewModel.defaultTypeIdData.collectAsStateWithLifecycle()
     val selectedTypeCategory by viewModel.selectedTypeCategoryData.collectAsStateWithLifecycle()
     val tagText by viewModel.tagTextData.collectAsStateWithLifecycle()
+    val imageList by viewModel.displayImageData.collectAsStateWithLifecycle()
     val selectedTagIdList by viewModel.displayTagIdListData.collectAsStateWithLifecycle()
 
     EditRecordScreen(
@@ -142,6 +167,7 @@ internal fun EditRecordRoute(
         onChargesChange = viewModel::updateCharge,
         onConcessionsClick = viewModel::displayConcessions,
         onConcessionsChange = viewModel::updateConcessions,
+        onImageListChange = viewModel::updateImageData,
         typeListContent = {
             (uiState as? EditRecordUiState.Success)?.run {
                 typeListContent(
@@ -175,7 +201,9 @@ internal fun EditRecordRoute(
             }
         },
         tagText = tagText,
+        imageList = imageList,
         onTagClick = viewModel::displayTagSheet,
+        onImageClick = viewModel::displayImageSheet,
         selectTagBottomSheetContent = {
             tagBottomSheetContent(
                 selectedTagIdList,
@@ -251,6 +279,7 @@ internal fun EditRecordScreen(
     onConcessionsClick: () -> Unit,
     onRelatedRecordClick: () -> Unit,
     onConcessionsChange: (String) -> Unit,
+    onImageListChange: (List<ImageModel>) -> Unit,
     typeListContent: @Composable () -> Unit,
     onRemarkChange: (String) -> Unit,
     onAssetClick: () -> Unit,
@@ -258,7 +287,9 @@ internal fun EditRecordScreen(
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
     tagText: String,
+    imageList: List<ImageModel>,
     onTagClick: () -> Unit,
+    onImageClick: () -> Unit,
     selectTagBottomSheetContent: @Composable () -> Unit,
     onReimbursableClick: () -> Unit,
     onSaveClick: () -> Unit,
@@ -334,15 +365,17 @@ internal fun EditRecordScreen(
                         },
                         content = {
                             EditRecordBottomSheetContent(
-                                bottomSheetType,
-                                uiState,
-                                selectedTypeCategory.typeColor,
-                                onAmountChange,
-                                onChargesChange,
-                                onConcessionsChange,
-                                selectAssetBottomSheetContent,
-                                selectRelatedAssetBottomSheetContent,
-                                selectTagBottomSheetContent,
+                                bottomSheetType = bottomSheetType,
+                                uiState = uiState,
+                                imageList = imageList,
+                                primaryColor = selectedTypeCategory.typeColor,
+                                onAmountChange = onAmountChange,
+                                onChargesChange = onChargesChange,
+                                onConcessionsChange = onConcessionsChange,
+                                onImageListChange = onImageListChange,
+                                selectAssetBottomSheetContent = selectAssetBottomSheetContent,
+                                selectRelatedAssetBottomSheetContent = selectRelatedAssetBottomSheetContent,
+                                selectTagBottomSheetContent = selectTagBottomSheetContent,
                             )
                         },
                     )
@@ -422,7 +455,9 @@ internal fun EditRecordScreen(
                     onAssetClick = onAssetClick,
                     onRelatedAssetClick = onRelatedAssetClick,
                     tagText = tagText,
+                    imageList = imageList,
                     onTagClick = onTagClick,
+                    onImageClick = onImageClick,
                     onReimbursableClick = onReimbursableClick,
                     onChargesClick = onChargesClick,
                     onConcessionsClick = onConcessionsClick,
@@ -464,7 +499,9 @@ private fun EditRecordScaffoldContent(
     onAssetClick: () -> Unit,
     onRelatedAssetClick: () -> Unit,
     tagText: String,
+    imageList: List<ImageModel>,
     onTagClick: () -> Unit,
+    onImageClick: () -> Unit,
     onReimbursableClick: () -> Unit,
     onChargesClick: () -> Unit,
     onConcessionsClick: () -> Unit,
@@ -569,6 +606,20 @@ private fun EditRecordScaffoldContent(
                             label = { Text(text = stringResource(id = R.string.tags) + if (hasTag) ":$tagText" else "") },
                         )
 
+                        // 关联图片
+                        val imageCount = imageList.size
+                        ElevatedFilterChip(
+                            selected = imageCount > 0,
+                            onClick = {
+                                // TODO 显示选择图片
+                                onImageClick.invoke()
+                            },
+                            leadingIcon = {
+                                Icon(imageVector = CbIcons.PhotoLibrary, contentDescription = null)
+                            },
+                            label = { Text(text = imageCount.toString()) },
+                        )
+
                         if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
                             // 只有支出类型显示是否可报销
                             val reimbursable = uiState.reimbursable
@@ -650,10 +701,12 @@ private fun EditRecordScaffoldContent(
 private fun EditRecordBottomSheetContent(
     bottomSheetType: EditRecordBottomSheetEnum,
     uiState: EditRecordUiState,
+    imageList: List<ImageModel>,
     primaryColor: Color,
     onAmountChange: (String) -> Unit,
     onChargesChange: (String) -> Unit,
     onConcessionsChange: (String) -> Unit,
+    onImageListChange: (List<ImageModel>) -> Unit,
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
     selectTagBottomSheetContent: @Composable () -> Unit,
@@ -704,8 +757,178 @@ private fun EditRecordBottomSheetContent(
             selectTagBottomSheetContent()
         }
 
+        EditRecordBottomSheetEnum.IMAGES -> {
+            // TODO 选择照片
+            SelectImageSheetContent(
+                imageList = imageList,
+                onImageListChange = onImageListChange,
+            )
+        }
+
         EditRecordBottomSheetEnum.NONE -> {
             // empty block
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+internal fun SelectImageSheetContent(
+    imageList: List<ImageModel>,
+    onImageListChange: (List<ImageModel>) -> Unit,
+) {
+    val context = LocalContext.current
+    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+    var pictureUri: Uri? = null
+    val takePictureResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { result ->
+            if (result) {
+                onImageListChange.invoke(
+                    arrayListOf<ImageModel>().apply {
+                        addAll(imageList)
+                        add(ImageModel(-1L, -1L, pictureUri?.toString().orEmpty(), byteArrayOf()))
+                    },
+                )
+            }
+            pictureUri = null
+        }
+    val pickMultiplePicture =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uriList ->
+            if (uriList.isNotEmpty()) {
+                onImageListChange.invoke(
+                    arrayListOf<ImageModel>().apply {
+                        addAll(imageList)
+                        val pathList = imageList.map { it.path }
+                        addAll(
+                            uriList.filter { !pathList.contains(it.toString()) }.map {
+                                ImageModel(-1L, -1L, it.toString(), byteArrayOf())
+                            },
+                        )
+                    },
+                )
+            }
+        }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            val (title, subTitle, takePicture, pickImage) = createRefs()
+            Text(
+                text = stringResource(id = R.string.please_select_images),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.constrainAs(title) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                },
+            )
+            Text(
+                text = stringResource(id = R.string.allow_multiple_choices),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.constrainAs(subTitle) {
+                    top.linkTo(title.bottom, 8.dp)
+                    start.linkTo(parent.start)
+                },
+            )
+            CbTextButton(
+                modifier = Modifier.constrainAs(takePicture) {
+                    top.linkTo(parent.top)
+                    end.linkTo(pickImage.start)
+                    bottom.linkTo(parent.bottom)
+                },
+                onClick = {
+                    if (cameraPermissionState.status.isGranted) {
+                        val tempFile = File.createTempFile(
+                            "CB_IMG_${System.currentTimeMillis()}",
+                            ".jpg",
+                            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                        ).apply {
+                            createNewFile()
+                        }
+                        pictureUri = FileProvider.getUriForFile(
+                            context,
+                            "${ApplicationInfo.applicationId}.FileProvider",
+                            tempFile,
+                        )
+                        takePictureResult.launch(pictureUri!!)
+                    } else {
+                        cameraPermissionState.launchPermissionRequest()
+                    }
+                },
+            ) {
+                Text(
+                    text = stringResource(id = R.string.take_picture),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            CbTextButton(
+                modifier = Modifier.constrainAs(pickImage) {
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom)
+                },
+                onClick = {
+                    // 从相册选择图片
+                    pickMultiplePicture.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
+            ) {
+                Text(
+                    text = stringResource(id = R.string.pick_image),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+
+        CbHorizontalDivider()
+
+        if (imageList.isEmpty()) {
+            Empty(
+                hintText = stringResource(id = R.string.image_empty_hint),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                columns = GridCells.Fixed(3),
+                content = {
+                    items(items = imageList) { image ->
+                        ConstraintLayout(
+                            modifier = Modifier.padding(8.dp),
+                        ) {
+                            val (iv, delete) = createRefs()
+                            AsyncImage(
+                                model = image.path.toUri(),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .constrainAs(iv) {
+                                        centerTo(parent)
+                                    }
+                                    .clip(RoundedCornerShape(8.dp)),
+                            )
+                            Image(
+                                imageVector = CbIcons.RemoveCircle,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .constrainAs(delete) {
+                                        top.linkTo(iv.top)
+                                        bottom.linkTo(iv.top)
+                                        start.linkTo(iv.end)
+                                        end.linkTo(iv.end)
+                                    }
+                                    .clickable {
+                                        onImageListChange.invoke(imageList.filter { image.path != it.path })
+                                    },
+                            )
+                        }
+                    }
+                },
+            )
         }
     }
 }

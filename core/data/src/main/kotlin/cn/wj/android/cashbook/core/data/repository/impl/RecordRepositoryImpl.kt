@@ -35,6 +35,7 @@ import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -383,5 +384,10 @@ class RecordRepositoryImpl @Inject constructor(
     override suspend fun queryRelatedRecordCountById(id: Long): Int =
         withContext(coroutineContext) {
             recordDao.queryRelatedRecordCountByID(id)
+        }
+
+    override suspend fun queryImagesByRecordId(id: Long): List<ImageModel> =
+        withContext(coroutineContext) {
+            recordDao.queryImagesByRecordId(id).map { it.asModel() }
         }
 }
