@@ -35,7 +35,6 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -45,6 +44,9 @@ import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
+import cn.wj.android.cashbook.feature.records.model.ImageViewModel
+import cn.wj.android.cashbook.feature.records.model.asModel
+import cn.wj.android.cashbook.feature.records.model.asViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -105,9 +107,10 @@ class EditRecordViewModel @Inject constructor(
         }
 
     /** 关联图片 */
-    private val _mutableImageData = MutableStateFlow<List<ImageModel>?>(null)
-    private val _defaultImageData = _recordIdData.mapLatest {
-        recordRepository.queryImagesByRecordId(it)
+    private val _mutableImageData = MutableStateFlow<List<ImageViewModel>?>(null)
+    private val _defaultImageData = _recordIdData.mapLatest { id ->
+        recordRepository.queryImagesByRecordId(id)
+            .map { it.asViewModel() }
     }
     val displayImageData =
         combine(_mutableImageData, _defaultImageData) { mutable, default ->
@@ -403,8 +406,13 @@ class EditRecordViewModel @Inject constructor(
         bottomSheetType = EditRecordBottomSheetEnum.IMAGES
     }
 
-    fun updateImageData(list: List<ImageModel>) {
+    fun updateImageData(list: List<ImageViewModel>) {
+        dismissBottomSheet()
         _mutableImageData.tryEmit(list)
+    }
+
+    fun showImagePreviewDialog(list: List<ImageViewModel>, index: Int) {
+        dialogState = DialogState.Shown(ImagePreviewData(list, index))
     }
 
     /** 切换可报销状态 */
@@ -450,6 +458,7 @@ class EditRecordViewModel @Inject constructor(
                     ),
                     tagIdList = displayTagIdListData.first(),
                     relatedRecordIdList = _relatedRecordIdData.first(),
+                    relatedImageList = displayImageData.first().map { it.asModel() },
                 )
                 Result.success(null)
             }.getOrElse { throwable ->
@@ -571,6 +580,11 @@ sealed interface EditRecordUiState {
         val relatedAmount: String,
     ) : EditRecordUiState
 }
+
+data class ImagePreviewData(
+    val list: List<ImageViewModel>,
+    val index: Int,
+)
 
 private fun String.clearZero(): String {
     return if (this.toDoubleOrZero() == 0.0) {

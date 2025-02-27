@@ -31,4 +31,27 @@ data class ImageModel(
     val recordId: Long,
     val path: String,
     val bytes: ByteArray,
-)
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ImageModel
+
+        if (id != other.id) return false
+        if (recordId != other.recordId) return false
+        if (path != other.path) return false
+        if (!bytes.contentEquals(other.bytes)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + recordId.hashCode()
+        result = 31 * result + path.hashCode()
+        result = 31 * result + bytes.contentHashCode()
+        return result
+    }
+}

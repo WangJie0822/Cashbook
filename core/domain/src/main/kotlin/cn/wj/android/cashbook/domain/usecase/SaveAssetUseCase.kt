@@ -90,6 +90,7 @@ class SaveAssetUseCase @Inject constructor(
                     tagIdList = emptyList(),
                     needRelated = false,
                     relatedRecordIdList = emptyList(),
+                    relatedImageList = emptyList(),
                 )
             }
         } else {

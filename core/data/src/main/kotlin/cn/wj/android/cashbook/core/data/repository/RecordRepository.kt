@@ -43,6 +43,7 @@ interface RecordRepository {
         tagIdList: List<Long>,
         needRelated: Boolean,
         relatedRecordIdList: List<Long>,
+        relatedImageList: List<ImageModel>,
     )
 
     suspend fun deleteRecord(recordId: Long)

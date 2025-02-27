@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.core.model.entity
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
@@ -39,8 +40,10 @@ data class RecordViewsEntity(
     val typeCategory: RecordTypeCategoryEnum,
     val typeName: String,
     val typeIconResName: String,
+    val assetId: Long?,
     val assetName: String?,
     val assetIconResId: Int?,
+    val relatedAssetId: Long?,
     val relatedAssetName: String?,
     val relatedAssetIconResId: Int?,
     val amount: String,
@@ -50,6 +53,7 @@ data class RecordViewsEntity(
     val remark: String,
     val reimbursable: Boolean,
     val relatedTags: List<TagModel>,
+    val relatedImage: List<ImageModel>,
     val relatedRecord: List<RecordModel>,
     val relatedAmount: String,
     val recordTime: String,

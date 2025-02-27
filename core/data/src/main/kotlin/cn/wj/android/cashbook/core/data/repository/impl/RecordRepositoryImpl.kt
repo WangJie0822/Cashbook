@@ -77,6 +77,7 @@ class RecordRepositoryImpl @Inject constructor(
         tagIdList: List<Long>,
         needRelated: Boolean,
         relatedRecordIdList: List<Long>,
+        relatedImageList: List<ImageModel>,
     ) = withContext(coroutineContext) {
         logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
         transactionDao.updateRecordTransaction(
@@ -84,6 +85,7 @@ class RecordRepositoryImpl @Inject constructor(
             tagIdList = tagIdList,
             needRelated = needRelated,
             relatedRecordIdList = relatedRecordIdList,
+            relatedImageList = relatedImageList,
         )
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
