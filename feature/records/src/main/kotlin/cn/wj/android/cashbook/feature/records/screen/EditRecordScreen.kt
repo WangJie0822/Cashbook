@@ -47,7 +47,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SheetValue
@@ -89,6 +88,7 @@ import cn.wj.android.cashbook.core.design.component.Calculator
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
+import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTab
@@ -965,7 +965,7 @@ internal fun SelectImageSheetContent(
                                         onImageItemClick.invoke(cacheImageList, index)
                                     },
                             )
-                            IconButton(
+                            CbIconButton(
                                 onClick = { cacheImageList.removeIf { item.path == it.path } },
                                 modifier = Modifier
                                     .constrainAs(delete) {
