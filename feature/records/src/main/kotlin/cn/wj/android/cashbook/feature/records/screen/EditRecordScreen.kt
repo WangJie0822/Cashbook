@@ -16,6 +16,11 @@
 
 package cn.wj.android.cashbook.feature.records.screen
 
+import android.net.Uri
+import android.os.Environment
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,11 +28,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.DatePicker
@@ -51,21 +63,32 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.ApplicationInfo
+import cn.wj.android.cashbook.core.common.IMAGE_MAX_COUNT
 import cn.wj.android.cashbook.core.common.Symbol
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.tools.getCompressedBitmap
 import cn.wj.android.cashbook.core.design.component.Calculator
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
+import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTab
@@ -73,6 +96,7 @@ import cn.wj.android.cashbook.core.design.component.CbTabRow
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
+import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
@@ -82,11 +106,20 @@ import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.expand.text
 import cn.wj.android.cashbook.core.ui.expand.typeColor
+import cn.wj.android.cashbook.feature.records.dialog.ImagePreviewDialog
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
+import cn.wj.android.cashbook.feature.records.model.ImageViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
+import cn.wj.android.cashbook.feature.records.viewmodel.ImagePreviewData
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import java.io.File
 import java.util.Calendar
 
 /**
@@ -120,6 +153,7 @@ internal fun EditRecordRoute(
     val defaultTypeId by viewModel.defaultTypeIdData.collectAsStateWithLifecycle()
     val selectedTypeCategory by viewModel.selectedTypeCategoryData.collectAsStateWithLifecycle()
     val tagText by viewModel.tagTextData.collectAsStateWithLifecycle()
+    val imageList by viewModel.displayImageData.collectAsStateWithLifecycle()
     val selectedTagIdList by viewModel.displayTagIdListData.collectAsStateWithLifecycle()
 
     EditRecordScreen(
@@ -142,6 +176,8 @@ internal fun EditRecordRoute(
         onChargesChange = viewModel::updateCharge,
         onConcessionsClick = viewModel::displayConcessions,
         onConcessionsChange = viewModel::updateConcessions,
+        onImageItemClick = viewModel::showImagePreviewDialog,
+        onImageListSave = viewModel::updateImageData,
         typeListContent = {
             (uiState as? EditRecordUiState.Success)?.run {
                 typeListContent(
@@ -175,7 +211,9 @@ internal fun EditRecordRoute(
             }
         },
         tagText = tagText,
+        imageList = imageList,
         onTagClick = viewModel::displayTagSheet,
+        onImageClick = viewModel::displayImageSheet,
         selectTagBottomSheetContent = {
             tagBottomSheetContent(
                 selectedTagIdList,
@@ -251,6 +289,8 @@ internal fun EditRecordScreen(
     onConcessionsClick: () -> Unit,
     onRelatedRecordClick: () -> Unit,
     onConcessionsChange: (String) -> Unit,
+    onImageItemClick: (List<ImageViewModel>, Int) -> Unit,
+    onImageListSave: (List<ImageViewModel>) -> Unit,
     typeListContent: @Composable () -> Unit,
     onRemarkChange: (String) -> Unit,
     onAssetClick: () -> Unit,
@@ -258,7 +298,9 @@ internal fun EditRecordScreen(
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
     tagText: String,
+    imageList: List<ImageViewModel>,
     onTagClick: () -> Unit,
+    onImageClick: () -> Unit,
     selectTagBottomSheetContent: @Composable () -> Unit,
     onReimbursableClick: () -> Unit,
     onSaveClick: () -> Unit,
@@ -334,21 +376,24 @@ internal fun EditRecordScreen(
                         },
                         content = {
                             EditRecordBottomSheetContent(
-                                bottomSheetType,
-                                uiState,
-                                selectedTypeCategory.typeColor,
-                                onAmountChange,
-                                onChargesChange,
-                                onConcessionsChange,
-                                selectAssetBottomSheetContent,
-                                selectRelatedAssetBottomSheetContent,
-                                selectTagBottomSheetContent,
+                                bottomSheetType = bottomSheetType,
+                                uiState = uiState,
+                                imageList = imageList,
+                                primaryColor = selectedTypeCategory.typeColor,
+                                onAmountChange = onAmountChange,
+                                onChargesChange = onChargesChange,
+                                onConcessionsChange = onConcessionsChange,
+                                onImageItemClick = onImageItemClick,
+                                onImageListSave = onImageListSave,
+                                selectAssetBottomSheetContent = selectAssetBottomSheetContent,
+                                selectRelatedAssetBottomSheetContent = selectRelatedAssetBottomSheetContent,
+                                selectTagBottomSheetContent = selectTagBottomSheetContent,
                             )
                         },
                     )
                 }
 
-                ((dialogState as? DialogState.Shown<*>)?.data as? DateTimePickerModel)?.let { model ->
+                ((dialogState as? DialogState.Shown<*>)?.data)?.let { model ->
                     when (model) {
                         is DateTimePickerModel.DatePicker -> {
                             val datePickerState = rememberDatePickerState(model.dateMs)
@@ -409,6 +454,14 @@ internal fun EditRecordScreen(
                                 },
                             )
                         }
+
+                        is ImagePreviewData -> {
+                            ImagePreviewDialog(
+                                onRequestDismissDialog = onRequestDismissDialog,
+                                list = model.list,
+                                index = model.index,
+                            )
+                        }
                     }
                 }
 
@@ -422,7 +475,9 @@ internal fun EditRecordScreen(
                     onAssetClick = onAssetClick,
                     onRelatedAssetClick = onRelatedAssetClick,
                     tagText = tagText,
+                    imageList = imageList,
                     onTagClick = onTagClick,
+                    onImageClick = onImageClick,
                     onReimbursableClick = onReimbursableClick,
                     onChargesClick = onChargesClick,
                     onConcessionsClick = onConcessionsClick,
@@ -464,7 +519,9 @@ private fun EditRecordScaffoldContent(
     onAssetClick: () -> Unit,
     onRelatedAssetClick: () -> Unit,
     tagText: String,
+    imageList: List<ImageViewModel>,
     onTagClick: () -> Unit,
+    onImageClick: () -> Unit,
     onReimbursableClick: () -> Unit,
     onChargesClick: () -> Unit,
     onConcessionsClick: () -> Unit,
@@ -569,6 +626,17 @@ private fun EditRecordScaffoldContent(
                             label = { Text(text = stringResource(id = R.string.tags) + if (hasTag) ":$tagText" else "") },
                         )
 
+                        // 关联图片
+                        val imageCount = imageList.size
+                        ElevatedFilterChip(
+                            selected = imageCount > 0,
+                            onClick = onImageClick,
+                            leadingIcon = {
+                                Icon(imageVector = CbIcons.PhotoLibrary, contentDescription = null)
+                            },
+                            label = { Text(text = imageCount.toString()) },
+                        )
+
                         if (selectedTypeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
                             // 只有支出类型显示是否可报销
                             val reimbursable = uiState.reimbursable
@@ -650,10 +718,13 @@ private fun EditRecordScaffoldContent(
 private fun EditRecordBottomSheetContent(
     bottomSheetType: EditRecordBottomSheetEnum,
     uiState: EditRecordUiState,
+    imageList: List<ImageViewModel>,
     primaryColor: Color,
     onAmountChange: (String) -> Unit,
     onChargesChange: (String) -> Unit,
     onConcessionsChange: (String) -> Unit,
+    onImageItemClick: (List<ImageViewModel>, Int) -> Unit,
+    onImageListSave: (List<ImageViewModel>) -> Unit,
     selectAssetBottomSheetContent: @Composable () -> Unit,
     selectRelatedAssetBottomSheetContent: @Composable () -> Unit,
     selectTagBottomSheetContent: @Composable () -> Unit,
@@ -704,9 +775,218 @@ private fun EditRecordBottomSheetContent(
             selectTagBottomSheetContent()
         }
 
+        EditRecordBottomSheetEnum.IMAGES -> {
+            // 选择照片
+            SelectImageSheetContent(
+                imageList = imageList,
+                onImageItemClick = onImageItemClick,
+                onImageListSave = onImageListSave,
+            )
+        }
+
         EditRecordBottomSheetEnum.NONE -> {
             // empty block
         }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+internal fun SelectImageSheetContent(
+    imageList: List<ImageViewModel>,
+    onImageItemClick: (List<ImageViewModel>, Int) -> Unit,
+    onImageListSave: (List<ImageViewModel>) -> Unit,
+) {
+    val context = LocalContext.current
+    val cacheImageList = remember {
+        mutableStateListOf(*imageList.toTypedArray())
+    }
+    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+    var pictureUri: Uri? = null
+    val takePictureResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { result ->
+            if (result) {
+                cacheImageList.add(
+                    ImageViewModel(
+                        -1L,
+                        -1L,
+                        pictureUri?.toString().orEmpty(),
+                        pictureUri?.getCompressedBitmap(),
+                    ),
+                )
+            }
+            pictureUri = null
+        }
+    val lessCount = IMAGE_MAX_COUNT - cacheImageList.size
+    val pickMultipleImage = if (lessCount <= 1) {
+        ActivityResultContracts.PickMultipleVisualMedia()
+    } else {
+        ActivityResultContracts.PickMultipleVisualMedia(lessCount)
+    }
+    val pickMultiplePicture = rememberLauncherForActivityResult(pickMultipleImage) { uriList ->
+        if (uriList.isNotEmpty()) {
+            val pathList = cacheImageList.map { it.path }
+            val resultList = uriList.filter { !pathList.contains(it.toString()) }
+            val finalList = if (resultList.size > lessCount) {
+                resultList.subList(0, lessCount)
+            } else {
+                resultList
+            }.map {
+                ImageViewModel(-1L, -1L, it.toString(), it.getCompressedBitmap())
+            }
+            cacheImageList.addAll(finalList)
+        }
+    }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            val (title, subTitle, takePicture, pickImage, done) = createRefs()
+            Text(
+                text = stringResource(id = R.string.please_select_images),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.constrainAs(title) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                },
+            )
+            Text(
+                text = stringResource(id = R.string.image_allow_multiple_choices),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.constrainAs(subTitle) {
+                    top.linkTo(title.bottom, 8.dp)
+                    start.linkTo(parent.start)
+                },
+            )
+            if (lessCount > 0) {
+                CbTextButton(
+                    modifier = Modifier.constrainAs(takePicture) {
+                        top.linkTo(parent.top)
+                        end.linkTo(pickImage.start)
+                        bottom.linkTo(parent.bottom)
+                    },
+                    onClick = {
+                        if (cameraPermissionState.status.isGranted) {
+                            val tempFile = File.createTempFile(
+                                "CB_IMG_${System.currentTimeMillis()}",
+                                ".jpg",
+                                context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                            ).apply {
+                                createNewFile()
+                            }
+                            pictureUri = FileProvider.getUriForFile(
+                                context,
+                                "${ApplicationInfo.applicationId}.FileProvider",
+                                tempFile,
+                            )
+                            takePictureResult.launch(pictureUri!!)
+                        } else {
+                            cameraPermissionState.launchPermissionRequest()
+                        }
+                    },
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.take_picture),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+                CbTextButton(
+                    modifier = Modifier.constrainAs(pickImage) {
+                        top.linkTo(parent.top)
+                        end.linkTo(done.start)
+                        bottom.linkTo(parent.bottom)
+                    },
+                    onClick = {
+                        // 从相册选择图片
+                        pickMultiplePicture.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    },
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.pick_image),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+            CbTextButton(
+                modifier = Modifier.constrainAs(done) {
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom)
+                },
+                onClick = {
+                    onImageListSave.invoke(cacheImageList)
+                },
+            ) {
+                Text(
+                    text = stringResource(id = R.string.done),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+
+        CbHorizontalDivider()
+
+        if (cacheImageList.isEmpty()) {
+            Empty(
+                hintText = stringResource(id = R.string.image_empty_hint),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                columns = GridCells.Fixed(3),
+                content = {
+                    itemsIndexed(items = cacheImageList) { index, item ->
+                        ConstraintLayout(
+                            modifier = Modifier.padding(8.dp),
+                        ) {
+                            val (iv, delete) = createRefs()
+                            val placeholder = rememberAsyncImagePainter(model = item.path)
+                            AsyncImage(
+                                model = item.bitmap,
+                                placeholder = placeholder,
+                                error = placeholder,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .constrainAs(iv) {
+                                        centerTo(parent)
+                                        width = Dimension.fillToConstraints
+                                    }
+                                    .aspectRatio(2f / 3f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable {
+                                        onImageItemClick.invoke(cacheImageList, index)
+                                    },
+                            )
+                            CbIconButton(
+                                onClick = { cacheImageList.removeIf { item.path == it.path } },
+                                modifier = Modifier
+                                    .constrainAs(delete) {
+                                        top.linkTo(iv.top)
+                                        bottom.linkTo(iv.top)
+                                        start.linkTo(iv.end)
+                                        end.linkTo(iv.end)
+                                    },
+                            ) {
+                                Icon(imageVector = CbIcons.RemoveCircle, contentDescription = null)
+                            }
+                        }
+                    }
+                },
+            )
+        }
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(96.dp),
+        )
     }
 }
 

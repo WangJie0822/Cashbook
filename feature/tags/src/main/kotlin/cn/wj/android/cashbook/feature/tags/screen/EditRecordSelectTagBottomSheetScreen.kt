@@ -76,7 +76,8 @@ internal fun EditRecordSelectTagBottomSheetRoute(
         onAddTagClick = viewModel::displayAddTagDialog,
         onDoneClick = {
             onRequestDismissSheet()
-            onTagIdListChange(tagList.filter { it.selected }.map { it.data.id })
+            val tagIds = tagList.filter { it.selected }.map { it.data.id }
+            onTagIdListChange(tagIds)
         },
         onTagItemClick = viewModel::updateSelectedTagList,
         modifier = modifier,

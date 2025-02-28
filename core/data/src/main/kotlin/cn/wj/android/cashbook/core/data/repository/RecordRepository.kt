@@ -22,7 +22,9 @@ import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
+import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import kotlinx.coroutines.flow.Flow
 
@@ -41,6 +43,7 @@ interface RecordRepository {
         tagIdList: List<Long>,
         needRelated: Boolean,
         relatedRecordIdList: List<Long>,
+        relatedImageList: List<ImageModel>,
     )
 
     suspend fun deleteRecord(recordId: Long)
@@ -102,6 +105,8 @@ interface RecordRepository {
     suspend fun migrateAfter9To10()
 
     suspend fun queryRelatedRecordCountById(id: Long): Int
+
+    suspend fun queryImagesByRecordId(id: Long): List<ImageModel>
 }
 
 internal fun RecordTable.asModel(): RecordModel {
@@ -135,5 +140,23 @@ internal fun RecordModel.asTable(): RecordTable {
         remark = this.remark,
         reimbursable = if (this.reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
         recordTime = this.recordTime.parseDateLong(DATE_FORMAT_NO_SECONDS),
+    )
+}
+
+internal fun ImageWithRelatedTable.asModel(): ImageModel {
+    return ImageModel(
+        id = this.id ?: -1L,
+        recordId = this.recordId,
+        path = this.path,
+        bytes = this.bytes,
+    )
+}
+
+internal fun ImageModel.asModel(): ImageWithRelatedTable {
+    return ImageWithRelatedTable(
+        id = if (this.id == -1L) null else this.id,
+        recordId = this.recordId,
+        path = this.path,
+        bytes = this.bytes,
     )
 }

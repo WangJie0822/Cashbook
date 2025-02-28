@@ -54,6 +54,7 @@ import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
+import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
@@ -63,6 +64,9 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.dialog.ConfirmDeleteRecordDialogRoute
+import cn.wj.android.cashbook.feature.records.dialog.ImagePreviewDialog
+import cn.wj.android.cashbook.feature.records.enums.RecordDetailsDialogEnum
+import cn.wj.android.cashbook.feature.records.model.asViewModel
 import cn.wj.android.cashbook.feature.records.preview.RecordDetailsSheetPreviewParameterProvider
 import java.math.BigDecimal
 
@@ -86,18 +90,34 @@ internal fun RecordDetailsSheet(
         mutableStateOf(DialogState.Dismiss)
     }
 
-    if (null != recordData && dialogState is DialogState.Shown<*>) {
-        // 删除确认弹窗
-        ConfirmDeleteRecordDialogRoute(
-            recordId = recordData.id,
-            onResult = { result ->
-                if (result.isSuccess) {
-                    dialogState = DialogState.Dismiss
-                    onRequestDismissSheet()
+    if (null != recordData) {
+        (dialogState as? DialogState.Shown<*>)?.data?.run {
+            when (this) {
+                RecordDetailsDialogEnum.DELETE_CONFIRM -> {
+                    // 删除确认弹窗
+                    ConfirmDeleteRecordDialogRoute(
+                        recordId = recordData.id,
+                        onResult = { result ->
+                            if (result.isSuccess) {
+                                dialogState = DialogState.Dismiss
+                                onRequestDismissSheet()
+                            }
+                        },
+                        onDismissRequest = { dialogState = DialogState.Dismiss },
+                    )
                 }
-            },
-            onDismissRequest = { dialogState = DialogState.Dismiss },
-        )
+
+                RecordDetailsDialogEnum.IMAGE_PREVIEW -> {
+                    // 图片预览
+                    ImagePreviewDialog(
+                        onRequestDismissDialog = {
+                            dialogState = DialogState.Dismiss
+                        },
+                        list = recordData.relatedImage.map { it.asViewModel() },
+                    )
+                }
+            }
+        }
     }
 
     CashbookBackground {
@@ -139,7 +159,10 @@ internal fun RecordDetailsSheet(
                         }
 
                         CbTextButton(
-                            onClick = { dialogState = DialogState.Shown(0) },
+                            onClick = {
+                                dialogState =
+                                    DialogState.Shown(RecordDetailsDialogEnum.DELETE_CONFIRM)
+                            },
                         ) {
                             Text(
                                 text = stringResource(id = R.string.delete),
@@ -292,7 +315,7 @@ internal fun RecordDetailsSheet(
                                         painter = painterResource(id = recordData.assetIconResId!!),
                                         assetName = assetName,
                                         modifier = Modifier.clickable {
-                                            // TODO onRequestNaviToAssetInfo()
+                                            recordData.assetId?.let(onRequestNaviToAssetInfo)
                                         },
                                     )
                                     // 关联资产
@@ -306,7 +329,9 @@ internal fun RecordDetailsSheet(
                                             painter = painterResource(id = recordData.relatedAssetIconResId!!),
                                             assetName = relatedName,
                                             modifier = Modifier.clickable {
-                                                // TODO onRequestNaviToAssetInfo()
+                                                recordData.relatedAssetId?.let(
+                                                    onRequestNaviToAssetInfo,
+                                                )
                                             },
                                         )
                                     }
@@ -344,6 +369,32 @@ internal fun RecordDetailsSheet(
                                         )
                                         .padding(horizontal = 4.dp),
                                 )
+                            },
+                        )
+                    }
+
+                    if (recordData.relatedImage.isNotEmpty()) {
+                        // 关联图片
+                        CbListItem(
+                            headlineContent = { Text(text = stringResource(id = R.string.related_image)) },
+                            trailingContent = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        imageVector = CbIcons.PhotoLibrary,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = recordData.relatedImage.size.toString(),
+                                        style = MaterialTheme.typography.labelLarge,
+                                    )
+                                }
+                            },
+                            modifier = Modifier.clickable {
+                                dialogState =
+                                    DialogState.Shown(RecordDetailsDialogEnum.IMAGE_PREVIEW)
                             },
                         )
                     }

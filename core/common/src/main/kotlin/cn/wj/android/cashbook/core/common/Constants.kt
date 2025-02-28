@@ -24,7 +24,12 @@ package cn.wj.android.cashbook.core.common
 
 /** 数据库文件名 */
 const val DB_FILE_NAME = "cashbook.db"
+
+/** 初始化默认数据库名 */
 const val DB_INIT_FILE_NAME = "cashbook_init.db"
+
+/** 账单图片最大数量 */
+const val IMAGE_MAX_COUNT = 9
 
 /** 密码加密别名 */
 const val KEY_ALIAS_PASSWORD = "KEY_ALIAS_PASSWORD"

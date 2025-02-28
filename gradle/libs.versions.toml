@@ -111,6 +111,8 @@ androidx-annotation = "1.9.1"
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.0.1"
 androidx-benchmark-macro = "1.3.3"
+# exif
+androidx-exifinterface = "1.3.6"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
 androidx-test-core = "1.6.1"
@@ -141,6 +143,9 @@ jsoup = "1.18.3"
 
 # Coil 图片加载框架 [指南](https://coil-kt.github.io/coil/)
 coil = "2.7.0"
+
+# 滴滴开发者工具 [Github](https://github.com/didi/DoKit) [指南](https://xingyun.xiaojukeji.com/docs/dokit/#/intro)
+didi-dokit = "3.5.0.1"
 
 [libraries]
 # junit
@@ -257,6 +262,8 @@ androidx-annotation = { group = "androidx.annotation", name = "annotation", vers
 # DocumentFile [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "androidx-documentfile" }
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "androidx-benchmark-macro" }
+# exif
+androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "androidx-exifinterface" }
 # 测试相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/test)
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test-core" }
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-test-espresso" }
@@ -298,6 +305,10 @@ robolectric-shadows = { group = "org.robolectric", name = "shadows-framework", v
 coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
+
+# 滴滴开发者工具 [Github](https://github.com/didi/DoKit) [指南](https://xingyun.xiaojukeji.com/docs/dokit/#/intro)
+didi-dokit-core = { group = "io.github.didi.dokit", name = "dokitx", version.ref = "didi-dokit"}
+didi-dokit-core-noOp = { group = "io.github.didi.dokit", name = "dokitx-no-op", version.ref = "didi-dokit"}
 
 # 插件
 [plugins]

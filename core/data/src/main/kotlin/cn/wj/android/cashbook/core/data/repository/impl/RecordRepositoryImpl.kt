@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
@@ -35,12 +36,14 @@ import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 import java.util.Calendar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -76,6 +79,7 @@ class RecordRepositoryImpl @Inject constructor(
         tagIdList: List<Long>,
         needRelated: Boolean,
         relatedRecordIdList: List<Long>,
+        relatedImageList: List<ImageModel>,
     ) = withContext(coroutineContext) {
         logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
         transactionDao.updateRecordTransaction(
@@ -83,6 +87,7 @@ class RecordRepositoryImpl @Inject constructor(
             tagIdList = tagIdList,
             needRelated = needRelated,
             relatedRecordIdList = relatedRecordIdList,
+            relatedImageList = relatedImageList,
         )
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
@@ -333,7 +338,7 @@ class RecordRepositoryImpl @Inject constructor(
         val transferCount = recordDao.updateRecord(
             recordDao.queryByTypeCategory(RecordTypeCategoryEnum.TRANSFER.ordinal).map {
                 // 转账记录最终金额计算为 优惠 - 手续费
-                it.copy(finalAmount = it.concessions - it.charge)
+                it.copy(finalAmount = (it.concessions.toBigDecimalOrZero() - it.charge.toBigDecimalOrZero()).toDouble())
             },
         )
         this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), transferCount $transferCount")
@@ -345,7 +350,7 @@ class RecordRepositoryImpl @Inject constructor(
                     it.copy(finalAmount = 0.0)
                 } else {
                     // 普通支出，最终金额为 金额 + 手续费 - 优惠
-                    it.copy(finalAmount = it.amount + it.charge - it.concessions)
+                    it.copy(finalAmount = (it.amount.toBigDecimalOrZero() + it.charge.toBigDecimalOrZero() - it.concessions.toBigDecimalOrZero()).toDouble())
                 }
             }
         // 更新支出记录
@@ -361,17 +366,17 @@ class RecordRepositoryImpl @Inject constructor(
                             .map { related -> related.relatedRecordId }
                     if (relatedIdList.isNotEmpty()) {
                         // 已关联记录，最终金额为 金额 - 手续费 - 关联记录金额
-                        var expandAmount = 0.0
+                        var expandAmount = BigDecimal.ZERO
                         expandList.filter { expand -> expand.id in relatedIdList }
-                            .forEach { expand -> expandAmount += (expand.amount + expand.charge - expand.concessions) }
-                        it.copy(finalAmount = it.amount - it.charge - expandAmount)
+                            .forEach { expand -> expandAmount += (expand.amount.toBigDecimalOrZero() + expand.charge.toBigDecimalOrZero() - expand.concessions.toBigDecimalOrZero()) }
+                        it.copy(finalAmount = (it.amount.toBigDecimalOrZero() - it.charge.toBigDecimalOrZero() - expandAmount).toDouble())
                     } else {
                         // 未关联记录，最终金额计算为 金额 - 手续费
-                        it.copy(finalAmount = it.amount - it.charge)
+                        it.copy(finalAmount = (it.amount.toBigDecimalOrZero() - it.charge.toBigDecimalOrZero()).toDouble())
                     }
                 } else {
                     // 其它收入记录，最终金额计算为 金额 - 手续费
-                    it.copy(finalAmount = it.amount - it.charge)
+                    it.copy(finalAmount = (it.amount.toBigDecimalOrZero() - it.charge.toBigDecimalOrZero()).toDouble())
                 }
             },
         )
@@ -383,5 +388,10 @@ class RecordRepositoryImpl @Inject constructor(
     override suspend fun queryRelatedRecordCountById(id: Long): Int =
         withContext(coroutineContext) {
             recordDao.queryRelatedRecordCountByID(id)
+        }
+
+    override suspend fun queryImagesByRecordId(id: Long): List<ImageModel> =
+        withContext(coroutineContext) {
+            recordDao.queryImagesByRecordId(id).map { it.asModel() }
         }
 }

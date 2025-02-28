@@ -17,37 +17,15 @@
 package cn.wj.android.cashbook.feature.records.enums
 
 /**
- * 底部菜单类型
+ * 记录详情弹窗枚举
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/27
+ * > [王杰](mailto:15555650921@163.com) 创建于 2025/2/28
  */
-enum class EditRecordBottomSheetEnum {
+enum class RecordDetailsDialogEnum {
 
-    /** 不显示 */
-    NONE,
+    /** 删除确认 */
+    DELETE_CONFIRM,
 
-    /** 金额 */
-    AMOUNT,
-
-    /** 手续费 */
-    CHARGES,
-
-    /** 优惠 */
-    CONCESSIONS,
-
-    /** 资产列表 */
-    ASSETS,
-
-    /** 关联资产列表 */
-    RELATED_ASSETS,
-
-    /** 标签 */
-    TAGS,
-
-    /** 图片 */
-    IMAGES,
-    ;
-
-    val isCalculator: Boolean
-        get() = this == AMOUNT || this == CHARGES || this == CONCESSIONS
+    /** 图片预览 */
+    IMAGE_PREVIEW,
 }

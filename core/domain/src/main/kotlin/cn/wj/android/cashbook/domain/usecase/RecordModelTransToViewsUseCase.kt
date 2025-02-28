@@ -85,6 +85,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 remark = recordModel.remark,
                 reimbursable = recordModel.reimbursable,
                 relatedTags = tagRepository.getRelatedTag(recordModel.id),
+                relatedImage = recordRepository.queryImagesByRecordId(recordModel.id),
                 relatedRecord = relatedRecord,
                 relatedAmount = totalRelated.decimalFormat(),
                 recordTime = recordModel.recordTime,

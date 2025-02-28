@@ -63,6 +63,13 @@ const val TABLE_RECORD_RELATED_ID = "id"
 const val TABLE_RECORD_RELATED_RECORD_ID = "record_id"
 const val TABLE_RECORD_RELATED_RELATED_RECORD_ID = "related_record_id"
 
+/* 记录关联关系表 */
+const val TABLE_IMAGE_RELATED = "db_image_with_related"
+const val TABLE_IMAGE_ID = "id"
+const val TABLE_IMAGE_RELATED_RECORD_ID = "record_id"
+const val TABLE_IMAGE_PATH = "image_path"
+const val TABLE_IMAGE_BYTES = "image_bytes"
+
 /* 标签 */
 const val TABLE_TAG = "db_tag"
 const val TABLE_TAG_ID = "id"

@@ -46,6 +46,7 @@ data class RecordViewsModel(
     val remark: String,
     val reimbursable: Boolean,
     val relatedTags: List<TagModel>,
+    val relatedImage: List<ImageModel>,
     val relatedRecord: List<RecordModel>,
     val relatedAmount: String,
     val recordTime: String,

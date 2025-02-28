@@ -32,7 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cn.wj.android.cashbook.core.design.component.CbCard
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import kotlin.system.measureTimeMillis
 
 /**
@@ -100,17 +102,21 @@ object ProgressDialogManager {
     }
 }
 
+/** 显示提示文本为[hint]，能否取消[cancelable]的进度弹窗，并执行[block]逻辑，最低显示[minInterval]ms，最高显示[timeout]ms，逻辑执行完成、异常或超时返回结果，并执行回调[onDismiss] */
 suspend inline fun <R> runCatchWithProgress(
     hint: String? = null,
     cancelable: Boolean = true,
     noinline onDismiss: () -> Unit = {},
     minInterval: Long = 550L,
-    block: () -> R,
+    timeout: Long = 5000L,
+    noinline block: suspend CoroutineScope.() -> R,
 ): Result<R> {
     val result: Result<R>
     val ms = measureTimeMillis {
         ProgressDialogManager.show(hint, cancelable, onDismiss)
-        result = runCatching(block)
+        result = runCatching {
+            withTimeout(timeout, block)
+        }
     }
     if (ms < minInterval) {
         delay(minInterval - ms)

@@ -19,37 +19,34 @@ package cn.wj.android.cashbook.core.database.migration
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD
-import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_FINAL_AMOUNT
 import org.intellij.lang.annotations.Language
 
 /**
- * 数据库升级 9 -> 10
- * - db_record：新增 final_amount 字段
+ * 数据库升级 10 -> 11
+ * - db_image_with_related：新增表格
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2025/1/14
+ * > [王杰](mailto:15555650921@163.com) 创建于 2025/2/24
  */
-object Migration9To10 : Migration(9, 10) {
+object Migration10To11 : Migration(10, 11) {
 
     override fun migrate(db: SupportSQLiteDatabase) {
         logger().i("migrate(db)")
         with(db) {
-            migrateRecord()
+            migrateImage()
         }
     }
 
-    /** 增加 final_amount 字段 */
+    /** 创建 image 表 */
     @Language("SQL")
-    private const val SQL_ALTER_TABLE_RECORD_ADD_FINAL_AMOUNT = """
-        ALTER TABLE `$TABLE_RECORD` ADD `$TABLE_RECORD_FINAL_AMOUNT` REAL DEFAULT 0 NOT NULL
+    private const val SQL_CREATE_TABLE_IMAGE_WITH_RELATED_11 = """
+        CREATE TABLE IF NOT EXISTS `db_image_with_related` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `record_id` INTEGER NOT NULL, `image_path` TEXT NOT NULL, `image_bytes` BLOB NOT NULL)
     """
 
     /**
-     * 升级记录表
-     * - db_record：新增 final_amount 字段
+     * 创建 image 表
      */
-    private fun SupportSQLiteDatabase.migrateRecord() {
-        // 添加 final_amount 字段
-        execSQL(SQL_ALTER_TABLE_RECORD_ADD_FINAL_AMOUNT)
+    private fun SupportSQLiteDatabase.migrateImage() {
+        // 创建 image 表
+        execSQL(SQL_CREATE_TABLE_IMAGE_WITH_RELATED_11)
     }
 }

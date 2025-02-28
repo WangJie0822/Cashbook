@@ -16,7 +16,6 @@
 
 package cn.wj.android.cashbook.feature.books.screen
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -46,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Visibility
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.tools.dateFormat
@@ -204,7 +204,7 @@ private fun MyBooksContent(
                                                     centerTo(parent)
                                                 }
                                                 .fillMaxSize(),
-                                            model = Uri.parse(item.data.bgUri),
+                                            model = item.data.bgUri.toUri(),
                                             placeholder = painterResource(id = R.drawable.im_top_background),
                                             error = painterResource(id = R.drawable.im_top_background),
                                             fallback = painterResource(id = R.drawable.im_top_background),

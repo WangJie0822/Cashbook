@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.database.table.AssetTable
+import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.TYPE_TABLE_BALANCE_EXPENDITURE
@@ -35,6 +36,7 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
 import cn.wj.android.cashbook.core.database.throwable.DataTransactionException
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import java.math.BigDecimal
 
 /**
@@ -51,6 +53,9 @@ interface TransactionDao {
     @Insert
     suspend fun insertRelatedTags(tagWithRecordTable: List<TagWithRecordTable>)
 
+    @Insert
+    suspend fun insertRelatedImages(images: List<ImageWithRelatedTable>)
+
     @Delete
     suspend fun deleteRecord(recordTable: RecordTable): Int
 
@@ -60,6 +65,13 @@ interface TransactionDao {
     """,
     )
     suspend fun deleteOldRelatedTags(recordId: Long)
+
+    @Query(
+        value = """
+        DELETE FROM db_image_with_related WHERE record_id=:recordId
+    """,
+    )
+    suspend fun deleteOldRelatedImages(recordId: Long)
 
     @Update
     suspend fun updateRecord(recordTable: RecordTable)
@@ -119,6 +131,7 @@ interface TransactionDao {
         tagIdList: List<Long>,
         needRelated: Boolean,
         relatedRecordIdList: List<Long>,
+        relatedImageList: List<ImageModel>,
     ) {
         // 删除旧数据
         deleteRecordTransaction(record.id)
@@ -128,6 +141,7 @@ interface TransactionDao {
             tagIdList = tagIdList,
             needRelated = needRelated,
             relatedRecordIdList = relatedRecordIdList,
+            relatedImageList = relatedImageList,
         )
     }
 
@@ -149,6 +163,7 @@ interface TransactionDao {
         tagIdList: List<Long>,
         needRelated: Boolean,
         relatedRecordIdList: List<Long>,
+        relatedImageList: List<ImageModel>,
     ) {
         val type = when (record.typeId) {
             TYPE_TABLE_BALANCE_EXPENDITURE.id -> {
@@ -222,6 +237,18 @@ interface TransactionDao {
         insertRelatedTags(
             tagIdList.map { tagId ->
                 TagWithRecordTable(id = null, recordId = recordId, tagId = tagId)
+            },
+        )
+
+        // 插入新的关联图片
+        insertRelatedImages(
+            relatedImageList.map {
+                ImageWithRelatedTable(
+                    id = null,
+                    recordId = recordId,
+                    path = it.path,
+                    bytes = it.bytes,
+                )
             },
         )
 
@@ -344,6 +371,9 @@ interface TransactionDao {
 
         // 移除关联标签
         deleteOldRelatedTags(recordId)
+
+        // 移除关联照片
+        deleteOldRelatedImages(recordId)
 
         // 更新关联记录的 finalAmount
         if (category == RecordTypeCategoryEnum.EXPENDITURE) {

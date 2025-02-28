@@ -44,6 +44,9 @@ import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
+import cn.wj.android.cashbook.feature.records.model.ImageViewModel
+import cn.wj.android.cashbook.feature.records.model.asModel
+import cn.wj.android.cashbook.feature.records.model.asViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -102,6 +105,22 @@ class EditRecordViewModel @Inject constructor(
         combine(_mutableRecordData, _defaultRecordData) { mutable, default ->
             mutable ?: default
         }
+
+    /** 关联图片 */
+    private val _mutableImageData = MutableStateFlow<List<ImageViewModel>?>(null)
+    private val _defaultImageData = _recordIdData.mapLatest { id ->
+        recordRepository.queryImagesByRecordId(id)
+            .map { it.asViewModel() }
+    }
+    val displayImageData =
+        combine(_mutableImageData, _defaultImageData) { mutable, default ->
+            mutable ?: default
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList(),
+            )
 
     /** 关联记录 */
     private val _mutableRelatedRecordIdData = MutableStateFlow<List<Long>?>(null)
@@ -189,27 +208,35 @@ class EditRecordViewModel @Inject constructor(
                 initialValue = RecordTypeCategoryEnum.EXPENDITURE,
             )
 
-    /** 标签数据 */
-    private val _mutableTagIdListData = MutableStateFlow<List<Long>>(emptyList())
-    private val _tagListData = _mutableTagIdListData.mapLatest { list ->
-        mutableListOf<TagModel>().apply {
-            list.map { tagId ->
-                tagRepository.getTagById(tagId)?.let { tagModel -> add(tagModel) }
+    /** 可变标签id列表数据 - 用户手动设置 */
+    private val _mutableTagIdListData = MutableStateFlow<List<Long>?>(null)
+
+    /** 可变标签信息列表数据 - 根据可变标签id列表数据获取对于数据 */
+    private val _mutableTagListData = _mutableTagIdListData.mapLatest { list ->
+        if (null == list) {
+            null
+        } else {
+            mutableListOf<TagModel>().apply {
+                list.map { tagId ->
+                    tagRepository.getTagById(tagId)?.let { tagModel -> add(tagModel) }
+                }
             }
         }
     }
+
+    /** 默认标签列表数据 - 已保存的数据，新建记录为空 */
     private val _defaultTagListData = _recordIdData
         .mapLatest {
             tagRepository.getRelatedTag(it)
         }
+
+    /** 最终用于显示的标签数据 */
     private val _displayTagListData =
-        combine(_tagListData, _defaultTagListData) { mutable, default ->
-            if (mutable.isEmpty()) {
-                default
-            } else {
-                mutable
-            }
+        combine(_mutableTagListData, _defaultTagListData) { mutable, default ->
+            mutable ?: default
         }
+
+    /** 实际显示的标签id列表数据，用于控制选择标签Sheet中标签的选中状态 */
     val displayTagIdListData = _displayTagListData
         .mapLatest { list ->
             list.map {
@@ -222,6 +249,7 @@ class EditRecordViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
+    /** 标签显示文本 */
     val tagTextData = _displayTagListData
         .mapLatest { list ->
             StringBuilder().run {
@@ -373,6 +401,20 @@ class EditRecordViewModel @Inject constructor(
         _mutableTagIdListData.tryEmit(tags)
     }
 
+    /** 显示选择照片抽屉 */
+    fun displayImageSheet() {
+        bottomSheetType = EditRecordBottomSheetEnum.IMAGES
+    }
+
+    fun updateImageData(list: List<ImageViewModel>) {
+        dismissBottomSheet()
+        _mutableImageData.tryEmit(list)
+    }
+
+    fun showImagePreviewDialog(list: List<ImageViewModel>, index: Int) {
+        dialogState = DialogState.Shown(ImagePreviewData(list, index))
+    }
+
     /** 切换可报销状态 */
     fun switchReimbursable() {
         viewModelScope.launch {
@@ -407,7 +449,7 @@ class EditRecordViewModel @Inject constructor(
                 shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_NOT_MATCH_CATEGORY
                 return@launch
             }
-            runCatchWithProgress(hint = hintText, cancelable = false) {
+            val result = runCatchWithProgress(hint = hintText, cancelable = false) {
                 saveRecordUseCase(
                     recordModel = recordEntity.copy(
                         relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
@@ -416,12 +458,17 @@ class EditRecordViewModel @Inject constructor(
                     ),
                     tagIdList = displayTagIdListData.first(),
                     relatedRecordIdList = _relatedRecordIdData.first(),
+                    relatedImageList = displayImageData.first().map { it.asModel() },
                 )
-                onSuccess()
+                Result.success(null)
             }.getOrElse { throwable ->
                 // 保存失败
                 this@EditRecordViewModel.logger().e(throwable, "onSaveClick()")
                 shouldDisplayBookmark = EditRecordBookmarkEnum.SAVE_FAILED
+                Result.failure<Any>(throwable)
+            }
+            if (result.isSuccess) {
+                onSuccess.invoke()
             }
         }
     }
@@ -533,6 +580,11 @@ sealed interface EditRecordUiState {
         val relatedAmount: String,
     ) : EditRecordUiState
 }
+
+data class ImagePreviewData(
+    val list: List<ImageViewModel>,
+    val index: Int,
+)
 
 private fun String.clearZero(): String {
     return if (this.toDoubleOrZero() == 0.0) {

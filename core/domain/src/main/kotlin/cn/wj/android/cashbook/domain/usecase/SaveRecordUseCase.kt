@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -35,6 +36,7 @@ class SaveRecordUseCase @Inject constructor(
         recordModel: RecordModel,
         tagIdList: List<Long>,
         relatedRecordIdList: List<Long>,
+        relatedImageList: List<ImageModel>,
     ) = withContext(coroutineContext) {
         // 向数据库内更新最新记录信息及关联信息
         val needRelated = typeRepository.needRelated(recordModel.typeId)
@@ -43,6 +45,7 @@ class SaveRecordUseCase @Inject constructor(
             tagIdList = tagIdList,
             needRelated = needRelated,
             relatedRecordIdList = relatedRecordIdList,
+            relatedImageList = relatedImageList,
         )
     }
 }

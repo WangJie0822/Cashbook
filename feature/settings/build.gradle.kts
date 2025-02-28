@@ -35,7 +35,4 @@ dependencies {
 
     // Constraintlayout
     implementation(libs.androidx.constraintlayout.compose)
-
-    // 权限申请
-    implementation(libs.google.accompanist.permissions)
 }

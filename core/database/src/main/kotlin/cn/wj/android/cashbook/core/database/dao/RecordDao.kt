@@ -21,6 +21,7 @@ import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
+import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -284,4 +285,11 @@ interface RecordDao {
     """,
     )
     fun deleteRelatedWithAsset(assetId: Long)
+
+    @Query(
+        """
+        SELECT * FROM db_image_with_related WHERE record_id=:recordId
+    """,
+    )
+    suspend fun queryImagesByRecordId(recordId: Long): List<ImageWithRelatedTable>
 }
