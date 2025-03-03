@@ -145,7 +145,7 @@ jsoup = "1.18.3"
 coil = "2.7.0"
 
 # 滴滴开发者工具 [Github](https://github.com/didi/DoKit) [指南](https://xingyun.xiaojukeji.com/docs/dokit/#/intro)
-didi-dokit = "3.5.0.1"
+didi-dokit = "3.7.11"
 
 [libraries]
 # junit
