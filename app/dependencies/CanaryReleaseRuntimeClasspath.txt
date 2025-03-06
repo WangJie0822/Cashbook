@@ -170,7 +170,7 @@ io.coil-kt:coil-base:2.7.0
 io.coil-kt:coil-compose-base:2.7.0
 io.coil-kt:coil-compose:2.7.0
 io.coil-kt:coil:2.7.0
-io.github.didi.dokit:dokitx-no-op:3.5.0.1
+io.github.didi.dokit:dokitx-no-op:3.7.11
 io.noties.markwon:core:4.6.2
 jakarta.inject:jakarta.inject-api:2.0.1
 javax.inject:javax.inject:1
