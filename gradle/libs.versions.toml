@@ -70,7 +70,7 @@ android-lint = "31.8.2"
 androidx-appcompat = "1.7.0"
 # 约束性布局 [指南](https://developer.android.google.cn/jetpack/androidx/releases/constraintlayout)
 # [版本查询](https://mvnrepository.com/artifact/androidx.constraintlayout)
-androidx-constraintlayout-compose = "1.1.0"
+androidx-constraintlayout-compose = "1.1.1"
 # multidex 分包 [指南](https://developer.android.google.cn/jetpack/androidx/releases/multidex)
 # [版本查询](https://mvnrepository.com/artifact/androidx.multidex)
 androidx-multidex = "2.0.1"
