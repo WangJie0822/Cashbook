@@ -91,10 +91,10 @@ androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.7
 androidx.lifecycle:lifecycle-viewmodel:2.8.7
 androidx.loader:loader:1.0.0
 androidx.localbroadcastmanager:localbroadcastmanager:1.0.0
-androidx.navigation:navigation-common-ktx:2.8.7
-androidx.navigation:navigation-common:2.8.7
-androidx.navigation:navigation-runtime-ktx:2.8.7
-androidx.navigation:navigation-runtime:2.8.7
+androidx.navigation:navigation-common-ktx:2.8.8
+androidx.navigation:navigation-common:2.8.8
+androidx.navigation:navigation-runtime-ktx:2.8.8
+androidx.navigation:navigation-runtime:2.8.8
 androidx.print:print:1.0.0
 androidx.profileinstaller:profileinstaller:1.4.0
 androidx.recyclerview:recyclerview:1.1.0
