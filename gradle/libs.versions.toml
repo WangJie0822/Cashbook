@@ -112,7 +112,7 @@ androidx-annotation = "1.9.1"
 androidx-documentfile = "1.0.1"
 androidx-benchmark-macro = "1.3.3"
 # exif
-androidx-exifinterface = "1.3.6"
+androidx-exifinterface = "1.4.0"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
 androidx-test-core = "1.6.1"
