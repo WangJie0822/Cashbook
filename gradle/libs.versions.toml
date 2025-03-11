@@ -139,7 +139,7 @@ noties-markwon = "4.6.2"
 orhanobut-logger = "2.2.0"
 
 # jsoup HTML 解析 [Github](https://github.com/jhy/jsoup)
-jsoup = "1.18.3"
+jsoup = "1.19.1"
 
 # Coil 图片加载框架 [指南](https://coil-kt.github.io/coil/)
 coil = "2.7.0"
