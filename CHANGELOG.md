@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Fixed
+- 修复数据库11版本恢复备份失败问题；
 ### Changed
 - 弹窗超时逻辑优化，默认无限长；
 

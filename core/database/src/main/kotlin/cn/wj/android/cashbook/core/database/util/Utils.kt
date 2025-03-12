@@ -63,6 +63,10 @@ internal fun Cursor.getContentValues(): ContentValues? = runCatching {
                     put(name, getString(index))
                 }
 
+                Cursor.FIELD_TYPE_BLOB -> {
+                    put(name, getBlob(index))
+                }
+
                 else -> {}
             }
         }
