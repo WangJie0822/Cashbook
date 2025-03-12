@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import java.time.LocalDate
 import javax.inject.Inject
 
 /**
@@ -61,8 +62,9 @@ class TypedAnalyticsViewModel @Inject constructor(
 
     private val _tagIdData = MutableStateFlow(-1L)
     private val _typeIdData = MutableStateFlow(-1L)
+    private val _dateData: MutableStateFlow<DateData?> = MutableStateFlow(null)
 
-    val uiState = combine(_tagIdData, _typeIdData) { tagId, typeId ->
+    val uiState = combine(_tagIdData, _typeIdData, _dateData) { tagId, typeId, date ->
         if (tagId == typeId) {
             TypedAnalyticsUiState.Loading
         } else {
@@ -74,6 +76,7 @@ class TypedAnalyticsViewModel @Inject constructor(
                 } else {
                     tagRepository.getTagById(tagId)?.name
                 }.orEmpty(),
+                subTitleText = date?.titleText.orEmpty(),
             )
         }
     }
@@ -84,33 +87,54 @@ class TypedAnalyticsViewModel @Inject constructor(
         )
 
     /** 记录列表数据 */
-    val recordList = combine(_tagIdData, _typeIdData, recordDataVersion) { tagId, typeId, _ ->
-        val isType = typeId != -1L
-        GetTypedRecordData(
-            isType = isType,
-            if (isType) typeId else tagId,
-        )
-    }
-        .flatMapLatest {
-            Pager(
-                config = PagingConfig(
-                    pageSize = DEFAULT_PAGE_SIZE,
-                    initialLoadSize = DEFAULT_PAGE_SIZE,
-                ),
-                pagingSourceFactory = {
-                    if (it.isType) {
-                        TypeRecordPagingSource(it.id, getTypeRecordViewsUseCase)
-                    } else {
-                        TagRecordPagingSource(it.id, getTagRecordViewsUseCase)
-                    }
-                },
-            ).flow
+    val recordList =
+        combine(_tagIdData, _typeIdData, _dateData, recordDataVersion) { tagId, typeId, date, _ ->
+            val isType = typeId != -1L
+            GetTypedRecordData(
+                isType = isType,
+                id = if (isType) typeId else tagId,
+                date = date,
+            )
         }
-        .cachedIn(viewModelScope)
+            .flatMapLatest {
+                Pager(
+                    config = PagingConfig(
+                        pageSize = DEFAULT_PAGE_SIZE,
+                        initialLoadSize = DEFAULT_PAGE_SIZE,
+                    ),
+                    pagingSourceFactory = {
+                        if (it.isType) {
+                            TypeRecordPagingSource(it.id, it.date, getTypeRecordViewsUseCase)
+                        } else {
+                            TagRecordPagingSource(it.id, getTagRecordViewsUseCase)
+                        }
+                    },
+                ).flow
+            }
+            .cachedIn(viewModelScope)
 
-    fun updateId(tagId: Long, typeId: Long) {
+    fun updateData(tagId: Long, typeId: Long, date: String) {
         _tagIdData.tryEmit(tagId)
         _typeIdData.tryEmit(typeId)
+        val dateData = kotlin.runCatching {
+            if (date.isNotBlank()) {
+                if (date.contains("~")) {
+                    val dates = date.split("~")
+                    DateData(
+                        from = LocalDate.parse(dates[0]),
+                        to = LocalDate.parse(dates[1]),
+                    )
+                } else if (date.contains("-")) {
+                    DateData(LocalDate.parse("$date-01"))
+                } else {
+                    DateData(from = LocalDate.parse("$date-01-01"), year = true)
+                }
+            } else {
+                null
+            }
+        }.getOrNull()
+        _dateData.tryEmit(dateData)
+        logger().i("updateData(tagId = <$tagId>, typeId = <$typeId>, date = <$date>), dateData = <$dateData>")
     }
 
     fun showRecordDetailsSheet(item: RecordViewsEntity) {
@@ -125,6 +149,7 @@ class TypedAnalyticsViewModel @Inject constructor(
 data class GetTypedRecordData(
     val isType: Boolean,
     val id: Long,
+    val date: DateData?,
 )
 
 sealed interface TypedAnalyticsUiState {
@@ -132,6 +157,7 @@ sealed interface TypedAnalyticsUiState {
     data class Success(
         val isType: Boolean,
         val titleText: String,
+        val subTitleText: String,
     ) : TypedAnalyticsUiState
 }
 
@@ -140,6 +166,7 @@ sealed interface TypedAnalyticsUiState {
  */
 private class TypeRecordPagingSource(
     private val typeId: Long,
+    private val date: DateData?,
     private val getTypeRecordViewsUseCase: GetTypeRecordViewsUseCase,
 ) : PagingSource<Int, RecordViewsEntity>() {
     override fun getRefreshKey(state: PagingState<Int, RecordViewsEntity>): Int? = null
@@ -148,7 +175,7 @@ private class TypeRecordPagingSource(
         return runCatching {
             val page = params.key ?: 0
             val pageSize = params.loadSize
-            val items = getTypeRecordViewsUseCase(typeId, page, pageSize)
+            val items = getTypeRecordViewsUseCase(typeId, date?.dateStr.orEmpty(), page, pageSize)
             val prevKey = if (page > 0) page - 1 else null
             val nextKey = if (items.isNotEmpty()) page + 1 else null
             LoadResult.Page(items, prevKey, nextKey)

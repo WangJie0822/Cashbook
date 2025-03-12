@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Add
+- 数据分析内层界面新增时间筛选，保存数据一致；
 ### Fixed
 - 修复数据库11版本恢复备份失败问题；
 ### Changed

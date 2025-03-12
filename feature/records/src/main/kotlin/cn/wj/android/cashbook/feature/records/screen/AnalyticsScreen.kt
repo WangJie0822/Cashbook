@@ -108,7 +108,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
  */
 @Composable
 internal fun AnalyticsRoute(
-    onRequestNaviToTypeAnalytics: (Long) -> Unit,
+    onRequestNaviToTypeAnalytics: (Long, String?) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalyticsViewModel = hiltViewModel(),
@@ -125,9 +125,12 @@ internal fun AnalyticsRoute(
         onRequestShowBottomSheet = viewModel::showSheet,
         onRequestDismissBottomSheet = viewModel::dismissSheet,
         uiState = uiState,
-        onRequestNaviToTypeAnalytics = {
+        onRequestNaviToTypeAnalytics = { typeId ->
             viewModel.dismissSheet()
-            onRequestNaviToTypeAnalytics(it)
+            onRequestNaviToTypeAnalytics(
+                typeId,
+                (uiState as? AnalyticsUiState.Success)?.titleText?.replace("\n", "~"),
+            )
         },
         onRequestPopBackStack = onRequestPopBackStack,
         modifier = modifier,

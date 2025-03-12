@@ -131,6 +131,50 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun queryPagingRecordListByTypeIdBetweenDate(
+        typeId: Long,
+        date: String,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        if (date.isNotBlank()) {
+            val startDate: Long
+            val endDate: Long
+            if (date.contains("~")) {
+                val dates = date.split("~")
+                startDate = "${dates[0]} 00:00:00".parseDateLong()
+                endDate = "${dates[1]} 23:59:59".parseDateLong()
+            } else if (date.contains("-")) {
+                startDate = "$date-01 00:00:00".parseDateLong()
+                endDate = with(Calendar.getInstance()) {
+                    timeInMillis = startDate
+                    add(Calendar.MONTH, 1)
+                    timeInMillis
+                }
+            } else {
+                startDate = "$date-01-01 00:00:00".parseDateLong()
+                endDate = "$date-12-31 23:59:59".parseDateLong()
+            }
+            recordDao.queryRecordByTypeIdBetween(
+                booksId = combineProtoDataSource.appData.first().currentBookId,
+                typeId = typeId,
+                startDate = startDate,
+                endDate = endDate,
+                pageNum = page * pageSize,
+                pageSize = pageSize,
+            )
+        } else {
+            recordDao.queryRecordByTypeId(
+                booksId = combineProtoDataSource.appData.first().currentBookId,
+                typeId = typeId,
+                pageNum = page * pageSize,
+                pageSize = pageSize,
+            )
+        }.map {
+            it.asModel()
+        }
+    }
+
     override suspend fun queryPagingRecordListByTagId(
         tagId: Long,
         page: Int,
