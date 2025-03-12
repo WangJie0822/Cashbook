@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cn.wj.android.cashbook.core.design.component.CbCard
+import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
-import kotlin.system.measureTimeMillis
 
 /**
  * 弹窗状态
@@ -108,14 +108,19 @@ suspend inline fun <R> runCatchWithProgress(
     cancelable: Boolean = true,
     noinline onDismiss: () -> Unit = {},
     minInterval: Long = 550L,
-    timeout: Long = 5000L,
+    timeout: Long = -1L,
     noinline block: suspend CoroutineScope.() -> R,
 ): Result<R> {
     val result: Result<R>
     val ms = measureTimeMillis {
         ProgressDialogManager.show(hint, cancelable, onDismiss)
         result = runCatching {
-            withTimeout(timeout, block)
+            val timeMillis = if (timeout < 0L) {
+                Long.MAX_VALUE
+            } else {
+                timeout
+            }
+            withTimeout(timeMillis, block)
         }
     }
     if (ms < minInterval) {

@@ -3,6 +3,8 @@
 # 记账本 Changelog
 
 ## [Unreleased]
+### Changed
+- 弹窗超时逻辑优化，默认无限长；
 
 ## [1.0.7_25022800]
 ### Add

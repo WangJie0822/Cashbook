@@ -48,6 +48,8 @@ import cn.wj.android.cashbook.feature.records.model.ImageViewModel
 import cn.wj.android.cashbook.feature.records.model.asModel
 import cn.wj.android.cashbook.feature.records.model.asViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,8 +59,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import javax.inject.Inject
 
 /**
  * 编辑记录 ViewModel
@@ -200,7 +200,7 @@ class EditRecordViewModel @Inject constructor(
     val selectedTypeCategoryData =
         combine(_mutableTypeCategoryData, _defaultRecordData) { mutable, defaultRecord ->
             mutable ?: typeRepository.getRecordTypeById(defaultRecord.typeId)?.typeCategory
-                ?: RecordTypeCategoryEnum.EXPENDITURE
+            ?: RecordTypeCategoryEnum.EXPENDITURE
         }
             .stateIn(
                 scope = viewModelScope,
@@ -433,8 +433,14 @@ class EditRecordViewModel @Inject constructor(
         bottomSheetType = EditRecordBottomSheetEnum.NONE
     }
 
+    private var inSave = false
+
     /** 保存记录 */
     fun trySave(hintText: String, onSuccess: () -> Unit) {
+        if (inSave) {
+            return
+        }
+        inSave = true
         viewModelScope.launch {
             val recordEntity = _displayRecordData.first()
             if (recordEntity.amount.toDoubleOrZero() == 0.0) {
@@ -469,6 +475,8 @@ class EditRecordViewModel @Inject constructor(
             }
             if (result.isSuccess) {
                 onSuccess.invoke()
+            } else {
+                inSave = false
             }
         }
     }
