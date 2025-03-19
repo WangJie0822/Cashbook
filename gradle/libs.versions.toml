@@ -29,7 +29,7 @@ google-accompanist = "0.36.0"
 google-devtools-ksp = "2.1.10-1.0.31"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
-google-protobuf = "4.30.0"
+google-protobuf = "4.30.1"
 google-protobuf-plugin = "0.9.4"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
@@ -80,7 +80,7 @@ androidx-core = "1.15.0"
 androidx-core-splashscreen = "1.0.1"
 # Compose 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/compose)
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
-androidx-compose-bom = "2025.02.00"
+androidx-compose-bom = "2025.03.00"
 androidx-compose-material3-adaptive = "1.1.0"
 androidx-compose-material3-adaptive-navigation-suite = "1.3.1"
 # activity 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/activity)
@@ -97,7 +97,7 @@ androidx-room = "2.6.1"
 androidx-paging = "3.3.6"
 # Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
-androidx-navigation = "2.8.8"
+androidx-navigation = "2.8.9"
 # WorkManager 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/work)
 # [版本查询](https://mvnrepository.com/artifact/androidx.work)
 androidx-work = "2.10.0"

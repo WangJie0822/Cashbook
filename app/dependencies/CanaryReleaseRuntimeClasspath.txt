@@ -53,7 +53,7 @@ androidx.compose.ui:ui-unit:1.7.8
 androidx.compose.ui:ui-util-android:1.7.8
 androidx.compose.ui:ui-util:1.7.8
 androidx.compose.ui:ui:1.7.8
-androidx.compose:compose-bom:2025.02.00
+androidx.compose:compose-bom:2025.03.00
 androidx.concurrent:concurrent-futures-ktx:1.1.0
 androidx.concurrent:concurrent-futures:1.1.0
 androidx.constraintlayout:constraintlayout-compose-android:1.1.1
@@ -113,11 +113,11 @@ androidx.lifecycle:lifecycle-viewmodel:2.8.7
 androidx.loader:loader:1.0.0
 androidx.localbroadcastmanager:localbroadcastmanager:1.0.0
 androidx.multidex:multidex:2.0.1
-androidx.navigation:navigation-common-ktx:2.8.8
-androidx.navigation:navigation-common:2.8.8
-androidx.navigation:navigation-compose:2.8.8
-androidx.navigation:navigation-runtime-ktx:2.8.8
-androidx.navigation:navigation-runtime:2.8.8
+androidx.navigation:navigation-common-ktx:2.8.9
+androidx.navigation:navigation-common:2.8.9
+androidx.navigation:navigation-compose:2.8.9
+androidx.navigation:navigation-runtime-ktx:2.8.9
+androidx.navigation:navigation-runtime:2.8.9
 androidx.paging:paging-common-android:3.3.6
 androidx.paging:paging-common:3.3.6
 androidx.paging:paging-compose-android:3.3.6
@@ -159,8 +159,8 @@ com.google.dagger:hilt-android:2.55
 com.google.dagger:hilt-core:2.55
 com.google.errorprone:error_prone_annotations:2.15.0
 com.google.guava:listenablefuture:1.0
-com.google.protobuf:protobuf-javalite:4.30.0
-com.google.protobuf:protobuf-kotlin-lite:4.30.0
+com.google.protobuf:protobuf-javalite:4.30.1
+com.google.protobuf:protobuf-kotlin-lite:4.30.1
 com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0
 com.orhanobut:logger:2.2.0
 com.squareup.okhttp3:okhttp:4.12.0
