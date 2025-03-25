@@ -43,7 +43,7 @@ androidx-hilt = "1.2.0"
 
 # Roborazzi 测试工具 [Github](https://github.com/takahirom/roborazzi)
 # [版本查询](https://mvnrepository.com/artifact/io.github.takahirom.roborazzi)
-takahirom-roborazzi = "1.43.0"
+takahirom-roborazzi = "1.43.1"
 
 # Robolectric UI 测试工具 [Github](https://github.com/robolectric/robolectric)
 # [版本查询](https://mvnrepository.com/artifact/org.robolectric)
