@@ -110,7 +110,7 @@ androidx-annotation = "1.9.1"
 # DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.0.1"
-androidx-benchmark-macro = "1.3.3"
+androidx-benchmark-macro = "1.3.4"
 # exif
 androidx-exifinterface = "1.4.0"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
