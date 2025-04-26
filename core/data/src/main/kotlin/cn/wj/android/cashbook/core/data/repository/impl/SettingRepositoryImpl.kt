@@ -206,6 +206,11 @@ class SettingRepositoryImpl @Inject constructor(
             combineProtoDataSource.updateKeepLatestBackup(keepLatestBackup)
         }
 
+    override suspend fun updateMobileNetworkBackupEnable(enable: Boolean) =
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateMobileNetworkBackupEnable(enable)
+        }
+
     override suspend fun updateCanary(canary: Boolean) =
         withContext(coroutineContext) {
             combineProtoDataSource.updateCanary(canary)

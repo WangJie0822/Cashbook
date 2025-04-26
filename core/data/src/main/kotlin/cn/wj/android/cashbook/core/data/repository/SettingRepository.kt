@@ -104,6 +104,8 @@ interface SettingRepository {
 
     suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean)
 
+    suspend fun updateMobileNetworkBackupEnable(enable: Boolean)
+
     suspend fun updateCanary(canary: Boolean)
 
     suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String

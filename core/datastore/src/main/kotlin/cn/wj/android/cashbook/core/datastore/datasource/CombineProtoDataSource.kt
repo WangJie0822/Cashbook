@@ -338,6 +338,10 @@ class CombineProtoDataSource @Inject constructor(
         appSettings.updateData { it.copy { this.keepLatestBackup = keepLatestBackup } }
     }
 
+    suspend fun updateMobileNetworkBackupEnable(enable: Boolean) {
+        appSettings.updateData { it.copy { this.mobileNetworkBackupEnable = enable } }
+    }
+
     suspend fun updateCanary(canary: Boolean) {
         appSettings.updateData { it.copy { this.canary = canary } }
     }

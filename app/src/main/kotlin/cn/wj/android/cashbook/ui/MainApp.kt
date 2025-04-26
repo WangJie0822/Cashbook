@@ -778,11 +778,14 @@ internal fun NoWifiUpdateHintDialog(
     onConfirmClick: (Boolean) -> Unit,
     onDismissClick: () -> Unit,
 ) {
-    var noMOrePrompt by remember {
+    var noMorePrompt by remember {
         mutableStateOf(false)
     }
     CbAlertDialog(
         onDismissRequest = onDismissClick,
+        title = {
+            Text(text = stringResource(R.string.warm_tip))
+        },
         text = {
             Column {
                 Text(
@@ -790,17 +793,17 @@ internal fun NoWifiUpdateHintDialog(
                 )
                 Row(
                     modifier = Modifier
-                        .clickable { noMOrePrompt = !noMOrePrompt }
+                        .clickable { noMorePrompt = !noMorePrompt }
                         .padding(end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Checkbox(checked = noMOrePrompt, onCheckedChange = { noMOrePrompt = it })
+                    Checkbox(checked = noMorePrompt, onCheckedChange = { noMorePrompt = it })
                     Text(text = stringResource(id = R.string.no_more_prompt))
                 }
             }
         },
         confirmButton = {
-            CbTextButton(onClick = { onConfirmClick.invoke(noMOrePrompt) }) {
+            CbTextButton(onClick = { onConfirmClick.invoke(noMorePrompt) }) {
                 Text(text = stringResource(id = R.string.update))
             }
         },

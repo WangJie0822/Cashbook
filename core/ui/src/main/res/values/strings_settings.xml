@@ -39,8 +39,10 @@
     <string name="download_failed">下载失败，请稍后重试</string>
     <string name="install_failed">安装失败，请稍后重试</string>
     <string name="ignore_this_version">忽略该版本</string>
+    <string name="warm_tip">温馨提示</string>
     <string name="no_more_prompt">不再提示</string>
     <string name="no_wifi_download_available_hint">未连接Wi-Fi，确定使用数据流量下载吗？</string>
+    <string name="no_wifi_backup_available_hint">未连接Wi-Fi，确定使用数据流量备份吗？</string>
     <string name="update">更新</string>
     <string name="unknown_type">未知类型</string>
     <string name="version_info">版本信息</string>

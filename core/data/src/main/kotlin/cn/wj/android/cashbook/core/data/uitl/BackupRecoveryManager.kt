@@ -78,7 +78,7 @@ import kotlin.coroutines.CoroutineContext
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/21
  */
 class BackupRecoveryManager @Inject constructor(
-    networkMonitor: NetworkMonitor,
+    private val networkMonitor: NetworkMonitor,
     private val settingRepository: SettingRepository,
     private val webDAVHandler: WebDAVHandler,
     private val database: CashbookDatabase,
@@ -139,21 +139,28 @@ class BackupRecoveryManager @Inject constructor(
         }
     }
 
-    suspend fun requestBackup(): Unit = withContext(ioCoroutineContext) {
+    suspend fun requestAutoBackup() = withContext(ioCoroutineContext) {
+        requestBackup(
+            onlyLocal = !settingRepository.appSettingsModel.first().mobileNetworkBackupEnable &&
+                !networkMonitor.isWifi.first(),
+        )
+    }
+
+    suspend fun requestBackup(onlyLocal: Boolean = false): Unit = withContext(ioCoroutineContext) {
         updateBackupState(BackupRecoveryState.InProgress)
         val appDataModel = settingRepository.appSettingsModel.first()
         val backupPath = appDataModel.backupPath
-        logger().i("requestBackup(), backupPath = <$backupPath>")
+        logger().i("requestBackup(onlyLocal = <$onlyLocal>), backupPath = <$backupPath>")
         if (backupPath.isBlank()) {
-            logger().i("requestBackup(), blank backupPath")
+            logger().i("requestBackup(onlyLocal), blank backupPath")
             updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BLANK_BACKUP_PATH))
         } else {
             if (grantedPermissions(backupPath)) {
                 // 有权限，开始备份
-                logger().i("requestBackup(), startBackup")
-                startBackup(backupPath)
+                logger().i("requestBackup(onlyLocal), startBackup")
+                startBackup(backupPath, onlyLocal)
             } else {
-                logger().i("requestBackup(), unauthorized")
+                logger().i("requestBackup(onlyLocal), unauthorized")
                 updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED))
             }
         }
@@ -338,7 +345,9 @@ class BackupRecoveryManager @Inject constructor(
         webDAVHandler.block(appDataMode.webDAVDomain.backupPath)
     }
 
-    private suspend fun startBackup(backupPath: String) {
+    private suspend fun startBackup(backupPath: String, onlyLocal: Boolean) {
+        this@BackupRecoveryManager.logger()
+            .i("startBackup(backupPath = <$backupPath>, onlyLocal = <$onlyLocal>)")
         if (backupPath.isBlank()) {
             this@BackupRecoveryManager.logger().i("startBackup(), backupPath is blank")
             updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BLANK_BACKUP_PATH))
@@ -425,8 +434,8 @@ class BackupRecoveryManager @Inject constructor(
             // 更新备份时间
             settingRepository.updateBackupMs(currentMs)
 
-            val innerResult = if (isWebDAVConnected.first()) {
-                // WebDAV 已连接，上传备份文件到云端
+            val innerResult = if (!onlyLocal && isWebDAVConnected.first()) {
+                // 非仅本地且 WebDAV 已连接，上传备份文件到云端
                 runCatching {
                     this@BackupRecoveryManager.logger()
                         .i("startBackup(), upload to WebDAV")

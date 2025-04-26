@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
+import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.ProgressDialogManager
@@ -51,6 +52,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     private val recordRepository: RecordRepository,
     private val backupRecoveryManager: BackupRecoveryManager,
+    private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     /** 弹窗状态 */
@@ -70,6 +72,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
                 lastBackupTime = if (it.lastBackupMs <= 0L) "" else it.lastBackupMs.dateFormat(),
                 autoBackup = it.autoBackup,
                 keepLatestBackup = it.keepLatestBackup,
+                mobileNetworkBackupEnable = it.mobileNetworkBackupEnable,
             )
         }
         .stateIn(
@@ -139,6 +142,14 @@ class BackupAndRecoveryViewModel @Inject constructor(
     /** 开始备份 */
     fun backup() {
         viewModelScope.launch {
+            if (backupRecoveryManager.isWebDAVConnected.first() &&
+                !settingRepository.appSettingsModel.first().mobileNetworkBackupEnable &&
+                !networkMonitor.isWifi.first()
+            ) {
+                // WebDAV已连接，不允许移动数据备份，不是Wi-Fi，提示
+                dialogState = DialogState.Shown(1)
+                return@launch
+            }
             backupRecoveryManager.requestBackup()
         }
     }
@@ -183,6 +194,22 @@ class BackupAndRecoveryViewModel @Inject constructor(
         }
     }
 
+    fun onMobileNetworkBackupEnableChanged(keep: Boolean) {
+        viewModelScope.launch {
+            settingRepository.updateMobileNetworkBackupEnable(keep)
+        }
+    }
+
+    fun onNoWifiConfirmBackupClick(noMorePrompt: Boolean) {
+        dismissDialog()
+        viewModelScope.launch {
+            if (noMorePrompt) {
+                settingRepository.updateMobileNetworkBackupEnable(true)
+            }
+            backupRecoveryManager.requestBackup()
+        }
+    }
+
     fun refreshDbMigrate() {
         viewModelScope.launch {
             ProgressDialogManager.show()
@@ -213,5 +240,6 @@ sealed interface BackupAndRecoveryUiState {
         val lastBackupTime: String,
         val autoBackup: AutoBackupModeEnum,
         val keepLatestBackup: Boolean,
+        val mobileNetworkBackupEnable: Boolean,
     ) : BackupAndRecoveryUiState
 }
