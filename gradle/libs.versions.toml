@@ -16,7 +16,7 @@ kotlin = "2.1.20"
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
 kotlinx-coroutines = "1.10.2"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
-kotlinx-serialization-json = "1.8.0"
+kotlinx-serialization-json = "1.8.1"
 
 # Google 相关
 # Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
@@ -26,17 +26,17 @@ google-material = "1.12.0"
 google-accompanist = "0.36.0"
 # ksp 前缀版本需要和kotlin版本兼容 [Github](https://github.com/google/ksp)
 # [版本查询](https://mvnrepository.com/artifact/com.google.devtools.ksp)
-google-devtools-ksp = "2.1.20-1.0.31"
+google-devtools-ksp = "2.1.20-2.0.0"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
-google-protobuf = "4.30.1"
-google-protobuf-plugin = "0.9.4"
+google-protobuf = "4.30.2"
+google-protobuf-plugin = "0.9.5"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
 google-truth = "1.4.4"
 # hilt [指南](https://dagger.dev/hilt)
 # [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
-google-hilt = "2.56"
+google-hilt = "2.56.1"
 # hilt 拓展 [版本对照](https://developer.android.google.cn/jetpack/androidx/releases/hilt)
 # [版本查询](https://mvnrepository.com/artifact/androidx.hilt)
 androidx-hilt = "1.2.0"
@@ -59,7 +59,7 @@ android-desugarJdkLibs = "2.1.5"
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
 android-gradle-plugin = "8.9.1"
 android-tools = "31.9.1"
-androidx-baselineprofile = "1.3.3"
+androidx-baselineprofile = "1.3.4"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
 android-lint = "31.9.1"
@@ -103,14 +103,14 @@ androidx-navigation = "2.8.9"
 androidx-work = "2.10.0"
 # DataStore 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/datastore)
 # [版本查询](https://mvnrepository.com/artifact/androidx.datastore)
-androidx-datastore = "1.1.3"
+androidx-datastore = "1.1.4"
 # Annotation [指南](https://developer.android.google.cn/jetpack/androidx/releases/annotation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
 androidx-annotation = "1.9.1"
 # DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.0.1"
-androidx-benchmark-macro = "1.3.3"
+androidx-benchmark-macro = "1.3.4"
 # exif
 androidx-exifinterface = "1.4.0"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
