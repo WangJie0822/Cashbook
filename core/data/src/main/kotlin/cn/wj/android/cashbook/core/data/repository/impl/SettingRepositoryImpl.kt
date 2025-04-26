@@ -25,6 +25,7 @@ import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppSettingsModel
@@ -88,6 +89,12 @@ class SettingRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             combineProtoDataSource.updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable)
         }
+
+    override suspend fun updateImageQuality(imageQuality: ImageQualityEnum) {
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateImageQuality(imageQuality)
+        }
+    }
 
     override suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean) =
         withContext(coroutineContext) {

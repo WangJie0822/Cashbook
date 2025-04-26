@@ -19,6 +19,7 @@ package cn.wj.android.cashbook.core.data.repository
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppSettingsModel
@@ -60,6 +61,9 @@ interface SettingRepository {
 
     /** 更新是否允许流量下载配置 */
     suspend fun updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable: Boolean)
+
+    /** 更新图片质量 */
+    suspend fun updateImageQuality(imageQuality: ImageQualityEnum)
 
     /** 更新启动时是否需要安全验证配置 */
     suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean)

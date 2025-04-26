@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.core.datastore.TempKeys
 import cn.wj.android.cashbook.core.datastore.copy
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.model.model.AppSettingsModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
@@ -81,7 +82,7 @@ class CombineProtoDataSource @Inject constructor(
             canary = it.canary,
             logcatInRelease = it.logcatInRelease,
             mobileNetworkBackupEnable = it.mobileNetworkBackupEnable,
-            imageZipEnable = it.imageZipEnable,
+            imageQuality = ImageQualityEnum.ordinalOf(it.imageQuality),
         )
     }
 
@@ -231,6 +232,14 @@ class CombineProtoDataSource @Inject constructor(
         appSettings.updateData {
             it.copy {
                 this.mobileNetworkDownloadEnable = mobileNetworkDownloadEnable
+            }
+        }
+    }
+
+    suspend fun updateImageQuality(imageQuality: ImageQualityEnum) {
+        appSettings.updateData {
+            it.copy {
+                this.imageQuality = imageQuality.ordinal
             }
         }
     }

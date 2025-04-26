@@ -56,6 +56,12 @@
 
     <string name="mobile_network_download_enable">允许手机流量下载</string>
     <string name="mobile_network_download_enable_hint">允许使用手机流量下载新版本</string>
+    <string name="record_image_quality">记录图片质量</string>
+    <string name="record_image_quality_hint">记录保存到数据库时图片质量</string>
+    <string name="record_image_quality_original">原图</string>
+    <string name="image_quality">图片质量</string>
+    <string name="record_image_quality_high">高质量</string>
+    <string name="record_image_quality_medium">中等质量</string>
     <string name="need_security_verification_when_launch">启动时安全验证</string>
     <string name="enable_fingerprint_verification">允许指纹验证</string>
     <string name="create_password">创建密码</string>

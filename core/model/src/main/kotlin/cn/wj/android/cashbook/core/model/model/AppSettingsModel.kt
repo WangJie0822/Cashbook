@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.model.model
 
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 
 /**
@@ -74,6 +75,6 @@ data class AppSettingsModel(
     val logcatInRelease: Boolean,
     /** 是否允许使用数据流量备份 */
     val mobileNetworkBackupEnable: Boolean,
-    /** 是否压缩图片 */
-    val imageZipEnable: Boolean,
+    /** 图片质量 */
+    val imageQuality: ImageQualityEnum,
 )

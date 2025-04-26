@@ -35,6 +35,9 @@ enum class SettingDialogEnum {
     /** 清除密码 */
     CLEAR_PASSWORD,
 
+    /** 图片质量 */
+    IMAGE_QUALITY,
+
     /** 黑夜模式 */
     DARK_MODE,
 

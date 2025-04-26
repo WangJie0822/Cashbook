@@ -32,8 +32,10 @@ import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
+import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
@@ -77,6 +79,7 @@ class EditRecordViewModel @Inject constructor(
     assetRepository: AssetRepository,
     tagRepository: TagRepository,
     recordRepository: RecordRepository,
+    settingRepository: SettingRepository,
     getDefaultRecordUseCase: GetDefaultRecordUseCase,
     private val saveRecordUseCase: SaveRecordUseCase,
 ) : ViewModel() {
@@ -146,7 +149,11 @@ class EditRecordViewModel @Inject constructor(
 
     /** 界面 UI 状态 */
     val uiState =
-        combine(_displayRecordData, _relatedRecordTotalAmountData) { record, relatedAmount ->
+        combine(
+            _displayRecordData,
+            _relatedRecordTotalAmountData,
+            settingRepository.appSettingsModel,
+        ) { record, relatedAmount, model ->
             val assetText = assetRepository.getAssetById(record.assetId)?.let { asset ->
                 "${asset.name}(${
                     if (asset.type.isCreditCard) {
@@ -181,6 +188,7 @@ class EditRecordViewModel @Inject constructor(
                 needRelated = needRelated,
                 relatedCount = _relatedRecordListData.first().size,
                 relatedAmount = relatedAmount,
+                imageQuality = model.imageQuality,
             )
         }
             .stateIn(
@@ -571,6 +579,7 @@ sealed interface EditRecordUiState {
      * @param reimbursable 是否可报销
      * @param selectedTypeId 当前选择类型 id
      * @param needRelated 是否需要关联记录
+     * @param imageQuality 图片质量
      */
     data class Success(
         val amountText: String,
@@ -586,6 +595,7 @@ sealed interface EditRecordUiState {
         val needRelated: Boolean,
         val relatedCount: Int,
         val relatedAmount: String,
+        val imageQuality: ImageQualityEnum,
     ) : EditRecordUiState
 }
 

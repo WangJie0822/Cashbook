@@ -31,6 +31,7 @@ import cn.wj.android.cashbook.core.design.security.loadEncryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.design.security.toHexString
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
@@ -66,6 +67,7 @@ class SettingViewModel @Inject constructor(
         .mapLatest {
             SettingUiState.Success(
                 mobileNetworkDownloadEnable = it.mobileNetworkDownloadEnable,
+                imageQuality = it.imageQuality,
                 needSecurityVerificationWhenLaunch = it.needSecurityVerificationWhenLaunch,
                 verificationMode = it.verificationMode,
                 enableFingerprintVerification = it.enableFingerprintVerification,
@@ -95,6 +97,16 @@ class SettingViewModel @Inject constructor(
     fun onMobileNetworkDownloadEnableChanged(enable: Boolean) {
         viewModelScope.launch {
             settingRepository.updateMobileNetworkDownloadEnable(enable)
+        }
+    }
+
+    fun onImageQualityClick() {
+        dialogState = DialogState.Shown(SettingDialogEnum.IMAGE_QUALITY)
+    }
+
+    fun onImageQualitySelected(imageQuality: ImageQualityEnum) {
+        viewModelScope.launch {
+            settingRepository.updateImageQuality(imageQuality)
         }
     }
 
@@ -331,6 +343,7 @@ class SettingViewModel @Inject constructor(
 
 sealed class SettingUiState(
     open val mobileNetworkDownloadEnable: Boolean = false,
+    open val imageQuality: ImageQualityEnum = ImageQualityEnum.ORIGINAL,
     open val needSecurityVerificationWhenLaunch: Boolean = false,
     open val verificationMode: VerificationModeEnum = VerificationModeEnum.WHEN_LAUNCH,
     open val enableFingerprintVerification: Boolean = false,
@@ -342,6 +355,7 @@ sealed class SettingUiState(
 
     data class Success(
         override val mobileNetworkDownloadEnable: Boolean,
+        override val imageQuality: ImageQualityEnum,
         override val needSecurityVerificationWhenLaunch: Boolean,
         override val verificationMode: VerificationModeEnum,
         override val enableFingerprintVerification: Boolean,

@@ -101,6 +101,7 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -777,11 +778,14 @@ private fun EditRecordBottomSheetContent(
 
         EditRecordBottomSheetEnum.IMAGES -> {
             // 选择照片
-            SelectImageSheetContent(
-                imageList = imageList,
-                onImageItemClick = onImageItemClick,
-                onImageListSave = onImageListSave,
-            )
+            (uiState as? EditRecordUiState.Success)?.let { data ->
+                SelectImageSheetContent(
+                    imageQuality = data.imageQuality,
+                    imageList = imageList,
+                    onImageItemClick = onImageItemClick,
+                    onImageListSave = onImageListSave,
+                )
+            }
         }
 
         EditRecordBottomSheetEnum.NONE -> {
@@ -793,6 +797,7 @@ private fun EditRecordBottomSheetContent(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun SelectImageSheetContent(
+    imageQuality: ImageQualityEnum,
     imageList: List<ImageViewModel>,
     onImageItemClick: (List<ImageViewModel>, Int) -> Unit,
     onImageListSave: (List<ImageViewModel>) -> Unit,
@@ -811,7 +816,10 @@ internal fun SelectImageSheetContent(
                         -1L,
                         -1L,
                         pictureUri?.toString().orEmpty(),
-                        pictureUri?.getCompressedBitmap(),
+                        pictureUri?.getCompressedBitmap(
+                            inSampleSize = imageQuality.inSampleSize,
+                            reSize = imageQuality.reSize,
+                        ),
                     ),
                 )
             }
@@ -832,7 +840,15 @@ internal fun SelectImageSheetContent(
             } else {
                 resultList
             }.map {
-                ImageViewModel(-1L, -1L, it.toString(), it.getCompressedBitmap())
+                ImageViewModel(
+                    -1L,
+                    -1L,
+                    it.toString(),
+                    it.getCompressedBitmap(
+                        inSampleSize = imageQuality.inSampleSize,
+                        reSize = imageQuality.reSize,
+                    ),
+                )
             }
             cacheImageList.addAll(finalList)
         }

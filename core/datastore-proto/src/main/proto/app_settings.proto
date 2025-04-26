@@ -29,5 +29,5 @@ message AppSettings {
   bool canary = 22; // 是否支持实验版本
   bool logcatInRelease = 23; // 在 Release 版本输出日志
   bool mobileNetworkBackupEnable = 24; // 是否允许使用数据流量备份
-  bool imageZipEnable = 25; // 是否压缩图片
+  int32 imageQuality = 25; // 图片质量
 }
