@@ -91,7 +91,7 @@ androidx-activity = "1.10.1"
 androidx-lifecycle = "2.8.7"
 # Room 数据库相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/room)
 # [版本查询](https://mvnrepository.com/artifact/androidx.room)
-androidx-room = "2.6.1"
+androidx-room = "2.7.0"
 # Paging 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/paging)
 # [版本查询](https://mvnrepository.com/artifact/androidx.paging)
 androidx-paging = "3.3.6"
