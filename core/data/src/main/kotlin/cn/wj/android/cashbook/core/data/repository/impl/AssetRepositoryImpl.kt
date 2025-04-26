@@ -52,8 +52,8 @@ class AssetRepositoryImpl @Inject constructor(
 ) : AssetRepository {
 
     override val currentVisibleAssetListData: Flow<List<AssetModel>> =
-        combine(assetDataVersion, combineProtoDataSource.appData) { _, appData ->
-            getVisibleAssetsByBookId(appData.currentBookId)
+        combine(assetDataVersion, combineProtoDataSource.recordSettingsData) { _, data ->
+            getVisibleAssetsByBookId(data.currentBookId)
         }
 
     override val currentVisibleAssetTypeData: Flow<List<AssetTypeViewsModel>> =
@@ -80,8 +80,8 @@ class AssetRepositoryImpl @Inject constructor(
         }
 
     override val currentInvisibleAssetListData: Flow<List<AssetModel>> =
-        combine(assetDataVersion, combineProtoDataSource.appData) { _, appData ->
-            getInvisibleAssetsByBookId(appData.currentBookId)
+        combine(assetDataVersion, combineProtoDataSource.recordSettingsData) { _, data ->
+            getInvisibleAssetsByBookId(data.currentBookId)
         }
 
     override val currentInvisibleAssetTypeData: Flow<List<AssetTypeViewsModel>> =
@@ -107,7 +107,7 @@ class AssetRepositoryImpl @Inject constructor(
             result
         }
 
-    override val topUpInTotalData: Flow<Boolean> = combineProtoDataSource.appData.mapLatest {
+    override val topUpInTotalData: Flow<Boolean> = combineProtoDataSource.recordSettingsData.mapLatest {
         it.topUpInTotal
     }
 
@@ -130,7 +130,7 @@ class AssetRepositoryImpl @Inject constructor(
     override suspend fun updateAsset(asset: AssetModel) = withContext(coroutineContext) {
         var table = asset.asTable()
         if (table.booksId <= 0) {
-            table = table.copy(booksId = combineProtoDataSource.appData.first().currentBookId)
+            table = table.copy(booksId = combineProtoDataSource.recordSettingsData.first().currentBookId)
         }
         if (null == table.id) {
             // 插入

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_package = "cn.wj.android.cashbook.core.datastore";
+option java_multiple_files = true;
+
+/* 应用设置 */
+message AppSettings {
+  bool useGithub = 1; // 使用 github 源
+  bool autoCheckUpdate = 2; // 自动检查更新
+  string ignoreUpdateVersion = 3; // 忽略的更新版本
+  bool mobileNetworkDownloadEnable = 4; // 是否允许使用数据流量下载
+  bool needSecurityVerificationWhenLaunch = 5; // 启动时进行安全验证
+  bool enableFingerprintVerification = 6; // 允许指纹验证
+  string passwordIv = 7; // 密码加密向量
+  string fingerprintIv = 8; // 指纹加密向量
+  string passwordInfo = 9; // 密码信息
+  string fingerprintPasswordInfo = 10; // 指纹密码信息
+  int32 darkMode = 11; // 黑夜模式
+  bool dynamicColor = 12; // 动态配色
+  int32 verificationMode = 13; // 安全验证类型
+  bool agreedProtocol = 14; // 已同意用户协议及隐私政策
+  string webDAVDomain = 15; // WebDAV 服务器地址
+  string webDAVAccount = 16; // WebDAV 账户
+  string webDAVPassword = 17; // WebDAV 密码
+  string backupPath = 18; // 备份路径
+  int32 autoBackup = 19; // 自动备份
+  sint64 lastBackupMs = 20; // 上次备份时间戳
+  bool keepLatestBackup = 21; // 是否仅保留本地最后一次备份
+  bool canary = 22; // 是否支持实验版本
+  bool logcatInRelease = 23; // 在 Release 版本输出日志
+  bool mobileNetworkBackupEnable = 24; // 是否允许使用数据流量备份
+  bool imageZipEnable = 25; // 是否压缩图片
+}

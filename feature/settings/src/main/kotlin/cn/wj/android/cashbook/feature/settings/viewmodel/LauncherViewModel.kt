@@ -27,6 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -42,6 +43,12 @@ class LauncherViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     booksRepository: BooksRepository,
 ) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            settingRepository.splitAppPreferences()
+        }
+    }
 
     /** 是否显示抽屉菜单 */
     var shouldDisplayDrawerSheet by mutableStateOf(false)

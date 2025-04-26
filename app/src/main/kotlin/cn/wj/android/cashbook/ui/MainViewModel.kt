@@ -30,7 +30,7 @@ class MainViewModel @Inject constructor(
     settingRepository: SettingRepository,
 ) : ViewModel() {
 
-    val uiState = settingRepository.appDataMode
+    val uiState = settingRepository.appSettingsModel
         .mapLatest {
             ActivityUiState.Success(
                 darkMode = it.darkMode,

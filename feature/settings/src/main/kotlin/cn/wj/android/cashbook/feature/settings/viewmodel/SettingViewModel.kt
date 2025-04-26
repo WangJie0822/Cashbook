@@ -62,12 +62,12 @@ class SettingViewModel @Inject constructor(
     var shouldDisplayBookmark by mutableStateOf("")
         private set
 
-    val uiState = settingRepository.appDataMode
+    val uiState = settingRepository.appSettingsModel
         .mapLatest {
             SettingUiState.Success(
                 mobileNetworkDownloadEnable = it.mobileNetworkDownloadEnable,
                 needSecurityVerificationWhenLaunch = it.needSecurityVerificationWhenLaunch,
-                verificationMode = it.verificationModel,
+                verificationMode = it.verificationMode,
                 enableFingerprintVerification = it.enableFingerprintVerification,
                 hasPassword = it.passwordInfo.isNotBlank(),
                 darkMode = it.darkMode,
@@ -81,11 +81,11 @@ class SettingViewModel @Inject constructor(
         )
 
     /** 密码加密向量信息 */
-    private val passwordIv = settingRepository.appDataMode
+    private val passwordIv = settingRepository.appSettingsModel
         .mapLatest { it.passwordIv }
 
     /** 密码信息 */
-    private val passwordInfo = settingRepository.appDataMode
+    private val passwordInfo = settingRepository.appSettingsModel
         .mapLatest { it.passwordInfo }
 
     /** 是否有密码 */
@@ -338,7 +338,7 @@ sealed class SettingUiState(
     open val darkMode: DarkModeEnum = DarkModeEnum.FOLLOW_SYSTEM,
     open val dynamicColor: Boolean = false,
 ) {
-    object Loading : SettingUiState()
+    data object Loading : SettingUiState()
 
     data class Success(
         override val mobileNetworkDownloadEnable: Boolean,

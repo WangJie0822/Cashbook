@@ -59,6 +59,7 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
@@ -67,6 +68,7 @@ import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
@@ -313,6 +315,7 @@ internal fun SettingContent(
                     CbListItem(
                         modifier = Modifier.padding(top = 16.dp),
                         headlineContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
+                        supportingContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable_hint)) },
                         trailingContent = {
                             Switch(
                                 checked = uiState.mobileNetworkDownloadEnable,
@@ -1112,3 +1115,38 @@ internal val VerificationModeEnum.text: String
             VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
         },
     )
+
+@DevicePreviews
+@Composable
+private fun SettingScreenPreview() {
+    PreviewTheme {
+        SettingScreen(
+            supportFingerprint = true,
+            uiState = SettingUiState.Loading,
+            shouldDisplayBookmark = "",
+            onRequestDismissBookmark = { },
+            dialogState = DialogState.Dismiss,
+            onRequestDismissDialog = { },
+            onMobileNetworkDownloadEnableChanged = { },
+            onNeedSecurityVerificationWhenLaunchChanged = { },
+            onEnableFingerprintVerificationChanged = { },
+            onPasswordClick = { },
+            onClearPasswordClick = { },
+            onDarkModeClick = { },
+            onDynamicColorClick = { },
+            onVerificationModeClick = { },
+            onCreateConfirmClick = { SettingPasswordStateEnum.SUCCESS },
+            onModifyConfirmClick = { _, _, _ -> },
+            onVerifyConfirmClick = { _, _ -> },
+            onClearConfirmClick = { _, _ -> },
+            onFingerprintVerifySuccess = { },
+            onFingerprintVerifyError = { _, _ -> },
+            onDarkModeSelected = { },
+            onDynamicColorSelected = { },
+            onVerificationModeSelected = { },
+            onBackupAndRecoveryClick = { },
+            onBackClick = { },
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+        )
+    }
+}

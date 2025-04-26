@@ -620,6 +620,19 @@ internal fun BackupAndRecoveryScaffoldContent(
         )
 
         CbListItem(
+            headlineContent = { Text(text = stringResource(id = R.string.mobile_network_backup_enable)) },
+            supportingContent = {
+                Text(text = stringResource(id = R.string.mobile_network_backup_enable_hint))
+            },
+            trailingContent = {
+                Switch(
+                    checked = uiState.keepLatestBackup,
+                    onCheckedChange = onKeepLatestBackupChanged,
+                )
+            },
+        )
+
+        CbListItem(
             headlineContent = { Text(text = stringResource(id = R.string.db_data_migrate)) },
             supportingContent = {
                 Text(text = stringResource(id = R.string.db_data_migrate_hint))

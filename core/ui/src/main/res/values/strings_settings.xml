@@ -55,6 +55,7 @@
     <string name="retry">重试</string>
 
     <string name="mobile_network_download_enable">允许手机流量下载</string>
+    <string name="mobile_network_download_enable_hint">允许使用手机流量下载新版本</string>
     <string name="need_security_verification_when_launch">启动时安全验证</string>
     <string name="enable_fingerprint_verification">允许指纹验证</string>
     <string name="create_password">创建密码</string>
@@ -120,6 +121,8 @@
     <string name="in_recovery">恢复中…</string>
     <string name="only_save_latest_backup">仅保留最新备份</string>
     <string name="only_save_latest_backup_hint">本地仅保留最新备份文件</string>
+    <string name="mobile_network_backup_enable">允许手机流量备份</string>
+    <string name="mobile_network_backup_enable_hint">允许使用手机流量下载上传备份文件</string>
     <string name="db_data_migrate">数据库迁移</string>
     <string name="db_data_migrate_hint">新版本新增实际金额，数据异常可在此刷新</string>
 

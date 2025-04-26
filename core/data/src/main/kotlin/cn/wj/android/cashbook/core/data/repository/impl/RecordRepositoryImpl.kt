@@ -107,7 +107,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByAssetId(
-            booksId = combineProtoDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
             assetId = assetId,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -122,7 +122,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByTypeId(
-            booksId = combineProtoDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
             typeId = typeId,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -156,7 +156,7 @@ class RecordRepositoryImpl @Inject constructor(
                 endDate = "$date-12-31 23:59:59".parseDateLong()
             }
             recordDao.queryRecordByTypeIdBetween(
-                booksId = combineProtoDataSource.appData.first().currentBookId,
+                booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
                 typeId = typeId,
                 startDate = startDate,
                 endDate = endDate,
@@ -165,7 +165,7 @@ class RecordRepositoryImpl @Inject constructor(
             )
         } else {
             recordDao.queryRecordByTypeId(
-                booksId = combineProtoDataSource.appData.first().currentBookId,
+                booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
                 typeId = typeId,
                 pageNum = page * pageSize,
                 pageSize = pageSize,
@@ -181,7 +181,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByTagId(
-            booksId = combineProtoDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
             tagId = tagId,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -196,7 +196,7 @@ class RecordRepositoryImpl @Inject constructor(
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryRecordByKeyword(
-            booksId = combineProtoDataSource.appData.first().currentBookId,
+            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
             keyword = keyword,
             pageNum = page * pageSize,
             pageSize = pageSize,
@@ -220,9 +220,9 @@ class RecordRepositoryImpl @Inject constructor(
         }
         val startDate = "$yearInt-${monthInt.completeZero()}-01 00:00:00"
         val endDate = "$nextYearInt-${nextMonthInt.completeZero()}-01 00:00:00"
-        return combine(recordDataVersion, combineProtoDataSource.appData) { _, appData ->
+        return combine(recordDataVersion, combineProtoDataSource.recordSettingsData) { _, data ->
             recordDao.queryByBooksIdBetweenDate(
-                appData.currentBookId,
+                data.currentBookId,
                 startDate.parseDateLong(),
                 endDate.parseDateLong(),
             ).map {
@@ -236,7 +236,7 @@ class RecordRepositoryImpl @Inject constructor(
             this@RecordRepositoryImpl.logger()
                 .i("queryRecordListBetweenDate(from = <$from>, to = <$to>)")
             recordDao.queryByBooksIdBetweenDate(
-                combineProtoDataSource.appData.first().currentBookId,
+                combineProtoDataSource.recordSettingsData.first().currentBookId,
                 from.parseDateLong(),
                 to.parseDateLong(),
             ).map {
@@ -246,7 +246,7 @@ class RecordRepositoryImpl @Inject constructor(
 
     override suspend fun getDefaultRecord(typeId: Long): RecordModel =
         withContext(coroutineContext) {
-            val appDataModel = combineProtoDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.recordSettingsData.first()
             RecordModel(
                 id = -1L,
                 booksId = appDataModel.currentBookId,
@@ -286,7 +286,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = combineProtoDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.recordSettingsData.first()
             recordDao.getExpenditureRecordListAfterTime(
                 booksId = appDataModel.currentBookId,
                 recordTime = startDate,
@@ -300,7 +300,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = combineProtoDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.recordSettingsData.first()
             recordDao.getExpenditureReimburseRecordListAfterTime(
                 booksId = appDataModel.currentBookId,
                 recordTime = startDate,
@@ -314,7 +314,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = combineProtoDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.recordSettingsData.first()
             recordDao.getExpenditureRecordListByKeywordAfterTime(
                 keyword = keyword,
                 booksId = appDataModel.currentBookId,
@@ -339,7 +339,7 @@ class RecordRepositoryImpl @Inject constructor(
             calendar[Calendar.DAY_OF_MONTH] = -90
             val startDate =
                 "${calendar.timeInMillis.dateFormat(DATE_FORMAT_DATE)} 00:00:00".toLongTime()!!
-            val appDataModel = combineProtoDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.recordSettingsData.first()
             recordDao.getLastThreeMonthExpenditureReimburseRecordListByKeyword(
                 keyword = keyword,
                 booksId = appDataModel.currentBookId,
@@ -400,7 +400,7 @@ class RecordRepositoryImpl @Inject constructor(
         // 更新支出记录
         val expandCount = recordDao.updateRecord(expandList)
         this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), expandCount $expandCount")
-        val appData = combineProtoDataSource.appData.first()
+        val appData = combineProtoDataSource.recordSettingsData.first()
         val incomeCount = recordDao.updateRecord(
             recordDao.queryByTypeCategory(RecordTypeCategoryEnum.INCOME.ordinal).map {
                 if (it.typeId == appData.refundTypeId || it.typeId == appData.reimburseTypeId) {

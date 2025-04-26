@@ -73,7 +73,7 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun getNoNullDefaultRecordType(): RecordTypeModel =
         withContext(coroutineContext) {
-            getNoNullRecordTypeById(combineProtoDataSource.appData.first().defaultTypeId)
+            getNoNullRecordTypeById(combineProtoDataSource.recordSettingsData.first().defaultTypeId)
         }
 
     private suspend fun getFirstRecordTypeList(): List<RecordTypeModel> =
@@ -94,7 +94,7 @@ class TypeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun needRelated(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.appData.first()
+        val appDataModel = combineProtoDataSource.recordSettingsData.first()
         val refundTypeId = if (appDataModel.refundTypeId > 0L) {
             appDataModel.refundTypeId
         } else {
@@ -117,7 +117,7 @@ class TypeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isReimburseType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.appData.first()
+        val appDataModel = combineProtoDataSource.recordSettingsData.first()
         val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
             appDataModel.reimburseTypeId
         } else {
@@ -131,7 +131,7 @@ class TypeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isRefundType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.appData.first()
+        val appDataModel = combineProtoDataSource.recordSettingsData.first()
         val refundTypeId = if (appDataModel.refundTypeId > 0L) {
             appDataModel.refundTypeId
         } else {
@@ -202,7 +202,7 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun isCreditPaymentType(typeId: Long): Boolean =
         withContext(coroutineContext) {
-            val appDataModel = combineProtoDataSource.appData.first()
+            val appDataModel = combineProtoDataSource.recordSettingsData.first()
             val creditCardPaymentTypeId = if (appDataModel.creditCardPaymentTypeId > 0L) {
                 appDataModel.creditCardPaymentTypeId
             } else {

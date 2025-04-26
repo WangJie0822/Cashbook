@@ -58,7 +58,7 @@ class BackupAndRecoveryViewModel @Inject constructor(
         private set
 
     /** 界面 UI 状态 */
-    val uiState = settingRepository.appDataMode
+    val uiState = settingRepository.appSettingsModel
         .mapLatest {
             BackupAndRecoveryUiState.Success(
                 webDAVDomain = it.webDAVDomain.ifBlank {

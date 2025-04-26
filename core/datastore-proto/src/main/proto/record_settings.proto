@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "cn.wj.android.cashbook.core.datastore";
+option java_multiple_files = true;
+
+/* 记录设置 */
+message RecordSettings {
+  sint64 currentBookId = 1; // 当前使用的账本 id
+  sint64 defaultTypeId = 2; // 默认类型 id
+  sint64 lastAssetId = 3; // 上一次使用资产 id
+  sint64 refundTypeId = 4; // 退款类型 id
+  sint64 reimburseTypeId = 5; // 报销类型 id
+  sint64 creditCardPaymentTypeId = 6; // 信用卡还款类型 id
+  bool topUpInTotal = 7; // 充值账号是否计入总资产
+}

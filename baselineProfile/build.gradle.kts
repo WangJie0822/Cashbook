@@ -45,7 +45,7 @@ android {
         buildConfigField("String", "APP_FLAVOR_SUFFIX", "\"${flavor.applicationIdSuffix ?: ""}\"")
     }
 
-    testOptions.managedDevices.devices {
+    testOptions.managedDevices.allDevices {
         create<ManagedVirtualDevice>("pixel6Api34") {
             device = "Pixel 6"
             apiLevel = 34

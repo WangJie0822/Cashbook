@@ -23,11 +23,15 @@ import androidx.datastore.dataStoreFile
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.datastore.AppPreferences
+import cn.wj.android.cashbook.core.datastore.AppSettings
 import cn.wj.android.cashbook.core.datastore.GitInfos
+import cn.wj.android.cashbook.core.datastore.RecordSettings
 import cn.wj.android.cashbook.core.datastore.SearchHistory
 import cn.wj.android.cashbook.core.datastore.TempKeys
 import cn.wj.android.cashbook.core.datastore.serializer.AppPreferencesSerializer
+import cn.wj.android.cashbook.core.datastore.serializer.AppSettingsSerializer
 import cn.wj.android.cashbook.core.datastore.serializer.GitInfosSerializer
+import cn.wj.android.cashbook.core.datastore.serializer.RecordSettingsSerializer
 import cn.wj.android.cashbook.core.datastore.serializer.SearchHistorySerializer
 import cn.wj.android.cashbook.core.datastore.serializer.TempKeysSerializer
 import dagger.Module
@@ -56,6 +60,34 @@ object DataStoreModule {
             scope = CoroutineScope(ioDispatcher + SupervisorJob()),
         ) {
             context.dataStoreFile("app_preferences.pb")
+        }
+
+    @Provides
+    @Singleton
+    fun providesAppSettingsDataStore(
+        @ApplicationContext context: Context,
+        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineContext,
+        appSettingsSerializer: AppSettingsSerializer,
+    ): DataStore<AppSettings> =
+        DataStoreFactory.create(
+            serializer = appSettingsSerializer,
+            scope = CoroutineScope(ioDispatcher + SupervisorJob()),
+        ) {
+            context.dataStoreFile("app_settings.pb")
+        }
+
+    @Provides
+    @Singleton
+    fun providesRecordSettingsDataStore(
+        @ApplicationContext context: Context,
+        @Dispatcher(CashbookDispatchers.IO) ioDispatcher: CoroutineContext,
+        recordSettingsSerializer: RecordSettingsSerializer,
+    ): DataStore<RecordSettings> =
+        DataStoreFactory.create(
+            serializer = recordSettingsSerializer,
+            scope = CoroutineScope(ioDispatcher + SupervisorJob()),
+        ) {
+            context.dataStoreFile("record_settings.pb")
         }
 
     @Provides
