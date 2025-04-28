@@ -59,7 +59,7 @@ class InitWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         this@InitWorker.logger().i("doWork(), init worker")
-        settingRepository.appDataMode.first().let { appDateModel ->
+        settingRepository.appSettingsModel.first().let { appDateModel ->
             WorkManager.getInstance(appContext).apply {
                 // 执行数据同步
                 if (appDateModel.autoCheckUpdate) {

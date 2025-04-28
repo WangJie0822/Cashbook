@@ -30,10 +30,11 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
 private val SIZE_ZERO = Size.parseSize("0x0")
-private val DEFAULT_IN_SAMPLE_SIZE = 4
+private const val DEFAULT_IN_SAMPLE_SIZE = 6
 
 fun Uri.getCompressedBitmap(
-    maxSize: Size = SIZE_ZERO,
+    inSampleSize: Int,
+    reSize: Boolean,
     context: Context = AppManager.context,
 ): Bitmap? {
     return try {
@@ -43,17 +44,17 @@ fun Uri.getCompressedBitmap(
             val options = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
             }
-            BitmapFactory.decodeStream(stream, null, options)
+            var bitmap = BitmapFactory.decodeStream(stream, null, options)
             stream.close()
 
             // 计算采样率
-            options.inSampleSize = calculateInSampleSize(options, maxSize)
+            options.inSampleSize = inSampleSize
             options.inJustDecodeBounds = false
 
             // 重新打开流解码 Bitmap
             inputStream = context.contentResolver.openInputStream(this)
-            var bitmap = BitmapFactory.decodeStream(inputStream, null, options)
-            logger().i("getCompressedBitmap old size ${(bitmap?.allocationByteCount ?: 0) / 1024}KB")
+            bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+            logger().i("getCompressedBitmap after inSampleSize size ${(bitmap?.allocationByteCount ?: 0) / 1024}KB")
             inputStream?.close()
 
             // 处理旋转
@@ -61,35 +62,18 @@ fun Uri.getCompressedBitmap(
             bitmap = rotateBitmapIfRequired(context, bitmap!!, this)
             inputStream?.close()
 
-            // 二次缩放确保符合尺寸要求
-            val resizeBitmap = resizeBitmap(bitmap, maxSize)
-            logger().i("getCompressedBitmap new size ${resizeBitmap.allocationByteCount / 1024}KB")
-            resizeBitmap
+            if (reSize) {
+                // 二次缩放
+                bitmap = resizeBitmap(bitmap)
+            }
+
+            logger().i("getCompressedBitmap final size ${bitmap.allocationByteCount / 1024}KB")
+            bitmap
         }
     } catch (e: Exception) {
         e.printStackTrace()
         null
     }
-}
-
-private fun calculateInSampleSize(
-    options: BitmapFactory.Options,
-    reqSize: Size = SIZE_ZERO,
-): Int {
-    val height = options.outHeight
-    val width = options.outWidth
-    var inSampleSize = 1
-
-    if (reqSize == SIZE_ZERO) {
-        inSampleSize = DEFAULT_IN_SAMPLE_SIZE
-    } else if (height > reqSize.height || width > reqSize.width) {
-        val halfHeight = height / 2
-        val halfWidth = width / 2
-        while (halfHeight / inSampleSize >= reqSize.height && halfWidth / inSampleSize >= reqSize.width) {
-            inSampleSize *= 2
-        }
-    }
-    return inSampleSize
 }
 
 private fun rotateBitmapIfRequired(context: Context, bitmap: Bitmap, uri: Uri): Bitmap {

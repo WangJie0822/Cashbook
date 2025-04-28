@@ -109,8 +109,8 @@ class MainAppViewModel @Inject constructor(
     val confirmUpdateInfoData: StateFlow<UpgradeInfoEntity?> = _confirmUpdateInfoData
 
     val ignoreUpdateVersionData =
-        combine(settingRepository.appDataMode, _updateInfoData) { appDataModel, updateInfoEntity ->
-            appDataModel.ignoreUpdateVersion.isNotBlank() && appDataModel.ignoreUpdateVersion == updateInfoEntity?.versionName
+        combine(settingRepository.appSettingsModel, _updateInfoData) { model, updateInfoEntity ->
+            model.ignoreUpdateVersion.isNotBlank() && model.ignoreUpdateVersion == updateInfoEntity?.versionName
         }
             .stateIn(
                 scope = viewModelScope,
@@ -123,21 +123,21 @@ class MainAppViewModel @Inject constructor(
      * - WiFi或用户允许流量下载
      */
     private val _allowDownload =
-        combine(settingRepository.appDataMode, networkMonitor.isWifi) { appDataModel, isWifi ->
-            isWifi || appDataModel.mobileNetworkDownloadEnable
+        combine(settingRepository.appSettingsModel, networkMonitor.isWifi) { model, isWifi ->
+            isWifi || model.mobileNetworkDownloadEnable
         }
 
     /** 界面 UI 状态 */
-    val uiState = combine(settingRepository.appDataMode, _verified) { appData, verified ->
-        val needSecurityVerificationWhenLaunch = appData.needSecurityVerificationWhenLaunch
+    val uiState = combine(settingRepository.appSettingsModel, _verified) { model, verified ->
+        val needSecurityVerificationWhenLaunch = model.needSecurityVerificationWhenLaunch
         if (!needSecurityVerificationWhenLaunch) {
             // 未开启安全认证，启动自动修改认证状态为已认证，防止开启认证开关时立即拉起认证
             _verified.tryEmit(true)
         }
         MainAppUiState.Success(
-            needRequestProtocol = !appData.agreedProtocol,
+            needRequestProtocol = !model.agreedProtocol,
             needVerity = needSecurityVerificationWhenLaunch && !verified,
-            supportFingerprint = appData.enableFingerprintVerification,
+            supportFingerprint = model.enableFingerprintVerification,
             currentBookName = booksRepository.currentBook.first().name,
         )
     }
@@ -148,24 +148,24 @@ class MainAppViewModel @Inject constructor(
         )
 
     /** 密码加密向量信息 */
-    private val _passwordIv = settingRepository.appDataMode
+    private val _passwordIv = settingRepository.appSettingsModel
         .mapLatest { it.passwordIv }
 
     /** 密码信息 */
-    private val _passwordInfo = settingRepository.appDataMode
+    private val _passwordInfo = settingRepository.appSettingsModel
         .mapLatest { it.passwordInfo }
 
     /** 密码加密向量信息 */
-    private val _fingerprintIv = settingRepository.appDataMode
+    private val _fingerprintIv = settingRepository.appSettingsModel
         .mapLatest { it.fingerprintIv }
 
     /** 密码信息 */
-    private val _fingerprintPasswordInfo = settingRepository.appDataMode
+    private val _fingerprintPasswordInfo = settingRepository.appSettingsModel
         .mapLatest { it.fingerprintPasswordInfo }
 
     /** 验证模式 */
-    private val _verificationMode = settingRepository.appDataMode
-        .mapLatest { it.verificationModel }
+    private val _verificationMode = settingRepository.appSettingsModel
+        .mapLatest { it.verificationMode }
 
     /** 确认认证，使用 [pwd] 进行认证 */
     fun onVerityConfirm(pwd: String) {
@@ -272,8 +272,8 @@ class MainAppViewModel @Inject constructor(
         logger().i("checkUpdateAuto()")
         viewModelScope.launch {
             try {
-                val appDataModel = settingRepository.appDataMode.first()
-                if (!appDataModel.autoCheckUpdate) {
+                val settingsModel = settingRepository.appSettingsModel.first()
+                if (!settingsModel.autoCheckUpdate) {
                     this@MainAppViewModel.logger().i("checkUpdateAuto(), autoCheckUpdate is off")
                     return@launch
                 }
@@ -282,7 +282,7 @@ class MainAppViewModel @Inject constructor(
                     return@launch
                 }
                 val upgradeInfoEntity = settingRepository.getLatestUpdateInfo()
-                if (upgradeInfoEntity.versionName == appDataModel.ignoreUpdateVersion) {
+                if (upgradeInfoEntity.versionName == settingsModel.ignoreUpdateVersion) {
                     return@launch
                 }
                 checkUpgradeFromInfo(

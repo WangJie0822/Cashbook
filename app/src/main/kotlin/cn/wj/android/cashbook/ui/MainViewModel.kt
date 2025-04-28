@@ -30,7 +30,7 @@ class MainViewModel @Inject constructor(
     settingRepository: SettingRepository,
 ) : ViewModel() {
 
-    val uiState = settingRepository.appDataMode
+    val uiState = settingRepository.appSettingsModel
         .mapLatest {
             ActivityUiState.Success(
                 darkMode = it.darkMode,
@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = ActivityUiState.Loading,
         )
 }

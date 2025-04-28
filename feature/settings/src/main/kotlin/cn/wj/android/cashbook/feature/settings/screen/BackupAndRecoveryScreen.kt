@@ -36,6 +36,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -121,6 +122,8 @@ internal fun BackupAndRecoveryRoute(
         onAutoBackupClick = viewModel::displaySelectAutoBackupDialog,
         onAutoBackupModeSelected = viewModel::onAutoBackupModeSelected,
         onKeepLatestBackupChanged = viewModel::changeKeepLatestBackup,
+        onMobileNetworkBackupEnableChanged = viewModel::onMobileNetworkBackupEnableChanged,
+        onNoWifiConfirmBackupClick = viewModel::onNoWifiConfirmBackupClick,
         onDbMigrateClick = viewModel::refreshDbMigrate,
         onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,
@@ -163,6 +166,8 @@ internal fun BackupAndRecoveryScreen(
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
     onKeepLatestBackupChanged: (Boolean) -> Unit,
+    onMobileNetworkBackupEnableChanged: (Boolean) -> Unit,
+    onNoWifiConfirmBackupClick: (Boolean) -> Unit,
     onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
     onDbMigrateClick: () -> Unit,
     onBackClick: () -> Unit,
@@ -220,7 +225,7 @@ internal fun BackupAndRecoveryScreen(
                             )
                         }
 
-                        is Int -> {
+                        0 -> {
                             if (uiState is BackupAndRecoveryUiState.Success) {
                                 AutoBackupModeDialog(
                                     autoBackupMode = uiState.autoBackup,
@@ -228,6 +233,13 @@ internal fun BackupAndRecoveryScreen(
                                     onRequestDismissDialog = onRequestDismissDialog,
                                 )
                             }
+                        }
+
+                        1 -> {
+                            NoWifiBackupHintDialog(
+                                onNoWifiConfirmBackupClick = onNoWifiConfirmBackupClick,
+                                onRequestDismissDialog = onRequestDismissDialog,
+                            )
                         }
                     }
                 }
@@ -247,6 +259,7 @@ internal fun BackupAndRecoveryScreen(
                             onRecoveryClick = onRecoveryClick,
                             onAutoBackupClick = onAutoBackupClick,
                             onKeepLatestBackupChanged = onKeepLatestBackupChanged,
+                            onMobileNetworkBackupEnableChanged = onMobileNetworkBackupEnableChanged,
                             onDbMigrateClick = onDbMigrateClick,
                         )
                     }
@@ -352,6 +365,54 @@ internal fun AutoBackupModeDialog(
 }
 
 /**
+ * 无Wi-Fi备份提示弹窗
+ *
+ * @param onNoWifiConfirmBackupClick 确认点击
+ * @param onRequestDismissDialog 隐藏弹窗
+ */
+@Composable
+internal fun NoWifiBackupHintDialog(
+    onNoWifiConfirmBackupClick: (Boolean) -> Unit,
+    onRequestDismissDialog: () -> Unit,
+) {
+    var noMorePrompt by remember {
+        mutableStateOf(false)
+    }
+    CbAlertDialog(
+        onDismissRequest = onRequestDismissDialog,
+        title = {
+            Text(text = stringResource(R.string.warm_tip))
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.no_wifi_backup_available_hint),
+                )
+                Row(
+                    modifier = Modifier
+                        .clickable { noMorePrompt = !noMorePrompt }
+                        .padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(checked = noMorePrompt, onCheckedChange = { noMorePrompt = it })
+                    Text(text = stringResource(id = R.string.no_more_prompt))
+                }
+            }
+        },
+        confirmButton = {
+            CbTextButton(onClick = { onNoWifiConfirmBackupClick.invoke(noMorePrompt) }) {
+                Text(text = stringResource(id = R.string.confirm))
+            }
+        },
+        dismissButton = {
+            CbTextButton(onClick = onRequestDismissDialog) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+    )
+}
+
+/**
  * 备份恢复内容
  *
  * @param uiState 界面 UI 状态
@@ -373,6 +434,7 @@ internal fun BackupAndRecoveryScaffoldContent(
     onRecoveryClick: (Boolean, String) -> Unit,
     onAutoBackupClick: () -> Unit,
     onKeepLatestBackupChanged: (Boolean) -> Unit,
+    onMobileNetworkBackupEnableChanged: (Boolean) -> Unit,
     onDbMigrateClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -615,6 +677,19 @@ internal fun BackupAndRecoveryScaffoldContent(
                 Switch(
                     checked = uiState.keepLatestBackup,
                     onCheckedChange = onKeepLatestBackupChanged,
+                )
+            },
+        )
+
+        CbListItem(
+            headlineContent = { Text(text = stringResource(id = R.string.mobile_network_backup_enable)) },
+            supportingContent = {
+                Text(text = stringResource(id = R.string.mobile_network_backup_enable_hint))
+            },
+            trailingContent = {
+                Switch(
+                    checked = uiState.mobileNetworkBackupEnable,
+                    onCheckedChange = onMobileNetworkBackupEnableChanged,
                 )
             },
         )

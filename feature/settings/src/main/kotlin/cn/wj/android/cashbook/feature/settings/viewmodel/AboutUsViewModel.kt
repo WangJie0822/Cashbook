@@ -51,11 +51,11 @@ class AboutUsViewModel @Inject constructor(
     var logcatDialogState: DialogState by mutableStateOf(DialogState.Dismiss)
 
     /** 界面 UI 状态 */
-    val uiState = settingRepository.appDataMode.mapLatest { appDataModel ->
+    val uiState = settingRepository.appSettingsModel.mapLatest { model ->
         AboutUsUiState.Success(
-            useGitee = !appDataModel.useGithub,
-            canary = appDataModel.canary,
-            autoCheckUpdate = appDataModel.autoCheckUpdate,
+            useGitee = !model.useGithub,
+            canary = model.canary,
+            autoCheckUpdate = model.autoCheckUpdate,
         )
     }
         .stateIn(
@@ -77,7 +77,7 @@ class AboutUsViewModel @Inject constructor(
             viewModelScope.launch {
                 logcatDialogState = DialogState.Shown(
                     when {
-                        settingRepository.appDataMode.first().logcatInRelease -> LogcatState.ALWAYS
+                        settingRepository.appSettingsModel.first().logcatInRelease -> LogcatState.ALWAYS
                         ApplicationInfo.logcatEnable -> LogcatState.ONCE
                         else -> LogcatState.NONE
                     },

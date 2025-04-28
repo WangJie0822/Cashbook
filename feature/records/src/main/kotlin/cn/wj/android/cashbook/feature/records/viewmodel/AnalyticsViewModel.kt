@@ -75,26 +75,6 @@ class AnalyticsViewModel @Inject constructor(
 
     val uiState = _recordListData.mapLatest { list ->
         val date = _dateData.first()
-        val crossYear: Boolean
-        val titleText: String
-        when {
-            date.year -> {
-                crossYear = false
-                titleText = date.from.year.toString()
-            }
-
-            date.to != null -> {
-                crossYear = date.from.year != date.to.year
-                titleText =
-                    "${date.from.year}-${date.from.monthValue.completeZero()}-${date.from.dayOfMonth.completeZero()}\n" +
-                    "${date.to.year}-${date.to.monthValue.completeZero()}-${date.to.dayOfMonth.completeZero()}"
-            }
-
-            else -> {
-                crossYear = false
-                titleText = "${date.from.year}-${date.from.monthValue.completeZero()}"
-            }
-        }
         var totalIncome = BigDecimal.ZERO
         var totalExpenditure = BigDecimal.ZERO
         var totalBalance = BigDecimal.ZERO
@@ -112,8 +92,8 @@ class AnalyticsViewModel @Inject constructor(
             transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.TRANSFER, list)
         val success = AnalyticsUiState.Success(
             year = date.year,
-            crossYear = crossYear,
-            titleText = titleText,
+            crossYear = date.crossYear,
+            titleText = date.titleText,
             noData = list.isEmpty(),
             totalIncome = totalIncome.decimalFormat(),
             totalExpenditure = totalExpenditure.decimalFormat(),
@@ -198,11 +178,40 @@ sealed interface AnalyticsUiState {
     ) : AnalyticsUiState
 }
 
+/**
+ * 日期数据
+ *
+ * @param from 开始时间
+ * @param to 结束时间，为空时为开始时间当月
+ * @param year 是否为全年
+ */
 data class DateData(
     val from: LocalDate,
     val to: LocalDate? = null,
     val year: Boolean = false,
-)
+) {
+    val titleText: String
+        get() = when {
+            year -> {
+                from.year.toString()
+            }
+
+            to != null -> {
+                "${from.year}-${from.monthValue.completeZero()}-${from.dayOfMonth.completeZero()}\n" +
+                    "${to.year}-${to.monthValue.completeZero()}-${to.dayOfMonth.completeZero()}"
+            }
+
+            else -> {
+                "${from.year}-${from.monthValue.completeZero()}"
+            }
+        }
+
+    val dateStr: String
+        get() = titleText.replace("\n", "~")
+
+    val crossYear: Boolean
+        get() = to != null && from.year != to.year
+}
 
 data class ShowSheetData(
     val typeId: Long,

@@ -19,10 +19,12 @@ package cn.wj.android.cashbook.core.data.repository
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
-import cn.wj.android.cashbook.core.model.model.AppDataModel
+import cn.wj.android.cashbook.core.model.model.AppSettingsModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
+import cn.wj.android.cashbook.core.model.model.RecordSettingsModel
 import cn.wj.android.cashbook.core.model.model.TempKeysModel
 import kotlinx.coroutines.flow.Flow
 
@@ -33,14 +35,20 @@ import kotlinx.coroutines.flow.Flow
  */
 interface SettingRepository {
 
-    /** 应用配置信息数据源 */
-    val appDataMode: Flow<AppDataModel>
+    /** 应用设置数据源 */
+    val appSettingsModel: Flow<AppSettingsModel>
+
+    /** 记录设置数据源 */
+    val recordSettingsModel: Flow<RecordSettingsModel>
 
     /** 远程仓库数据源 */
     val gitDataModel: Flow<GitDataModel>
 
     /** 临时开关数据 */
     val tempKeysModel: Flow<TempKeysModel>
+
+    /** 拆分 AppPreferences 数据 */
+    suspend fun splitAppPreferences()
 
     /** 更新使用 github 配置 */
     suspend fun updateUseGithub(useGithub: Boolean)
@@ -53,6 +61,9 @@ interface SettingRepository {
 
     /** 更新是否允许流量下载配置 */
     suspend fun updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable: Boolean)
+
+    /** 更新图片质量 */
+    suspend fun updateImageQuality(imageQuality: ImageQualityEnum)
 
     /** 更新启动时是否需要安全验证配置 */
     suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean)
@@ -92,6 +103,8 @@ interface SettingRepository {
     suspend fun updateAutoBackupMode(autoBackupMode: AutoBackupModeEnum)
 
     suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean)
+
+    suspend fun updateMobileNetworkBackupEnable(enable: Boolean)
 
     suspend fun updateCanary(canary: Boolean)
 

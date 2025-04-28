@@ -122,11 +122,9 @@ class ConnectivityManagerNetworkMonitor @Inject constructor(
 
     private fun ConnectivityManager.isCurrentlyConnected() = activeNetwork
         ?.let(::getNetworkCapabilities)
-        ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        ?: false
+        ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
 
     private fun ConnectivityManager.isCurrentlyWifi() = activeNetwork
         ?.let(::getNetworkCapabilities)
-        ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-        ?: false
+        ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
 }

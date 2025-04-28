@@ -60,6 +60,13 @@ interface RecordRepository {
         pageSize: Int,
     ): List<RecordModel>
 
+    suspend fun queryPagingRecordListByTypeIdBetweenDate(
+        typeId: Long,
+        date: String,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel>
+
     suspend fun queryPagingRecordListByTagId(
         tagId: Long,
         page: Int,

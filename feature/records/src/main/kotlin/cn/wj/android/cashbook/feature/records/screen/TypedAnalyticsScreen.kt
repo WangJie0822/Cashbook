@@ -18,10 +18,12 @@ package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -30,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
@@ -56,12 +59,13 @@ import cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsViewModel
 internal fun TypedAnalyticsRoute(
     typeId: Long,
     tagId: Long,
+    date: String,
     onRequestNaviToEditRecord: (Long) -> Unit,
     onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TypedAnalyticsViewModel = hiltViewModel<TypedAnalyticsViewModel>().apply {
-        updateId(tagId = tagId, typeId = typeId)
+        updateData(tagId = tagId, typeId = typeId, date = date)
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -96,11 +100,23 @@ private fun TypedAnalyticsScreen(
     CbScaffold(
         modifier = modifier,
         topBar = {
-            CbTopAppBar(title = {
-                if (uiState is TypedAnalyticsUiState.Success) {
-                    Text(text = uiState.titleText)
-                }
-            }, onBackClick = onRequestPopBackStack)
+            CbTopAppBar(
+                title = {
+                    if (uiState is TypedAnalyticsUiState.Success) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = uiState.titleText)
+                            if (uiState.subTitleText.isNotBlank()) {
+                                Text(
+                                    text = uiState.subTitleText,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(start = 16.dp),
+                                )
+                            }
+                        }
+                    }
+                },
+                onBackClick = onRequestPopBackStack,
+            )
         },
         content = { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
@@ -132,30 +148,32 @@ private fun TypedAnalyticsScreen(
                     }
 
                     is TypedAnalyticsUiState.Success -> {
-                        LazyColumn(content = {
-                            if (recordList.itemCount <= 0) {
-                                item {
-                                    Empty(
-                                        hintText = stringResource(id = R.string.asset_no_record_data_hint),
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
-                            } else {
-                                items(count = recordList.itemCount) { index ->
-                                    recordList[index]?.let { item ->
-                                        RecordListItem(
-                                            item = item,
-                                            modifier = Modifier.clickable {
-                                                onRequestShowRecordDetailsSheet(item)
-                                            },
+                        LazyColumn(
+                            content = {
+                                if (recordList.itemCount <= 0) {
+                                    item {
+                                        Empty(
+                                            hintText = stringResource(id = R.string.asset_no_record_data_hint),
+                                            modifier = Modifier.fillMaxWidth(),
                                         )
                                     }
+                                } else {
+                                    items(count = recordList.itemCount) { index ->
+                                        recordList[index]?.let { item ->
+                                            RecordListItem(
+                                                item = item,
+                                                modifier = Modifier.clickable {
+                                                    onRequestShowRecordDetailsSheet(item)
+                                                },
+                                            )
+                                        }
+                                    }
+                                    item {
+                                        Footer(hintText = stringResource(id = R.string.footer_hint_default))
+                                    }
                                 }
-                                item {
-                                    Footer(hintText = stringResource(id = R.string.footer_hint_default))
-                                }
-                            }
-                        })
+                            },
+                        )
                     }
                 }
             }

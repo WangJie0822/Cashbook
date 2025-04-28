@@ -31,6 +31,7 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
@@ -51,10 +52,13 @@ class AutoBackupWorker @AssistedInject constructor(
     override suspend fun getForegroundInfo(): ForegroundInfo =
         appContext.syncForegroundInfo()
 
-    override suspend fun doWork(): Result = withContext(ioDispatcher) {
-        this@AutoBackupWorker.logger().i("doWork(), requestBackup")
-        backupRecoveryManager.requestBackup()
-        Result.success()
+    override suspend fun doWork(): Result {
+        this@AutoBackupWorker.logger().i("doWork(), requestAutoBackup")
+        withContext(ioDispatcher) {
+            delay(2_000L)
+            backupRecoveryManager.requestAutoBackup()
+        }
+        return Result.success()
     }
 
     companion object {

@@ -62,7 +62,7 @@ class CashbookApplication : Application() {
         super.onCreate()
 
         applicationScope.launch {
-            settingsRepository.appDataMode.collectLatest {
+            settingsRepository.appSettingsModel.collectLatest {
                 logcatEnable = it.logcatInRelease
             }
         }

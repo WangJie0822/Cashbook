@@ -25,10 +25,12 @@ import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
-import cn.wj.android.cashbook.core.model.model.AppDataModel
+import cn.wj.android.cashbook.core.model.model.AppSettingsModel
 import cn.wj.android.cashbook.core.model.model.GitDataModel
+import cn.wj.android.cashbook.core.model.model.RecordSettingsModel
 import cn.wj.android.cashbook.core.model.model.TempKeysModel
 import cn.wj.android.cashbook.core.network.datasource.RemoteDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -42,6 +44,11 @@ import kotlin.coroutines.CoroutineContext
 /**
  * 设置相关数据仓库
  *
+ * @param combineProtoDataSource proto 组合数据源
+ * @param remoteDataSource 远程数据源
+ * @param context 应用全局 [Context] 对象
+ * @param coroutineContext IO 相关 [CoroutineContext]
+ *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/14
  */
 class SettingRepositoryImpl @Inject constructor(
@@ -51,11 +58,18 @@ class SettingRepositoryImpl @Inject constructor(
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : SettingRepository {
 
-    override val appDataMode: Flow<AppDataModel> = combineProtoDataSource.appData
+    override val appSettingsModel: Flow<AppSettingsModel> = combineProtoDataSource.appSettingsData
+
+    override val recordSettingsModel: Flow<RecordSettingsModel> =
+        combineProtoDataSource.recordSettingsData
 
     override val gitDataModel: Flow<GitDataModel> = combineProtoDataSource.gitData
 
     override val tempKeysModel: Flow<TempKeysModel> = combineProtoDataSource.tempKeysData
+
+    override suspend fun splitAppPreferences() = withContext(coroutineContext) {
+        combineProtoDataSource.splitAppPreferences()
+    }
 
     override suspend fun updateUseGithub(useGithub: Boolean) = withContext(coroutineContext) {
         combineProtoDataSource.updateUseGithub(useGithub)
@@ -75,6 +89,12 @@ class SettingRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             combineProtoDataSource.updateMobileNetworkDownloadEnable(mobileNetworkDownloadEnable)
         }
+
+    override suspend fun updateImageQuality(imageQuality: ImageQualityEnum) {
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateImageQuality(imageQuality)
+        }
+    }
 
     override suspend fun updateNeedSecurityVerificationWhenLaunch(needSecurityVerificationWhenLaunch: Boolean) =
         withContext(coroutineContext) {
@@ -140,7 +160,7 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun syncLatestVersion(): Boolean = withContext(coroutineContext) {
         try {
-            val appData = combineProtoDataSource.appData.first()
+            val appData = combineProtoDataSource.appSettingsData.first()
             val release = remoteDataSource.checkUpdate(!appData.useGithub, appData.canary)
             val asset = release?.assets?.firstOrNull {
                 val assetName = it.name.orEmpty()
@@ -184,6 +204,11 @@ class SettingRepositoryImpl @Inject constructor(
     override suspend fun updateKeepLatestBackup(keepLatestBackup: Boolean) =
         withContext(coroutineContext) {
             combineProtoDataSource.updateKeepLatestBackup(keepLatestBackup)
+        }
+
+    override suspend fun updateMobileNetworkBackupEnable(enable: Boolean) =
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateMobileNetworkBackupEnable(enable)
         }
 
     override suspend fun updateCanary(canary: Boolean) =

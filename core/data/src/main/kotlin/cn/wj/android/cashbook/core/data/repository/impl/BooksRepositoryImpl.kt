@@ -48,8 +48,8 @@ class BooksRepositoryImpl @Inject constructor(
             .mapLatest { getAllBooksList() }
 
     override val currentBook: Flow<BooksModel> =
-        combine(booksListData, combineProtoDataSource.appData) { list, appData ->
-            var selected = list.firstOrNull { it.id == appData.currentBookId }
+        combine(booksListData, combineProtoDataSource.recordSettingsData) { list, data ->
+            var selected = list.firstOrNull { it.id == data.currentBookId }
             if (null == selected) {
                 // 没有找到当前账本，默认选择第一个
                 selected = list.first()

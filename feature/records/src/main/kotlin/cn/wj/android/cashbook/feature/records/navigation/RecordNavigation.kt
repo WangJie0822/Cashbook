@@ -39,6 +39,7 @@ private const val ROUTE_EDIT_RECORD_KEY_RECORD_ID = "recordId"
 private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
 private const val ROUTE_EDIT_RECORD_KEY_TAG_ID = "tagId"
 private const val ROUTE_EDIT_RECORD_KEY_ASSET_ID = "assetId"
+private const val ROUTE_EDIT_RECORD_KEY_DATE = "date"
 
 /** 路由 - 数据分析 */
 private const val ROUTE_ANALYTICS = "record/analytics"
@@ -47,7 +48,8 @@ private const val ROUTE_ANALYTICS = "record/analytics"
 private const val ROUTE_TYPED_ANALYTICS =
     "record/typed_analytics" +
         "?$ROUTE_EDIT_RECORD_KEY_TAG_ID={$ROUTE_EDIT_RECORD_KEY_TAG_ID}" +
-        "&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}"
+        "&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}" +
+        "&$ROUTE_EDIT_RECORD_KEY_DATE={$ROUTE_EDIT_RECORD_KEY_DATE}"
 
 /** 路由 - 编辑记录 */
 const val ROUTE_EDIT_RECORD =
@@ -82,7 +84,11 @@ fun NavController.naviToEditRecord(recordId: Long = -1L, assetId: Long = -1L) {
     )
 }
 
-fun NavController.naviToTypedAnalytics(tagId: Long = -1L, typeId: Long = -1L) {
+fun NavController.naviToTypedAnalytics(
+    tagId: Long = -1L,
+    typeId: Long = -1L,
+    date: String? = null,
+) {
     this.navigate(
         ROUTE_TYPED_ANALYTICS
             .replace(
@@ -92,6 +98,10 @@ fun NavController.naviToTypedAnalytics(tagId: Long = -1L, typeId: Long = -1L) {
             .replace(
                 oldValue = "{$ROUTE_EDIT_RECORD_KEY_TYPE_ID}",
                 newValue = typeId.toString(),
+            )
+            .replace(
+                oldValue = "{$ROUTE_EDIT_RECORD_KEY_DATE}",
+                newValue = date.orEmpty(),
             ),
     )
 }
@@ -149,7 +159,7 @@ fun NavGraphBuilder.editRecordScreen(
 }
 
 fun NavGraphBuilder.analyticsScreen(
-    onRequestNaviToTypeAnalytics: (Long) -> Unit,
+    onRequestNaviToTypeAnalytics: (Long, String?) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(
@@ -178,11 +188,16 @@ fun NavGraphBuilder.typedAnalyticsScreen(
                 type = NavType.LongType
                 defaultValue = -1L
             },
+            navArgument(ROUTE_EDIT_RECORD_KEY_DATE) {
+                type = NavType.StringType
+                defaultValue = ""
+            },
         ),
     ) {
         TypedAnalyticsRoute(
             typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
             tagId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TAG_ID) ?: -1L,
+            date = it.arguments?.getString(ROUTE_EDIT_RECORD_KEY_DATE) ?: "",
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,

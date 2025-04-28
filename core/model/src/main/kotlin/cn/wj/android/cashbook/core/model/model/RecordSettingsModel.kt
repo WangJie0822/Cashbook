@@ -17,13 +17,23 @@
 package cn.wj.android.cashbook.core.model.model
 
 /**
- * 临时开关数据
+ * 记录设置数据
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2025/1/20
+ * > [王杰](mailto:15555650921@163.com) 创建于 2025/4/26
  */
-data class TempKeysModel(
-    /** 数据库数据是否执行版本9到版本10迁移 */
-    val db9To10DataMigrated: Boolean,
-    /** proto app_preferences 是否拆分 */
-    val preferenceSplit: Boolean,
+data class RecordSettingsModel(
+    /** 当前账本 id */
+    val currentBookId: Long,
+    /** 默认类型 id */
+    val defaultTypeId: Long,
+    /** 上次记录资产 id */
+    val lastAssetId: Long,
+    /** 退款类型 id */
+    val refundTypeId: Long,
+    /** 报销类型 id */
+    val reimburseTypeId: Long,
+    /** 信用卡还款类型 id */
+    val creditCardPaymentTypeId: Long,
+    /** 充值账号计入总资产 */
+    val topUpInTotal: Boolean,
 )

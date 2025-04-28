@@ -38,13 +38,27 @@ class GetTypeRecordViewsUseCase @Inject constructor(
 
     suspend operator fun invoke(
         typeId: Long,
+        date: String,
         pageNum: Int,
         pageSize: Int,
     ): List<RecordViewsEntity> = withContext(coroutineContext) {
         if (typeId == -1L) {
             return@withContext emptyList()
         }
-        recordRepository.queryPagingRecordListByTypeId(typeId, pageNum, pageSize)
+        if (date.isNotBlank()) {
+            recordRepository.queryPagingRecordListByTypeIdBetweenDate(
+                typeId = typeId,
+                date = date,
+                page = pageNum,
+                pageSize = pageSize,
+            )
+        } else {
+            recordRepository.queryPagingRecordListByTypeId(
+                typeId = typeId,
+                page = pageNum,
+                pageSize = pageSize,
+            )
+        }
             .sortedBy { it.recordTime }
             .reversed()
             .map {

@@ -78,7 +78,7 @@ import kotlin.coroutines.CoroutineContext
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/7/21
  */
 class BackupRecoveryManager @Inject constructor(
-    networkMonitor: NetworkMonitor,
+    private val networkMonitor: NetworkMonitor,
     private val settingRepository: SettingRepository,
     private val webDAVHandler: WebDAVHandler,
     private val database: CashbookDatabase,
@@ -100,7 +100,7 @@ class BackupRecoveryManager @Inject constructor(
         combine(
             networkMonitor.isOnline,
             connectedDataVersion,
-            settingRepository.appDataMode,
+            settingRepository.appSettingsModel,
         ) { isOnline, _, _ ->
             isOnline && refreshConnectedStatus()
         }
@@ -110,11 +110,11 @@ class BackupRecoveryManager @Inject constructor(
     val recoveryState: Flow<BackupRecoveryState> = _recoveryState
 
     private val onlineBackupListData = combine(connectedDataVersion, backupDataVersion) { _, _ ->
-        val appDataMode = settingRepository.appDataMode.first()
+        val appDataMode = settingRepository.appSettingsModel.first()
         webDAVHandler.list(appDataMode.webDAVDomain.backupPath)
     }
 
-    private val localBackupListData = settingRepository.appDataMode.mapLatest { appDataModel ->
+    private val localBackupListData = settingRepository.appSettingsModel.mapLatest { appDataModel ->
         getLocalBackupList(appDataModel.backupPath)
     }
 
@@ -139,21 +139,28 @@ class BackupRecoveryManager @Inject constructor(
         }
     }
 
-    suspend fun requestBackup(): Unit = withContext(ioCoroutineContext) {
+    suspend fun requestAutoBackup() = withContext(ioCoroutineContext) {
+        requestBackup(
+            onlyLocal = !settingRepository.appSettingsModel.first().mobileNetworkBackupEnable &&
+                !networkMonitor.isWifi.first(),
+        )
+    }
+
+    suspend fun requestBackup(onlyLocal: Boolean = false): Unit = withContext(ioCoroutineContext) {
         updateBackupState(BackupRecoveryState.InProgress)
-        val appDataModel = settingRepository.appDataMode.first()
+        val appDataModel = settingRepository.appSettingsModel.first()
         val backupPath = appDataModel.backupPath
-        logger().i("requestBackup(), backupPath = <$backupPath>")
+        logger().i("requestBackup(onlyLocal = <$onlyLocal>), backupPath = <$backupPath>")
         if (backupPath.isBlank()) {
-            logger().i("requestBackup(), blank backupPath")
+            logger().i("requestBackup(onlyLocal), blank backupPath")
             updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BLANK_BACKUP_PATH))
         } else {
             if (grantedPermissions(backupPath)) {
                 // 有权限，开始备份
-                logger().i("requestBackup(), startBackup")
-                startBackup(backupPath)
+                logger().i("requestBackup(onlyLocal), startBackup")
+                startBackup(backupPath, onlyLocal)
             } else {
-                logger().i("requestBackup(), unauthorized")
+                logger().i("requestBackup(onlyLocal), unauthorized")
                 updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED))
             }
         }
@@ -277,7 +284,7 @@ class BackupRecoveryManager @Inject constructor(
     ): List<BackupModel> = withContext(ioCoroutineContext) {
         val list = if (!onlyLocal && isWebDAVConnected.first()) {
             // 使用云端数据
-            val webDAVDomain = settingRepository.appDataMode.first().webDAVDomain
+            val webDAVDomain = settingRepository.appSettingsModel.first().webDAVDomain
             onlineBackupListData.first().map {
                 // 云端路径不包含服务器地址，完善地址
                 if (!it.path.startsWith(webDAVDomain)) {
@@ -333,12 +340,14 @@ class BackupRecoveryManager @Inject constructor(
     private suspend fun <T> withCredentials(
         block: suspend WebDAVHandler.(String) -> T,
     ): T = withContext(ioCoroutineContext) {
-        val appDataMode = settingRepository.appDataMode.first()
+        val appDataMode = settingRepository.appSettingsModel.first()
         webDAVHandler.setCredentials(appDataMode.webDAVAccount, appDataMode.webDAVPassword)
         webDAVHandler.block(appDataMode.webDAVDomain.backupPath)
     }
 
-    private suspend fun startBackup(backupPath: String) {
+    private suspend fun startBackup(backupPath: String, onlyLocal: Boolean) {
+        this@BackupRecoveryManager.logger()
+            .i("startBackup(backupPath = <$backupPath>, onlyLocal = <$onlyLocal>)")
         if (backupPath.isBlank()) {
             this@BackupRecoveryManager.logger().i("startBackup(), backupPath is blank")
             updateBackupState(BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BLANK_BACKUP_PATH))
@@ -383,7 +392,7 @@ class BackupRecoveryManager @Inject constructor(
                 return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
             }
             val zippedFileName = zippedFile.name
-            val keepLatest = settingRepository.appDataMode.first().keepLatestBackup
+            val keepLatest = settingRepository.appSettingsModel.first().keepLatestBackup
             val backupFileUri = if (backupPath.startsWith("content://")) {
                 val documentFile = DocumentFile.fromTreeUri(context, backupPath.toUri())
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
@@ -425,8 +434,8 @@ class BackupRecoveryManager @Inject constructor(
             // 更新备份时间
             settingRepository.updateBackupMs(currentMs)
 
-            val innerResult = if (isWebDAVConnected.first()) {
-                // WebDAV 已连接，上传备份文件到云端
+            val innerResult = if (!onlyLocal && isWebDAVConnected.first()) {
+                // 非仅本地且 WebDAV 已连接，上传备份文件到云端
                 runCatching {
                     this@BackupRecoveryManager.logger()
                         .i("startBackup(), upload to WebDAV")

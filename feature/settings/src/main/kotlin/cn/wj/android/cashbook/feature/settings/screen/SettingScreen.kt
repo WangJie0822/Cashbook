@@ -59,6 +59,7 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
@@ -66,7 +67,9 @@ import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAut
 import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
@@ -104,6 +107,8 @@ internal fun SettingRoute(
         dialogState = viewModel.dialogState,
         onRequestDismissDialog = viewModel::dismissDialog,
         onMobileNetworkDownloadEnableChanged = viewModel::onMobileNetworkDownloadEnableChanged,
+        onImageQualityClick = viewModel::onImageQualityClick,
+        onImageQualitySelected = viewModel::onImageQualitySelected,
         onNeedSecurityVerificationWhenLaunchChanged = viewModel::onNeedSecurityVerificationWhenLaunchChanged,
         onEnableFingerprintVerificationChanged = viewModel::onEnableFingerprintVerificationChanged,
         onPasswordClick = viewModel::onPasswordClick,
@@ -167,6 +172,8 @@ internal fun SettingScreen(
     dialogState: DialogState,
     onRequestDismissDialog: () -> Unit,
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
+    onImageQualityClick: () -> Unit,
+    onImageQualitySelected: (ImageQualityEnum) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -220,6 +227,8 @@ internal fun SettingScreen(
             onFingerprintVerifySuccess = onFingerprintVerifySuccess,
             onFingerprintVerifyError = onFingerprintVerifyError,
             onMobileNetworkDownloadEnableChanged = onMobileNetworkDownloadEnableChanged,
+            onImageQualityClick = onImageQualityClick,
+            onImageQualitySelected = onImageQualitySelected,
             onNeedSecurityVerificationWhenLaunchChanged = onNeedSecurityVerificationWhenLaunchChanged,
             onEnableFingerprintVerificationChanged = onEnableFingerprintVerificationChanged,
             onPasswordClick = onPasswordClick,
@@ -243,6 +252,7 @@ internal fun SettingScreen(
  * @param dialogState 弹窗状态
  * @param onRequestDismissDialog 隐藏弹窗
  * @param onMobileNetworkDownloadEnableChanged 允许移动流量开关切换
+ * @param onImageQualitySelected 图片质量点击
  * @param onNeedSecurityVerificationWhenLaunchChanged 启动时需要安全验证开关切换
  * @param onVerificationModeClick 认证模式点击回调
  * @param onEnableFingerprintVerificationChanged 允许指纹认证开关切换
@@ -268,6 +278,8 @@ internal fun SettingContent(
     dialogState: DialogState,
     onRequestDismissDialog: () -> Unit,
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
+    onImageQualityClick: () -> Unit,
+    onImageQualitySelected: (ImageQualityEnum) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -293,9 +305,11 @@ internal fun SettingContent(
         DialogContent(
             dialogState = dialogState,
             onRequestDismissDialog = onRequestDismissDialog,
+            imageQuality = uiState.imageQuality,
             verificationMode = uiState.verificationMode,
             darkMode = uiState.darkMode,
             dynamicColor = uiState.dynamicColor,
+            onImageQualitySelected = onImageQualitySelected,
             onCreateConfirmClick = onCreateConfirmClick,
             onModifyConfirmClick = onModifyConfirmClick,
             onVerifyConfirmClick = onVerifyConfirmClick,
@@ -313,6 +327,7 @@ internal fun SettingContent(
                     CbListItem(
                         modifier = Modifier.padding(top = 16.dp),
                         headlineContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable)) },
+                        supportingContent = { Text(text = stringResource(id = R.string.mobile_network_download_enable_hint)) },
                         trailingContent = {
                             Switch(
                                 checked = uiState.mobileNetworkDownloadEnable,
@@ -326,7 +341,33 @@ internal fun SettingContent(
 
             item {
                 CbListItem(
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .clickable { onImageQualityClick.invoke() },
+                    headlineContent = { Text(text = stringResource(id = R.string.record_image_quality)) },
+                    supportingContent = { Text(text = stringResource(id = R.string.record_image_quality_hint)) },
+                    trailingContent = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(end = 8.dp),
+                                text = uiState.imageQuality.text,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Icon(
+                                imageVector = CbIcons.KeyboardArrowRight,
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                )
+            }
+
+            item {
+                CbListItem(
+                    modifier = Modifier,
                     headlineContent = { Text(text = stringResource(id = R.string.need_security_verification_when_launch)) },
                     trailingContent = {
                         Switch(
@@ -479,9 +520,11 @@ internal fun SettingContent(
 internal fun DialogContent(
     dialogState: DialogState,
     onRequestDismissDialog: () -> Unit,
+    imageQuality: ImageQualityEnum,
     verificationMode: VerificationModeEnum,
     darkMode: DarkModeEnum,
     dynamicColor: Boolean,
+    onImageQualitySelected: (ImageQualityEnum) -> Unit,
     onCreateConfirmClick: (String) -> SettingPasswordStateEnum,
     onModifyConfirmClick: (String, String, (SettingPasswordStateEnum) -> Unit) -> Unit,
     onVerifyConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
@@ -522,6 +565,15 @@ internal fun DialogContent(
                 // 清除密码
                 ClearPasswordDialog(
                     onConfirmClick = onClearConfirmClick,
+                    onDismissClick = onRequestDismissDialog,
+                )
+            }
+
+            SettingDialogEnum.IMAGE_QUALITY -> {
+                // 图片质量
+                ImageQualityDialog(
+                    imageQuality = imageQuality,
+                    onImageQualitySelected = onImageQualitySelected,
                     onDismissClick = onRequestDismissDialog,
                 )
             }
@@ -1027,6 +1079,57 @@ internal fun DarkModeDialog(
 }
 
 /**
+ * 图片质量选择弹窗
+ *
+ * @param imageQuality 当前选择模式
+ * @param onImageQualitySelected 模式选择回调
+ * @param onDismissClick 隐藏弹窗
+ */
+@Composable
+internal fun ImageQualityDialog(
+    imageQuality: ImageQualityEnum,
+    onImageQualitySelected: (ImageQualityEnum) -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    CbAlertDialog(
+        onDismissRequest = onDismissClick,
+        title = { Text(text = stringResource(id = R.string.image_quality)) },
+        text = {
+            Column(
+                modifier = Modifier.selectableGroup(),
+            ) {
+                ImageQualityEnum.entries.forEach { enum ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .selectable(
+                                selected = (enum == imageQuality),
+                                onClick = { onImageQualitySelected.invoke(enum) },
+                                role = Role.RadioButton,
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(selected = enum == imageQuality, onClick = null)
+                        Text(
+                            text = enum.text,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 16.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            CbTextButton(onClick = onDismissClick) {
+                Text(text = stringResource(id = R.string.close))
+            }
+        },
+    )
+}
+
+/**
  * 动态配色模式选择弹窗
  *
  * @param dynamicColor 当前选择模式
@@ -1105,6 +1208,16 @@ internal val DarkModeEnum.text: String
     )
 
 /** 枚举对应文本 */
+internal val ImageQualityEnum.text: String
+    @Composable get() = stringResource(
+        id = when (this) {
+            ImageQualityEnum.ORIGINAL -> R.string.record_image_quality_original
+            ImageQualityEnum.HIGH -> R.string.record_image_quality_high
+            ImageQualityEnum.MEDIUM -> R.string.record_image_quality_medium
+        },
+    )
+
+/** 枚举对应文本 */
 internal val VerificationModeEnum.text: String
     @Composable get() = stringResource(
         id = when (this) {
@@ -1112,3 +1225,40 @@ internal val VerificationModeEnum.text: String
             VerificationModeEnum.WHEN_FOREGROUND -> R.string.each_foreground
         },
     )
+
+@DevicePreviews
+@Composable
+private fun SettingScreenPreview() {
+    PreviewTheme {
+        SettingScreen(
+            supportFingerprint = true,
+            uiState = SettingUiState.Loading,
+            shouldDisplayBookmark = "",
+            onRequestDismissBookmark = { },
+            dialogState = DialogState.Dismiss,
+            onRequestDismissDialog = { },
+            onMobileNetworkDownloadEnableChanged = { },
+            onNeedSecurityVerificationWhenLaunchChanged = { },
+            onEnableFingerprintVerificationChanged = { },
+            onPasswordClick = { },
+            onClearPasswordClick = { },
+            onDarkModeClick = { },
+            onDynamicColorClick = { },
+            onVerificationModeClick = { },
+            onCreateConfirmClick = { SettingPasswordStateEnum.SUCCESS },
+            onModifyConfirmClick = { _, _, _ -> },
+            onImageQualityClick = { },
+            onImageQualitySelected = { _ -> },
+            onVerifyConfirmClick = { _, _ -> },
+            onClearConfirmClick = { _, _ -> },
+            onFingerprintVerifySuccess = { },
+            onFingerprintVerifyError = { _, _ -> },
+            onDarkModeSelected = { },
+            onDynamicColorSelected = { },
+            onVerificationModeSelected = { },
+            onBackupAndRecoveryClick = { },
+            onBackClick = { },
+            onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+        )
+    }
+}

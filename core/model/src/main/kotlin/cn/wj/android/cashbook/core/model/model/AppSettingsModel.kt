@@ -18,42 +18,63 @@ package cn.wj.android.cashbook.core.model.model
 
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 
 /**
- * 应用配置数据
+ * 应用设置数据
  *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/6/14
+ * > [王杰](mailto:15555650921@163.com) 创建于 2025/4/26
  */
-data class AppDataModel(
-    val currentBookId: Long,
-    val defaultTypeId: Long,
-    val lastAssetId: Long,
-    val refundTypeId: Long,
-    val reimburseTypeId: Long,
+data class AppSettingsModel(
+    /** 使用 github 源 */
     val useGithub: Boolean,
+    /** 自动检查更新 */
     val autoCheckUpdate: Boolean,
+    /** 忽略的更新版本 */
     val ignoreUpdateVersion: String,
+    /** 是否允许使用数据流量下载 */
     val mobileNetworkDownloadEnable: Boolean,
+    /** 启动时进行安全验证 */
     val needSecurityVerificationWhenLaunch: Boolean,
+    /** 允许指纹验证 */
     val enableFingerprintVerification: Boolean,
+    /** 密码加密向量 */
     val passwordIv: String,
+    /** 指纹加密向量 */
     val fingerprintIv: String,
+    /** 密码信息 */
     val passwordInfo: String,
+    /** 指纹密码信息 */
     val fingerprintPasswordInfo: String,
+    /** 黑夜模式 */
     val darkMode: DarkModeEnum,
+    /** 动态配色 */
     val dynamicColor: Boolean,
-    val verificationModel: VerificationModeEnum,
+    /** 安全验证类型 */
+    val verificationMode: VerificationModeEnum,
+    /** 已同意用户协议及隐私政策 */
     val agreedProtocol: Boolean,
+    /** WebDAV 服务器地址 */
     val webDAVDomain: String,
+    /** WebDAV 账户 */
     val webDAVAccount: String,
+    /** WebDAV 密码 */
     val webDAVPassword: String,
+    /** 备份路径 */
     val backupPath: String,
+    /** 自动备份类型 */
     val autoBackup: AutoBackupModeEnum,
+    /** 最后一次备份时间 */
     val lastBackupMs: Long,
-    val creditCardPaymentTypeId: Long,
+    /** 是否仅保留本地最后一次备份 */
     val keepLatestBackup: Boolean,
+    /** 是否支持实验版本 */
     val canary: Boolean,
-    val topUpInTotal: Boolean,
+    /** 在 Release 版本输出日志 */
     val logcatInRelease: Boolean,
+    /** 是否允许使用数据流量备份 */
+    val mobileNetworkBackupEnable: Boolean,
+    /** 图片质量 */
+    val imageQuality: ImageQualityEnum,
 )

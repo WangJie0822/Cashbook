@@ -108,14 +108,19 @@ suspend inline fun <R> runCatchWithProgress(
     cancelable: Boolean = true,
     noinline onDismiss: () -> Unit = {},
     minInterval: Long = 550L,
-    timeout: Long = 5000L,
+    timeout: Long = -1L,
     noinline block: suspend CoroutineScope.() -> R,
 ): Result<R> {
     val result: Result<R>
     val ms = measureTimeMillis {
         ProgressDialogManager.show(hint, cancelable, onDismiss)
         result = runCatching {
-            withTimeout(timeout, block)
+            val timeMillis = if (timeout < 0L) {
+                Long.MAX_VALUE
+            } else {
+                timeout
+            }
+            withTimeout(timeMillis, block)
         }
     }
     if (ms < minInterval) {

@@ -31,6 +31,7 @@ import cn.wj.android.cashbook.core.design.security.loadEncryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.design.security.toHexString
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
+import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
@@ -62,12 +63,13 @@ class SettingViewModel @Inject constructor(
     var shouldDisplayBookmark by mutableStateOf("")
         private set
 
-    val uiState = settingRepository.appDataMode
+    val uiState = settingRepository.appSettingsModel
         .mapLatest {
             SettingUiState.Success(
                 mobileNetworkDownloadEnable = it.mobileNetworkDownloadEnable,
+                imageQuality = it.imageQuality,
                 needSecurityVerificationWhenLaunch = it.needSecurityVerificationWhenLaunch,
-                verificationMode = it.verificationModel,
+                verificationMode = it.verificationMode,
                 enableFingerprintVerification = it.enableFingerprintVerification,
                 hasPassword = it.passwordInfo.isNotBlank(),
                 darkMode = it.darkMode,
@@ -81,11 +83,11 @@ class SettingViewModel @Inject constructor(
         )
 
     /** 密码加密向量信息 */
-    private val passwordIv = settingRepository.appDataMode
+    private val passwordIv = settingRepository.appSettingsModel
         .mapLatest { it.passwordIv }
 
     /** 密码信息 */
-    private val passwordInfo = settingRepository.appDataMode
+    private val passwordInfo = settingRepository.appSettingsModel
         .mapLatest { it.passwordInfo }
 
     /** 是否有密码 */
@@ -95,6 +97,16 @@ class SettingViewModel @Inject constructor(
     fun onMobileNetworkDownloadEnableChanged(enable: Boolean) {
         viewModelScope.launch {
             settingRepository.updateMobileNetworkDownloadEnable(enable)
+        }
+    }
+
+    fun onImageQualityClick() {
+        dialogState = DialogState.Shown(SettingDialogEnum.IMAGE_QUALITY)
+    }
+
+    fun onImageQualitySelected(imageQuality: ImageQualityEnum) {
+        viewModelScope.launch {
+            settingRepository.updateImageQuality(imageQuality)
         }
     }
 
@@ -331,6 +343,7 @@ class SettingViewModel @Inject constructor(
 
 sealed class SettingUiState(
     open val mobileNetworkDownloadEnable: Boolean = false,
+    open val imageQuality: ImageQualityEnum = ImageQualityEnum.ORIGINAL,
     open val needSecurityVerificationWhenLaunch: Boolean = false,
     open val verificationMode: VerificationModeEnum = VerificationModeEnum.WHEN_LAUNCH,
     open val enableFingerprintVerification: Boolean = false,
@@ -338,10 +351,11 @@ sealed class SettingUiState(
     open val darkMode: DarkModeEnum = DarkModeEnum.FOLLOW_SYSTEM,
     open val dynamicColor: Boolean = false,
 ) {
-    object Loading : SettingUiState()
+    data object Loading : SettingUiState()
 
     data class Success(
         override val mobileNetworkDownloadEnable: Boolean,
+        override val imageQuality: ImageQualityEnum,
         override val needSecurityVerificationWhenLaunch: Boolean,
         override val verificationMode: VerificationModeEnum,
         override val enableFingerprintVerification: Boolean,
