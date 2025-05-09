@@ -76,7 +76,7 @@ androidx-constraintlayout-compose = "1.1.1"
 androidx-multidex = "2.0.1"
 # core 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/core)
 # [版本查询](https://mvnrepository.com/artifact/androidx.core)
-androidx-core = "1.15.0"
+androidx-core = "1.16.0"
 androidx-core-splashscreen = "1.0.1"
 # Compose 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/compose)
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
