@@ -57,7 +57,7 @@ dropbox-dependency-guard = "0.5.0"
 android-desugarJdkLibs = "2.1.5"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
-android-gradle-plugin = "8.9.2"
+android-gradle-plugin = "8.10.0"
 android-tools = "31.9.2"
 androidx-baselineprofile = "1.3.4"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
