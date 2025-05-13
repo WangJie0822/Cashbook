@@ -103,7 +103,7 @@ androidx-navigation = "2.9.0"
 androidx-work = "2.10.1"
 # DataStore 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/datastore)
 # [版本查询](https://mvnrepository.com/artifact/androidx.datastore)
-androidx-datastore = "1.1.5"
+androidx-datastore = "1.1.6"
 # Annotation [指南](https://developer.android.google.cn/jetpack/androidx/releases/annotation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.annotation)
 androidx-annotation = "1.9.1"
