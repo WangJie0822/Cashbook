@@ -75,7 +75,7 @@ androidx.datastore:datastore-core-okio-jvm:1.1.6
 androidx.datastore:datastore-core-okio:1.1.6
 androidx.datastore:datastore-core:1.1.6
 androidx.datastore:datastore:1.1.6
-androidx.documentfile:documentfile:1.0.1
+androidx.documentfile:documentfile:1.1.0
 androidx.drawerlayout:drawerlayout:1.1.1
 androidx.dynamicanimation:dynamicanimation:1.0.0
 androidx.emoji2:emoji2-views-helper:1.4.0
