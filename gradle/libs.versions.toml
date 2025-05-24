@@ -29,7 +29,7 @@ google-accompanist = "0.36.0"
 google-devtools-ksp = "2.1.21-2.0.1"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
-google-protobuf = "4.30.2"
+google-protobuf = "4.31.0"
 google-protobuf-plugin = "0.9.5"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
