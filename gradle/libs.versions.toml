@@ -67,7 +67,7 @@ android-lint = "31.10.1"
 # Androidx
 # appcompat [指南](https://developer.android.google.cn/jetpack/androidx/releases/appcompat)
 # [版本查询](https://mvnrepository.com/artifact/androidx.appcompat)
-androidx-appcompat = "1.7.0"
+androidx-appcompat = "1.7.1"
 # 约束性布局 [指南](https://developer.android.google.cn/jetpack/androidx/releases/constraintlayout)
 # [版本查询](https://mvnrepository.com/artifact/androidx.constraintlayout)
 androidx-constraintlayout-compose = "1.1.1"
