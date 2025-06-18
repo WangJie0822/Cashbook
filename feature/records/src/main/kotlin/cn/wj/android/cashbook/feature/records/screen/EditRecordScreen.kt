@@ -594,20 +594,21 @@ private fun EditRecordScaffoldContent(
                     ) {
                         // 目标资产
                         val hasAsset = uiState.assetText.isNotBlank()
+                        val isTransferring = selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER
                         ElevatedFilterChip(
                             selected = hasAsset,
                             onClick = onAssetClick,
-                            label = { Text(text = stringResource(id = R.string.target_asset) + if (hasAsset) ":${uiState.assetText}" else "") },
+                            label = { Text(text = stringResource(id = if(isTransferring) R.string.transfer_from_asset else R.string.target_asset) + if (hasAsset) ":${uiState.assetText}" else "") },
                         )
 
-                        if (selectedTypeCategory == RecordTypeCategoryEnum.TRANSFER) {
+                        if (isTransferring) {
                             // 只有转账类型显示关联资产
                             val hasRelatedAsset =
                                 uiState.relatedAssetText.isNotBlank()
                             ElevatedFilterChip(
                                 selected = hasRelatedAsset,
                                 onClick = onRelatedAssetClick,
-                                label = { Text(text = stringResource(id = R.string.related_asset) + if (hasRelatedAsset) ":${uiState.relatedAssetText}" else "") },
+                                label = { Text(text = stringResource(id = R.string.transfer_to_asset) + if (hasRelatedAsset) ":${uiState.relatedAssetText}" else "") },
                             )
                         }
 

@@ -53,6 +53,8 @@
     <string name="copied_to_clipboard">已复制到剪贴板</string>
     <string name="target_asset">目标资产</string>
     <string name="related_asset">关联的资产</string>
+    <string name="transfer_to_asset">转入的资产</string>
+    <string name="transfer_from_asset">转出的资产</string>
     <string name="related_record">关联的记录</string>
     <string name="related_record_display_format">关联%1$s条记录，总计%2$s</string>
     <string name="tags">标签</string>
