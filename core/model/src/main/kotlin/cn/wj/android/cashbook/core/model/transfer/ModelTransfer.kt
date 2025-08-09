@@ -59,6 +59,7 @@ fun RecordEntity.asModel(): RecordModel {
 
 fun RecordTypeModel.asEntity(
     child: List<RecordTypeEntity> = emptyList(),
+    selected: Boolean = false,
 ): RecordTypeEntity {
     return RecordTypeEntity(
         id = this.id,
@@ -68,7 +69,7 @@ fun RecordTypeModel.asEntity(
         sort = this.sort,
         typeCategory = this.typeCategory,
         child = child,
-        selected = false,
+        selected = selected,
         shapeType = -1,
         needRelated = needRelated,
     )

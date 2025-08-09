@@ -22,6 +22,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 /**
@@ -36,6 +40,31 @@ fun <T> CbVerticalGrid(
     modifier: Modifier = Modifier,
     content: @Composable (T) -> Unit,
 ) {
+    CbVerticalGridRowExpansion(
+        columns,
+        items,
+        modifier,
+        defaultExpandedIndex = null,
+        expandedRowContent = {},
+    ) { item, _ ->
+        content(item)
+    }
+}
+
+/**
+ * 横向网格布局，行之间可以嵌套自定义内容
+ *
+ */
+@Composable
+fun <T> CbVerticalGridRowExpansion(
+    columns: Int,
+    items: List<T>,
+    modifier: Modifier = Modifier,
+    defaultExpandedIndex: Int? = null,
+    expandedRowContent: @Composable (T) -> Unit = {},
+    content: @Composable (T, () -> Unit) -> Unit,
+) {
+    var curExpandedIdx by remember { mutableStateOf(defaultExpandedIndex) }
     Column(
         modifier = modifier,
     ) {
@@ -49,15 +78,22 @@ fun <T> CbVerticalGrid(
             }
             val columnCount = fixedSize / columns
             for (col in 0 until columnCount) {
+                var extend = false
                 Row(modifier = Modifier.fillMaxWidth()) {
                     for (r in 0 until columns) {
                         Box(modifier = Modifier.weight(1f)) {
                             val index = col * columns + r
                             if (index in items.indices) {
-                                content(items[index])
+                                if (curExpandedIdx == index) {
+                                    extend = true
+                                }
+                                content(items[index], { curExpandedIdx = index })
                             }
                         }
                     }
+                }
+                if (extend) {
+                    expandedRowContent(items[curExpandedIdx!!])
                 }
             }
         }
