@@ -54,7 +54,7 @@ class GetRecordTypeListUseCase @Inject constructor(
                 list.map { model ->
                     model.asEntity(
                         child = typeRepository.getSecondRecordTypeListByParentId(model.id)
-                            .map { it.asEntity() }
+                            .map { it.asEntity(selected = selectedTypeId == it.id) }
                             .sortedBy { it.sort },
                     )
                 }

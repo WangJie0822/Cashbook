@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,12 +40,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
+import cn.wj.android.cashbook.core.common.tools.funLogger
 import cn.wj.android.cashbook.core.design.component.CbVerticalGrid
+import cn.wj.android.cashbook.core.design.component.CbVerticalGridRowExpansion
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.fixedContainerColorFor
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.typeColor
@@ -104,12 +108,63 @@ internal fun EditRecordTypeListScreen(
     onTypeSettingClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // 等待typeList加载完成，确保CbVerticalGridRowExpansion的defaultExpandedIndex正确
+    if (typeList.isEmpty()) {
+        return
+    }
     val typeColor = currentTypeCategory.typeColor
-    CbVerticalGrid(
+    val primaryList = remember(typeList) {
+        typeList.filter { it.parentId == -1L }
+    }
+    val defaultExpandedIndex = remember(primaryList) {
+        primaryList.indexOfFirst {
+            funLogger().i("aaa name=${it.name}")
+            it.selected or it.child.any { v -> v.selected }
+        }
+    }
+    val clickCallback: (RecordTypeEntity) -> Unit = { type ->
+        val selected = if (!type.selected) {
+            // 当前为选中，更新为选中
+            type.copy(selected = true)
+        } else {
+            // 当前已选中，取消选中
+            if (type.parentId != -1L) {
+                // 二级分类，选择父类型
+                (typeList.firstOrNull { it.id == type.parentId } ?: typeList.first())
+                    .copy(selected = true)
+            } else {
+                // 一级分类，无法取消，不做处理
+                null
+            }
+        }
+        selected?.let { onTypeSelect(it.id) }
+    }
+
+    CbVerticalGridRowExpansion(
         modifier = modifier,
         columns = RECORD_TYPE_COLUMNS,
-        items = typeList,
-    ) { type ->
+        items = primaryList,
+        defaultExpandedIndex = defaultExpandedIndex,
+        expandedRowContent = { child ->
+            CbVerticalGrid(
+                modifier = Modifier,
+                columns = RECORD_TYPE_COLUMNS,
+                items = child.child,
+            ) { type ->
+                TypeItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    first = false,
+                    shapeType = 0,
+                    iconPainter = painterDrawableResource(idStr = type.iconResName),
+                    typeColor = typeColor,
+                    showMore = false,
+                    title = type.name,
+                    selected = type.selected,
+                    onTypeClick = { clickCallback(type) },
+                )
+            }
+        },
+    ) { type, expandCallback ->
         if (type == RECORD_TYPE_SETTINGS) {
             // 设置项
             TypeItem(
@@ -126,7 +181,7 @@ internal fun EditRecordTypeListScreen(
         } else {
             TypeItem(
                 modifier = Modifier.fillMaxWidth(),
-                first = type.parentId == -1L,
+                first = true,
                 shapeType = type.shapeType,
                 iconPainter = painterDrawableResource(idStr = type.iconResName),
                 typeColor = typeColor,
@@ -134,23 +189,8 @@ internal fun EditRecordTypeListScreen(
                 title = type.name,
                 selected = type.selected,
                 onTypeClick = {
-                    val selected = if (!type.selected) {
-                        // 当前为选中，更新为选中
-                        type.copy(selected = true)
-                    } else {
-                        // 当前已选中，取消选中
-                        if (type.parentId != -1L) {
-                            // 二级分类，选择父类型
-                            (
-                                typeList.firstOrNull { it.id == type.parentId }
-                                    ?: typeList.first()
-                                ).copy(selected = true)
-                        } else {
-                            // 一级分类，无法取消，不做处理
-                            null
-                        }
-                    }
-                    selected?.let { onTypeSelect(it.id) }
+                    expandCallback()
+                    clickCallback(type)
                 },
             )
         }
@@ -214,4 +254,30 @@ internal fun TypeItem(
             style = MaterialTheme.typography.labelMedium,
         )
     }
+}
+
+@DevicePreviews
+@Composable
+private fun EditRecordTypeListScreenPreview() {
+    EditRecordTypeListScreen(
+        currentTypeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        typeList = arrayListOf("餐饮", "生活", "游戏", "通讯").mapIndexed { nameIdx, name ->
+            RecordTypeEntity(
+                1, 0, name + nameIdx, "vector_type_dining_24",
+                RecordTypeCategoryEnum.EXPENDITURE, nameIdx,
+                arrayOfNulls<String>(6).mapIndexed { idx, v ->
+                    RecordTypeEntity(
+                        1, 0, name + idx.toString(), "vector_type_dining_24",
+                        RecordTypeCategoryEnum.EXPENDITURE, 1,
+                        arrayListOf(),
+                        false, 1, false,
+                    )
+                },
+                nameIdx == 0, 1, false,
+            )
+        },
+        onTypeSelect = {
+        },
+        onTypeSettingClick = {},
+    )
 }
