@@ -111,14 +111,14 @@ jobs:
         run: ./gradlew :app:assemble
 
       - name: Upload build outputs (APKs)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: APKs
           path: '**/build/outputs/apk/**/*.apk'
 
       - name: Upload test results (XML)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results
           path: '**/build/test-results/test*UnitTest/**.xml'
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload lint reports (HTML)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: lint-reports
           path: '**/build/reports/lint-results-*.html'
@@ -203,7 +203,7 @@ jobs:
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-reports-${{ matrix.api-level }}
           path: '**/build/reports/androidTests'
@@ -222,7 +222,7 @@ jobs:
 
       - name: Upload local coverage reports (XML + HTML) (only API 30)
         if: matrix.api-level == 30
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: coverage-reports
           if-no-files-found: error
