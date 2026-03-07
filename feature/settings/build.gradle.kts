@@ -35,4 +35,6 @@ dependencies {
 
     // Constraintlayout
     implementation(libs.androidx.constraintlayout.compose)
+
+    testImplementation(projects.core.testing)
 }

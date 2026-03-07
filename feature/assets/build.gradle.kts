@@ -32,4 +32,7 @@ dependencies {
     implementation(projects.core.data)
 
     implementation(libs.androidx.constraintlayout.compose)
+
+    testImplementation(projects.core.testing)
+    testImplementation(libs.robolectric)
 }

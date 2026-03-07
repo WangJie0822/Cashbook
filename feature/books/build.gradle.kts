@@ -34,4 +34,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.coil.kt.compose)
+
+    testImplementation(projects.core.testing)
+    testImplementation(libs.robolectric)
 }

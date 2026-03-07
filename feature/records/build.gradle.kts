@@ -40,4 +40,7 @@ dependencies {
 
     // 权限申请
     implementation(libs.google.accompanist.permissions)
+
+    testImplementation(projects.core.testing)
+    testImplementation(libs.robolectric)
 }

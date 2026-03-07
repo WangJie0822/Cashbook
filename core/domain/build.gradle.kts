@@ -28,4 +28,7 @@ dependencies {
     implementation(projects.core.common)
     implementation(projects.core.model)
     implementation(projects.core.data)
+
+    testImplementation(projects.core.testing)
+    testImplementation(libs.robolectric)
 }

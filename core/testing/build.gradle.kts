@@ -32,6 +32,7 @@ dependencies {
     implementation(projects.core.design)
 
     api(libs.junit)
+    api(libs.google.truth)
 
     api(libs.kotlinx.coroutines.test)
 
