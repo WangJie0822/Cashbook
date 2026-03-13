@@ -33,7 +33,7 @@ google-protobuf = "4.31.1"
 google-protobuf-plugin = "0.9.5"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
-google-truth = "1.4.4"
+google-truth = "1.4.5"
 # hilt [指南](https://dagger.dev/hilt)
 # [版本查询](https://mvnrepository.com/artifact/com.google.dagger)
 google-hilt = "2.56.2"
