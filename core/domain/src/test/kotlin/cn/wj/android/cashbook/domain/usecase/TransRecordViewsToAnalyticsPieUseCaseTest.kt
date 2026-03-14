@@ -62,9 +62,9 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(transportType)
 
         val records = listOf(
-            createRecordViewsModel(type = foodType, amount = "100", charges = "0", concessions = "0"),
-            createRecordViewsModel(type = foodType, amount = "50", charges = "0", concessions = "0"),
-            createRecordViewsModel(type = transportType, amount = "30", charges = "0", concessions = "0"),
+            createRecordViewsModel(type = foodType, amount = 10000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = foodType, amount = 5000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = transportType, amount = 3000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
@@ -93,8 +93,8 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(lunchType)
 
         val records = listOf(
-            createRecordViewsModel(type = lunchType, amount = "30", charges = "0", concessions = "0"),
-            createRecordViewsModel(type = foodType, amount = "20", charges = "0", concessions = "0"),
+            createRecordViewsModel(type = lunchType, amount = 3000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = foodType, amount = 2000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
@@ -102,7 +102,7 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         // 应该只有一个一级分类
         assertThat(result).hasSize(1)
         assertThat(result.first().typeName).isEqualTo("餐饮")
-        assertThat(result.first().totalAmount).isEqualTo("50")
+        assertThat(result.first().totalAmount).isEqualTo(5000L)
     }
 
     @Test
@@ -115,13 +115,13 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(type)
 
         val records = listOf(
-            createRecordViewsModel(type = type, amount = "100", charges = "5", concessions = "10"),
+            createRecordViewsModel(type = type, amount = 10000L, charges = 500L, concessions = 1000L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
 
-        // 支出: amount + charges - concessions = 100 + 5 - 10 = 95
-        assertThat(result.first().totalAmount).isEqualTo("95")
+        // 支出: amount + charges - concessions = 10000 + 500 - 1000 = 9500
+        assertThat(result.first().totalAmount).isEqualTo(9500L)
     }
 
     @Test
@@ -134,13 +134,13 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(type)
 
         val records = listOf(
-            createRecordViewsModel(type = type, amount = "5000", charges = "100", concessions = "0"),
+            createRecordViewsModel(type = type, amount = 500000L, charges = 10000L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.INCOME, records)
 
-        // 收入: amount - charges = 5000 - 100 = 4900
-        assertThat(result.first().totalAmount).isEqualTo("4900")
+        // 收入: amount - charges = 500000 - 10000 = 490000
+        assertThat(result.first().totalAmount).isEqualTo(490000L)
     }
 
     @Test
@@ -153,9 +153,9 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(typeC)
 
         val records = listOf(
-            createRecordViewsModel(type = typeA, amount = "10", charges = "0", concessions = "0"),
-            createRecordViewsModel(type = typeB, amount = "50", charges = "0", concessions = "0"),
-            createRecordViewsModel(type = typeC, amount = "30", charges = "0", concessions = "0"),
+            createRecordViewsModel(type = typeA, amount = 1000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = typeB, amount = 5000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = typeC, amount = 3000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)

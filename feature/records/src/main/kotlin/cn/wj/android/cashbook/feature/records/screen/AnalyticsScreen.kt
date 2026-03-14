@@ -53,7 +53,7 @@ import androidx.core.util.Pair
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toFloatOrZero
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
@@ -490,21 +490,21 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = item.expenditure.withCNY(),
+                    text = item.expenditure.toMoneyCNY(),
                     textAlign = TextAlign.Center,
                     color = LocalExtendedColors.current.expenditure,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = item.income.withCNY(),
+                    text = item.income.toMoneyCNY(),
                     textAlign = TextAlign.Center,
                     color = LocalExtendedColors.current.income,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = item.balance.withCNY(),
+                    text = item.balance.toMoneyCNY(),
                     textAlign = TextAlign.Center,
                     color = LocalExtendedColors.current.transfer,
                     style = MaterialTheme.typography.bodySmall,
@@ -725,7 +725,7 @@ private fun AnalyticsBarChart(
                     val incomeLs = mutableListOf<Entry>()
                     val balanceLs = mutableListOf<Entry>()
                     dataList.forEachIndexed { index, entity ->
-                        val expenditure = entity.expenditure.toFloatOrZero()
+                        val expenditure = entity.expenditure / 100f
                         if (expenditure > 0f) {
                             expenditureLs.add(
                                 Entry(
@@ -735,7 +735,7 @@ private fun AnalyticsBarChart(
                                 ),
                             )
                         }
-                        val income = entity.income.toFloatOrZero()
+                        val income = entity.income / 100f
                         if (income > 0f) {
                             incomeLs.add(
                                 Entry(
@@ -745,7 +745,7 @@ private fun AnalyticsBarChart(
                                 ),
                             )
                         }
-                        val balance = entity.balance.toFloatOrZero()
+                        val balance = entity.balance / 100f
                         if (balance > 0f) {
                             balanceLs.add(
                                 Entry(

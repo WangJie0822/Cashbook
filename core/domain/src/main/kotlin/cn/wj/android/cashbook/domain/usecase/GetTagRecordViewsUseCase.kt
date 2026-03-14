@@ -45,8 +45,7 @@ class GetTagRecordViewsUseCase @Inject constructor(
             return@withContext emptyList()
         }
         recordRepository.queryPagingRecordListByTagId(tagId, pageNum, pageSize)
-            .sortedBy { it.recordTime }
-            .reversed()
+            .sortedByDescending { it.recordTime }
             .map {
                 recordModelTransToViewsUseCase(it).asEntity()
             }

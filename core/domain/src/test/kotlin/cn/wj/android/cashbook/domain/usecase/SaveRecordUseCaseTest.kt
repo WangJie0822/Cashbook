@@ -73,7 +73,7 @@ class SaveRecordUseCaseTest {
     fun when_save_record_then_record_is_passed_to_repository() = runTest {
         val record = createRecordModel(
             id = 10L,
-            amount = "100",
+            amount = 10000L,
             remark = "测试记录",
         )
 

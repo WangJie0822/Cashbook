@@ -44,10 +44,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
-import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
+import cn.wj.android.cashbook.core.common.tools.toDateTimeString
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbListItem
@@ -68,7 +66,6 @@ import cn.wj.android.cashbook.feature.records.dialog.ImagePreviewDialog
 import cn.wj.android.cashbook.feature.records.enums.RecordDetailsDialogEnum
 import cn.wj.android.cashbook.feature.records.model.asViewModel
 import cn.wj.android.cashbook.feature.records.preview.RecordDetailsSheetPreviewParameterProvider
-import java.math.BigDecimal
 
 /**
  * 记录详情 sheet 内容
@@ -177,7 +174,7 @@ internal fun RecordDetailsSheet(
                         headlineContent = { Text(text = stringResource(id = R.string.final_amount)) },
                         trailingContent = {
                             Text(
-                                text = recordData.finalAmount.withCNY(),
+                                text = recordData.finalAmount.toMoneyCNY(),
                                 color = recordData.typeCategory.typeColor,
                                 style = MaterialTheme.typography.labelLarge,
                             )
@@ -207,7 +204,7 @@ internal fun RecordDetailsSheet(
                                     )
                                 }
                                 Text(
-                                    text = recordData.amount.withCNY(),
+                                    text = recordData.amount.toMoneyCNY(),
                                     color = recordData.typeCategory.typeColor,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
@@ -215,13 +212,13 @@ internal fun RecordDetailsSheet(
                         },
                     )
 
-                    if (recordData.charges.toDoubleOrZero() > 0.0) {
+                    if (recordData.charges > 0L) {
                         // 手续费
                         CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.charges)) },
                             trailingContent = {
                                 Text(
-                                    text = "-${recordData.charges}".withCNY(),
+                                    text = "-${recordData.charges.toMoneyCNY()}",
                                     color = LocalExtendedColors.current.expenditure,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
@@ -229,13 +226,13 @@ internal fun RecordDetailsSheet(
                         )
                     }
 
-                    if (recordData.typeCategory != RecordTypeCategoryEnum.INCOME && recordData.concessions.toDoubleOrZero() > 0.0) {
+                    if (recordData.typeCategory != RecordTypeCategoryEnum.INCOME && recordData.concessions > 0L) {
                         // 优惠
                         CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.concessions)) },
                             trailingContent = {
                                 Text(
-                                    text = "+${recordData.concessions.withCNY()}",
+                                    text = "+${recordData.concessions.toMoneyCNY()}",
                                     color = LocalExtendedColors.current.income,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
@@ -277,22 +274,22 @@ internal fun RecordDetailsSheet(
                                 val text =
                                     if (recordData.typeCategory == RecordTypeCategoryEnum.INCOME) {
                                         // 收入类型，报销 or 退款，计算关联记录的金额
-                                        var total = BigDecimal.ZERO
+                                        var total = 0L
                                         list.forEach {
-                                            total += (it.amount.toBigDecimalOrZero() + it.charges.toBigDecimalOrZero() - it.concessions.toBigDecimalOrZero())
+                                            total += (it.amount + it.charges - it.concessions)
                                         }
                                         stringResource(id = R.string.related_record_display_format).format(
                                             list.size,
-                                            total.decimalFormat().withCNY(),
+                                            total.toMoneyCNY(),
                                         )
                                     } else {
                                         // 支出类型，被退款 or 被报销，计算金额
-                                        var total = BigDecimal.ZERO
+                                        var total = 0L
                                         list.forEach {
-                                            total += (it.amount.toBigDecimalOrZero() - it.charges.toBigDecimalOrZero())
+                                            total += (it.amount - it.charges)
                                         }
                                         stringResource(id = R.string.refund_reimbursed_format).format(
-                                            total.decimalFormat().withCNY(),
+                                            total.toMoneyCNY(),
                                         )
                                     }
                                 Text(
@@ -417,7 +414,7 @@ internal fun RecordDetailsSheet(
                         headlineContent = { Text(text = stringResource(id = R.string.time)) },
                         trailingContent = {
                             Text(
-                                text = recordData.recordTime,
+                                text = recordData.recordTime.toDateTimeString(),
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         },

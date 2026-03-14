@@ -78,7 +78,7 @@ class AssetInfoViewModelTest {
         val asset = createAssetModel(
             id = 1L,
             name = "测试现金",
-            balance = "1000.00",
+            balance = 100000L,
             openBank = "中国银行",
             cardNo = "1234",
             remark = "测试备注",
@@ -110,7 +110,7 @@ class AssetInfoViewModelTest {
             id = 2L,
             type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
             classification = AssetClassificationEnum.CREDIT_CARD,
-            totalAmount = "50000",
+            totalAmount = 5000000L,
             billingDate = "15",
             repaymentDate = "5",
         )
@@ -120,7 +120,7 @@ class AssetInfoViewModelTest {
 
         val state = viewModel.uiState.value as AssetInfoUiState.Success
         assertThat(state.isCreditCard).isTrue()
-        assertThat(state.totalAmount).isEqualTo("50000")
+        assertThat(state.totalAmount).isEqualTo("50000.00")
         assertThat(state.billingDate).isEqualTo("15")
         assertThat(state.repaymentDate).isEqualTo("5")
     }
@@ -224,7 +224,7 @@ class AssetInfoViewModelTest {
         // assetInfo 为 null 时使用 orEmpty() 等默认值
         val success = state as AssetInfoUiState.Success
         assertThat(success.title).isEmpty()
-        assertThat(success.balance).isEqualTo("0")
+        assertThat(success.balance).isEqualTo("0.00")
     }
 
     /**
@@ -233,10 +233,10 @@ class AssetInfoViewModelTest {
     private fun createAssetModel(
         id: Long = 1L,
         name: String = "测试资产",
-        balance: String = "0",
+        balance: Long = 0L,
         type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT,
         classification: AssetClassificationEnum = AssetClassificationEnum.CASH,
-        totalAmount: String = "",
+        totalAmount: Long = 0L,
         billingDate: String = "",
         repaymentDate: String = "",
         openBank: String = "",
@@ -257,7 +257,7 @@ class AssetInfoViewModelTest {
         cardNo = cardNo,
         remark = remark,
         sort = 0,
-        modifyTime = "2024-01-01",
+        modifyTime = 1704067200000L,
         balance = balance,
     )
 
@@ -275,16 +275,16 @@ class AssetInfoViewModelTest {
         relatedAssetId = null,
         relatedAssetName = null,
         relatedAssetIconResId = null,
-        amount = "100.00",
-        finalAmount = "100.00",
-        charges = "0",
-        concessions = "0",
+        amount = 10000L,
+        finalAmount = 10000L,
+        charges = 0L,
+        concessions = 0L,
         remark = "",
         reimbursable = false,
         relatedTags = emptyList(),
         relatedImage = emptyList(),
         relatedRecord = emptyList(),
-        relatedAmount = "0",
-        recordTime = "2024-01-01 12:00",
+        relatedAmount = 0L,
+        recordTime = 1704110400000L,
     )
 }

@@ -16,7 +16,6 @@
 
 package cn.wj.android.cashbook.feature.records.screen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -31,7 +30,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BackdropScaffold
 import androidx.compose.material3.BackdropScaffoldState
 import androidx.compose.material3.BackdropValue
@@ -62,17 +60,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import cn.wj.android.cashbook.core.common.TestTag
-import cn.wj.android.cashbook.core.common.ext.completeZero
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.tools.toDateTimeString
+import cn.wj.android.cashbook.core.common.tools.toTimeString
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
@@ -88,18 +89,20 @@ import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.enums.DateSelectionTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DevicePreviews
-import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
+import cn.wj.android.cashbook.core.ui.component.DateSelectionPopup
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.bookImageRatio
 import cn.wj.android.cashbook.core.ui.expand.typeColor
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
+import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
 import coil.compose.AsyncImage
 import java.time.YearMonth
 
@@ -127,7 +130,9 @@ internal fun LauncherContentRoute(
     viewModel: LauncherContentViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val date by viewModel.dateData.collectAsStateWithLifecycle()
+    val dateSelection by viewModel.dateSelection.collectAsStateWithLifecycle()
+    val dailySummaries by viewModel.dailySummaries.collectAsStateWithLifecycle()
+    val pagingItems = viewModel.recordPagingData.collectAsLazyPagingItems()
 
     LauncherContentScreen(
         shouldDisplayDeleteFailedBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
@@ -136,18 +141,20 @@ internal fun LauncherContentRoute(
             recordDetailSheetContent(record, viewModel::dismissSheet)
         },
         viewRecord = viewModel.viewRecord,
-        date = date,
+        dateSelection = dateSelection,
+        showDatePopup = viewModel.showDatePopup,
         onMenuClick = onRequestOpenDrawer,
-        onDateClick = viewModel::displayDateSelectDialog,
-        onDateSelected = viewModel::refreshSelectedDate,
+        onDateClick = viewModel::displayDatePopup,
+        onDateSelected = viewModel::updateDateSelection,
+        onDismissDatePopup = viewModel::dismissDatePopup,
         onSearchClick = onRequestNaviToSearch,
         onCalendarClick = onRequestNaviToCalendar,
         onAnalyticsClick = onRequestNaviToAnalytics,
         onAddClick = { onRequestNaviToEditRecord.invoke(-1L) },
         uiState = uiState,
+        pagingItems = pagingItems,
+        dailySummaries = dailySummaries,
         onRecordItemClick = viewModel::displayRecordDetailsSheet,
-        dialogState = viewModel.dialogState,
-        onRequestDismissDialog = viewModel::dismissDialog,
         onRequestDismissSheet = viewModel::dismissSheet,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
@@ -156,25 +163,6 @@ internal fun LauncherContentRoute(
 
 /**
  * 首页内容
- *
- * @param shouldDisplayDeleteFailedBookmark 删除失败提示
- * @param onRequestDismissBookmark 隐藏提示
- * @param viewRecord 需要显示的记录数据
- * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据) -> [Unit]
- * @param date 当前选择的年月信息
- * @param onMenuClick 菜单点击回调
- * @param onDateClick 日期点击回调
- * @param onDateSelected 日期选择回调
- * @param onSearchClick 搜索点击回调
- * @param onCalendarClick 日历点击回调
- * @param onAnalyticsClick 分析点击回调
- * @param onAddClick 添加点击回调
- * @param uiState 界面 UI 数据
- * @param onRecordItemClick 记录列表 item 点击回调
- * @param dialogState 弹窗状态
- * @param onRequestDismissDialog 隐藏弹窗
- * @param onRequestDismissSheet 隐藏 sheet
- * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,18 +172,20 @@ internal fun LauncherContentScreen(
     onRequestDismissBookmark: () -> Unit,
     viewRecord: RecordViewsEntity?,
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
-    date: YearMonth,
+    dateSelection: DateSelectionEntity,
+    showDatePopup: Boolean,
     onMenuClick: () -> Unit,
     onDateClick: () -> Unit,
-    onDateSelected: (YearMonth) -> Unit,
+    onDateSelected: (DateSelectionEntity) -> Unit,
+    onDismissDatePopup: () -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onAnalyticsClick: () -> Unit,
     onAddClick: () -> Unit,
     uiState: LauncherContentUiState,
+    pagingItems: LazyPagingItems<LauncherListItem>? = null,
+    dailySummaries: Map<String, RecordDayEntity> = emptyMap(),
     onRecordItemClick: (RecordViewsEntity) -> Unit,
-    dialogState: DialogState,
-    onRequestDismissDialog: () -> Unit,
     onRequestDismissSheet: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
@@ -221,9 +211,13 @@ internal fun LauncherContentScreen(
         topBar = {
             LauncherTopBar(
                 scaffoldState = scaffoldState,
-                dateStr = "${date.year}-${date.monthValue.completeZero()}",
+                dateStr = dateSelection.getDisplayText(),
+                showDatePopup = showDatePopup,
+                dateSelection = dateSelection,
                 onMenuClick = onMenuClick,
                 onDateClick = onDateClick,
+                onDateSelected = onDateSelected,
+                onDismissDatePopup = onDismissDatePopup,
                 onSearchClick = onSearchClick,
                 onCalendarClick = onCalendarClick,
                 onAnalyticsClick = onAnalyticsClick,
@@ -281,19 +275,19 @@ internal fun LauncherContentScreen(
                                 // 背景布局
                                 BackLayerContent(
                                     paddingValues = paddingValues,
-                                    monthIncome = uiState.monthIncome,
-                                    monthExpand = uiState.monthExpand,
-                                    monthBalance = uiState.monthBalance,
+                                    dateSelectionType = dateSelection.type,
+                                    totalIncome = uiState.totalIncome,
+                                    totalExpand = uiState.totalExpand,
+                                    totalBalance = uiState.totalBalance,
                                 )
                             },
                             frontLayerScrimColor = Color.Unspecified,
                             frontLayerContent = {
                                 FrontLayerContent(
-                                    dialogState = dialogState,
+                                    dateSelectionType = dateSelection.type,
                                     onDateClick = onDateClick,
-                                    onDateSelected = onDateSelected,
-                                    onRequestDismissDialog = onRequestDismissDialog,
-                                    recordMap = uiState.recordMap,
+                                    pagingItems = pagingItems,
+                                    dailySummaries = dailySummaries,
                                     onRecordItemClick = onRecordItemClick,
                                 )
                             },
@@ -307,21 +301,18 @@ internal fun LauncherContentScreen(
 
 /**
  * 标题栏
- *
- * @param dateStr 日期文本
- * @param onMenuClick 菜单点击回调
- * @param onDateClick 日期点击回调
- * @param onSearchClick 搜索点击回调
- * @param onCalendarClick 日历点击回调
- * @param onAnalyticsClick 分析点击回调
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LauncherTopBar(
     scaffoldState: BackdropScaffoldState,
     dateStr: String,
+    showDatePopup: Boolean,
+    dateSelection: DateSelectionEntity,
     onMenuClick: () -> Unit,
     onDateClick: () -> Unit,
+    onDateSelected: (DateSelectionEntity) -> Unit,
+    onDismissDatePopup: () -> Unit,
     onSearchClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onAnalyticsClick: () -> Unit,
@@ -337,19 +328,37 @@ internal fun LauncherTopBar(
             },
         ),
         title = {
-            Row(
-                modifier = Modifier
-                    .clickable(onClick = onDateClick)
-                    .testTag(TestTag.Launcher.LAUNCHER_TITLE),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = dateStr,
-                    modifier = Modifier.clickable(onClick = onDateClick),
-                )
-                Icon(
-                    imageVector = CbIcons.ArrowDropDown,
-                    contentDescription = null,
+            Box {
+                Row(
+                    modifier = Modifier
+                        .clickable(onClick = onDateClick)
+                        .testTag(TestTag.Launcher.LAUNCHER_TITLE),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (dateSelection is DateSelectionEntity.DateRange) {
+                        Column {
+                            Text(
+                                text = dateSelection.from.let { "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}" },
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                            Text(
+                                text = dateSelection.to.let { "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}" },
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                        }
+                    } else {
+                        Text(text = dateStr)
+                    }
+                    Icon(
+                        imageVector = CbIcons.ArrowDropDown,
+                        contentDescription = null,
+                    )
+                }
+                DateSelectionPopup(
+                    expanded = showDatePopup,
+                    onDismissRequest = onDismissDatePopup,
+                    currentSelection = dateSelection,
+                    onDateSelected = onDateSelected,
                 )
             }
         },
@@ -386,20 +395,35 @@ internal fun LauncherTopBar(
 
 /**
  * 背景布局
- *
- * @param paddingValues 背景 padding 数据
- * @param monthIncome 月收入
- * @param monthExpand 月支出
- * @param monthBalance 月结余
  */
 @Composable
 private fun BackLayerContent(
     paddingValues: PaddingValues,
-    monthIncome: String,
-    monthExpand: String,
-    monthBalance: String,
+    dateSelectionType: DateSelectionTypeEnum,
+    totalIncome: String,
+    totalExpand: String,
+    totalBalance: String,
     modifier: Modifier = Modifier,
 ) {
+    val incomeLabel = when (dateSelectionType) {
+        DateSelectionTypeEnum.BY_DAY -> R.string.day_income
+        DateSelectionTypeEnum.BY_MONTH -> R.string.month_income
+        DateSelectionTypeEnum.BY_YEAR -> R.string.year_income
+        DateSelectionTypeEnum.DATE_RANGE, DateSelectionTypeEnum.ALL -> R.string.total_income
+    }
+    val expendLabel = when (dateSelectionType) {
+        DateSelectionTypeEnum.BY_DAY -> R.string.day_expend
+        DateSelectionTypeEnum.BY_MONTH -> R.string.month_expend
+        DateSelectionTypeEnum.BY_YEAR -> R.string.year_expend
+        DateSelectionTypeEnum.DATE_RANGE, DateSelectionTypeEnum.ALL -> R.string.total_expenditure
+    }
+    val balanceLabel = when (dateSelectionType) {
+        DateSelectionTypeEnum.BY_DAY -> R.string.day_balance
+        DateSelectionTypeEnum.BY_MONTH -> R.string.month_balance
+        DateSelectionTypeEnum.BY_YEAR -> R.string.year_balance
+        DateSelectionTypeEnum.DATE_RANGE, DateSelectionTypeEnum.ALL -> R.string.total_balance
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -420,25 +444,25 @@ private fun BackLayerContent(
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimaryContainer) {
                 Text(
                     modifier = textModifier,
-                    text = stringResource(id = R.string.month_income),
+                    text = stringResource(id = incomeLabel),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     modifier = textModifier,
-                    text = monthIncome.withCNY(),
+                    text = totalIncome.withCNY(),
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Row {
                     Box(modifier = Modifier.weight(1f)) {
                         Text(
                             modifier = textModifier,
-                            text = "${stringResource(id = R.string.month_expend)} ${monthExpand.withCNY()}",
+                            text = "${stringResource(id = expendLabel)} ${totalExpand.withCNY()}",
                         )
                     }
                     Box(modifier = Modifier.weight(1f)) {
                         Text(
                             modifier = textModifier,
-                            text = "${stringResource(id = R.string.month_balance)} ${monthBalance.withCNY()}",
+                            text = "${stringResource(id = balanceLabel)} ${totalBalance.withCNY()}",
                         )
                     }
                 }
@@ -449,109 +473,78 @@ private fun BackLayerContent(
 
 /**
  * 内容布局
- *
- * @param dialogState 弹窗状态
- * @param onDateClick 日期点击回调
- * @param onDateSelected 日期选中回调
- * @param onRequestDismissDialog 隐藏弹窗
- * @param recordMap 记录列表数据
- * @param onRecordItemClick 记录列表 item 点击回调
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun FrontLayerContent(
-    dialogState: DialogState,
+    dateSelectionType: DateSelectionTypeEnum,
     onDateClick: () -> Unit,
-    onDateSelected: (YearMonth) -> Unit,
-    onRequestDismissDialog: () -> Unit,
-    recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
+    pagingItems: LazyPagingItems<LauncherListItem>?,
+    dailySummaries: Map<String, RecordDayEntity>,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
 ) {
     CashbookGradientBackground {
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            (dialogState as? DialogState.Shown<*>)?.data?.let { date ->
-                if (date is YearMonth) {
-                    // 显示选择日期弹窗
-                    SelectDateDialog(
-                        onDialogDismiss = onRequestDismissDialog,
-                        currentDate = date,
-                        onDateSelected = { ym, _ -> onDateSelected(ym) },
-                    )
+            if (pagingItems == null || pagingItems.itemCount == 0) {
+                val hintText = if (dateSelectionType == DateSelectionTypeEnum.BY_MONTH) {
+                    stringResource(id = R.string.launcher_no_data_hint)
+                } else {
+                    stringResource(id = R.string.launcher_no_data_hint_general)
                 }
-            }
-
-            if (recordMap.isEmpty()) {
+                val buttonText = if (dateSelectionType == DateSelectionTypeEnum.BY_MONTH) {
+                    stringResource(id = R.string.launcher_no_data_button)
+                } else {
+                    stringResource(id = R.string.launcher_no_data_button_general)
+                }
                 Empty(
-                    hintText = stringResource(id = R.string.launcher_no_data_hint),
+                    hintText = hintText,
                     button = {
                         FilledTonalButton(onClick = onDateClick) {
-                            Text(text = stringResource(id = R.string.launcher_no_data_button))
+                            Text(text = buttonText)
                         }
                     },
                     modifier = Modifier.align(Alignment.TopCenter),
                 )
             } else {
+                val items = pagingItems!!
                 LazyColumn {
-                    recordMap.keys.reversed().forEach { key ->
-                        val recordList = recordMap[key] ?: emptyList()
-                        stickyHeader {
-                            Row(
-                                modifier = Modifier
-                                    .background(color = MaterialTheme.colorScheme.surface)
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    modifier = Modifier.weight(1f),
-                                    text = "${key.day}${stringResource(id = R.string.day)}${
-                                        when (key.dayType) {
-                                            0 -> stringResource(id = R.string.today_with_brackets)
-                                            -1 -> stringResource(id = R.string.yesterday_with_brackets)
-                                            -2 -> stringResource(id = R.string.before_yesterday_with_brackets)
-                                            else -> ""
-                                        }
-                                    }",
-                                )
-                                Text(
-                                    text = buildString {
-                                        val totalIncome = key.dayIncome.toDoubleOrZero()
-                                        val totalExpenditure = key.dayExpand.toDoubleOrZero()
-                                        val hasIncome = totalIncome != 0.0
-                                        if (hasIncome) {
-                                            append(
-                                                stringResource(id = R.string.income_with_colon) + totalIncome.decimalFormat()
-                                                    .withCNY(),
-                                            )
-                                        }
-                                        if (totalExpenditure != 0.0) {
-                                            if (hasIncome) {
-                                                append(", ")
-                                            }
-                                            append(
-                                                stringResource(id = R.string.expend_with_colon) + totalExpenditure.decimalFormat()
-                                                    .withCNY(),
-                                            )
-                                        }
-                                    },
-                                    style = MaterialTheme.typography.bodySmall,
+                    items(
+                        count = items.itemCount,
+                        key = { index ->
+                            when (val item = items.peek(index)) {
+                                is LauncherListItem.DayHeader -> "header_${item.dateStr}"
+                                is LauncherListItem.Record -> "record_${item.entity.id}"
+                                null -> "placeholder_$index"
+                            }
+                        },
+                    ) { index ->
+                        when (val item = items[index]) {
+                            is LauncherListItem.DayHeader -> {
+                                val summary = dailySummaries[item.dateStr]
+                                DayHeaderItem(
+                                    dateStr = item.dateStr,
+                                    day = item.day,
+                                    dayType = item.dayType,
+                                    dateSelectionType = dateSelectionType,
+                                    dayIncome = summary?.dayIncome ?: 0L,
+                                    dayExpand = summary?.dayExpand ?: 0L,
                                 )
                             }
-                            CbHorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                color = DividerDefaults.color.copy(0.3f),
-                            )
-                        }
-                        items(recordList, key = { it.id }) {
-                            RecordListItem(
-                                item = it,
-                                showDate = false,
-                                modifier = Modifier.clickable {
-                                    onRecordItemClick(it)
-                                },
-                            )
+
+                            is LauncherListItem.Record -> {
+                                RecordListItem(
+                                    item = item.entity,
+                                    showDate = false,
+                                    modifier = Modifier.clickable {
+                                        onRecordItemClick(item.entity)
+                                    },
+                                )
+                            }
+
+                            null -> {
+                                // 占位
+                            }
                         }
                     }
 
@@ -565,9 +558,75 @@ private fun FrontLayerContent(
 }
 
 /**
+ * 日期头布局
+ */
+@Composable
+private fun DayHeaderItem(
+    dateStr: String,
+    day: Int,
+    dayType: Int,
+    dateSelectionType: DateSelectionTypeEnum,
+    dayIncome: Long,
+    dayExpand: Long,
+) {
+    val dateArray = dateStr.split("-")
+    val month = dateArray.getOrNull(1)?.toIntOrNull() ?: 0
+    val year = dateArray.getOrNull(0)?.toIntOrNull() ?: 0
+    val dayTypeSuffix = when (dayType) {
+        0 -> stringResource(id = R.string.today_with_brackets)
+        -1 -> stringResource(id = R.string.yesterday_with_brackets)
+        -2 -> stringResource(id = R.string.before_yesterday_with_brackets)
+        else -> ""
+    }
+    val dateText = when (dateSelectionType) {
+        DateSelectionTypeEnum.BY_DAY, DateSelectionTypeEnum.BY_MONTH ->
+            "${day}${stringResource(id = R.string.day)}$dayTypeSuffix"
+        DateSelectionTypeEnum.BY_YEAR ->
+            "${month}${stringResource(id = R.string.month)}${day}${stringResource(id = R.string.day)}$dayTypeSuffix"
+        DateSelectionTypeEnum.DATE_RANGE, DateSelectionTypeEnum.ALL ->
+            "${year}${stringResource(id = R.string.year)}${month}${stringResource(id = R.string.month)}${day}${stringResource(id = R.string.day)}"
+    }
+    Column {
+        Row(
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.surface)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = dateText,
+            )
+            Text(
+                text = buildString {
+                    val hasIncome = dayIncome != 0L
+                    if (hasIncome) {
+                        append(
+                            stringResource(id = R.string.income_with_colon) + dayIncome.toMoneyCNY(),
+                        )
+                    }
+                    if (dayExpand != 0L) {
+                        if (hasIncome) {
+                            append(", ")
+                        }
+                        append(
+                            stringResource(id = R.string.expend_with_colon) + dayExpand.toMoneyCNY(),
+                        )
+                    }
+                },
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        CbHorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = DividerDefaults.color.copy(0.3f),
+        )
+    }
+}
+
+/**
  * 记录列表 item 布局
- *
- * @param item 记录数据
  */
 @Composable
 internal fun RecordListItem(
@@ -599,7 +658,7 @@ internal fun RecordListItem(
                         }
                         var result = toString()
                         if (result.length > 12) {
-                            result = result.substring(0, 12) + "…"
+                            result = result.substring(0, 12) + "..."
                         }
                         result
                     }
@@ -622,9 +681,9 @@ internal fun RecordListItem(
             Text(
                 text = buildAnnotatedString {
                     if (showDate) {
-                        append(item.recordTime)
+                        append(item.recordTime.toDateTimeString())
                     } else {
-                        append(item.recordTime.split(" ").last())
+                        append(item.recordTime.toTimeString())
                     }
                     if (showRemarks) {
                         withStyle(SpanStyle(color = LocalContentColor.current.copy(alpha = 0.7f))) {
@@ -652,31 +711,48 @@ internal fun RecordListItem(
                                 } else {
                                     R.string.related
                                 },
-                            ) + "(${item.relatedAmount.withCNY()})",
+                            ) + "(${item.relatedAmount.toMoneyCNY()})",
                             color = LocalContentColor.current.copy(alpha = 0.7f),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(end = 8.dp),
                         )
                     }
+                    val displayAmount = when {
+                        item.typeCategory == RecordTypeCategoryEnum.TRANSFER -> {
+                            item.amount
+                        }
+                        item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE &&
+                            item.relatedRecord.isNotEmpty() -> {
+                            item.amount
+                        }
+                        else -> item.finalAmount
+                    }
+                    val isReimbursed = item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE &&
+                        item.relatedRecord.isNotEmpty()
                     Text(
-                        text = item.finalAmount.withCNY(),
+                        text = displayAmount.toMoneyCNY(),
                         color = item.typeCategory.typeColor,
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            textDecoration = if (isReimbursed) {
+                                TextDecoration.LineThrough
+                            } else {
+                                TextDecoration.None
+                            },
+                        ),
                     )
                 }
                 item.assetName?.let { assetName ->
                     Text(
                         text = buildAnnotatedString {
-                            val hasCharges = item.charges.toDoubleOrZero() > 0.0
-                            val hasConcessions = item.concessions.toDoubleOrZero() > 0.0
+                            val hasCharges = item.charges > 0L
+                            val hasConcessions = item.concessions > 0L
                             if (hasCharges || hasConcessions) {
-                                // 有手续费、优惠信息
                                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
                                     append("(")
                                 }
                                 if (hasCharges) {
                                     withStyle(style = SpanStyle(color = LocalExtendedColors.current.expenditure)) {
-                                        append("-${item.charges}".withCNY())
+                                        append("-${item.charges.toMoneyCNY()}")
                                     }
                                 }
                                 if (hasConcessions) {
@@ -684,7 +760,7 @@ internal fun RecordListItem(
                                         append(" ")
                                     }
                                     withStyle(style = SpanStyle(color = LocalExtendedColors.current.income)) {
-                                        append("+${item.concessions.withCNY()}")
+                                        append("+${item.concessions.toMoneyCNY()}")
                                     }
                                 }
                                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
@@ -712,10 +788,12 @@ private fun LauncherContentScreenPreviewRevealed() {
             onRequestDismissBookmark = { },
             recordDetailSheetContent = { },
             viewRecord = null,
-            date = YearMonth.now(),
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+            showDatePopup = false,
             onMenuClick = { },
             onDateClick = { },
             onDateSelected = { },
+            onDismissDatePopup = { },
             onSearchClick = { },
             onCalendarClick = { },
             onAnalyticsClick = { },
@@ -725,11 +803,8 @@ private fun LauncherContentScreenPreviewRevealed() {
                 "300",
                 "200",
                 "100",
-                emptyMap(),
             ),
             onRecordItemClick = { },
-            dialogState = DialogState.Dismiss,
-            onRequestDismissDialog = { },
             onRequestDismissSheet = { },
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed),
@@ -746,10 +821,12 @@ private fun LauncherContentScreenPreviewConcealed() {
             onRequestDismissBookmark = { },
             recordDetailSheetContent = { },
             viewRecord = null,
-            date = YearMonth.now(),
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+            showDatePopup = false,
             onMenuClick = { },
             onDateClick = { },
             onDateSelected = { },
+            onDismissDatePopup = { },
             onSearchClick = { },
             onCalendarClick = { },
             onAnalyticsClick = { },
@@ -759,11 +836,8 @@ private fun LauncherContentScreenPreviewConcealed() {
                 "300",
                 "200",
                 "100",
-                emptyMap(),
             ),
             onRecordItemClick = { },
-            dialogState = DialogState.Dismiss,
-            onRequestDismissDialog = { },
             onRequestDismissSheet = { },
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed),

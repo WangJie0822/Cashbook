@@ -16,11 +16,14 @@
 
 package cn.wj.android.cashbook.core.testing.repository
 
+import androidx.paging.PagingData
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
+import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 
 class FakeRecordRepository : RecordRepository {
 
@@ -116,7 +119,7 @@ class FakeRecordRepository : RecordRepository {
 
     override suspend fun queryPagingRecordListByTypeIdBetweenDate(
         typeId: Long,
-        date: String,
+        dateRange: String,
         page: Int,
         pageSize: Int,
     ): List<RecordModel> {
@@ -144,8 +147,8 @@ class FakeRecordRepository : RecordRepository {
     }
 
     override suspend fun queryRecordListBetweenDate(
-        from: String,
-        to: String,
+        from: Long,
+        to: Long,
     ): List<RecordModel> {
         return records
     }
@@ -157,6 +160,20 @@ class FakeRecordRepository : RecordRepository {
         return MutableStateFlow(records.toList())
     }
 
+    override fun getRecordPagingData(
+        startDate: Long,
+        endDate: Long,
+    ): Flow<PagingData<RecordModel>> {
+        return flowOf(PagingData.from(records.toList()))
+    }
+
+    override fun queryRecordViewSummariesFlow(
+        startDate: Long,
+        endDate: Long,
+    ): Flow<List<RecordViewSummaryModel>> {
+        return flowOf(emptyList())
+    }
+
     override suspend fun getDefaultRecord(typeId: Long): RecordModel {
         return RecordModel(
             id = -1L,
@@ -164,13 +181,13 @@ class FakeRecordRepository : RecordRepository {
             typeId = typeId,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "0",
-            finalAmount = "0",
-            charges = "0",
-            concessions = "0",
+            amount = 0L,
+            finalAmount = 0L,
+            charges = 0L,
+            concessions = 0L,
             remark = "",
             reimbursable = false,
-            recordTime = "2024-01-01 00:00",
+            recordTime = 1704067200000L, // 2024-01-01 00:00:00 UTC+8
         )
     }
 

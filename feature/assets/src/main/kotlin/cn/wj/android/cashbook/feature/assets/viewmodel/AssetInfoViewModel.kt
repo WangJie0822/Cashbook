@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
@@ -73,8 +74,8 @@ class AssetInfoViewModel @Inject constructor(
         AssetInfoUiState.Success(
             assetName = assetInfo?.name.orEmpty(),
             isCreditCard = assetInfo?.type?.isCreditCard ?: false,
-            balance = assetInfo?.balance ?: "0",
-            totalAmount = assetInfo?.totalAmount ?: "0",
+            balance = assetInfo?.balance?.toMoneyString() ?: "0.00",
+            totalAmount = assetInfo?.totalAmount?.toMoneyString() ?: "0.00",
             billingDate = assetInfo?.billingDate.orEmpty(),
             repaymentDate = assetInfo?.repaymentDate.orEmpty(),
             openBank = assetInfo?.openBank.orEmpty(),

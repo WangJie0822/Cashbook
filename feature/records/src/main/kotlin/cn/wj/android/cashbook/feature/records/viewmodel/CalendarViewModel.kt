@@ -22,8 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
@@ -39,7 +38,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -81,20 +79,20 @@ class CalendarViewModel @Inject constructor(
         val selectedDay = selectedDate.dayOfMonth
         val recordList = arrayListOf<RecordViewsEntity>()
         val schemas = mutableMapOf<LocalDate, RecordDayEntity>()
-        var totalIncome = BigDecimal.ZERO
-        var totalExpenditure = BigDecimal.ZERO
+        var totalIncome = 0L
+        var totalExpenditure = 0L
         getCurrentMonthRecordViewsMapUseCase(list).forEach {
-            totalIncome += it.key.dayIncome.toBigDecimalOrZero()
-            totalExpenditure += it.key.dayExpand.toBigDecimalOrZero()
+            totalIncome += it.key.dayIncome
+            totalExpenditure += it.key.dayExpand
             if (selectedDay == it.key.day) {
                 recordList.addAll(it.value)
             }
             schemas[selectedYearMonth.atDay(it.key.day)] = it.key
         }
         CalendarUiState.Success(
-            monthIncome = totalIncome.decimalFormat(),
-            monthExpand = totalExpenditure.decimalFormat(),
-            monthBalance = (totalIncome - totalExpenditure).decimalFormat(),
+            monthIncome = totalIncome.toMoneyString(),
+            monthExpand = totalExpenditure.toMoneyString(),
+            monthBalance = (totalIncome - totalExpenditure).toMoneyString(),
             schemas = schemas,
             recordList = recordList,
         )

@@ -129,17 +129,17 @@ class SearchViewModelTest {
             relatedAssetId = null,
             relatedAssetName = null,
             relatedAssetIconResId = null,
-            amount = "100.00",
-            finalAmount = "100.00",
-            charges = "0",
-            concessions = "0",
+            amount = 10000L,
+            finalAmount = 10000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "测试备注",
             reimbursable = false,
             relatedTags = emptyList(),
             relatedImage = emptyList(),
             relatedRecord = emptyList(),
-            relatedAmount = "0",
-            recordTime = "2024-01-01 12:00",
+            relatedAmount = 0L,
+            recordTime = 1704067200000L,
         )
     }
 }

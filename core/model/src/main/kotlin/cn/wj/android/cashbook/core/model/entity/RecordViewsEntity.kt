@@ -46,17 +46,23 @@ data class RecordViewsEntity(
     val relatedAssetId: Long?,
     val relatedAssetName: String?,
     val relatedAssetIconResId: Int?,
-    val amount: String,
-    val finalAmount: String,
-    val charges: String,
-    val concessions: String,
+    /** 金额，单位：分 */
+    val amount: Long,
+    /** 最终金额，单位：分 */
+    val finalAmount: Long,
+    /** 手续费，单位：分 */
+    val charges: Long,
+    /** 优惠，单位：分 */
+    val concessions: Long,
     val remark: String,
     val reimbursable: Boolean,
     val relatedTags: List<TagModel>,
     val relatedImage: List<ImageModel>,
     val relatedRecord: List<RecordModel>,
-    val relatedAmount: String,
-    val recordTime: String,
+    /** 关联金额，单位：分 */
+    val relatedAmount: Long,
+    /** 记录时间，毫秒时间戳 */
+    val recordTime: Long,
 ) : RecordViews {
     val isBalanceAccount: Boolean
         get() = typeName == RECORD_TYPE_BALANCE_EXPENDITURE.name

@@ -18,8 +18,8 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
-import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.yearMonth
+import cn.wj.android.cashbook.core.common.tools.toMs
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
@@ -43,25 +43,25 @@ class GetRecordViewsBetweenDateUseCase @Inject constructor(
         toDate: LocalDate?,
         yearSelected: Boolean,
     ): List<RecordViewsModel> = withContext(coroutineContext) {
-        val from: String
-        val to: String
+        val from: Long
+        val to: Long
         when {
             yearSelected -> {
-                from = "${fromDate.year}-01-01 00:00:00"
-                to = "${fromDate.year}-12-31 23:59:59"
+                from = LocalDate.of(fromDate.year, 1, 1).toMs()
+                // 下一年的第一天零点 - 1ms 即为本年最后一刻
+                to = LocalDate.of(fromDate.year + 1, 1, 1).toMs() - 1L
             }
 
             null == toDate -> {
-                from = "${fromDate.year}-${fromDate.monthValue.completeZero()}-01 00:00:00"
-                to =
-                    "${fromDate.year}-${fromDate.monthValue.completeZero()}-${fromDate.yearMonth.atEndOfMonth().dayOfMonth} 23:59:59"
+                from = LocalDate.of(fromDate.year, fromDate.monthValue, 1).toMs()
+                // 下月第一天零点 - 1ms
+                to = fromDate.yearMonth.atEndOfMonth().plusDays(1).toMs() - 1L
             }
 
             else -> {
-                from =
-                    "${fromDate.year}-${fromDate.monthValue.completeZero()}-${fromDate.dayOfMonth.completeZero()} 00:00:00"
-                to =
-                    "${toDate.year}-${toDate.monthValue.completeZero()}-${toDate.dayOfMonth.completeZero()} 23:59:59"
+                from = fromDate.toMs()
+                // 结束日期的次日零点 - 1ms
+                to = toDate.plusDays(1).toMs() - 1L
             }
         }
         recordRepository.queryRecordListBetweenDate(from, to)

@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import cn.wj.android.cashbook.core.common.Symbol
-import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.ui.expand.colorInt
 import com.github.mikephil.charting.charts.PieChart
@@ -91,7 +91,7 @@ internal fun AnalyticsPieChart(
                                 tempCenterText = centerText
                             }
                             (e.data as? AnalyticsRecordPieEntity)?.let { data ->
-                                centerText = "${data.typeName}\n${data.totalAmount.withCNY()}"
+                                centerText = "${data.typeName}\n${data.totalAmount.toMoneyCNY()}"
                             }
                         }
 

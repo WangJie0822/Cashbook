@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.core.model.entity
+package cn.wj.android.cashbook.core.model.enums
 
-data class AnalyticsRecordBarEntity(
-    val date: String,
-    /** 支出，单位：分 */
-    val expenditure: Long,
-    /** 收入，单位：分 */
-    val income: Long,
-    /** 结余，单位：分 */
-    val balance: Long,
-    val year: Boolean,
-)
+/**
+ * 日期选择类型枚举
+ */
+enum class DateSelectionTypeEnum {
+    /** 按日 */
+    BY_DAY,
+
+    /** 按月 */
+    BY_MONTH,
+
+    /** 按年 */
+    BY_YEAR,
+
+    /** 时间范围 */
+    DATE_RANGE,
+
+    /** 全部 */
+    ALL,
+}

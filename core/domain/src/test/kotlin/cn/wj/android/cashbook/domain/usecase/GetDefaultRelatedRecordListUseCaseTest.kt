@@ -43,7 +43,7 @@ class GetDefaultRelatedRecordListUseCaseTest {
 
     @Test
     fun when_has_related_records_then_returns_entities() = runTest {
-        val relatedRecord = createRecordModel(id = 2L, amount = "100")
+        val relatedRecord = createRecordModel(id = 2L, amount = 10000L)
         recordRepository.addRecord(relatedRecord)
         recordRepository.setRelatedIds(1L, listOf(2L))
 

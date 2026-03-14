@@ -17,34 +17,15 @@
 package cn.wj.android.cashbook.core.model.model
 
 /**
- * 记录数据实体类
- *
- * @param id 主键自增长
- *  @param booksId 关联账本 id
- * @param typeId 记录类型
- * @param assetId 关联资产
- * @param relatedAssetId 转账关联资产
- * @param amount 记录金额
- * @param finalAmount 最终金额
- * @param charges 手续费
- * @param concessions 优惠
- * @param remark 备注
- * @param reimbursable 能否报销
- * @param recordTime 修改时间
- *
- * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
+ * 记录轻量汇总数据，用于收支统计计算，不含关联数据的 N+1 查询
  */
-data class RecordModel(
+data class RecordViewSummaryModel(
     val id: Long,
-    val booksId: Long,
-    val typeId: Long,
-    val assetId: Long,
-    val relatedAssetId: Long,
+    val typeCategory: Int,
+    val typeName: String,
     val amount: Long,
     val finalAmount: Long,
     val charges: Long,
     val concessions: Long,
-    val remark: String,
-    val reimbursable: Boolean,
     val recordTime: Long,
 )

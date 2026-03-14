@@ -17,6 +17,8 @@
 package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createRecordViewsModel
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
@@ -94,13 +96,13 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         val records = listOf(
             createRecordViewsModel(
                 type = expenditureType,
-                finalAmount = "100",
-                recordTime = "2024-01-15 12:00",
+                finalAmount = 10000L,
+                recordTime = 1705291200000L, // 2024-01-15 12:00
             ),
             createRecordViewsModel(
                 type = expenditureType,
-                finalAmount = "50",
-                recordTime = "2024-01-15 18:00",
+                finalAmount = 5000L,
+                recordTime = 1705312800000L, // 2024-01-15 18:00
             ),
         )
 
@@ -113,11 +115,11 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
 
         val jan15 = result.find { it.date == "2024-01-15" }
         assertThat(jan15).isNotNull()
-        assertThat(jan15!!.expenditure).isEqualTo("150")
+        assertThat(jan15!!.expenditure).isEqualTo(15000L)
     }
 
     @Test
-    fun when_has_transfer_records_then_charges_as_expenditure_concessions_as_income() = runTest {
+    fun when_has_transfer_records_then_concessions_offset_charges() = runTest {
         val transferType = createRecordTypeModel(
             id = 1L,
             typeCategory = RecordTypeCategoryEnum.TRANSFER,
@@ -125,9 +127,9 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         val records = listOf(
             createRecordViewsModel(
                 type = transferType,
-                charges = "10",
-                concessions = "5",
-                recordTime = "2024-01-01 12:00",
+                charges = 1000L,
+                concessions = 300L,
+                recordTime = 1704081600000L, // 2024-01-01 12:00
             ),
         )
 
@@ -140,8 +142,55 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
 
         val jan1 = result.find { it.date == "2024-01-01" }
         assertThat(jan1).isNotNull()
-        assertThat(jan1!!.expenditure).isEqualTo("10")
-        assertThat(jan1.income).isEqualTo("5")
+        // 转账优惠冲减支出：1000 - 300 = 700（分）
+        assertThat(jan1!!.expenditure).isEqualTo(700L)
+        assertThat(jan1.income).isEqualTo(0L)
+    }
+
+    @Test
+    fun when_balance_records_then_excluded_from_statistics() = runTest {
+        val balanceExpType = createRecordTypeModel(
+            id = RECORD_TYPE_BALANCE_EXPENDITURE.id,
+            typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        )
+        val balanceIncType = createRecordTypeModel(
+            id = RECORD_TYPE_BALANCE_INCOME.id,
+            typeCategory = RecordTypeCategoryEnum.INCOME,
+        )
+        val normalType = createRecordTypeModel(
+            id = 1L,
+            typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        )
+        val records = listOf(
+            createRecordViewsModel(
+                type = balanceExpType,
+                finalAmount = 10000L,
+                recordTime = 1704074400000L, // 2024-01-01 10:00
+            ),
+            createRecordViewsModel(
+                type = balanceIncType,
+                finalAmount = 20000L,
+                recordTime = 1704078000000L, // 2024-01-01 11:00
+            ),
+            createRecordViewsModel(
+                type = normalType,
+                finalAmount = 5000L,
+                recordTime = 1704081600000L, // 2024-01-01 12:00
+            ),
+        )
+
+        val result = useCase(
+            fromDate = LocalDate.of(2024, 1, 1),
+            toDate = null,
+            yearSelected = false,
+            recordViewsList = records,
+        )
+
+        val jan1 = result.find { it.date == "2024-01-01" }
+        assertThat(jan1).isNotNull()
+        // 平账记录不计入统计，只有 5000（分）支出
+        assertThat(jan1!!.expenditure).isEqualTo(5000L)
+        assertThat(jan1.income).isEqualTo(0L)
     }
 
     @Test
@@ -153,13 +202,13 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         val records = listOf(
             createRecordViewsModel(
                 type = expenditureType,
-                finalAmount = "100",
-                recordTime = "2024-03-15 12:00",
+                finalAmount = 10000L,
+                recordTime = 1710475200000L, // 2024-03-15 12:00
             ),
             createRecordViewsModel(
                 type = expenditureType,
-                finalAmount = "200",
-                recordTime = "2024-03-20 12:00",
+                finalAmount = 20000L,
+                recordTime = 1710907200000L, // 2024-03-20 12:00
             ),
         )
 
@@ -172,6 +221,6 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
 
         val march = result.find { it.date == "2024-03" }
         assertThat(march).isNotNull()
-        assertThat(march!!.expenditure).isEqualTo("300")
+        assertThat(march!!.expenditure).isEqualTo(30000L)
     }
 }

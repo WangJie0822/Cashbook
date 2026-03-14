@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.table
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -25,7 +26,12 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2025/2/24
  */
-@Entity(tableName = TABLE_IMAGE_RELATED)
+@Entity(
+    tableName = TABLE_IMAGE_RELATED,
+    indices = [
+        Index("record_id"),
+    ],
+)
 data class ImageWithRelatedTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = TABLE_IMAGE_ID)

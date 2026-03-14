@@ -68,10 +68,10 @@ class MappingTest {
             typeId = 2L,
             assetId = 3L,
             intoAssetId = 4L,
-            amount = 100.5,
-            finalAmount = 95.0,
-            charge = 5.5,
-            concessions = 10.0,
+            amount = 10050L,
+            finalAmount = 9500L,
+            charge = 550L,
+            concessions = 1000L,
             remark = "测试备注",
             reimbursable = SWITCH_INT_ON,
         )
@@ -81,10 +81,10 @@ class MappingTest {
         assertThat(model.typeId).isEqualTo(2L)
         assertThat(model.assetId).isEqualTo(3L)
         assertThat(model.relatedAssetId).isEqualTo(4L)
-        assertThat(model.amount).isEqualTo("100.5")
-        assertThat(model.finalAmount).isEqualTo("95.0")
-        assertThat(model.charges).isEqualTo("5.5")
-        assertThat(model.concessions).isEqualTo("10.0")
+        assertThat(model.amount).isEqualTo(10050L)
+        assertThat(model.finalAmount).isEqualTo(9500L)
+        assertThat(model.charges).isEqualTo(550L)
+        assertThat(model.concessions).isEqualTo(1000L)
         assertThat(model.remark).isEqualTo("测试备注")
         assertThat(model.reimbursable).isTrue()
     }
@@ -396,10 +396,10 @@ class MappingTest {
         assetId: Long = 1L,
         intoAssetId: Long = -1L,
         booksId: Long = 1L,
-        amount: Double = 0.0,
-        finalAmount: Double = 0.0,
-        concessions: Double = 0.0,
-        charge: Double = 0.0,
+        amount: Long = 0L,
+        finalAmount: Long = 0L,
+        concessions: Long = 0L,
+        charge: Long = 0L,
         remark: String = "",
         reimbursable: Int = SWITCH_INT_OFF,
         recordTime: Long = 1000L,
@@ -424,13 +424,13 @@ class MappingTest {
         typeId: Long = 1L,
         assetId: Long = 1L,
         relatedAssetId: Long = -1L,
-        amount: String = "0",
-        finalAmount: String = "0",
-        charges: String = "",
-        concessions: String = "",
+        amount: Long = 0L,
+        finalAmount: Long = 0L,
+        charges: Long = 0L,
+        concessions: Long = 0L,
         remark: String = "",
         reimbursable: Boolean = false,
-        recordTime: String = "2024-01-01 00:00",
+        recordTime: Long = 1704067200000L,
     ) = RecordModel(
         id = id,
         booksId = booksId,
@@ -492,8 +492,8 @@ class MappingTest {
         id: Long? = 1L,
         booksId: Long = 1L,
         name: String = "现金",
-        balance: Double = 0.0,
-        totalAmount: Double = 0.0,
+        balance: Long = 0L,
+        totalAmount: Long = 0L,
         billingDate: String = "",
         repaymentDate: String = "",
         type: Int = ClassificationTypeEnum.CAPITAL_ACCOUNT.ordinal,
@@ -526,8 +526,8 @@ class MappingTest {
         id: Long = 1L,
         booksId: Long = 1L,
         name: String = "现金",
-        balance: String = "0",
-        totalAmount: String = "0",
+        balance: Long = 0L,
+        totalAmount: Long = 0L,
         billingDate: String = "",
         repaymentDate: String = "",
         type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT,
@@ -537,7 +537,7 @@ class MappingTest {
         cardNo: String = "",
         remark: String = "",
         sort: Int = 0,
-        modifyTime: String = "2024-01-01 00:00:00",
+        modifyTime: Long = 1704067200000L,
     ) = AssetModel(
         id = id,
         booksId = booksId,

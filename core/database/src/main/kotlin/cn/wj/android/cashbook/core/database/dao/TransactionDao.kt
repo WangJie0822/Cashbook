@@ -22,9 +22,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -37,7 +34,6 @@ import cn.wj.android.cashbook.core.database.throwable.DataTransactionException
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ImageModel
-import java.math.BigDecimal
 
 /**
  * 事务数据库操作类
@@ -99,6 +95,13 @@ interface TransactionDao {
     """,
     )
     suspend fun queryRecordById(recordId: Long): RecordTable?
+
+    @Query(
+        value = """
+        SELECT * FROM db_record WHERE id IN (:ids)
+    """,
+    )
+    suspend fun queryRecordByIds(ids: List<Long>): List<RecordTable>
 
     @Query(
         value = """
@@ -180,13 +183,13 @@ interface TransactionDao {
         } ?: throw DataTransactionException("Type must not be null")
 
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
-        // 计算记录涉及金额
+        // 计算记录涉及金额（单位：分）
         val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
             // 收入，金额 - 手续费
-            record.amount.toBigDecimalOrZero() - record.charge.toBigDecimalOrZero()
+            record.amount - record.charge
         } else {
             // 支出、转账，金额 + 手续费 - 优惠
-            record.amount.toBigDecimal() + record.charge.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero()
+            record.amount + record.charge - record.concessions
         }
         // 更新资产余额
         queryAssetById(record.assetId)?.let { asset ->
@@ -196,23 +199,23 @@ interface TransactionDao {
                     // 信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，已用额度 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - recordAmount
+                        asset.balance - recordAmount
                     } else {
                         // 支出、转账，已用额度 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + recordAmount
+                        asset.balance + recordAmount
                     }
                 } else {
                     // 非信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，余额 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + recordAmount
+                        asset.balance + recordAmount
                     } else {
                         // 支出、转账，余额 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - recordAmount
+                        asset.balance - recordAmount
                     }
                 }
             // 更新资产
-            updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+            updateAsset(asset.copy(balance = balance))
         }
         if (category == RecordTypeCategoryEnum.TRANSFER) {
             // 转账，更新关联资产余额
@@ -221,17 +224,17 @@ interface TransactionDao {
                 val balance =
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
+                        asset.balance - record.amount
                     } else {
                         // 非信用卡账户，余额 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
+                        asset.balance + record.amount
                     }
                 // 更新资产
-                updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+                updateAsset(asset.copy(balance = balance))
             }
         }
 
-        val recordId = insertRecord(record.copy(finalAmount = recordAmount.toDouble()))
+        val recordId = insertRecord(record.copy(finalAmount = recordAmount))
 
         // 插入新的关联标签
         insertRelatedTags(
@@ -265,16 +268,14 @@ interface TransactionDao {
             )
 
             // 更新关联记录的金额
-            var relatedAmount = BigDecimal.ZERO
-            relatedRecordIdList.mapNotNull { relatedRecordId ->
-                queryRecordById(relatedRecordId)
-            }.forEach { relatedRecord ->
-                relatedAmount += relatedRecord.finalAmount.toBigDecimalOrZero()
+            var relatedAmount = 0L
+            queryRecordByIds(relatedRecordIdList).forEach { relatedRecord ->
+                relatedAmount += relatedRecord.finalAmount
             }
             relatedRecordIdList.forEach { relatedRecordId ->
-                updateRecordFinalAmountById(relatedRecordId, 0.0)
+                updateRecordFinalAmountById(relatedRecordId, 0L)
             }
-            updateRecordFinalAmountById(recordId, (recordAmount - relatedAmount).toDouble())
+            updateRecordFinalAmountById(recordId, recordAmount - relatedAmount)
         }
     }
 
@@ -318,13 +319,13 @@ interface TransactionDao {
         } ?: throw DataTransactionException("Type must not be null")
 
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
-        // 计算之前记录涉及金额
+        // 计算之前记录涉及金额（单位：分）
         val oldRecordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
             // 收入，金额 - 手续费
-            record.amount.toBigDecimalOrZero() - record.charge.toBigDecimalOrZero()
+            record.amount - record.charge
         } else {
             // 支出、转账，金额 + 手续费 - 优惠
-            record.amount.toBigDecimal() + record.charge.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero()
+            record.amount + record.charge - record.concessions
         }
         // 更新资产余额
         queryAssetById(record.assetId)?.let { asset ->
@@ -334,23 +335,23 @@ interface TransactionDao {
                     // 信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，已用额度 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                        asset.balance + oldRecordAmount
                     } else {
                         // 支出、转账，已用额度 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                        asset.balance - oldRecordAmount
                     }
                 } else {
                     // 非信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，余额 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                        asset.balance - oldRecordAmount
                     } else {
                         // 支出、转账，余额 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                        asset.balance + oldRecordAmount
                     }
                 }
             // 更新资产
-            updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+            updateAsset(asset.copy(balance = balance))
         }
         if (category == RecordTypeCategoryEnum.TRANSFER) {
             // 转账，更新关联资产余额
@@ -359,13 +360,13 @@ interface TransactionDao {
                 val balance =
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
+                        asset.balance + record.amount
                     } else {
                         // 非信用卡账户，余额 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
+                        asset.balance - record.amount
                     }
                 // 更新资产
-                updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+                updateAsset(asset.copy(balance = balance))
             }
         }
 
@@ -385,8 +386,7 @@ interface TransactionDao {
                 if (null != relatedRecordId) {
                     updateRecordFinalAmountById(
                         relatedRecordId,
-                        (relatedRecord.finalAmount.toBigDecimalOrZero() + oldRecordAmount).decimalFormat()
-                            .toDoubleOrZero(),
+                        relatedRecord.finalAmount + oldRecordAmount,
                     )
                 }
             }
@@ -399,8 +399,7 @@ interface TransactionDao {
                 if (null != relatedRecordId) {
                     updateRecordFinalAmountById(
                         relatedRecordId,
-                        (relatedRecord.amount.toBigDecimalOrZero() - relatedRecord.concessions.toBigDecimalOrZero() + relatedRecord.charge.toBigDecimalOrZero()).decimalFormat()
-                            .toDoubleOrZero(),
+                        relatedRecord.amount - relatedRecord.concessions + relatedRecord.charge,
                     )
                 }
             }
@@ -421,7 +420,7 @@ interface TransactionDao {
         UPDATE db_record SET final_amount=:finalAmount WHERE id=:id
     """,
     )
-    suspend fun updateRecordFinalAmountById(id: Long, finalAmount: Double)
+    suspend fun updateRecordFinalAmountById(id: Long, finalAmount: Long)
 
     @Query(
         value = """

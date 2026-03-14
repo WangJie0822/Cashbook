@@ -16,6 +16,8 @@
 
 package cn.wj.android.cashbook.core.data.testdoubles
 
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
@@ -167,6 +169,10 @@ class FakeRecordDao : RecordDao {
             .take(pageSize)
     }
 
+    override suspend fun queryByIds(ids: List<Long>): List<RecordTable> {
+        return records.filter { it.id in ids }
+    }
+
     override fun queryByTypeId(id: Long): List<RecordTable> {
         return records.filter { it.typeId == id }
     }
@@ -281,6 +287,52 @@ class FakeRecordDao : RecordDao {
             .filter { it.assetId == assetId || it.intoAssetId == assetId }
             .mapNotNull { it.id }
         relatedRecords.removeAll { it.recordId in recordIds || it.relatedRecordId in recordIds }
+    }
+
+    override fun pagingQueryByBooksIdBetweenDate(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): PagingSource<Int, RecordTable> {
+        return object : PagingSource<Int, RecordTable>() {
+            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RecordTable> {
+                val data = records.filter {
+                    it.booksId == booksId && it.recordTime >= startDate && it.recordTime < endDate
+                }.sortedByDescending { it.recordTime }
+                return LoadResult.Page(data = data, prevKey = null, nextKey = null)
+            }
+
+            override fun getRefreshKey(state: PagingState<Int, RecordTable>): Int? = null
+        }
+    }
+
+    override suspend fun queryViewsBetweenDate(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<RecordViewsRelation> {
+        return records.filter {
+            it.booksId == booksId && it.recordTime >= startDate && it.recordTime < endDate
+        }.map { record ->
+            val type = types.firstOrNull { it.id == record.typeId }
+            RecordViewsRelation(
+                id = record.id ?: -1L,
+                typeCategory = type?.typeCategory ?: 0,
+                typeName = "",
+                typeIconResName = "",
+                assetName = null,
+                assetClassification = null,
+                relatedAssetName = null,
+                relatedAssetClassification = null,
+                amount = record.amount,
+                finalAmount = record.finalAmount,
+                charges = record.charge,
+                concessions = record.concessions,
+                remark = record.remark,
+                reimbursable = record.reimbursable,
+                recordTime = record.recordTime,
+            )
+        }
     }
 
     override suspend fun queryImagesByRecordId(recordId: Long): List<ImageWithRelatedTable> {

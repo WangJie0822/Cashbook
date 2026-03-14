@@ -72,6 +72,7 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
         arrayOf(
             AssetClassificationEnum.BORROW,
             AssetClassificationEnum.LEND,
+            AssetClassificationEnum.DEBT,
         ),
     ),
 

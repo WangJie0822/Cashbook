@@ -22,79 +22,184 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import androidx.paging.PagingData
+import androidx.paging.insertSeparators
+import androidx.paging.map
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
+import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
+import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
-import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsMapUseCase
-import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCase
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import cn.wj.android.cashbook.core.model.transfer.asEntity
+import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class LauncherContentViewModel @Inject constructor(
     booksRepository: BooksRepository,
     settingRepository: SettingRepository,
-    recordRepository: RecordRepository,
-    getCurrentMonthRecordViewsUseCase: GetCurrentMonthRecordViewsUseCase,
-    getCurrentMonthRecordViewsMapUseCase: GetCurrentMonthRecordViewsMapUseCase,
+    private val recordRepository: RecordRepository,
+    private val recordModelTransToViewsUseCase: RecordModelTransToViewsUseCase,
 ) : ViewModel() {
 
     /** 删除记录失败错误信息 */
     var shouldDisplayDeleteFailedBookmark by mutableIntStateOf(0)
         private set
 
-    /** 弹窗状态 */
-    var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
-        private set
-
     /** 记录详情数据 */
     var viewRecord by mutableStateOf<RecordViewsEntity?>(null)
         private set
 
-    /** 当前选择时间 */
-    private val _dateData = MutableStateFlow(YearMonth.now())
-    val dateData: StateFlow<YearMonth> = _dateData
+    /** 日期选择 Popup 是否显示 */
+    var showDatePopup by mutableStateOf(false)
+        private set
 
-    /** 当前月记录数据 */
-    private val _currentMonthRecordListData = _dateData.flatMapLatest { date ->
-        getCurrentMonthRecordViewsUseCase(date.year.toString(), date.monthValue.toString())
+    /** 当前日期选择 */
+    private val _dateSelection = MutableStateFlow<DateSelectionEntity>(
+        DateSelectionEntity.ByMonth(YearMonth.now()),
+    )
+    val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
+
+    /** 根据日期选择计算起止时间戳（毫秒） */
+    private fun computeDateRange(selection: DateSelectionEntity): Pair<Long, Long> {
+        val zone = ZoneId.systemDefault()
+        return when (selection) {
+            is DateSelectionEntity.ByDay -> {
+                val start = selection.date.atStartOfDay(zone).toInstant().toEpochMilli()
+                val end = selection.date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+                start to end
+            }
+
+            is DateSelectionEntity.ByMonth -> {
+                val start = selection.yearMonth.atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
+                val end = selection.yearMonth.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
+                start to end
+            }
+
+            is DateSelectionEntity.ByYear -> {
+                val start = LocalDate.of(selection.year, 1, 1).atStartOfDay(zone).toInstant().toEpochMilli()
+                val end = LocalDate.of(selection.year + 1, 1, 1).atStartOfDay(zone).toInstant().toEpochMilli()
+                start to end
+            }
+
+            is DateSelectionEntity.DateRange -> {
+                val start = selection.from.atStartOfDay(zone).toInstant().toEpochMilli()
+                val end = selection.to.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+                start to end
+            }
+
+            is DateSelectionEntity.All -> {
+                0L to Long.MAX_VALUE
+            }
+        }
+    }
+
+    /** 轻量汇总数据（用于计算收支总额和每日汇总） */
+    private val _summaryData: Flow<List<RecordViewSummaryModel>> = _dateSelection.flatMapLatest { selection ->
+        val (startDate, endDate) = computeDateRange(selection)
+        recordRepository.queryRecordViewSummariesFlow(startDate, endDate)
+    }
+
+    /** 每日汇总 Map（日期字符串 -> RecordDayEntity）*/
+    val dailySummaries: StateFlow<Map<String, RecordDayEntity>> = _summaryData
+        .map { list -> computeDailySummaries(list) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyMap(),
+        )
+
+    /** 分页记录数据 */
+    val recordPagingData: Flow<PagingData<LauncherListItem>> = _dateSelection.flatMapLatest { selection ->
+        val (startDate, endDate) = computeDateRange(selection)
+        recordRepository.getRecordPagingData(startDate, endDate)
+            .map { pagingData ->
+                pagingData.map { recordModel ->
+                    val views = recordModelTransToViewsUseCase(recordModel).asEntity()
+                    LauncherListItem.Record(views) as LauncherListItem
+                }
+            }
+            .map { pagingData ->
+                pagingData.insertSeparators { before, after ->
+                    val afterRecord = (after as? LauncherListItem.Record)?.entity
+                    val beforeRecord = (before as? LauncherListItem.Record)?.entity
+                    if (afterRecord != null) {
+                        val afterDate = afterRecord.recordTime.dateFormat(DATE_FORMAT_DATE)
+                        val beforeDate = beforeRecord?.recordTime?.dateFormat(DATE_FORMAT_DATE)
+                        if (afterDate != beforeDate) {
+                            val dateArray = afterDate.split("-")
+                            val day = dateArray.last().toIntOrNull() ?: 0
+                            val dayType = computeDayType(dateArray)
+                            LauncherListItem.DayHeader(
+                                dateStr = afterDate,
+                                day = day,
+                                dayType = dayType,
+                            )
+                        } else {
+                            null
+                        }
+                    } else {
+                        null
+                    }
+                }
+            }
     }
 
     /** 界面 UI 状态 */
-    val uiState = combine(_currentMonthRecordListData, booksRepository.currentBook, settingRepository.tempKeysModel) { list, book, temp ->
+    val uiState: StateFlow<LauncherContentUiState> = combine(
+        _summaryData,
+        booksRepository.currentBook,
+        settingRepository.tempKeysModel,
+    ) { summaryList, book, temp ->
         if (!temp.db9To10DataMigrated) {
-            // 升级后数据迁移
             recordRepository.migrateAfter9To10()
             LauncherContentUiState.Loading
         } else {
-            val recordMap = getCurrentMonthRecordViewsMapUseCase(list)
-            var totalIncome = BigDecimal.ZERO
-            var totalExpenditure = BigDecimal.ZERO
-            recordMap.keys.forEach {
-                totalIncome += it.dayIncome.toBigDecimalOrZero()
-                totalExpenditure += it.dayExpand.toBigDecimalOrZero()
+            var totalIncome = 0L
+            var totalExpenditure = 0L
+            summaryList.forEach { record ->
+                if (record.typeName == RECORD_TYPE_BALANCE_EXPENDITURE.name) {
+                    return@forEach
+                }
+                when (RecordTypeCategoryEnum.ordinalOf(record.typeCategory)) {
+                    RecordTypeCategoryEnum.EXPENDITURE -> {
+                        totalExpenditure += record.finalAmount
+                    }
+
+                    RecordTypeCategoryEnum.INCOME -> {
+                        totalIncome += record.finalAmount
+                    }
+
+                    RecordTypeCategoryEnum.TRANSFER -> {
+                        totalExpenditure += record.charges - record.concessions
+                    }
+                }
             }
             LauncherContentUiState.Success(
                 topBgUri = book.bgUri,
-                monthIncome = totalIncome.decimalFormat(),
-                monthExpand = totalExpenditure.decimalFormat(),
-                monthBalance = (totalIncome - totalExpenditure).decimalFormat(),
-                recordMap = recordMap,
+                totalIncome = totalIncome.toMoneyString(),
+                totalExpand = totalExpenditure.toMoneyString(),
+                totalBalance = (totalIncome - totalExpenditure).toMoneyString(),
             )
         }
     }
@@ -119,23 +224,95 @@ class LauncherContentViewModel @Inject constructor(
         viewRecord = null
     }
 
-    /** 显示日期选择弹窗 */
-    fun displayDateSelectDialog() {
-        viewModelScope.launch {
-            dialogState = DialogState.Shown(_dateData.first())
+    /** 显示日期选择 Popup */
+    fun displayDatePopup() {
+        showDatePopup = true
+    }
+
+    /** 隐藏日期选择 Popup */
+    fun dismissDatePopup() {
+        showDatePopup = false
+    }
+
+    /** 更新日期选择 */
+    fun updateDateSelection(selection: DateSelectionEntity) {
+        _dateSelection.tryEmit(selection)
+    }
+
+    /** 计算每日汇总 */
+    private fun computeDailySummaries(
+        list: List<RecordViewSummaryModel>,
+    ): Map<String, RecordDayEntity> {
+        val dayMap = linkedMapOf<String, MutableList<RecordViewSummaryModel>>()
+        list.sortedByDescending { it.recordTime }
+            .forEach { record ->
+                val dateStr = record.recordTime.dateFormat(DATE_FORMAT_DATE)
+                dayMap.getOrPut(dateStr) { mutableListOf() }.add(record)
+            }
+        return dayMap.mapValues { (dateStr, records) ->
+            var dayIncome = 0L
+            var dayExpenditure = 0L
+            records.forEach { record ->
+                if (record.typeName == RECORD_TYPE_BALANCE_EXPENDITURE.name) {
+                    return@forEach
+                }
+                when (RecordTypeCategoryEnum.ordinalOf(record.typeCategory)) {
+                    RecordTypeCategoryEnum.EXPENDITURE -> {
+                        dayExpenditure += record.finalAmount
+                    }
+
+                    RecordTypeCategoryEnum.INCOME -> {
+                        dayIncome += record.finalAmount
+                    }
+
+                    RecordTypeCategoryEnum.TRANSFER -> {
+                        dayExpenditure += record.charges - record.concessions
+                    }
+                }
+            }
+            val dateArray = dateStr.split("-")
+            val day = dateArray.last().toIntOrNull() ?: 0
+            val dayType = computeDayType(dateArray)
+            RecordDayEntity(
+                day = day,
+                dayType = dayType,
+                dayIncome = dayIncome,
+                dayExpand = dayExpenditure,
+            )
         }
     }
 
-    /** 刷新已选择日期 */
-    fun refreshSelectedDate(date: YearMonth) {
-        dismissDialog()
-        _dateData.tryEmit(date)
+    /** 计算 dayType：0=今天, -1=昨天, -2=前天, 1=其它 */
+    private fun computeDayType(dateArray: List<String>): Int {
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar[Calendar.YEAR]
+        val currentMonth = calendar[Calendar.MONTH] + 1
+        val currentDay = calendar[Calendar.DAY_OF_MONTH]
+        val dateDay = dateArray.last().toIntOrNull() ?: return 1
+        return if (currentYear == dateArray[0].toIntOrNull() && currentMonth == dateArray[1].toIntOrNull()) {
+            when (dateDay) {
+                currentDay -> 0
+                currentDay - 1 -> -1
+                currentDay - 2 -> -2
+                else -> 1
+            }
+        } else {
+            1
+        }
     }
+}
 
-    /** 隐藏弹窗 */
-    fun dismissDialog() {
-        dialogState = DialogState.Dismiss
-    }
+/** 首页列表项密封接口 */
+sealed interface LauncherListItem {
+    /** 日期头 */
+    data class DayHeader(
+        val dateStr: String,
+        val day: Int,
+        val dayType: Int,
+    ) : LauncherListItem
+
+    /** 记录项 */
+    data class Record(val entity: RecordViewsEntity) : LauncherListItem
 }
 
 /**
@@ -148,16 +325,14 @@ sealed interface LauncherContentUiState {
     /**
      * 加载完成
      *
-     * @param monthIncome 月收入
-     * @param monthExpand 月支出
-     * @param monthBalance 月结余
-     * @param recordMap 记录列表数据
+     * @param totalIncome 收入
+     * @param totalExpand 支出
+     * @param totalBalance 结余
      */
     data class Success(
         val topBgUri: String,
-        val monthIncome: String,
-        val monthExpand: String,
-        val monthBalance: String,
-        val recordMap: Map<RecordDayEntity, List<RecordViewsEntity>>,
+        val totalIncome: String,
+        val totalExpand: String,
+        val totalBalance: String,
     ) : LauncherContentUiState
 }

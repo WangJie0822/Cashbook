@@ -184,7 +184,7 @@ class EditRecordSelectAssetBottomSheetViewModelTest {
         booksId = 1L,
         name = "测试资产$id",
         iconResId = 0,
-        totalAmount = "",
+        totalAmount = 0L,
         billingDate = "",
         repaymentDate = "",
         type = type,
@@ -194,7 +194,7 @@ class EditRecordSelectAssetBottomSheetViewModelTest {
         cardNo = "",
         remark = "",
         sort = 0,
-        modifyTime = "2024-01-01",
-        balance = "0",
+        modifyTime = 1704067200000L,
+        balance = 0L,
     )
 }

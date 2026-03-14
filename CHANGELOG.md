@@ -3,7 +3,16 @@
 # 记账本 Changelog
 
 ## [Unreleased]
-
+### Changed
+- 重构金额存储为 Long（分）并优化首页性能
+- 全链路将金额字段从 String/Double 重构为 Long（单位：分），消除浮点精度问题
+- 新增 Money.kt 提供分与元之间的转换工具方法
+- 数据库升级至 v12：金额字段迁移为 INTEGER、recordTime 统一为毫秒时间戳、添加多表索引优化查询
+- 新增 DateSelectionEntity 密封类支持按日/月/年/范围/全部的灵活日期筛选
+- 首页记录列表改用 Paging 分页加载，新增 RecordViewSummaryModel 轻量汇总避免 N+1 查询
+- 新增 WheelPicker 和 DateSelectionPopup UI 组件
+- 同步更新全部相关 UseCase、Repository、ViewModel 及测试
+- 
 ## [1.0.8_25042622]
 ### Add
 - 数据分析内层界面新增时间筛选，保存数据一致；

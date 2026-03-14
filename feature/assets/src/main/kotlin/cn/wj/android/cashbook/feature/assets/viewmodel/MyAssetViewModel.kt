@@ -21,8 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import javax.inject.Inject
 
 /**
@@ -62,23 +60,26 @@ class MyAssetViewModel @Inject constructor(
         assetRepository.currentVisibleAssetListData,
         assetRepository.topUpInTotalData,
     ) { list, topUpInTotal ->
-        var totalLiabilities = BigDecimal.ZERO
-        var totalAsset = BigDecimal.ZERO
+        var totalLiabilities = 0L
+        var totalAsset = 0L
         list.forEach { assetModel ->
-            if (assetModel.type.isCreditCard || assetModel.classification == AssetClassificationEnum.BORROW) {
-                // 信用卡和债务借入
-                totalLiabilities += assetModel.balance.toBigDecimalOrZero()
+            if (assetModel.type.isCreditCard ||
+                assetModel.classification == AssetClassificationEnum.BORROW ||
+                assetModel.classification == AssetClassificationEnum.DEBT
+            ) {
+                // 信用卡、债务借入和欠债
+                totalLiabilities += assetModel.balance
             } else {
                 if (!assetModel.type.isTopUp || topUpInTotal) {
-                    totalAsset += assetModel.balance.toBigDecimalOrZero()
+                    totalAsset += assetModel.balance
                 }
             }
         }
         MyAssetUiState.Success(
             topUpInTotal = topUpInTotal,
-            totalAsset = totalAsset.decimalFormat(),
-            totalLiabilities = totalLiabilities.decimalFormat(),
-            netAsset = (totalAsset - totalLiabilities).decimalFormat(),
+            totalAsset = totalAsset.toMoneyString(),
+            totalLiabilities = totalLiabilities.toMoneyString(),
+            netAsset = (totalAsset - totalLiabilities).toMoneyString(),
         )
     }
         .stateIn(

@@ -96,5 +96,7 @@ lint/tmp/
 # 生成的 RELEASE.md
 RELEASE.md
 
+.kotlin
+
 # 输出路径
 /outputs

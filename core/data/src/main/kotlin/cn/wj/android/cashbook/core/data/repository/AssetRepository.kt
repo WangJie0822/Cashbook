@@ -18,9 +18,6 @@ package cn.wj.android.cashbook.core.data.repository
 
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
-import cn.wj.android.cashbook.core.common.tools.dateFormat
-import cn.wj.android.cashbook.core.common.tools.parseDateLong
 import cn.wj.android.cashbook.core.data.helper.AssetHelper
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
@@ -73,7 +70,7 @@ internal fun AssetTable.asModel(): AssetModel {
         booksId = this.booksId,
         name = this.name,
         iconResId = AssetHelper.getIconResIdByType(classification),
-        totalAmount = this.totalAmount.toString(),
+        totalAmount = this.totalAmount,
         billingDate = this.billingDate,
         repaymentDate = this.repaymentDate,
         type = ClassificationTypeEnum.ordinalOf(this.type),
@@ -83,8 +80,8 @@ internal fun AssetTable.asModel(): AssetModel {
         cardNo = this.cardNo,
         remark = this.remark,
         sort = this.sort,
-        modifyTime = this.modifyTime.dateFormat(),
-        balance = this.balance.toString(),
+        modifyTime = this.modifyTime,
+        balance = this.balance,
     )
 }
 
@@ -93,7 +90,7 @@ internal fun AssetModel.asTable(): AssetTable {
         id = if (this.id == -1L) null else this.id,
         booksId = this.booksId,
         name = this.name,
-        totalAmount = this.totalAmount.toDoubleOrZero(),
+        totalAmount = this.totalAmount,
         billingDate = this.billingDate,
         repaymentDate = this.repaymentDate,
         type = this.type.ordinal,
@@ -103,7 +100,7 @@ internal fun AssetModel.asTable(): AssetTable {
         cardNo = this.cardNo,
         remark = this.remark,
         sort = this.sort,
-        modifyTime = this.modifyTime.parseDateLong(),
-        balance = this.balance.toDoubleOrZero(),
+        modifyTime = this.modifyTime,
+        balance = this.balance,
     )
 }

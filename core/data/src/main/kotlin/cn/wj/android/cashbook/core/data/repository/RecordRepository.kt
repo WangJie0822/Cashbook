@@ -16,16 +16,15 @@
 
 package cn.wj.android.cashbook.core.data.repository
 
+import androidx.paging.PagingData
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
-import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
-import cn.wj.android.cashbook.core.common.tools.dateFormat
-import cn.wj.android.cashbook.core.common.tools.parseDateLong
+import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
+import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
@@ -62,7 +61,7 @@ interface RecordRepository {
 
     suspend fun queryPagingRecordListByTypeIdBetweenDate(
         typeId: Long,
-        date: String,
+        dateRange: String,
         page: Int,
         pageSize: Int,
     ): List<RecordModel>
@@ -79,9 +78,15 @@ interface RecordRepository {
         pageSize: Int,
     ): List<RecordModel>
 
-    suspend fun queryRecordListBetweenDate(from: String, to: String): List<RecordModel>
+    suspend fun queryRecordListBetweenDate(from: Long, to: Long): List<RecordModel>
 
     fun queryRecordByYearMonth(year: String, month: String): Flow<List<RecordModel>>
+
+    /** 获取分页记录数据 */
+    fun getRecordPagingData(startDate: Long, endDate: Long): Flow<PagingData<RecordModel>>
+
+    /** 获取轻量记录汇总数据（响应式，数据变更时重新发射） */
+    fun queryRecordViewSummariesFlow(startDate: Long, endDate: Long): Flow<List<RecordViewSummaryModel>>
 
     suspend fun getDefaultRecord(typeId: Long): RecordModel
 
@@ -123,13 +128,13 @@ internal fun RecordTable.asModel(): RecordModel {
         typeId = this.typeId,
         assetId = this.assetId,
         relatedAssetId = this.intoAssetId,
-        amount = this.amount.toString(),
-        finalAmount = this.finalAmount.toString(),
-        charges = this.charge.toString(),
-        concessions = this.concessions.toString(),
+        amount = this.amount,
+        finalAmount = this.finalAmount,
+        charges = this.charge,
+        concessions = this.concessions,
         remark = this.remark,
         reimbursable = this.reimbursable == SWITCH_INT_ON,
-        recordTime = this.recordTime.dateFormat(DATE_FORMAT_NO_SECONDS),
+        recordTime = this.recordTime,
     )
 }
 
@@ -140,13 +145,13 @@ internal fun RecordModel.asTable(): RecordTable {
         typeId = this.typeId,
         assetId = this.assetId,
         intoAssetId = this.relatedAssetId,
-        amount = this.amount.toDoubleOrZero(),
-        finalAmount = this.finalAmount.toDoubleOrZero(),
-        charge = this.charges.toDoubleOrZero(),
-        concessions = this.concessions.toDoubleOrZero(),
+        amount = this.amount,
+        finalAmount = this.finalAmount,
+        charge = this.charges,
+        concessions = this.concessions,
         remark = this.remark,
         reimbursable = if (this.reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
-        recordTime = this.recordTime.parseDateLong(DATE_FORMAT_NO_SECONDS),
+        recordTime = this.recordTime,
     )
 }
 
@@ -165,5 +170,18 @@ internal fun ImageModel.asModel(): ImageWithRelatedTable {
         recordId = this.recordId,
         path = this.path,
         bytes = this.bytes,
+    )
+}
+
+internal fun RecordViewsRelation.asSummaryModel(): RecordViewSummaryModel {
+    return RecordViewSummaryModel(
+        id = this.id,
+        typeCategory = this.typeCategory,
+        typeName = this.typeName,
+        amount = this.amount,
+        finalAmount = this.finalAmount,
+        charges = this.charges,
+        concessions = this.concessions,
+        recordTime = this.recordTime,
     )
 }

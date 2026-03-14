@@ -46,6 +46,59 @@ class TypeRepositoryImpl @Inject constructor(
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : TypeRepository {
 
+    /** 缓存特殊类型 ID，避免频繁查库 */
+    private var _refundTypeId: Long? = null
+    private var _reimburseTypeId: Long? = null
+    private var _creditCardPaymentTypeId: Long? = null
+
+    private suspend fun getRefundTypeId(): Long {
+        _refundTypeId?.let { return it }
+        val appDataModel = combineProtoDataSource.recordSettingsData.first()
+        val id = if (appDataModel.refundTypeId > 0L) {
+            appDataModel.refundTypeId
+        } else {
+            val queryId = typeDao.queryByName("退款")?.id ?: 0L
+            if (queryId > 0L) {
+                combineProtoDataSource.updateRefundTypeId(queryId)
+            }
+            queryId
+        }
+        _refundTypeId = id
+        return id
+    }
+
+    private suspend fun getReimburseTypeId(): Long {
+        _reimburseTypeId?.let { return it }
+        val appDataModel = combineProtoDataSource.recordSettingsData.first()
+        val id = if (appDataModel.reimburseTypeId > 0L) {
+            appDataModel.reimburseTypeId
+        } else {
+            val queryId = typeDao.queryByName("报销")?.id ?: 0L
+            if (queryId > 0L) {
+                combineProtoDataSource.updateReimburseTypeId(queryId)
+            }
+            queryId
+        }
+        _reimburseTypeId = id
+        return id
+    }
+
+    private suspend fun getCreditCardPaymentTypeId(): Long {
+        _creditCardPaymentTypeId?.let { return it }
+        val appDataModel = combineProtoDataSource.recordSettingsData.first()
+        val id = if (appDataModel.creditCardPaymentTypeId > 0L) {
+            appDataModel.creditCardPaymentTypeId
+        } else {
+            val queryId = typeDao.queryByName("还信用卡")?.id ?: 0L
+            if (queryId > 0L) {
+                combineProtoDataSource.updateCreditCardPaymentTypeId(queryId)
+            }
+            queryId
+        }
+        _creditCardPaymentTypeId = id
+        return id
+    }
+
     override val firstExpenditureTypeListData: Flow<List<RecordTypeModel>> =
         typeDataVersion.mapLatest {
             getFirstRecordTypeList().filter { it.typeCategory == RecordTypeCategoryEnum.EXPENDITURE }
@@ -94,62 +147,25 @@ class TypeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun needRelated(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.recordSettingsData.first()
-        val refundTypeId = if (appDataModel.refundTypeId > 0L) {
-            appDataModel.refundTypeId
-        } else {
-            val id = typeDao.queryByName("退款")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateRefundTypeId(id)
-            }
-            id
-        }
-        val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
-            appDataModel.reimburseTypeId
-        } else {
-            val id = typeDao.queryByName("报销")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateReimburseTypeId(id)
-            }
-            id
-        }
-        typeId == refundTypeId || typeId == reimburseTypeId
+        typeId == getRefundTypeId() || typeId == getReimburseTypeId()
     }
 
     override suspend fun isReimburseType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.recordSettingsData.first()
-        val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
-            appDataModel.reimburseTypeId
-        } else {
-            val id = typeDao.queryByName("报销")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateReimburseTypeId(id)
-            }
-            id
-        }
-        typeId == reimburseTypeId
+        typeId == getReimburseTypeId()
     }
 
     override suspend fun isRefundType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.recordSettingsData.first()
-        val refundTypeId = if (appDataModel.refundTypeId > 0L) {
-            appDataModel.refundTypeId
-        } else {
-            val id = typeDao.queryByName("退款")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateRefundTypeId(id)
-            }
-            id
-        }
-        typeId == refundTypeId
+        typeId == getRefundTypeId()
     }
 
     override suspend fun setReimburseType(typeId: Long): Unit = withContext(coroutineContext) {
         combineProtoDataSource.updateReimburseTypeId(typeId)
+        _reimburseTypeId = typeId
     }
 
     override suspend fun setRefundType(typeId: Long): Unit = withContext(coroutineContext) {
         combineProtoDataSource.updateRefundTypeId(typeId)
+        _refundTypeId = typeId
     }
 
     override suspend fun changeTypeToSecond(id: Long, parentId: Long): Unit =
@@ -202,20 +218,11 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun isCreditPaymentType(typeId: Long): Boolean =
         withContext(coroutineContext) {
-            val appDataModel = combineProtoDataSource.recordSettingsData.first()
-            val creditCardPaymentTypeId = if (appDataModel.creditCardPaymentTypeId > 0L) {
-                appDataModel.creditCardPaymentTypeId
-            } else {
-                val id = typeDao.queryByName("还信用卡")?.id ?: 0L
-                if (id > 0L) {
-                    combineProtoDataSource.updateCreditCardPaymentTypeId(id)
-                }
-                id
-            }
-            creditCardPaymentTypeId == typeId
+            getCreditCardPaymentTypeId() == typeId
         }
 
     override suspend fun setCreditPaymentType(typeId: Long): Unit = withContext(coroutineContext) {
         combineProtoDataSource.updateCreditCardPaymentTypeId(typeId)
+        _creditCardPaymentTypeId = typeId
     }
 }

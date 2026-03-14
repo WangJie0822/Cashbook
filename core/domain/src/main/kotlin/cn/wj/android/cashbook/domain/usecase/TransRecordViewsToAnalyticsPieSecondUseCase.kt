@@ -18,15 +18,12 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -41,33 +38,35 @@ class TransRecordViewsToAnalyticsPieSecondUseCase @Inject constructor(
         val result = mutableListOf<AnalyticsRecordPieEntity>()
         val categoryList =
             recordViewsList.filter { it.type.id == typeId || it.type.parentId == typeId }
-        var total = BigDecimal.ZERO
+        var total = 0L
         val typeList = mutableListOf<RecordTypeModel>()
+        val addedTypeIds = mutableSetOf<Long>()
         val typeCategory =
             categoryList.firstOrNull()?.type?.typeCategory ?: return@withContext emptyList()
         categoryList.forEach { record ->
             // 计算总金额
             total += if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
+                record.amount + record.charges - record.concessions
             } else {
-                (record.amount.toBigDecimalOrZero() - record.charges.toBigDecimalOrZero())
+                record.amount - record.charges
             }
             // 统计所有分类
             val type = record.type
-            if (typeList.count { it.id == type.id } <= 0) {
+            if (addedTypeIds.add(type.id)) {
                 typeList.add(type)
             }
         }
 
+        val addedResultTypeIds = mutableSetOf<Long>()
         typeList.forEach { type ->
-            if (result.count { it.typeId == type.id } <= 0) {
-                var typeTotal = BigDecimal.ZERO
+            if (addedResultTypeIds.add(type.id)) {
+                var typeTotal = 0L
                 categoryList.filter { it.type.id == type.id }
                     .forEach {
                         typeTotal += if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                            (it.amount.toBigDecimalOrZero() + it.charges.toBigDecimalOrZero() - it.concessions.toBigDecimalOrZero())
+                            it.amount + it.charges - it.concessions
                         } else {
-                            (it.amount.toBigDecimalOrZero() - it.charges.toBigDecimalOrZero())
+                            it.amount - it.charges
                         }
                     }
                 result.add(
@@ -76,8 +75,8 @@ class TransRecordViewsToAnalyticsPieSecondUseCase @Inject constructor(
                         typeName = type.name,
                         typeIconResName = type.iconName,
                         typeCategory = type.typeCategory,
-                        totalAmount = typeTotal.decimalFormat(),
-                        percent = (typeTotal / total).toFloat(),
+                        totalAmount = typeTotal,
+                        percent = if (total != 0L) typeTotal.toFloat() / total.toFloat() else 0f,
                     ),
                 )
             }

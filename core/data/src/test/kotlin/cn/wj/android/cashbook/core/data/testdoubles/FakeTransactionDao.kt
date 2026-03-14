@@ -161,11 +161,15 @@ class FakeTransactionDao : TransactionDao {
         )
     }
 
-    override suspend fun updateRecordFinalAmountById(id: Long, finalAmount: Double) {
+    override suspend fun updateRecordFinalAmountById(id: Long, finalAmount: Long) {
         val index = records.indexOfFirst { it.id == id }
         if (index >= 0) {
             records[index] = records[index].copy(finalAmount = finalAmount)
         }
+    }
+
+    override suspend fun queryRecordByIds(ids: List<Long>): List<RecordTable> {
+        return records.filter { it.id in ids }
     }
 
     override suspend fun queryRecordListByBookId(bookId: Long): List<RecordTable> {

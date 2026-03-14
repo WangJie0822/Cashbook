@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.completeZero
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.design.component.CalendarView
@@ -64,7 +64,6 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.CalendarViewModel
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -224,9 +223,9 @@ internal fun CalendarScreen(
                             schemeContent = { date, _ ->
                                 if (uiState is CalendarUiState.Success) {
                                     uiState.schemas[date]?.let {
-                                        if (it.dayIncome.toBigDecimalOrZero() != BigDecimal.ZERO) {
+                                        if (it.dayIncome != 0L) {
                                             Text(
-                                                text = it.dayIncome.withCNY(),
+                                                text = it.dayIncome.toMoneyCNY(),
                                                 color = LocalExtendedColors.current.income,
                                                 style = MaterialTheme.typography.labelSmall.copy(
                                                     fontSize = 8.sp,
@@ -237,9 +236,9 @@ internal fun CalendarScreen(
                                                 ),
                                             )
                                         }
-                                        if (it.dayExpand.toBigDecimalOrZero() != BigDecimal.ZERO) {
+                                        if (it.dayExpand != 0L) {
                                             Text(
-                                                text = it.dayExpand.withCNY(),
+                                                text = it.dayExpand.toMoneyCNY(),
                                                 color = LocalExtendedColors.current.expenditure,
                                                 style = MaterialTheme.typography.labelSmall.copy(
                                                     fontSize = 8.sp,

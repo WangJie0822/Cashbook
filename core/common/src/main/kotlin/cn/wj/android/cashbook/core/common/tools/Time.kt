@@ -127,3 +127,15 @@ fun Long.toLocalDate(): LocalDate {
 fun LocalDate.toMs(): Long {
     return atStartOfDay(ZoneOffset.systemDefault()).toInstant().toEpochMilli()
 }
+
+/** Long(毫秒) -> 日期字符串 "2024-01-15" */
+fun Long.toDateString(): String = dateFormat(DATE_FORMAT_DATE)
+
+/** Long(毫秒) -> 日期时间字符串 "2024-01-15 10:30" */
+fun Long.toDateTimeString(): String = dateFormat(DATE_FORMAT_NO_SECONDS)
+
+/** Long(毫秒) -> 时间字符串 "10:30" */
+fun Long.toTimeString(): String = dateFormat(DATE_FORMAT_TIME)
+
+/** Long(毫秒) -> 年月字符串 "2024-01" */
+fun Long.toYearMonthString(): String = dateFormat(DATE_FORMAT_YEAR_MONTH)

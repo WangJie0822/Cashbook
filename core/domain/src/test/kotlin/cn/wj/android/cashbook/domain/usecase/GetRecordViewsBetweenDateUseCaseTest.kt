@@ -60,8 +60,8 @@ class GetRecordViewsBetweenDateUseCaseTest {
 
     @Test
     fun when_has_records_then_transforms_to_views() = runTest {
-        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = "100"))
-        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, amount = "200"))
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 10000L))
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, amount = 20000L))
 
         val result = useCase(
             fromDate = LocalDate.of(2024, 1, 1),

@@ -18,8 +18,6 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.model.AssetModel
@@ -54,14 +52,13 @@ class SaveAssetUseCase @Inject constructor(
                     ),
                 )
             }
-            // 修改资产，计算差额
-            val diffBalance =
-                (assetModel.balance.toBigDecimalOrZero() - oldAsset.balance.toBigDecimalOrZero()).toDouble()
-            if (diffBalance != 0.0) {
+            // 修改资产，计算差额（单位：分）
+            val diffBalance = assetModel.balance - oldAsset.balance
+            if (diffBalance != 0L) {
                 // 余额有变化
                 val typeId = if (assetModel.type.isCreditCard) {
                     // 信用卡类型
-                    if (diffBalance > 0.0) {
+                    if (diffBalance > 0L) {
                         // 已使用额度增加，支出
                         RECORD_TYPE_BALANCE_EXPENDITURE
                     } else {
@@ -70,7 +67,7 @@ class SaveAssetUseCase @Inject constructor(
                     }
                 } else {
                     // 其它类型
-                    if (diffBalance > 0.0) {
+                    if (diffBalance > 0L) {
                         // 余额增加，收入
                         RECORD_TYPE_BALANCE_INCOME
                     } else {
@@ -81,7 +78,7 @@ class SaveAssetUseCase @Inject constructor(
                 val record = recordRepository.getDefaultRecord(typeId)
                     .copy(
                         assetId = assetModel.id,
-                        amount = diffBalance.absoluteValue.decimalFormat(),
+                        amount = diffBalance.absoluteValue,
                         remark = "金额变动，自动生成",
                     )
                 // 插入记录

@@ -22,8 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.completeZero
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
@@ -38,11 +37,11 @@ import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieUseCa
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -73,16 +72,15 @@ class AnalyticsViewModel @Inject constructor(
         getRecordViewsBetweenDateUseCase(date.from, date.to, date.year)
     }
 
-    val uiState = _recordListData.mapLatest { list ->
-        val date = _dateData.first()
-        var totalIncome = BigDecimal.ZERO
-        var totalExpenditure = BigDecimal.ZERO
-        var totalBalance = BigDecimal.ZERO
+    val uiState = combine(_recordListData, _dateData) { list, date ->
+        var totalIncome = 0L
+        var totalExpenditure = 0L
+        var totalBalance = 0L
         val barList = transRecordViewsToAnalyticsBarUseCase(date.from, date.to, date.year, list)
         barList.forEach {
-            totalIncome += it.income.toBigDecimalOrZero()
-            totalExpenditure += it.expenditure.toBigDecimalOrZero()
-            totalBalance += it.balance.toBigDecimalOrZero()
+            totalIncome += it.income
+            totalExpenditure += it.expenditure
+            totalBalance += it.balance
         }
         val expenditurePieDataList =
             transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.EXPENDITURE, list)
@@ -95,9 +93,9 @@ class AnalyticsViewModel @Inject constructor(
             crossYear = date.crossYear,
             titleText = date.titleText,
             noData = list.isEmpty(),
-            totalIncome = totalIncome.decimalFormat(),
-            totalExpenditure = totalExpenditure.decimalFormat(),
-            totalBalance = totalBalance.decimalFormat(),
+            totalIncome = totalIncome.toMoneyString(),
+            totalExpenditure = totalExpenditure.toMoneyString(),
+            totalBalance = totalBalance.toMoneyString(),
             barDataList = barList,
             expenditurePieDataList = expenditurePieDataList,
             incomePieDataList = incomePieDataList,

@@ -56,6 +56,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
@@ -396,7 +397,7 @@ internal fun AssetTypedInfoItem(
             )
         }
         Text(
-            text = assetTypedInfo.totalAmount.withCNY(),
+            text = assetTypedInfo.totalAmount.toMoneyCNY(),
             style = MaterialTheme.typography.bodyLarge,
         )
         Icon(

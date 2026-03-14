@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.table
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -41,15 +42,20 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/3
  */
-@Entity(tableName = TABLE_ASSET)
+@Entity(
+    tableName = TABLE_ASSET,
+    indices = [
+        Index("books_id"),
+    ],
+)
 data class AssetTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = TABLE_ASSET_ID)
     val id: Long?,
     @ColumnInfo(name = TABLE_ASSET_BOOKS_ID) val booksId: Long,
     @ColumnInfo(name = TABLE_ASSET_NAME) val name: String,
-    @ColumnInfo(name = TABLE_ASSET_BALANCE) val balance: Double,
-    @ColumnInfo(name = TABLE_ASSET_TOTAL_AMOUNT) val totalAmount: Double,
+    @ColumnInfo(name = TABLE_ASSET_BALANCE) val balance: Long,
+    @ColumnInfo(name = TABLE_ASSET_TOTAL_AMOUNT) val totalAmount: Long,
     @ColumnInfo(name = TABLE_ASSET_BILLING_DATE) val billingDate: String,
     @ColumnInfo(name = TABLE_ASSET_REPAYMENT_DATE) val repaymentDate: String,
     @ColumnInfo(name = TABLE_ASSET_TYPE) val type: Int,

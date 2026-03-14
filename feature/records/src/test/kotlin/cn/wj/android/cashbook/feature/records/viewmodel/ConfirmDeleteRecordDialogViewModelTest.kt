@@ -67,13 +67,13 @@ class ConfirmDeleteRecordDialogViewModelTest {
                 typeId = 1L,
                 assetId = -1L,
                 relatedAssetId = -1L,
-                amount = "100",
-                finalAmount = "100",
-                charges = "0",
-                concessions = "0",
+                amount = 10000L,
+                finalAmount = 10000L,
+                charges = 0L,
+                concessions = 0L,
                 remark = "测试记录",
                 reimbursable = false,
-                recordTime = "2024-01-01 12:00",
+                recordTime = 1704067200000L,
             ),
         )
 
