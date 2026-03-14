@@ -36,7 +36,6 @@ import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
@@ -157,7 +156,7 @@ class LauncherContentViewModel @Inject constructor(
             var totalIncome = 0L
             var totalExpenditure = 0L
             summaryList.forEach { record ->
-                if (record.typeName == RECORD_TYPE_BALANCE_EXPENDITURE.name) {
+                if (record.isBalanceRecord) {
                     return@forEach
                 }
                 when (RecordTypeCategoryEnum.ordinalOf(record.typeCategory)) {
@@ -232,7 +231,7 @@ class LauncherContentViewModel @Inject constructor(
             var dayIncome = 0L
             var dayExpenditure = 0L
             records.forEach { record ->
-                if (record.typeName == RECORD_TYPE_BALANCE_EXPENDITURE.name) {
+                if (record.isBalanceRecord) {
                     return@forEach
                 }
                 when (RecordTypeCategoryEnum.ordinalOf(record.typeCategory)) {

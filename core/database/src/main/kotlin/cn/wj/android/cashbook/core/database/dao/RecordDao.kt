@@ -89,7 +89,7 @@ interface RecordDao {
     /** 查询日期范围内的轻量记录视图（含类型分类），用于计算收支汇总 */
     @Query(
         value = """
-            SELECT db_record.id as id, db_record.amount as amount, db_record.final_amount as finalAmount,
+            SELECT db_record.id as id, db_record.type_id as typeId, db_record.amount as amount, db_record.final_amount as finalAmount,
             db_record.charge as charges, db_record.concessions as concessions,
             db_record.remark as remark, db_record.reimbursable as reimbursable, db_record.record_time as recordTime,
             db_type.type_category as typeCategory, db_type.name as typeName, db_type.icon_name as typeIconResName,
@@ -119,10 +119,10 @@ interface RecordDao {
 
     @Query(
         value = """
-        SELECT db_record.id as id, db_record.amount as amount, db_record.final_amount as finalAmount,
+        SELECT db_record.id as id, db_record.type_id as typeId, db_record.amount as amount, db_record.final_amount as finalAmount,
         db_record.charge as charges, db_record.concessions as concessions,
         db_record.remark as remark, db_record.reimbursable as reimbursable, db_record.record_time as recordTime,
-        db_type.type_category as typeCategory,db_type.name as typeName, db_type.icon_name as typeIconResName,
+        db_type.type_category as typeCategory, db_type.name as typeName, db_type.icon_name as typeIconResName,
         db_asset.name as assetName, db_asset.classification as assetClassification,
         related.name as relatedAssetName, related.classification as relatedAssetClassification
         FROM db_record

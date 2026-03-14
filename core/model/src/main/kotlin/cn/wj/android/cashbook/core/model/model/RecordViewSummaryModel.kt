@@ -21,6 +21,7 @@ package cn.wj.android.cashbook.core.model.model
  */
 data class RecordViewSummaryModel(
     val id: Long,
+    val typeId: Long,
     val typeCategory: Int,
     val typeName: String,
     val amount: Long,
@@ -28,4 +29,9 @@ data class RecordViewSummaryModel(
     val charges: Long,
     val concessions: Long,
     val recordTime: Long,
-)
+) {
+    /** 是否为平账记录 */
+    val isBalanceRecord: Boolean
+        get() = typeId == RECORD_TYPE_BALANCE_EXPENDITURE.id ||
+            typeId == RECORD_TYPE_BALANCE_INCOME.id
+}

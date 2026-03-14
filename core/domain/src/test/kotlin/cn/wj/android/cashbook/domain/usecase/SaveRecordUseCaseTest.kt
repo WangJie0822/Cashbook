@@ -51,7 +51,7 @@ class SaveRecordUseCaseTest {
     fun when_save_record_then_needRelated_fetched_from_type_repository() = runTest {
         // 设置类型需要关联
         typeRepository.setNeedRelated(1L)
-        val record = createRecordModel(typeId = 1L)
+        val record = createRecordModel(typeId = 1L, amount = 100L)
 
         useCase(record, listOf(1L), listOf(2L), emptyList())
 
@@ -62,7 +62,7 @@ class SaveRecordUseCaseTest {
 
     @Test
     fun when_save_record_with_no_related_type_then_needRelated_is_false() = runTest {
-        val record = createRecordModel(typeId = 2L)
+        val record = createRecordModel(typeId = 2L, amount = 100L)
 
         useCase(record, emptyList(), emptyList(), emptyList())
 
@@ -81,5 +81,35 @@ class SaveRecordUseCaseTest {
 
         assertThat(recordRepository.lastUpdatedRecord).isEqualTo(record)
         assertThat(recordRepository.lastUpdatedTagIdList).containsExactly(1L, 2L)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_amount_is_zero_then_throws() = runTest {
+        val record = createRecordModel(amount = 0L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_amount_is_negative_then_throws() = runTest {
+        val record = createRecordModel(amount = -100L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_charges_is_negative_then_throws() = runTest {
+        val record = createRecordModel(amount = 100L, charges = -1L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_concessions_is_negative_then_throws() = runTest {
+        val record = createRecordModel(amount = 100L, concessions = -1L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_recordTime_is_zero_then_throws() = runTest {
+        val record = createRecordModel(amount = 100L, recordTime = 0L)
+        useCase(record, emptyList(), emptyList(), emptyList())
     }
 }

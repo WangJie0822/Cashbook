@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.relation
 
 data class RecordViewsRelation(
     val id: Long,
+    val typeId: Long,
     val typeCategory: Int,
     val typeName: String,
     val typeIconResName: String,

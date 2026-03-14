@@ -157,7 +157,12 @@ class RecordRepositoryImpl @Inject constructor(
             if (dateRange.contains("~")) {
                 val dates = dateRange.split("~")
                 startDate = "${dates[0]} 00:00:00".parseDateLong()
-                endDate = "${dates[1]} 23:59:59".parseDateLong()
+                // 使用次日 00:00:00 作为结束时间（半开区间）
+                endDate = with(Calendar.getInstance()) {
+                    timeInMillis = "${dates[1]} 00:00:00".parseDateLong()
+                    add(Calendar.DAY_OF_MONTH, 1)
+                    timeInMillis
+                }
             } else if (dateRange.contains("-")) {
                 startDate = "$dateRange-01 00:00:00".parseDateLong()
                 endDate = with(Calendar.getInstance()) {
@@ -167,7 +172,12 @@ class RecordRepositoryImpl @Inject constructor(
                 }
             } else {
                 startDate = "$dateRange-01-01 00:00:00".parseDateLong()
-                endDate = "$dateRange-12-31 23:59:59".parseDateLong()
+                // 使用次年 1 月 1 日作为结束时间（半开区间）
+                endDate = with(Calendar.getInstance()) {
+                    timeInMillis = startDate
+                    add(Calendar.YEAR, 1)
+                    timeInMillis
+                }
             }
             if (includeChildTypes) {
                 recordDao.queryRecordByTypeIdBetween(

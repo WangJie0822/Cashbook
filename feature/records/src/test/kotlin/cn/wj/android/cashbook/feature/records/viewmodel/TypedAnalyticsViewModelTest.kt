@@ -265,6 +265,7 @@ class TypedAnalyticsViewModelTest {
     private fun createTestRecordViewsEntity(id: Long): RecordViewsEntity {
         return RecordViewsEntity(
             id = id,
+            typeId = 1L,
             typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
             typeName = "餐饮",
             typeIconResName = "vector_eating",

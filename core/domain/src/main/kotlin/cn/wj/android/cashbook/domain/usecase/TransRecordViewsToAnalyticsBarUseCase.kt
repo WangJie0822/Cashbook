@@ -20,14 +20,11 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.yearMonth
 import cn.wj.android.cashbook.core.common.tools.toLocalDate
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
-import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -56,7 +53,8 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
             is DateSelectionEntity.All -> {
                 granularity = AnalyticsBarGranularity.YEAR
                 // 从记录中提取年份范围
-                val years = recordViewsList.map { it.recordTime.toLocalDate().year }.distinct().sorted()
+                val years =
+                    recordViewsList.map { it.recordTime.toLocalDate().year }.distinct().sorted()
                 years.forEach { year ->
                     dateList.add("$year")
                 }
@@ -100,7 +98,7 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
                 }
             }.forEach { record ->
                 // 跳过平账记录
-                if (record.type.id == RECORD_TYPE_BALANCE_EXPENDITURE.id || record.type.id == RECORD_TYPE_BALANCE_INCOME.id) {
+                if (record.isBalanceRecord) {
                     return@forEach
                 }
                 when (record.type.typeCategory) {

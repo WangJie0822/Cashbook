@@ -178,6 +178,7 @@ internal fun ImageModel.asModel(): ImageWithRelatedTable {
 internal fun RecordViewsRelation.asSummaryModel(): RecordViewSummaryModel {
     return RecordViewSummaryModel(
         id = this.id,
+        typeId = this.typeId,
         typeCategory = this.typeCategory,
         typeName = this.typeName,
         amount = this.amount,

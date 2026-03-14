@@ -4,22 +4,19 @@
 
 ## [Unreleased]
 ### Changed
-- 重构金额存储为 Long（分）并优化首页性能
-- 全链路将金额字段从 String/Double 重构为 Long（单位：分），消除浮点精度问题
-- 新增 Money.kt 提供分与元之间的转换工具方法
-- 数据库升级至 v12：金额字段迁移为 INTEGER、recordTime 统一为毫秒时间戳、添加多表索引优化查询
-- 新增 DateSelectionEntity 密封类支持按日/月/年/范围/全部的灵活日期筛选
-- 首页记录列表改用 Paging 分页加载，新增 RecordViewSummaryModel 轻量汇总避免 N+1 查询
-- 新增 WheelPicker 和 DateSelectionPopup UI 组件
-- 同步更新全部相关 UseCase、Repository、ViewModel 及测试
-- 完全移除 repos/MPChartLib 第三方图表库及 app-catalog 示例代码
-- core/design 中使用 Compose Canvas 重写 PieChart 和 LineChart 组件
-- 新增 AnalyticsBarGranularity 枚举，重构统计分析页面支持多粒度数据展示
-- BackupRecoveryManager 接口与实现分离，提取 BackupRecoveryManagerImpl
-- 优化 WebDAV 处理逻辑及 APK 下载 Worker
-- 更新 RecordDao/TransactionDao 查询及数据库 Schema
-- 新增 MoneyTest、SettingRepositoryImplTest、AnalyticsViewModelTest 等多个测试类及 Fake 实现
-- 
+- 金额存储从浮点重构为整数（单位：分），消除精度问题；
+- 数据库升级至 v12，添加多表索引优化查询性能；
+- 首页记录列表改用 Paging 分页加载，优化大数据量场景；
+- 移除 MPChartLib 第三方图表库，使用 Compose Canvas 重写饼图和折线图；
+- 统计分析页面支持按日/月/年/范围/全部的多粒度数据展示；
+- 新增 WheelPicker 和 DateSelectionPopup UI 组件；
+- 备份流程优化：使用 WAL checkpoint 替代关闭数据库，先写入新备份再删除旧备份；
+### Fixed
+- 修复平账记录按名称匹配可能误判的问题，改为按类型 ID 匹配；
+- 修复统计分析饼图和柱状图未排除平账记录的问题；
+- 修复日期范围查询可能遗漏边界时间记录的问题；
+- 修复统计百分比计算精度不足的问题；
+
 ## [1.0.8_25042622]
 ### Add
 - 数据分析内层界面新增时间筛选，保存数据一致；

@@ -49,6 +49,7 @@ object RecordDetailsSheetData {
 
     private val expenditureRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 1L,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         typeName = "三餐",
         typeIconResName = "vector_type_three_meals_24",
@@ -73,6 +74,7 @@ object RecordDetailsSheetData {
 
     private val reimbursedExpenditureRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 2L,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         typeName = "酒店",
         typeIconResName = "vector_type_hotel_24",
@@ -97,6 +99,7 @@ object RecordDetailsSheetData {
 
     private val reimbursableExpenditureRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 2L,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         typeName = "酒店",
         typeIconResName = "vector_type_hotel_24",
@@ -121,6 +124,7 @@ object RecordDetailsSheetData {
 
     private val refundExpenditureRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 3L,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         typeName = "购物",
         typeIconResName = "vector_type_shopping_24",
@@ -145,6 +149,7 @@ object RecordDetailsSheetData {
 
     private val incomeRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 4L,
         typeCategory = RecordTypeCategoryEnum.INCOME,
         typeName = "薪资",
         typeIconResName = "vector_type_salary_24",
@@ -169,6 +174,7 @@ object RecordDetailsSheetData {
 
     private val refundIncomeRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 5L,
         typeCategory = RecordTypeCategoryEnum.INCOME,
         typeName = "退款",
         typeIconResName = "vector_type_refund_24",
@@ -193,6 +199,7 @@ object RecordDetailsSheetData {
 
     private val reimbursedIncomeRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 6L,
         typeCategory = RecordTypeCategoryEnum.INCOME,
         typeName = "报销",
         typeIconResName = "vector_type_reimburse_24",
@@ -217,6 +224,7 @@ object RecordDetailsSheetData {
 
     private val transferRecordViewsData = RecordViewsEntity(
         id = 1L,
+        typeId = 7L,
         typeCategory = RecordTypeCategoryEnum.TRANSFER,
         typeName = "还信用卡",
         typeIconResName = "vector_type_credit_card_payment_24",

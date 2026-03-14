@@ -38,6 +38,11 @@ class SaveRecordUseCase @Inject constructor(
         relatedRecordIdList: List<Long>,
         relatedImageList: List<ImageModel>,
     ) = withContext(coroutineContext) {
+        // 输入校验
+        require(recordModel.amount > 0) { "金额必须大于 0" }
+        require(recordModel.charges >= 0) { "手续费不能为负数" }
+        require(recordModel.concessions >= 0) { "优惠不能为负数" }
+        require(recordModel.recordTime > 0) { "记录时间无效" }
         // 向数据库内更新最新记录信息及关联信息
         val needRelated = typeRepository.needRelated(recordModel.typeId)
         recordRepository.updateRecord(

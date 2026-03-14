@@ -39,7 +39,7 @@ class TransRecordViewsToAnalyticsPieUseCase @Inject constructor(
         recordViewsList: List<RecordViewsModel>,
     ): List<AnalyticsRecordPieEntity> = withContext(coroutineContext) {
         val result = mutableListOf<AnalyticsRecordPieEntity>()
-        val categoryList = recordViewsList.filter { it.type.typeCategory == typeCategory }
+        val categoryList = recordViewsList.filter { !it.isBalanceRecord && it.type.typeCategory == typeCategory }
         var total = 0L
         val typeList = mutableListOf<RecordTypeModel>()
         val addedTypeIds = mutableSetOf<Long>()
@@ -84,7 +84,7 @@ class TransRecordViewsToAnalyticsPieUseCase @Inject constructor(
                         typeIconResName = type.iconName,
                         typeCategory = type.typeCategory,
                         totalAmount = typeTotal,
-                        percent = if (total != 0L) typeTotal.toFloat() / total.toFloat() else 0f,
+                        percent = if (total != 0L) (typeTotal.toDouble() / total.toDouble()).toFloat() else 0f,
                     ),
                 )
             }

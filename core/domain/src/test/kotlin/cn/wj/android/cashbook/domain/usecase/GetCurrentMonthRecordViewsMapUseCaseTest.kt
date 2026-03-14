@@ -139,6 +139,7 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
         val entities = listOf(
             createRecordViewsEntity(
                 id = 1L,
+                typeId = RECORD_TYPE_BALANCE_EXPENDITURE.id,
                 recordTime = 1705284000000L,
                 typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
                 typeName = RECORD_TYPE_BALANCE_EXPENDITURE.name,
@@ -146,6 +147,7 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
             ),
             createRecordViewsEntity(
                 id = 2L,
+                typeId = RECORD_TYPE_BALANCE_INCOME.id,
                 recordTime = 1705287600000L,
                 typeCategory = RecordTypeCategoryEnum.INCOME,
                 typeName = RECORD_TYPE_BALANCE_INCOME.name,
@@ -169,6 +171,7 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
 
     private fun createRecordViewsEntity(
         id: Long = 1L,
+        typeId: Long = 1L,
         recordTime: Long = 1705284000000L,
         typeCategory: RecordTypeCategoryEnum = RecordTypeCategoryEnum.EXPENDITURE,
         typeName: String = "test",
@@ -178,6 +181,7 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
     ): RecordViewsEntity {
         return RecordViewsEntity(
             id = id,
+            typeId = typeId,
             typeCategory = typeCategory,
             typeName = typeName,
             typeIconResName = "test_icon",

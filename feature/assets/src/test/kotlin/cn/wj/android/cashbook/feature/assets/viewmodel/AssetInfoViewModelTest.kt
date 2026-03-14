@@ -266,6 +266,7 @@ class AssetInfoViewModelTest {
      */
     private fun createRecordViewsEntity(id: Long = 1L): RecordViewsEntity = RecordViewsEntity(
         id = id,
+        typeId = 1L,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         typeName = "餐饮",
         typeIconResName = "ic_type_food",

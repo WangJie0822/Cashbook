@@ -50,4 +50,7 @@ data class RecordViewsModel(
     val relatedRecord: List<RecordModel>,
     val relatedAmount: Long,
     val recordTime: Long,
-)
+) {
+    /** 是否为平账记录 */
+    val isBalanceRecord: Boolean get() = type.isBalanceType()
+}

@@ -48,7 +48,7 @@ class GetCurrentMonthRecordViewsMapUseCase @Inject constructor() {
             var totalIncome = 0L
             it.value.forEach { record ->
                 // 跳过平账记录
-                if (record.isBalanceAccount) {
+                if (record.isBalanceRecord) {
                     return@forEach
                 }
                 when (record.typeCategory) {

@@ -18,6 +18,8 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createRecordViewsModel
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
@@ -170,5 +172,35 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, emptyList())
 
         assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun when_has_balance_records_then_excluded_from_pie() = runTest {
+        val foodType = createRecordTypeModel(
+            id = 1L,
+            name = "餐饮",
+            typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        )
+        typeRepository.addType(foodType)
+
+        val records = listOf(
+            createRecordViewsModel(type = foodType, amount = 10000L, charges = 0L, concessions = 0L),
+            // 平账支出记录
+            createRecordViewsModel(type = RECORD_TYPE_BALANCE_EXPENDITURE, amount = 5000L, charges = 0L, concessions = 0L),
+            // 平账收入记录
+            createRecordViewsModel(type = RECORD_TYPE_BALANCE_INCOME, amount = 3000L, charges = 0L, concessions = 0L),
+        )
+
+        val expenditureResult = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
+
+        // 平账支出记录应被排除，只剩餐饮
+        assertThat(expenditureResult).hasSize(1)
+        assertThat(expenditureResult.first().typeName).isEqualTo("餐饮")
+        assertThat(expenditureResult.first().totalAmount).isEqualTo(10000L)
+
+        val incomeResult = useCase(RecordTypeCategoryEnum.INCOME, records)
+
+        // 平账收入记录应被排除，收入结果为空
+        assertThat(incomeResult).isEmpty()
     }
 }

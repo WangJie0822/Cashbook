@@ -19,6 +19,8 @@ package cn.wj.android.cashbook.feature.records.viewmodel
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
@@ -115,6 +117,7 @@ class LauncherContentViewModelTest {
             listOf(
                 RecordViewSummaryModel(
                     id = 1L,
+                    typeId = 1L,
                     typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
                     typeName = "餐饮",
                     amount = 10000L,
@@ -145,6 +148,7 @@ class LauncherContentViewModelTest {
             listOf(
                 RecordViewSummaryModel(
                     id = 1L,
+                    typeId = 2L,
                     typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
                     typeName = "工资",
                     amount = 20000L,
@@ -175,6 +179,7 @@ class LauncherContentViewModelTest {
             listOf(
                 RecordViewSummaryModel(
                     id = 1L,
+                    typeId = 2L,
                     typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
                     typeName = "工资",
                     amount = 50000L,
@@ -185,6 +190,7 @@ class LauncherContentViewModelTest {
                 ),
                 RecordViewSummaryModel(
                     id = 2L,
+                    typeId = 1L,
                     typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
                     typeName = "餐饮",
                     amount = 30000L,
@@ -215,6 +221,7 @@ class LauncherContentViewModelTest {
             listOf(
                 RecordViewSummaryModel(
                     id = 1L,
+                    typeId = 3L,
                     typeCategory = RecordTypeCategoryEnum.TRANSFER.ordinal,
                     typeName = "转账",
                     amount = 10000L,
@@ -239,13 +246,14 @@ class LauncherContentViewModelTest {
 
     @Test
     fun when_has_balance_expenditure_record_then_skipped_in_totals() = runTest {
-        // 平账记录应被跳过，RECORD_TYPE_BALANCE_EXPENDITURE.name 为 "平账"
+        // 平账记录应被跳过
         recordRepository.setSummaryData(
             listOf(
                 RecordViewSummaryModel(
                     id = 1L,
+                    typeId = RECORD_TYPE_BALANCE_EXPENDITURE.id,
                     typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
-                    typeName = "平账",
+                    typeName = RECORD_TYPE_BALANCE_EXPENDITURE.name,
                     amount = 10000L,
                     finalAmount = 10000L,
                     charges = 0L,
@@ -262,6 +270,36 @@ class LauncherContentViewModelTest {
         val state = viewModel.uiState.value as LauncherContentUiState.Success
         assertThat(state.totalExpand).isEqualTo("0.00")
         assertThat(state.totalIncome).isEqualTo("0.00")
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun when_has_balance_income_record_then_skipped_in_totals() = runTest {
+        // 平账收入记录也应被跳过
+        recordRepository.setSummaryData(
+            listOf(
+                RecordViewSummaryModel(
+                    id = 1L,
+                    typeId = RECORD_TYPE_BALANCE_INCOME.id,
+                    typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
+                    typeName = RECORD_TYPE_BALANCE_INCOME.name,
+                    amount = 10000L,
+                    finalAmount = 10000L,
+                    charges = 0L,
+                    concessions = 0L,
+                    recordTime = 1704067200000L,
+                ),
+            ),
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher()) {
+            viewModel.uiState.collect()
+        }
+
+        val state = viewModel.uiState.value as LauncherContentUiState.Success
+        assertThat(state.totalIncome).isEqualTo("0.00")
+        assertThat(state.totalExpand).isEqualTo("0.00")
 
         collectJob.cancel()
     }
@@ -362,6 +400,7 @@ class LauncherContentViewModelTest {
             listOf(
                 RecordViewSummaryModel(
                     id = 1L,
+                    typeId = 1L,
                     typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
                     typeName = "餐饮",
                     amount = 5000L,
@@ -372,6 +411,7 @@ class LauncherContentViewModelTest {
                 ),
                 RecordViewSummaryModel(
                     id = 2L,
+                    typeId = 2L,
                     typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
                     typeName = "工资",
                     amount = 10000L,
@@ -401,6 +441,7 @@ class LauncherContentViewModelTest {
     private fun createTestRecordViewsEntity(id: Long): RecordViewsEntity {
         return RecordViewsEntity(
             id = id,
+            typeId = 1L,
             typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
             typeName = "餐饮",
             typeIconResName = "vector_eating",

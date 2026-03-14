@@ -374,8 +374,17 @@ class BackupRecoveryManagerImpl @Inject constructor(
             this@BackupRecoveryManagerImpl.logger()
                 .i("startBackup(), backupPath = <$backupPath>, databaseFile = <$databaseFile>, databaseCacheFile = <$databaseCacheFile>, dateFormat = <$dateFormat>")
 
-            // 复制数据库文件到缓存路径
-            database.close()
+            // 执行 checkpoint 确保所有数据写入主数据库文件，然后复制
+            database.openHelper.writableDatabase.run {
+                query("PRAGMA wal_checkpoint(TRUNCATE)").use { cursor ->
+                    cursor.moveToFirst()
+                    val busy = cursor.getInt(0)
+                    if (busy != 0) {
+                        this@BackupRecoveryManagerImpl.logger()
+                            .w("WAL checkpoint busy, backup may be incomplete")
+                    }
+                }
+            }
             databaseFile.copyTo(databaseCacheFile)
             // 压缩备份文件
             val zippedPath =
@@ -399,38 +408,48 @@ class BackupRecoveryManagerImpl @Inject constructor(
             val backupFileUri = if (backupPath.startsWith("content://")) {
                 val documentFile = DocumentFile.fromTreeUri(context, backupPath.toUri())
                     ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
+                // 先删除同名文件（避免重名冲突）
                 documentFile.findFile(zippedFileName)?.delete()
+                // 先写入新备份文件
+                val backupFile = documentFile.createFile("application/zip", zippedFileName)
+                    ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
+                val outputStream = context.contentResolver.openOutputStream(backupFile.uri)
+                if (outputStream == null) {
+                    backupFile.delete()
+                    return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
+                }
+                outputStream.use {
+                    it.write(zippedFile.readBytes())
+                }
+                // 写入成功后再删除旧备份
                 if (keepLatest) {
                     documentFile.listFiles()
                         .filter {
-                            // 仅删除备份文件
                             val name = it.name.orEmpty()
-                            name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)
+                            name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT) &&
+                                it.uri != backupFile.uri
                         }
                         .forEach { it.delete() }
-                }
-                val backupFile = documentFile.createFile("application/zip", zippedFileName)
-                    ?: return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
-                context.contentResolver.openOutputStream(backupFile.uri)?.use {
-                    it.write(zippedFile.readBytes())
                 }
                 backupFile.uri
             } else {
                 val backupDir = File(backupPath)
-                if (keepLatest) {
-                    backupDir.listFiles { _, name ->
-                        // 仅删除备份文件
-                        name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT)
-                    }?.forEach { it.delete() }
-                }
                 if (!backupDir.exists()) {
                     backupDir.mkdirs()
                 }
+                // 先写入新备份文件
                 val backupFile = File(backupDir, zippedFileName)
                 if (!backupFile.exists()) {
                     backupFile.createNewFile()
                 }
-                zippedFile.copyTo(backupFile)
+                zippedFile.copyTo(backupFile, overwrite = true)
+                // 写入成功后再删除旧备份
+                if (keepLatest) {
+                    backupDir.listFiles { _, name ->
+                        name.contains(BACKUP_FILE_NAME) && name.endsWith(BACKUP_FILE_EXT) &&
+                            name != zippedFileName
+                    }?.forEach { it.delete() }
+                }
                 backupFile.toUri()
             }
 

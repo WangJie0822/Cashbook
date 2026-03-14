@@ -141,7 +141,7 @@ internal fun RecordDetailsSheet(
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.weight(1f),
                         )
-                        if (!recordData.isBalanceAccount) {
+                        if (!recordData.isBalanceRecord) {
                             CbTextButton(
                                 onClick = {
                                     onRequestNaviToEditRecord(recordData.id)
