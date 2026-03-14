@@ -47,89 +47,70 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.util.Pair
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.ext.withCNY
-import cn.wj.android.cashbook.core.common.ext.yearMonth
-import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
-import cn.wj.android.cashbook.core.common.tools.parseDateLong
-import cn.wj.android.cashbook.core.common.tools.toLocalDate
-import cn.wj.android.cashbook.core.common.tools.toMs
 import cn.wj.android.cashbook.core.design.component.CbElevatedCard
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbLineChart
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTab
 import cn.wj.android.cashbook.core.design.component.CbTabRow
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
-import cn.wj.android.cashbook.core.design.component.DateRangePickerDialog
 import cn.wj.android.cashbook.core.design.component.Footer
+import cn.wj.android.cashbook.core.design.component.LineEntry
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
-import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
+import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
-import cn.wj.android.cashbook.core.ui.expand.colorInt
+import cn.wj.android.cashbook.core.ui.component.DateSelectionPopup
 import cn.wj.android.cashbook.core.ui.expand.percentText
 import cn.wj.android.cashbook.core.ui.expand.text
 import cn.wj.android.cashbook.feature.records.view.AnalyticsPieChart
 import cn.wj.android.cashbook.feature.records.view.AnalyticsPieListItem
 import cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsViewModel
-import cn.wj.android.cashbook.feature.records.viewmodel.DateData
-import cn.wj.android.cashbook.feature.records.viewmodel.ShowSelectDateDialogData
 import cn.wj.android.cashbook.feature.records.viewmodel.ShowSheetData
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.LimitLine
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
-import com.github.mikephil.charting.formatter.LargeValueFormatter
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 
 /**
  * 数据分析界面
- * TODO ChartView 夜间模式适配、文本大小、选中label、全屏查看
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/10/20
  */
 @Composable
 internal fun AnalyticsRoute(
-    onRequestNaviToTypeAnalytics: (Long, String?) -> Unit,
+    onRequestNaviToTypeAnalytics: (Long, String?, Boolean) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dateSelection by viewModel.dateSelection.collectAsStateWithLifecycle()
 
     AnalyticsScreen(
-        dialogState = viewModel.dialogState,
-        onRequestShowSelectDateDialog = viewModel::showSelectDateDialog,
-        onRequestShowSelectDateRangeDialog = viewModel::showSelectDateRangeDialog,
-        onRequestDismissDialog = viewModel::dismissDialog,
-        onDateSelect = viewModel::selectDate,
+        dateSelection = dateSelection,
+        showDatePopup = viewModel.showDatePopup,
+        onDateClick = viewModel::displayDatePopup,
+        onDateSelected = viewModel::updateDateSelection,
+        onDismissDatePopup = viewModel::dismissDatePopup,
         sheetData = viewModel.sheetData,
         onRequestShowBottomSheet = viewModel::showSheet,
         onRequestDismissBottomSheet = viewModel::dismissSheet,
         uiState = uiState,
-        onRequestNaviToTypeAnalytics = { typeId ->
+        onRequestNaviToTypeAnalytics = { typeId, includeChildTypes ->
             viewModel.dismissSheet()
             onRequestNaviToTypeAnalytics(
                 typeId,
-                (uiState as? AnalyticsUiState.Success)?.titleText?.replace("\n", "~"),
+                (uiState as? AnalyticsUiState.Success)?.titleText,
+                includeChildTypes,
             )
         },
         onRequestPopBackStack = onRequestPopBackStack,
@@ -140,16 +121,16 @@ internal fun AnalyticsRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AnalyticsScreen(
-    dialogState: DialogState,
-    onRequestShowSelectDateDialog: () -> Unit,
-    onRequestShowSelectDateRangeDialog: () -> Unit,
-    onRequestDismissDialog: () -> Unit,
-    onDateSelect: (DateData) -> Unit,
+    dateSelection: DateSelectionEntity,
+    showDatePopup: Boolean,
+    onDateClick: () -> Unit,
+    onDateSelected: (DateSelectionEntity) -> Unit,
+    onDismissDatePopup: () -> Unit,
     sheetData: ShowSheetData?,
     onRequestShowBottomSheet: (Long) -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
     uiState: AnalyticsUiState,
-    onRequestNaviToTypeAnalytics: (Long) -> Unit,
+    onRequestNaviToTypeAnalytics: (Long, Boolean) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -158,33 +139,46 @@ private fun AnalyticsScreen(
         topBar = {
             CbTopAppBar(
                 title = {
-                    if (uiState is AnalyticsUiState.Success) {
+                    Box {
                         Row(
-                            modifier = Modifier.clickable(onClick = onRequestShowSelectDateDialog),
+                            modifier = Modifier.clickable(onClick = onDateClick),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            val titleText = uiState.titleText
-                            Text(
-                                text = titleText,
-                                style = if (titleText.contains("\n")) {
-                                    MaterialTheme.typography.titleSmall
-                                } else {
-                                    MaterialTheme.typography.titleLarge
-                                },
-                            )
+                            if (dateSelection is DateSelectionEntity.DateRange) {
+                                Column {
+                                    Text(
+                                        text = dateSelection.from.let {
+                                            "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}"
+                                        },
+                                        style = MaterialTheme.typography.labelMedium,
+                                    )
+                                    Text(
+                                        text = dateSelection.to.let {
+                                            "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}"
+                                        },
+                                        style = MaterialTheme.typography.labelMedium,
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    text = dateSelection.getDisplayText(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            }
                             Icon(
                                 imageVector = CbIcons.ArrowDropDown,
                                 contentDescription = null,
                             )
                         }
+                        DateSelectionPopup(
+                            expanded = showDatePopup,
+                            onDismissRequest = onDismissDatePopup,
+                            currentSelection = dateSelection,
+                            onDateSelected = onDateSelected,
+                        )
                     }
                 },
                 onBackClick = onRequestPopBackStack,
-                actions = {
-                    CbIconButton(onClick = onRequestShowSelectDateRangeDialog) {
-                        Icon(imageVector = CbIcons.DateRange, contentDescription = null)
-                    }
-                },
             )
         },
         content = { paddingValues ->
@@ -193,43 +187,6 @@ private fun AnalyticsScreen(
                     .padding(paddingValues)
                     .fillMaxSize(),
             ) {
-                ((dialogState as? DialogState.Shown<*>)?.data as? ShowSelectDateDialogData)?.let { data ->
-                    val date = data.date
-                    if (data is ShowSelectDateDialogData.SelectDate) {
-                        SelectDateDialog(
-                            onDialogDismiss = onRequestDismissDialog,
-                            currentDate = date.from.yearMonth,
-                            yearSelectable = true,
-                            yearSelected = date.year,
-                            onDateSelected = { ym, year ->
-                                onDateSelect(
-                                    DateData(
-                                        from = ym.atDay(1),
-                                        year = year,
-                                    ),
-                                )
-                            },
-                        )
-                    } else {
-                        DateRangePickerDialog(
-                            onDismissRequest = onRequestDismissDialog,
-                            selection = Pair.create(
-                                date.from.toMs(),
-                                date.to?.toMs(),
-                            ),
-                            onPositiveButtonClick = { pair ->
-                                onDateSelect(
-                                    DateData(
-                                        from = pair.first.toLocalDate(),
-                                        to = pair.second.toLocalDate(),
-                                    ),
-                                )
-                            },
-                            onNegativeButtonClick = onRequestDismissDialog,
-                        )
-                    }
-                }
-
                 if (null != sheetData) {
                     CbModalBottomSheet(
                         onDismissRequest = onRequestDismissBottomSheet,
@@ -253,7 +210,12 @@ private fun AnalyticsScreen(
                                     },
                                 )
                                 CbIconButton(
-                                    onClick = { onRequestNaviToTypeAnalytics(sheetData.typeId) },
+                                    onClick = {
+                                        onRequestNaviToTypeAnalytics(
+                                            sheetData.typeId,
+                                            true,
+                                        )
+                                    },
                                     modifier = Modifier.constrainAs(icon) {
                                         end.linkTo(parent.end)
                                         centerVerticallyTo(parent)
@@ -266,33 +228,40 @@ private fun AnalyticsScreen(
                                 }
                             }
 
-                            val pieColorsCompose = listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.primaryContainer,
-                                MaterialTheme.colorScheme.secondary,
-                                MaterialTheme.colorScheme.secondaryContainer,
-                                MaterialTheme.colorScheme.tertiary,
-                                MaterialTheme.colorScheme.tertiaryContainer,
-                                LocalExtendedColors.current.quaternary,
-                                LocalExtendedColors.current.quaternaryContainer,
-                            )
+                            val colorScheme = MaterialTheme.colorScheme
+                            val extendedColors = LocalExtendedColors.current
+                            val pieColorsCompose = remember(colorScheme, extendedColors) {
+                                listOf(
+                                    colorScheme.primary,
+                                    colorScheme.primaryContainer,
+                                    colorScheme.secondary,
+                                    colorScheme.secondaryContainer,
+                                    colorScheme.tertiary,
+                                    colorScheme.tertiaryContainer,
+                                    extendedColors.quaternary,
+                                    extendedColors.quaternaryContainer,
+                                )
+                            }
+                            val onPieColorsCompose = remember(colorScheme, extendedColors) {
+                                listOf(
+                                    colorScheme.onPrimary,
+                                    colorScheme.onPrimaryContainer,
+                                    colorScheme.onSecondary,
+                                    colorScheme.onSecondaryContainer,
+                                    colorScheme.onTertiary,
+                                    colorScheme.onTertiaryContainer,
+                                    extendedColors.onQuaternary,
+                                    extendedColors.onQuaternaryContainer,
+                                )
+                            }
                             AnalyticsPieChart(
                                 barCenterText = sheetData.typeName,
                                 dataList = sheetData.dataList,
                                 pieColorsCompose = pieColorsCompose,
-                                onPieColorsCompose = listOf(
-                                    MaterialTheme.colorScheme.onPrimary,
-                                    MaterialTheme.colorScheme.onPrimaryContainer,
-                                    MaterialTheme.colorScheme.onSecondary,
-                                    MaterialTheme.colorScheme.onSecondaryContainer,
-                                    MaterialTheme.colorScheme.onTertiary,
-                                    MaterialTheme.colorScheme.onTertiaryContainer,
-                                    LocalExtendedColors.current.onQuaternary,
-                                    LocalExtendedColors.current.onQuaternaryContainer,
-                                ),
+                                onPieColorsCompose = onPieColorsCompose,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp)
+                                    .height(260.dp)
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                             repeat(sheetData.dataList.size) { i ->
@@ -304,7 +273,7 @@ private fun AnalyticsScreen(
                                         .fillMaxWidth()
                                         .defaultMinSize(minHeight = 70.dp)
                                         .clickable {
-                                            onRequestNaviToTypeAnalytics(item.typeId)
+                                            onRequestNaviToTypeAnalytics(item.typeId, false)
                                         }
                                         .padding(horizontal = 16.dp, vertical = 8.dp),
                                 )
@@ -388,16 +357,14 @@ private fun AnalyticsScreen(
                                         )
                                     }
 
-                                    if (!uiState.crossYear) {
-                                        item {
-                                            SplitReports(
-                                                uiState = uiState,
-                                                modifier = Modifier.padding(
-                                                    horizontal = 16.dp,
-                                                    vertical = 8.dp,
-                                                ),
-                                            )
-                                        }
+                                    item {
+                                        SplitReports(
+                                            uiState = uiState,
+                                            modifier = Modifier.padding(
+                                                horizontal = 16.dp,
+                                                vertical = 8.dp,
+                                            ),
+                                        )
                                     }
                                 }
 
@@ -419,10 +386,10 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
         modifier = modifier,
     ) {
         Text(
-            text = if (uiState.year) {
-                stringResource(id = R.string.monthly_report)
-            } else {
-                stringResource(id = R.string.daily_report)
+            text = when (uiState.granularity) {
+                AnalyticsBarGranularity.YEAR -> stringResource(id = R.string.yearly_report)
+                AnalyticsBarGranularity.MONTH -> stringResource(id = R.string.monthly_report)
+                AnalyticsBarGranularity.DAY -> stringResource(id = R.string.daily_report)
             },
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -465,9 +432,7 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
             )
         }
         CbHorizontalDivider()
-        val barDataList = uiState.barDataList.filter {
-            it.date.parseDateLong(DATE_FORMAT_DATE) <= System.currentTimeMillis()
-        }.reversed()
+        val barDataList = remember(uiState.barDataList) { uiState.barDataList.reversed() }
         repeat(barDataList.size) { i ->
             val item = barDataList[i]
             Row(
@@ -476,10 +441,10 @@ private fun SplitReports(uiState: AnalyticsUiState.Success, modifier: Modifier =
                     vertical = 8.dp,
                 ),
             ) {
-                val date = if (uiState.year) {
-                    item.date.split("-")[1] + stringResource(id = R.string.month)
-                } else {
-                    item.date.split("-").run {
+                val date = when (uiState.granularity) {
+                    AnalyticsBarGranularity.YEAR -> item.date + stringResource(id = R.string.year)
+                    AnalyticsBarGranularity.MONTH -> item.date.split("-")[1] + stringResource(id = R.string.month)
+                    AnalyticsBarGranularity.DAY -> item.date.split("-").run {
                         "${this[1]}-${this[2]}"
                     }
                 }
@@ -532,16 +497,20 @@ private fun AnalyticsPieChart(
                 .padding(top = 8.dp),
         )
 
-        val pieColorsCompose = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.primaryContainer,
-            MaterialTheme.colorScheme.secondary,
-            MaterialTheme.colorScheme.secondaryContainer,
-            MaterialTheme.colorScheme.tertiary,
-            MaterialTheme.colorScheme.tertiaryContainer,
-            LocalExtendedColors.current.quaternary,
-            LocalExtendedColors.current.quaternaryContainer,
-        )
+        val colorScheme = MaterialTheme.colorScheme
+        val extendedColors = LocalExtendedColors.current
+        val pieColorsCompose = remember(colorScheme, extendedColors) {
+            listOf(
+                colorScheme.primary,
+                colorScheme.primaryContainer,
+                colorScheme.secondary,
+                colorScheme.secondaryContainer,
+                colorScheme.tertiary,
+                colorScheme.tertiaryContainer,
+                extendedColors.quaternary,
+                extendedColors.quaternaryContainer,
+            )
+        }
 
         var selectedTab by remember {
             mutableStateOf(RecordTypeCategoryEnum.EXPENDITURE)
@@ -555,19 +524,21 @@ private fun AnalyticsPieChart(
                 RecordTypeCategoryEnum.TRANSFER -> uiState.transferPieDataList
             },
             pieColorsCompose = pieColorsCompose,
-            onPieColorsCompose = listOf(
-                MaterialTheme.colorScheme.onPrimary,
-                MaterialTheme.colorScheme.onPrimaryContainer,
-                MaterialTheme.colorScheme.onSecondary,
-                MaterialTheme.colorScheme.onSecondaryContainer,
-                MaterialTheme.colorScheme.onTertiary,
-                MaterialTheme.colorScheme.onTertiaryContainer,
-                LocalExtendedColors.current.onQuaternary,
-                LocalExtendedColors.current.onQuaternaryContainer,
-            ),
+            onPieColorsCompose = remember(colorScheme, extendedColors) {
+                listOf(
+                    colorScheme.onPrimary,
+                    colorScheme.onPrimaryContainer,
+                    colorScheme.onSecondary,
+                    colorScheme.onSecondaryContainer,
+                    colorScheme.onTertiary,
+                    colorScheme.onTertiaryContainer,
+                    extendedColors.onQuaternary,
+                    extendedColors.onQuaternaryContainer,
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(260.dp)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         )
 
@@ -628,24 +599,18 @@ private fun AnalyticsBarChart(
         modifier = modifier,
     ) {
         Text(
-            text = if (uiState.year) {
-                stringResource(id = R.string.monthly_statistics)
-            } else {
-                stringResource(id = R.string.daily_statistics)
+            text = when (uiState.granularity) {
+                AnalyticsBarGranularity.YEAR -> stringResource(id = R.string.yearly_statistics)
+                AnalyticsBarGranularity.MONTH -> stringResource(id = R.string.monthly_statistics)
+                AnalyticsBarGranularity.DAY -> stringResource(id = R.string.daily_statistics)
             },
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 8.dp),
         )
-        var tempUiState: AnalyticsUiState.Success? by remember {
-            mutableStateOf(null)
-        }
         var selectedTab by remember {
             mutableStateOf(AnalyticsBarTypeEnum.EXPENDITURE)
-        }
-        var tempTab: AnalyticsBarTypeEnum? by remember {
-            mutableStateOf(null)
         }
         val expenditureColor = LocalExtendedColors.current.expenditure
         val expenditureText = AnalyticsBarTypeEnum.EXPENDITURE.text
@@ -654,7 +619,129 @@ private fun AnalyticsBarChart(
         val balanceColor = LocalExtendedColors.current.transfer
         val balanceText = AnalyticsBarTypeEnum.BALANCE.text
         val dataList = uiState.barDataList
-        AndroidView(
+
+        // 构建折线图数据
+        val chartDataSets = remember(dataList, selectedTab) {
+            val expenditureLs = mutableListOf<LineEntry>()
+            val incomeLs = mutableListOf<LineEntry>()
+            val balanceLs = mutableListOf<LineEntry>()
+            dataList.forEachIndexed { index, entity ->
+                val xLabel = when (entity.granularity) {
+                    AnalyticsBarGranularity.YEAR -> entity.date
+                    AnalyticsBarGranularity.MONTH -> entity.date.split("-").last()
+                    AnalyticsBarGranularity.DAY -> entity.date.split("-").run {
+                        "${this[1]}-${this[2]}"
+                    }
+                }
+                val expenditure = entity.expenditure / 100f
+                if (expenditure > 0f) {
+                    expenditureLs.add(
+                        LineEntry(
+                            x = (index + 1).toFloat(),
+                            y = expenditure * -1f,
+                            label = xLabel,
+                        ),
+                    )
+                }
+                val income = entity.income / 100f
+                if (income > 0f) {
+                    incomeLs.add(
+                        LineEntry(
+                            x = (index + 1).toFloat(),
+                            y = income,
+                            label = xLabel,
+                        ),
+                    )
+                }
+                val balance = entity.balance / 100f
+                if (balance > 0f) {
+                    balanceLs.add(
+                        LineEntry(
+                            x = (index + 1).toFloat(),
+                            y = balance,
+                            label = xLabel,
+                        ),
+                    )
+                }
+            }
+
+            val result = mutableListOf<cn.wj.android.cashbook.core.design.component.LineDataSet>()
+            when (selectedTab) {
+                AnalyticsBarTypeEnum.EXPENDITURE -> {
+                    if (expenditureLs.isNotEmpty()) {
+                        result.add(
+                            cn.wj.android.cashbook.core.design.component.LineDataSet(
+                                label = expenditureText,
+                                entries = expenditureLs,
+                                color = expenditureColor,
+                            ),
+                        )
+                    }
+                }
+
+                AnalyticsBarTypeEnum.INCOME -> {
+                    if (incomeLs.isNotEmpty()) {
+                        result.add(
+                            cn.wj.android.cashbook.core.design.component.LineDataSet(
+                                label = incomeText,
+                                entries = incomeLs,
+                                color = incomeColor,
+                            ),
+                        )
+                    }
+                }
+
+                AnalyticsBarTypeEnum.BALANCE -> {
+                    if (balanceLs.isNotEmpty()) {
+                        result.add(
+                            cn.wj.android.cashbook.core.design.component.LineDataSet(
+                                label = balanceText,
+                                entries = balanceLs,
+                                color = balanceColor,
+                            ),
+                        )
+                    }
+                }
+
+                AnalyticsBarTypeEnum.ALL -> {
+                    if (expenditureLs.isNotEmpty()) {
+                        result.add(
+                            cn.wj.android.cashbook.core.design.component.LineDataSet(
+                                label = expenditureText,
+                                entries = expenditureLs,
+                                color = expenditureColor,
+                            ),
+                        )
+                    }
+                    if (incomeLs.isNotEmpty()) {
+                        result.add(
+                            cn.wj.android.cashbook.core.design.component.LineDataSet(
+                                label = incomeText,
+                                entries = incomeLs,
+                                color = incomeColor,
+                            ),
+                        )
+                    }
+                    if (balanceLs.isNotEmpty()) {
+                        result.add(
+                            cn.wj.android.cashbook.core.design.component.LineDataSet(
+                                label = balanceText,
+                                entries = balanceLs,
+                                color = balanceColor,
+                            ),
+                        )
+                    }
+                }
+            }
+            result
+        }
+
+        val showZeroLine = selectedTab == AnalyticsBarTypeEnum.BALANCE ||
+            selectedTab == AnalyticsBarTypeEnum.ALL
+
+        CbLineChart(
+            dataSets = chartDataSets,
+            showZeroLine = showZeroLine,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
@@ -662,218 +749,6 @@ private fun AnalyticsBarChart(
                     horizontal = 16.dp,
                     vertical = 8.dp,
                 ),
-            factory = { context ->
-                LineChart(context).apply {
-                    description.isEnabled = false
-                    setDrawGridBackground(false)
-
-                    with(legend) {
-                        verticalAlignment = Legend.LegendVerticalAlignment.TOP
-                        horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-                        orientation = Legend.LegendOrientation.VERTICAL
-                        setDrawInside(true)
-                        yOffset = -20f
-                        xOffset = 10f
-                        yEntrySpace = 0f
-                        textSize = 8f
-                    }
-
-                    with(xAxis) {
-                        granularity = 1f
-                        setCenterAxisLabels(true)
-                        position = XAxis.XAxisPosition.BOTTOM
-                        offsetLeftAndRight(50)
-                        setAvoidFirstLastClipping(true)
-                        valueFormatter = IAxisValueFormatter { value, _ ->
-                            val position = value.toInt()
-                            val dataSet = data.dataSets.first()
-                            if (position in 0 until dataSet.entryCount) {
-                                val entry = dataSet.getEntryForIndex(position)
-                                val data = entry.data
-                                if (data is AnalyticsRecordBarEntity) {
-                                    val date = data.date
-                                    if (data.year) {
-                                        date.split("-").last()
-                                    } else {
-                                        date.split("-").run {
-                                            "${this[1]}-${this[2]}"
-                                        }
-                                    }
-                                } else {
-                                    ""
-                                }
-                            } else {
-                                ""
-                            }
-                        }
-                    }
-
-                    with(axisLeft) {
-                        valueFormatter = LargeValueFormatter()
-                        setDrawGridLines(false)
-                        spaceTop = 35f
-                    }
-
-                    axisRight.isEnabled = false
-                }
-            },
-            update = { chart ->
-                if (uiState != tempUiState || selectedTab != tempTab) {
-                    tempUiState = uiState
-                    tempTab = selectedTab
-                    val expenditureLs = mutableListOf<Entry>()
-                    val incomeLs = mutableListOf<Entry>()
-                    val balanceLs = mutableListOf<Entry>()
-                    dataList.forEachIndexed { index, entity ->
-                        val expenditure = entity.expenditure / 100f
-                        if (expenditure > 0f) {
-                            expenditureLs.add(
-                                Entry(
-                                    (index + 1).toFloat(),
-                                    expenditure * -1f,
-                                    entity,
-                                ),
-                            )
-                        }
-                        val income = entity.income / 100f
-                        if (income > 0f) {
-                            incomeLs.add(
-                                Entry(
-                                    (index + 1).toFloat(),
-                                    income,
-                                    entity,
-                                ),
-                            )
-                        }
-                        val balance = entity.balance / 100f
-                        if (balance > 0f) {
-                            balanceLs.add(
-                                Entry(
-                                    (index + 1).toFloat(),
-                                    balance,
-                                    entity,
-                                ),
-                            )
-                        }
-                    }
-                    val dataSets = mutableListOf<ILineDataSet>()
-                    val expenditureSet = LineDataSet(expenditureLs, expenditureText).apply {
-                        color = expenditureColor.colorInt
-                        lineWidth = 2f
-                    }
-                    val incomeSet = LineDataSet(incomeLs, incomeText).apply {
-                        color = incomeColor.colorInt
-                        lineWidth = 2f
-                    }
-                    val balanceSet = LineDataSet(balanceLs, balanceText).apply {
-                        color = balanceColor.colorInt
-                        lineWidth = 2f
-                    }
-                    val spaceValue = 1000f
-                    when (selectedTab) {
-                        AnalyticsBarTypeEnum.EXPENDITURE -> {
-                            with(chart.axisLeft) {
-                                if (expenditureLs.isEmpty()) {
-                                    resetAxisMinimum()
-                                    resetAxisMaximum()
-                                } else {
-                                    axisMinimum = expenditureLs.minOf { it.y } - spaceValue
-                                    axisMaximum = expenditureLs.maxOf { it.y } + spaceValue
-                                }
-                                removeAllLimitLines()
-                            }
-                            if (expenditureLs.isNotEmpty()) {
-                                dataSets.add(expenditureSet)
-                            }
-                        }
-
-                        AnalyticsBarTypeEnum.INCOME -> {
-                            with(chart.axisLeft) {
-                                if (incomeLs.isEmpty()) {
-                                    resetAxisMinimum()
-                                    resetAxisMaximum()
-                                } else {
-                                    axisMinimum = incomeLs.minOf { it.y } - spaceValue
-                                    axisMaximum = incomeLs.maxOf { it.y } + spaceValue
-                                }
-                                removeAllLimitLines()
-                            }
-                            if (incomeLs.isNotEmpty()) {
-                                dataSets.add(incomeSet)
-                            }
-                        }
-
-                        AnalyticsBarTypeEnum.BALANCE -> {
-                            with(chart.axisLeft) {
-                                if (balanceLs.isEmpty()) {
-                                    resetAxisMinimum()
-                                    resetAxisMaximum()
-                                    removeAllLimitLines()
-                                } else {
-                                    axisMinimum = balanceLs.minOf { it.y } - spaceValue
-                                    axisMaximum = balanceLs.maxOf { it.y } + spaceValue
-                                    addLimitLine(
-                                        LimitLine(0f).apply {
-                                            lineWidth = 4f
-                                            enableDashedLine(10f, 10f, 0f)
-                                        },
-                                    )
-                                }
-                            }
-                            if (balanceLs.isNotEmpty()) {
-                                dataSets.add(balanceSet)
-                            }
-                        }
-
-                        AnalyticsBarTypeEnum.ALL -> {
-                            with(chart.axisLeft) {
-                                if (expenditureLs.isEmpty() && incomeLs.isEmpty() && balanceLs.isEmpty()) {
-                                    resetAxisMinimum()
-                                    resetAxisMaximum()
-                                    removeAllLimitLines()
-                                } else {
-                                    axisMinimum = when {
-                                        expenditureLs.isNotEmpty() -> expenditureLs
-                                        balanceLs.isNotEmpty() -> balanceLs
-                                        else -> incomeLs
-                                    }.minOf { it.y } - spaceValue
-                                    axisMaximum = when {
-                                        incomeLs.isNotEmpty() -> incomeLs
-                                        balanceLs.isNotEmpty() -> balanceLs
-                                        else -> expenditureLs
-                                    }.maxOf { it.y } + spaceValue
-                                }
-                                if (expenditureLs.isEmpty() && balanceLs.isEmpty()) {
-                                    removeAllLimitLines()
-                                } else {
-                                    addLimitLine(
-                                        LimitLine(0f).apply {
-                                            lineWidth = 4f
-                                            enableDashedLine(10f, 10f, 0f)
-                                        },
-                                    )
-                                }
-                            }
-                            if (expenditureLs.isNotEmpty()) {
-                                dataSets.add(expenditureSet)
-                            }
-                            if (incomeLs.isNotEmpty()) {
-                                dataSets.add(incomeSet)
-                            }
-                            if (balanceLs.isNotEmpty()) {
-                                dataSets.add(balanceSet)
-                            }
-                        }
-                    }
-                    chart.data = LineData(dataSets).apply {
-                        setValueFormatter { _, entry, _, _ ->
-                            entry.y.decimalFormat().withCNY()
-                        }
-                    }
-                    chart.invalidate()
-                    chart.animateY(250)
-                }
-            },
         )
         CbTabRow(
             selectedTabIndex = selectedTab.ordinal,

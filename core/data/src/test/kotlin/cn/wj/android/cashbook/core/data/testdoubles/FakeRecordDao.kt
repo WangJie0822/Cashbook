@@ -117,6 +117,20 @@ class FakeRecordDao : RecordDao {
             .take(pageSize)
     }
 
+    override suspend fun queryRecordByTypeIdExact(
+        booksId: Long,
+        typeId: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId && it.typeId == typeId
+        }
+            .sortedByDescending { it.recordTime }
+            .drop(pageNum)
+            .take(pageSize)
+    }
+
     override suspend fun queryRecordByTypeIdBetween(
         booksId: Long,
         typeId: Long,
@@ -131,6 +145,25 @@ class FakeRecordDao : RecordDao {
                 it.recordTime >= startDate &&
                 it.recordTime < endDate &&
                 (it.typeId == typeId || it.typeId in childTypeIds)
+        }
+            .sortedByDescending { it.recordTime }
+            .drop(pageNum)
+            .take(pageSize)
+    }
+
+    override suspend fun queryRecordByTypeIdExactBetween(
+        booksId: Long,
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId &&
+                it.recordTime >= startDate &&
+                it.recordTime < endDate &&
+                it.typeId == typeId
         }
             .sortedByDescending { it.recordTime }
             .drop(pageNum)
@@ -173,20 +206,20 @@ class FakeRecordDao : RecordDao {
         return records.filter { it.id in ids }
     }
 
-    override fun queryByTypeId(id: Long): List<RecordTable> {
+    override suspend fun queryByTypeId(id: Long): List<RecordTable> {
         return records.filter { it.typeId == id }
     }
 
-    override fun queryByTypeCategory(typeCategoryId: Int): List<RecordTable> {
+    override suspend fun queryByTypeCategory(typeCategoryId: Int): List<RecordTable> {
         val typeIds = types.filter { it.typeCategory == typeCategoryId }.mapNotNull { it.id }
         return records.filter { it.typeId in typeIds }
     }
 
-    override fun queryRelatedRecord(): List<RecordWithRelatedTable> {
+    override suspend fun queryRelatedRecord(): List<RecordWithRelatedTable> {
         return relatedRecords.toList()
     }
 
-    override fun queryRelatedRecordCountByID(id: Long): Int {
+    override suspend fun queryRelatedRecordCountByID(id: Long): Int {
         return relatedRecords.count { it.relatedRecordId == id || it.recordId == id }
     }
 
@@ -218,7 +251,7 @@ class FakeRecordDao : RecordDao {
         return relatedRecords.filter { it.relatedRecordId == id }.map { it.recordId }
     }
 
-    override fun getExpenditureRecordListAfterTime(
+    override suspend fun getExpenditureRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
         incomeCategory: Int,
@@ -233,7 +266,7 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun getExpenditureReimburseRecordListAfterTime(
+    override suspend fun getExpenditureReimburseRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
     ): List<RecordTable> {
@@ -244,7 +277,7 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun getExpenditureRecordListByKeywordAfterTime(
+    override suspend fun getExpenditureRecordListByKeywordAfterTime(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -261,11 +294,11 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun getRecordCountByAssetIdAfterTime(assetId: Long, recordTime: Long): Int {
+    override suspend fun getRecordCountByAssetIdAfterTime(assetId: Long, recordTime: Long): Int {
         return records.count { it.assetId == assetId && it.recordTime >= recordTime }
     }
 
-    override fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
+    override suspend fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -278,11 +311,11 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun deleteWithAsset(assetId: Long) {
+    override suspend fun deleteWithAsset(assetId: Long) {
         records.removeAll { it.assetId == assetId || it.intoAssetId == assetId }
     }
 
-    override fun deleteRelatedWithAsset(assetId: Long) {
+    override suspend fun deleteRelatedWithAsset(assetId: Long) {
         val recordIds = records
             .filter { it.assetId == assetId || it.intoAssetId == assetId }
             .mapNotNull { it.id }

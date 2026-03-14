@@ -143,12 +143,12 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
-    /** 类型 id 为 [typeId] 的第 [pageNum] 页 [pageSize] 条记录 */
+    /** 类型 id 为 [typeId]（包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
     @Query(
         """
-        SELECT * FROM db_record 
-        WHERE books_id=:booksId 
-        AND (type_id=:typeId 
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND (type_id=:typeId
         OR type_id IN (SELECT id FROM db_type WHERE parent_id=:typeId))
         ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
     """,
@@ -160,19 +160,55 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
-    /** 类型 id 为 [typeId] 的第 [pageNum] 页 [pageSize] 条记录 */
+    /** 类型 id 精确为 [typeId]（不包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
     @Query(
         """
-        SELECT * FROM db_record 
-        WHERE books_id=:booksId 
-        AND record_time>=:startDate 
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND type_id=:typeId
+        ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
+    """,
+    )
+    suspend fun queryRecordByTypeIdExact(
+        booksId: Long,
+        typeId: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
+    /** 类型 id 为 [typeId]（包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query(
+        """
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND record_time>=:startDate
         AND record_time<:endDate
-        AND (type_id=:typeId 
+        AND (type_id=:typeId
         OR type_id IN (SELECT id FROM db_type WHERE parent_id=:typeId))
         ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
     """,
     )
     suspend fun queryRecordByTypeIdBetween(
+        booksId: Long,
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
+    /** 类型 id 精确为 [typeId]（不包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query(
+        """
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND record_time>=:startDate
+        AND record_time<:endDate
+        AND type_id=:typeId
+        ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
+    """,
+    )
+    suspend fun queryRecordByTypeIdExactBetween(
         booksId: Long,
         typeId: Long,
         startDate: Long,
@@ -223,7 +259,7 @@ interface RecordDao {
     suspend fun queryByIds(ids: List<Long>): List<RecordTable>
 
     @Query("SELECT * FROM db_record WHERE type_id=:id")
-    fun queryByTypeId(id: Long): List<RecordTable>
+    suspend fun queryByTypeId(id: Long): List<RecordTable>
 
     @Query(
         """
@@ -236,15 +272,15 @@ interface RecordDao {
         )
     """,
     )
-    fun queryByTypeCategory(
+    suspend fun queryByTypeCategory(
         typeCategoryId: Int,
     ): List<RecordTable>
 
     @Query("SELECT * FROM db_record_with_related")
-    fun queryRelatedRecord(): List<RecordWithRelatedTable>
+    suspend fun queryRelatedRecord(): List<RecordWithRelatedTable>
 
     @Query("SELECT COUNT(*) FROM db_record_with_related WHERE related_record_id=:id OR record_id=:id")
-    fun queryRelatedRecordCountByID(id: Long): Int
+    suspend fun queryRelatedRecordCountByID(id: Long): Int
 
     @Update
     suspend fun updateRecord(list: List<RecordTable>): Int
@@ -267,7 +303,7 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getExpenditureRecordListAfterTime(
+    suspend fun getExpenditureRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
         incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
@@ -282,7 +318,7 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getExpenditureReimburseRecordListAfterTime(
+    suspend fun getExpenditureReimburseRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
     ): List<RecordTable>
@@ -297,7 +333,7 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getExpenditureRecordListByKeywordAfterTime(
+    suspend fun getExpenditureRecordListByKeywordAfterTime(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -311,7 +347,7 @@ interface RecordDao {
         AND asset_id=:assetId
     """,
     )
-    fun getRecordCountByAssetIdAfterTime(
+    suspend fun getRecordCountByAssetIdAfterTime(
         assetId: Long,
         recordTime: Long,
     ): Int
@@ -326,7 +362,7 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
+    suspend fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -338,7 +374,7 @@ interface RecordDao {
         WHERE asset_id=:assetId OR into_asset_id=:assetId
     """,
     )
-    fun deleteWithAsset(assetId: Long)
+    suspend fun deleteWithAsset(assetId: Long)
 
     @Query(
         value = """
@@ -347,7 +383,7 @@ interface RecordDao {
         OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
     """,
     )
-    fun deleteRelatedWithAsset(assetId: Long)
+    suspend fun deleteRelatedWithAsset(assetId: Long)
 
     @Query(
         """

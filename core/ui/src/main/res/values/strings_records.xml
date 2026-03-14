@@ -25,8 +25,10 @@
     <string name="overview_of_revenue_and_expenditure">收支概览</string>
     <string name="daily_statistics">每日统计</string>
     <string name="monthly_statistics">每月统计</string>
+    <string name="yearly_statistics">每年统计</string>
     <string name="daily_report">日报表</string>
     <string name="monthly_report">月报表</string>
+    <string name="yearly_report">年报表</string>
     <string name="date">日期</string>
     <string name="category_report">分类报表</string>
     <string name="total_liabilities">总负债</string>

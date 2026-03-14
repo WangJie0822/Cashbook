@@ -57,6 +57,7 @@ interface RecordRepository {
         typeId: Long,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean = true,
     ): List<RecordModel>
 
     suspend fun queryPagingRecordListByTypeIdBetweenDate(
@@ -64,6 +65,7 @@ interface RecordRepository {
         dateRange: String,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean = true,
     ): List<RecordModel>
 
     suspend fun queryPagingRecordListByTagId(

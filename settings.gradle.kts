@@ -76,8 +76,6 @@ include(":core:common")
 
 include(":sync:work")
 
-include(":repos:MPChartLib")
-
 include(":baselineProfile")
 include(":lint")
 

@@ -512,10 +512,11 @@ fun CashbookNavHost(
         )
         // 数据分析
         analyticsScreen(
-            onRequestNaviToTypeAnalytics = { typeId, date ->
+            onRequestNaviToTypeAnalytics = { typeId, date, includeChildTypes ->
                 navController.naviToTypedAnalytics(
                     typeId = typeId,
                     date = date,
+                    includeChildTypes = includeChildTypes,
                 )
             },
             onRequestPopBackStack = navController::popBackStackSafety,

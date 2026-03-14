@@ -469,20 +469,29 @@ interface TransactionDao {
     )
     suspend fun deleteBookById(bookId: Long)
 
+    @Query("DELETE FROM db_tag_with_record WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
+    suspend fun deleteTagRelationsByBookId(bookId: Long)
+
+    @Query("DELETE FROM db_record_with_related WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId) OR related_record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
+    suspend fun deleteRecordRelationsByBookId(bookId: Long)
+
+    @Query("DELETE FROM db_image_with_related WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
+    suspend fun deleteImageRelationsByBookId(bookId: Long)
+
+    @Query("DELETE FROM db_record WHERE books_id = :bookId")
+    suspend fun deleteRecordsByBookId(bookId: Long)
+
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteBookTransaction(bookId: Long) {
-        // 查询当前账本下的记录
-        val recordList = queryRecordListByBookId(bookId)
-        // 从记录关系表和标签关系表中删除对应记录
-        recordList.forEach { record ->
-            val id = record.id
-            if (null != id) {
-                deleteTagRelationByRecordId(id)
-                deleteRecordRelationByRecordId(id)
-            }
-            deleteRecord(record)
-        }
+        // 批量删除当前账本下的标签关联
+        deleteTagRelationsByBookId(bookId)
+        // 批量删除当前账本下的记录关联
+        deleteRecordRelationsByBookId(bookId)
+        // 批量删除当前账本下的图片关联
+        deleteImageRelationsByBookId(bookId)
+        // 批量删除当前账本下的记录
+        deleteRecordsByBookId(bookId)
         // 删除账本
         deleteBookById(bookId)
     }
@@ -491,5 +500,55 @@ interface TransactionDao {
     suspend fun deleteTag(id: Long) {
         deleteTagRelationByTagId(id)
         deleteTagById(id)
+    }
+
+    /** 删除资产关联的标签记录关联 */
+    @Query(
+        value = """
+        DELETE FROM db_tag_with_record
+        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+    """,
+    )
+    suspend fun deleteTagRelationsByAssetId(assetId: Long)
+
+    /** 删除资产关联的记录关联数据 */
+    @Query(
+        value = """
+        DELETE FROM db_record_with_related
+        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+        OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+    """,
+    )
+    suspend fun deleteRecordRelationsByAssetId(assetId: Long)
+
+    /** 删除资产关联的图片关联数据 */
+    @Query(
+        value = """
+        DELETE FROM db_image_with_related
+        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+    """,
+    )
+    suspend fun deleteImageRelationsByAssetId(assetId: Long)
+
+    /** 删除资产关联的记录 */
+    @Query(
+        value = """
+        DELETE FROM db_record
+        WHERE asset_id=:assetId OR into_asset_id=:assetId
+    """,
+    )
+    suspend fun deleteRecordsByAssetId(assetId: Long)
+
+    /**
+     * 事务化删除资产关联的所有数据
+     *
+     * 按顺序删除：标签关联 -> 记录关联 -> 图片关联 -> 记录
+     */
+    @Transaction
+    suspend fun deleteAssetRelatedData(assetId: Long) {
+        deleteTagRelationsByAssetId(assetId)
+        deleteRecordRelationsByAssetId(assetId)
+        deleteImageRelationsByAssetId(assetId)
+        deleteRecordsByAssetId(assetId)
     }
 }

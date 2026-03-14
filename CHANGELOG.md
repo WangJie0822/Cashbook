@@ -12,6 +12,13 @@
 - 首页记录列表改用 Paging 分页加载，新增 RecordViewSummaryModel 轻量汇总避免 N+1 查询
 - 新增 WheelPicker 和 DateSelectionPopup UI 组件
 - 同步更新全部相关 UseCase、Repository、ViewModel 及测试
+- 完全移除 repos/MPChartLib 第三方图表库及 app-catalog 示例代码
+- core/design 中使用 Compose Canvas 重写 PieChart 和 LineChart 组件
+- 新增 AnalyticsBarGranularity 枚举，重构统计分析页面支持多粒度数据展示
+- BackupRecoveryManager 接口与实现分离，提取 BackupRecoveryManagerImpl
+- 优化 WebDAV 处理逻辑及 APK 下载 Worker
+- 更新 RecordDao/TransactionDao 查询及数据库 Schema
+- 新增 MoneyTest、SettingRepositoryImplTest、AnalyticsViewModelTest 等多个测试类及 Fake 实现
 - 
 ## [1.0.8_25042622]
 ### Add

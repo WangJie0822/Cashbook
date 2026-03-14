@@ -60,12 +60,13 @@ internal fun TypedAnalyticsRoute(
     typeId: Long,
     tagId: Long,
     date: String,
+    includeChildTypes: Boolean = true,
     onRequestNaviToEditRecord: (Long) -> Unit,
     onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TypedAnalyticsViewModel = hiltViewModel<TypedAnalyticsViewModel>().apply {
-        updateData(tagId = tagId, typeId = typeId, date = date)
+        updateData(tagId = tagId, typeId = typeId, date = date, includeChildTypes = includeChildTypes)
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -158,7 +159,10 @@ private fun TypedAnalyticsScreen(
                                         )
                                     }
                                 } else {
-                                    items(count = recordList.itemCount) { index ->
+                                    items(
+                                        count = recordList.itemCount,
+                                        key = { index -> recordList.peek(index)?.id ?: "placeholder_$index" },
+                                    ) { index ->
                                         recordList[index]?.let { item ->
                                             RecordListItem(
                                                 item = item,

@@ -95,7 +95,7 @@ app → feature/* → core/*
 - **网络**: Retrofit 3 + OkHttp + Kotlin Serialization
 - **异步**: Kotlin Coroutines + Flow
 - **同步**: WorkManager (`sync/work` 模块)
-- **图表**: MPChartLib (本地 `repos/MPChartLib`)
+- **图表**: Compose Canvas 自绘制 (`core/design` 中的 CbPieChart、CbLineChart)
 
 ### 多渠道 (Product Flavors)
 

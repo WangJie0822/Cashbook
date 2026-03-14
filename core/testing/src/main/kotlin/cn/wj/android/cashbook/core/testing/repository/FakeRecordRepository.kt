@@ -111,6 +111,7 @@ class FakeRecordRepository : RecordRepository {
         typeId: Long,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean,
     ): List<RecordModel> {
         return records.filter { it.typeId == typeId }
             .drop(page * pageSize)
@@ -122,6 +123,7 @@ class FakeRecordRepository : RecordRepository {
         dateRange: String,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean,
     ): List<RecordModel> {
         return records.filter { it.typeId == typeId }
             .drop(page * pageSize)
@@ -167,11 +169,17 @@ class FakeRecordRepository : RecordRepository {
         return flowOf(PagingData.from(records.toList()))
     }
 
+    private val _summaryData = MutableStateFlow<List<RecordViewSummaryModel>>(emptyList())
+
+    fun setSummaryData(data: List<RecordViewSummaryModel>) {
+        _summaryData.value = data
+    }
+
     override fun queryRecordViewSummariesFlow(
         startDate: Long,
         endDate: Long,
     ): Flow<List<RecordViewSummaryModel>> {
-        return flowOf(emptyList())
+        return _summaryData
     }
 
     override suspend fun getDefaultRecord(typeId: Long): RecordModel {

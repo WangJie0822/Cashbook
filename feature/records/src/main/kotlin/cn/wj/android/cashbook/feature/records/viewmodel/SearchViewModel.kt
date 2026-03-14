@@ -33,6 +33,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.domain.usecase.GetSearchRecordViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -83,9 +84,12 @@ class SearchViewModel @Inject constructor(
         }
         .cachedIn(viewModelScope)
 
+    private var searchHistoryJob: Job? = null
+
     fun onKeywordChange(keyword: String) {
-        viewModelScope.launch {
-            _keywordData.tryEmit(keyword)
+        _keywordData.tryEmit(keyword)
+        searchHistoryJob?.cancel()
+        searchHistoryJob = viewModelScope.launch {
             delay(500L)
             recordRepository.addSearchHistory(keyword)
         }

@@ -34,4 +34,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.documentfile)
     implementation(libs.androidx.exifinterface)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.google.truth)
 }

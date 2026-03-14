@@ -17,6 +17,9 @@
 package cn.wj.android.cashbook.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import android.util.Base64
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.AppSettings
@@ -34,6 +37,10 @@ import cn.wj.android.cashbook.core.model.model.GitDataModel
 import cn.wj.android.cashbook.core.model.model.RecordSettingsModel
 import cn.wj.android.cashbook.core.model.model.SearchHistoryModel
 import cn.wj.android.cashbook.core.model.model.TempKeysModel
+import java.security.KeyStore
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.spec.IvParameterSpec
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -74,7 +81,7 @@ class CombineProtoDataSource @Inject constructor(
             agreedProtocol = it.agreedProtocol,
             webDAVDomain = it.webDAVDomain,
             webDAVAccount = it.webDAVAccount,
-            webDAVPassword = it.webDAVPassword,
+            webDAVPassword = decryptWebDAVPassword(it.webDAVPassword),
             backupPath = it.backupPath,
             autoBackup = AutoBackupModeEnum.ordinalOf(it.autoBackup),
             lastBackupMs = it.lastBackupMs,
@@ -261,22 +268,22 @@ class CombineProtoDataSource @Inject constructor(
     }
 
     suspend fun updatePasswordIv(iv: String) {
-        logger().i("updatePasswordIv(iv = <$iv>)")
+        logger().i("updatePasswordIv()")
         appSettings.updateData { it.copy { this.passwordIv = iv } }
     }
 
     suspend fun updateFingerprintIv(iv: String) {
-        logger().i("updateFingerprintIv(iv = <$iv>)")
+        logger().i("updateFingerprintIv()")
         appSettings.updateData { it.copy { this.fingerprintIv = iv } }
     }
 
     suspend fun updatePasswordInfo(passwordInfo: String) {
-        logger().i("updatePasswordInfo(iv = <$passwordInfo>)")
+        logger().i("updatePasswordInfo()")
         appSettings.updateData { it.copy { this.passwordInfo = passwordInfo } }
     }
 
     suspend fun updateFingerprintPasswordInfo(fingerprintPasswordInfo: String) {
-        logger().i("updateFingerprintPasswordInfo(iv = <$fingerprintPasswordInfo>)")
+        logger().i("updateFingerprintPasswordInfo()")
         appSettings.updateData {
             it.copy {
                 this.fingerprintPasswordInfo = fingerprintPasswordInfo
@@ -305,7 +312,7 @@ class CombineProtoDataSource @Inject constructor(
             it.copy {
                 this.webDAVDomain = domain
                 this.webDAVAccount = account
-                this.webDAVPassword = password
+                this.webDAVPassword = encryptWebDAVPassword(password)
             }
         }
     }
@@ -357,5 +364,74 @@ class CombineProtoDataSource @Inject constructor(
 
     suspend fun updateLogcatInRelease(logcatInRelease: Boolean) {
         appSettings.updateData { it.copy { this.logcatInRelease = logcatInRelease } }
+    }
+
+    companion object {
+
+        private const val ANDROID_KEY_STORE = "AndroidKeyStore"
+        private const val WEBDAV_KEY_ALIAS = "CashbookWebDAVKey"
+        private const val AES_CBC_TRANSFORMATION =
+            KeyProperties.KEY_ALGORITHM_AES + "/" +
+                KeyProperties.BLOCK_MODE_CBC + "/" +
+                KeyProperties.ENCRYPTION_PADDING_PKCS7
+
+        /** 确保 WebDAV 密钥存在，不存在则生成 */
+        private fun ensureWebDAVKey(): java.security.Key {
+            val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+            keyStore.load(null)
+            if (!keyStore.containsAlias(WEBDAV_KEY_ALIAS)) {
+                val keyGenerator =
+                    KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
+                val builder = KeyGenParameterSpec.Builder(
+                    WEBDAV_KEY_ALIAS,
+                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
+                )
+                    .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                    .setUserAuthenticationRequired(false)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                keyGenerator.init(builder.build())
+                keyGenerator.generateKey()
+            }
+            return keyStore.getKey(WEBDAV_KEY_ALIAS, null)
+        }
+
+        /**
+         * 使用 AndroidKeyStore 加密 WebDAV 密码
+         *
+         * 返回格式: Base64(iv):Base64(encrypted)
+         */
+        fun encryptWebDAVPassword(plainText: String): String {
+            if (plainText.isBlank()) return plainText
+            val key = ensureWebDAVKey()
+            val cipher = Cipher.getInstance(AES_CBC_TRANSFORMATION)
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val iv = cipher.iv
+            val encrypted = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+            return Base64.encodeToString(iv, Base64.NO_WRAP) + ":" +
+                Base64.encodeToString(encrypted, Base64.NO_WRAP)
+        }
+
+        /**
+         * 使用 AndroidKeyStore 解密 WebDAV 密码
+         *
+         * 如果传入的字符串不含 ":" 分隔符（旧的明文数据），直接返回原文，保证向后兼容
+         */
+        fun decryptWebDAVPassword(encryptedText: String): String {
+            if (encryptedText.isBlank() || !encryptedText.contains(":")) return encryptedText
+            return try {
+                val parts = encryptedText.split(":")
+                val iv = Base64.decode(parts[0], Base64.NO_WRAP)
+                val encrypted = Base64.decode(parts[1], Base64.NO_WRAP)
+                val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+                keyStore.load(null)
+                val key = keyStore.getKey(WEBDAV_KEY_ALIAS, null)
+                val cipher = Cipher.getInstance(AES_CBC_TRANSFORMATION)
+                cipher.init(Cipher.DECRYPT_MODE, key, IvParameterSpec(iv))
+                String(cipher.doFinal(encrypted), Charsets.UTF_8)
+            } catch (_: Exception) {
+                // 解密失败，可能是旧的明文数据，直接返回原文
+                encryptedText
+            }
+        }
     }
 }

@@ -182,7 +182,7 @@ private fun MyBooksContent(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         content = {
-                            items(uiState.booksList) { item ->
+                            items(uiState.booksList, key = { it.data.id }) { item ->
                                 CbCard(
                                     modifier = Modifier
                                         .padding(horizontal = 16.dp)

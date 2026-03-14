@@ -204,7 +204,10 @@ private fun SearchScreen(
                         )
                     }
                 } else {
-                    items(count = recordList.itemCount) { index ->
+                    items(
+                        count = recordList.itemCount,
+                        key = { index -> recordList.peek(index)?.id ?: "placeholder_$index" },
+                    ) { index ->
                         recordList[index]?.let { item ->
                             RecordListItem(
                                 item = item,

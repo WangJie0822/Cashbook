@@ -123,7 +123,8 @@ constructor(
             for (i in 0 until headers.size) {
                 val name = headers.name(i)
                 if (!"Content-Type".equals(name, true) && !"Content-Length".equals(name, true)) {
-                    logStr.appendLine("\t${name.fixLength(headersMaxLength)}\t: \t${headers.value(i)}")
+                    val value = if (name in headersToRedact) "██" else headers.value(i)
+                    logStr.appendLine("\t${name.fixLength(headersMaxLength)}\t: \t$value")
                 }
             }
             logStr.appendLine(">> END Headers")

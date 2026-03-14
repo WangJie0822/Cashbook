@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import cn.wj.android.cashbook.core.common.ext.toMoneyString
@@ -45,12 +46,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import java.time.LocalDate
+import kotlinx.coroutines.launch
 import java.time.YearMonth
-import java.time.ZoneId
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -61,6 +62,19 @@ class LauncherContentViewModel @Inject constructor(
     private val recordRepository: RecordRepository,
     private val recordModelTransToViewsUseCase: RecordModelTransToViewsUseCase,
 ) : ViewModel() {
+
+    /** 标记 - 数据迁移是否已完成 */
+    private val _migrationCompleted = MutableStateFlow(false)
+
+    init {
+        viewModelScope.launch {
+            val tempKeys = settingRepository.tempKeysModel.first()
+            if (!tempKeys.db9To10DataMigrated) {
+                recordRepository.migrateAfter9To10()
+            }
+            _migrationCompleted.value = true
+        }
+    }
 
     /** 删除记录失败错误信息 */
     var shouldDisplayDeleteFailedBookmark by mutableIntStateOf(0)
@@ -80,43 +94,9 @@ class LauncherContentViewModel @Inject constructor(
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
-    /** 根据日期选择计算起止时间戳（毫秒） */
-    private fun computeDateRange(selection: DateSelectionEntity): Pair<Long, Long> {
-        val zone = ZoneId.systemDefault()
-        return when (selection) {
-            is DateSelectionEntity.ByDay -> {
-                val start = selection.date.atStartOfDay(zone).toInstant().toEpochMilli()
-                val end = selection.date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
-                start to end
-            }
-
-            is DateSelectionEntity.ByMonth -> {
-                val start = selection.yearMonth.atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
-                val end = selection.yearMonth.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
-                start to end
-            }
-
-            is DateSelectionEntity.ByYear -> {
-                val start = LocalDate.of(selection.year, 1, 1).atStartOfDay(zone).toInstant().toEpochMilli()
-                val end = LocalDate.of(selection.year + 1, 1, 1).atStartOfDay(zone).toInstant().toEpochMilli()
-                start to end
-            }
-
-            is DateSelectionEntity.DateRange -> {
-                val start = selection.from.atStartOfDay(zone).toInstant().toEpochMilli()
-                val end = selection.to.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
-                start to end
-            }
-
-            is DateSelectionEntity.All -> {
-                0L to Long.MAX_VALUE
-            }
-        }
-    }
-
     /** 轻量汇总数据（用于计算收支总额和每日汇总） */
     private val _summaryData: Flow<List<RecordViewSummaryModel>> = _dateSelection.flatMapLatest { selection ->
-        val (startDate, endDate) = computeDateRange(selection)
+        val (startDate, endDate) = selection.toDateRange()
         recordRepository.queryRecordViewSummariesFlow(startDate, endDate)
     }
 
@@ -131,7 +111,7 @@ class LauncherContentViewModel @Inject constructor(
 
     /** 分页记录数据 */
     val recordPagingData: Flow<PagingData<LauncherListItem>> = _dateSelection.flatMapLatest { selection ->
-        val (startDate, endDate) = computeDateRange(selection)
+        val (startDate, endDate) = selection.toDateRange()
         recordRepository.getRecordPagingData(startDate, endDate)
             .map { pagingData ->
                 pagingData.map { recordModel ->
@@ -163,16 +143,15 @@ class LauncherContentViewModel @Inject constructor(
                     }
                 }
             }
-    }
+    }.cachedIn(viewModelScope)
 
     /** 界面 UI 状态 */
     val uiState: StateFlow<LauncherContentUiState> = combine(
         _summaryData,
         booksRepository.currentBook,
-        settingRepository.tempKeysModel,
-    ) { summaryList, book, temp ->
-        if (!temp.db9To10DataMigrated) {
-            recordRepository.migrateAfter9To10()
+        _migrationCompleted,
+    ) { summaryList, book, migrationCompleted ->
+        if (!migrationCompleted) {
             LauncherContentUiState.Loading
         } else {
             var totalIncome = 0L

@@ -47,6 +47,7 @@ import androidx.room.PrimaryKey
         Index("asset_id"),
         Index("into_asset_id"),
         Index("record_time"),
+        Index("books_id", "record_time"),
     ],
 )
 data class RecordTable(

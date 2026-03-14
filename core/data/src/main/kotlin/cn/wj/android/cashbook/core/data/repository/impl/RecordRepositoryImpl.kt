@@ -122,13 +122,24 @@ class RecordRepositoryImpl @Inject constructor(
         typeId: Long,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean,
     ): List<RecordModel> = withContext(coroutineContext) {
-        recordDao.queryRecordByTypeId(
-            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
-            typeId = typeId,
-            pageNum = page * pageSize,
-            pageSize = pageSize,
-        ).map {
+        val booksId = combineProtoDataSource.recordSettingsData.first().currentBookId
+        if (includeChildTypes) {
+            recordDao.queryRecordByTypeId(
+                booksId = booksId,
+                typeId = typeId,
+                pageNum = page * pageSize,
+                pageSize = pageSize,
+            )
+        } else {
+            recordDao.queryRecordByTypeIdExact(
+                booksId = booksId,
+                typeId = typeId,
+                pageNum = page * pageSize,
+                pageSize = pageSize,
+            )
+        }.map {
             it.asModel()
         }
     }
@@ -138,6 +149,7 @@ class RecordRepositoryImpl @Inject constructor(
         dateRange: String,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean,
     ): List<RecordModel> = withContext(coroutineContext) {
         if (dateRange.isNotBlank()) {
             val startDate: Long
@@ -157,21 +169,41 @@ class RecordRepositoryImpl @Inject constructor(
                 startDate = "$dateRange-01-01 00:00:00".parseDateLong()
                 endDate = "$dateRange-12-31 23:59:59".parseDateLong()
             }
-            recordDao.queryRecordByTypeIdBetween(
-                booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
-                typeId = typeId,
-                startDate = startDate,
-                endDate = endDate,
-                pageNum = page * pageSize,
-                pageSize = pageSize,
-            )
+            if (includeChildTypes) {
+                recordDao.queryRecordByTypeIdBetween(
+                    booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
+                    typeId = typeId,
+                    startDate = startDate,
+                    endDate = endDate,
+                    pageNum = page * pageSize,
+                    pageSize = pageSize,
+                )
+            } else {
+                recordDao.queryRecordByTypeIdExactBetween(
+                    booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
+                    typeId = typeId,
+                    startDate = startDate,
+                    endDate = endDate,
+                    pageNum = page * pageSize,
+                    pageSize = pageSize,
+                )
+            }
         } else {
-            recordDao.queryRecordByTypeId(
-                booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
-                typeId = typeId,
-                pageNum = page * pageSize,
-                pageSize = pageSize,
-            )
+            if (includeChildTypes) {
+                recordDao.queryRecordByTypeId(
+                    booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
+                    typeId = typeId,
+                    pageNum = page * pageSize,
+                    pageSize = pageSize,
+                )
+            } else {
+                recordDao.queryRecordByTypeIdExact(
+                    booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
+                    typeId = typeId,
+                    pageNum = page * pageSize,
+                    pageSize = pageSize,
+                )
+            }
         }.map {
             it.asModel()
         }
@@ -385,13 +417,14 @@ class RecordRepositoryImpl @Inject constructor(
 
     override suspend fun deleteRecordsWithAsset(assetId: Long): Unit =
         withContext(coroutineContext) {
-            recordDao.deleteWithAsset(assetId)
+            // 事务化删除：标签关联、记录关联、图片关联、记录
+            transactionDao.deleteAssetRelatedData(assetId)
             recordDataVersion.updateVersion()
         }
 
     override suspend fun deleteRecordRelatedWithAsset(assetId: Long): Unit =
         withContext(coroutineContext) {
-            recordDao.deleteRelatedWithAsset(assetId)
+            // 已由 deleteRecordsWithAsset 中的事务方法统一处理，此处保留为空操作以兼容接口
         }
 
     override suspend fun addSearchHistory(keyword: String): Unit = withContext(coroutineContext) {

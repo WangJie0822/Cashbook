@@ -41,6 +41,7 @@ class GetTypeRecordViewsUseCase @Inject constructor(
         dateRange: String,
         pageNum: Int,
         pageSize: Int,
+        includeChildTypes: Boolean = true,
     ): List<RecordViewsEntity> = withContext(coroutineContext) {
         if (typeId == -1L) {
             return@withContext emptyList()
@@ -51,12 +52,14 @@ class GetTypeRecordViewsUseCase @Inject constructor(
                 dateRange = dateRange,
                 page = pageNum,
                 pageSize = pageSize,
+                includeChildTypes = includeChildTypes,
             )
         } else {
             recordRepository.queryPagingRecordListByTypeId(
                 typeId = typeId,
                 page = pageNum,
                 pageSize = pageSize,
+                includeChildTypes = includeChildTypes,
             )
         }
             .sortedByDescending { it.recordTime }

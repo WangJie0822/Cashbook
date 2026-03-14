@@ -198,17 +198,31 @@ class FakeTransactionDao : TransactionDao {
         deleteBookCalled = true
     }
 
+    override suspend fun deleteTagRelationsByBookId(bookId: Long) {
+        val recordIds = records.filter { it.booksId == bookId }.mapNotNull { it.id }
+        tagWithRecords.removeAll { it.recordId in recordIds }
+    }
+
+    override suspend fun deleteRecordRelationsByBookId(bookId: Long) {
+        val recordIds = records.filter { it.booksId == bookId }.mapNotNull { it.id }
+        relatedRecords.removeAll { it.recordId in recordIds || it.relatedRecordId in recordIds }
+    }
+
+    override suspend fun deleteImageRelationsByBookId(bookId: Long) {
+        val recordIds = records.filter { it.booksId == bookId }.mapNotNull { it.id }
+        imageWithRecords.removeAll { it.recordId in recordIds }
+    }
+
+    override suspend fun deleteRecordsByBookId(bookId: Long) {
+        records.removeAll { it.booksId == bookId }
+    }
+
     override suspend fun deleteBookTransaction(bookId: Long) {
-        // 简化实现：删除账本下的记录和账本本身
-        val bookRecords = records.filter { it.booksId == bookId }
-        bookRecords.forEach { record ->
-            val id = record.id
-            if (id != null) {
-                deleteTagRelationByRecordId(id)
-                deleteRecordRelationByRecordId(id)
-            }
-            deleteRecord(record)
-        }
+        // 简化实现：批量删除账本下的关联数据和记录
+        deleteTagRelationsByBookId(bookId)
+        deleteRecordRelationsByBookId(bookId)
+        deleteImageRelationsByBookId(bookId)
+        deleteRecordsByBookId(bookId)
         deleteBookById(bookId)
         deleteBookCalled = true
     }
@@ -219,7 +233,29 @@ class FakeTransactionDao : TransactionDao {
         deleteTagCalled = true
     }
 
-    // 注意：insertRecordTransaction、updateRecordTransaction、deleteRecordTransaction
+    override suspend fun deleteTagRelationsByAssetId(assetId: Long) {
+        val recordIds = records.filter { it.assetId == assetId || it.intoAssetId == assetId }
+            .mapNotNull { it.id }
+        tagWithRecords.removeAll { it.recordId in recordIds }
+    }
+
+    override suspend fun deleteRecordRelationsByAssetId(assetId: Long) {
+        val recordIds = records.filter { it.assetId == assetId || it.intoAssetId == assetId }
+            .mapNotNull { it.id }
+        relatedRecords.removeAll { it.recordId in recordIds || it.relatedRecordId in recordIds }
+    }
+
+    override suspend fun deleteImageRelationsByAssetId(assetId: Long) {
+        val recordIds = records.filter { it.assetId == assetId || it.intoAssetId == assetId }
+            .mapNotNull { it.id }
+        imageWithRecords.removeAll { it.recordId in recordIds }
+    }
+
+    override suspend fun deleteRecordsByAssetId(assetId: Long) {
+        records.removeAll { it.assetId == assetId || it.intoAssetId == assetId }
+    }
+
+    // 注意：insertRecordTransaction、updateRecordTransaction、deleteRecordTransaction、deleteAssetRelatedData
     // 使用了默认实现（@Transaction 注解方法），会调用上面的基础方法
     // 在 Fake 中不需要重新实现事务方法，因为测试不会直接调用它们
     // Repository 层通过调用这些事务方法来间接使用基础方法

@@ -31,8 +31,6 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.data)
 
-    implementation(projects.repos.mpChartLib)
-
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.paging.compose)
 

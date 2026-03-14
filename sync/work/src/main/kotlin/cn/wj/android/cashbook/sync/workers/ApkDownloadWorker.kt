@@ -103,30 +103,25 @@ class ApkDownloadWorker @AssistedInject constructor(
                 var len: Int
                 var sum = 0L
 
-                var fos: FileOutputStream? = FileOutputStream(saveFile)
-                response.body!!.byteStream().use { inputStream ->
-                    while (inputStream.read(buf).also { len = it } != -1) {
-                        if (!isActive) {
-                            // 已停止
-                            logger().d("doWork stopped")
-                            appUpgradeManager.downloadStopped()
-                            return@withContext Result.failure()
+                FileOutputStream(saveFile).use { fos ->
+                    response.body!!.byteStream().use { inputStream ->
+                        while (inputStream.read(buf).also { len = it } != -1) {
+                            if (!isActive) {
+                                // 已停止
+                                logger().d("doWork stopped")
+                                appUpgradeManager.downloadStopped()
+                                return@withContext Result.failure()
+                            }
+                            fos.write(buf, 0, len)
+                            sum += len.toLong()
+                            val progress = (sum * 1f / total * 100).toInt()
+                            appUpgradeManager.updateDownloadProgress(progress)
                         }
-                        fos?.write(buf, 0, len)
-                        sum += len.toLong()
-                        val progress = (sum * 1f / total * 100).toInt()
-                        appUpgradeManager.updateDownloadProgress(progress)
+                        fos.flush()
+                        // 下载完成
+                        logger().d("doWork download finish")
+                        appUpgradeManager.downloadComplete(saveFile)
                     }
-                    fos?.flush()
-                    // 下载完成
-                    logger().d("doWork download finish")
-                    appUpgradeManager.downloadComplete(saveFile)
-                }
-                try {
-                    fos?.close()
-                    fos = null
-                } catch (throwable: Throwable) {
-                    logger().e(throwable, "doWork fos close")
                 }
             }
             return@withContext Result.success()

@@ -40,6 +40,7 @@ private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
 private const val ROUTE_EDIT_RECORD_KEY_TAG_ID = "tagId"
 private const val ROUTE_EDIT_RECORD_KEY_ASSET_ID = "assetId"
 private const val ROUTE_EDIT_RECORD_KEY_DATE = "date"
+private const val ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES = "includeChildTypes"
 
 /** 路由 - 数据分析 */
 private const val ROUTE_ANALYTICS = "record/analytics"
@@ -49,7 +50,8 @@ private const val ROUTE_TYPED_ANALYTICS =
     "record/typed_analytics" +
         "?$ROUTE_EDIT_RECORD_KEY_TAG_ID={$ROUTE_EDIT_RECORD_KEY_TAG_ID}" +
         "&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}" +
-        "&$ROUTE_EDIT_RECORD_KEY_DATE={$ROUTE_EDIT_RECORD_KEY_DATE}"
+        "&$ROUTE_EDIT_RECORD_KEY_DATE={$ROUTE_EDIT_RECORD_KEY_DATE}" +
+        "&$ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES={$ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES}"
 
 /** 路由 - 编辑记录 */
 const val ROUTE_EDIT_RECORD =
@@ -88,6 +90,7 @@ fun NavController.naviToTypedAnalytics(
     tagId: Long = -1L,
     typeId: Long = -1L,
     date: String? = null,
+    includeChildTypes: Boolean = true,
 ) {
     this.navigate(
         ROUTE_TYPED_ANALYTICS
@@ -102,6 +105,10 @@ fun NavController.naviToTypedAnalytics(
             .replace(
                 oldValue = "{$ROUTE_EDIT_RECORD_KEY_DATE}",
                 newValue = date.orEmpty(),
+            )
+            .replace(
+                oldValue = "{$ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES}",
+                newValue = includeChildTypes.toString(),
             ),
     )
 }
@@ -159,7 +166,7 @@ fun NavGraphBuilder.editRecordScreen(
 }
 
 fun NavGraphBuilder.analyticsScreen(
-    onRequestNaviToTypeAnalytics: (Long, String?) -> Unit,
+    onRequestNaviToTypeAnalytics: (Long, String?, Boolean) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
     composable(
@@ -192,12 +199,18 @@ fun NavGraphBuilder.typedAnalyticsScreen(
                 type = NavType.StringType
                 defaultValue = ""
             },
+            navArgument(ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES) {
+                type = NavType.BoolType
+                defaultValue = true
+            },
         ),
     ) {
         TypedAnalyticsRoute(
             typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
             tagId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TAG_ID) ?: -1L,
             date = it.arguments?.getString(ROUTE_EDIT_RECORD_KEY_DATE) ?: "",
+            includeChildTypes = it.arguments?.getBoolean(ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES)
+                ?: true,
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,

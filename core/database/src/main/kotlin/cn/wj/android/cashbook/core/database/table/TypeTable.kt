@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.table
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -37,7 +38,13 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
  */
-@Entity(tableName = TABLE_TYPE)
+@Entity(
+    tableName = TABLE_TYPE,
+    indices = [
+        Index("type_category"),
+        Index("parent_id"),
+    ],
+)
 data class TypeTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = TABLE_TYPE_ID)

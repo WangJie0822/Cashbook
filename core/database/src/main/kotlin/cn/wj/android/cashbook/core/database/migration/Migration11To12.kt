@@ -182,18 +182,33 @@ object Migration11To12 : Migration(11, 12) {
     private const val SQL_INDEX_IMAGE_RECORD_ID =
         "CREATE INDEX IF NOT EXISTS `index_db_image_with_related_record_id` ON `db_image_with_related`(`record_id`)"
 
+    @Language("SQL")
+    private const val SQL_INDEX_RECORD_BOOKS_ID_RECORD_TIME =
+        "CREATE INDEX IF NOT EXISTS `index_db_record_books_id_record_time` ON `db_record`(`books_id`, `record_time`)"
+
+    @Language("SQL")
+    private const val SQL_INDEX_TYPE_PARENT_ID =
+        "CREATE INDEX IF NOT EXISTS `index_db_type_parent_id` ON `db_type`(`parent_id`)"
+
+    @Language("SQL")
+    private const val SQL_INDEX_TYPE_CATEGORY =
+        "CREATE INDEX IF NOT EXISTS `index_db_type_type_category` ON `db_type`(`type_category`)"
+
     private fun SupportSQLiteDatabase.createIndices() {
         execSQL(SQL_INDEX_RECORD_BOOKS_ID)
         execSQL(SQL_INDEX_RECORD_TYPE_ID)
         execSQL(SQL_INDEX_RECORD_ASSET_ID)
         execSQL(SQL_INDEX_RECORD_INTO_ASSET_ID)
         execSQL(SQL_INDEX_RECORD_TIME)
+        execSQL(SQL_INDEX_RECORD_BOOKS_ID_RECORD_TIME)
         execSQL(SQL_INDEX_RELATED_RECORD_ID)
         execSQL(SQL_INDEX_RELATED_RELATED_ID)
         execSQL(SQL_INDEX_TAG_RECORD_RECORD_ID)
         execSQL(SQL_INDEX_TAG_RECORD_TAG_ID)
         execSQL(SQL_INDEX_ASSET_BOOKS_ID)
         execSQL(SQL_INDEX_IMAGE_RECORD_ID)
+        execSQL(SQL_INDEX_TYPE_PARENT_ID)
+        execSQL(SQL_INDEX_TYPE_CATEGORY)
     }
 
     // endregion

@@ -18,12 +18,10 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
-import cn.wj.android.cashbook.core.common.ext.yearMonth
-import cn.wj.android.cashbook.core.common.tools.toMs
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -39,31 +37,9 @@ class GetRecordViewsBetweenDateUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
-        fromDate: LocalDate,
-        toDate: LocalDate?,
-        yearSelected: Boolean,
+        dateSelection: DateSelectionEntity,
     ): List<RecordViewsModel> = withContext(coroutineContext) {
-        val from: Long
-        val to: Long
-        when {
-            yearSelected -> {
-                from = LocalDate.of(fromDate.year, 1, 1).toMs()
-                // 下一年的第一天零点 - 1ms 即为本年最后一刻
-                to = LocalDate.of(fromDate.year + 1, 1, 1).toMs() - 1L
-            }
-
-            null == toDate -> {
-                from = LocalDate.of(fromDate.year, fromDate.monthValue, 1).toMs()
-                // 下月第一天零点 - 1ms
-                to = fromDate.yearMonth.atEndOfMonth().plusDays(1).toMs() - 1L
-            }
-
-            else -> {
-                from = fromDate.toMs()
-                // 结束日期的次日零点 - 1ms
-                to = toDate.plusDays(1).toMs() - 1L
-            }
-        }
+        val (from, to) = dateSelection.toDateRange()
         recordRepository.queryRecordListBetweenDate(from, to)
             .map {
                 recordModelTransToViewsUseCase(it)

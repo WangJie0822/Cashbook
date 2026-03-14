@@ -16,6 +16,8 @@
 
 package cn.wj.android.cashbook.core.model.entity
 
+import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
+
 data class AnalyticsRecordBarEntity(
     val date: String,
     /** 支出，单位：分 */
@@ -24,5 +26,6 @@ data class AnalyticsRecordBarEntity(
     val income: Long,
     /** 结余，单位：分 */
     val balance: Long,
-    val year: Boolean,
+    /** 聚合粒度 */
+    val granularity: AnalyticsBarGranularity,
 )

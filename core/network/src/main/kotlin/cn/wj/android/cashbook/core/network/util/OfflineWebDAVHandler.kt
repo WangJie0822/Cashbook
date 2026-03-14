@@ -42,5 +42,5 @@ class OfflineWebDAVHandler @Inject constructor() : WebDAVHandler {
 
     override suspend fun list(url: String, propsList: List<String>): List<BackupModel> = emptyList()
 
-    override suspend fun get(url: String): InputStream? = null
+    override suspend fun get(url: String): ByteArray? = null
 }

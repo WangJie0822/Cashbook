@@ -16,6 +16,8 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
+import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
@@ -29,6 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
+import java.time.YearMonth
 
 class TransRecordViewsToAnalyticsBarUseCaseTest {
 
@@ -47,23 +50,20 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
     @Test
     fun when_year_selected_then_generates_12_entries() = runTest {
         val result = useCase(
-            fromDate = LocalDate.of(2024, 1, 1),
-            toDate = null,
-            yearSelected = true,
+            dateSelection = DateSelectionEntity.ByYear(2024),
             recordViewsList = emptyList(),
         )
 
         assertThat(result).hasSize(12)
         assertThat(result.first().date).isEqualTo("2024-01")
         assertThat(result.last().date).isEqualTo("2024-12")
+        assertThat(result.first().granularity).isEqualTo(AnalyticsBarGranularity.MONTH)
     }
 
     @Test
     fun when_month_selected_then_generates_entries_for_each_day() = runTest {
         val result = useCase(
-            fromDate = LocalDate.of(2024, 2, 1),
-            toDate = null,
-            yearSelected = false,
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 2)),
             recordViewsList = emptyList(),
         )
 
@@ -71,20 +71,77 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         assertThat(result).hasSize(29)
         assertThat(result.first().date).isEqualTo("2024-02-01")
         assertThat(result.last().date).isEqualTo("2024-02-29")
+        assertThat(result.first().granularity).isEqualTo(AnalyticsBarGranularity.DAY)
     }
 
     @Test
     fun when_date_range_then_generates_entries_for_range() = runTest {
         val result = useCase(
-            fromDate = LocalDate.of(2024, 3, 1),
-            toDate = LocalDate.of(2024, 3, 5),
-            yearSelected = false,
+            dateSelection = DateSelectionEntity.DateRange(
+                from = LocalDate.of(2024, 3, 1),
+                to = LocalDate.of(2024, 3, 5),
+            ),
             recordViewsList = emptyList(),
         )
 
         assertThat(result).hasSize(5)
         assertThat(result.first().date).isEqualTo("2024-03-01")
         assertThat(result.last().date).isEqualTo("2024-03-05")
+        assertThat(result.first().granularity).isEqualTo(AnalyticsBarGranularity.DAY)
+    }
+
+    @Test
+    fun when_by_day_then_generates_single_entry() = runTest {
+        val result = useCase(
+            dateSelection = DateSelectionEntity.ByDay(LocalDate.of(2024, 3, 15)),
+            recordViewsList = emptyList(),
+        )
+
+        assertThat(result).hasSize(1)
+        assertThat(result.first().date).isEqualTo("2024-03-15")
+        assertThat(result.first().granularity).isEqualTo(AnalyticsBarGranularity.DAY)
+    }
+
+    @Test
+    fun when_all_selected_then_aggregates_by_year() = runTest {
+        val expenditureType = createRecordTypeModel(
+            id = 1L,
+            typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        )
+        val records = listOf(
+            createRecordViewsModel(
+                type = expenditureType,
+                finalAmount = 10000L,
+                recordTime = 1704081600000L, // 2024-01-01 12:00
+            ),
+            createRecordViewsModel(
+                type = expenditureType,
+                finalAmount = 20000L,
+                recordTime = 1735718400000L, // 2025-01-01 12:00
+            ),
+        )
+
+        val result = useCase(
+            dateSelection = DateSelectionEntity.All,
+            recordViewsList = records,
+        )
+
+        assertThat(result).hasSize(2)
+        assertThat(result.first().date).isEqualTo("2024")
+        assertThat(result.first().expenditure).isEqualTo(10000L)
+        assertThat(result.last().date).isEqualTo("2025")
+        assertThat(result.last().expenditure).isEqualTo(20000L)
+        assertThat(result.first().granularity).isEqualTo(AnalyticsBarGranularity.YEAR)
+    }
+
+    @Test
+    fun when_all_selected_with_no_records_then_empty_list() = runTest {
+        val result = useCase(
+            dateSelection = DateSelectionEntity.All,
+            recordViewsList = emptyList(),
+        )
+
+        assertThat(result).isEmpty()
     }
 
     @Test
@@ -107,9 +164,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         )
 
         val result = useCase(
-            fromDate = LocalDate.of(2024, 1, 1),
-            toDate = null,
-            yearSelected = false,
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
             recordViewsList = records,
         )
 
@@ -134,9 +189,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         )
 
         val result = useCase(
-            fromDate = LocalDate.of(2024, 1, 1),
-            toDate = null,
-            yearSelected = false,
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
             recordViewsList = records,
         )
 
@@ -180,9 +233,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         )
 
         val result = useCase(
-            fromDate = LocalDate.of(2024, 1, 1),
-            toDate = null,
-            yearSelected = false,
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
             recordViewsList = records,
         )
 
@@ -213,9 +264,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         )
 
         val result = useCase(
-            fromDate = LocalDate.of(2024, 1, 1),
-            toDate = null,
-            yearSelected = true,
+            dateSelection = DateSelectionEntity.ByYear(2024),
             recordViewsList = records,
         )
 

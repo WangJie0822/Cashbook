@@ -337,7 +337,7 @@ internal fun CalendarScreen(
                                     )
                                 }
                             } else {
-                                items(uiState.recordList) {
+                                items(uiState.recordList, key = { it.id }) {
                                     RecordListItem(
                                         item = it,
                                         showDate = false,
