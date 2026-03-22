@@ -125,7 +125,7 @@ class XxxScreenshotTests {
 | EditRecordScreen | `EditRecordScreenScreenshotTests.kt` | Loading、支出编辑、收入编辑、转账编辑、显示计算器 |
 | AnalyticsScreen | `AnalyticsScreenScreenshotTests.kt` | Loading、有数据（饼图+折线图）、无数据、展开 DatePopup |
 | CalendarScreen | `CalendarScreenScreenshotTests.kt` | Loading、有日历数据、选中某日展示记录列表 |
-| SearchScreen | `SearchScreenScreenshotTests.kt` | 空搜索、有搜索结果、无结果 |
+| SearchScreen | `SearchScreenScreenshotTests.kt` | 空搜索、有搜索结果、无结果（独立参数，非 sealed UiState，需构造 LazyPagingItems） |
 | SelectRelatedRecordScreen | `SelectRelatedRecordScreenScreenshotTests.kt` | Loading、有关联记录列表、空列表 |
 | TypedAnalyticsScreen | `TypedAnalyticsScreenScreenshotTests.kt` | Loading、有分类统计数据、无数据 |
 | AssetInfoContentScreen | `AssetInfoContentScreenScreenshotTests.kt` | Loading、有资产记录、空记录 |
@@ -134,11 +134,11 @@ class XxxScreenshotTests {
 
 | Screen | 测试文件 | 状态变体 |
 |--------|---------|---------|
-| LauncherScreen | `LauncherScreenScreenshotTests.kt` | Loading、正常主界面、显示书签提示 |
+| LauncherScreen | `LauncherScreenScreenshotTests.kt` | Loading、Success（正常主界面） |
 | SettingScreen | `SettingScreenScreenshotTests.kt` | Loading、Success（各开关状态）、暗色模式对话框、密码对话框 |
 | BackupAndRecoveryScreen | `BackupAndRecoveryScreenScreenshotTests.kt` | Loading、有备份数据、WebDAV 已/未配置 |
 | AboutUsScreen | `AboutUsScreenScreenshotTests.kt` | Loading、正常展示 |
-| MarkdownScreen | `MarkdownScreenScreenshotTests.kt` | Loading、有 Markdown 内容 |
+| MarkdownScreen | `MarkdownScreenScreenshotTests.kt` | 空内容、有 Markdown 内容（接收 String 参数，无 sealed UiState） |
 
 ### feature/assets（5 个）
 
