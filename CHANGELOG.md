@@ -29,6 +29,9 @@
 - 修复按资产查询记录时遗漏转入资产（into_asset_id）关联记录的问题；
 - 新增资产余额校验方法，支持检测因异常导致的余额偏差；
 - 新增记录插入前对类型和资产的防御性校验，防止引用不存在的数据；
+### Tests
+- 新增 6 个 DAO 仪器测试类（BooksDaoTest、AssetDaoTest、TagDaoTest、TypeDaoTest、RecordDaoTest、TransactionDaoTest），共 86 个测试方法，覆盖全部 DAO 的 SQL 查询、事务操作及资产余额计算逻辑；
+- 修复 DatabaseTest.recovery_from_database 中缺少 final_amount 字段导致 NOT NULL 约束失败的问题；
 
 ## [1.0.8_25042622]
 ### Add
