@@ -17,6 +17,7 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
