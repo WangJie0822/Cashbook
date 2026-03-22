@@ -46,7 +46,7 @@ class InvisibleAssetScreenScreenshotTests {
     private val assetTypedList = listOf(
         AssetTypeViewsModel(
             type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
-            nameResId = 0,
+            nameResId = android.R.string.ok,
             totalAmount = 500000L,
             assetList = listOf(
                 createAssetModel(

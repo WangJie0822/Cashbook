@@ -55,14 +55,14 @@ class AnalyticsScreenScreenshotTests {
         noData = false,
         barDataList = listOf(
             AnalyticsRecordBarEntity(
-                date = "01",
+                date = "2024-01-01",
                 expenditure = 100_00L,
                 income = 200_00L,
                 balance = 100_00L,
                 granularity = AnalyticsBarGranularity.DAY,
             ),
             AnalyticsRecordBarEntity(
-                date = "02",
+                date = "2024-01-02",
                 expenditure = 150_00L,
                 income = 50_00L,
                 balance = -100_00L,
@@ -73,7 +73,7 @@ class AnalyticsScreenScreenshotTests {
             AnalyticsRecordPieEntity(
                 typeId = 1L,
                 typeName = "餐饮",
-                typeIconResName = "vector_type_food",
+                typeIconResName = "vector_type_three_meals_24",
                 typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
                 totalAmount = 200_00L,
                 percent = 0.6f,
@@ -81,7 +81,7 @@ class AnalyticsScreenScreenshotTests {
             AnalyticsRecordPieEntity(
                 typeId = 2L,
                 typeName = "交通",
-                typeIconResName = "vector_type_traffic",
+                typeIconResName = "vector_type_traffic_24",
                 typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
                 totalAmount = 100_00L,
                 percent = 0.4f,
@@ -91,7 +91,7 @@ class AnalyticsScreenScreenshotTests {
             AnalyticsRecordPieEntity(
                 typeId = 3L,
                 typeName = "工资",
-                typeIconResName = "vector_type_salary",
+                typeIconResName = "vector_type_salary_24",
                 typeCategory = RecordTypeCategoryEnum.INCOME,
                 totalAmount = 500_00L,
                 percent = 1.0f,

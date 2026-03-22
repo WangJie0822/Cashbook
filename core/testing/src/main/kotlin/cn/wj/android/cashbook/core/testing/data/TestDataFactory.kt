@@ -63,7 +63,7 @@ fun createAssetModel(
     id: Long = -1L,
     booksId: Long = 1L,
     name: String = "测试资产",
-    iconResId: Int = 0,
+    iconResId: Int = android.R.drawable.ic_menu_camera,
     totalAmount: Long = 0L,
     billingDate: String = "",
     repaymentDate: String = "",

@@ -24,10 +24,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainter
+import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHint
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.RoborazziOptions
@@ -75,6 +79,8 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
     this.activity.setContent {
         CompositionLocalProvider(
             LocalInspectionMode provides true,
+            LocalDefaultLoadingHint provides "数据加载中",
+            LocalDefaultEmptyImagePainter provides ColorPainter(Color.Gray),
         ) {
             TestHarness(darkMode = darkMode) {
                 body()
@@ -108,6 +114,8 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
     this.setContent {
         CompositionLocalProvider(
             LocalInspectionMode provides true,
+            LocalDefaultLoadingHint provides "数据加载中",
+            LocalDefaultEmptyImagePainter provides ColorPainter(Color.Gray),
         ) {
             CashbookTheme(
                 darkTheme = darkMode,

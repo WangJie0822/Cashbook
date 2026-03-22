@@ -51,7 +51,7 @@ class TypedAnalyticsScreenScreenshotTests {
             typeId = 1L,
             typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
             typeName = "餐饮",
-            typeIconResName = "vector_type_food",
+            typeIconResName = "vector_type_three_meals_24",
             assetId = null,
             assetName = null,
             assetIconResId = null,

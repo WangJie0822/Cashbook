@@ -54,7 +54,7 @@ class MyAssetScreenScreenshotTests {
     private val assetTypedListData = listOf(
         AssetTypeViewsModel(
             type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
-            nameResId = 0,
+            nameResId = android.R.string.ok,
             totalAmount = 1000000L,
             assetList = listOf(
                 createAssetModel(

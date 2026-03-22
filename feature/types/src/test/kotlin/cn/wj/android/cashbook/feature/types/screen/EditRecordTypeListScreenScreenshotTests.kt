@@ -17,7 +17,10 @@
 package cn.wj.android.cashbook.feature.types.screen
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -116,6 +119,7 @@ class EditRecordTypeListScreenScreenshotTests {
                 typeList = emptyList(),
                 onTypeSelect = {},
                 onTypeSettingClick = {},
+                modifier = Modifier.defaultMinSize(minHeight = 120.dp),
             )
         }
     }
@@ -143,6 +147,7 @@ class EditRecordTypeListScreenScreenshotTests {
                     typeList = emptyList(),
                     onTypeSelect = {},
                     onTypeSettingClick = {},
+                    modifier = Modifier.defaultMinSize(minHeight = 120.dp),
                 )
             }
         }
