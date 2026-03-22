@@ -32,6 +32,7 @@
 ### Tests
 - 新增 6 个 DAO 仪器测试类（BooksDaoTest、AssetDaoTest、TagDaoTest、TypeDaoTest、RecordDaoTest、TransactionDaoTest），共 86 个测试方法，覆盖全部 DAO 的 SQL 查询、事务操作及资产余额计算逻辑；
 - 修复 DatabaseTest.recovery_from_database 中缺少 final_amount 字段导致 NOT NULL 约束失败的问题；
+- 新增 Roborazzi UI 截图测试，覆盖 core/design（22 组件）、core/ui（3 组件）和全部 feature Screen（24 页面），共 50 个测试类、164 个测试方法；基准截图需在 CI（Linux）环境生成；
 
 ## [1.0.8_25042622]
 ### Add
