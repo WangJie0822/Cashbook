@@ -43,4 +43,11 @@ dependencies {
     api(libs.androidx.compose.ui.util)
     api(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material.icons.extended)
+
+    testImplementation(libs.androidx.compose.ui.test.manifest)
+    testImplementation(libs.google.accompanist.testharness)
+    testImplementation(libs.google.hilt.android.testing)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.takahirom.roborazzi)
+    testImplementation(projects.core.testing)
 }
