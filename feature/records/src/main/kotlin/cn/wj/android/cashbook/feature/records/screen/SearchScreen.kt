@@ -85,7 +85,7 @@ internal fun SearchRoute(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun SearchScreen(
+internal fun SearchScreen(
     viewRecord: RecordViewsEntity?,
     onRequestShowRecordDetailSheet: (RecordViewsEntity) -> Unit,
     onRequestDismissBottomSheet: () -> Unit,

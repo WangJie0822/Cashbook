@@ -87,7 +87,7 @@ internal fun TypedAnalyticsRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TypedAnalyticsScreen(
+internal fun TypedAnalyticsScreen(
     viewRecord: RecordViewsEntity?,
     onRequestShowRecordDetailsSheet: (RecordViewsEntity) -> Unit,
     onRequestDismissBottomSheet: () -> Unit,

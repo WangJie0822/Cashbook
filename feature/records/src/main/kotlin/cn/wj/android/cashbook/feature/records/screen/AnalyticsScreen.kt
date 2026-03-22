@@ -120,7 +120,7 @@ internal fun AnalyticsRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AnalyticsScreen(
+internal fun AnalyticsScreen(
     dateSelection: DateSelectionEntity,
     showDatePopup: Boolean,
     onDateClick: () -> Unit,

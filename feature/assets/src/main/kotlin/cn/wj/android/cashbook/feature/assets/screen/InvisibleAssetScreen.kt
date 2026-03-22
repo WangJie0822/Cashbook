@@ -60,7 +60,7 @@ internal fun InvisibleAssetRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun InvisibleAssetScreen(
+internal fun InvisibleAssetScreen(
     assetTypedList: List<AssetTypeViewsModel>,
     onAssetItemClick: (Long) -> Unit,
     onRequestVisibleAsset: (Long) -> Unit,
