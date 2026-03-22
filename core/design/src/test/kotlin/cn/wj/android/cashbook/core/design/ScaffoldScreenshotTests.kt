@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.design
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import org.robolectric.annotation.LooperMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(application = HiltTestApplication::class, qualifiers = "480dpi")
 @LooperMode(LooperMode.Mode.PAUSED)
+@OptIn(ExperimentalMaterial3Api::class)
 class ScaffoldScreenshotTests {
 
     @get:Rule

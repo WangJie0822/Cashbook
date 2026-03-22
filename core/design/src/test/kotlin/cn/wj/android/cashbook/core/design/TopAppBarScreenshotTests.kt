@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.core.design
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -37,6 +38,7 @@ import org.robolectric.annotation.LooperMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(application = HiltTestApplication::class, qualifiers = "480dpi")
 @LooperMode(LooperMode.Mode.PAUSED)
+@OptIn(ExperimentalMaterial3Api::class)
 class TopAppBarScreenshotTests {
 
     @get:Rule

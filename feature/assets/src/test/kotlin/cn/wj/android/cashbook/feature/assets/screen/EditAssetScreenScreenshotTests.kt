@@ -61,7 +61,7 @@ class EditAssetScreenScreenshotTests {
     private val editAssetUiState = EditAssetUiState.Success(
         typeEnable = false,
         isCreditCard = true,
-        classification = AssetClassificationEnum.BANK_OF_CHINA,
+        classification = AssetClassificationEnum.CREDIT_CARD,
         assetName = "中国银行信用卡",
         totalAmount = "50,000.00",
         balance = "12,345.67",
