@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_CREDIT_CARD_PAYMENT
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.testing.data.createAssetModel
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
@@ -87,10 +88,9 @@ class GetAssetListUseCaseTest {
         )
         assetRepository.addAsset(capitalAsset)
         assetRepository.addAsset(creditAsset)
-        typeRepository.setCreditPayment(5L)
 
         val result = useCase(
-            currentTypeId = 5L,
+            currentTypeId = FIXED_TYPE_ID_CREDIT_CARD_PAYMENT,
             selectedAssetId = -1L,
             isRelated = true,
         ).first()

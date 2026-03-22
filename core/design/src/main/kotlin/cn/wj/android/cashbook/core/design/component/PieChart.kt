@@ -354,6 +354,7 @@ private fun DrawScope.calculateLeaderLineLayouts(
         }
 
         val percent = (slice.value * 100f)
+
         @Suppress("DefaultLocale")
         val labelText = "${slice.label} ${String.format("%.1f%%", percent)}"
 

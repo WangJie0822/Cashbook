@@ -51,6 +51,7 @@ import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
+import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.model.BackupModel
 import cn.wj.android.cashbook.core.network.util.WebDAVHandler
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -84,6 +85,7 @@ class BackupRecoveryManagerImpl @Inject constructor(
     private val settingRepository: SettingRepository,
     private val webDAVHandler: WebDAVHandler,
     private val database: CashbookDatabase,
+    private val combineProtoDataSource: CombineProtoDataSource,
     @ApplicationContext private val context: Context,
     @Dispatcher(CashbookDispatchers.IO) private val ioCoroutineContext: CoroutineContext,
 ) : BackupRecoveryManager {
@@ -600,6 +602,20 @@ class BackupRecoveryManagerImpl @Inject constructor(
             )
             val currentDatabase = database.openHelper.writableDatabase
             if (DatabaseMigrations.recoveryFromDb(backupDatabase, currentDatabase)) {
+                // 确保固定类型行存在（旧版备份可能不包含）
+                currentDatabase.execSQL(
+                    "INSERT OR IGNORE INTO db_type (id, parent_id, name, icon_name, type_level, type_category, protected, sort) VALUES (-2001, -1, '退款', 'vector_type_refund_24', 0, 1, 1, 0)",
+                )
+                currentDatabase.execSQL(
+                    "INSERT OR IGNORE INTO db_type (id, parent_id, name, icon_name, type_level, type_category, protected, sort) VALUES (-2002, -1, '报销', 'vector_type_reimburse_24', 0, 1, 1, 0)",
+                )
+                currentDatabase.execSQL(
+                    "INSERT OR IGNORE INTO db_type (id, parent_id, name, icon_name, type_level, type_category, protected, sort) VALUES (-2003, -1, '信用卡还款', 'vector_type_credit_card_payment_24', 0, 2, 1, 0)",
+                )
+                // 重置迁移标志，下次启动时自动触发应用层迁移
+                combineProtoDataSource.updateRefundTypeId(0L)
+                combineProtoDataSource.updateReimburseTypeId(0L)
+                combineProtoDataSource.updateCreditCardPaymentTypeId(0L)
                 BackupRecoveryState.SUCCESS_RECOVERY
             } else {
                 BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED

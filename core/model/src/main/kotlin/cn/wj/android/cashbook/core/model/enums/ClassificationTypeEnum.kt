@@ -21,10 +21,14 @@ package cn.wj.android.cashbook.core.model.enums
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/2
  */
-enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
+enum class ClassificationTypeEnum(
+    val code: Int,
+    val array: Array<AssetClassificationEnum>,
+) {
 
     /** 资金账户 */
     CAPITAL_ACCOUNT(
+        0,
         arrayOf(
             AssetClassificationEnum.CASH,
             AssetClassificationEnum.WECHAT,
@@ -37,6 +41,7 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
 
     /** 信用卡账户 */
     CREDIT_CARD_ACCOUNT(
+        1,
         arrayOf(
             AssetClassificationEnum.CREDIT_CARD,
             AssetClassificationEnum.ANT_CREDIT_PAY,
@@ -48,6 +53,7 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
 
     /** 充值账户 */
     TOP_UP_ACCOUNT(
+        2,
         arrayOf(
             AssetClassificationEnum.PHONE_CHARGE,
             AssetClassificationEnum.BUS_CARD,
@@ -60,6 +66,7 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
 
     /** 投资理财账户 */
     INVESTMENT_FINANCIAL_ACCOUNT(
+        3,
         arrayOf(
             AssetClassificationEnum.STOCK,
             AssetClassificationEnum.FUND,
@@ -69,6 +76,7 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
 
     /** 债务 */
     DEBT_ACCOUNT(
+        4,
         arrayOf(
             AssetClassificationEnum.BORROW,
             AssetClassificationEnum.LEND,
@@ -85,8 +93,12 @@ enum class ClassificationTypeEnum(val array: Array<AssetClassificationEnum>) {
         get() = this == TOP_UP_ACCOUNT
 
     companion object {
-        fun ordinalOf(ordinal: Int): ClassificationTypeEnum {
-            return entries.first { it.ordinal == ordinal }
+        /** 通过持久化的 code 值查找枚举，与 ordinal 解耦 */
+        fun codeOf(code: Int): ClassificationTypeEnum {
+            return entries.first { it.code == code }
         }
+
+        /** @see codeOf */
+        fun ordinalOf(ordinal: Int): ClassificationTypeEnum = codeOf(ordinal)
     }
 }

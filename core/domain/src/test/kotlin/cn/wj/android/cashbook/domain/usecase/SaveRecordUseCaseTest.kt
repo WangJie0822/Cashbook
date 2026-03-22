@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
@@ -49,9 +50,8 @@ class SaveRecordUseCaseTest {
 
     @Test
     fun when_save_record_then_needRelated_fetched_from_type_repository() = runTest {
-        // 设置类型需要关联
-        typeRepository.setNeedRelated(1L)
-        val record = createRecordModel(typeId = 1L, amount = 100L)
+        // 使用固定退款类型 ID，自动判断为 needRelated
+        val record = createRecordModel(typeId = FIXED_TYPE_ID_REFUND, amount = 100L)
 
         useCase(record, listOf(1L), listOf(2L), emptyList())
 

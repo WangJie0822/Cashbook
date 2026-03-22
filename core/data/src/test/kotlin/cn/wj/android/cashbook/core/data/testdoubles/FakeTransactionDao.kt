@@ -217,14 +217,40 @@ class FakeTransactionDao : TransactionDao {
         records.removeAll { it.booksId == bookId }
     }
 
+    override suspend fun queryAllAssetsByBookId(bookId: Long): List<AssetTable> {
+        return assets.filter { it.booksId == bookId }
+    }
+
+    override suspend fun deleteAssetsByBookId(bookId: Long) {
+        assets.removeAll { it.booksId == bookId }
+    }
+
+    override suspend fun deleteTagsByBookId(bookId: Long) {
+        // 简化实现：Fake 中标签不追踪 booksId
+    }
+
+    override suspend fun queryRecordsByAssetId(assetId: Long): List<RecordTable> {
+        return records.filter { it.assetId == assetId || it.intoAssetId == assetId }
+    }
+
     override suspend fun deleteBookTransaction(bookId: Long) {
-        // 简化实现：批量删除账本下的关联数据和记录
+        // 简化实现：批量删除账本下的关联数据、记录、资产
         deleteTagRelationsByBookId(bookId)
         deleteRecordRelationsByBookId(bookId)
         deleteImageRelationsByBookId(bookId)
         deleteRecordsByBookId(bookId)
+        deleteAssetsByBookId(bookId)
+        deleteTagsByBookId(bookId)
         deleteBookById(bookId)
         deleteBookCalled = true
+    }
+
+    override suspend fun deleteAssetRelatedData(assetId: Long) {
+        // 简化实现：批量删除资产关联数据
+        deleteTagRelationsByAssetId(assetId)
+        deleteRecordRelationsByAssetId(assetId)
+        deleteImageRelationsByAssetId(assetId)
+        deleteRecordsByAssetId(assetId)
     }
 
     override suspend fun deleteTag(id: Long) {
@@ -255,7 +281,31 @@ class FakeTransactionDao : TransactionDao {
         records.removeAll { it.assetId == assetId || it.intoAssetId == assetId }
     }
 
-    // 注意：insertRecordTransaction、updateRecordTransaction、deleteRecordTransaction、deleteAssetRelatedData
+    override suspend fun updateRecordTypeId(oldTypeId: Long, newTypeId: Long) {
+        val updated = records.mapIndexed { index, record ->
+            if (record.typeId == oldTypeId) record.copy(typeId = newTypeId) else record
+        }
+        records.clear()
+        records.addAll(updated)
+    }
+
+    override suspend fun promoteChildTypes(parentId: Long) {
+        val updated = types.map { type ->
+            if (type.parentId == parentId) type.copy(parentId = -1, typeLevel = 0) else type
+        }
+        types.clear()
+        types.addAll(updated)
+    }
+
+    override suspend fun countRecordsByTypeId(typeId: Long): Int {
+        return records.count { it.typeId == typeId }
+    }
+
+    override suspend fun deleteTypeById(typeId: Long) {
+        types.removeAll { it.id == typeId }
+    }
+
+    // 注意：insertRecordTransaction、updateRecordTransaction、deleteRecordTransaction、deleteAssetRelatedData、migrateTypeRecords
     // 使用了默认实现（@Transaction 注解方法），会调用上面的基础方法
     // 在 Fake 中不需要重新实现事务方法，因为测试不会直接调用它们
     // Repository 层通过调用这些事务方法来间接使用基础方法

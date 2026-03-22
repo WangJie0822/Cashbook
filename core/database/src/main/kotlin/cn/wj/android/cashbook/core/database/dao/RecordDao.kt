@@ -134,8 +134,8 @@ interface RecordDao {
     )
     suspend fun query(booksId: Long): List<RecordViewsRelation>
 
-    /** 资产 id 为 [assetId] 的第 [pageNum] 页 [pageSize] 条记录 */
-    @Query("SELECT * FROM db_record WHERE books_id=:booksId AND asset_id=:assetId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
+    /** 资产 id 为 [assetId]（含转入资产）的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query("SELECT * FROM db_record WHERE books_id=:booksId AND (asset_id=:assetId OR into_asset_id=:assetId) ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
     suspend fun queryRecordByAssetId(
         booksId: Long,
         assetId: Long,
@@ -342,9 +342,9 @@ interface RecordDao {
 
     @Query(
         """
-        SELECT COUNT(*) FROM db_record 
-        WHERE record_time>=:recordTime 
-        AND asset_id=:assetId
+        SELECT COUNT(*) FROM db_record
+        WHERE record_time>=:recordTime
+        AND (asset_id=:assetId OR into_asset_id=:assetId)
     """,
     )
     suspend fun getRecordCountByAssetIdAfterTime(

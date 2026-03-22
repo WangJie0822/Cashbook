@@ -34,8 +34,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.sp
 import kotlin.math.abs
-import kotlin.math.log10
-import kotlin.math.pow
 
 /**
  * 折线图数据集

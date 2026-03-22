@@ -37,6 +37,7 @@ object Migration11To12 : Migration(11, 12) {
             migrateRecord()
             migrateAsset()
             createIndices()
+            insertFixedTypes()
         }
     }
 
@@ -132,6 +133,34 @@ object Migration11To12 : Migration(11, 12) {
         execSQL(SQL_COPY_ASSET)
         execSQL(SQL_DROP_ASSET)
         execSQL(SQL_RENAME_ASSET)
+    }
+
+    // endregion
+
+    // region 固定类型插入
+
+    @Language("SQL")
+    private const val SQL_INSERT_TYPE_REFUND = """
+        INSERT OR IGNORE INTO db_type (id, parent_id, name, icon_name, type_level, type_category, protected, sort)
+        VALUES (-2001, -1, '退款', 'vector_type_refund_24', 0, 1, 1, 0)
+    """
+
+    @Language("SQL")
+    private const val SQL_INSERT_TYPE_REIMBURSE = """
+        INSERT OR IGNORE INTO db_type (id, parent_id, name, icon_name, type_level, type_category, protected, sort)
+        VALUES (-2002, -1, '报销', 'vector_type_reimburse_24', 0, 1, 1, 0)
+    """
+
+    @Language("SQL")
+    private const val SQL_INSERT_TYPE_CREDIT_CARD_PAYMENT = """
+        INSERT OR IGNORE INTO db_type (id, parent_id, name, icon_name, type_level, type_category, protected, sort)
+        VALUES (-2003, -1, '信用卡还款', 'vector_type_credit_card_payment_24', 0, 2, 1, 0)
+    """
+
+    private fun SupportSQLiteDatabase.insertFixedTypes() {
+        execSQL(SQL_INSERT_TYPE_REFUND)
+        execSQL(SQL_INSERT_TYPE_REIMBURSE)
+        execSQL(SQL_INSERT_TYPE_CREDIT_CARD_PAYMENT)
     }
 
     // endregion

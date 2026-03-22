@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.records.viewmodel
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.testing.data.createAssetModel
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
@@ -897,13 +898,24 @@ class EditRecordViewModelTest {
 
     @Test
     fun given_type_needs_related_when_init_then_needRelated_is_true() = runTest {
-        typeRepository.setNeedRelated(1L)
+        // 添加固定退款类型，自动判断为 needRelated
+        typeRepository.addType(
+            createRecordTypeModel(
+                id = FIXED_TYPE_ID_REFUND,
+                name = "退款",
+                typeCategory = RecordTypeCategoryEnum.INCOME,
+            ),
+        )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
         }
 
         viewModel.initRecordId(-1L)
+        advanceUntilIdle()
+
+        // 切换到退款类型
+        viewModel.updateType(FIXED_TYPE_ID_REFUND)
         advanceUntilIdle()
 
         val success = viewModel.uiState.value as EditRecordUiState.Success

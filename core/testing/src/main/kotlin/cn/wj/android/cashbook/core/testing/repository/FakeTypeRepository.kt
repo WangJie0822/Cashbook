@@ -16,6 +16,9 @@
 
 package cn.wj.android.cashbook.core.testing.repository
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_CREDIT_CARD_PAYMENT
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
@@ -26,10 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class FakeTypeRepository : TypeRepository {
 
     private val types = mutableListOf<RecordTypeModel>()
-    private val needRelatedSet = mutableSetOf<Long>()
-    private val reimburseTypeSet = mutableSetOf<Long>()
-    private val refundTypeSet = mutableSetOf<Long>()
-    private val creditPaymentTypeSet = mutableSetOf<Long>()
 
     private val _firstExpenditureTypeListData = MutableStateFlow<List<RecordTypeModel>>(emptyList())
     private val _firstIncomeTypeListData = MutableStateFlow<List<RecordTypeModel>>(emptyList())
@@ -42,24 +41,6 @@ class FakeTypeRepository : TypeRepository {
     fun addType(type: RecordTypeModel) {
         types.add(type)
         updateFlows()
-    }
-
-    fun setNeedRelated(typeId: Long) {
-        needRelatedSet.add(typeId)
-    }
-
-    fun setReimburse(typeId: Long) {
-        reimburseTypeSet.add(typeId)
-        needRelatedSet.add(typeId)
-    }
-
-    fun setRefund(typeId: Long) {
-        refundTypeSet.add(typeId)
-        needRelatedSet.add(typeId)
-    }
-
-    fun setCreditPayment(typeId: Long) {
-        creditPaymentTypeSet.add(typeId)
     }
 
     private fun updateFlows() {
@@ -92,27 +73,15 @@ class FakeTypeRepository : TypeRepository {
     }
 
     override suspend fun needRelated(typeId: Long): Boolean {
-        return typeId in needRelatedSet
+        return typeId == FIXED_TYPE_ID_REFUND || typeId == FIXED_TYPE_ID_REIMBURSE
     }
 
     override suspend fun isReimburseType(typeId: Long): Boolean {
-        return typeId in reimburseTypeSet
+        return typeId == FIXED_TYPE_ID_REIMBURSE
     }
 
     override suspend fun isRefundType(typeId: Long): Boolean {
-        return typeId in refundTypeSet
-    }
-
-    override suspend fun setReimburseType(typeId: Long) {
-        reimburseTypeSet.clear()
-        reimburseTypeSet.add(typeId)
-        needRelatedSet.add(typeId)
-    }
-
-    override suspend fun setRefundType(typeId: Long) {
-        refundTypeSet.clear()
-        refundTypeSet.add(typeId)
-        needRelatedSet.add(typeId)
+        return typeId == FIXED_TYPE_ID_REFUND
     }
 
     override suspend fun changeTypeToSecond(id: Long, parentId: Long) {
@@ -132,6 +101,9 @@ class FakeTypeRepository : TypeRepository {
     }
 
     override suspend fun deleteById(id: Long) {
+        require(id != FIXED_TYPE_ID_REFUND && id != FIXED_TYPE_ID_REIMBURSE && id != FIXED_TYPE_ID_CREDIT_CARD_PAYMENT) {
+            "Cannot delete fixed type: $id"
+        }
         types.removeAll { it.id == id }
         updateFlows()
     }
@@ -155,11 +127,10 @@ class FakeTypeRepository : TypeRepository {
     }
 
     override suspend fun isCreditPaymentType(typeId: Long): Boolean {
-        return typeId in creditPaymentTypeSet
+        return typeId == FIXED_TYPE_ID_CREDIT_CARD_PAYMENT
     }
 
-    override suspend fun setCreditPaymentType(typeId: Long) {
-        creditPaymentTypeSet.clear()
-        creditPaymentTypeSet.add(typeId)
+    override suspend fun migrateSpecialTypes() {
+        // 测试中不需要实际迁移
     }
 }

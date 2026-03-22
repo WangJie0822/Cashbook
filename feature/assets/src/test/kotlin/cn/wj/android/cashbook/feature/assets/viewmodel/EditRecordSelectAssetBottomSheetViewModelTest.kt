@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_CREDIT_CARD_PAYMENT
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
@@ -114,9 +115,6 @@ class EditRecordSelectAssetBottomSheetViewModelTest {
             viewModel.assetListData.collect {}
         }
 
-        // 设置信用卡还款类型
-        typeRepository.setCreditPayment(100L)
-
         // 添加一个普通资产和一个信用卡
         val capitalAsset = createAssetModel(
             id = 1L,
@@ -130,9 +128,9 @@ class EditRecordSelectAssetBottomSheetViewModelTest {
         )
         assetRepository.setVisibleAssets(listOf(capitalAsset, creditCard))
 
-        // 关联资产且当前类型为信用卡还款
+        // 关联资产且当前类型为信用卡还款（使用固定 ID）
         viewModel.update(
-            currentTypeId = 100L,
+            currentTypeId = FIXED_TYPE_ID_CREDIT_CARD_PAYMENT,
             selectedAssetId = -1L,
             isRelated = true,
         )

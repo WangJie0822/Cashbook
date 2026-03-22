@@ -32,7 +32,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import cn.wj.android.cashbook.core.design.component.CbScaffold
-import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 

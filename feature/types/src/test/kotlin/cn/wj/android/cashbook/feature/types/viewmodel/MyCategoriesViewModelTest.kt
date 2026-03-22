@@ -463,51 +463,6 @@ class MyCategoriesViewModelTest {
     }
 
     @Test
-    fun when_set_reimburse_type_then_type_updated() = runTest {
-        typeRepository.addType(
-            createRecordTypeModel(
-                id = 1L,
-                name = "报销",
-                typeCategory = RecordTypeCategoryEnum.INCOME,
-            ),
-        )
-
-        viewModel.setReimburseType(1L)
-
-        assertThat(typeRepository.isReimburseType(1L)).isTrue()
-    }
-
-    @Test
-    fun when_set_refund_type_then_type_updated() = runTest {
-        typeRepository.addType(
-            createRecordTypeModel(
-                id = 1L,
-                name = "退款",
-                typeCategory = RecordTypeCategoryEnum.INCOME,
-            ),
-        )
-
-        viewModel.setRefundType(1L)
-
-        assertThat(typeRepository.isRefundType(1L)).isTrue()
-    }
-
-    @Test
-    fun when_set_credit_card_payment_type_then_type_updated() = runTest {
-        typeRepository.addType(
-            createRecordTypeModel(
-                id = 1L,
-                name = "还款",
-                typeCategory = RecordTypeCategoryEnum.TRANSFER,
-            ),
-        )
-
-        viewModel.setCreditCardPaymentType(1L)
-
-        assertThat(typeRepository.isCreditPaymentType(1L)).isTrue()
-    }
-
-    @Test
     fun when_request_move_second_type_then_show_select_dialog() = runTest {
         // 准备两个一级分类
         typeRepository.addType(

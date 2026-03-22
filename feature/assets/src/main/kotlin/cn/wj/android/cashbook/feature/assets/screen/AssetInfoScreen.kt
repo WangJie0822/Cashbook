@@ -40,9 +40,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import android.content.ClipData
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,6 +53,7 @@ import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbCard
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
 import cn.wj.android.cashbook.core.design.component.CbIconButton
+import kotlinx.coroutines.launch
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTextButton
@@ -230,7 +233,8 @@ internal fun AssetInfoScreen(
                     when (data) {
                         AssetInfoDialogEnum.MORE_INFO -> {
                             if (uiState is AssetInfoUiState.Success && uiState.shouldDisplayMore) {
-                                val clipboardManager = LocalClipboardManager.current
+                                val clipboard = LocalClipboard.current
+                                val scope = rememberCoroutineScope()
                                 CbAlertDialog(
                                     onDismissRequest = onRequestDismissDialog,
                                     text = {
@@ -250,11 +254,11 @@ internal fun AssetInfoScreen(
                                                     )
                                                     CbIconButton(
                                                         onClick = {
-                                                            clipboardManager.setText(
-                                                                AnnotatedString(
-                                                                    uiState.openBank,
-                                                                ),
-                                                            )
+                                                            scope.launch {
+                                                                clipboard.setClipEntry(
+                                                                    ClipEntry(ClipData.newPlainText("", uiState.openBank)),
+                                                                )
+                                                            }
                                                             onRequestDisplayBookmark()
                                                         },
                                                     ) {
@@ -277,11 +281,11 @@ internal fun AssetInfoScreen(
                                                     )
                                                     CbIconButton(
                                                         onClick = {
-                                                            clipboardManager.setText(
-                                                                AnnotatedString(
-                                                                    uiState.cardNo,
-                                                                ),
-                                                            )
+                                                            scope.launch {
+                                                                clipboard.setClipEntry(
+                                                                    ClipEntry(ClipData.newPlainText("", uiState.cardNo)),
+                                                                )
+                                                            }
                                                             onRequestDisplayBookmark()
                                                         },
                                                     ) {
@@ -309,7 +313,11 @@ internal fun AssetInfoScreen(
                                     confirmButton = {
                                         CbTextButton(
                                             onClick = {
-                                                clipboardManager.setText(AnnotatedString("${uiState.openBank}\n${uiState.cardNo}"))
+                                                scope.launch {
+                                                    clipboard.setClipEntry(
+                                                        ClipEntry(ClipData.newPlainText("", "${uiState.openBank}\n${uiState.cardNo}")),
+                                                    )
+                                                }
                                                 onRequestDisplayBookmark()
                                             },
                                         ) {

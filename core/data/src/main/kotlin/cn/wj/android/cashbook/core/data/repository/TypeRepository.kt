@@ -52,10 +52,6 @@ interface TypeRepository {
 
     suspend fun isRefundType(typeId: Long): Boolean
 
-    suspend fun setReimburseType(typeId: Long)
-
-    suspend fun setRefundType(typeId: Long)
-
     suspend fun changeTypeToSecond(id: Long, parentId: Long)
 
     suspend fun changeSecondTypeToFirst(id: Long)
@@ -70,7 +66,7 @@ interface TypeRepository {
 
     suspend fun isCreditPaymentType(typeId: Long): Boolean
 
-    suspend fun setCreditPaymentType(typeId: Long)
+    suspend fun migrateSpecialTypes()
 }
 
 internal fun TypeTable.asModel(needRelated: Boolean): RecordTypeModel {

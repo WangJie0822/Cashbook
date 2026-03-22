@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.records.viewmodel
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
@@ -140,7 +141,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -151,13 +152,12 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         // 添加可关联的记录
         val relatedRecord = RecordModel(
             id = 100L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
             amount = 10000L,
@@ -173,7 +173,7 @@ class SelectRelatedRecordViewModelTest {
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
             amount = 5000L,
@@ -211,7 +211,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -222,12 +222,11 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         val relatedRecord = RecordModel(
             id = 100L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
             amount = 10000L,
@@ -243,7 +242,7 @@ class SelectRelatedRecordViewModelTest {
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
             amount = 5000L,
@@ -284,7 +283,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -295,12 +294,11 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
             amount = 5000L,
@@ -335,7 +333,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -346,12 +344,11 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         val relatedRecord = RecordModel(
             id = 100L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
             amount = 10000L,
@@ -367,7 +364,7 @@ class SelectRelatedRecordViewModelTest {
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
             amount = 5000L,

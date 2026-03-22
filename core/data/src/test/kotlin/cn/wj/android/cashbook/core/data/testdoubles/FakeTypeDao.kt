@@ -122,4 +122,32 @@ class FakeTypeDao : TypeDao {
     override suspend fun countByParentId(parentId: Long): Int {
         return typesFlow.value.count { it.parentId == parentId }
     }
+
+    // 迁移相关方法（用于测试）
+    /** 记录数据列表（用于模拟迁移操作） */
+    private val records = mutableListOf<FakeRecord>()
+
+    data class FakeRecord(val id: Long, var typeId: Long)
+
+    fun addRecord(id: Long, typeId: Long) {
+        records.add(FakeRecord(id, typeId))
+    }
+
+    override suspend fun updateRecordTypeId(oldTypeId: Long, newTypeId: Long) {
+        records.filter { it.typeId == oldTypeId }.forEach { it.typeId = newTypeId }
+    }
+
+    override suspend fun promoteChildTypes(parentId: Long) {
+        val mutable = typesFlow.value.toMutableList()
+        mutable.forEachIndexed { index, table ->
+            if (table.parentId == parentId) {
+                mutable[index] = table.copy(parentId = -1L, typeLevel = 0)
+            }
+        }
+        typesFlow.value = mutable
+    }
+
+    override suspend fun countRecordsByTypeId(typeId: Long): Int {
+        return records.count { it.typeId == typeId }
+    }
 }

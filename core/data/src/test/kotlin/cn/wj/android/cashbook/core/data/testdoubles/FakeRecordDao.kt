@@ -350,6 +350,7 @@ class FakeRecordDao : RecordDao {
             val type = types.firstOrNull { it.id == record.typeId }
             RecordViewsRelation(
                 id = record.id ?: -1L,
+                typeId = record.typeId,
                 typeCategory = type?.typeCategory ?: 0,
                 typeName = "",
                 typeIconResName = "",

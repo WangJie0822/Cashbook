@@ -37,6 +37,9 @@ const val KEY_ALIAS_PASSWORD = "KEY_ALIAS_PASSWORD"
 /** 指纹加密别名 */
 const val KEY_ALIAS_FINGERPRINT = "KEY_ALIAS_FINGERPRINT"
 
+/** 无关联资产的哨兵值 */
+const val NO_ASSET_ID = -1L
+
 /** 开关 - 开 */
 const val SWITCH_INT_ON = 1
 
@@ -75,3 +78,12 @@ const val SHORTCUTS_TYPE_ADD = 0
 
 /** 快捷方式类型 - 资产 */
 const val SHORTCUTS_TYPE_ASSET = 1
+
+/** 固定类型 ID - 退款 */
+const val FIXED_TYPE_ID_REFUND = -2001L
+
+/** 固定类型 ID - 报销 */
+const val FIXED_TYPE_ID_REIMBURSE = -2002L
+
+/** 固定类型 ID - 信用卡还款 */
+const val FIXED_TYPE_ID_CREDIT_CARD_PAYMENT = -2003L

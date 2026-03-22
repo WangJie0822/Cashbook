@@ -16,10 +16,12 @@
 
 package cn.wj.android.cashbook.core.datastore.datasource
 
-import androidx.datastore.core.DataStore
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import androidx.datastore.core.DataStore
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.datastore.AppPreferences
 import cn.wj.android.cashbook.core.datastore.AppSettings
@@ -37,12 +39,12 @@ import cn.wj.android.cashbook.core.model.model.GitDataModel
 import cn.wj.android.cashbook.core.model.model.RecordSettingsModel
 import cn.wj.android.cashbook.core.model.model.SearchHistoryModel
 import cn.wj.android.cashbook.core.model.model.TempKeysModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.IvParameterSpec
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -353,9 +355,13 @@ class CombineProtoDataSource @Inject constructor(
         appSettings.updateData { it.copy { this.canary = canary } }
     }
 
+    /**
+     * 判断类型是否需要关联记录
+     * [FIXED_TYPE_ID_REFUND] = 退款
+     * [FIXED_TYPE_ID_REIMBURSE] = 报销
+     */
     suspend fun needRelated(typeId: Long): Boolean {
-        val recordSettingsModel = recordSettingsData.first()
-        return typeId == recordSettingsModel.reimburseTypeId || typeId == recordSettingsModel.refundTypeId
+        return typeId == FIXED_TYPE_ID_REFUND || typeId == FIXED_TYPE_ID_REIMBURSE
     }
 
     suspend fun updateTopUpInTotal(topUpInTotal: Boolean) {
