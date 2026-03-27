@@ -132,6 +132,8 @@ androidx.resourceinspection:resourceinspection-annotation:1.0.1
 androidx.room:room-common-jvm:2.7.1
 androidx.room:room-common:2.7.1
 androidx.room:room-ktx:2.7.1
+androidx.room:room-paging-android:2.7.1
+androidx.room:room-paging:2.7.1
 androidx.room:room-runtime-android:2.7.1
 androidx.room:room-runtime:2.7.1
 androidx.savedstate:savedstate-android:1.3.0
