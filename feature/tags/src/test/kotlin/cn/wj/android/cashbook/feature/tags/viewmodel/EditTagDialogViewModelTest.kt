@@ -19,6 +19,9 @@ package cn.wj.android.cashbook.feature.tags.viewmodel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
+import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
+import cn.wj.android.cashbook.core.ui.ProgressDialogState
 import cn.wj.android.cashbook.feature.tags.enums.EditTagDialogBookmarkEnum
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
@@ -33,11 +36,23 @@ class EditTagDialogViewModelTest {
 
     private lateinit var tagRepository: FakeTagRepository
     private lateinit var viewModel: EditTagDialogViewModel
+    private lateinit var fakeController: FakeProgressDialogController
 
     @Before
     fun setup() {
         tagRepository = FakeTagRepository()
         viewModel = EditTagDialogViewModel(tagRepository)
+        fakeController = FakeProgressDialogController()
+    }
+
+    private class FakeProgressDialogController : ProgressDialogController {
+        override var dialogState: DialogState = DialogState.Dismiss
+        override fun show(hint: String?, cancelable: Boolean, onDismiss: () -> Unit) {
+            dialogState = DialogState.Shown(ProgressDialogState(hint, cancelable, onDismiss))
+        }
+        override fun dismiss() {
+            dialogState = DialogState.Dismiss
+        }
     }
 
     @Test
@@ -49,7 +64,7 @@ class EditTagDialogViewModelTest {
         // 尝试保存同名标签
         val newTag = TagModel(id = -1L, name = "已存在标签", invisible = false)
         var dismissed = false
-        viewModel.saveTag(newTag) { dismissed = true }
+        viewModel.saveTag(fakeController, newTag) { dismissed = true }
 
         // 验证 bookmark 状态为 NAME_EXIST，且 dismissDialog 未被调用
         assertThat(viewModel.bookmark).isEqualTo(EditTagDialogBookmarkEnum.NAME_EXIST)
@@ -61,7 +76,7 @@ class EditTagDialogViewModelTest {
         // 保存不重名的标签
         val newTag = TagModel(id = -1L, name = "新标签", invisible = false)
         var dismissed = false
-        viewModel.saveTag(newTag) { dismissed = true }
+        viewModel.saveTag(fakeController, newTag) { dismissed = true }
 
         // 验证 dismissDialog 被调用，bookmark 保持 DISMISS
         assertThat(dismissed).isTrue()
@@ -74,7 +89,7 @@ class EditTagDialogViewModelTest {
         val tag = TagModel(id = 1L, name = "已存在标签", invisible = false)
         tagRepository.addTag(tag)
         val newTag = TagModel(id = -1L, name = "已存在标签", invisible = false)
-        viewModel.saveTag(newTag) {}
+        viewModel.saveTag(fakeController, newTag) {}
 
         // 此时 bookmark 应该为 NAME_EXIST
         assertThat(viewModel.bookmark).isEqualTo(EditTagDialogBookmarkEnum.NAME_EXIST)
@@ -93,7 +108,7 @@ class EditTagDialogViewModelTest {
 
         val updatedTag = TagModel(id = 1L, name = "新名称", invisible = false)
         var dismissed = false
-        viewModel.saveTag(updatedTag) { dismissed = true }
+        viewModel.saveTag(fakeController, updatedTag) { dismissed = true }
 
         // 验证保存成功且弹窗关闭
         assertThat(dismissed).isTrue()

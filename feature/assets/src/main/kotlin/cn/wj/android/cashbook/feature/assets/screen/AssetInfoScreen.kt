@@ -59,6 +59,7 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
@@ -88,6 +89,7 @@ internal fun AssetInfoRoute(
         setProgressDialogHintText(stringResource(id = R.string.asset_in_delete))
     },
 ) {
+    val progressDialogController = LocalProgressDialogController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AssetInfoScreen(
@@ -107,7 +109,7 @@ internal fun AssetInfoRoute(
         },
         onEditAssetClick = onRequestNaviToEditAsset,
         onDeleteAssetClick = viewModel::showDeleteConfirmDialog,
-        onConfirmDeleteAsset = { viewModel.deleteAsset(onSuccess = onRequestPopBackStack) },
+        onConfirmDeleteAsset = { viewModel.deleteAsset(progressDialogController, onSuccess = onRequestPopBackStack) },
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
         onAddRecordClick = onRequestNaviToAddRecord,
         onBackClick = onRequestPopBackStack,

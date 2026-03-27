@@ -20,22 +20,19 @@ import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.ResultModel
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
+import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
+import cn.wj.android.cashbook.core.ui.ProgressDialogState
 import cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 /**
  * ConfirmDeleteRecordDialogViewModel 的单元测试
- *
- * 由于 runCatchWithProgress 使用了 ProgressDialogManager（依赖 Compose mutableStateOf），
- * 需要使用 Robolectric 提供 Android 环境。
  */
-@RunWith(RobolectricTestRunner::class)
 class ConfirmDeleteRecordDialogViewModelTest {
 
     @get:Rule
@@ -43,6 +40,7 @@ class ConfirmDeleteRecordDialogViewModelTest {
 
     private lateinit var recordRepository: FakeRecordRepository
     private lateinit var viewModel: ConfirmDeleteRecordDialogViewModel
+    private lateinit var fakeController: FakeProgressDialogController
 
     @Before
     fun setup() {
@@ -54,6 +52,18 @@ class ConfirmDeleteRecordDialogViewModelTest {
         viewModel = ConfirmDeleteRecordDialogViewModel(
             deleteRecordUseCase = deleteRecordUseCase,
         )
+        fakeController = FakeProgressDialogController()
+    }
+
+    /** 测试用的 FakeProgressDialogController */
+    private class FakeProgressDialogController : ProgressDialogController {
+        override var dialogState: DialogState = DialogState.Dismiss
+        override fun show(hint: String?, cancelable: Boolean, onDismiss: () -> Unit) {
+            dialogState = DialogState.Shown(ProgressDialogState(hint, cancelable, onDismiss))
+        }
+        override fun dismiss() {
+            dialogState = DialogState.Dismiss
+        }
     }
 
     @Test
@@ -81,6 +91,7 @@ class ConfirmDeleteRecordDialogViewModelTest {
 
         // 执行删除
         viewModel.onDeleteRecordConfirm(
+            controller = fakeController,
             hintText = "删除中...",
             recordId = recordId,
             onResult = { result = it },
@@ -99,6 +110,7 @@ class ConfirmDeleteRecordDialogViewModelTest {
         var result: ResultModel? = null
 
         viewModel.onDeleteRecordConfirm(
+            controller = fakeController,
             hintText = "删除中...",
             recordId = 999L,
             onResult = { result = it },

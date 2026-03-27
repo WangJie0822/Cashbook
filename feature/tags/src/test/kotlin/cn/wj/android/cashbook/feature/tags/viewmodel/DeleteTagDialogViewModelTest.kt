@@ -19,6 +19,9 @@ package cn.wj.android.cashbook.feature.tags.viewmodel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
+import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
+import cn.wj.android.cashbook.core.ui.ProgressDialogState
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -32,11 +35,23 @@ class DeleteTagDialogViewModelTest {
 
     private lateinit var tagRepository: FakeTagRepository
     private lateinit var viewModel: DeleteTagDialogViewModel
+    private lateinit var fakeController: FakeProgressDialogController
 
     @Before
     fun setup() {
         tagRepository = FakeTagRepository()
         viewModel = DeleteTagDialogViewModel(tagRepository)
+        fakeController = FakeProgressDialogController()
+    }
+
+    private class FakeProgressDialogController : ProgressDialogController {
+        override var dialogState: DialogState = DialogState.Dismiss
+        override fun show(hint: String?, cancelable: Boolean, onDismiss: () -> Unit) {
+            dialogState = DialogState.Shown(ProgressDialogState(hint, cancelable, onDismiss))
+        }
+        override fun dismiss() {
+            dialogState = DialogState.Dismiss
+        }
     }
 
     @Test
@@ -46,7 +61,7 @@ class DeleteTagDialogViewModelTest {
         tagRepository.addTag(tag)
 
         var dismissed = false
-        viewModel.deleteTag(tag) { dismissed = true }
+        viewModel.deleteTag(fakeController, tag) { dismissed = true }
 
         // 验证 dismissDialog 被调用，且标签已从仓库删除
         assertThat(dismissed).isTrue()
@@ -73,7 +88,7 @@ class DeleteTagDialogViewModelTest {
         tagRepository.addTag(tag2)
 
         // 删除 tag1
-        viewModel.deleteTag(tag1) {}
+        viewModel.deleteTag(fakeController, tag1) {}
 
         // 验证 tag1 已被删除，tag2 还在
         val remainingTag = tagRepository.getTagById(1L)

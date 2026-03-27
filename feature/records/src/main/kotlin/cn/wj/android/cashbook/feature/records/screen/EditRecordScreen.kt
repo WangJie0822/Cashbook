@@ -104,6 +104,7 @@ import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.expand.text
 import cn.wj.android.cashbook.core.ui.expand.typeColor
@@ -149,6 +150,7 @@ internal fun EditRecordRoute(
     },
 ) {
     val savingHintText = stringResource(id = R.string.record_saving)
+    val progressDialogController = LocalProgressDialogController.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val defaultTypeId by viewModel.defaultTypeIdData.collectAsStateWithLifecycle()
@@ -226,6 +228,7 @@ internal fun EditRecordRoute(
         onRelatedRecordClick = onRequestNaviToSelectRelatedRecord,
         onSaveClick = {
             viewModel.trySave(
+                controller = progressDialogController,
                 hintText = savingHintText,
                 onSuccess = onRequestPopBackStack,
             )

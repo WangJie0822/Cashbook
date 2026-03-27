@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.model.TagModel
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.feature.tags.enums.EditTagDialogBookmarkEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,7 +54,7 @@ class EditTagDialogViewModel @Inject constructor(
         bookmark = EditTagDialogBookmarkEnum.DISMISS
     }
 
-    fun saveTag(tag: TagModel, dismissDialog: () -> Unit) {
+    fun saveTag(controller: ProgressDialogController, tag: TagModel, dismissDialog: () -> Unit) {
         viewModelScope.launch {
             if (tagRepository.countTagByName(tag.name) > 0) {
                 // 已存在相同名称标签
@@ -61,6 +62,7 @@ class EditTagDialogViewModel @Inject constructor(
                 return@launch
             }
             runCatchWithProgress(
+                controller,
                 hint = progressDialogHintText,
                 cancelable = false,
             ) {

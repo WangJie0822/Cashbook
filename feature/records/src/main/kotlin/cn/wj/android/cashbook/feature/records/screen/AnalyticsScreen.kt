@@ -77,6 +77,7 @@ import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.SelectDateDialog
 import cn.wj.android.cashbook.core.ui.expand.colorInt
@@ -113,6 +114,9 @@ internal fun AnalyticsRoute(
     modifier: Modifier = Modifier,
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
+    val progressDialogController = LocalProgressDialogController.current
+    viewModel.setProgressDialogController(progressDialogController)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AnalyticsScreen(
@@ -122,7 +126,7 @@ internal fun AnalyticsRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         onDateSelect = viewModel::selectDate,
         sheetData = viewModel.sheetData,
-        onRequestShowBottomSheet = viewModel::showSheet,
+        onRequestShowBottomSheet = { typeId -> viewModel.showSheet(progressDialogController, typeId) },
         onRequestDismissBottomSheet = viewModel::dismissSheet,
         uiState = uiState,
         onRequestNaviToTypeAnalytics = { typeId ->

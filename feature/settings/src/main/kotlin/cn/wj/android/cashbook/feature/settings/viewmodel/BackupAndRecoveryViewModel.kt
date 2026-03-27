@@ -29,7 +29,7 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.core.ui.ProgressDialogManager
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -54,6 +54,14 @@ class BackupAndRecoveryViewModel @Inject constructor(
     private val backupRecoveryManager: BackupRecoveryManager,
     private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
+
+    /** 进度弹窗控制器 */
+    private var progressDialogController: ProgressDialogController? = null
+
+    /** 设置进度弹窗控制器 */
+    fun setProgressDialogController(controller: ProgressDialogController) {
+        progressDialogController = controller
+    }
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
@@ -96,9 +104,9 @@ class BackupAndRecoveryViewModel @Inject constructor(
             backupRecoveryManager.recoveryState,
         ) { backup, recovery ->
             if (recovery == BackupRecoveryState.InProgress || backup == BackupRecoveryState.InProgress) {
-                ProgressDialogManager.show(cancelable = false)
+                progressDialogController?.show(cancelable = false)
             } else {
-                ProgressDialogManager.dismiss()
+                progressDialogController?.dismiss()
             }
             if (backup.code != 0) {
                 backup.code
@@ -210,11 +218,11 @@ class BackupAndRecoveryViewModel @Inject constructor(
         }
     }
 
-    fun refreshDbMigrate() {
+    fun refreshDbMigrate(controller: ProgressDialogController) {
         viewModelScope.launch {
-            ProgressDialogManager.show()
+            controller.show()
             recordRepository.migrateAfter9To10()
-            ProgressDialogManager.dismiss()
+            controller.dismiss()
         }
     }
 
