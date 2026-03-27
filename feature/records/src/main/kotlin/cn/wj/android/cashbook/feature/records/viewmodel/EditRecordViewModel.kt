@@ -41,6 +41,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
@@ -442,7 +443,7 @@ class EditRecordViewModel @Inject constructor(
     private var inSave = false
 
     /** 保存记录 */
-    fun trySave(hintText: String, onSuccess: () -> Unit) {
+    fun trySave(controller: ProgressDialogController, hintText: String, onSuccess: () -> Unit) {
         if (inSave) {
             return
         }
@@ -463,7 +464,7 @@ class EditRecordViewModel @Inject constructor(
                 inSave = false
                 return@launch
             }
-            val result = runCatchWithProgress(hint = hintText, cancelable = false) {
+            val result = runCatchWithProgress(controller, hint = hintText, cancelable = false) {
                 saveRecordUseCase(
                     recordModel = recordEntity.copy(
                         relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,

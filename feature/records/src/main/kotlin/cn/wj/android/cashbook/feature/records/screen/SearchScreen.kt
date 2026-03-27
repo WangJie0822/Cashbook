@@ -149,14 +149,14 @@ internal fun SearchScreen(
                         ) {
                             Icon(
                                 imageVector = CbIcons.ArrowBack,
-                                contentDescription = null,
+                                contentDescription = stringResource(id = R.string.cd_navigate_back),
                             )
                         }
                     },
                     trailingIcon = {
                         if (expanded && query.isNotBlank()) {
                             CbIconButton(onClick = { query = "" }) {
-                                Icon(imageVector = CbIcons.Cancel, contentDescription = null)
+                                Icon(imageVector = CbIcons.Cancel, contentDescription = stringResource(id = R.string.cd_clear))
                             }
                         }
                     },

@@ -70,6 +70,8 @@ import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.DateSelectionPopup
 import cn.wj.android.cashbook.core.ui.expand.percentText
@@ -92,6 +94,9 @@ internal fun AnalyticsRoute(
     modifier: Modifier = Modifier,
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
+    val progressDialogController = LocalProgressDialogController.current
+    viewModel.setProgressDialogController(progressDialogController)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dateSelection by viewModel.dateSelection.collectAsStateWithLifecycle()
 
@@ -102,7 +107,7 @@ internal fun AnalyticsRoute(
         onDateSelected = viewModel::updateDateSelection,
         onDismissDatePopup = viewModel::dismissDatePopup,
         sheetData = viewModel.sheetData,
-        onRequestShowBottomSheet = viewModel::showSheet,
+        onRequestShowBottomSheet = { typeId -> viewModel.showSheet(progressDialogController, typeId) },
         onRequestDismissBottomSheet = viewModel::dismissSheet,
         uiState = uiState,
         onRequestNaviToTypeAnalytics = { typeId, includeChildTypes ->
@@ -223,7 +228,7 @@ internal fun AnalyticsScreen(
                                 ) {
                                     Icon(
                                         imageVector = CbIcons.DonutSmall,
-                                        contentDescription = null,
+                                        contentDescription = stringResource(id = R.string.cd_analytics),
                                     )
                                 }
                             }

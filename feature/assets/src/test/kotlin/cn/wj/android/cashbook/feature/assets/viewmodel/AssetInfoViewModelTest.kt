@@ -26,6 +26,8 @@ import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
+import cn.wj.android.cashbook.core.ui.ProgressDialogState
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import com.google.common.truth.Truth.assertThat
@@ -48,6 +50,7 @@ class AssetInfoViewModelTest {
     private lateinit var recordRepository: FakeRecordRepository
     private lateinit var tagRepository: FakeTagRepository
     private lateinit var viewModel: AssetInfoViewModel
+    private lateinit var fakeController: FakeProgressDialogController
 
     @Before
     fun setup() {
@@ -59,6 +62,17 @@ class AssetInfoViewModelTest {
             recordRepository = recordRepository,
             tagRepository = tagRepository,
         )
+        fakeController = FakeProgressDialogController()
+    }
+
+    private class FakeProgressDialogController : ProgressDialogController {
+        override var dialogState: DialogState = DialogState.Dismiss
+        override fun show(hint: String?, cancelable: Boolean, onDismiss: () -> Unit) {
+            dialogState = DialogState.Shown(ProgressDialogState(hint, cancelable, onDismiss))
+        }
+        override fun dismiss() {
+            dialogState = DialogState.Dismiss
+        }
     }
 
     @Test
@@ -204,7 +218,7 @@ class AssetInfoViewModelTest {
         viewModel.setProgressDialogHintText("删除中...")
 
         var successCalled = false
-        viewModel.deleteAsset { successCalled = true }
+        viewModel.deleteAsset(fakeController) { successCalled = true }
 
         assertThat(successCalled).isTrue()
     }

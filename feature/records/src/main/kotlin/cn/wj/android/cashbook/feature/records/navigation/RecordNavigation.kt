@@ -20,9 +20,8 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.records.screen.AnalyticsRoute
@@ -34,56 +33,45 @@ import cn.wj.android.cashbook.feature.records.screen.SearchRoute
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.TypedAnalyticsRoute
 import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
-
-private const val ROUTE_EDIT_RECORD_KEY_RECORD_ID = "recordId"
-private const val ROUTE_EDIT_RECORD_KEY_TYPE_ID = "typeId"
-private const val ROUTE_EDIT_RECORD_KEY_TAG_ID = "tagId"
-private const val ROUTE_EDIT_RECORD_KEY_ASSET_ID = "assetId"
-private const val ROUTE_EDIT_RECORD_KEY_DATE = "date"
-private const val ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES = "includeChildTypes"
-
-/** 路由 - 数据分析 */
-private const val ROUTE_ANALYTICS = "record/analytics"
-
-/** 路由 - 分类数据分析 */
-private const val ROUTE_TYPED_ANALYTICS =
-    "record/typed_analytics" +
-        "?$ROUTE_EDIT_RECORD_KEY_TAG_ID={$ROUTE_EDIT_RECORD_KEY_TAG_ID}" +
-        "&$ROUTE_EDIT_RECORD_KEY_TYPE_ID={$ROUTE_EDIT_RECORD_KEY_TYPE_ID}" +
-        "&$ROUTE_EDIT_RECORD_KEY_DATE={$ROUTE_EDIT_RECORD_KEY_DATE}" +
-        "&$ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES={$ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES}"
+import kotlinx.serialization.Serializable
 
 /** 路由 - 编辑记录 */
-const val ROUTE_EDIT_RECORD =
-    "record/edit_record" +
-        "?$ROUTE_EDIT_RECORD_KEY_RECORD_ID={$ROUTE_EDIT_RECORD_KEY_RECORD_ID}" +
-        "&$ROUTE_EDIT_RECORD_KEY_ASSET_ID={$ROUTE_EDIT_RECORD_KEY_ASSET_ID}"
+@Serializable
+data class EditRecord(
+    val recordId: Long = -1L,
+    val assetId: Long = -1L,
+)
+
+/** 路由 - 数据分析 */
+@Serializable
+object Analytics
+
+/** 路由 - 分类数据分析 */
+@Serializable
+data class TypedAnalytics(
+    val tagId: Long = -1L,
+    val typeId: Long = -1L,
+    val date: String = "",
+)
 
 /** 路由 - 选择关联记录 */
-private const val ROUTE_SELECT_RELATED_RECORD = "record/select_related_record"
+@Serializable
+object SelectRelatedRecord
 
 /** 路由 - 日历 */
-private const val ROUTE_RECORD_CALENDAR = "record/calendar"
+@Serializable
+object RecordCalendar
 
 /** 路由 - 搜索 */
-private const val ROUTE_RECORD_SEARCH = "record/search"
+@Serializable
+object RecordSearch
 
 fun NavController.naviToAnalytics() {
-    this.navigate(ROUTE_ANALYTICS)
+    this.navigate(Analytics)
 }
 
 fun NavController.naviToEditRecord(recordId: Long = -1L, assetId: Long = -1L) {
-    this.navigate(
-        ROUTE_EDIT_RECORD
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_RECORD_ID}",
-                newValue = recordId.toString(),
-            )
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_ASSET_ID}",
-                newValue = assetId.toString(),
-            ),
-    )
+    this.navigate(EditRecord(recordId = recordId, assetId = assetId))
 }
 
 fun NavController.naviToTypedAnalytics(
@@ -93,36 +81,24 @@ fun NavController.naviToTypedAnalytics(
     includeChildTypes: Boolean = true,
 ) {
     this.navigate(
-        ROUTE_TYPED_ANALYTICS
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_TAG_ID}",
-                newValue = tagId.toString(),
-            )
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_TYPE_ID}",
-                newValue = typeId.toString(),
-            )
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_DATE}",
-                newValue = date.orEmpty(),
-            )
-            .replace(
-                oldValue = "{$ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES}",
-                newValue = includeChildTypes.toString(),
-            ),
+        TypedAnalytics(
+            tagId = tagId,
+            typeId = typeId,
+            date = date.orEmpty(),
+        ),
     )
 }
 
 fun NavController.naviToSelectRelatedRecord() {
-    this.navigate(ROUTE_SELECT_RELATED_RECORD)
+    this.navigate(SelectRelatedRecord)
 }
 
 fun NavController.naviToCalendar() {
-    this.navigate(ROUTE_RECORD_CALENDAR)
+    this.navigate(RecordCalendar)
 }
 
 fun NavController.naviToSearch() {
-    this.navigate(ROUTE_RECORD_SEARCH)
+    this.navigate(RecordSearch)
 }
 
 /**
@@ -140,22 +116,11 @@ fun NavGraphBuilder.editRecordScreen(
     onRequestNaviToSelectRelatedRecord: () -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_EDIT_RECORD,
-        arguments = listOf(
-            navArgument(ROUTE_EDIT_RECORD_KEY_RECORD_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-            navArgument(ROUTE_EDIT_RECORD_KEY_ASSET_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-        ),
-    ) {
+    composable<EditRecord> { backStackEntry ->
+        val route = backStackEntry.toRoute<EditRecord>()
         EditRecordRoute(
-            recordId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_RECORD_ID) ?: -1L,
-            assetId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_ASSET_ID) ?: -1L,
+            recordId = route.recordId,
+            assetId = route.assetId,
             typeListContent = typeListContent,
             assetBottomSheetContent = assetBottomSheetContent,
             tagBottomSheetContent = tagBottomSheetContent,
@@ -169,9 +134,7 @@ fun NavGraphBuilder.analyticsScreen(
     onRequestNaviToTypeAnalytics: (Long, String?, Boolean) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_ANALYTICS,
-    ) {
+    composable<Analytics> {
         AnalyticsRoute(
             onRequestNaviToTypeAnalytics = onRequestNaviToTypeAnalytics,
             onRequestPopBackStack = onRequestPopBackStack,
@@ -184,33 +147,12 @@ fun NavGraphBuilder.typedAnalyticsScreen(
     onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_TYPED_ANALYTICS,
-        arguments = listOf(
-            navArgument(ROUTE_EDIT_RECORD_KEY_TAG_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-            navArgument(ROUTE_EDIT_RECORD_KEY_TYPE_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-            navArgument(ROUTE_EDIT_RECORD_KEY_DATE) {
-                type = NavType.StringType
-                defaultValue = ""
-            },
-            navArgument(ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES) {
-                type = NavType.BoolType
-                defaultValue = true
-            },
-        ),
-    ) {
+    composable<TypedAnalytics> { backStackEntry ->
+        val route = backStackEntry.toRoute<TypedAnalytics>()
         TypedAnalyticsRoute(
-            typeId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TYPE_ID) ?: -1L,
-            tagId = it.arguments?.getLong(ROUTE_EDIT_RECORD_KEY_TAG_ID) ?: -1L,
-            date = it.arguments?.getString(ROUTE_EDIT_RECORD_KEY_DATE) ?: "",
-            includeChildTypes = it.arguments?.getBoolean(ROUTE_EDIT_RECORD_KEY_INCLUDE_CHILD_TYPES)
-                ?: true,
+            typeId = route.typeId,
+            tagId = route.tagId,
+            date = route.date,
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,
@@ -221,9 +163,7 @@ fun NavGraphBuilder.typedAnalyticsScreen(
 fun NavGraphBuilder.selectRelatedRecordScreen(
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_SELECT_RELATED_RECORD,
-    ) {
+    composable<SelectRelatedRecord> {
         SelectRelatedRecordRoute(
             onRequestPopBackStack = onRequestPopBackStack,
         )
@@ -242,7 +182,7 @@ fun NavGraphBuilder.calendarScreen(
     onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
-    composable(route = ROUTE_RECORD_CALENDAR) {
+    composable<RecordCalendar> {
         CalendarRoute(
             recordDetailSheetContent = recordDetailSheetContent,
             onRequestPopBackStack = onRequestPopBackStack,
@@ -256,7 +196,7 @@ fun NavGraphBuilder.searchScreen(
     onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(route = ROUTE_RECORD_SEARCH) {
+    composable<RecordSearch> {
         SearchRoute(
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,

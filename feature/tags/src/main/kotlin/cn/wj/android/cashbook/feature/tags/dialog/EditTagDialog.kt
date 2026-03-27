@@ -37,6 +37,7 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.model.model.TagModel
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.enums.EditTagDialogBookmarkEnum
 import cn.wj.android.cashbook.feature.tags.viewmodel.EditTagDialogViewModel
@@ -49,11 +50,12 @@ internal fun EditTagDialogRoute(
         setProgressDialogHintText(stringResource(id = R.string.tag_saving))
     },
 ) {
+    val progressDialogController = LocalProgressDialogController.current
     EditTagDialog(
         bookmark = viewModel.bookmark,
         onRequestDismissBookmark = viewModel::dismissBookmark,
         tagModel = tagModel,
-        onRequestSaveTag = { viewModel.saveTag(it, onRequestDismissDialog) },
+        onRequestSaveTag = { viewModel.saveTag(progressDialogController, it, onRequestDismissDialog) },
         onRequestDismissDialog = onRequestDismissDialog,
     )
 }

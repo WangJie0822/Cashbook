@@ -169,7 +169,7 @@ internal fun EditBookScreen(
                     }
                 },
             ) {
-                Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
+                Icon(imageVector = CbIcons.SaveAs, contentDescription = stringResource(id = R.string.cd_confirm))
             }
         },
     ) { paddingValues ->
@@ -222,7 +222,7 @@ internal fun EditBookScreen(
                                     Icon(
                                         imageVector = CbIcons.CleaningServices,
                                         tint = MaterialTheme.colorScheme.primaryContainer,
-                                        contentDescription = null,
+                                        contentDescription = stringResource(id = R.string.cd_clear),
                                     )
                                 }
 

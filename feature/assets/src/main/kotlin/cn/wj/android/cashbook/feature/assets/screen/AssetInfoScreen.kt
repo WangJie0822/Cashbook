@@ -61,6 +61,7 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
@@ -91,6 +92,7 @@ internal fun AssetInfoRoute(
         setProgressDialogHintText(stringResource(id = R.string.asset_in_delete))
     },
 ) {
+    val progressDialogController = LocalProgressDialogController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AssetInfoScreen(
@@ -110,7 +112,7 @@ internal fun AssetInfoRoute(
         },
         onEditAssetClick = onRequestNaviToEditAsset,
         onDeleteAssetClick = viewModel::showDeleteConfirmDialog,
-        onConfirmDeleteAsset = { viewModel.deleteAsset(onSuccess = onRequestPopBackStack) },
+        onConfirmDeleteAsset = { viewModel.deleteAsset(progressDialogController, onSuccess = onRequestPopBackStack) },
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
         onAddRecordClick = onRequestNaviToAddRecord,
         onBackClick = onRequestPopBackStack,
@@ -178,19 +180,19 @@ internal fun AssetInfoScreen(
                 actions = {
                     if (uiState is AssetInfoUiState.Success) {
                         CbIconButton(onClick = onEditAssetClick) {
-                            Icon(imageVector = CbIcons.EditNote, contentDescription = null)
+                            Icon(imageVector = CbIcons.EditNote, contentDescription = stringResource(id = R.string.cd_edit))
                         }
                         CbIconButton(onClick = onDeleteAssetClick) {
                             Icon(
                                 imageVector = CbIcons.DeleteForever,
-                                contentDescription = null,
+                                contentDescription = stringResource(id = R.string.cd_delete),
                             )
                         }
                         if (uiState.shouldDisplayMore) {
                             CbIconButton(onClick = onRequestShowMoreDialog) {
                                 Icon(
                                     imageVector = CbIcons.Info,
-                                    contentDescription = null,
+                                    contentDescription = stringResource(id = R.string.cd_more_options),
                                 )
                             }
                         }
@@ -200,7 +202,7 @@ internal fun AssetInfoScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = onAddRecordClick) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
         snackbarHost = {
@@ -264,7 +266,7 @@ internal fun AssetInfoScreen(
                                                     ) {
                                                         Icon(
                                                             imageVector = CbIcons.ContentCopy,
-                                                            contentDescription = null,
+                                                            contentDescription = stringResource(id = R.string.cd_copy),
                                                         )
                                                     }
                                                 }
@@ -291,7 +293,7 @@ internal fun AssetInfoScreen(
                                                     ) {
                                                         Icon(
                                                             imageVector = CbIcons.ContentCopy,
-                                                            contentDescription = null,
+                                                            contentDescription = stringResource(id = R.string.cd_copy),
                                                         )
                                                     }
                                                 }

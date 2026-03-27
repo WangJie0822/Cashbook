@@ -16,17 +16,18 @@
 
 package cn.wj.android.cashbook.ui
 
-import androidx.activity.OnBackPressedDispatcher
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainter
 import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHint
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
-import cn.wj.android.cashbook.core.ui.LocalBackPressedDispatcher
+import cn.wj.android.cashbook.core.ui.DefaultProgressDialogController
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.LocalProgressDialogHint
 import cn.wj.android.cashbook.core.ui.R
 
@@ -41,14 +42,14 @@ sealed interface ActivityUiState {
 
 @Composable
 internal fun ProvideLocalState(
-    onBackPressedDispatcher: OnBackPressedDispatcher,
     content: @Composable () -> Unit,
 ) {
+    val progressDialogController = remember { DefaultProgressDialogController() }
     CompositionLocalProvider(
-        LocalBackPressedDispatcher provides onBackPressedDispatcher,
         LocalDefaultEmptyImagePainter provides painterResource(id = R.drawable.vector_no_data_200),
         LocalDefaultLoadingHint provides stringResource(id = R.string.data_in_loading),
         LocalProgressDialogHint provides stringResource(id = R.string.progress_loading_default),
+        LocalProgressDialogController provides progressDialogController,
         content = content,
     )
 }

@@ -28,7 +28,8 @@ import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
-import cn.wj.android.cashbook.core.ui.ProgressDialogManager
+import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.domain.usecase.GetRecordViewsBetweenDateUseCase
 import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCase
@@ -58,6 +59,17 @@ class AnalyticsViewModel @Inject constructor(
     transRecordViewsToAnalyticsPieUseCase: TransRecordViewsToAnalyticsPieUseCase,
     private val transRecordViewsToAnalyticsPieSecondUseCase: TransRecordViewsToAnalyticsPieSecondUseCase,
 ) : ViewModel() {
+
+    /** 进度弹窗控制器 */
+    private var progressDialogController: ProgressDialogController? = null
+
+    /** 设置进度弹窗控制器 */
+    fun setProgressDialogController(controller: ProgressDialogController) {
+        progressDialogController = controller
+    }
+
+    var dialogState: DialogState by mutableStateOf(DialogState.Dismiss)
+        private set
 
     var sheetData: ShowSheetData? by mutableStateOf(null)
         private set
@@ -110,7 +122,7 @@ class AnalyticsViewModel @Inject constructor(
             incomePieDataList = incomePieDataList,
             transferPieDataList = transferPieDataList,
         )
-        ProgressDialogManager.dismiss()
+        progressDialogController?.dismiss()
         success
     }
         .stateIn(
@@ -134,9 +146,13 @@ class AnalyticsViewModel @Inject constructor(
         _dateSelection.tryEmit(selection)
     }
 
-    fun showSheet(typeId: Long) {
+    fun dismissDialog() {
+        dialogState = DialogState.Dismiss
+    }
+
+    fun showSheet(controller: ProgressDialogController, typeId: Long) {
         viewModelScope.launch {
-            runCatchWithProgress {
+            runCatchWithProgress(controller) {
                 val type = typeRepository.getRecordTypeById(typeId) ?: return@runCatchWithProgress
                 val ls =
                     transRecordViewsToAnalyticsPieSecondUseCase(typeId, _selectionWithRecords.first().second)

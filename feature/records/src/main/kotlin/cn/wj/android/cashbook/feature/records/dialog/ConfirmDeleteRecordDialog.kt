@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.viewmodel.ConfirmDeleteRecordDialogViewModel
 
@@ -34,9 +35,10 @@ internal fun ConfirmDeleteRecordDialogRoute(
     viewModel: ConfirmDeleteRecordDialogViewModel = hiltViewModel(),
 ) {
     val recordRemovingText = stringResource(id = R.string.record_removing)
+    val progressDialogController = LocalProgressDialogController.current
     ConfirmDeleteRecordDialog(
         onDeleteRecordConfirm = {
-            viewModel.onDeleteRecordConfirm(recordRemovingText, recordId, onResult)
+            viewModel.onDeleteRecordConfirm(progressDialogController, recordRemovingText, recordId, onResult)
         },
         onDismissRequest = onDismissRequest,
     )

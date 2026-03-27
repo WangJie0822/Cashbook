@@ -86,6 +86,7 @@ import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.model.BackupModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewModel
@@ -104,6 +105,9 @@ internal fun BackupAndRecoveryRoute(
     modifier: Modifier = Modifier,
     viewModel: BackupAndRecoveryViewModel = hiltViewModel(),
 ) {
+    val progressDialogController = LocalProgressDialogController.current
+    viewModel.setProgressDialogController(progressDialogController)
+
     val shouldDisplayBookmark by viewModel.shouldDisplayBookmark.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
@@ -125,7 +129,7 @@ internal fun BackupAndRecoveryRoute(
         onKeepLatestBackupChanged = viewModel::changeKeepLatestBackup,
         onMobileNetworkBackupEnableChanged = viewModel::onMobileNetworkBackupEnableChanged,
         onNoWifiConfirmBackupClick = viewModel::onNoWifiConfirmBackupClick,
-        onDbMigrateClick = viewModel::refreshDbMigrate,
+        onDbMigrateClick = { viewModel.refreshDbMigrate(progressDialogController) },
         onRequestNaviToRecordImport = onRequestNaviToRecordImport,
         onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,

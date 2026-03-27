@@ -104,6 +104,7 @@ import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.expand.text
 import cn.wj.android.cashbook.core.ui.expand.typeColor
@@ -149,6 +150,7 @@ internal fun EditRecordRoute(
     },
 ) {
     val savingHintText = stringResource(id = R.string.record_saving)
+    val progressDialogController = LocalProgressDialogController.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val defaultTypeId by viewModel.defaultTypeIdData.collectAsStateWithLifecycle()
@@ -226,6 +228,7 @@ internal fun EditRecordRoute(
         onRelatedRecordClick = onRequestNaviToSelectRelatedRecord,
         onSaveClick = {
             viewModel.trySave(
+                controller = progressDialogController,
                 hintText = savingHintText,
                 onSuccess = onRequestPopBackStack,
             )
@@ -348,7 +351,7 @@ internal fun EditRecordScreen(
                 CbFloatingActionButton(
                     onClick = onSaveClick,
                     content = {
-                        Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
+                        Icon(imageVector = CbIcons.SaveAs, contentDescription = stringResource(id = R.string.cd_confirm))
                     },
                 )
             }
@@ -991,7 +994,7 @@ internal fun SelectImageSheetContent(
                                         end.linkTo(iv.end)
                                     },
                             ) {
-                                Icon(imageVector = CbIcons.RemoveCircle, contentDescription = null)
+                                Icon(imageVector = CbIcons.RemoveCircle, contentDescription = stringResource(id = R.string.cd_delete))
                             }
                         }
                     }

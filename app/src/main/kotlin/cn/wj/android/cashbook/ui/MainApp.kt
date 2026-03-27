@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -83,7 +84,7 @@ import cn.wj.android.cashbook.core.ui.ProgressDialog
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.popBackStackSafety
 import cn.wj.android.cashbook.feature.assets.navigation.EditRecordSelectAssetBottomSheetContent
-import cn.wj.android.cashbook.feature.assets.navigation.ROUTE_MY_ASSET
+import cn.wj.android.cashbook.feature.assets.navigation.MyAsset
 import cn.wj.android.cashbook.feature.assets.navigation.assetInfoScreen
 import cn.wj.android.cashbook.feature.assets.navigation.editAssetScreen
 import cn.wj.android.cashbook.feature.assets.navigation.invisibleAssetScreen
@@ -99,8 +100,8 @@ import cn.wj.android.cashbook.feature.books.navigation.naviToMyBooks
 import cn.wj.android.cashbook.feature.record.imports.navigation.naviToRecordImport
 import cn.wj.android.cashbook.feature.record.imports.navigation.recordImportScreen
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
+import cn.wj.android.cashbook.feature.records.navigation.EditRecord
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
-import cn.wj.android.cashbook.feature.records.navigation.ROUTE_EDIT_RECORD
 import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.records.navigation.analyticsScreen
 import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
@@ -116,7 +117,7 @@ import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScre
 import cn.wj.android.cashbook.feature.records.navigation.typedAnalyticsScreen
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
-import cn.wj.android.cashbook.feature.settings.navigation.ROUTE_SETTINGS_LAUNCHER
+import cn.wj.android.cashbook.feature.settings.navigation.SettingsLauncher
 import cn.wj.android.cashbook.feature.settings.navigation.aboutUsScreen
 import cn.wj.android.cashbook.feature.settings.navigation.backupAndRecoveryScreen
 import cn.wj.android.cashbook.feature.settings.navigation.naviToAboutUs
@@ -136,7 +137,7 @@ import io.noties.markwon.Markwon
 import javax.crypto.Cipher
 
 /** 开始默认显示路径 */
-private const val START_DESTINATION = ROUTE_SETTINGS_LAUNCHER
+private val START_DESTINATION = SettingsLauncher
 
 /** 应用入口 */
 @Composable
@@ -222,14 +223,14 @@ fun MainApp(
                             when (shortcutsType) {
                                 SHORTCUTS_TYPE_ADD -> {
                                     // 当前已显示对应界面，不重复显示
-                                    if (navController.currentDestination?.route != ROUTE_EDIT_RECORD) {
+                                    if (navController.currentDestination?.hasRoute<EditRecord>() != true) {
                                         navController.naviToEditRecord()
                                     }
                                 }
 
                                 SHORTCUTS_TYPE_ASSET -> {
                                     // 当前已显示对应界面，不重复显示
-                                    if (navController.currentDestination?.route != ROUTE_MY_ASSET) {
+                                    if (navController.currentDestination?.hasRoute<MyAsset>() != true) {
                                         navController.naviToMyAsset()
                                     }
                                 }
@@ -714,7 +715,7 @@ internal fun Verification(
                     Icon(
                         imageVector = CbIcons.Fingerprint,
                         tint = MaterialTheme.colorScheme.primary,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.cd_fingerprint),
                     )
                 }
                 if (firstOpen) {

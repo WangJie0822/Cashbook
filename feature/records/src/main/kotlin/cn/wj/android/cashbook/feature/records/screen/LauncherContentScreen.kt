@@ -225,7 +225,7 @@ internal fun LauncherContentScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = onAddClick) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
     ) { paddingValues ->
@@ -366,7 +366,7 @@ internal fun LauncherTopBar(
             CbIconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = CbIcons.Menu,
-                    contentDescription = null,
+                    contentDescription = stringResource(id = R.string.cd_menu),
                 )
             }
         },

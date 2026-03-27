@@ -35,10 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import cn.wj.android.cashbook.core.design.R
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 
 @Composable
@@ -181,7 +183,9 @@ fun CbPasswordTextField(
             CbIconButton(onClick = { visible = !visible }) {
                 Icon(
                     imageVector = if (visible) CbIcons.VisibilityOff else CbIcons.Visibility,
-                    contentDescription = null,
+                    contentDescription = stringResource(
+                        id = if (visible) R.string.cd_design_hide_password else R.string.cd_design_show_password,
+                    ),
                 )
             }
         },

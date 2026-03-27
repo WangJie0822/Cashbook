@@ -28,6 +28,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
@@ -125,10 +126,11 @@ class AssetInfoViewModel @Inject constructor(
         dialogState = DialogState.Shown(AssetInfoDialogEnum.DELETE_ASSET)
     }
 
-    fun deleteAsset(onSuccess: () -> Unit) {
+    fun deleteAsset(controller: ProgressDialogController, onSuccess: () -> Unit) {
         // 删除资产
         viewModelScope.launch {
             runCatchWithProgress(
+                controller,
                 hint = progressDialogHintText,
                 cancelable = false,
             ) {

@@ -35,12 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 
 @Composable
 fun Loading(
     modifier: Modifier = Modifier,
     hintText: String = LocalDefaultLoadingHint.current,
 ) {
+    val spacing = LocalSpacing.current
     Column(
         modifier = modifier
             .defaultMinSize(minHeight = 120.dp),
@@ -51,7 +53,7 @@ fun Loading(
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(32.dp),
+                .height(spacing.extraLarge),
         )
         Text(text = hintText, color = LocalContentColor.current.copy(0.5f))
     }
