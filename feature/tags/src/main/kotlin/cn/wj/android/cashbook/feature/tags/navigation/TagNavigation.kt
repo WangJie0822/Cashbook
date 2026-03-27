@@ -22,11 +22,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import cn.wj.android.cashbook.feature.tags.screen.EditRecordSelectTagBottomSheetRoute
 import cn.wj.android.cashbook.feature.tags.screen.MyTagsRoute
+import kotlinx.serialization.Serializable
 
-private const val ROUTE_MY_TAGS = "tag/my_tag"
+/** 路由 - 我的标签 */
+@Serializable
+object MyTags
 
 fun NavController.naviToMyTags() {
-    this.navigate(ROUTE_MY_TAGS)
+    this.navigate(MyTags)
 }
 
 /**
@@ -39,7 +42,7 @@ fun NavGraphBuilder.myTagsScreen(
     onRequestNaviToTagStatistic: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(ROUTE_MY_TAGS) {
+    composable<MyTags> {
         MyTagsRoute(
             onRequestPopBackStack = onRequestPopBackStack,
             onRequestNaviToTagStatistic = onRequestNaviToTagStatistic,

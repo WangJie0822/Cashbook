@@ -37,11 +37,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.design.R
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.design.util.CalculatorUtils
-import cn.wj.android.cashbook.core.ui.R as UiR
 
 /**
  * 计算器组件
@@ -179,7 +179,7 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { text = CalculatorUtils.onBackPressed(text) },
                 ) {
-                    Icon(imageVector = CbIcons.Backspace, contentDescription = stringResource(id = UiR.string.cd_backspace))
+                    Icon(imageVector = CbIcons.Backspace, contentDescription = stringResource(id = R.string.cd_design_backspace))
                 }
                 CbTextButton(
                     modifier = Modifier.fillMaxWidth(),

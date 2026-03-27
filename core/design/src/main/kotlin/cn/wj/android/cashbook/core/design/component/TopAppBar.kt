@@ -34,9 +34,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import cn.wj.android.cashbook.core.common.TestTag
+import cn.wj.android.cashbook.core.design.R
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
-import cn.wj.android.cashbook.core.ui.R as UiR
 
 /**
  * 通用顶部标题栏
@@ -52,7 +52,7 @@ fun CbTopAppBar(
     title: @Composable () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    navigationIconContentDescription: String? = stringResource(id = UiR.string.cd_navigate_back),
+    navigationIconContentDescription: String? = stringResource(id = R.string.cd_design_navigate_back),
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),

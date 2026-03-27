@@ -25,32 +25,37 @@ import cn.wj.android.cashbook.feature.settings.screen.AboutUsRoute
 import cn.wj.android.cashbook.feature.settings.screen.BackupAndRecoveryRoute
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
 import cn.wj.android.cashbook.feature.settings.screen.SettingRoute
+import kotlinx.serialization.Serializable
 
 /** 设置 - 启动页路由 */
-const val ROUTE_SETTINGS_LAUNCHER = "settings/launcher"
+@Serializable
+object SettingsLauncher
 
 /** 设置 - 关于我们路由 */
-private const val ROUTE_SETTINGS_ABOUT_US = "settings/about_us"
+@Serializable
+object AboutUs
 
 /** 设置 - 设置路由 */
-private const val ROUTE_SETTINGS_SETTING = "settings/setting"
+@Serializable
+object Setting
 
-/** 设置  - 备份与恢复 */
-private const val ROUTE_SETTINGS_BACKUP_AND_RECOVERY = "settings/backup_and_recovery"
+/** 设置 - 备份与恢复路由 */
+@Serializable
+object BackupAndRecovery
 
 /** 跳转到关于我们 */
 fun NavController.naviToAboutUs() {
-    this.navigate(ROUTE_SETTINGS_ABOUT_US)
+    this.navigate(AboutUs)
 }
 
 /** 跳转到设置 */
 fun NavController.naviToSetting() {
-    this.navigate(ROUTE_SETTINGS_SETTING)
+    this.navigate(Setting)
 }
 
 /** 跳转备份恢复界面 */
 fun NavController.naviToBackupAndRecovery() {
-    this.navigate(ROUTE_SETTINGS_BACKUP_AND_RECOVERY)
+    this.navigate(BackupAndRecovery)
 }
 
 /**
@@ -74,7 +79,7 @@ fun NavGraphBuilder.settingsLauncherScreen(
     onRequestNaviToAboutUs: () -> Unit,
     content: @Composable (() -> Unit) -> Unit,
 ) {
-    composable(route = ROUTE_SETTINGS_LAUNCHER) {
+    composable<SettingsLauncher> {
         LauncherRoute(
             onRequestNaviToMyAsset = onRequestNaviToMyAsset,
             onRequestNaviToMyBooks = onRequestNaviToMyBooks,
@@ -99,7 +104,7 @@ fun NavGraphBuilder.aboutUsScreen(
     onRequestNaviToPrivacyPolicy: () -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(route = ROUTE_SETTINGS_ABOUT_US) {
+    composable<AboutUs> {
         AboutUsRoute(
             onRequestNaviToChangelog = onRequestNaviToChangelog,
             onRequestNaviToPrivacyPolicy = onRequestNaviToPrivacyPolicy,
@@ -120,7 +125,7 @@ fun NavGraphBuilder.settingScreen(
     onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
-    composable(route = ROUTE_SETTINGS_SETTING) {
+    composable<Setting> {
         SettingRoute(
             onRequestPopBackStack = onRequestPopBackStack,
             onRequestNaviToBackupAndRecovery = onRequestNaviToBackupAndRecovery,
@@ -139,7 +144,7 @@ fun NavGraphBuilder.backupAndRecoveryScreen(
     onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
 ) {
-    composable(route = ROUTE_SETTINGS_BACKUP_AND_RECOVERY) {
+    composable<BackupAndRecovery> {
         BackupAndRecoveryRoute(
             onRequestPopBackStack = onRequestPopBackStack,
             onShowSnackbar = onShowSnackbar,

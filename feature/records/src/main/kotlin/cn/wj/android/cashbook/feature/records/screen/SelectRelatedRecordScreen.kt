@@ -48,7 +48,7 @@ import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.records.navigation.ROUTE_EDIT_RECORD
+import cn.wj.android.cashbook.feature.records.navigation.EditRecord
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.SelectRelatedRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.SelectRelatedRecordViewModel
@@ -58,9 +58,7 @@ internal fun SelectRelatedRecordRoute(
     onRequestPopBackStack: () -> Unit,
     modifier: Modifier = Modifier,
     parentViewModel: EditRecordViewModel = hiltViewModel(
-        LocalNavController.current.getBackStackEntry(
-            ROUTE_EDIT_RECORD,
-        ),
+        LocalNavController.current.getBackStackEntry<EditRecord>(),
     ),
     viewModel: SelectRelatedRecordViewModel = hiltViewModel<SelectRelatedRecordViewModel>().apply {
         updateData(parentViewModel.currentRecord(), parentViewModel.currentRelatedRecord())

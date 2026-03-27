@@ -18,28 +18,28 @@ package cn.wj.android.cashbook.feature.books.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import cn.wj.android.cashbook.feature.books.screen.EditBookRoute
 import cn.wj.android.cashbook.feature.books.screen.MyBooksRoute
-
-private const val ROUTE_KEY_BOOK_ID = "bookId"
+import kotlinx.serialization.Serializable
 
 /** 路由 - 我的账本 */
-private const val ROUTE_BOOKS_MY_BOOKS = "/books/my"
+@Serializable
+object MyBooks
 
 /** 路由 - 编辑账本 */
-private const val ROUTE_BOOKS_EDIT_BOOK = "/books/edit?$ROUTE_KEY_BOOK_ID={$ROUTE_KEY_BOOK_ID}"
+@Serializable
+data class EditBook(val bookId: Long = -1L)
 
 /** 跳转到我的账本 */
 fun NavController.naviToMyBooks() {
-    this.navigate(ROUTE_BOOKS_MY_BOOKS)
+    this.navigate(MyBooks)
 }
 
 /** 跳转到编辑账本 */
 fun NavController.naviToEditBook(bookId: Long = -1L) {
-    this.navigate(ROUTE_BOOKS_EDIT_BOOK.replace("{$ROUTE_KEY_BOOK_ID}", bookId.toString()))
+    this.navigate(EditBook(bookId = bookId))
 }
 
 /**
@@ -52,7 +52,7 @@ fun NavGraphBuilder.myBooksScreen(
     onRequestNaviToEditBook: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(route = ROUTE_BOOKS_MY_BOOKS) {
+    composable<MyBooks> {
         MyBooksRoute(
             onRequestNaviToEditBook = onRequestNaviToEditBook,
             onRequestPopBackStack = onRequestPopBackStack,
@@ -68,18 +68,10 @@ fun NavGraphBuilder.myBooksScreen(
 fun NavGraphBuilder.editBookScreen(
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_BOOKS_EDIT_BOOK,
-        arguments = listOf(
-            navArgument(ROUTE_KEY_BOOK_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-        ),
-    ) {
-        val bookId = it.arguments?.getLong(ROUTE_KEY_BOOK_ID) ?: -1L
+    composable<EditBook> { backStackEntry ->
+        val route = backStackEntry.toRoute<EditBook>()
         EditBookRoute(
-            bookId = bookId,
+            bookId = route.bookId,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }

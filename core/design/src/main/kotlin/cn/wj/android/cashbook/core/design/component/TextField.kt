@@ -40,8 +40,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import cn.wj.android.cashbook.core.design.R
 import cn.wj.android.cashbook.core.design.icon.CbIcons
-import cn.wj.android.cashbook.core.ui.R as UiR
 
 @Composable
 fun CbTextField(
@@ -184,7 +184,7 @@ fun CbPasswordTextField(
                 Icon(
                     imageVector = if (visible) CbIcons.VisibilityOff else CbIcons.Visibility,
                     contentDescription = stringResource(
-                        id = if (visible) UiR.string.cd_hide_password else UiR.string.cd_show_password,
+                        id = if (visible) R.string.cd_design_hide_password else R.string.cd_design_show_password,
                     ),
                 )
             }
