@@ -438,4 +438,29 @@ class RecordRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             recordDao.queryImagesByRecordId(id).map { it.asModel() }
         }
+
+    override suspend fun queryByWechatTransactionId(
+        booksId: Long,
+        transactionId: String,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryByWechatTransactionId(booksId, transactionId).map { it.asModel() }
+    }
+
+    override suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryByTimeAndAmount(booksId, startTime, endTime, amount).map { it.asModel() }
+    }
+
+    override suspend fun batchImportRecords(
+        records: List<cn.wj.android.cashbook.core.database.table.RecordTable>,
+    ): List<Long> = withContext(coroutineContext) {
+        val ids = transactionDao.batchImportRecordsTransaction(records)
+        recordDataVersion.updateVersion()
+        assetDataVersion.updateVersion()
+        ids
+    }
 }
