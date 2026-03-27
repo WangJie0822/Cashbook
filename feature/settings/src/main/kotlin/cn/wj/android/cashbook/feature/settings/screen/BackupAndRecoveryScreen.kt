@@ -100,6 +100,7 @@ import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewMo
 internal fun BackupAndRecoveryRoute(
     onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    onRequestNaviToRecordImport: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: BackupAndRecoveryViewModel = hiltViewModel(),
 ) {
@@ -125,6 +126,7 @@ internal fun BackupAndRecoveryRoute(
         onMobileNetworkBackupEnableChanged = viewModel::onMobileNetworkBackupEnableChanged,
         onNoWifiConfirmBackupClick = viewModel::onNoWifiConfirmBackupClick,
         onDbMigrateClick = viewModel::refreshDbMigrate,
+        onRequestNaviToRecordImport = onRequestNaviToRecordImport,
         onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
@@ -170,6 +172,7 @@ internal fun BackupAndRecoveryScreen(
     onNoWifiConfirmBackupClick: (Boolean) -> Unit,
     onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
     onDbMigrateClick: () -> Unit,
+    onRequestNaviToRecordImport: (String) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -261,6 +264,7 @@ internal fun BackupAndRecoveryScreen(
                             onKeepLatestBackupChanged = onKeepLatestBackupChanged,
                             onMobileNetworkBackupEnableChanged = onMobileNetworkBackupEnableChanged,
                             onDbMigrateClick = onDbMigrateClick,
+                            onRequestNaviToRecordImport = onRequestNaviToRecordImport,
                         )
                     }
                 }
@@ -436,6 +440,7 @@ internal fun BackupAndRecoveryScaffoldContent(
     onKeepLatestBackupChanged: (Boolean) -> Unit,
     onMobileNetworkBackupEnableChanged: (Boolean) -> Unit,
     onDbMigrateClick: () -> Unit,
+    onRequestNaviToRecordImport: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // 提示文本
@@ -701,6 +706,44 @@ internal fun BackupAndRecoveryScaffoldContent(
             },
             modifier = Modifier.clickable(onClick = onDbMigrateClick),
         )
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(32.dp),
+        )
+
+        Text(
+            text = stringResource(id = R.string.import_bill),
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp),
+        )
+
+        val selectFileLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+            onResult = { uri ->
+                if (uri != null) {
+                    // 获取持久化读取授权
+                    context.contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                    )
+                    onRequestNaviToRecordImport(uri.toString())
+                }
+            },
+        )
+
+        CbListItem(
+            headlineContent = { Text(text = stringResource(id = R.string.import_from_wechat)) },
+            supportingContent = {
+                Text(text = stringResource(id = R.string.import_from_wechat_hint))
+            },
+            modifier = Modifier.clickable {
+                selectFileLauncher.launch(
+                    arrayOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                )
+            },
+        )
     }
 }
 
@@ -722,6 +765,7 @@ private fun BackupAndRecoveryScreenPreview() {
         BackupAndRecoveryRoute(
             onRequestPopBackStack = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+            onRequestNaviToRecordImport = {},
         )
     }
 }

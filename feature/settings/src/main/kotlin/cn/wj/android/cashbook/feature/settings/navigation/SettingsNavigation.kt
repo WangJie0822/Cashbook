@@ -134,15 +134,18 @@ fun NavGraphBuilder.settingScreen(
  *
  * @param onRequestPopBackStack 导航到上一级
  * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
+ * @param onRequestNaviToRecordImport 导航到账单导入，参数：(文件Uri字符串) -> [Unit]
  */
 fun NavGraphBuilder.backupAndRecoveryScreen(
     onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    onRequestNaviToRecordImport: (String) -> Unit,
 ) {
     composable(route = ROUTE_SETTINGS_BACKUP_AND_RECOVERY) {
         BackupAndRecoveryRoute(
             onRequestPopBackStack = onRequestPopBackStack,
             onShowSnackbar = onShowSnackbar,
+            onRequestNaviToRecordImport = onRequestNaviToRecordImport,
         )
     }
 }
