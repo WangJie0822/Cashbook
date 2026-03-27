@@ -195,7 +195,7 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp)
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .padding(horizontal = 12.dp, vertical = spacing.small)
                         .background(primaryColor),
                     onClick = {
                         if (CalculatorUtils.needShowEqualSign(text)) {
