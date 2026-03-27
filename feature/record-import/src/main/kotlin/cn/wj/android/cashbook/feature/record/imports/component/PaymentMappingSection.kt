@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.icon.CbIcons
@@ -67,8 +68,11 @@ internal fun PaymentMappingSection(
                 modifier = Modifier.weight(1f),
             )
             Icon(
-                imageVector = if (expanded) CbIcons.KeyboardArrowUp else CbIcons.KeyboardArrowDown,
+                imageVector = CbIcons.KeyboardArrowDown,
                 contentDescription = null,
+                modifier = Modifier.graphicsLayer {
+                    rotationZ = if (expanded) 180f else 0f
+                },
             )
         }
 
