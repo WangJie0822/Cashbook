@@ -397,11 +397,11 @@ interface TransactionDao {
     ): List<Long> {
         val insertedIds = mutableListOf<Long>()
 
-        // 按资产分组汇总余额变化
+        // 按资产分组汇总余额变化（使用 Long，与项目金额类型一致）
         data class BalanceChange(
             val assetId: Long,
-            var incomeTotal: BigDecimal = BigDecimal.ZERO,
-            var expenditureTotal: BigDecimal = BigDecimal.ZERO,
+            var incomeTotal: Long = 0L,
+            var expenditureTotal: Long = 0L,
         )
 
         val balanceChanges = mutableMapOf<Long, BalanceChange>()
@@ -410,15 +410,11 @@ interface TransactionDao {
             val type = queryTypeById(record.typeId) ?: continue
             val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
 
-            // 计算实际金额（与 insertRecordTransaction 逻辑一致）
-            val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
-                record.amount.toBigDecimalOrZero() - record.charge.toBigDecimalOrZero()
-            } else {
-                record.amount.toBigDecimalOrZero() + record.charge.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero()
-            }
+            // 复用已有方法计算实际金额
+            val recordAmount = calculateRecordAmount(record, category)
 
             // 插入记录
-            val id = insertRecord(record.copy(finalAmount = recordAmount.toDouble()))
+            val id = insertRecord(record.copy(finalAmount = recordAmount))
             insertedIds.add(id)
 
             // 累计余额变化
@@ -442,13 +438,13 @@ interface TransactionDao {
 
             val balance = if (isCreditCard) {
                 // 信用卡：收入减少已用额度，支出增加已用额度
-                asset.balance.toBigDecimalOrZero() - change.incomeTotal + change.expenditureTotal
+                asset.balance - change.incomeTotal + change.expenditureTotal
             } else {
                 // 非信用卡：收入增加余额，支出减少余额
-                asset.balance.toBigDecimalOrZero() + change.incomeTotal - change.expenditureTotal
+                asset.balance + change.incomeTotal - change.expenditureTotal
             }
 
-            updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+            updateAsset(asset.copy(balance = balance))
         }
 
         return insertedIds

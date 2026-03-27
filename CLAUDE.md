@@ -97,6 +97,14 @@ app → feature/* → core/*
 - **同步**: WorkManager (`sync/work` 模块)
 - **图表**: Compose Canvas 自绘制 (`core/design` 中的 CbPieChart、CbLineChart)
 
+### 金额约定（强制）
+
+- 数据库及全链路金额统一使用 **`Long` 类型，单位：分**（1 元 = 100）
+- `RecordTable.amount`、`finalAmount`、`concessions`、`charge` 以及 `AssetTable.balance` 均为 `Long`
+- 外部输入（如导入账单的 `Double` 元值）必须通过 `Double.toCent()` 或 `String.toAmountCent()` 转换为分再存入数据库（工具方法在 `core/common/ext/Money.kt`）
+- 计算 `recordAmount` 应复用 `TransactionDao.calculateRecordAmount()` 方法，禁止自行用 `BigDecimal` / `Double` 重新实现
+- UI 显示时使用 `Long.toMoneyString()` / `Long.toMoneyFormat()` / `Long.toMoneyCNY()` 转回元
+
 ### 多渠道 (Product Flavors)
 
 - **Online**: 在线版 (支持网络更新检查)

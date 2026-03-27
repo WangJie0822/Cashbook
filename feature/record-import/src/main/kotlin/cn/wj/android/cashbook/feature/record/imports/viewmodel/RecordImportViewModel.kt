@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.toCent
 import cn.wj.android.cashbook.core.data.helper.BillCategoryMatcher
 import cn.wj.android.cashbook.core.data.helper.BillPaymentMatcher
 import cn.wj.android.cashbook.core.data.helper.WechatBillParser
@@ -287,16 +288,17 @@ class RecordImportViewModel @Inject constructor(
                         }
                     }
 
+                    val amountCent = preview.billItem.amount.toCent()
                     RecordTable(
                         id = null,
                         typeId = preview.mappedTypeId,
                         assetId = preview.mappedAssetId,
                         intoAssetId = -1L,
                         booksId = state.selectedBooksId,
-                        amount = preview.billItem.amount,
-                        finalAmount = preview.billItem.amount,
-                        concessions = 0.0,
-                        charge = 0.0,
+                        amount = amountCent,
+                        finalAmount = amountCent,
+                        concessions = 0L,
+                        charge = 0L,
                         remark = remarkText,
                         reimbursable = cn.wj.android.cashbook.core.common.SWITCH_INT_OFF,
                         recordTime = preview.billItem.transactionTime,
