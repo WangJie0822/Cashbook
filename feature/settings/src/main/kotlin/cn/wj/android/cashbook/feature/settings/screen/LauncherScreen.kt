@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.settings.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -42,7 +43,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
-import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModel
@@ -161,10 +161,8 @@ internal fun LauncherScreen(
     }
 
     // 抽屉显示时，返回关闭抽屉
-    if (drawerState.isOpen) {
-        BackPressHandler {
-            onRequestDismissDrawerSheet()
-        }
+    BackHandler(enabled = drawerState.isOpen) {
+        onRequestDismissDrawerSheet()
     }
 
     Box(

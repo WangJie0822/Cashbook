@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.assets.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -68,7 +69,6 @@ import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
-import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
 import cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetUiState
@@ -99,10 +99,8 @@ internal fun MyAssetRoute(
     val showMoreDialog = viewModel.showMoreDialog
 
     // 显示更多显示时返回隐藏弹窗
-    if (showMoreDialog) {
-        BackPressHandler {
-            viewModel.dismissShowMoreDialog()
-        }
+    BackHandler(enabled = showMoreDialog) {
+        viewModel.dismissShowMoreDialog()
     }
 
     MyAssetScreen(

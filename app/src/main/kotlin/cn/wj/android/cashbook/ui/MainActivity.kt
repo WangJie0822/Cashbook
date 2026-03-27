@@ -102,9 +102,7 @@ class MainActivity : AppCompatActivity() {
                 darkTheme = darkTheme,
                 disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
             ) {
-                ProvideLocalState(
-                    onBackPressedDispatcher = this.onBackPressedDispatcher,
-                ) {
+                ProvideLocalState {
                     MainApp(shortcutsType = shortcutsType)
                 }
             }

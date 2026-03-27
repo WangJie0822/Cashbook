@@ -87,9 +87,7 @@ class MarkdownActivity : AppCompatActivity() {
                 darkTheme = darkTheme,
                 disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
             ) {
-                ProvideLocalState(
-                    onBackPressedDispatcher = this.onBackPressedDispatcher,
-                ) {
+                ProvideLocalState {
                     MarkdownRoute(
                         markdownType = MarkdownTypeEnum.ordinalOf(
                             intent.getIntExtra(

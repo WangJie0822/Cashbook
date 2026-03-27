@@ -1556,7 +1556,7 @@ CashbookTheme
 | LocalBackgroundTheme | BackgroundTheme | 背景配置 |
 | LocalTintTheme | TintTheme | 图标色调 |
 | LocalNavController | NavController | 导航控制器 |
-| LocalBackPressedDispatcher | OnBackPressedDispatcher | 返回事件分发 |
+| ~~LocalBackPressedDispatcher~~ | ~~OnBackPressedDispatcher~~ | 已移除，使用官方 `androidx.activity.compose.BackHandler` 替代 |
 | LocalDefaultLoadingHint | String | Loading 默认提示文本 |
 | LocalDefaultEmptyImagePainter | Painter | Empty 默认图片 |
 | LocalProgressDialogHint | String | 进度弹窗默认提示 |
