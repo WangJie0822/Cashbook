@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 
 @Composable
 fun Empty(
@@ -55,6 +56,7 @@ fun Empty(
     imagePainter: Painter = LocalDefaultEmptyImagePainter.current,
     button: @Composable ColumnScope.() -> Unit = {},
 ) {
+    val spacing = LocalSpacing.current
     Column(
         modifier = modifier
             .defaultMinSize(minHeight = 250.dp),
@@ -69,7 +71,7 @@ fun Empty(
         Text(
             text = hintText,
             color = LocalContentColor.current.copy(0.5f),
-            modifier = Modifier.padding(vertical = 16.dp),
+            modifier = Modifier.padding(vertical = spacing.medium),
         )
 
         button()

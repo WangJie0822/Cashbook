@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.ui.R
 import java.time.YearMonth
 import java.util.Calendar
@@ -54,6 +55,7 @@ fun SelectDateDialog(
     yearSelected: Boolean = false,
     onDateSelected: (YearMonth, Boolean) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     Dialog(onDismissRequest = onDialogDismiss) {
         Surface(
             shape = AlertDialogDefaults.shape,
@@ -63,7 +65,7 @@ fun SelectDateDialog(
             Column(
                 modifier = Modifier
                     .sizeIn(minWidth = 280.dp, maxWidth = 560.dp)
-                    .padding(16.dp),
+                    .padding(spacing.medium),
             ) {
                 val currentYear = currentDate.year
                 val currentMonth = currentDate.monthValue
@@ -76,7 +78,7 @@ fun SelectDateDialog(
                     yearList.add(i)
                 }
                 LazyRow(
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    modifier = Modifier.padding(vertical = spacing.extraSmall),
                     content = {
                         items(yearList) { year ->
                             val containerColor = if (year == selectedYear) {
@@ -96,8 +98,8 @@ fun SelectDateDialog(
                                         shape = MaterialTheme.shapes.large,
                                     )
                                     .padding(
-                                        horizontal = 8.dp,
-                                        vertical = 4.dp,
+                                        horizontal = spacing.small,
+                                        vertical = spacing.extraSmall,
                                     ),
                             )
                         }
@@ -139,7 +141,7 @@ fun SelectDateDialog(
                                                     shape = MaterialTheme.shapes.large,
                                                 )
                                                 .weight(1f)
-                                                .padding(vertical = 8.dp),
+                                                .padding(vertical = spacing.small),
                                         )
                                     }
                                 },
@@ -173,7 +175,7 @@ fun SelectDateDialog(
                                 color = containerColor,
                                 shape = MaterialTheme.shapes.large,
                             )
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = spacing.small),
                     )
                 }
             }

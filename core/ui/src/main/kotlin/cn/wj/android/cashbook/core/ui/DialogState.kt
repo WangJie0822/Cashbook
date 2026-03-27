@@ -28,10 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cn.wj.android.cashbook.core.design.component.CbCard
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
@@ -150,6 +150,7 @@ val LocalProgressDialogHint =
  */
 @Composable
 fun ProgressDialog() {
+    val spacing = LocalSpacing.current
     ((ProgressDialogManager.dialogState as? DialogState.Shown<*>)?.data as? ProgressDialogState)?.let { state ->
         Dialog(
             onDismissRequest = {
@@ -163,7 +164,7 @@ fun ProgressDialog() {
             content = {
                 CbCard {
                     Column(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
+                        modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.extraLarge),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         LinearProgressIndicator()
@@ -173,7 +174,7 @@ fun ProgressDialog() {
                             } else {
                                 state.hint
                             },
-                            modifier = Modifier.padding(top = 32.dp),
+                            modifier = Modifier.padding(top = spacing.extraLarge),
                         )
                     }
                 }

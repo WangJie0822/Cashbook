@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.util.LunarUtils
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import kotlinx.coroutines.flow.collectLatest
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -176,6 +177,7 @@ internal fun MonthView(
     weekStart: DayOfWeek = DayOfWeek.SUNDAY,
     schemeContent: @Composable BoxScope.(LocalDate, Boolean) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     Column(modifier = modifier) {
         val nowDate = LocalDate.now()
         val startDay = yearMonth.atDay(1)
@@ -187,7 +189,7 @@ internal fun MonthView(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                    .padding(vertical = spacing.extraSmall),
             ) {
                 for (r in 0 until 7) {
                     val currentDay = c * 7 + r - monthStartOffset

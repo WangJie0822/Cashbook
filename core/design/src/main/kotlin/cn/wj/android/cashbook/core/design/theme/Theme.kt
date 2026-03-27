@@ -230,6 +230,7 @@ fun CashbookTheme(
         LocalGradientColors provides gradientColors,
         LocalBackgroundTheme provides backgroundTheme,
         LocalTintTheme provides tintTheme,
+        LocalSpacing provides CbSpacing(),
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

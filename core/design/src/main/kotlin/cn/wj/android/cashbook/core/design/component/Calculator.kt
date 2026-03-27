@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.design.util.CalculatorUtils
 
 /**
@@ -51,11 +52,12 @@ import cn.wj.android.cashbook.core.design.util.CalculatorUtils
  */
 @Composable
 fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String) -> Unit) {
+    val spacing = LocalSpacing.current
     var text: String by remember { mutableStateOf(defaultText.ifBlank { "0" }) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(spacing.medium),
     ) {
         TextField(
             value = text,
