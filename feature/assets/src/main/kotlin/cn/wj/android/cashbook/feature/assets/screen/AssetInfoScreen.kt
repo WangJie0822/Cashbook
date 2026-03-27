@@ -175,19 +175,19 @@ internal fun AssetInfoScreen(
                 actions = {
                     if (uiState is AssetInfoUiState.Success) {
                         CbIconButton(onClick = onEditAssetClick) {
-                            Icon(imageVector = CbIcons.EditNote, contentDescription = null)
+                            Icon(imageVector = CbIcons.EditNote, contentDescription = stringResource(id = R.string.cd_edit))
                         }
                         CbIconButton(onClick = onDeleteAssetClick) {
                             Icon(
                                 imageVector = CbIcons.DeleteForever,
-                                contentDescription = null,
+                                contentDescription = stringResource(id = R.string.cd_delete),
                             )
                         }
                         if (uiState.shouldDisplayMore) {
                             CbIconButton(onClick = onRequestShowMoreDialog) {
                                 Icon(
                                     imageVector = CbIcons.Info,
-                                    contentDescription = null,
+                                    contentDescription = stringResource(id = R.string.cd_more_options),
                                 )
                             }
                         }
@@ -197,7 +197,7 @@ internal fun AssetInfoScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = onAddRecordClick) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
         snackbarHost = {
@@ -260,7 +260,7 @@ internal fun AssetInfoScreen(
                                                     ) {
                                                         Icon(
                                                             imageVector = CbIcons.ContentCopy,
-                                                            contentDescription = null,
+                                                            contentDescription = stringResource(id = R.string.cd_copy),
                                                         )
                                                     }
                                                 }
@@ -287,7 +287,7 @@ internal fun AssetInfoScreen(
                                                     ) {
                                                         Icon(
                                                             imageVector = CbIcons.ContentCopy,
-                                                            contentDescription = null,
+                                                            contentDescription = stringResource(id = R.string.cd_copy),
                                                         )
                                                     }
                                                 }

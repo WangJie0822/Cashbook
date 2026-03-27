@@ -705,7 +705,7 @@ internal fun Verification(
                     Icon(
                         imageVector = CbIcons.Fingerprint,
                         tint = MaterialTheme.colorScheme.primary,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.cd_fingerprint),
                     )
                 }
                 if (firstOpen) {

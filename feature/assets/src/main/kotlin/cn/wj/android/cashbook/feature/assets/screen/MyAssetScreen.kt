@@ -162,7 +162,7 @@ internal fun MyAssetScreen(
                 CbFloatingActionButton(onClick = onRequestDisplayShowMoreDialog) {
                     Icon(
                         imageVector = CbIcons.MoreVert,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.cd_more_options),
                     )
                 }
             },
@@ -240,7 +240,7 @@ private fun ShowMoreContent(
                         onCloseClick.invoke()
                     },
                 ) {
-                    Icon(imageVector = CbIcons.Add, contentDescription = null)
+                    Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
                 }
             }
 
@@ -272,7 +272,7 @@ private fun ShowMoreContent(
                 ) {
                     Icon(
                         imageVector = CbIcons.VisibilityOff,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.cd_visibility_toggle),
                     )
                 }
             }
@@ -280,7 +280,7 @@ private fun ShowMoreContent(
             CbFloatingActionButton(
                 onClick = onCloseClick,
             ) {
-                Icon(imageVector = CbIcons.Close, contentDescription = null)
+                Icon(imageVector = CbIcons.Close, contentDescription = stringResource(id = R.string.cd_close))
             }
         }
     }

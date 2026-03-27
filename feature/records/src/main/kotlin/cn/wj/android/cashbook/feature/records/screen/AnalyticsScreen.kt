@@ -182,7 +182,7 @@ private fun AnalyticsScreen(
                 onBackClick = onRequestPopBackStack,
                 actions = {
                     CbIconButton(onClick = onRequestShowSelectDateRangeDialog) {
-                        Icon(imageVector = CbIcons.DateRange, contentDescription = null)
+                        Icon(imageVector = CbIcons.DateRange, contentDescription = stringResource(id = R.string.cd_select_date))
                     }
                 },
             )
@@ -261,7 +261,7 @@ private fun AnalyticsScreen(
                                 ) {
                                     Icon(
                                         imageVector = CbIcons.DonutSmall,
-                                        contentDescription = null,
+                                        contentDescription = stringResource(id = R.string.cd_analytics),
                                     )
                                 }
                             }

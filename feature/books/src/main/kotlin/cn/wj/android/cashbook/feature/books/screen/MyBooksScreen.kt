@@ -120,7 +120,7 @@ internal fun MyBooksScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = { onEditBookClick(-1L) }) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
         content = { paddingValues ->
@@ -297,7 +297,7 @@ private fun MyBooksContent(
                                                 content = {
                                                     Icon(
                                                         imageVector = CbIcons.MoreHoriz,
-                                                        contentDescription = null,
+                                                        contentDescription = stringResource(id = R.string.cd_more_options),
                                                     )
                                                 },
                                                 modifier = Modifier,

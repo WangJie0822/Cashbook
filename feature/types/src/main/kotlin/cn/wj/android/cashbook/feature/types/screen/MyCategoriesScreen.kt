@@ -193,7 +193,7 @@ internal fun MyCategoriesScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = onRequestAddFirstType) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
         snackbarHost = {

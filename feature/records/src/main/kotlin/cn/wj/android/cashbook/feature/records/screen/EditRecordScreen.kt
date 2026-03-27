@@ -348,7 +348,7 @@ internal fun EditRecordScreen(
                 CbFloatingActionButton(
                     onClick = onSaveClick,
                     content = {
-                        Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
+                        Icon(imageVector = CbIcons.SaveAs, contentDescription = stringResource(id = R.string.cd_confirm))
                     },
                 )
             }
@@ -991,7 +991,7 @@ internal fun SelectImageSheetContent(
                                         end.linkTo(iv.end)
                                     },
                             ) {
-                                Icon(imageVector = CbIcons.RemoveCircle, contentDescription = null)
+                                Icon(imageVector = CbIcons.RemoveCircle, contentDescription = stringResource(id = R.string.cd_delete))
                             }
                         }
                     }

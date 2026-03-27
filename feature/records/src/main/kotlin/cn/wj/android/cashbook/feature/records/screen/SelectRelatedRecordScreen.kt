@@ -104,7 +104,7 @@ internal fun SelectRelatedRecordScreen(
                     onRequestSaveRelatedRecord(uiState.relatedRecordList.map { it.id })
                     onRequestPopBackStack()
                 }) {
-                    Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
+                    Icon(imageVector = CbIcons.SaveAs, contentDescription = stringResource(id = R.string.cd_confirm))
                 }
             }
         },
