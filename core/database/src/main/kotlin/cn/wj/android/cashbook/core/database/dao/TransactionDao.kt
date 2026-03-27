@@ -278,6 +278,77 @@ interface TransactionDao {
         }
     }
 
+    /**
+     * 批量导入记录事务
+     *
+     * 在单个事务中插入多条记录并更新对应资产余额。
+     *
+     * @param records 要插入的记录列表
+     * @return 插入后的记录 ID 列表
+     */
+    @Transaction
+    suspend fun batchImportRecordsTransaction(
+        records: List<RecordTable>,
+    ): List<Long> {
+        val insertedIds = mutableListOf<Long>()
+
+        // 按资产分组汇总余额变化
+        data class BalanceChange(
+            val assetId: Long,
+            var incomeTotal: BigDecimal = BigDecimal.ZERO,
+            var expenditureTotal: BigDecimal = BigDecimal.ZERO,
+        )
+
+        val balanceChanges = mutableMapOf<Long, BalanceChange>()
+
+        for (record in records) {
+            val type = queryTypeById(record.typeId) ?: continue
+            val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
+
+            // 计算实际金额（与 insertRecordTransaction 逻辑一致）
+            val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
+                record.amount.toBigDecimalOrZero() - record.charge.toBigDecimalOrZero()
+            } else {
+                record.amount.toBigDecimalOrZero() + record.charge.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero()
+            }
+
+            // 插入记录
+            val id = insertRecord(record.copy(finalAmount = recordAmount.toDouble()))
+            insertedIds.add(id)
+
+            // 累计余额变化
+            if (record.assetId > 0) {
+                val change = balanceChanges.getOrPut(record.assetId) {
+                    BalanceChange(assetId = record.assetId)
+                }
+                if (category == RecordTypeCategoryEnum.INCOME) {
+                    change.incomeTotal += recordAmount
+                } else {
+                    change.expenditureTotal += recordAmount
+                }
+            }
+        }
+
+        // 批量更新资产余额
+        for ((assetId, change) in balanceChanges) {
+            val asset = queryAssetById(assetId) ?: continue
+            val isCreditCard = ClassificationTypeEnum.ordinalOf(asset.type) ==
+                ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
+
+            val balance = if (isCreditCard) {
+                // 信用卡：收入减少已用额度，支出增加已用额度
+                asset.balance.toBigDecimalOrZero() - change.incomeTotal + change.expenditureTotal
+            } else {
+                // 非信用卡：收入增加余额，支出减少余额
+                asset.balance.toBigDecimalOrZero() + change.incomeTotal - change.expenditureTotal
+            }
+
+            updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+        }
+
+        return insertedIds
+    }
+
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteRecordTransaction(recordId: Long?) {

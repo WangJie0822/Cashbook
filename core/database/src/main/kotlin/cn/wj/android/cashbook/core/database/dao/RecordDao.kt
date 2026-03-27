@@ -313,4 +313,29 @@ interface RecordDao {
     """,
     )
     suspend fun queryImagesByRecordId(recordId: Long): List<ImageWithRelatedTable>
+
+    @Query(
+        """
+    SELECT * FROM db_record
+    WHERE books_id=:booksId
+    AND remark LIKE '%[微信单号:' || :transactionId || ']%'
+""",
+    )
+    suspend fun queryByWechatTransactionId(booksId: Long, transactionId: String): List<RecordTable>
+
+    @Query(
+        """
+    SELECT * FROM db_record
+    WHERE books_id=:booksId
+    AND record_time>=:startTime
+    AND record_time<=:endTime
+    AND amount=:amount
+""",
+    )
+    suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordTable>
 }
