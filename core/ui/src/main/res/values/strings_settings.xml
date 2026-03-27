@@ -140,4 +140,30 @@
     <string name="backup_success">备份成功</string>
     <string name="recovery_success">恢复成功</string>
     <string name="backup_path_empty">备份路径为空</string>
+
+    <string name="import_bill">导入账单</string>
+    <string name="import_from_wechat">从微信导入</string>
+    <string name="import_from_wechat_hint">导入微信支付账单(.xlsx)</string>
+    <string name="import_summary_total">共 %1$d 条记录</string>
+    <string name="import_summary_income">收入 %1$d 笔 %2$s 元</string>
+    <string name="import_summary_expenditure">支出 %1$d 笔 %2$s 元</string>
+    <string name="import_target_book">目标账本</string>
+    <string name="import_payment_mapping">支付方式映射</string>
+    <string name="import_payment_unmapped">未映射</string>
+    <string name="import_payment_click_to_select">点击选择资产</string>
+    <string name="import_preview_list">记录预览</string>
+    <string name="import_duplicate_exact">已存在</string>
+    <string name="import_duplicate_possible">可能重复</string>
+    <string name="import_selected_count">已选 %1$d 条</string>
+    <string name="import_selected_amount">共 ¥%1$s</string>
+    <string name="import_confirm">确认导入</string>
+    <string name="import_has_unmapped_payment">存在未映射的支付方式</string>
+    <string name="import_success">成功导入 %1$d 条记录，跳过 %2$d 条</string>
+    <string name="import_parsing">正在解析账单…</string>
+    <string name="import_importing">正在导入…</string>
+    <string name="import_file_format_error">文件格式不支持，请选择微信支付导出的 xlsx 文件</string>
+    <string name="import_select_all">全选</string>
+    <string name="import_deselect_all">取消全选</string>
+    <string name="import_select_asset">选择资产</string>
+    <string name="import_select_category">选择分类</string>
 </resources>

@@ -121,6 +121,29 @@ interface RecordRepository {
     suspend fun queryRelatedRecordCountById(id: Long): Int
 
     suspend fun queryImagesByRecordId(id: Long): List<ImageModel>
+
+    /**
+     * 查询指定账本中是否存在包含微信交易单号的记录
+     */
+    suspend fun queryByWechatTransactionId(booksId: Long, transactionId: String): List<RecordModel>
+
+    /**
+     * 查询指定账本中指定时间范围和金额的记录（用于模糊去重）
+     */
+    suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordModel>
+
+    /**
+     * 批量导入记录
+     *
+     * @param records 要导入的记录列表（RecordTable 格式）
+     * @return 插入后的记录 ID 列表
+     */
+    suspend fun batchImportRecords(records: List<cn.wj.android.cashbook.core.database.table.RecordTable>): List<Long>
 }
 
 internal fun RecordTable.asModel(): RecordModel {

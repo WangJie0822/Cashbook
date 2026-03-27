@@ -96,6 +96,8 @@ import cn.wj.android.cashbook.feature.books.navigation.editBookScreen
 import cn.wj.android.cashbook.feature.books.navigation.myBooksScreen
 import cn.wj.android.cashbook.feature.books.navigation.naviToEditBook
 import cn.wj.android.cashbook.feature.books.navigation.naviToMyBooks
+import cn.wj.android.cashbook.feature.record.imports.navigation.naviToRecordImport
+import cn.wj.android.cashbook.feature.record.imports.navigation.recordImportScreen
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
 import cn.wj.android.cashbook.feature.records.navigation.ROUTE_EDIT_RECORD
@@ -448,6 +450,12 @@ fun CashbookNavHost(
         )
         // 备份与恢复
         backupAndRecoveryScreen(
+            onRequestPopBackStack = navController::popBackStackSafety,
+            onShowSnackbar = onShowSnackbar,
+            onRequestNaviToRecordImport = { fileUri -> navController.naviToRecordImport(fileUri) },
+        )
+        // 账单导入
+        recordImportScreen(
             onRequestPopBackStack = navController::popBackStackSafety,
             onShowSnackbar = onShowSnackbar,
         )
