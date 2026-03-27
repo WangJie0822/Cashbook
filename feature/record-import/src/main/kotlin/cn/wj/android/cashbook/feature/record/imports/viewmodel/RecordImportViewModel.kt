@@ -24,7 +24,6 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.data.helper.BillCategoryMatcher
 import cn.wj.android.cashbook.core.data.helper.BillPaymentMatcher
 import cn.wj.android.cashbook.core.data.helper.WechatBillParser
@@ -41,13 +40,10 @@ import cn.wj.android.cashbook.core.model.model.ImportPreviewItem
 import cn.wj.android.cashbook.core.model.model.ImportedBillItem
 import cn.wj.android.cashbook.core.model.model.PaymentMethodMapping
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
-import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import javax.inject.Inject
