@@ -34,7 +34,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -572,7 +572,7 @@ private fun DatePickerWheelDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextButton(
+                CbTextButton(
                     onClick = { onConfirm(selectedDate) },
                     modifier = Modifier.align(Alignment.End),
                 ) {

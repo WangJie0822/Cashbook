@@ -113,6 +113,36 @@ app → feature/* → core/*
 - 源文件需包含 Apache 2.0 License Header（Spotless 自动检查，模板在 `spotless/` 目录）
 - Kotlin 格式化使用 ktlint (android mode)
 - 自定义 Lint 规则在 `lint/` 模块，通过 `:core:design` 发布
+- **禁止在 `app/`、`feature/`、`core/ui/` 中直接使用以下 Material3 组件，必须使用 `core/design` 中对应的设计系统封装：**
+
+  | Material3 组件 | 项目封装 |
+  |---|---|
+  | `MaterialTheme()` | `CashbookTheme` |
+  | `TopAppBar` | `CbTopAppBar` |
+  | `Scaffold` | `CbScaffold` |
+  | `Divider` | `CbHorizontalDivider` / `CbVerticalDivider` |
+  | `TextField` | `CbTextField` |
+  | `OutlinedTextField` | `CbOutlinedTextField` |
+  | `FloatingActionButton` | `CbFloatingActionButton` |
+  | `SmallFloatingActionButton` | `CbSmallFloatingActionButton` |
+  | `ListItem` | `CbListItem` |
+  | `ModalBottomSheet` | `CbModalBottomSheet` |
+  | `TextButton` | `CbTextButton` |
+  | `IconButton` | `CbIconButton` |
+  | `Card` | `CbCard` |
+  | `ElevatedCard` | `CbElevatedCard` |
+  | `AlertDialog` | `CbAlertDialog` |
+  | `BaseAlterDialog` | `CbBaseAlterDialog` |
+  | `Tab` | `CbTab` |
+  | `TabRow` | `CbTabRow` |
+  | `Icons` | `CbIcons` |
+
+  > 访问 `MaterialTheme.colorScheme`/`.typography`/`.shapes` 属性是允许的，仅禁止作为 composable 调用。
+  > 违反此规则会触发 lint `Design` error，构建将中止。
 - `compose_compiler_config.conf` 声明了 `core/model` 中模型类的 Compose 稳定性
 - 测试使用自定义 TestRunner: `cn.wj.android.cashbook.core.testing.CashbookTestRunner`
 - 包名: `cn.wj.android.cashbook`
+
+## 规范（强制）
+- 所有修改新增功能必须确认是否新增对应测试，功能开发必须在测试通过才算完成
+- 
