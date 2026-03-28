@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -134,6 +135,7 @@ import cn.wj.android.cashbook.feature.types.navigation.EditRecordTypeListContent
 import cn.wj.android.cashbook.feature.types.navigation.myCategoriesScreen
 import cn.wj.android.cashbook.feature.types.navigation.naviToMyCategories
 import io.noties.markwon.Markwon
+import kotlinx.coroutines.launch
 import javax.crypto.Cipher
 
 /** 开始默认显示路径 */
@@ -399,6 +401,7 @@ fun CashbookNavHost(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     NavHost(
         navController = navController,
         startDestination = START_DESTINATION,
@@ -458,7 +461,10 @@ fun CashbookNavHost(
         // 账单导入
         recordImportScreen(
             onRequestPopBackStack = navController::popBackStackSafety,
-            onShowSnackbar = onShowSnackbar,
+            onImportResult = { message ->
+                navController.popBackStackSafety()
+                scope.launch { onShowSnackbar(message, null) }
+            },
         )
 
         // 我的标签

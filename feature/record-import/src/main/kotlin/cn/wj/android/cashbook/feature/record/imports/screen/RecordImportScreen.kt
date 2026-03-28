@@ -30,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -64,7 +63,7 @@ import cn.wj.android.cashbook.feature.record.imports.viewmodel.RecordImportViewM
 @Composable
 internal fun RecordImportRoute(
     onRequestPopBackStack: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    onImportResult: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RecordImportViewModel = hiltViewModel(),
 ) {
@@ -86,7 +85,7 @@ internal fun RecordImportRoute(
         onUpdateItemType = viewModel::updateItemType,
         onConfirmImport = viewModel::confirmImport,
         onBackClick = onRequestPopBackStack,
-        onShowSnackbar = onShowSnackbar,
+        onImportResult = onImportResult,
         selectedMappingName = selectedMappingName,
         onDismissMappingDialog = { selectedMappingName = null },
         selectedTypeIndex = selectedTypeIndex,
@@ -108,7 +107,7 @@ internal fun RecordImportScreen(
     onUpdateItemType: (Int, Long, String) -> Unit,
     onConfirmImport: () -> Unit,
     onBackClick: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    onImportResult: (String) -> Unit,
     selectedMappingName: String?,
     onDismissMappingDialog: () -> Unit,
     selectedTypeIndex: Int,
@@ -121,19 +120,13 @@ internal fun RecordImportScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is RecordImportUiState.Done -> {
-                onShowSnackbar(
+                onImportResult(
                     context.getString(R.string.import_success, uiState.imported, uiState.skipped),
-                    null,
                 )
-                onBackClick()
             }
 
             is RecordImportUiState.Error -> {
-                onShowSnackbar(
-                    context.getString(R.string.import_file_format_error),
-                    null,
-                )
-                onBackClick()
+                onImportResult(context.getString(R.string.import_file_format_error))
             }
 
             else -> {}

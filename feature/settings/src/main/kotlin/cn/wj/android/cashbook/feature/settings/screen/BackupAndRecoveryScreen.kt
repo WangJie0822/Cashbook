@@ -65,6 +65,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.BACKUP_FILE_NAME
+import cn.wj.android.cashbook.core.common.tools.funLogger
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_EMPTY
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_UNAUTHORIZED
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_WEBDAV
@@ -727,12 +728,30 @@ internal fun BackupAndRecoveryScaffoldContent(
             contract = ActivityResultContracts.OpenDocument(),
             onResult = { uri ->
                 if (uri != null) {
-                    // 获取持久化读取授权
-                    context.contentResolver.takePersistableUriPermission(
-                        uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
-                    )
-                    onRequestNaviToRecordImport(uri.toString())
+                    // 在回调中立即复制文件到缓存，避免 URI 权限在导航后失效
+                    try {
+                        // 用原始文件名保存，确保导入界面显示正确名称
+                        val displayName = context.contentResolver.query(
+                            uri,
+                            arrayOf(android.provider.OpenableColumns.DISPLAY_NAME),
+                            null,
+                            null,
+                            null,
+                        )?.use { cursor ->
+                            if (cursor.moveToFirst()) cursor.getString(0) else null
+                        } ?: "import_bill_temp.xlsx"
+                        val cacheFile = java.io.File(context.cacheDir, displayName)
+                        context.contentResolver.openInputStream(uri)?.use { input ->
+                            cacheFile.outputStream().use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        onRequestNaviToRecordImport(cacheFile.absolutePath)
+                    } catch (e: Exception) {
+                        // 文件复制失败，权限不足或文件无法读取
+                        funLogger("BackupAndRecovery")
+                            .e(e, "copy import file failed")
+                    }
                 }
             },
         )

@@ -37,12 +37,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModel
@@ -217,6 +217,7 @@ internal fun LauncherSheet(
     onAboutUsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val spacing = LocalSpacing.current
     ModalDrawerSheet(
         modifier = modifier,
     ) {
@@ -224,7 +225,7 @@ internal fun LauncherSheet(
             text = stringResource(id = R.string.sheet_title),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(spacing.large),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_books)) },
@@ -261,7 +262,7 @@ internal fun LauncherSheet(
             onClick = onMyTagClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
-        CbHorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
+        CbHorizontalDivider(modifier = Modifier.padding(horizontal = spacing.large))
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.settings)) },
             icon = { Icon(imageVector = CbIcons.Settings, contentDescription = null) },

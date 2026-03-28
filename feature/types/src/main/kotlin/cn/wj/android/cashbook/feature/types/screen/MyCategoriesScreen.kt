@@ -81,6 +81,7 @@ import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -514,6 +515,7 @@ private fun DialogExpandableTypeList(
     typeList: List<ExpandableRecordTypeModel>,
     onTypeItemClick: (Long) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     LazyColumn(
         content = {
             typeList.forEach { first ->
@@ -536,7 +538,9 @@ private fun DialogExpandableTypeList(
                                         } else {
                                             CbIcons.KeyboardArrowRight
                                         },
-                                        contentDescription = null,
+                                        contentDescription = stringResource(
+                                            id = if (first.expanded) R.string.cd_collapse else R.string.cd_expand,
+                                        ),
                                     )
                                 }
                             }
@@ -544,7 +548,7 @@ private fun DialogExpandableTypeList(
                         modifier = Modifier.clickable { onTypeItemClick(first.data.id) },
                     )
                     if (first.expanded && hasChild) {
-                        CbElevatedCard(Modifier.padding(horizontal = 8.dp)) {
+                        CbElevatedCard(Modifier.padding(horizontal = spacing.small)) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 val col = if (first.list.size % RECORD_TYPE_COLUMNS == 0) {
                                     first.list.size / RECORD_TYPE_COLUMNS

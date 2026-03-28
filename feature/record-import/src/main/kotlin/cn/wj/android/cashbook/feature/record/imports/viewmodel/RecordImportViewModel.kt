@@ -16,8 +16,6 @@
 
 package cn.wj.android.cashbook.feature.record.imports.viewmodel
 
-import android.app.Application
-import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,7 +44,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.net.URLDecoder
+import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -56,7 +54,6 @@ import kotlin.coroutines.CoroutineContext
 @HiltViewModel
 class RecordImportViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val application: Application,
     private val recordRepository: RecordRepository,
     private val typeRepository: TypeRepository,
     private val assetRepository: AssetRepository,
@@ -64,10 +61,8 @@ class RecordImportViewModel @Inject constructor(
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : ViewModel() {
 
-    private val fileUri: String = URLDecoder.decode(
-        savedStateHandle.get<String>("fileUri") ?: "",
-        "UTF-8",
-    )
+    /** 缓存文件路径（由文件选择回调复制到缓存目录） */
+    private val filePath: String = savedStateHandle.get<String>("fileUri") ?: ""
 
     private val _uiState = MutableStateFlow<RecordImportUiState>(RecordImportUiState.Parsing)
     val uiState: StateFlow<RecordImportUiState> = _uiState
@@ -87,14 +82,13 @@ class RecordImportViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = RecordImportUiState.Parsing
             try {
-                val uri = Uri.parse(fileUri)
-                val inputStream = application.contentResolver.openInputStream(uri)
-                    ?: run {
-                        _uiState.value = RecordImportUiState.Error("")
-                        return@launch
-                    }
+                val cacheFile = File(filePath)
+                if (!cacheFile.exists()) {
+                    _uiState.value = RecordImportUiState.Error("")
+                    return@launch
+                }
 
-                val result = inputStream.use { WechatBillParser.parse(it) }
+                val result = cacheFile.inputStream().use { WechatBillParser.parse(it) }
                 if (result == null) {
                     _uiState.value = RecordImportUiState.Error("")
                     return@launch
@@ -127,7 +121,7 @@ class RecordImportViewModel @Inject constructor(
                 )
 
                 _uiState.value = RecordImportUiState.Ready(
-                    fileName = uri.lastPathSegment ?: "",
+                    fileName = cacheFile.name,
                     summary = result.summary,
                     selectedBooksId = currentBook.id,
                     booksList = booksList,

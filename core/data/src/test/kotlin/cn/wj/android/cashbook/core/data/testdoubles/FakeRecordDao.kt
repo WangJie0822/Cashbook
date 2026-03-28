@@ -373,6 +373,28 @@ class FakeRecordDao : RecordDao {
         return images.filter { it.recordId == recordId }
     }
 
+    override suspend fun queryByWechatTransactionId(
+        booksId: Long,
+        transactionId: String,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId && it.remark.contains(transactionId)
+        }
+    }
+
+    override suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId &&
+                it.recordTime in startTime..endTime &&
+                it.amount == amount.toLong()
+        }
+    }
+
     /** 辅助方法：添加记录并自动分配 id */
     fun addRecord(record: RecordTable): RecordTable {
         val withId = if (record.id == null) record.copy(id = nextId++) else record

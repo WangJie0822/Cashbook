@@ -16,7 +16,6 @@
 
 package cn.wj.android.cashbook.feature.record.imports.navigation
 
-import androidx.compose.material3.SnackbarResult
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -33,7 +32,7 @@ private const val KEY_FILE_URI = "fileUri"
 /**
  * 跳转到账单导入界面
  *
- * @param fileUri 选择的账单文件 URI（需要 URL 编码）
+ * @param fileUri 选择的账单文件路径（需要 URL 编码）
  */
 fun NavController.naviToRecordImport(fileUri: String) {
     this.navigate("record_import/${java.net.URLEncoder.encode(fileUri, "UTF-8")}")
@@ -43,11 +42,11 @@ fun NavController.naviToRecordImport(fileUri: String) {
  * 账单导入界面
  *
  * @param onRequestPopBackStack 导航到上一级
- * @param onShowSnackbar 显示提示
+ * @param onImportResult 导入完成回调，参数为提示消息；回调负责返回上一级并展示提示
  */
 fun NavGraphBuilder.recordImportScreen(
     onRequestPopBackStack: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    onImportResult: (String) -> Unit,
 ) {
     composable(
         route = ROUTE_RECORD_IMPORT,
@@ -59,7 +58,7 @@ fun NavGraphBuilder.recordImportScreen(
     ) {
         RecordImportRoute(
             onRequestPopBackStack = onRequestPopBackStack,
-            onShowSnackbar = onShowSnackbar,
+            onImportResult = onImportResult,
         )
     }
 }

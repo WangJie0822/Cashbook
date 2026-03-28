@@ -25,6 +25,7 @@ import org.xmlpull.v1.XmlPullParserFactory
 import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 import java.util.zip.ZipInputStream
 
 /**
@@ -288,18 +289,44 @@ object WechatBillParser {
     }
 
     /**
+     * Excel 序列号与 Unix 时间戳的天数差（1899-12-30 到 1970-01-01）
+     *
+     * Excel 以 1899-12-30 为第 0 天（含 Lotus 1-2-3 闰年 Bug），
+     * Unix 以 1970-01-01 为第 0 天，两者相差 25569 天。
+     */
+    private const val EXCEL_EPOCH_DIFF = 25569
+
+    /** 一天的毫秒数 */
+    private const val MS_PER_DAY = 24 * 60 * 60 * 1000L
+
+    /**
      * 解析日期时间字符串
      *
      * 支持格式：
      * - ISO 格式：2026-03-26T11:50:04（xlsx 的 t="d" 类型）
      * - 标准格式：2026-03-26 11:50:04
+     * - Excel 序列号：46107.493101851855（xlsx 无 t 属性、通过 style 格式化的日期）
      */
     private fun parseDateTime(dateStr: String): Long? {
+        val trimmed = dateStr.trim()
+        // 先尝试标准日期格式
+        try {
+            val normalized = trimmed.replace("T", " ")
+            val result = DATE_FORMAT.parse(normalized)?.time
+            if (result != null) return result
+        } catch (_: Exception) {
+            // 标准格式解析失败，继续尝试 Excel 序列号
+        }
+        // 尝试 Excel 序列号格式
         return try {
-            val normalized = dateStr.replace("T", " ").trim()
-            DATE_FORMAT.parse(normalized)?.time
-        } catch (e: Exception) {
-            logger().e(e, "parse date failed: $dateStr")
+            val serial = trimmed.toDouble()
+            if (serial < 1) return null // 无效序列号
+            // 序列号中的时间是本地时间（微信账单注明 UTC+8），
+            // 直接换算得到的是 UTC 解释的毫秒值，减去时区偏移得到正确 UTC 时间戳
+            val rawMs = ((serial - EXCEL_EPOCH_DIFF) * MS_PER_DAY).toLong()
+            rawMs - TimeZone.getDefault().getOffset(rawMs)
+        } catch (_: Exception) {
+            logger().e("parse date failed: $dateStr")
             null
         }
     }
