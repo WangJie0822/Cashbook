@@ -18,6 +18,8 @@ package cn.wj.android.cashbook.core.testing.repository
 
 import androidx.paging.PagingData
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
+import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
@@ -266,5 +268,47 @@ class FakeRecordRepository : RecordRepository {
 
     override suspend fun queryImagesByRecordId(id: Long): List<ImageModel> {
         return imageMap[id] ?: emptyList()
+    }
+
+    override suspend fun queryByWechatTransactionId(
+        booksId: Long,
+        transactionId: String,
+    ): List<RecordModel> {
+        return emptyList()
+    }
+
+    override suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordModel> {
+        return emptyList()
+    }
+
+    override suspend fun batchImportRecords(records: List<RecordTable>): List<Long> {
+        return emptyList()
+    }
+
+    override suspend fun queryExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<ExportRecordModel> {
+        return emptyList()
+    }
+
+    override suspend fun countExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Int {
+        return 0
+    }
+
+    override suspend fun queryEarliestRecordTime(booksId: Long): Long? {
+        return records.filter { it.booksId == booksId }
+            .minByOrNull { it.recordTime }
+            ?.recordTime
     }
 }
