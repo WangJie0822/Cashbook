@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
@@ -144,6 +145,12 @@ interface RecordRepository {
      * @return 插入后的记录 ID 列表
      */
     suspend fun batchImportRecords(records: List<cn.wj.android.cashbook.core.database.table.RecordTable>): List<Long>
+
+    suspend fun queryExportRecords(booksId: Long, startDate: Long, endDate: Long): List<ExportRecordModel>
+
+    suspend fun countExportRecords(booksId: Long, startDate: Long, endDate: Long): Int
+
+    suspend fun queryEarliestRecordTime(booksId: Long): Long?
 }
 
 internal fun RecordTable.asModel(): RecordModel {
