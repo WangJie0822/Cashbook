@@ -33,4 +33,7 @@ dependencies {
 
     implementation(libs.androidx.datastore.proto)
     implementation(libs.google.protobuf.kotlin.lite)
+
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.google.truth)
 }
