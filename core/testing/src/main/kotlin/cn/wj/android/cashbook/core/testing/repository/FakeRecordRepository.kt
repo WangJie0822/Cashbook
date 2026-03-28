@@ -45,6 +45,9 @@ class FakeRecordRepository : RecordRepository {
     var lastDeletedRecordId: Long = -1L
         private set
 
+    /** 可配置的导出记录列表 */
+    var exportRecordsList: List<ExportRecordModel> = emptyList()
+
     override val searchHistoryListData: Flow<List<String>> = _searchHistoryListData
 
     fun addRecord(record: RecordModel) {
@@ -295,7 +298,7 @@ class FakeRecordRepository : RecordRepository {
         startDate: Long,
         endDate: Long,
     ): List<ExportRecordModel> {
-        return emptyList()
+        return exportRecordsList
     }
 
     override suspend fun countExportRecords(

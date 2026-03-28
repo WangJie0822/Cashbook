@@ -29,7 +29,7 @@ import javax.inject.Inject
  * 将 [ExportRecordModel] 列表导出为 UTF-8 with BOM 的 CSV 文件，
  * 可直接用 Excel 打开并正确显示中文。
  */
-class DailyAccountExporter @Inject constructor() {
+open class DailyAccountExporter @Inject constructor() {
 
     /** CSV 列标题 */
     private val header = "日期,类型,账户,类别,子类别,金额,备注,货币类型,图片"
@@ -44,7 +44,7 @@ class DailyAccountExporter @Inject constructor() {
      * @param outputFile 目标输出文件
      * @return 实际写入的记录数量
      */
-    fun export(records: List<ExportRecordModel>, outputFile: File): Int {
+    open fun export(records: List<ExportRecordModel>, outputFile: File): Int {
         outputFile.parentFile?.mkdirs()
         outputFile.outputStream().bufferedWriter(Charsets.UTF_8).use { writer ->
             // 写入 UTF-8 BOM，让 Excel 等工具正确识别编码
