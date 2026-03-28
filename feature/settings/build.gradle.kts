@@ -30,6 +30,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.common)
     implementation(projects.core.data)
+    implementation(projects.core.domain)
 
     // Markdown 解析
     implementation(libs.noties.markwon)

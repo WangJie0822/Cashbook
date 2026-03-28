@@ -20,6 +20,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.dao.RecordDao
+import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -393,6 +394,28 @@ class FakeRecordDao : RecordDao {
                 it.recordTime in startTime..endTime &&
                 it.amount == amount.toLong()
         }
+    }
+
+    override suspend fun queryExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<ExportRecordRelation> {
+        // 简化实现：返回空列表（测试中不依赖此方法）
+        return emptyList()
+    }
+
+    override suspend fun countExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Int {
+        return 0
+    }
+
+    override suspend fun queryEarliestRecordTime(booksId: Long): Long? {
+        return records.filter { it.booksId == booksId }
+            .minOfOrNull { it.recordTime }
     }
 
     /** 辅助方法：添加记录并自动分配 id */

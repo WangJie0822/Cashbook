@@ -36,6 +36,7 @@ import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
@@ -542,4 +543,35 @@ class RecordRepositoryImpl @Inject constructor(
         assetDataVersion.updateVersion()
         ids
     }
+
+    override suspend fun queryExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<ExportRecordModel> = withContext(coroutineContext) {
+        recordDao.queryExportRecords(booksId, startDate, endDate).map { relation ->
+            ExportRecordModel(
+                recordTime = relation.recordTime,
+                typeCategory = relation.typeCategory,
+                assetName = relation.assetName,
+                categoryName = relation.categoryName,
+                subCategoryName = relation.subCategoryName,
+                amount = relation.amount,
+                remark = relation.remark,
+            )
+        }
+    }
+
+    override suspend fun countExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Int = withContext(coroutineContext) {
+        recordDao.countExportRecords(booksId, startDate, endDate)
+    }
+
+    override suspend fun queryEarliestRecordTime(booksId: Long): Long? =
+        withContext(coroutineContext) {
+            recordDao.queryEarliestRecordTime(booksId)
+        }
 }

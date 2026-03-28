@@ -21,6 +21,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
+import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -416,4 +417,57 @@ interface RecordDao {
         endTime: Long,
         amount: Double,
     ): List<RecordTable>
+
+    /** 查询指定账本和日期范围内的记录用于导出（排除转账），含类型父子关系和资产名 */
+    @Query(
+        value = """
+        SELECT db_record.record_time AS recordTime,
+               db_type.type_category AS typeCategory,
+               COALESCE(db_asset.name, '') AS assetName,
+               CASE WHEN db_type.parent_id = -1 THEN db_type.name
+                    ELSE COALESCE(parent_type.name, db_type.name)
+               END AS categoryName,
+               CASE WHEN db_type.parent_id = -1 THEN ''
+                    ELSE db_type.name
+               END AS subCategoryName,
+               db_record.amount AS amount,
+               db_record.remark AS remark
+        FROM db_record
+        JOIN db_type ON db_type.id = db_record.type_id
+        LEFT JOIN db_type AS parent_type ON parent_type.id = db_type.parent_id
+        LEFT JOIN db_asset ON db_asset.id = db_record.asset_id
+        WHERE db_record.books_id = :booksId
+          AND db_record.record_time >= :startDate
+          AND db_record.record_time < :endDate
+          AND db_type.type_category != 2
+        ORDER BY db_record.record_time ASC
+    """,
+    )
+    suspend fun queryExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<ExportRecordRelation>
+
+    /** 查询导出记录数量（排除转账），用于 Bottom Sheet 按钮显示 */
+    @Query(
+        value = """
+        SELECT COUNT(*)
+        FROM db_record
+        JOIN db_type ON db_type.id = db_record.type_id
+        WHERE db_record.books_id = :booksId
+          AND db_record.record_time >= :startDate
+          AND db_record.record_time < :endDate
+          AND db_type.type_category != 2
+    """,
+    )
+    suspend fun countExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Int
+
+    /** 查询指定账本中最早的记录时间，用于日期选择器的默认起始日期 */
+    @Query("SELECT MIN(record_time) FROM db_record WHERE books_id = :booksId")
+    suspend fun queryEarliestRecordTime(booksId: Long): Long?
 }
