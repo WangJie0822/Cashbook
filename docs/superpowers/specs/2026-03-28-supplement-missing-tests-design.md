@@ -152,7 +152,7 @@
 | `when_canary_true_then_includes_pre_release` | canary=true 时包含 "Pre Release" 前缀 |
 | `when_canary_false_then_excludes_pre_release` | canary=false 时排除预发布版 |
 | `when_no_matching_release_then_returns_null` | 无匹配版本时返回 null |
-| `when_api_error_then_returns_null_or_throws` | 网络错误时的异常处理 |
+| `when_api_error_then_propagates_exception` | 网络错误（如 HTTP 500）时异常向上传播 |
 
 ### LoggerInterceptorTest.kt
 
