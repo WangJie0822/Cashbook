@@ -31,7 +31,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbScaffold
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.model.model.BillDirection
@@ -156,7 +156,7 @@ internal fun RecordImportScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = onDismissMappingDialog) {
+                CbTextButton(onClick = onDismissMappingDialog) {
                     Text(text = stringResource(R.string.close))
                 }
             },
@@ -192,7 +192,7 @@ internal fun RecordImportScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = onDismissTypeDialog) {
+                CbTextButton(onClick = onDismissTypeDialog) {
                     Text(text = stringResource(R.string.close))
                 }
             },
@@ -324,7 +324,7 @@ private fun ImportBottomBar(
     val canImport = selectedCount > 0 && !uiState.hasUnmappedPayments
 
     BottomAppBar(modifier = modifier) {
-        TextButton(
+        CbTextButton(
             onClick = { onSelectAll(!allSelected) },
             modifier = Modifier.padding(start = 8.dp),
         ) {
