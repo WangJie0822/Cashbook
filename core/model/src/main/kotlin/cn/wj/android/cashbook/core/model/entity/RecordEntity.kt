@@ -40,11 +40,16 @@ data class RecordEntity(
     val typeId: Long,
     val assetId: Long,
     val relatedAssetId: Long,
-    val amount: String,
-    val finalAmount: String,
-    val charges: String,
-    val concessions: String,
+    /** 金额，单位：分 */
+    val amount: Long,
+    /** 最终金额，单位：分 */
+    val finalAmount: Long,
+    /** 手续费，单位：分 */
+    val charges: Long,
+    /** 优惠，单位：分 */
+    val concessions: Long,
     val remark: String,
     val reimbursable: Boolean,
-    val recordTime: String,
+    /** 记录时间，毫秒时间戳 */
+    val recordTime: Long,
 )

@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.table
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -38,7 +39,17 @@ import androidx.room.PrimaryKey
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
-@Entity(tableName = TABLE_RECORD)
+@Entity(
+    tableName = TABLE_RECORD,
+    indices = [
+        Index("books_id"),
+        Index("type_id"),
+        Index("asset_id"),
+        Index("into_asset_id"),
+        Index("record_time"),
+        Index("books_id", "record_time"),
+    ],
+)
 data class RecordTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = TABLE_RECORD_ID)
@@ -47,10 +58,10 @@ data class RecordTable(
     @ColumnInfo(name = TABLE_RECORD_ASSET_ID) val assetId: Long,
     @ColumnInfo(name = TABLE_RECORD_INTO_ASSET_ID) val intoAssetId: Long,
     @ColumnInfo(name = TABLE_RECORD_BOOKS_ID) val booksId: Long,
-    @ColumnInfo(name = TABLE_RECORD_AMOUNT) val amount: Double,
-    @ColumnInfo(name = TABLE_RECORD_FINAL_AMOUNT) val finalAmount: Double,
-    @ColumnInfo(name = TABLE_RECORD_CONCESSIONS) val concessions: Double,
-    @ColumnInfo(name = TABLE_RECORD_CHARGE) val charge: Double,
+    @ColumnInfo(name = TABLE_RECORD_AMOUNT) val amount: Long,
+    @ColumnInfo(name = TABLE_RECORD_FINAL_AMOUNT) val finalAmount: Long,
+    @ColumnInfo(name = TABLE_RECORD_CONCESSIONS) val concessions: Long,
+    @ColumnInfo(name = TABLE_RECORD_CHARGE) val charge: Long,
     @ColumnInfo(name = TABLE_RECORD_REMARK) val remark: String,
     @ColumnInfo(name = TABLE_RECORD_REIMBURSABLE) val reimbursable: Int,
     @ColumnInfo(name = TABLE_RECORD_RECORD_TIME) val recordTime: Long,

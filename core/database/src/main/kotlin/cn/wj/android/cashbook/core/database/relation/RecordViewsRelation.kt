@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.database.relation
 
 data class RecordViewsRelation(
     val id: Long,
+    val typeId: Long,
     val typeCategory: Int,
     val typeName: String,
     val typeIconResName: String,
@@ -25,9 +26,10 @@ data class RecordViewsRelation(
     val assetClassification: Int?,
     val relatedAssetName: String?,
     val relatedAssetClassification: Int?,
-    val amount: Double,
-    val charges: Double,
-    val concessions: Double,
+    val amount: Long,
+    val finalAmount: Long,
+    val charges: Long,
+    val concessions: Long,
     val remark: String,
     val reimbursable: Int,
     val recordTime: Long,

@@ -59,12 +59,12 @@ class GetRecordViewsUseCaseTest {
 
     @Test
     fun when_record_exists_then_returns_entity() = runTest {
-        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = "100"))
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 10000L))
 
         val result = useCase(1L)
 
         assertThat(result).isNotNull()
-        assertThat(result!!.amount).isEqualTo("100")
+        assertThat(result!!.amount).isEqualTo(10000L)
     }
 
     @Test

@@ -82,7 +82,7 @@ class MyAssetViewModelTest {
         // 设置可见资产列表
         val asset = createAssetModel(
             id = 1L,
-            balance = "1000.00",
+            balance = 100000L,
             type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
             classification = AssetClassificationEnum.CASH,
         )
@@ -92,9 +92,9 @@ class MyAssetViewModelTest {
         val state = viewModel.uiState.value
         assertThat(state).isInstanceOf(MyAssetUiState.Success::class.java)
         val success = state as MyAssetUiState.Success
-        assertThat(success.totalAsset).isEqualTo("1000")
-        assertThat(success.totalLiabilities).isEqualTo("0")
-        assertThat(success.netAsset).isEqualTo("1000")
+        assertThat(success.totalAsset).isEqualTo("1000.00")
+        assertThat(success.totalLiabilities).isEqualTo("0.00")
+        assertThat(success.netAsset).isEqualTo("1000.00")
     }
 
     @Test
@@ -107,16 +107,16 @@ class MyAssetViewModelTest {
         // 信用卡应被计入负债
         val creditCard = createAssetModel(
             id = 1L,
-            balance = "500.00",
+            balance = 50000L,
             type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
             classification = AssetClassificationEnum.CREDIT_CARD,
         )
         assetRepository.setVisibleAssets(listOf(creditCard))
 
         val state = viewModel.uiState.value as MyAssetUiState.Success
-        assertThat(state.totalLiabilities).isEqualTo("500")
-        assertThat(state.totalAsset).isEqualTo("0")
-        assertThat(state.netAsset).isEqualTo("-500")
+        assertThat(state.totalLiabilities).isEqualTo("500.00")
+        assertThat(state.totalAsset).isEqualTo("0.00")
+        assertThat(state.netAsset).isEqualTo("-500.00")
     }
 
     @Test
@@ -129,15 +129,15 @@ class MyAssetViewModelTest {
         // 借入资产应被计入负债
         val borrow = createAssetModel(
             id = 1L,
-            balance = "2000.00",
+            balance = 200000L,
             type = ClassificationTypeEnum.DEBT_ACCOUNT,
             classification = AssetClassificationEnum.BORROW,
         )
         assetRepository.setVisibleAssets(listOf(borrow))
 
         val state = viewModel.uiState.value as MyAssetUiState.Success
-        assertThat(state.totalLiabilities).isEqualTo("2000")
-        assertThat(state.totalAsset).isEqualTo("0")
+        assertThat(state.totalLiabilities).isEqualTo("2000.00")
+        assertThat(state.totalAsset).isEqualTo("0.00")
     }
 
     @Test
@@ -150,7 +150,7 @@ class MyAssetViewModelTest {
         // 充值账户在 topUpInTotal=false 时不计入资产总额
         val topUp = createAssetModel(
             id = 1L,
-            balance = "300.00",
+            balance = 30000L,
             type = ClassificationTypeEnum.TOP_UP_ACCOUNT,
             classification = AssetClassificationEnum.PHONE_CHARGE,
         )
@@ -159,7 +159,7 @@ class MyAssetViewModelTest {
         val state = viewModel.uiState.value as MyAssetUiState.Success
         // topUpInTotal 默认 false，充值账户不计入
         assertThat(state.topUpInTotal).isFalse()
-        assertThat(state.totalAsset).isEqualTo("0")
+        assertThat(state.totalAsset).isEqualTo("0.00")
     }
 
     @Test
@@ -172,7 +172,7 @@ class MyAssetViewModelTest {
         // 充值账户在 topUpInTotal=true 时计入资产总额
         val topUp = createAssetModel(
             id = 1L,
-            balance = "300.00",
+            balance = 30000L,
             type = ClassificationTypeEnum.TOP_UP_ACCOUNT,
             classification = AssetClassificationEnum.PHONE_CHARGE,
         )
@@ -183,7 +183,7 @@ class MyAssetViewModelTest {
 
         val state = viewModel.uiState.value as MyAssetUiState.Success
         assertThat(state.topUpInTotal).isTrue()
-        assertThat(state.totalAsset).isEqualTo("300")
+        assertThat(state.totalAsset).isEqualTo("300.00")
     }
 
     @Test
@@ -197,7 +197,7 @@ class MyAssetViewModelTest {
      */
     private fun createAssetModel(
         id: Long = 1L,
-        balance: String = "0",
+        balance: Long = 0L,
         type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT,
         classification: AssetClassificationEnum = AssetClassificationEnum.CASH,
     ): AssetModel = AssetModel(
@@ -205,7 +205,7 @@ class MyAssetViewModelTest {
         booksId = 1L,
         name = "测试资产",
         iconResId = 0,
-        totalAmount = "",
+        totalAmount = 0L,
         billingDate = "",
         repaymentDate = "",
         type = type,
@@ -215,7 +215,7 @@ class MyAssetViewModelTest {
         cardNo = "",
         remark = "",
         sort = 0,
-        modifyTime = "2024-01-01",
+        modifyTime = 1704067200000L,
         balance = balance,
     )
 }

@@ -51,7 +51,7 @@ class MyTagsViewModel @Inject constructor(
     val tagListData = tagRepository.tagListData
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList(),
         )
 

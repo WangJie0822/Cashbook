@@ -25,8 +25,10 @@
     <string name="overview_of_revenue_and_expenditure">收支概览</string>
     <string name="daily_statistics">每日统计</string>
     <string name="monthly_statistics">每月统计</string>
+    <string name="yearly_statistics">每年统计</string>
     <string name="daily_report">日报表</string>
     <string name="monthly_report">月报表</string>
+    <string name="yearly_report">年报表</string>
     <string name="date">日期</string>
     <string name="category_report">分类报表</string>
     <string name="total_liabilities">总负债</string>
@@ -92,4 +94,22 @@
     <string name="image_empty_hint">还没有照片，点击右上角添加</string>
     <string name="image_allow_multiple_choices">允许多选，最多9张</string>
     <string name="image_preview">图片预览</string>
+    <string name="date_selection_by_day">按日</string>
+    <string name="date_selection_by_month">按月</string>
+    <string name="date_selection_by_year">按年</string>
+    <string name="date_selection_date_range">范围</string>
+    <string name="date_selection_all">全部</string>
+    <string name="date_selection_start_date">起始日期</string>
+    <string name="date_selection_end_date">结束日期</string>
+    <string name="date_selection_view_all">查看所有记录</string>
+    <string name="date_selection_select_start_date">选择起始日期</string>
+    <string name="date_selection_select_end_date">选择结束日期</string>
+    <string name="day_income">日收入</string>
+    <string name="day_expend">日支出</string>
+    <string name="day_balance">日结余</string>
+    <string name="year_income">年收入</string>
+    <string name="year_expend">年支出</string>
+    <string name="year_balance">年结余</string>
+    <string name="launcher_no_data_hint_general">当前没有记录数据</string>
+    <string name="launcher_no_data_button_general">点击选择其它日期</string>
 </resources>

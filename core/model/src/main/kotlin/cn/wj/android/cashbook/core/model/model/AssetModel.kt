@@ -46,7 +46,7 @@ data class AssetModel(
     val booksId: Long,
     val name: String,
     val iconResId: Int,
-    val totalAmount: String,
+    val totalAmount: Long,
     val billingDate: String,
     val repaymentDate: String,
     val type: ClassificationTypeEnum,
@@ -56,6 +56,6 @@ data class AssetModel(
     val cardNo: String,
     val remark: String,
     val sort: Int,
-    val modifyTime: String,
-    val balance: String,
+    val modifyTime: Long,
+    val balance: Long,
 )

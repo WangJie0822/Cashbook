@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
@@ -49,9 +50,8 @@ class SaveRecordUseCaseTest {
 
     @Test
     fun when_save_record_then_needRelated_fetched_from_type_repository() = runTest {
-        // 设置类型需要关联
-        typeRepository.setNeedRelated(1L)
-        val record = createRecordModel(typeId = 1L)
+        // 使用固定退款类型 ID，自动判断为 needRelated
+        val record = createRecordModel(typeId = FIXED_TYPE_ID_REFUND, amount = 100L)
 
         useCase(record, listOf(1L), listOf(2L), emptyList())
 
@@ -62,7 +62,7 @@ class SaveRecordUseCaseTest {
 
     @Test
     fun when_save_record_with_no_related_type_then_needRelated_is_false() = runTest {
-        val record = createRecordModel(typeId = 2L)
+        val record = createRecordModel(typeId = 2L, amount = 100L)
 
         useCase(record, emptyList(), emptyList(), emptyList())
 
@@ -73,7 +73,7 @@ class SaveRecordUseCaseTest {
     fun when_save_record_then_record_is_passed_to_repository() = runTest {
         val record = createRecordModel(
             id = 10L,
-            amount = "100",
+            amount = 10000L,
             remark = "测试记录",
         )
 
@@ -81,5 +81,35 @@ class SaveRecordUseCaseTest {
 
         assertThat(recordRepository.lastUpdatedRecord).isEqualTo(record)
         assertThat(recordRepository.lastUpdatedTagIdList).containsExactly(1L, 2L)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_amount_is_zero_then_throws() = runTest {
+        val record = createRecordModel(amount = 0L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_amount_is_negative_then_throws() = runTest {
+        val record = createRecordModel(amount = -100L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_charges_is_negative_then_throws() = runTest {
+        val record = createRecordModel(amount = 100L, charges = -1L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_concessions_is_negative_then_throws() = runTest {
+        val record = createRecordModel(amount = 100L, concessions = -1L)
+        useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun when_recordTime_is_zero_then_throws() = runTest {
+        val record = createRecordModel(amount = 100L, recordTime = 0L)
+        useCase(record, emptyList(), emptyList(), emptyList())
     }
 }

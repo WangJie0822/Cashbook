@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.records.viewmodel
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
@@ -107,13 +108,13 @@ class SelectRelatedRecordViewModelTest {
             typeId = 1L,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "50",
-            finalAmount = "50",
-            charges = "0",
-            concessions = "0",
+            amount = 5000L,
+            finalAmount = 5000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "测试",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
 
         val recordFlow = MutableStateFlow(record)
@@ -140,7 +141,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -151,38 +152,37 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         // 添加可关联的记录
         val relatedRecord = RecordModel(
             id = 100L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "100",
-            finalAmount = "100",
-            charges = "0",
-            concessions = "0",
+            amount = 10000L,
+            finalAmount = 10000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "可关联记录",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
         recordRepository.addRecord(relatedRecord)
 
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "50",
-            finalAmount = "50",
-            charges = "0",
-            concessions = "0",
+            amount = 5000L,
+            finalAmount = 5000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "当前记录",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
 
         // 初始化数据
@@ -211,7 +211,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -222,37 +222,36 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         val relatedRecord = RecordModel(
             id = 100L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "100",
-            finalAmount = "100",
-            charges = "0",
-            concessions = "0",
+            amount = 10000L,
+            finalAmount = 10000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "可关联记录",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
         recordRepository.addRecord(relatedRecord)
 
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "50",
-            finalAmount = "50",
-            charges = "0",
-            concessions = "0",
+            amount = 5000L,
+            finalAmount = 5000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "当前记录",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
 
         // 初始化数据并预设关联 ID
@@ -284,7 +283,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -295,21 +294,20 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "50",
-            finalAmount = "50",
-            charges = "0",
-            concessions = "0",
+            amount = 5000L,
+            finalAmount = 5000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "当前记录",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
 
         // 初始化数据
@@ -335,7 +333,7 @@ class SelectRelatedRecordViewModelTest {
 
         // 准备类型数据
         val type = RecordTypeModel(
-            id = 1L,
+            id = FIXED_TYPE_ID_REFUND,
             parentId = -1L,
             name = "退款",
             iconName = "vector_refund",
@@ -346,37 +344,36 @@ class SelectRelatedRecordViewModelTest {
             needRelated = true,
         )
         typeRepository.addType(type)
-        typeRepository.setRefund(1L)
 
         val relatedRecord = RecordModel(
             id = 100L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "100",
-            finalAmount = "100",
-            charges = "0",
-            concessions = "0",
+            amount = 10000L,
+            finalAmount = 10000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "可关联记录",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
         recordRepository.addRecord(relatedRecord)
 
         val currentRecord = RecordModel(
             id = 10L,
             booksId = 1L,
-            typeId = 1L,
+            typeId = FIXED_TYPE_ID_REFUND,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "50",
-            finalAmount = "50",
-            charges = "0",
-            concessions = "0",
+            amount = 5000L,
+            finalAmount = 5000L,
+            charges = 0L,
+            concessions = 0L,
             remark = "当前记录",
             reimbursable = false,
-            recordTime = "2024-01-01 12:00",
+            recordTime = 1704067200000L,
         )
 
         viewModel.updateData(

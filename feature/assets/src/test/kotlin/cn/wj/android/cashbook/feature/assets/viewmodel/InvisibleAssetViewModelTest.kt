@@ -96,7 +96,7 @@ class InvisibleAssetViewModelTest {
         booksId = 1L,
         name = "测试资产",
         iconResId = 0,
-        totalAmount = "",
+        totalAmount = 0L,
         billingDate = "",
         repaymentDate = "",
         type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
@@ -106,7 +106,7 @@ class InvisibleAssetViewModelTest {
         cardNo = "",
         remark = "",
         sort = 0,
-        modifyTime = "2024-01-01",
-        balance = "0",
+        modifyTime = 1704067200000L,
+        balance = 0L,
     )
 }

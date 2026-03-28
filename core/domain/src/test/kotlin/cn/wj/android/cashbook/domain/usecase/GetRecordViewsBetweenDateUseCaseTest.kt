@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
@@ -29,7 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDate
+import java.time.YearMonth
 
 class GetRecordViewsBetweenDateUseCaseTest {
 
@@ -60,13 +61,11 @@ class GetRecordViewsBetweenDateUseCaseTest {
 
     @Test
     fun when_has_records_then_transforms_to_views() = runTest {
-        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = "100"))
-        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, amount = "200"))
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 10000L))
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, amount = 20000L))
 
         val result = useCase(
-            fromDate = LocalDate.of(2024, 1, 1),
-            toDate = null,
-            yearSelected = false,
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
         )
 
         assertThat(result).hasSize(2)
@@ -77,9 +76,7 @@ class GetRecordViewsBetweenDateUseCaseTest {
         recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L))
 
         val result = useCase(
-            fromDate = LocalDate.of(2024, 1, 1),
-            toDate = null,
-            yearSelected = true,
+            dateSelection = DateSelectionEntity.ByYear(2024),
         )
 
         assertThat(result).hasSize(1)

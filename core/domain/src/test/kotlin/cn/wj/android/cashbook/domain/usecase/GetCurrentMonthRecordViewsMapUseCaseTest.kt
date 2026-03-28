@@ -18,6 +18,8 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
@@ -49,8 +51,8 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
     @Test
     fun when_same_day_records_then_grouped_together() {
         val entities = listOf(
-            createRecordViewsEntity(id = 1L, recordTime = "2024-01-15 10:00"),
-            createRecordViewsEntity(id = 2L, recordTime = "2024-01-15 14:00"),
+            createRecordViewsEntity(id = 1L, recordTime = 1705284000000L),
+            createRecordViewsEntity(id = 2L, recordTime = 1705298400000L),
         )
 
         val result = useCase(entities)
@@ -63,8 +65,8 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
     @Test
     fun when_different_day_records_then_grouped_separately() {
         val entities = listOf(
-            createRecordViewsEntity(id = 1L, recordTime = "2024-01-15 10:00"),
-            createRecordViewsEntity(id = 2L, recordTime = "2024-01-16 14:00"),
+            createRecordViewsEntity(id = 1L, recordTime = 1705284000000L),
+            createRecordViewsEntity(id = 2L, recordTime = 1705384800000L),
         )
 
         val result = useCase(entities)
@@ -77,22 +79,22 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
         val entities = listOf(
             createRecordViewsEntity(
                 id = 1L,
-                recordTime = "2024-01-15 10:00",
+                recordTime = 1705284000000L,
                 typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
-                finalAmount = "100",
+                finalAmount = 10000L,
             ),
             createRecordViewsEntity(
                 id = 2L,
-                recordTime = "2024-01-15 14:00",
+                recordTime = 1705298400000L,
                 typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
-                finalAmount = "200",
+                finalAmount = 20000L,
             ),
         )
 
         val result = useCase(entities)
         val dayEntity = result.keys.first()
 
-        assertThat(dayEntity.dayExpand).isEqualTo("300")
+        assertThat(dayEntity.dayExpand).isEqualTo(30000L)
     }
 
     @Test
@@ -100,49 +102,88 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
         val entities = listOf(
             createRecordViewsEntity(
                 id = 1L,
-                recordTime = "2024-01-15 10:00",
+                recordTime = 1705284000000L,
                 typeCategory = RecordTypeCategoryEnum.INCOME,
-                finalAmount = "500",
+                finalAmount = 50000L,
             ),
         )
 
         val result = useCase(entities)
         val dayEntity = result.keys.first()
 
-        assertThat(dayEntity.dayIncome).isEqualTo("500")
+        assertThat(dayEntity.dayIncome).isEqualTo(50000L)
     }
 
     @Test
-    fun when_transfer_records_then_charges_and_concessions_counted() {
+    fun when_transfer_records_then_concessions_offset_charges() {
         val entities = listOf(
             createRecordViewsEntity(
                 id = 1L,
-                recordTime = "2024-01-15 10:00",
+                recordTime = 1705284000000L,
                 typeCategory = RecordTypeCategoryEnum.TRANSFER,
-                charges = "5",
-                concessions = "10",
+                charges = 1000L,
+                concessions = 300L,
             ),
         )
 
         val result = useCase(entities)
         val dayEntity = result.keys.first()
 
-        assertThat(dayEntity.dayExpand).isEqualTo("5")
-        assertThat(dayEntity.dayIncome).isEqualTo("10")
+        // 转账优惠冲减支出：1000 - 300 = 700（分）
+        assertThat(dayEntity.dayExpand).isEqualTo(700L)
+        assertThat(dayEntity.dayIncome).isEqualTo(0L)
+    }
+
+    @Test
+    fun when_balance_records_then_excluded_from_statistics() {
+        val entities = listOf(
+            createRecordViewsEntity(
+                id = 1L,
+                typeId = RECORD_TYPE_BALANCE_EXPENDITURE.id,
+                recordTime = 1705284000000L,
+                typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+                typeName = RECORD_TYPE_BALANCE_EXPENDITURE.name,
+                finalAmount = 10000L,
+            ),
+            createRecordViewsEntity(
+                id = 2L,
+                typeId = RECORD_TYPE_BALANCE_INCOME.id,
+                recordTime = 1705287600000L,
+                typeCategory = RecordTypeCategoryEnum.INCOME,
+                typeName = RECORD_TYPE_BALANCE_INCOME.name,
+                finalAmount = 20000L,
+            ),
+            createRecordViewsEntity(
+                id = 3L,
+                recordTime = 1705291200000L,
+                typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+                finalAmount = 5000L,
+            ),
+        )
+
+        val result = useCase(entities)
+        val dayEntity = result.keys.first()
+
+        // 平账记录不计入统计，只有 id=3 的 5000（分）支出
+        assertThat(dayEntity.dayExpand).isEqualTo(5000L)
+        assertThat(dayEntity.dayIncome).isEqualTo(0L)
     }
 
     private fun createRecordViewsEntity(
         id: Long = 1L,
-        recordTime: String = "2024-01-15 10:00",
+        typeId: Long = 1L,
+        recordTime: Long = 1705284000000L,
         typeCategory: RecordTypeCategoryEnum = RecordTypeCategoryEnum.EXPENDITURE,
-        finalAmount: String = "0",
-        charges: String = "0",
-        concessions: String = "0",
+        typeName: String = "test",
+        finalAmount: Long = 0L,
+        charges: Long = 0L,
+        concessions: Long = 0L,
     ): RecordViewsEntity {
         return RecordViewsEntity(
             id = id,
+            typeId = typeId,
             typeCategory = typeCategory,
-            typeName = "test",
+            typeName = typeName,
             typeIconResName = "test_icon",
             assetId = null,
             assetName = null,
@@ -159,7 +200,7 @@ class GetCurrentMonthRecordViewsMapUseCaseTest {
             relatedTags = emptyList(),
             relatedImage = emptyList(),
             relatedRecord = emptyList(),
-            relatedAmount = "0",
+            relatedAmount = 0L,
             recordTime = recordTime,
         )
     }

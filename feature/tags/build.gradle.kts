@@ -17,6 +17,7 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library.feature)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
@@ -34,4 +35,5 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     testImplementation(projects.core.testing)
+    testImplementation(libs.robolectric)
 }

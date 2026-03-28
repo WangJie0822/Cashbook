@@ -65,9 +65,9 @@ class TransRecordViewsToAnalyticsPieSecondUseCaseTest {
         )
 
         val records = listOf(
-            createRecordViewsModel(type = parentType, amount = "20", charges = "0", concessions = "0"),
-            createRecordViewsModel(type = lunchType, amount = "30", charges = "0", concessions = "0"),
-            createRecordViewsModel(type = dinnerType, amount = "50", charges = "0", concessions = "0"),
+            createRecordViewsModel(type = parentType, amount = 2000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = lunchType, amount = 3000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = dinnerType, amount = 5000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(1L, records)
@@ -92,7 +92,7 @@ class TransRecordViewsToAnalyticsPieSecondUseCaseTest {
             typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         )
         val records = listOf(
-            createRecordViewsModel(type = otherType, amount = "50", charges = "0", concessions = "0"),
+            createRecordViewsModel(type = otherType, amount = 5000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(1L, records)

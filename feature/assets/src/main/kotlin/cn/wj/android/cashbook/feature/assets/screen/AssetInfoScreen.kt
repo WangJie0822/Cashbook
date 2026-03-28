@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.assets.screen
 
+import android.content.ClipData
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,11 +39,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,11 +61,13 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoUiState
 import cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModel
+import kotlinx.coroutines.launch
 
 /**
  * 资产信息界面
@@ -88,6 +92,7 @@ internal fun AssetInfoRoute(
         setProgressDialogHintText(stringResource(id = R.string.asset_in_delete))
     },
 ) {
+    val progressDialogController = LocalProgressDialogController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AssetInfoScreen(
@@ -107,7 +112,7 @@ internal fun AssetInfoRoute(
         },
         onEditAssetClick = onRequestNaviToEditAsset,
         onDeleteAssetClick = viewModel::showDeleteConfirmDialog,
-        onConfirmDeleteAsset = { viewModel.deleteAsset(onSuccess = onRequestPopBackStack) },
+        onConfirmDeleteAsset = { viewModel.deleteAsset(progressDialogController, onSuccess = onRequestPopBackStack) },
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
         onAddRecordClick = onRequestNaviToAddRecord,
         onBackClick = onRequestPopBackStack,
@@ -175,19 +180,19 @@ internal fun AssetInfoScreen(
                 actions = {
                     if (uiState is AssetInfoUiState.Success) {
                         CbIconButton(onClick = onEditAssetClick) {
-                            Icon(imageVector = CbIcons.EditNote, contentDescription = null)
+                            Icon(imageVector = CbIcons.EditNote, contentDescription = stringResource(id = R.string.cd_edit))
                         }
                         CbIconButton(onClick = onDeleteAssetClick) {
                             Icon(
                                 imageVector = CbIcons.DeleteForever,
-                                contentDescription = null,
+                                contentDescription = stringResource(id = R.string.cd_delete),
                             )
                         }
                         if (uiState.shouldDisplayMore) {
                             CbIconButton(onClick = onRequestShowMoreDialog) {
                                 Icon(
                                     imageVector = CbIcons.Info,
-                                    contentDescription = null,
+                                    contentDescription = stringResource(id = R.string.cd_more_options),
                                 )
                             }
                         }
@@ -197,7 +202,7 @@ internal fun AssetInfoScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = onAddRecordClick) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
         snackbarHost = {
@@ -230,7 +235,8 @@ internal fun AssetInfoScreen(
                     when (data) {
                         AssetInfoDialogEnum.MORE_INFO -> {
                             if (uiState is AssetInfoUiState.Success && uiState.shouldDisplayMore) {
-                                val clipboardManager = LocalClipboardManager.current
+                                val clipboard = LocalClipboard.current
+                                val scope = rememberCoroutineScope()
                                 CbAlertDialog(
                                     onDismissRequest = onRequestDismissDialog,
                                     text = {
@@ -250,17 +256,17 @@ internal fun AssetInfoScreen(
                                                     )
                                                     CbIconButton(
                                                         onClick = {
-                                                            clipboardManager.setText(
-                                                                AnnotatedString(
-                                                                    uiState.openBank,
-                                                                ),
-                                                            )
+                                                            scope.launch {
+                                                                clipboard.setClipEntry(
+                                                                    ClipEntry(ClipData.newPlainText("", uiState.openBank)),
+                                                                )
+                                                            }
                                                             onRequestDisplayBookmark()
                                                         },
                                                     ) {
                                                         Icon(
                                                             imageVector = CbIcons.ContentCopy,
-                                                            contentDescription = null,
+                                                            contentDescription = stringResource(id = R.string.cd_copy),
                                                         )
                                                     }
                                                 }
@@ -277,17 +283,17 @@ internal fun AssetInfoScreen(
                                                     )
                                                     CbIconButton(
                                                         onClick = {
-                                                            clipboardManager.setText(
-                                                                AnnotatedString(
-                                                                    uiState.cardNo,
-                                                                ),
-                                                            )
+                                                            scope.launch {
+                                                                clipboard.setClipEntry(
+                                                                    ClipEntry(ClipData.newPlainText("", uiState.cardNo)),
+                                                                )
+                                                            }
                                                             onRequestDisplayBookmark()
                                                         },
                                                     ) {
                                                         Icon(
                                                             imageVector = CbIcons.ContentCopy,
-                                                            contentDescription = null,
+                                                            contentDescription = stringResource(id = R.string.cd_copy),
                                                         )
                                                     }
                                                 }
@@ -309,7 +315,11 @@ internal fun AssetInfoScreen(
                                     confirmButton = {
                                         CbTextButton(
                                             onClick = {
-                                                clipboardManager.setText(AnnotatedString("${uiState.openBank}\n${uiState.cardNo}"))
+                                                scope.launch {
+                                                    clipboard.setClipEntry(
+                                                        ClipEntry(ClipData.newPlainText("", "${uiState.openBank}\n${uiState.cardNo}")),
+                                                    )
+                                                }
                                                 onRequestDisplayBookmark()
                                             },
                                         ) {

@@ -123,7 +123,7 @@ internal fun MyTagsScreen(
                 actions = {
                     // 添加标签按钮
                     CbIconButton(onClick = { onRequestShowEditTagDialog(null) }) {
-                        Icon(imageVector = CbIcons.Add, contentDescription = null)
+                        Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
                     }
                 },
             )

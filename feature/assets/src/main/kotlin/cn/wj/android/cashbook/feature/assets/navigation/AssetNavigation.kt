@@ -19,45 +19,46 @@ package cn.wj.android.cashbook.feature.assets.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.feature.assets.screen.AssetInfoRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.EditRecordSelectAssetBottomSheetRoute
 import cn.wj.android.cashbook.feature.assets.screen.InvisibleAssetRoute
 import cn.wj.android.cashbook.feature.assets.screen.MyAssetRoute
-
-private const val ROUTE_KEY_ASSET_ID = "assetId"
+import kotlinx.serialization.Serializable
 
 /** 我的资产 */
-const val ROUTE_MY_ASSET = "asset/my"
+@Serializable
+object MyAsset
 
 /** 不可见资产 */
-private const val ROUTE_ASSET_INVISIBLE = "asset/invisible"
+@Serializable
+object InvisibleAsset
 
 /** 资产信息 */
-private const val ROUTE_ASSET_INFO = "asset/info?$ROUTE_KEY_ASSET_ID={$ROUTE_KEY_ASSET_ID}"
+@Serializable
+data class AssetInfo(val assetId: Long = -1L)
 
 /** 编辑资产 */
-private const val ROUTE_EDIT_ASSET =
-    "asset/edit_asset?$ROUTE_KEY_ASSET_ID={$ROUTE_KEY_ASSET_ID}"
+@Serializable
+data class EditAsset(val assetId: Long = -1L)
 
 fun NavController.naviToMyAsset() {
-    this.navigate(ROUTE_MY_ASSET)
+    this.navigate(MyAsset)
 }
 
 fun NavController.naviToInvisibleAsset() {
-    this.navigate(ROUTE_ASSET_INVISIBLE)
+    this.navigate(InvisibleAsset)
 }
 
 fun NavController.naviToAssetInfo(assetId: Long) {
-    this.navigate(ROUTE_ASSET_INFO.replace("{$ROUTE_KEY_ASSET_ID}", assetId.toString()))
+    this.navigate(AssetInfo(assetId = assetId))
 }
 
 fun NavController.naviToEditAsset(assetId: Long = -1L) {
-    this.navigate(ROUTE_EDIT_ASSET.replace("{$ROUTE_KEY_ASSET_ID}", assetId.toString()))
+    this.navigate(EditAsset(assetId = assetId))
 }
 
 /**
@@ -100,7 +101,7 @@ fun NavGraphBuilder.myAssetScreen(
     onRequestNaviToInvisibleAsset: () -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(route = ROUTE_MY_ASSET) {
+    composable<MyAsset> {
         MyAssetRoute(
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestNaviToAddAsset = onRequestNaviToAddAsset,
@@ -117,7 +118,7 @@ fun NavGraphBuilder.invisibleAssetScreen(
     onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(route = ROUTE_ASSET_INVISIBLE) {
+    composable<InvisibleAsset> {
         InvisibleAssetRoute(
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,
@@ -140,16 +141,9 @@ fun NavGraphBuilder.assetInfoScreen(
     onRequestNaviToAddRecord: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_ASSET_INFO,
-        arguments = listOf(
-            navArgument(ROUTE_KEY_ASSET_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-        ),
-    ) {
-        val assetId = it.arguments?.getLong(ROUTE_KEY_ASSET_ID) ?: -1L
+    composable<AssetInfo> { backStackEntry ->
+        val route = backStackEntry.toRoute<AssetInfo>()
+        val assetId = route.assetId
         AssetInfoRoute(
             assetId = assetId,
             assetRecordListContent = { topContent, onRecordItemClick ->
@@ -175,17 +169,10 @@ fun NavGraphBuilder.assetInfoScreen(
 fun NavGraphBuilder.editAssetScreen(
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(
-        route = ROUTE_EDIT_ASSET,
-        arguments = listOf(
-            navArgument(ROUTE_KEY_ASSET_ID) {
-                type = NavType.LongType
-                defaultValue = -1L
-            },
-        ),
-    ) {
+    composable<EditAsset> { backStackEntry ->
+        val route = backStackEntry.toRoute<EditAsset>()
         EditAssetRoute(
-            assetId = it.arguments?.getLong(ROUTE_KEY_ASSET_ID) ?: -1L,
+            assetId = route.assetId,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }

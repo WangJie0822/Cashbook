@@ -17,6 +17,7 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library.feature)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
@@ -30,8 +31,6 @@ dependencies {
     implementation(projects.core.common)
     implementation(projects.core.domain)
     implementation(projects.core.data)
-
-    implementation(projects.repos.mpChartLib)
 
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.paging.compose)

@@ -22,9 +22,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -37,7 +34,6 @@ import cn.wj.android.cashbook.core.database.throwable.DataTransactionException
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ImageModel
-import java.math.BigDecimal
 
 /**
  * 事务数据库操作类
@@ -102,6 +98,13 @@ interface TransactionDao {
 
     @Query(
         value = """
+        SELECT * FROM db_record WHERE id IN (:ids)
+    """,
+    )
+    suspend fun queryRecordByIds(ids: List<Long>): List<RecordTable>
+
+    @Query(
+        value = """
         DELETE FROM db_record_with_related WHERE record_id=:id OR related_record_id=:id
     """,
     )
@@ -123,6 +126,117 @@ interface TransactionDao {
 
     @Insert
     suspend fun insertRelatedRecord(related: List<RecordWithRelatedTable>)
+
+    @Query("SELECT * FROM db_asset WHERE books_id=:bookId")
+    suspend fun queryAllAssetsByBookId(bookId: Long): List<AssetTable>
+
+    @Query("DELETE FROM db_asset WHERE books_id=:bookId")
+    suspend fun deleteAssetsByBookId(bookId: Long)
+
+    @Query("DELETE FROM db_tag WHERE books_id=:bookId")
+    suspend fun deleteTagsByBookId(bookId: Long)
+
+    @Query("SELECT * FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId")
+    suspend fun queryRecordsByAssetId(assetId: Long): List<RecordTable>
+
+    /** 解析记录类型，处理平账特殊类型 */
+    suspend fun resolveType(typeId: Long): TypeTable? {
+        return when (typeId) {
+            TYPE_TABLE_BALANCE_EXPENDITURE.id -> TYPE_TABLE_BALANCE_EXPENDITURE
+            TYPE_TABLE_BALANCE_INCOME.id -> TYPE_TABLE_BALANCE_INCOME
+            else -> queryTypeById(typeId)
+        }
+    }
+
+    /** 计算记录涉及的实际金额（单位：分） */
+    fun calculateRecordAmount(
+        record: RecordTable,
+        category: RecordTypeCategoryEnum,
+    ): Long {
+        return if (category == RecordTypeCategoryEnum.INCOME) {
+            // 收入：金额 - 手续费
+            record.amount - record.charge
+        } else {
+            // 支出、转账：金额 + 手续费 - 优惠
+            record.amount + record.charge - record.concessions
+        }
+    }
+
+    /**
+     * 重算某个吸收者（收入记录）的 finalAmount
+     *
+     * finalAmount = 吸收者自身的 recordAmount - 其所吸收的所有支出记录的 fullAmount 之和
+     *
+     * @param absorberId 吸收者记录 ID
+     * @param excludeAbsorbedId 需要排除的被吸收记录 ID（用于删除场景，该记录即将被删除但关联尚未清除）
+     */
+    suspend fun recalculateAbsorberFinalAmount(
+        absorberId: Long,
+        excludeAbsorbedId: Long = -1L,
+    ) {
+        val absorber = queryRecordById(absorberId) ?: return
+        val absorberType = resolveType(absorber.typeId) ?: return
+        val absorberCategory = RecordTypeCategoryEnum.ordinalOf(absorberType.typeCategory)
+        val absorberRecordAmount = calculateRecordAmount(absorber, absorberCategory)
+
+        var totalAbsorbedFullAmount = 0L
+        queryRelatedByRecordId(absorberId)
+            .filter { it.relatedRecordId != excludeAbsorbedId }
+            .forEach { relation ->
+                val absorbed = queryRecordById(relation.relatedRecordId) ?: return@forEach
+                val absorbedType = resolveType(absorbed.typeId) ?: return@forEach
+                val absorbedCategory = RecordTypeCategoryEnum.ordinalOf(absorbedType.typeCategory)
+                totalAbsorbedFullAmount += calculateRecordAmount(absorbed, absorbedCategory)
+            }
+
+        updateRecordFinalAmountById(absorberId, absorberRecordAmount - totalAbsorbedFullAmount)
+    }
+
+    /**
+     * 校验资产余额的一致性
+     *
+     * 遍历资产的所有关联记录，计算余额应有的净变化量，与当前余额对比。
+     * 返回差值：0 表示余额正确，非 0 表示存在偏差。
+     *
+     * 注意：新建资产时的初始余额不通过记录产生（直接写入 AssetTable），
+     * 后续的余额修改会生成平账记录。因此本方法计算的是"记录产生的净变化量"，
+     * 需要加上初始余额才等于期望的当前余额。
+     *
+     * @return 差值 = 当前余额 - (初始余额推算值 + 记录净变化)，正常应为 0
+     */
+    @Transaction
+    suspend fun verifyAssetBalance(assetId: Long): Long {
+        val asset = queryAssetById(assetId) ?: return 0L
+        val isCreditCard =
+            ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
+        val records = queryRecordsByAssetId(assetId)
+
+        var balanceChange = 0L
+        for (record in records) {
+            val type = resolveType(record.typeId) ?: continue
+            val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
+            val recordAmount = calculateRecordAmount(record, category)
+
+            // 此资产作为源资产（assetId）
+            if (record.assetId == assetId) {
+                balanceChange += if (isCreditCard) {
+                    if (category == RecordTypeCategoryEnum.INCOME) -recordAmount else recordAmount
+                } else {
+                    if (category == RecordTypeCategoryEnum.INCOME) recordAmount else -recordAmount
+                }
+            }
+
+            // 此资产作为转账目标（intoAssetId）
+            if (record.intoAssetId == assetId && category == RecordTypeCategoryEnum.TRANSFER) {
+                balanceChange += if (isCreditCard) -record.amount else record.amount
+            }
+        }
+
+        // 初始余额推算 = 当前余额 - 记录净变化
+        // 如果一切正确，初始余额应是资产创建时的值（无法独立验证）
+        // 但可以用于跨资产交叉校验：同一批操作后重算应与原值一致
+        return balanceChange
+    }
 
     @Throws(DataTransactionException::class)
     @Transaction
@@ -165,29 +279,22 @@ interface TransactionDao {
         relatedRecordIdList: List<Long>,
         relatedImageList: List<ImageModel>,
     ) {
-        val type = when (record.typeId) {
-            TYPE_TABLE_BALANCE_EXPENDITURE.id -> {
-                TYPE_TABLE_BALANCE_EXPENDITURE
-            }
-
-            TYPE_TABLE_BALANCE_INCOME.id -> {
-                TYPE_TABLE_BALANCE_INCOME
-            }
-
-            else -> {
-                queryTypeById(record.typeId)
-            }
-        } ?: throw DataTransactionException("Type must not be null")
-
+        // 防御性校验：确保引用的类型存在
+        val type = resolveType(record.typeId)
+            ?: throw DataTransactionException("Type must not be null, typeId=${record.typeId}")
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
-        // 计算记录涉及金额
-        val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
-            // 收入，金额 - 手续费
-            record.amount.toBigDecimalOrZero() - record.charge.toBigDecimalOrZero()
-        } else {
-            // 支出、转账，金额 + 手续费 - 优惠
-            record.amount.toBigDecimal() + record.charge.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero()
+        // 防御性校验：确保引用的资产存在（NO_ASSET_ID 除外）
+        if (record.assetId != cn.wj.android.cashbook.core.common.NO_ASSET_ID) {
+            queryAssetById(record.assetId)
+                ?: throw DataTransactionException("Asset not found, assetId=${record.assetId}")
         }
+        if (category == RecordTypeCategoryEnum.TRANSFER &&
+            record.intoAssetId != cn.wj.android.cashbook.core.common.NO_ASSET_ID
+        ) {
+            queryAssetById(record.intoAssetId)
+                ?: throw DataTransactionException("Transfer target asset not found, intoAssetId=${record.intoAssetId}")
+        }
+        val recordAmount = calculateRecordAmount(record, category)
         // 更新资产余额
         queryAssetById(record.assetId)?.let { asset ->
             // 计算已用额度 or 余额
@@ -196,23 +303,23 @@ interface TransactionDao {
                     // 信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，已用额度 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - recordAmount
+                        asset.balance - recordAmount
                     } else {
                         // 支出、转账，已用额度 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + recordAmount
+                        asset.balance + recordAmount
                     }
                 } else {
                     // 非信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，余额 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + recordAmount
+                        asset.balance + recordAmount
                     } else {
                         // 支出、转账，余额 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - recordAmount
+                        asset.balance - recordAmount
                     }
                 }
             // 更新资产
-            updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+            updateAsset(asset.copy(balance = balance))
         }
         if (category == RecordTypeCategoryEnum.TRANSFER) {
             // 转账，更新关联资产余额
@@ -221,17 +328,17 @@ interface TransactionDao {
                 val balance =
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
+                        asset.balance - record.amount
                     } else {
                         // 非信用卡账户，余额 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
+                        asset.balance + record.amount
                     }
                 // 更新资产
-                updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+                updateAsset(asset.copy(balance = balance))
             }
         }
 
-        val recordId = insertRecord(record.copy(finalAmount = recordAmount.toDouble()))
+        val recordId = insertRecord(record.copy(finalAmount = recordAmount))
 
         // 插入新的关联标签
         insertRelatedTags(
@@ -265,17 +372,82 @@ interface TransactionDao {
             )
 
             // 更新关联记录的金额
-            var relatedAmount = BigDecimal.ZERO
-            relatedRecordIdList.mapNotNull { relatedRecordId ->
-                queryRecordById(relatedRecordId)
-            }.forEach { relatedRecord ->
-                relatedAmount += relatedRecord.finalAmount.toBigDecimalOrZero()
+            var relatedAmount = 0L
+            queryRecordByIds(relatedRecordIdList).forEach { relatedRecord ->
+                relatedAmount += relatedRecord.finalAmount
             }
             relatedRecordIdList.forEach { relatedRecordId ->
-                updateRecordFinalAmountById(relatedRecordId, 0.0)
+                updateRecordFinalAmountById(relatedRecordId, 0L)
             }
-            updateRecordFinalAmountById(recordId, (recordAmount - relatedAmount).toDouble())
+            updateRecordFinalAmountById(recordId, recordAmount - relatedAmount)
         }
+    }
+
+    /**
+     * 批量导入记录事务
+     *
+     * 在单个事务中插入多条记录并更新对应资产余额。
+     *
+     * @param records 要插入的记录列表
+     * @return 插入后的记录 ID 列表
+     */
+    @Transaction
+    suspend fun batchImportRecordsTransaction(
+        records: List<RecordTable>,
+    ): List<Long> {
+        val insertedIds = mutableListOf<Long>()
+
+        // 按资产分组汇总余额变化（使用 Long，与项目金额类型一致）
+        data class BalanceChange(
+            val assetId: Long,
+            var incomeTotal: Long = 0L,
+            var expenditureTotal: Long = 0L,
+        )
+
+        val balanceChanges = mutableMapOf<Long, BalanceChange>()
+
+        for (record in records) {
+            val type = queryTypeById(record.typeId) ?: continue
+            val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
+
+            // 复用已有方法计算实际金额
+            val recordAmount = calculateRecordAmount(record, category)
+
+            // 插入记录
+            val id = insertRecord(record.copy(finalAmount = recordAmount))
+            insertedIds.add(id)
+
+            // 累计余额变化
+            if (record.assetId > 0) {
+                val change = balanceChanges.getOrPut(record.assetId) {
+                    BalanceChange(assetId = record.assetId)
+                }
+                if (category == RecordTypeCategoryEnum.INCOME) {
+                    change.incomeTotal += recordAmount
+                } else {
+                    change.expenditureTotal += recordAmount
+                }
+            }
+        }
+
+        // 批量更新资产余额
+        for ((assetId, change) in balanceChanges) {
+            val asset = queryAssetById(assetId) ?: continue
+            val isCreditCard = ClassificationTypeEnum.ordinalOf(asset.type) ==
+                ClassificationTypeEnum.CREDIT_CARD_ACCOUNT
+
+            val balance = if (isCreditCard) {
+                // 信用卡：收入减少已用额度，支出增加已用额度
+                asset.balance - change.incomeTotal + change.expenditureTotal
+            } else {
+                // 非信用卡：收入增加余额，支出减少余额
+                asset.balance + change.incomeTotal - change.expenditureTotal
+            }
+
+            updateAsset(asset.copy(balance = balance))
+        }
+
+        return insertedIds
     }
 
     @Throws(DataTransactionException::class)
@@ -303,29 +475,10 @@ interface TransactionDao {
     @Transaction
     suspend fun deleteRecordTransaction(record: RecordTable) {
         val recordId = record.id ?: return
-        val type = when (record.typeId) {
-            TYPE_TABLE_BALANCE_EXPENDITURE.id -> {
-                TYPE_TABLE_BALANCE_EXPENDITURE
-            }
-
-            TYPE_TABLE_BALANCE_INCOME.id -> {
-                TYPE_TABLE_BALANCE_INCOME
-            }
-
-            else -> {
-                queryTypeById(record.typeId)
-            }
-        } ?: throw DataTransactionException("Type must not be null")
-
+        val type = resolveType(record.typeId)
+            ?: throw DataTransactionException("Type must not be null")
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
-        // 计算之前记录涉及金额
-        val oldRecordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
-            // 收入，金额 - 手续费
-            record.amount.toBigDecimalOrZero() - record.charge.toBigDecimalOrZero()
-        } else {
-            // 支出、转账，金额 + 手续费 - 优惠
-            record.amount.toBigDecimal() + record.charge.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero()
-        }
+        val oldRecordAmount = calculateRecordAmount(record, category)
         // 更新资产余额
         queryAssetById(record.assetId)?.let { asset ->
             // 计算回退已用额度 or 余额
@@ -334,23 +487,23 @@ interface TransactionDao {
                     // 信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，已用额度 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                        asset.balance + oldRecordAmount
                     } else {
                         // 支出、转账，已用额度 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                        asset.balance - oldRecordAmount
                     }
                 } else {
                     // 非信用卡账户
                     if (category == RecordTypeCategoryEnum.INCOME) {
                         // 收入，余额 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - oldRecordAmount
+                        asset.balance - oldRecordAmount
                     } else {
                         // 支出、转账，余额 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + oldRecordAmount
+                        asset.balance + oldRecordAmount
                     }
                 }
             // 更新资产
-            updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+            updateAsset(asset.copy(balance = balance))
         }
         if (category == RecordTypeCategoryEnum.TRANSFER) {
             // 转账，更新关联资产余额
@@ -359,13 +512,13 @@ interface TransactionDao {
                 val balance =
                     if (ClassificationTypeEnum.ordinalOf(asset.type) == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT) {
                         // 信用卡账户，已用额度 + 记录金额
-                        asset.balance.toBigDecimalOrZero() + record.amount.toBigDecimalOrZero()
+                        asset.balance + record.amount
                     } else {
                         // 非信用卡账户，余额 - 记录金额
-                        asset.balance.toBigDecimalOrZero() - record.amount.toBigDecimalOrZero()
+                        asset.balance - record.amount
                     }
                 // 更新资产
-                updateAsset(asset.copy(balance = balance.decimalFormat().toDoubleOrZero()))
+                updateAsset(asset.copy(balance = balance))
             }
         }
 
@@ -377,31 +530,32 @@ interface TransactionDao {
 
         // 更新关联记录的 finalAmount
         if (category == RecordTypeCategoryEnum.EXPENDITURE) {
-            // 删除支出记录，需要更新报销、退款记录，最终金额为 关联最终金额 + 支出记录的finalAmount
-            queryRelatedByRelatedRecordId(recordId).mapNotNull { related ->
-                queryRecordById(related.recordId)
-            }.forEach { relatedRecord ->
-                val relatedRecordId = relatedRecord.id
-                if (null != relatedRecordId) {
-                    updateRecordFinalAmountById(
-                        relatedRecordId,
-                        (relatedRecord.finalAmount.toBigDecimalOrZero() + oldRecordAmount).decimalFormat()
-                            .toDoubleOrZero(),
-                    )
-                }
+            // 删除支出记录，重算所有吸收了该支出的收入记录的 finalAmount
+            queryRelatedByRelatedRecordId(recordId).forEach { relation ->
+                // 排除即将被删除的支出记录（关联尚未清除）
+                recalculateAbsorberFinalAmount(relation.recordId, excludeAbsorbedId = recordId)
             }
         } else if (category == RecordTypeCategoryEnum.INCOME) {
-            // 删除收入记录，需要更新被关联的支出记录，最终金额需重新计算
-            queryRelatedByRecordId(recordId).mapNotNull { related ->
-                queryRecordById(related.relatedRecordId)
-            }.forEach { relatedRecord ->
-                val relatedRecordId = relatedRecord.id
-                if (null != relatedRecordId) {
-                    updateRecordFinalAmountById(
-                        relatedRecordId,
-                        (relatedRecord.amount.toBigDecimalOrZero() - relatedRecord.concessions.toBigDecimalOrZero() + relatedRecord.charge.toBigDecimalOrZero()).decimalFormat()
-                            .toDoubleOrZero(),
-                    )
+            // 删除收入（吸收者）记录，需要更新被关联的支出记录
+            val absorbedRelations = queryRelatedByRecordId(recordId)
+            for (relation in absorbedRelations) {
+                val expenseId = relation.relatedRecordId
+                val expense = queryRecordById(expenseId) ?: continue
+                // 检查该支出是否还有其他吸收者
+                val remainingAbsorbers = queryRelatedByRelatedRecordId(expenseId)
+                    .filter { it.recordId != recordId }
+                if (remainingAbsorbers.isEmpty()) {
+                    // 无其他吸收者，恢复支出的完整金额
+                    val expenseType = resolveType(expense.typeId) ?: continue
+                    val expenseCategory = RecordTypeCategoryEnum.ordinalOf(expenseType.typeCategory)
+                    val fullAmount = calculateRecordAmount(expense, expenseCategory)
+                    updateRecordFinalAmountById(expenseId, fullAmount)
+                } else {
+                    // 还有其他吸收者，支出保持 finalAmount = 0
+                    // 重算每个剩余吸收者的 finalAmount
+                    for (absorber in remainingAbsorbers) {
+                        recalculateAbsorberFinalAmount(absorber.recordId)
+                    }
                 }
             }
         }
@@ -421,7 +575,7 @@ interface TransactionDao {
         UPDATE db_record SET final_amount=:finalAmount WHERE id=:id
     """,
     )
-    suspend fun updateRecordFinalAmountById(id: Long, finalAmount: Double)
+    suspend fun updateRecordFinalAmountById(id: Long, finalAmount: Long)
 
     @Query(
         value = """
@@ -470,27 +624,123 @@ interface TransactionDao {
     )
     suspend fun deleteBookById(bookId: Long)
 
+    @Query("DELETE FROM db_tag_with_record WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
+    suspend fun deleteTagRelationsByBookId(bookId: Long)
+
+    @Query("DELETE FROM db_record_with_related WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId) OR related_record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
+    suspend fun deleteRecordRelationsByBookId(bookId: Long)
+
+    @Query("DELETE FROM db_image_with_related WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
+    suspend fun deleteImageRelationsByBookId(bookId: Long)
+
+    @Query("DELETE FROM db_record WHERE books_id = :bookId")
+    suspend fun deleteRecordsByBookId(bookId: Long)
+
+    /**
+     * 事务化删除账本及其所有关联数据
+     *
+     * 逐条删除记录以确保正确回退所有资产余额（包括跨账本转账的对方资产）
+     * 并正确处理关联记录的 finalAmount 重算
+     */
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteBookTransaction(bookId: Long) {
-        // 查询当前账本下的记录
-        val recordList = queryRecordListByBookId(bookId)
-        // 从记录关系表和标签关系表中删除对应记录
-        recordList.forEach { record ->
-            val id = record.id
-            if (null != id) {
-                deleteTagRelationByRecordId(id)
-                deleteRecordRelationByRecordId(id)
-            }
-            deleteRecord(record)
+        // 逐条删除记录，正确回退所有关联资产余额及 finalAmount
+        val records = queryRecordListByBookId(bookId)
+        for (record in records) {
+            deleteRecordTransaction(record)
         }
+        // 删除该账本下的所有标签
+        deleteTagsByBookId(bookId)
+        // 删除该账本下的所有资产
+        deleteAssetsByBookId(bookId)
         // 删除账本
         deleteBookById(bookId)
+    }
+
+    @Query("UPDATE db_record SET type_id = :newTypeId WHERE type_id = :oldTypeId")
+    suspend fun updateRecordTypeId(oldTypeId: Long, newTypeId: Long)
+
+    @Query("UPDATE db_type SET parent_id = -1, type_level = 0 WHERE parent_id = :parentId")
+    suspend fun promoteChildTypes(parentId: Long)
+
+    @Query("SELECT COUNT(*) FROM db_record WHERE type_id = :typeId")
+    suspend fun countRecordsByTypeId(typeId: Long): Int
+
+    @Query("DELETE FROM db_type WHERE id = :typeId")
+    suspend fun deleteTypeById(typeId: Long)
+
+    /**
+     * 事务化迁移类型记录：将旧类型的记录迁移到固定类型，并清理旧类型
+     */
+    @Transaction
+    suspend fun migrateTypeRecords(oldTypeId: Long, fixedTypeId: Long) {
+        // 更新记录的 type_id
+        updateRecordTypeId(oldTypeId, fixedTypeId)
+        // 将旧类型的子类型提升为一级类型
+        promoteChildTypes(oldTypeId)
+        // 如果旧类型没有剩余记录引用，则删除
+        val remainingCount = countRecordsByTypeId(oldTypeId)
+        if (remainingCount == 0) {
+            deleteTypeById(oldTypeId)
+        }
     }
 
     @Transaction
     suspend fun deleteTag(id: Long) {
         deleteTagRelationByTagId(id)
         deleteTagById(id)
+    }
+
+    /** 删除资产关联的标签记录关联 */
+    @Query(
+        value = """
+        DELETE FROM db_tag_with_record
+        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+    """,
+    )
+    suspend fun deleteTagRelationsByAssetId(assetId: Long)
+
+    /** 删除资产关联的记录关联数据 */
+    @Query(
+        value = """
+        DELETE FROM db_record_with_related
+        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+        OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+    """,
+    )
+    suspend fun deleteRecordRelationsByAssetId(assetId: Long)
+
+    /** 删除资产关联的图片关联数据 */
+    @Query(
+        value = """
+        DELETE FROM db_image_with_related
+        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
+    """,
+    )
+    suspend fun deleteImageRelationsByAssetId(assetId: Long)
+
+    /** 删除资产关联的记录 */
+    @Query(
+        value = """
+        DELETE FROM db_record
+        WHERE asset_id=:assetId OR into_asset_id=:assetId
+    """,
+    )
+    suspend fun deleteRecordsByAssetId(assetId: Long)
+
+    /**
+     * 事务化删除资产关联的所有数据
+     *
+     * 逐条删除记录以确保正确回退对方资产余额（特别是转账场景）
+     * 并正确处理关联记录的 finalAmount 重算
+     */
+    @Transaction
+    suspend fun deleteAssetRelatedData(assetId: Long) {
+        // 逐条删除，正确回退对方资产余额及 finalAmount
+        val records = queryRecordsByAssetId(assetId)
+        for (record in records) {
+            deleteRecordTransaction(record)
+        }
     }
 }

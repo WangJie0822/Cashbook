@@ -47,8 +47,6 @@ dependencies {
 
     implementation(projects.core.design)
     implementation(projects.core.ui)
-
-    implementation(projects.repos.mpChartLib)
 }
 
 dependencyGuard {

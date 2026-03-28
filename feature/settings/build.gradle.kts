@@ -17,6 +17,7 @@ plugins {
     alias(conventionLibs.plugins.cashbook.android.library.feature)
     alias(conventionLibs.plugins.cashbook.android.library.compose)
     alias(conventionLibs.plugins.cashbook.android.library.jacoco)
+    alias(libs.plugins.takahirom.roborazzi)
 }
 
 android {
@@ -29,6 +30,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.common)
     implementation(projects.core.data)
+    implementation(projects.core.domain)
 
     // Markdown 解析
     implementation(libs.noties.markwon)
@@ -37,4 +39,5 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     testImplementation(projects.core.testing)
+    testImplementation(libs.robolectric)
 }

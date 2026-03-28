@@ -52,5 +52,5 @@ interface WebDAVHandler {
     ): List<BackupModel>
 
     @WorkerThread
-    suspend fun get(url: String): InputStream?
+    suspend fun get(url: String): ByteArray?
 }

@@ -95,7 +95,15 @@ app → feature/* → core/*
 - **网络**: Retrofit 3 + OkHttp + Kotlin Serialization
 - **异步**: Kotlin Coroutines + Flow
 - **同步**: WorkManager (`sync/work` 模块)
-- **图表**: MPChartLib (本地 `repos/MPChartLib`)
+- **图表**: Compose Canvas 自绘制 (`core/design` 中的 CbPieChart、CbLineChart)
+
+### 金额约定（强制）
+
+- 数据库及全链路金额统一使用 **`Long` 类型，单位：分**（1 元 = 100）
+- `RecordTable.amount`、`finalAmount`、`concessions`、`charge` 以及 `AssetTable.balance` 均为 `Long`
+- 外部输入（如导入账单的 `Double` 元值）必须通过 `Double.toCent()` 或 `String.toAmountCent()` 转换为分再存入数据库（工具方法在 `core/common/ext/Money.kt`）
+- 计算 `recordAmount` 应复用 `TransactionDao.calculateRecordAmount()` 方法，禁止自行用 `BigDecimal` / `Double` 重新实现
+- UI 显示时使用 `Long.toMoneyString()` / `Long.toMoneyFormat()` / `Long.toMoneyCNY()` 转回元
 
 ### 多渠道 (Product Flavors)
 
@@ -113,6 +121,36 @@ app → feature/* → core/*
 - 源文件需包含 Apache 2.0 License Header（Spotless 自动检查，模板在 `spotless/` 目录）
 - Kotlin 格式化使用 ktlint (android mode)
 - 自定义 Lint 规则在 `lint/` 模块，通过 `:core:design` 发布
+- **禁止在 `app/`、`feature/`、`core/ui/` 中直接使用以下 Material3 组件，必须使用 `core/design` 中对应的设计系统封装：**
+
+  | Material3 组件 | 项目封装 |
+  |---|---|
+  | `MaterialTheme()` | `CashbookTheme` |
+  | `TopAppBar` | `CbTopAppBar` |
+  | `Scaffold` | `CbScaffold` |
+  | `Divider` | `CbHorizontalDivider` / `CbVerticalDivider` |
+  | `TextField` | `CbTextField` |
+  | `OutlinedTextField` | `CbOutlinedTextField` |
+  | `FloatingActionButton` | `CbFloatingActionButton` |
+  | `SmallFloatingActionButton` | `CbSmallFloatingActionButton` |
+  | `ListItem` | `CbListItem` |
+  | `ModalBottomSheet` | `CbModalBottomSheet` |
+  | `TextButton` | `CbTextButton` |
+  | `IconButton` | `CbIconButton` |
+  | `Card` | `CbCard` |
+  | `ElevatedCard` | `CbElevatedCard` |
+  | `AlertDialog` | `CbAlertDialog` |
+  | `BaseAlterDialog` | `CbBaseAlterDialog` |
+  | `Tab` | `CbTab` |
+  | `TabRow` | `CbTabRow` |
+  | `Icons` | `CbIcons` |
+
+  > 访问 `MaterialTheme.colorScheme`/`.typography`/`.shapes` 属性是允许的，仅禁止作为 composable 调用。
+  > 违反此规则会触发 lint `Design` error，构建将中止。
 - `compose_compiler_config.conf` 声明了 `core/model` 中模型类的 Compose 稳定性
 - 测试使用自定义 TestRunner: `cn.wj.android.cashbook.core.testing.CashbookTestRunner`
 - 包名: `cn.wj.android.cashbook`
+
+## 规范（强制）
+- 所有修改新增功能必须确认是否新增对应测试，功能开发必须在测试通过才算完成
+- 

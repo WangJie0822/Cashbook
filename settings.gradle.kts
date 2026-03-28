@@ -60,6 +60,7 @@ include(":feature:books")
 include(":feature:assets")
 include(":feature:records")
 include(":feature:settings")
+include(":feature:record-import")
 
 include(":core:domain")
 include(":core:data")
@@ -75,8 +76,6 @@ include(":core:model")
 include(":core:common")
 
 include(":sync:work")
-
-include(":repos:MPChartLib")
 
 include(":baselineProfile")
 include(":lint")

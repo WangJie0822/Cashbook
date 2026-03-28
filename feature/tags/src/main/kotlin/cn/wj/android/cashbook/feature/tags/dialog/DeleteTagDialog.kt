@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.model.model.TagModel
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.tags.viewmodel.DeleteTagDialogViewModel
 
@@ -34,9 +35,10 @@ internal fun DeleteTagDialogRoute(
         setProgressDialogHintText(stringResource(id = R.string.tag_deleting))
     },
 ) {
+    val progressDialogController = LocalProgressDialogController.current
     DeleteTagDialog(
         tagModel = tagModel,
-        onRequestDeleteTag = { viewModel.deleteTag(it, onRequestDismissDialog) },
+        onRequestDeleteTag = { viewModel.deleteTag(progressDialogController, it, onRequestDismissDialog) },
         onRequestDismissDialog = onRequestDismissDialog,
     )
 }

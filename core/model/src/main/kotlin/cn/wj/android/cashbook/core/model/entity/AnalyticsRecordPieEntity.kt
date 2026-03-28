@@ -23,6 +23,7 @@ data class AnalyticsRecordPieEntity(
     val typeName: String,
     val typeIconResName: String,
     val typeCategory: RecordTypeCategoryEnum,
-    val totalAmount: String,
+    /** 总金额，单位：分 */
+    val totalAmount: Long,
     val percent: Float,
 )

@@ -16,6 +16,9 @@
 
 package cn.wj.android.cashbook.core.data.repository.impl
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_CREDIT_CARD_PAYMENT
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.model.typeDataVersion
@@ -23,6 +26,7 @@ import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
+import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -42,6 +46,7 @@ import kotlin.coroutines.CoroutineContext
  */
 class TypeRepositoryImpl @Inject constructor(
     private val typeDao: TypeDao,
+    private val transactionDao: TransactionDao,
     private val combineProtoDataSource: CombineProtoDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : TypeRepository {
@@ -62,7 +67,9 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun getRecordTypeById(typeId: Long): RecordTypeModel? =
         withContext(coroutineContext) {
-            typeDao.queryById(typeId)?.asModel(combineProtoDataSource.needRelated(typeId))
+            typeDao.queryById(typeId)?.asModel(
+                typeId == FIXED_TYPE_ID_REFUND || typeId == FIXED_TYPE_ID_REIMBURSE,
+            )
         }
 
     override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel =
@@ -78,78 +85,32 @@ class TypeRepositoryImpl @Inject constructor(
 
     private suspend fun getFirstRecordTypeList(): List<RecordTypeModel> =
         withContext(coroutineContext) {
-            val result = typeDao.queryByLevel(TypeLevelEnum.FIRST.ordinal)
+            typeDao.queryByLevel(TypeLevelEnum.FIRST.ordinal)
                 .map {
-                    it.asModel(combineProtoDataSource.needRelated(it.id ?: -1L))
+                    val id = it.id ?: -1L
+                    it.asModel(id == FIXED_TYPE_ID_REFUND || id == FIXED_TYPE_ID_REIMBURSE)
                 }
-            result
         }
 
     override suspend fun getSecondRecordTypeListByParentId(parentId: Long): List<RecordTypeModel> =
         withContext(coroutineContext) {
             typeDao.queryByParentId(parentId)
                 .map {
-                    it.asModel(combineProtoDataSource.needRelated(it.id ?: -1L))
+                    val id = it.id ?: -1L
+                    it.asModel(id == FIXED_TYPE_ID_REFUND || id == FIXED_TYPE_ID_REIMBURSE)
                 }
         }
 
     override suspend fun needRelated(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.recordSettingsData.first()
-        val refundTypeId = if (appDataModel.refundTypeId > 0L) {
-            appDataModel.refundTypeId
-        } else {
-            val id = typeDao.queryByName("退款")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateRefundTypeId(id)
-            }
-            id
-        }
-        val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
-            appDataModel.reimburseTypeId
-        } else {
-            val id = typeDao.queryByName("报销")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateReimburseTypeId(id)
-            }
-            id
-        }
-        typeId == refundTypeId || typeId == reimburseTypeId
+        typeId == FIXED_TYPE_ID_REFUND || typeId == FIXED_TYPE_ID_REIMBURSE
     }
 
     override suspend fun isReimburseType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.recordSettingsData.first()
-        val reimburseTypeId = if (appDataModel.reimburseTypeId > 0L) {
-            appDataModel.reimburseTypeId
-        } else {
-            val id = typeDao.queryByName("报销")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateReimburseTypeId(id)
-            }
-            id
-        }
-        typeId == reimburseTypeId
+        typeId == FIXED_TYPE_ID_REIMBURSE
     }
 
     override suspend fun isRefundType(typeId: Long): Boolean = withContext(coroutineContext) {
-        val appDataModel = combineProtoDataSource.recordSettingsData.first()
-        val refundTypeId = if (appDataModel.refundTypeId > 0L) {
-            appDataModel.refundTypeId
-        } else {
-            val id = typeDao.queryByName("退款")?.id ?: 0L
-            if (id > 0L) {
-                combineProtoDataSource.updateRefundTypeId(id)
-            }
-            id
-        }
-        typeId == refundTypeId
-    }
-
-    override suspend fun setReimburseType(typeId: Long): Unit = withContext(coroutineContext) {
-        combineProtoDataSource.updateReimburseTypeId(typeId)
-    }
-
-    override suspend fun setRefundType(typeId: Long): Unit = withContext(coroutineContext) {
-        combineProtoDataSource.updateRefundTypeId(typeId)
+        typeId == FIXED_TYPE_ID_REFUND
     }
 
     override suspend fun changeTypeToSecond(id: Long, parentId: Long): Unit =
@@ -172,6 +133,10 @@ class TypeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteById(id: Long): Unit = withContext(coroutineContext) {
+        // 固定类型不允许删除
+        require(id != FIXED_TYPE_ID_REFUND && id != FIXED_TYPE_ID_REIMBURSE && id != FIXED_TYPE_ID_CREDIT_CARD_PAYMENT) {
+            "Cannot delete fixed type: $id"
+        }
         typeDao.deleteById(id)
         typeDataVersion.updateVersion()
     }
@@ -202,20 +167,63 @@ class TypeRepositoryImpl @Inject constructor(
 
     override suspend fun isCreditPaymentType(typeId: Long): Boolean =
         withContext(coroutineContext) {
-            val appDataModel = combineProtoDataSource.recordSettingsData.first()
-            val creditCardPaymentTypeId = if (appDataModel.creditCardPaymentTypeId > 0L) {
-                appDataModel.creditCardPaymentTypeId
-            } else {
-                val id = typeDao.queryByName("还信用卡")?.id ?: 0L
-                if (id > 0L) {
-                    combineProtoDataSource.updateCreditCardPaymentTypeId(id)
-                }
-                id
-            }
-            creditCardPaymentTypeId == typeId
+            FIXED_TYPE_ID_CREDIT_CARD_PAYMENT == typeId
         }
 
-    override suspend fun setCreditPaymentType(typeId: Long): Unit = withContext(coroutineContext) {
-        combineProtoDataSource.updateCreditCardPaymentTypeId(typeId)
+    /**
+     * 应用层一次性迁移：将旧的特殊类型记录引用迁移到固定 ID
+     * 设计为幂等操作，崩溃后重试安全
+     */
+    override suspend fun migrateSpecialTypes(): Unit = withContext(coroutineContext) {
+        val settings = combineProtoDataSource.recordSettingsData.first()
+
+        migrateOneType(
+            oldTypeId = settings.refundTypeId,
+            fixedTypeId = FIXED_TYPE_ID_REFUND,
+            fallbackName = "退款",
+            fallbackCategory = RecordTypeCategoryEnum.INCOME.ordinal,
+            updateDataStore = { combineProtoDataSource.updateRefundTypeId(it) },
+        )
+        migrateOneType(
+            oldTypeId = settings.reimburseTypeId,
+            fixedTypeId = FIXED_TYPE_ID_REIMBURSE,
+            fallbackName = "报销",
+            fallbackCategory = RecordTypeCategoryEnum.INCOME.ordinal,
+            updateDataStore = { combineProtoDataSource.updateReimburseTypeId(it) },
+        )
+        migrateOneType(
+            oldTypeId = settings.creditCardPaymentTypeId,
+            fixedTypeId = FIXED_TYPE_ID_CREDIT_CARD_PAYMENT,
+            fallbackName = "还信用卡",
+            fallbackCategory = RecordTypeCategoryEnum.TRANSFER.ordinal,
+            updateDataStore = { combineProtoDataSource.updateCreditCardPaymentTypeId(it) },
+        )
+    }
+
+    private suspend fun migrateOneType(
+        oldTypeId: Long,
+        fixedTypeId: Long,
+        fallbackName: String,
+        fallbackCategory: Int,
+        updateDataStore: suspend (Long) -> Unit,
+    ) {
+        if (oldTypeId == fixedTypeId) return // 已迁移
+
+        val targetOldId = if (oldTypeId > 0L) {
+            oldTypeId
+        } else {
+            // DataStore 无记录，按名称查找
+            typeDao.queryByName(fallbackName)
+                ?.takeIf { it.typeCategory == fallbackCategory }
+                ?.id ?: 0L
+        }
+
+        if (targetOldId > 0L) {
+            // 在事务中执行数据库操作
+            transactionDao.migrateTypeRecords(targetOldId, fixedTypeId)
+        }
+
+        // 更新 DataStore（数据库事务之后，幂等安全）
+        updateDataStore(fixedTypeId)
     }
 }

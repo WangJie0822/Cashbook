@@ -38,14 +38,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
-import java.math.BigDecimal
 
 /**
  * 资产列表 Item
@@ -58,8 +56,8 @@ internal fun AssetListItem(
     type: ClassificationTypeEnum,
     iconPainter: Painter,
     name: String,
-    balance: String,
-    totalAmount: String,
+    balance: Long,
+    totalAmount: Long,
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
     onItemLongClick: (() -> Unit)? = null,
@@ -124,7 +122,7 @@ internal fun NotAssociatedAssetListItem(
 private fun CapitalAssetListItem(
     iconPainter: Painter,
     name: String,
-    balance: String,
+    balance: Long,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -145,7 +143,7 @@ private fun CapitalAssetListItem(
             style = MaterialTheme.typography.bodyLarge,
         )
         Text(
-            text = balance.withCNY(),
+            text = balance.toMoneyCNY(),
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -156,8 +154,8 @@ private fun CapitalAssetListItem(
 private fun CreditCardAssetListItem(
     iconPainter: Painter,
     name: String,
-    balance: String,
-    totalAmount: String,
+    balance: Long,
+    totalAmount: Long,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -184,18 +182,16 @@ private fun CreditCardAssetListItem(
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
-                    text = balance.withCNY(),
+                    text = balance.toMoneyCNY(),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-            val totalAmountDecimal = totalAmount.toBigDecimalOrZero()
-            val balanceDecimal = balance.toBigDecimalOrZero()
             val progress =
-                if (balanceDecimal > totalAmountDecimal || totalAmountDecimal <= BigDecimal.ZERO) {
+                if (balance > totalAmount || totalAmount <= 0L) {
                     0f
                 } else {
-                    1f - (balanceDecimal / totalAmountDecimal).toFloat()
+                    1f - (balance.toFloat() / totalAmount.toFloat())
                 }
             LinearProgressIndicator(
                 progress = { progress },
@@ -206,7 +202,7 @@ private fun CreditCardAssetListItem(
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.CenterEnd),
-                    text = stringResource(id = R.string.total_amount_with_colon) + totalAmount.withCNY(),
+                    text = stringResource(id = R.string.total_amount_with_colon) + totalAmount.toMoneyCNY(),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -227,16 +223,16 @@ private fun AssetListPreview() {
                 AssetListItem(
                     type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
                     iconPainter = painterResource(id = R.drawable.vector_bank_js_24),
-                    balance = "1000",
-                    totalAmount = "",
+                    balance = 100000L,
+                    totalAmount = 0L,
                     onItemClick = {},
                     name = "建设银行",
                 )
                 AssetListItem(
                     type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
                     iconPainter = painterResource(id = R.drawable.vector_bank_zs_24),
-                    balance = "1000",
-                    totalAmount = "2000",
+                    balance = 100000L,
+                    totalAmount = 200000L,
                     onItemClick = {},
                     name = "招商银行",
                 )

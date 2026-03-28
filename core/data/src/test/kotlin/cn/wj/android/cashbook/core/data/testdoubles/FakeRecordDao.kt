@@ -16,8 +16,11 @@
 
 package cn.wj.android.cashbook.core.data.testdoubles
 
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.dao.RecordDao
+import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -115,6 +118,20 @@ class FakeRecordDao : RecordDao {
             .take(pageSize)
     }
 
+    override suspend fun queryRecordByTypeIdExact(
+        booksId: Long,
+        typeId: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId && it.typeId == typeId
+        }
+            .sortedByDescending { it.recordTime }
+            .drop(pageNum)
+            .take(pageSize)
+    }
+
     override suspend fun queryRecordByTypeIdBetween(
         booksId: Long,
         typeId: Long,
@@ -129,6 +146,25 @@ class FakeRecordDao : RecordDao {
                 it.recordTime >= startDate &&
                 it.recordTime < endDate &&
                 (it.typeId == typeId || it.typeId in childTypeIds)
+        }
+            .sortedByDescending { it.recordTime }
+            .drop(pageNum)
+            .take(pageSize)
+    }
+
+    override suspend fun queryRecordByTypeIdExactBetween(
+        booksId: Long,
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId &&
+                it.recordTime >= startDate &&
+                it.recordTime < endDate &&
+                it.typeId == typeId
         }
             .sortedByDescending { it.recordTime }
             .drop(pageNum)
@@ -167,20 +203,24 @@ class FakeRecordDao : RecordDao {
             .take(pageSize)
     }
 
-    override fun queryByTypeId(id: Long): List<RecordTable> {
+    override suspend fun queryByIds(ids: List<Long>): List<RecordTable> {
+        return records.filter { it.id in ids }
+    }
+
+    override suspend fun queryByTypeId(id: Long): List<RecordTable> {
         return records.filter { it.typeId == id }
     }
 
-    override fun queryByTypeCategory(typeCategoryId: Int): List<RecordTable> {
+    override suspend fun queryByTypeCategory(typeCategoryId: Int): List<RecordTable> {
         val typeIds = types.filter { it.typeCategory == typeCategoryId }.mapNotNull { it.id }
         return records.filter { it.typeId in typeIds }
     }
 
-    override fun queryRelatedRecord(): List<RecordWithRelatedTable> {
+    override suspend fun queryRelatedRecord(): List<RecordWithRelatedTable> {
         return relatedRecords.toList()
     }
 
-    override fun queryRelatedRecordCountByID(id: Long): Int {
+    override suspend fun queryRelatedRecordCountByID(id: Long): Int {
         return relatedRecords.count { it.relatedRecordId == id || it.recordId == id }
     }
 
@@ -212,7 +252,7 @@ class FakeRecordDao : RecordDao {
         return relatedRecords.filter { it.relatedRecordId == id }.map { it.recordId }
     }
 
-    override fun getExpenditureRecordListAfterTime(
+    override suspend fun getExpenditureRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
         incomeCategory: Int,
@@ -227,7 +267,7 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun getExpenditureReimburseRecordListAfterTime(
+    override suspend fun getExpenditureReimburseRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
     ): List<RecordTable> {
@@ -238,7 +278,7 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun getExpenditureRecordListByKeywordAfterTime(
+    override suspend fun getExpenditureRecordListByKeywordAfterTime(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -255,11 +295,11 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun getRecordCountByAssetIdAfterTime(assetId: Long, recordTime: Long): Int {
+    override suspend fun getRecordCountByAssetIdAfterTime(assetId: Long, recordTime: Long): Int {
         return records.count { it.assetId == assetId && it.recordTime >= recordTime }
     }
 
-    override fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
+    override suspend fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -272,19 +312,110 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
-    override fun deleteWithAsset(assetId: Long) {
+    override suspend fun deleteWithAsset(assetId: Long) {
         records.removeAll { it.assetId == assetId || it.intoAssetId == assetId }
     }
 
-    override fun deleteRelatedWithAsset(assetId: Long) {
+    override suspend fun deleteRelatedWithAsset(assetId: Long) {
         val recordIds = records
             .filter { it.assetId == assetId || it.intoAssetId == assetId }
             .mapNotNull { it.id }
         relatedRecords.removeAll { it.recordId in recordIds || it.relatedRecordId in recordIds }
     }
 
+    override fun pagingQueryByBooksIdBetweenDate(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): PagingSource<Int, RecordTable> {
+        return object : PagingSource<Int, RecordTable>() {
+            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RecordTable> {
+                val data = records.filter {
+                    it.booksId == booksId && it.recordTime >= startDate && it.recordTime < endDate
+                }.sortedByDescending { it.recordTime }
+                return LoadResult.Page(data = data, prevKey = null, nextKey = null)
+            }
+
+            override fun getRefreshKey(state: PagingState<Int, RecordTable>): Int? = null
+        }
+    }
+
+    override suspend fun queryViewsBetweenDate(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<RecordViewsRelation> {
+        return records.filter {
+            it.booksId == booksId && it.recordTime >= startDate && it.recordTime < endDate
+        }.map { record ->
+            val type = types.firstOrNull { it.id == record.typeId }
+            RecordViewsRelation(
+                id = record.id ?: -1L,
+                typeId = record.typeId,
+                typeCategory = type?.typeCategory ?: 0,
+                typeName = "",
+                typeIconResName = "",
+                assetName = null,
+                assetClassification = null,
+                relatedAssetName = null,
+                relatedAssetClassification = null,
+                amount = record.amount,
+                finalAmount = record.finalAmount,
+                charges = record.charge,
+                concessions = record.concessions,
+                remark = record.remark,
+                reimbursable = record.reimbursable,
+                recordTime = record.recordTime,
+            )
+        }
+    }
+
     override suspend fun queryImagesByRecordId(recordId: Long): List<ImageWithRelatedTable> {
         return images.filter { it.recordId == recordId }
+    }
+
+    override suspend fun queryByWechatTransactionId(
+        booksId: Long,
+        transactionId: String,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId && it.remark.contains(transactionId)
+        }
+    }
+
+    override suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId &&
+                it.recordTime in startTime..endTime &&
+                it.amount == amount.toLong()
+        }
+    }
+
+    override suspend fun queryExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<ExportRecordRelation> {
+        // 简化实现：返回空列表（测试中不依赖此方法）
+        return emptyList()
+    }
+
+    override suspend fun countExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Int {
+        return 0
+    }
+
+    override suspend fun queryEarliestRecordTime(booksId: Long): Long? {
+        return records.filter { it.booksId == booksId }
+            .minOfOrNull { it.recordTime }
     }
 
     /** 辅助方法：添加记录并自动分配 id */

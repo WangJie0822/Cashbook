@@ -21,15 +21,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
-import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.ext.toAmountCent
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
+import cn.wj.android.cashbook.core.common.ext.toMoneyFormat
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.common.tools.parseDateLong
+import cn.wj.android.cashbook.core.common.tools.toDateTimeString
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
@@ -40,6 +41,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
@@ -59,7 +61,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import javax.inject.Inject
 
 /**
@@ -140,11 +141,11 @@ class EditRecordViewModel @Inject constructor(
         }
     }
     private val _relatedRecordTotalAmountData = _relatedRecordListData.mapLatest { list ->
-        var total = BigDecimal.ZERO
+        var total = 0L
         list.forEach {
-            total += (it.amount.toBigDecimalOrZero() + it.charges.toBigDecimalOrZero() - it.concessions.toBigDecimalOrZero())
+            total += (it.amount + it.charges - it.concessions)
         }
-        total.decimalFormat()
+        total.toMoneyString()
     }
 
     /** 界面 UI 状态 */
@@ -155,34 +156,32 @@ class EditRecordViewModel @Inject constructor(
             settingRepository.appSettingsModel,
         ) { record, relatedAmount, model ->
             val assetText = assetRepository.getAssetById(record.assetId)?.let { asset ->
-                "${asset.name}(${
-                    if (asset.type.isCreditCard) {
-                        (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
-                    } else {
-                        asset.balance
-                    }.withCNY()
-                })"
+                val displayBalance = if (asset.type.isCreditCard) {
+                    (asset.totalAmount - asset.balance).toMoneyCNY()
+                } else {
+                    asset.balance.toMoneyCNY()
+                }
+                "${asset.name}($displayBalance)"
             }.orEmpty()
             val relatedAssetText =
                 assetRepository.getAssetById(record.relatedAssetId)?.let { asset ->
-                    "${asset.name}(${
-                        if (asset.type.isCreditCard) {
-                            (asset.totalAmount.toBigDecimalOrZero() - asset.balance.toBigDecimalOrZero()).decimalFormat()
-                        } else {
-                            asset.balance
-                        }.withCNY()
-                    })"
+                    val displayBalance = if (asset.type.isCreditCard) {
+                        (asset.totalAmount - asset.balance).toMoneyCNY()
+                    } else {
+                        asset.balance.toMoneyCNY()
+                    }
+                    "${asset.name}($displayBalance)"
                 }.orEmpty()
             val needRelated = typeRepository.needRelated(record.typeId)
             EditRecordUiState.Success(
-                amountText = record.amount.ifBlank { "0" },
+                amountText = record.amount.toMoneyFormat().ifBlank { "0" },
                 chargesText = record.charges.clearZero(),
                 concessionsText = record.concessions.clearZero(),
                 remarkText = record.remark,
                 selectedAssetId = record.assetId,
                 assetText = assetText,
                 relatedAssetText = relatedAssetText,
-                dateTimeText = record.recordTime,
+                dateTimeText = record.recordTime.toDateTimeString(),
                 reimbursable = record.reimbursable,
                 selectedTypeId = record.typeId,
                 needRelated = needRelated,
@@ -253,7 +252,7 @@ class EditRecordViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList(),
         )
 
@@ -272,7 +271,7 @@ class EditRecordViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = "",
         )
 
@@ -325,7 +324,7 @@ class EditRecordViewModel @Inject constructor(
     /** 更新金额 */
     fun updateAmount(amount: String) {
         viewModelScope.launch {
-            _mutableRecordData.tryEmit(_displayRecordData.first().copy(amount = amount))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(amount = amount.toAmountCent()))
             dismissBottomSheet()
         }
     }
@@ -338,7 +337,7 @@ class EditRecordViewModel @Inject constructor(
     /** 更新手续费 */
     fun updateCharge(charges: String) {
         viewModelScope.launch {
-            _mutableRecordData.tryEmit(_displayRecordData.first().copy(charges = charges))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(charges = charges.toAmountCent()))
             dismissBottomSheet()
         }
     }
@@ -351,7 +350,7 @@ class EditRecordViewModel @Inject constructor(
     /** 更新优惠 */
     fun updateConcessions(concessions: String) {
         viewModelScope.launch {
-            _mutableRecordData.tryEmit(_displayRecordData.first().copy(concessions = concessions))
+            _mutableRecordData.tryEmit(_displayRecordData.first().copy(concessions = concessions.toAmountCent()))
             dismissBottomSheet()
         }
     }
@@ -444,16 +443,17 @@ class EditRecordViewModel @Inject constructor(
     private var inSave = false
 
     /** 保存记录 */
-    fun trySave(hintText: String, onSuccess: () -> Unit) {
+    fun trySave(controller: ProgressDialogController, hintText: String, onSuccess: () -> Unit) {
         if (inSave) {
             return
         }
         inSave = true
         viewModelScope.launch {
             val recordEntity = _displayRecordData.first()
-            if (recordEntity.amount.toDoubleOrZero() == 0.0) {
+            if (recordEntity.amount == 0L) {
                 // 记录金额不能为 0
                 shouldDisplayBookmark = EditRecordBookmarkEnum.AMOUNT_MUST_NOT_BE_ZERO
+                inSave = false
                 return@launch
             }
             // 支出分类
@@ -461,13 +461,14 @@ class EditRecordViewModel @Inject constructor(
             if (typeRepository.getNoNullRecordTypeById(recordEntity.typeId).typeCategory != typeCategory) {
                 // 类型与支出类型不匹配
                 shouldDisplayBookmark = EditRecordBookmarkEnum.TYPE_NOT_MATCH_CATEGORY
+                inSave = false
                 return@launch
             }
-            val result = runCatchWithProgress(hint = hintText, cancelable = false) {
+            val result = runCatchWithProgress(controller, hint = hintText, cancelable = false) {
                 saveRecordUseCase(
                     recordModel = recordEntity.copy(
                         relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
-                        concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) "" else recordEntity.concessions,
+                        concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) 0L else recordEntity.concessions,
                         reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
                     ),
                     tagIdList = displayTagIdListData.first(),
@@ -536,8 +537,9 @@ class EditRecordViewModel @Inject constructor(
     fun onTimeSelected(time: String) {
         dismissDialog()
         viewModelScope.launch {
+            val recordTimeMs = "$dateTemp $time".parseDateLong(format = DATE_FORMAT_NO_SECONDS)
             _mutableRecordData.tryEmit(
-                _displayRecordData.first().copy(recordTime = "$dateTemp $time"),
+                _displayRecordData.first().copy(recordTime = recordTimeMs),
             )
         }
     }
@@ -604,10 +606,10 @@ data class ImagePreviewData(
     val index: Int,
 )
 
-private fun String.clearZero(): String {
-    return if (this.toDoubleOrZero() == 0.0) {
+private fun Long.clearZero(): String {
+    return if (this == 0L) {
         ""
     } else {
-        this
+        this.toMoneyFormat()
     }
 }

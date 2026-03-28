@@ -22,21 +22,32 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.tools.dateFormat
+import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
+import cn.wj.android.cashbook.core.model.model.BooksModel
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.core.ui.ProgressDialogManager
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
+import cn.wj.android.cashbook.domain.usecase.ExportRecordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -51,9 +62,19 @@ import javax.inject.Inject
 class BackupAndRecoveryViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     private val recordRepository: RecordRepository,
+    private val booksRepository: BooksRepository,
     private val backupRecoveryManager: BackupRecoveryManager,
     private val networkMonitor: NetworkMonitor,
+    private val exportRecordUseCase: ExportRecordUseCase,
 ) : ViewModel() {
+
+    /** 进度弹窗控制器 */
+    private var progressDialogController: ProgressDialogController? = null
+
+    /** 设置进度弹窗控制器 */
+    fun setProgressDialogController(controller: ProgressDialogController) {
+        progressDialogController = controller
+    }
 
     /** 弹窗状态 */
     var dialogState by mutableStateOf<DialogState>(DialogState.Dismiss)
@@ -96,9 +117,9 @@ class BackupAndRecoveryViewModel @Inject constructor(
             backupRecoveryManager.recoveryState,
         ) { backup, recovery ->
             if (recovery == BackupRecoveryState.InProgress || backup == BackupRecoveryState.InProgress) {
-                ProgressDialogManager.show(cancelable = false)
+                progressDialogController?.show(cancelable = false)
             } else {
-                ProgressDialogManager.dismiss()
+                progressDialogController?.dismiss()
             }
             if (backup.code != 0) {
                 backup.code
@@ -210,11 +231,11 @@ class BackupAndRecoveryViewModel @Inject constructor(
         }
     }
 
-    fun refreshDbMigrate() {
+    fun refreshDbMigrate(controller: ProgressDialogController) {
         viewModelScope.launch {
-            ProgressDialogManager.show()
+            controller.show()
             recordRepository.migrateAfter9To10()
-            ProgressDialogManager.dismiss()
+            controller.dismiss()
         }
     }
 
@@ -227,6 +248,59 @@ class BackupAndRecoveryViewModel @Inject constructor(
     /** 隐藏弹窗 */
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
+    }
+
+    /** 账本列表（用于导出 Bottom Sheet 的账本选择器） */
+    val booksList: StateFlow<List<BooksModel>> = booksRepository.booksListData
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** 当前选中账本（用于导出的默认账本） */
+    val currentBook: StateFlow<BooksModel?> = booksRepository.currentBook
+        .map<BooksModel, BooksModel?> { it }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /** 导出状态 */
+    private val _exportState = MutableStateFlow<ExportState>(ExportState.Idle)
+    val exportState: StateFlow<ExportState> = _exportState.asStateFlow()
+
+    /** 查询指定账本最早的记录时间 */
+    suspend fun getEarliestRecordTime(booksId: Long): Long? =
+        recordRepository.queryEarliestRecordTime(booksId)
+
+    /** 查询导出记录数量（endDate 为 exclusive） */
+    suspend fun countExportRecords(booksId: Long, startDate: Long, endDate: Long): Int =
+        recordRepository.countExportRecords(booksId, startDate, endDate)
+
+    /**
+     * 执行导出
+     */
+    fun exportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+        bookName: String,
+        displayStartDate: Long,
+        displayEndDate: Long,
+        cacheDir: File,
+    ) {
+        viewModelScope.launch {
+            _exportState.value = ExportState.Exporting
+            try {
+                val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+                val fileName = "一日记账_${bookName}_${dateFormat.format(Date(displayStartDate))}_${dateFormat.format(Date(displayEndDate))}.csv"
+                val outputFile = File(File(cacheDir, "export"), fileName)
+                outputFile.parentFile?.mkdirs()
+                val count = exportRecordUseCase(booksId, startDate, endDate, outputFile)
+                _exportState.value = ExportState.Done(outputFile.absolutePath, count)
+            } catch (e: Exception) {
+                _exportState.value = ExportState.Error(e.message ?: "导出失败")
+            }
+        }
+    }
+
+    /** 重置导出状态 */
+    fun resetExportState() {
+        _exportState.value = ExportState.Idle
     }
 }
 
@@ -242,4 +316,19 @@ sealed interface BackupAndRecoveryUiState {
         val keepLatestBackup: Boolean,
         val mobileNetworkBackupEnable: Boolean,
     ) : BackupAndRecoveryUiState
+}
+
+/** 导出状态 */
+sealed interface ExportState {
+    /** 空闲 */
+    data object Idle : ExportState
+
+    /** 导出中 */
+    data object Exporting : ExportState
+
+    /** 导出完成 */
+    data class Done(val filePath: String, val count: Int) : ExportState
+
+    /** 导出失败 */
+    data class Error(val message: String) : ExportState
 }

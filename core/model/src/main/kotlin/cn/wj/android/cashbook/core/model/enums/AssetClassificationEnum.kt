@@ -23,57 +23,57 @@ package cn.wj.android.cashbook.core.model.enums
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/2
  */
-enum class AssetClassificationEnum {
+enum class AssetClassificationEnum(val code: Int) {
 
     // 资金账户
-    CASH,
-    WECHAT,
-    ALIPAY,
-    DOUYIN,
-    BANK_CARD,
-    OTHER_CAPITAL,
+    CASH(0),
+    WECHAT(1),
+    ALIPAY(2),
+    DOUYIN(3),
+    BANK_CARD(4),
+    OTHER_CAPITAL(5),
 
     // 信用卡账户
-    CREDIT_CARD,
-    ANT_CREDIT_PAY,
-    JD_IOUS,
-    DOUYIN_MONTH,
-    OTHER_CREDIT_CARD,
+    CREDIT_CARD(6),
+    ANT_CREDIT_PAY(7),
+    JD_IOUS(8),
+    DOUYIN_MONTH(9),
+    OTHER_CREDIT_CARD(10),
 
     // 充值账户
-    PHONE_CHARGE,
-    BUS_CARD,
-    MEAL_CARD,
-    MEMBER_CARD,
-    DEPOSIT,
-    OTHER_TOP_UP,
+    PHONE_CHARGE(11),
+    BUS_CARD(12),
+    MEAL_CARD(13),
+    MEMBER_CARD(14),
+    DEPOSIT(15),
+    OTHER_TOP_UP(16),
 
     // 投资理财账户
-    STOCK,
-    FUND,
-    OTHER_INVESTMENT_FINANCIAL,
+    STOCK(17),
+    FUND(18),
+    OTHER_INVESTMENT_FINANCIAL(19),
 
     // 债务
-    BORROW,
-    LEND,
-    DEBT,
+    BORROW(20),
+    LEND(21),
+    DEBT(22),
 
     // 银行卡
-    BANK_CARD_ZG,
-    BANK_CARD_ZS,
-    BANK_CARD_GS,
-    BANK_CARD_NY,
-    BANK_CARD_JS,
-    BANK_CARD_JT,
-    BANK_CARD_YZ,
-    BANK_CARD_HX,
-    BANK_CARD_BJ,
-    BANK_CARD_MS,
-    BANK_CARD_GD,
-    BANK_CARD_ZX,
-    BANK_CARD_GF,
-    BANK_CARD_PF,
-    BANK_CARD_XY,
+    BANK_CARD_ZG(23),
+    BANK_CARD_ZS(24),
+    BANK_CARD_GS(25),
+    BANK_CARD_NY(26),
+    BANK_CARD_JS(27),
+    BANK_CARD_JT(28),
+    BANK_CARD_YZ(29),
+    BANK_CARD_HX(30),
+    BANK_CARD_BJ(31),
+    BANK_CARD_MS(32),
+    BANK_CARD_GD(33),
+    BANK_CARD_ZX(34),
+    BANK_CARD_GF(35),
+    BANK_CARD_PF(36),
+    BANK_CARD_XY(37),
 
     ;
 
@@ -99,8 +99,12 @@ enum class AssetClassificationEnum {
         get() = this == BANK_CARD || this == CREDIT_CARD
 
     companion object {
-        fun ordinalOf(ordinal: Int): AssetClassificationEnum {
-            return entries.first { it.ordinal == ordinal }
+        /** 通过持久化的 code 值查找枚举，与 ordinal 解耦 */
+        fun codeOf(code: Int): AssetClassificationEnum {
+            return entries.first { it.code == code }
         }
+
+        /** @see codeOf */
+        fun ordinalOf(ordinal: Int): AssetClassificationEnum = codeOf(ordinal)
     }
 }

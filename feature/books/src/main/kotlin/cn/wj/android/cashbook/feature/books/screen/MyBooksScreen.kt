@@ -120,7 +120,7 @@ internal fun MyBooksScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = { onEditBookClick(-1L) }) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
         content = { paddingValues ->
@@ -182,7 +182,7 @@ private fun MyBooksContent(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         content = {
-                            items(uiState.booksList) { item ->
+                            items(uiState.booksList, key = { it.data.id }) { item ->
                                 CbCard(
                                     modifier = Modifier
                                         .padding(horizontal = 16.dp)
@@ -297,7 +297,7 @@ private fun MyBooksContent(
                                                 content = {
                                                     Icon(
                                                         imageVector = CbIcons.MoreHoriz,
-                                                        contentDescription = null,
+                                                        contentDescription = stringResource(id = R.string.cd_more_options),
                                                     )
                                                 },
                                                 modifier = Modifier,

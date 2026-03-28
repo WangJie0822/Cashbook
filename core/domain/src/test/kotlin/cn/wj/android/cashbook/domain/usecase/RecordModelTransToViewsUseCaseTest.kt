@@ -66,7 +66,7 @@ class RecordModelTransToViewsUseCaseTest {
         val record = createRecordModel(
             id = 1L,
             typeId = RECORD_TYPE_BALANCE_INCOME.id,
-            amount = "100",
+            amount = 10000L,
         )
         recordRepository.addRecord(record)
 
@@ -80,7 +80,7 @@ class RecordModelTransToViewsUseCaseTest {
         val record = createRecordModel(
             id = 1L,
             typeId = RECORD_TYPE_BALANCE_EXPENDITURE.id,
-            amount = "100",
+            amount = 10000L,
         )
         recordRepository.addRecord(record)
 
@@ -93,7 +93,7 @@ class RecordModelTransToViewsUseCaseTest {
     fun when_normal_type_then_fetches_from_repository() = runTest {
         val type = createRecordTypeModel(id = 1L, name = "餐饮")
         typeRepository.addType(type)
-        val record = createRecordModel(id = 1L, typeId = 1L, amount = "50")
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 5000L)
         recordRepository.addRecord(record)
 
         val result = useCase(record)
@@ -138,15 +138,15 @@ class RecordModelTransToViewsUseCaseTest {
             typeCategory = RecordTypeCategoryEnum.INCOME,
         )
         typeRepository.addType(type)
-        val record = createRecordModel(id = 1L, typeId = 1L, amount = "200")
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 20000L)
         recordRepository.addRecord(record)
         // 关联的支出记录
         val relatedRecord = createRecordModel(
             id = 2L,
             typeId = 2L,
-            amount = "100",
-            charges = "5",
-            concessions = "0",
+            amount = 10000L,
+            charges = 500L,
+            concessions = 0L,
         )
         recordRepository.addRecord(relatedRecord)
         // 收入类型使用 getRelatedIdListById
@@ -154,8 +154,8 @@ class RecordModelTransToViewsUseCaseTest {
 
         val result = useCase(record)
 
-        // 收入类型关联支出: amount + charges - concessions = 100 + 5 - 0 = 105
-        assertThat(result.relatedAmount).isEqualTo("105")
+        // 收入类型关联支出: amount + charges - concessions = 10000 + 500 - 0 = 10500
+        assertThat(result.relatedAmount).isEqualTo(10500L)
     }
 
     @Test
@@ -165,17 +165,17 @@ class RecordModelTransToViewsUseCaseTest {
             typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         )
         typeRepository.addType(type)
-        val record = createRecordModel(id = 1L, typeId = 1L, amount = "200")
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 20000L)
         recordRepository.addRecord(record)
         // 关联的收入记录
-        val relatedRecord = createRecordModel(id = 2L, typeId = 2L, amount = "80")
+        val relatedRecord = createRecordModel(id = 2L, typeId = 2L, amount = 8000L)
         recordRepository.addRecord(relatedRecord)
         // 支出类型使用 getRecordIdListFromRelatedId
         recordRepository.setRelatedFromIds(1L, listOf(2L))
 
         val result = useCase(record)
 
-        // 支出类型关联收入: amount = 80
-        assertThat(result.relatedAmount).isEqualTo("80")
+        // 支出类型关联收入: amount = 8000
+        assertThat(result.relatedAmount).isEqualTo(8000L)
     }
 }

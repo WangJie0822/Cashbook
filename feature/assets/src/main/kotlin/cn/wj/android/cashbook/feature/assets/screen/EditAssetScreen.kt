@@ -222,7 +222,7 @@ internal fun EditAssetScreen(
                         }
                     },
                 ) {
-                    Icon(imageVector = CbIcons.SaveAs, contentDescription = null)
+                    Icon(imageVector = CbIcons.SaveAs, contentDescription = stringResource(id = R.string.cd_confirm))
                 }
             }
         },

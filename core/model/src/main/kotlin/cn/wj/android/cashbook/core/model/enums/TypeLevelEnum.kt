@@ -21,18 +21,22 @@ package cn.wj.android.cashbook.core.model.enums
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
  */
-enum class TypeLevelEnum {
+enum class TypeLevelEnum(val code: Int) {
 
     /** 一级大类 */
-    FIRST,
+    FIRST(0),
 
     /** 二级小类 */
-    SECOND,
+    SECOND(1),
     ;
 
     companion object {
-        fun ordinalOf(ordinal: Int): TypeLevelEnum {
-            return entries.first { it.ordinal == ordinal }
+        /** 通过持久化的 code 值查找枚举，与 ordinal 解耦 */
+        fun codeOf(code: Int): TypeLevelEnum {
+            return entries.first { it.code == code }
         }
+
+        /** @see codeOf */
+        fun ordinalOf(ordinal: Int): TypeLevelEnum = codeOf(ordinal)
     }
 }

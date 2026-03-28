@@ -77,6 +77,7 @@ fun RecordTypeModel.asEntity(
 fun RecordViewsModel.asEntity(): RecordViewsEntity {
     return RecordViewsEntity(
         id = this.id,
+        typeId = this.type.id,
         typeCategory = this.type.typeCategory,
         typeName = this.type.name,
         typeIconResName = this.type.iconName,

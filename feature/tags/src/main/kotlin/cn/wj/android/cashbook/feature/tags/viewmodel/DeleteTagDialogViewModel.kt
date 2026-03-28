@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.model.TagModel
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -52,9 +53,10 @@ class DeleteTagDialogViewModel @Inject constructor(
         bookmark = false
     }
 
-    fun deleteTag(tag: TagModel, dismissDialog: () -> Unit) {
+    fun deleteTag(controller: ProgressDialogController, tag: TagModel, dismissDialog: () -> Unit) {
         viewModelScope.launch {
             runCatchWithProgress(
+                controller,
                 hint = progressDialogHintText,
                 cancelable = false,
             ) {

@@ -23,11 +23,14 @@ import androidx.navigation.compose.composable
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.feature.types.screen.EditRecordTypeListRoute
 import cn.wj.android.cashbook.feature.types.screen.MyCategoriesRoute
+import kotlinx.serialization.Serializable
 
-private const val ROUTE_MY_CATEGORIES = "type/my_categories"
+/** 路由 - 我的分类 */
+@Serializable
+object MyCategories
 
 fun NavController.naviToMyCategories() {
-    this.navigate(ROUTE_MY_CATEGORIES)
+    this.navigate(MyCategories)
 }
 
 /**
@@ -39,7 +42,7 @@ fun NavGraphBuilder.myCategoriesScreen(
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
 ) {
-    composable(ROUTE_MY_CATEGORIES) {
+    composable<MyCategories> {
         MyCategoriesRoute(
             onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
             onRequestPopBackStack = onRequestPopBackStack,

@@ -31,6 +31,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             pluginManager.apply {
                 apply(ProjectSetting.Plugin.PLUGIN_CASHBOOK_LIBRARY)
                 apply(ProjectSetting.Plugin.PLUGIN_CASHBOOK_HILT)
+                apply("org.jetbrains.kotlin.plugin.serialization")
             }
 
             extensions.configure<LibraryExtension> {
@@ -47,6 +48,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("androidx-hilt-navigation-compose").get())
                 "implementation"(libs.findLibrary("androidx-lifecycle-runtime-compose").get())
                 "implementation"(libs.findLibrary("androidx-lifecycle-viewmodel-compose").get())
+                "implementation"(libs.findLibrary("kotlinx-serialization-json").get())
 
                 "androidTestImplementation"(libs.findLibrary("androidx-lifecycle-runtime-testing").get())
             }

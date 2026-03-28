@@ -59,6 +59,10 @@ val RECORD_TYPE_BALANCE_EXPENDITURE: RecordTypeModel
         needRelated = false,
     )
 
+/** 判断类型是否为平账类型 */
+fun RecordTypeModel.isBalanceType(): Boolean =
+    id == RECORD_TYPE_BALANCE_EXPENDITURE.id || id == RECORD_TYPE_BALANCE_INCOME.id
+
 /** 固定类型 - 平账，收入 */
 val RECORD_TYPE_BALANCE_INCOME: RecordTypeModel
     get() = RecordTypeModel(

@@ -27,6 +27,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
+import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.data.repository.TagRepository
@@ -63,6 +64,7 @@ class TypedAnalyticsViewModel @Inject constructor(
     private val _tagIdData = MutableStateFlow(-1L)
     private val _typeIdData = MutableStateFlow(-1L)
     private val _dateData: MutableStateFlow<DateData?> = MutableStateFlow(null)
+    private val _includeChildTypes = MutableStateFlow(true)
 
     val uiState = combine(_tagIdData, _typeIdData, _dateData) { tagId, typeId, date ->
         if (tagId == typeId) {
@@ -88,12 +90,17 @@ class TypedAnalyticsViewModel @Inject constructor(
 
     /** 记录列表数据 */
     val recordList =
-        combine(_tagIdData, _typeIdData, _dateData, recordDataVersion) { tagId, typeId, date, _ ->
+        combine(_tagIdData, _typeIdData, _dateData, _includeChildTypes, recordDataVersion) { values ->
+            val tagId = values[0] as Long
+            val typeId = values[1] as Long
+            val date = values[2] as DateData?
+            val includeChildTypes = values[3] as Boolean
             val isType = typeId != -1L
             GetTypedRecordData(
                 isType = isType,
                 id = if (isType) typeId else tagId,
                 date = date,
+                includeChildTypes = includeChildTypes,
             )
         }
             .flatMapLatest {
@@ -104,7 +111,7 @@ class TypedAnalyticsViewModel @Inject constructor(
                     ),
                     pagingSourceFactory = {
                         if (it.isType) {
-                            TypeRecordPagingSource(it.id, it.date, getTypeRecordViewsUseCase)
+                            TypeRecordPagingSource(it.id, it.date, it.includeChildTypes, getTypeRecordViewsUseCase)
                         } else {
                             TagRecordPagingSource(it.id, getTagRecordViewsUseCase)
                         }
@@ -113,9 +120,10 @@ class TypedAnalyticsViewModel @Inject constructor(
             }
             .cachedIn(viewModelScope)
 
-    fun updateData(tagId: Long, typeId: Long, date: String) {
+    fun updateData(tagId: Long, typeId: Long, date: String, includeChildTypes: Boolean = true) {
         _tagIdData.tryEmit(tagId)
         _typeIdData.tryEmit(typeId)
+        _includeChildTypes.tryEmit(includeChildTypes)
         val dateData = kotlin.runCatching {
             if (date.isNotBlank()) {
                 if (date.contains("~")) {
@@ -134,7 +142,7 @@ class TypedAnalyticsViewModel @Inject constructor(
             }
         }.getOrNull()
         _dateData.tryEmit(dateData)
-        logger().i("updateData(tagId = <$tagId>, typeId = <$typeId>, date = <$date>), dateData = <$dateData>")
+        logger().i("updateData(tagId = <$tagId>, typeId = <$typeId>, date = <$date>, includeChildTypes = <$includeChildTypes>), dateData = <$dateData>")
     }
 
     fun showRecordDetailsSheet(item: RecordViewsEntity) {
@@ -146,10 +154,43 @@ class TypedAnalyticsViewModel @Inject constructor(
     }
 }
 
+/**
+ * 日期数据（用于 TypedAnalytics）
+ *
+ * @param from 开始时间
+ * @param to 结束时间，为空时为开始时间当月
+ * @param year 是否为全年
+ */
+data class DateData(
+    val from: LocalDate,
+    val to: LocalDate? = null,
+    val year: Boolean = false,
+) {
+    val titleText: String
+        get() = when {
+            year -> {
+                from.year.toString()
+            }
+
+            to != null -> {
+                "${from.year}-${from.monthValue.completeZero()}-${from.dayOfMonth.completeZero()}\n" +
+                    "${to.year}-${to.monthValue.completeZero()}-${to.dayOfMonth.completeZero()}"
+            }
+
+            else -> {
+                "${from.year}-${from.monthValue.completeZero()}"
+            }
+        }
+
+    val dateStr: String
+        get() = titleText.replace("\n", "~")
+}
+
 data class GetTypedRecordData(
     val isType: Boolean,
     val id: Long,
     val date: DateData?,
+    val includeChildTypes: Boolean = true,
 )
 
 sealed interface TypedAnalyticsUiState {
@@ -167,6 +208,7 @@ sealed interface TypedAnalyticsUiState {
 private class TypeRecordPagingSource(
     private val typeId: Long,
     private val date: DateData?,
+    private val includeChildTypes: Boolean,
     private val getTypeRecordViewsUseCase: GetTypeRecordViewsUseCase,
 ) : PagingSource<Int, RecordViewsEntity>() {
     override fun getRefreshKey(state: PagingState<Int, RecordViewsEntity>): Int? = null
@@ -175,7 +217,7 @@ private class TypeRecordPagingSource(
         return runCatching {
             val page = params.key ?: 0
             val pageSize = params.loadSize
-            val items = getTypeRecordViewsUseCase(typeId, date?.dateStr.orEmpty(), page, pageSize)
+            val items = getTypeRecordViewsUseCase(typeId, date?.dateStr.orEmpty(), page, pageSize, includeChildTypes)
             val prevKey = if (page > 0) page - 1 else null
             val nextKey = if (items.isNotEmpty()) page + 1 else null
             LoadResult.Page(items, prevKey, nextKey)

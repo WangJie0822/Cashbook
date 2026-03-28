@@ -16,6 +16,8 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
@@ -74,11 +76,10 @@ class GetRelatedRecordViewsUseCaseTest {
     @Test
     fun given_reimburse_type_when_no_keyword_then_returns_reimbursable_records() = runTest {
         val reimburseType = createRecordTypeModel(
-            id = 10L,
+            id = FIXED_TYPE_ID_REIMBURSE,
             typeCategory = RecordTypeCategoryEnum.INCOME,
         )
         typeRepository.addType(reimburseType)
-        typeRepository.setReimburse(10L)
 
         recordRepository.addRecord(
             createRecordModel(id = 1L, typeId = 1L, reimbursable = true),
@@ -95,11 +96,10 @@ class GetRelatedRecordViewsUseCaseTest {
     @Test
     fun given_refund_type_when_no_keyword_then_returns_refundable_records() = runTest {
         val refundType = createRecordTypeModel(
-            id = 11L,
+            id = FIXED_TYPE_ID_REFUND,
             typeCategory = RecordTypeCategoryEnum.INCOME,
         )
         typeRepository.addType(refundType)
-        typeRepository.setRefund(11L)
 
         recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L))
         recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L))
@@ -112,11 +112,10 @@ class GetRelatedRecordViewsUseCaseTest {
     @Test
     fun when_record_already_has_related_then_excluded() = runTest {
         val reimburseType = createRecordTypeModel(
-            id = 10L,
+            id = FIXED_TYPE_ID_REIMBURSE,
             typeCategory = RecordTypeCategoryEnum.INCOME,
         )
         typeRepository.addType(reimburseType)
-        typeRepository.setReimburse(10L)
 
         recordRepository.addRecord(
             createRecordModel(id = 1L, typeId = 1L, reimbursable = true),

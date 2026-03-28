@@ -51,7 +51,7 @@ class GetDefaultRecordUseCaseTest {
 
     @Test
     fun when_record_exists_then_returns_existing_record() = runTest {
-        val existingRecord = createRecordModel(id = 10L, amount = "50", remark = "午餐")
+        val existingRecord = createRecordModel(id = 10L, amount = 5000L, remark = "午餐")
         recordRepository.addRecord(existingRecord)
 
         val result = useCase(10L)

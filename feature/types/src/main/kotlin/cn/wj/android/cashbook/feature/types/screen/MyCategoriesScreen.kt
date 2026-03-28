@@ -81,6 +81,7 @@ import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -115,9 +116,6 @@ internal fun MyCategoriesRoute(
         changeFirstTypeToSecond = viewModel::changeTypeToSecond,
         onRequestChangeSecondTypeToFirst = viewModel::changeSecondTypeToFirst,
         onRequestMoveSecondTypeToAnother = viewModel::requestMoveSecondTypeToAnother,
-        onRequestSetRefundType = viewModel::setRefundType,
-        onRequestSetReimburseType = viewModel::setReimburseType,
-        onRequestSetCreditCardPaymentType = viewModel::setCreditCardPaymentType,
         onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
         onRequestDeleteType = viewModel::requestDeleteType,
         changeRecordTypeBeforeDelete = viewModel::changeRecordTypeBeforeDeleteType,
@@ -142,9 +140,6 @@ internal fun MyCategoriesScreen(
     changeFirstTypeToSecond: (Long, Long) -> Unit,
     onRequestChangeSecondTypeToFirst: (Long) -> Unit,
     onRequestMoveSecondTypeToAnother: (Long, Long) -> Unit,
-    onRequestSetRefundType: (Long) -> Unit,
-    onRequestSetReimburseType: (Long) -> Unit,
-    onRequestSetCreditCardPaymentType: (Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestDeleteType: (Long) -> Unit,
     changeRecordTypeBeforeDelete: (Long, Long) -> Unit,
@@ -193,7 +188,7 @@ internal fun MyCategoriesScreen(
         },
         floatingActionButton = {
             CbFloatingActionButton(onClick = onRequestAddFirstType) {
-                Icon(imageVector = CbIcons.Add, contentDescription = null)
+                Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
             }
         },
         snackbarHost = {
@@ -256,9 +251,6 @@ internal fun MyCategoriesScreen(
                                 onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
                                 onRequestChangeSecondTypeToFirst = onRequestChangeSecondTypeToFirst,
                                 onRequestMoveSecondTypeToAnother = onRequestMoveSecondTypeToAnother,
-                                onRequestSetRefundType = onRequestSetRefundType,
-                                onRequestSetReimburseType = onRequestSetReimburseType,
-                                onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                             )
                         }
                     }
@@ -484,9 +476,6 @@ private fun ExpandableTypeList(
     onRequestNaviToTypeStatistics: (Long) -> Unit,
     onRequestChangeSecondTypeToFirst: (Long) -> Unit,
     onRequestMoveSecondTypeToAnother: (Long, Long) -> Unit,
-    onRequestSetRefundType: (Long) -> Unit,
-    onRequestSetReimburseType: (Long) -> Unit,
-    onRequestSetCreditCardPaymentType: (Long) -> Unit,
 ) {
     LazyColumn(
         content = {
@@ -501,9 +490,6 @@ private fun ExpandableTypeList(
                         onRequestChangeFirstTypeToSecond = onRequestChangeFirstTypeToSecond,
                         onRequestAddSecondType = onRequestAddSecondType,
                         onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
-                        onRequestSetRefundType = onRequestSetRefundType,
-                        onRequestSetReimburseType = onRequestSetReimburseType,
-                        onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                     )
                     if (first.expanded && hasChild) {
                         SecondTypeList(
@@ -513,9 +499,6 @@ private fun ExpandableTypeList(
                             onRequestChangeSecondTypeToFirst = onRequestChangeSecondTypeToFirst,
                             onRequestMoveSecondTypeToAnother = onRequestMoveSecondTypeToAnother,
                             onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
-                            onRequestSetRefundType = onRequestSetRefundType,
-                            onRequestSetReimburseType = onRequestSetReimburseType,
-                            onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                         )
                     }
                 }
@@ -532,6 +515,7 @@ private fun DialogExpandableTypeList(
     typeList: List<ExpandableRecordTypeModel>,
     onTypeItemClick: (Long) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     LazyColumn(
         content = {
             typeList.forEach { first ->
@@ -554,7 +538,9 @@ private fun DialogExpandableTypeList(
                                         } else {
                                             CbIcons.KeyboardArrowRight
                                         },
-                                        contentDescription = null,
+                                        contentDescription = stringResource(
+                                            id = if (first.expanded) R.string.cd_collapse else R.string.cd_expand,
+                                        ),
                                     )
                                 }
                             }
@@ -562,7 +548,7 @@ private fun DialogExpandableTypeList(
                         modifier = Modifier.clickable { onTypeItemClick(first.data.id) },
                     )
                     if (first.expanded && hasChild) {
-                        CbElevatedCard(Modifier.padding(horizontal = 8.dp)) {
+                        CbElevatedCard(Modifier.padding(horizontal = spacing.small)) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 val col = if (first.list.size % RECORD_TYPE_COLUMNS == 0) {
                                     first.list.size / RECORD_TYPE_COLUMNS
@@ -630,9 +616,6 @@ private fun FirstTypeItem(
     onRequestChangeFirstTypeToSecond: (Long) -> Unit,
     onRequestAddSecondType: (Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
-    onRequestSetRefundType: (Long) -> Unit,
-    onRequestSetReimburseType: (Long) -> Unit,
-    onRequestSetCreditCardPaymentType: (Long) -> Unit,
 ) {
     Box {
         var expandedMenu by remember {
@@ -664,7 +647,11 @@ private fun FirstTypeItem(
                 }
             },
 
-            modifier = Modifier.clickable { expandedMenu = true },
+            modifier = Modifier.clickable {
+                if (!first.data.protected) {
+                    expandedMenu = true
+                }
+            },
         )
         DropdownMenu(
             expanded = expandedMenu,
@@ -698,64 +685,6 @@ private fun FirstTypeItem(
                     onRequestAddSecondType(first.data.id)
                 },
             )
-            if (first.data.typeCategory == RecordTypeCategoryEnum.INCOME) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(
-                                id = if (first.refundType) {
-                                    R.string.refund_type
-                                } else {
-                                    R.string.set_refund_type
-                                },
-                            ),
-                        )
-                    },
-                    enabled = !first.refundType,
-                    onClick = {
-                        expandedMenu = false
-                        onRequestSetRefundType(first.data.id)
-                    },
-                )
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(
-                                id = if (first.reimburseType) {
-                                    R.string.reimburse_type
-                                } else {
-                                    R.string.set_reimburse_type
-                                },
-                            ),
-                        )
-                    },
-                    enabled = !first.reimburseType,
-                    onClick = {
-                        expandedMenu = false
-                        onRequestSetReimburseType(first.data.id)
-                    },
-                )
-            }
-            if (first.data.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(
-                                id = if (first.creditCardPaymentType) {
-                                    R.string.credit_card_payment_type
-                                } else {
-                                    R.string.set_credit_card_payment_type
-                                },
-                            ),
-                        )
-                    },
-                    enabled = !first.creditCardPaymentType,
-                    onClick = {
-                        expandedMenu = false
-                        onRequestSetCreditCardPaymentType(first.data.id)
-                    },
-                )
-            }
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.statistic_data)) },
                 onClick = {
@@ -775,9 +704,6 @@ private fun SecondTypeList(
     onRequestChangeSecondTypeToFirst: (Long) -> Unit,
     onRequestMoveSecondTypeToAnother: (Long, Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
-    onRequestSetRefundType: (Long) -> Unit,
-    onRequestSetReimburseType: (Long) -> Unit,
-    onRequestSetCreditCardPaymentType: (Long) -> Unit,
 ) {
     CbElevatedCard(Modifier.padding(horizontal = 8.dp)) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -801,9 +727,6 @@ private fun SecondTypeList(
                                 onRequestChangeSecondTypeToFirst = onRequestChangeSecondTypeToFirst,
                                 onRequestMoveSecondTypeToAnother = onRequestMoveSecondTypeToAnother,
                                 onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
-                                onRequestSetRefundType = onRequestSetRefundType,
-                                onRequestSetReimburseType = onRequestSetReimburseType,
-                                onRequestSetCreditCardPaymentType = onRequestSetCreditCardPaymentType,
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -822,9 +745,6 @@ private fun SecondTypeItem(
     onRequestChangeSecondTypeToFirst: (Long) -> Unit,
     onRequestMoveSecondTypeToAnother: (Long, Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
-    onRequestSetRefundType: (Long) -> Unit,
-    onRequestSetReimburseType: (Long) -> Unit,
-    onRequestSetCreditCardPaymentType: (Long) -> Unit,
     modifier: Modifier,
 ) {
     Box(
@@ -838,7 +758,9 @@ private fun SecondTypeItem(
                 .fillMaxWidth()
                 .padding(8.dp)
                 .clickable {
-                    expandedMenu = true
+                    if (!second.data.protected) {
+                        expandedMenu = true
+                    }
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -900,64 +822,6 @@ private fun SecondTypeItem(
                     onRequestMoveSecondTypeToAnother(second.data.id, second.data.parentId)
                 },
             )
-            if (second.data.typeCategory == RecordTypeCategoryEnum.INCOME) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(
-                                id = if (second.refundType) {
-                                    R.string.refund_type
-                                } else {
-                                    R.string.set_refund_type
-                                },
-                            ),
-                        )
-                    },
-                    enabled = !second.refundType,
-                    onClick = {
-                        expandedMenu = false
-                        onRequestSetRefundType(second.data.id)
-                    },
-                )
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(
-                                id = if (second.reimburseType) {
-                                    R.string.reimburse_type
-                                } else {
-                                    R.string.set_reimburse_type
-                                },
-                            ),
-                        )
-                    },
-                    enabled = !second.reimburseType,
-                    onClick = {
-                        expandedMenu = false
-                        onRequestSetReimburseType(second.data.id)
-                    },
-                )
-            }
-            if (second.data.typeCategory == RecordTypeCategoryEnum.TRANSFER) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(
-                                id = if (second.creditCardPaymentType) {
-                                    R.string.credit_card_payment_type
-                                } else {
-                                    R.string.set_credit_card_payment_type
-                                },
-                            ),
-                        )
-                    },
-                    enabled = !second.creditCardPaymentType,
-                    onClick = {
-                        expandedMenu = false
-                        onRequestSetCreditCardPaymentType(second.data.id)
-                    },
-                )
-            }
             DropdownMenuItem(
                 text = {
                     Text(text = stringResource(id = R.string.statistic_data))

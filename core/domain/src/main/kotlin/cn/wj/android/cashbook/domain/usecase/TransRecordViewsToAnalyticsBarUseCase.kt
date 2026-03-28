@@ -19,15 +19,14 @@ package cn.wj.android.cashbook.domain.usecase
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
-import cn.wj.android.cashbook.core.common.ext.yearMonth
+import cn.wj.android.cashbook.core.common.tools.toLocalDate
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
+import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -36,29 +35,50 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
-        fromDate: LocalDate,
-        toDate: LocalDate?,
-        yearSelected: Boolean,
+        dateSelection: DateSelectionEntity,
         recordViewsList: List<RecordViewsModel>,
     ): List<AnalyticsRecordBarEntity> = withContext(coroutineContext) {
         val result = mutableListOf<AnalyticsRecordBarEntity>()
         val dateList = mutableListOf<String>()
-        when {
-            yearSelected -> {
+        val granularity: AnalyticsBarGranularity
+
+        when (dateSelection) {
+            is DateSelectionEntity.ByYear -> {
+                granularity = AnalyticsBarGranularity.MONTH
                 repeat(12) {
-                    dateList.add("${fromDate.year}-${(it + 1).completeZero()}")
+                    dateList.add("${dateSelection.year}-${(it + 1).completeZero()}")
                 }
             }
 
-            null == toDate -> {
-                val dayCount = fromDate.yearMonth.atEndOfMonth().dayOfMonth
+            is DateSelectionEntity.All -> {
+                granularity = AnalyticsBarGranularity.YEAR
+                // 从记录中提取年份范围
+                val years =
+                    recordViewsList.map { it.recordTime.toLocalDate().year }.distinct().sorted()
+                years.forEach { year ->
+                    dateList.add("$year")
+                }
+            }
+
+            is DateSelectionEntity.ByDay -> {
+                granularity = AnalyticsBarGranularity.DAY
+                val date = dateSelection.date
+                dateList.add("${date.year}-${date.monthValue.completeZero()}-${date.dayOfMonth.completeZero()}")
+            }
+
+            is DateSelectionEntity.ByMonth -> {
+                granularity = AnalyticsBarGranularity.DAY
+                val ym = dateSelection.yearMonth
+                val dayCount = ym.atEndOfMonth().dayOfMonth
                 repeat(dayCount) {
-                    dateList.add("${fromDate.year}-${fromDate.monthValue.completeZero()}-${(it + 1).completeZero()}")
+                    dateList.add("${ym.year}-${ym.monthValue.completeZero()}-${(it + 1).completeZero()}")
                 }
             }
 
-            else -> {
-                var date = fromDate
+            is DateSelectionEntity.DateRange -> {
+                granularity = AnalyticsBarGranularity.DAY
+                var date = dateSelection.from
+                val toDate = dateSelection.to
                 while (date != toDate) {
                     dateList.add("${date.year}-${date.monthValue.completeZero()}-${date.dayOfMonth.completeZero()}")
                     date = date.plusDays(1L)
@@ -67,41 +87,44 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
             }
         }
         dateList.forEach { date ->
-            var totalExpenditure = 0.0
-            var totalIncome = 0.0
+            var totalExpenditure = 0L
+            var totalIncome = 0L
             recordViewsList.filter {
-                date == if (yearSelected) {
-                    val dateArray = it.recordTime.split(" ").first().split("-")
-                    "${dateArray[0]}-${dateArray[1]}"
-                } else {
-                    it.recordTime.split(" ").first()
+                val recordDate = it.recordTime.toLocalDate()
+                date == when (granularity) {
+                    AnalyticsBarGranularity.YEAR -> "${recordDate.year}"
+                    AnalyticsBarGranularity.MONTH -> "${recordDate.year}-${recordDate.monthValue.completeZero()}"
+                    AnalyticsBarGranularity.DAY -> "${recordDate.year}-${recordDate.monthValue.completeZero()}-${recordDate.dayOfMonth.completeZero()}"
                 }
             }.forEach { record ->
+                // 跳过平账记录
+                if (record.isBalanceRecord) {
+                    return@forEach
+                }
                 when (record.type.typeCategory) {
                     RecordTypeCategoryEnum.EXPENDITURE -> {
                         // 支出
-                        totalExpenditure += record.finalAmount.toDoubleOrZero()
+                        totalExpenditure += record.finalAmount
                     }
 
                     RecordTypeCategoryEnum.INCOME -> {
                         // 收入
-                        totalIncome += record.finalAmount.toDoubleOrZero()
+                        totalIncome += record.finalAmount
                     }
 
                     RecordTypeCategoryEnum.TRANSFER -> {
-                        // 转账
-                        totalExpenditure += record.charges.toDoubleOrZero()
-                        totalIncome += record.concessions.toDoubleOrZero()
+                        // 转账，优惠冲减支出
+                        totalExpenditure += record.charges - record.concessions
                     }
                 }
             }
             result.add(
                 AnalyticsRecordBarEntity(
                     date = date,
-                    income = totalIncome.decimalFormat(),
-                    expenditure = totalExpenditure.decimalFormat(),
-                    balance = (totalIncome - totalExpenditure).decimalFormat(),
-                    year = yearSelected,
+                    income = totalIncome,
+                    expenditure = totalExpenditure,
+                    balance = totalIncome - totalExpenditure,
+                    granularity = granularity,
                 ),
             )
         }

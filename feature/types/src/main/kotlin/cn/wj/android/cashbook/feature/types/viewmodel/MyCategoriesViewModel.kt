@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.model.dataVersion
-import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -77,14 +76,8 @@ class MyCategoriesViewModel @Inject constructor(
                         ExpandableRecordTypeModel(
                             data = second,
                             list = emptyList(),
-                            reimburseType = typeRepository.isReimburseType(second.id),
-                            refundType = typeRepository.isRefundType(second.id),
-                            creditCardPaymentType = typeRepository.isCreditPaymentType(second.id),
                         )
                     },
-                reimburseType = typeRepository.isReimburseType(first.id),
-                refundType = typeRepository.isRefundType(first.id),
-                creditCardPaymentType = typeRepository.isCreditPaymentType(first.id),
             )
         }
         MyCategoriesUiState.Success(
@@ -194,14 +187,8 @@ class MyCategoriesViewModel @Inject constructor(
                                                         ExpandableRecordTypeModel(
                                                             data = second,
                                                             list = emptyList(),
-                                                            reimburseType = false,
-                                                            refundType = false,
-                                                            creditCardPaymentType = false,
                                                         )
                                                     },
-                                                reimburseType = false,
-                                                refundType = false,
-                                                creditCardPaymentType = false,
                                             )
                                         },
                                 ),
@@ -265,27 +252,6 @@ class MyCategoriesViewModel @Inject constructor(
                 typeRepository.update(model)
             }
             dismissDialog()
-        }
-    }
-
-    fun setReimburseType(id: Long) {
-        viewModelScope.launch {
-            typeRepository.setReimburseType(id)
-            _dataVersion.updateVersion()
-        }
-    }
-
-    fun setRefundType(id: Long) {
-        viewModelScope.launch {
-            typeRepository.setRefundType(id)
-            _dataVersion.updateVersion()
-        }
-    }
-
-    fun setCreditCardPaymentType(id: Long) {
-        viewModelScope.launch {
-            typeRepository.setCreditPaymentType(id)
-            _dataVersion.updateVersion()
         }
     }
 }

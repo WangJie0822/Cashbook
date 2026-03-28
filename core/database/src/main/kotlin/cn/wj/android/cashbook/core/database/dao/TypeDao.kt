@@ -79,4 +79,13 @@ interface TypeDao {
 
     @Query("SELECT COUNT(*) FROM db_type WHERE parent_id=:parentId")
     suspend fun countByParentId(parentId: Long): Int
+
+    @Query("UPDATE db_record SET type_id = :newTypeId WHERE type_id = :oldTypeId")
+    suspend fun updateRecordTypeId(oldTypeId: Long, newTypeId: Long)
+
+    @Query("UPDATE db_type SET parent_id = -1, type_level = 0 WHERE parent_id = :parentId")
+    suspend fun promoteChildTypes(parentId: Long)
+
+    @Query("SELECT COUNT(*) FROM db_record WHERE type_id = :typeId")
+    suspend fun countRecordsByTypeId(typeId: Long): Int
 }

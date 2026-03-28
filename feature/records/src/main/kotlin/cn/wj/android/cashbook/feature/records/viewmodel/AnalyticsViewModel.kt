@@ -21,15 +21,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.wj.android.cashbook.core.common.ext.completeZero
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
+import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
-import cn.wj.android.cashbook.core.ui.ProgressDialogManager
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.domain.usecase.GetRecordViewsBetweenDateUseCase
 import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCase
@@ -38,12 +38,12 @@ import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieUseCa
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 /**
@@ -60,29 +60,44 @@ class AnalyticsViewModel @Inject constructor(
     private val transRecordViewsToAnalyticsPieSecondUseCase: TransRecordViewsToAnalyticsPieSecondUseCase,
 ) : ViewModel() {
 
+    /** 进度弹窗控制器 */
+    private var progressDialogController: ProgressDialogController? = null
+
+    /** 设置进度弹窗控制器 */
+    fun setProgressDialogController(controller: ProgressDialogController) {
+        progressDialogController = controller
+    }
+
     var dialogState: DialogState by mutableStateOf(DialogState.Dismiss)
         private set
 
     var sheetData: ShowSheetData? by mutableStateOf(null)
         private set
 
-    /** 当前选择时间 */
-    private val _dateData = MutableStateFlow(DateData(LocalDate.now()))
+    /** 日期选择 Popup 是否显示 */
+    var showDatePopup by mutableStateOf(false)
+        private set
 
-    private val _recordListData = _dateData.mapLatest { date ->
-        getRecordViewsBetweenDateUseCase(date.from, date.to, date.year)
+    /** 当前日期选择 */
+    private val _dateSelection = MutableStateFlow<DateSelectionEntity>(
+        DateSelectionEntity.ByMonth(YearMonth.now()),
+    )
+    val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
+
+    /** 将 dateSelection 和对应的记录数据绑定在一起，避免 combine 时新旧数据混用 */
+    private val _selectionWithRecords = _dateSelection.mapLatest { selection ->
+        selection to getRecordViewsBetweenDateUseCase(selection)
     }
 
-    val uiState = _recordListData.mapLatest { list ->
-        val date = _dateData.first()
-        var totalIncome = BigDecimal.ZERO
-        var totalExpenditure = BigDecimal.ZERO
-        var totalBalance = BigDecimal.ZERO
-        val barList = transRecordViewsToAnalyticsBarUseCase(date.from, date.to, date.year, list)
+    val uiState = _selectionWithRecords.mapLatest { (selection, list) ->
+        var totalIncome = 0L
+        var totalExpenditure = 0L
+        var totalBalance = 0L
+        val barList = transRecordViewsToAnalyticsBarUseCase(selection, list)
         barList.forEach {
-            totalIncome += it.income.toBigDecimalOrZero()
-            totalExpenditure += it.expenditure.toBigDecimalOrZero()
-            totalBalance += it.balance.toBigDecimalOrZero()
+            totalIncome += it.income
+            totalExpenditure += it.expenditure
+            totalBalance += it.balance
         }
         val expenditurePieDataList =
             transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.EXPENDITURE, list)
@@ -90,20 +105,24 @@ class AnalyticsViewModel @Inject constructor(
             transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.INCOME, list)
         val transferPieDataList =
             transRecordViewsToAnalyticsPieUseCase(RecordTypeCategoryEnum.TRANSFER, list)
+        val granularity = when (selection) {
+            is DateSelectionEntity.ByYear -> AnalyticsBarGranularity.MONTH
+            is DateSelectionEntity.All -> AnalyticsBarGranularity.YEAR
+            else -> AnalyticsBarGranularity.DAY
+        }
         val success = AnalyticsUiState.Success(
-            year = date.year,
-            crossYear = date.crossYear,
-            titleText = date.titleText,
+            granularity = granularity,
+            titleText = selection.getDisplayText(),
             noData = list.isEmpty(),
-            totalIncome = totalIncome.decimalFormat(),
-            totalExpenditure = totalExpenditure.decimalFormat(),
-            totalBalance = totalBalance.decimalFormat(),
+            totalIncome = totalIncome.toMoneyString(),
+            totalExpenditure = totalExpenditure.toMoneyString(),
+            totalBalance = totalBalance.toMoneyString(),
             barDataList = barList,
             expenditurePieDataList = expenditurePieDataList,
             incomePieDataList = incomePieDataList,
             transferPieDataList = transferPieDataList,
         )
-        ProgressDialogManager.dismiss()
+        progressDialogController?.dismiss()
         success
     }
         .stateIn(
@@ -112,39 +131,31 @@ class AnalyticsViewModel @Inject constructor(
             initialValue = AnalyticsUiState.Loading,
         )
 
-    fun showSelectDateDialog() {
-        viewModelScope.launch {
-            dialogState = DialogState.Shown(ShowSelectDateDialogData.SelectDate(_dateData.first()))
-        }
+    /** 显示日期选择 Popup */
+    fun displayDatePopup() {
+        showDatePopup = true
     }
 
-    fun showSelectDateRangeDialog() {
-        viewModelScope.launch {
-            dialogState =
-                DialogState.Shown(ShowSelectDateDialogData.SelectRangeDate(_dateData.first()))
-        }
+    /** 隐藏日期选择 Popup */
+    fun dismissDatePopup() {
+        showDatePopup = false
     }
 
-    fun selectDate(date: DateData) {
-        dismissDialog()
-        viewModelScope.launch {
-            if (date != _dateData.first()) {
-                _dateData.tryEmit(date)
-                ProgressDialogManager.show()
-            }
-        }
+    /** 更新日期选择 */
+    fun updateDateSelection(selection: DateSelectionEntity) {
+        _dateSelection.tryEmit(selection)
     }
 
     fun dismissDialog() {
         dialogState = DialogState.Dismiss
     }
 
-    fun showSheet(typeId: Long) {
+    fun showSheet(controller: ProgressDialogController, typeId: Long) {
         viewModelScope.launch {
-            runCatchWithProgress {
+            runCatchWithProgress(controller) {
                 val type = typeRepository.getRecordTypeById(typeId) ?: return@runCatchWithProgress
                 val ls =
-                    transRecordViewsToAnalyticsPieSecondUseCase(typeId, _recordListData.first())
+                    transRecordViewsToAnalyticsPieSecondUseCase(typeId, _selectionWithRecords.first().second)
                 if (ls.isNotEmpty()) {
                     sheetData = ShowSheetData(
                         typeId = typeId,
@@ -164,8 +175,7 @@ class AnalyticsViewModel @Inject constructor(
 sealed interface AnalyticsUiState {
     data object Loading : AnalyticsUiState
     data class Success(
-        val year: Boolean,
-        val crossYear: Boolean,
+        val granularity: AnalyticsBarGranularity,
         val titleText: String,
         val totalIncome: String,
         val totalExpenditure: String,
@@ -178,48 +188,8 @@ sealed interface AnalyticsUiState {
     ) : AnalyticsUiState
 }
 
-/**
- * 日期数据
- *
- * @param from 开始时间
- * @param to 结束时间，为空时为开始时间当月
- * @param year 是否为全年
- */
-data class DateData(
-    val from: LocalDate,
-    val to: LocalDate? = null,
-    val year: Boolean = false,
-) {
-    val titleText: String
-        get() = when {
-            year -> {
-                from.year.toString()
-            }
-
-            to != null -> {
-                "${from.year}-${from.monthValue.completeZero()}-${from.dayOfMonth.completeZero()}\n" +
-                    "${to.year}-${to.monthValue.completeZero()}-${to.dayOfMonth.completeZero()}"
-            }
-
-            else -> {
-                "${from.year}-${from.monthValue.completeZero()}"
-            }
-        }
-
-    val dateStr: String
-        get() = titleText.replace("\n", "~")
-
-    val crossYear: Boolean
-        get() = to != null && from.year != to.year
-}
-
 data class ShowSheetData(
     val typeId: Long,
     val typeName: String,
     val dataList: List<AnalyticsRecordPieEntity>,
 )
-
-sealed class ShowSelectDateDialogData(open val date: DateData) {
-    data class SelectDate(override val date: DateData) : ShowSelectDateDialogData(date)
-    data class SelectRangeDate(override val date: DateData) : ShowSelectDateDialogData(date)
-}

@@ -45,8 +45,7 @@ class GetSearchRecordViewsUseCase @Inject constructor(
             return@withContext emptyList()
         }
         recordRepository.queryPagingRecordListByKeyword(keyword, pageNum, pageSize)
-            .sortedBy { it.recordTime }
-            .reversed()
+            .sortedByDescending { it.recordTime }
             .map {
                 recordModelTransToViewsUseCase(it).asEntity()
             }

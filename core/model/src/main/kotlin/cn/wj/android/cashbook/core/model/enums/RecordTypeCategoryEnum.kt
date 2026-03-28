@@ -21,16 +21,16 @@ package cn.wj.android.cashbook.core.model.enums
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/17
  */
-enum class RecordTypeCategoryEnum {
+enum class RecordTypeCategoryEnum(val code: Int) {
 
     /** 支出 */
-    EXPENDITURE,
+    EXPENDITURE(0),
 
     /** 收入 */
-    INCOME,
+    INCOME(1),
 
     /** 转账 */
-    TRANSFER,
+    TRANSFER(2),
     ;
 
     companion object {
@@ -38,8 +38,12 @@ enum class RecordTypeCategoryEnum {
         val size: Int
             get() = entries.size
 
-        fun ordinalOf(ordinal: Int): RecordTypeCategoryEnum {
-            return entries.first { it.ordinal == ordinal }
+        /** 通过持久化的 code 值查找枚举，与 ordinal 解耦，安全添加新值 */
+        fun codeOf(code: Int): RecordTypeCategoryEnum {
+            return entries.first { it.code == code }
         }
+
+        /** @see codeOf */
+        fun ordinalOf(ordinal: Int): RecordTypeCategoryEnum = codeOf(ordinal)
     }
 }

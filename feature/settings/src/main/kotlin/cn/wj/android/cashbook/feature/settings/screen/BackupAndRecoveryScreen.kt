@@ -30,13 +30,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +54,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,12 +64,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import androidx.core.util.Pair
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.common.BACKUP_FILE_NAME
+import cn.wj.android.cashbook.core.common.tools.funLogger
+import cn.wj.android.cashbook.core.common.tools.toDateString
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_EMPTY
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_UNAUTHORIZED
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_WEBDAV
@@ -73,22 +84,30 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCE
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_RECOVERY
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbListItem
+import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbPasswordTextField
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
+import cn.wj.android.cashbook.core.design.component.DateRangePickerDialog
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.model.BackupModel
+import cn.wj.android.cashbook.core.model.model.BooksModel
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.LocalProgressDialogController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewModel
+import cn.wj.android.cashbook.feature.settings.viewmodel.ExportState
+import java.io.File
+import java.util.Calendar
+import java.util.TimeZone
 
 /**
  * 备份恢复界面
@@ -100,12 +119,19 @@ import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewMo
 internal fun BackupAndRecoveryRoute(
     onRequestPopBackStack: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    onRequestNaviToRecordImport: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: BackupAndRecoveryViewModel = hiltViewModel(),
 ) {
+    val progressDialogController = LocalProgressDialogController.current
+    viewModel.setProgressDialogController(progressDialogController)
+
     val shouldDisplayBookmark by viewModel.shouldDisplayBookmark.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
+    val booksList by viewModel.booksList.collectAsStateWithLifecycle()
+    val currentBook by viewModel.currentBook.collectAsStateWithLifecycle()
+    val exportState by viewModel.exportState.collectAsStateWithLifecycle()
 
     BackupAndRecoveryScreen(
         uiState = uiState,
@@ -124,7 +150,15 @@ internal fun BackupAndRecoveryRoute(
         onKeepLatestBackupChanged = viewModel::changeKeepLatestBackup,
         onMobileNetworkBackupEnableChanged = viewModel::onMobileNetworkBackupEnableChanged,
         onNoWifiConfirmBackupClick = viewModel::onNoWifiConfirmBackupClick,
-        onDbMigrateClick = viewModel::refreshDbMigrate,
+        onDbMigrateClick = { viewModel.refreshDbMigrate(progressDialogController) },
+        onRequestNaviToRecordImport = onRequestNaviToRecordImport,
+        booksList = booksList,
+        currentBook = currentBook,
+        exportState = exportState,
+        onGetEarliestRecordTime = viewModel::getEarliestRecordTime,
+        onCountExportRecords = viewModel::countExportRecords,
+        onExportRecords = viewModel::exportRecords,
+        onResetExportState = viewModel::resetExportState,
         onBackClick = onRequestPopBackStack,
         onShowSnackbar = onShowSnackbar,
         modifier = modifier,
@@ -147,6 +181,13 @@ internal fun BackupAndRecoveryRoute(
  * @param onRecoveryClick 恢复点击回调
  * @param onAutoBackupClick 自动备份点击回调
  * @param onAutoBackupModeSelected 自动备份模式选择回调
+ * @param booksList 账本列表
+ * @param currentBook 当前选中账本
+ * @param exportState 导出状态
+ * @param onGetEarliestRecordTime 获取指定账本最早记录时间
+ * @param onCountExportRecords 查询导出记录数量
+ * @param onExportRecords 执行导出
+ * @param onResetExportState 重置导出状态
  * @param onBackClick 返回点击回调
  * @param onShowSnackbar 显示 [androidx.compose.material3.Snackbar]，参数：(显示文本，action文本) -> [SnackbarResult]
  */
@@ -170,6 +211,14 @@ internal fun BackupAndRecoveryScreen(
     onNoWifiConfirmBackupClick: (Boolean) -> Unit,
     onAutoBackupModeSelected: (AutoBackupModeEnum) -> Unit,
     onDbMigrateClick: () -> Unit,
+    onRequestNaviToRecordImport: (String) -> Unit,
+    booksList: List<BooksModel>,
+    currentBook: BooksModel?,
+    exportState: ExportState,
+    onGetEarliestRecordTime: suspend (Long) -> Long?,
+    onCountExportRecords: suspend (Long, Long, Long) -> Int,
+    onExportRecords: (Long, Long, Long, String, Long, Long, File) -> Unit,
+    onResetExportState: () -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
@@ -261,6 +310,15 @@ internal fun BackupAndRecoveryScreen(
                             onKeepLatestBackupChanged = onKeepLatestBackupChanged,
                             onMobileNetworkBackupEnableChanged = onMobileNetworkBackupEnableChanged,
                             onDbMigrateClick = onDbMigrateClick,
+                            onRequestNaviToRecordImport = onRequestNaviToRecordImport,
+                            booksList = booksList,
+                            currentBook = currentBook,
+                            exportState = exportState,
+                            onGetEarliestRecordTime = onGetEarliestRecordTime,
+                            onCountExportRecords = onCountExportRecords,
+                            onExportRecords = onExportRecords,
+                            onResetExportState = onResetExportState,
+                            onShowSnackbar = onShowSnackbar,
                         )
                     }
                 }
@@ -436,6 +494,15 @@ internal fun BackupAndRecoveryScaffoldContent(
     onKeepLatestBackupChanged: (Boolean) -> Unit,
     onMobileNetworkBackupEnableChanged: (Boolean) -> Unit,
     onDbMigrateClick: () -> Unit,
+    onRequestNaviToRecordImport: (String) -> Unit,
+    booksList: List<BooksModel>,
+    currentBook: BooksModel?,
+    exportState: ExportState,
+    onGetEarliestRecordTime: suspend (Long) -> Long?,
+    onCountExportRecords: suspend (Long, Long, Long) -> Int,
+    onExportRecords: (Long, Long, Long, String, Long, Long, File) -> Unit,
+    onResetExportState: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
     modifier: Modifier = Modifier,
 ) {
     // 提示文本
@@ -701,6 +768,391 @@ internal fun BackupAndRecoveryScaffoldContent(
             },
             modifier = Modifier.clickable(onClick = onDbMigrateClick),
         )
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(32.dp),
+        )
+
+        Text(
+            text = stringResource(id = R.string.import_bill),
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp),
+        )
+
+        val selectFileLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+            onResult = { uri ->
+                if (uri != null) {
+                    // 在回调中立即复制文件到缓存，避免 URI 权限在导航后失效
+                    try {
+                        // 用原始文件名保存，确保导入界面显示正确名称
+                        val displayName = context.contentResolver.query(
+                            uri,
+                            arrayOf(android.provider.OpenableColumns.DISPLAY_NAME),
+                            null,
+                            null,
+                            null,
+                        )?.use { cursor ->
+                            if (cursor.moveToFirst()) cursor.getString(0) else null
+                        } ?: "import_bill_temp.xlsx"
+                        val cacheFile = java.io.File(context.cacheDir, displayName)
+                        context.contentResolver.openInputStream(uri)?.use { input ->
+                            cacheFile.outputStream().use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        onRequestNaviToRecordImport(cacheFile.absolutePath)
+                    } catch (e: Exception) {
+                        // 文件复制失败，权限不足或文件无法读取
+                        funLogger("BackupAndRecovery")
+                            .e(e, "copy import file failed")
+                    }
+                }
+            },
+        )
+
+        CbListItem(
+            headlineContent = { Text(text = stringResource(id = R.string.import_from_wechat)) },
+            supportingContent = {
+                Text(text = stringResource(id = R.string.import_from_wechat_hint))
+            },
+            modifier = Modifier.clickable {
+                selectFileLauncher.launch(
+                    arrayOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                )
+            },
+        )
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(32.dp),
+        )
+
+        Text(
+            text = stringResource(id = R.string.export_bill),
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp),
+        )
+
+        // 导出 Bottom Sheet 状态
+        var showExportSheet by remember { mutableStateOf(false) }
+
+        CbListItem(
+            headlineContent = { Text(text = stringResource(id = R.string.export_to_daily_account)) },
+            supportingContent = {
+                Text(text = stringResource(id = R.string.export_to_daily_account_hint))
+            },
+            modifier = Modifier.clickable { showExportSheet = true },
+        )
+
+        if (showExportSheet) {
+            ExportBottomSheet(
+                booksList = booksList,
+                currentBook = currentBook,
+                exportState = exportState,
+                onGetEarliestRecordTime = onGetEarliestRecordTime,
+                onCountExportRecords = onCountExportRecords,
+                onExportRecords = onExportRecords,
+                onResetExportState = onResetExportState,
+                onShowSnackbar = onShowSnackbar,
+                onDismissRequest = { showExportSheet = false },
+            )
+        }
+    }
+}
+
+/**
+ * 导出到一日记账 Bottom Sheet
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExportBottomSheet(
+    booksList: List<BooksModel>,
+    currentBook: BooksModel?,
+    exportState: ExportState,
+    onGetEarliestRecordTime: suspend (Long) -> Long?,
+    onCountExportRecords: suspend (Long, Long, Long) -> Int,
+    onExportRecords: (Long, Long, Long, String, Long, Long, File) -> Unit,
+    onResetExportState: () -> Unit,
+    onShowSnackbar: suspend (String, String?) -> SnackbarResult,
+    onDismissRequest: () -> Unit,
+) {
+    val context = LocalContext.current
+
+    // 选中的账本 ID
+    var selectedBooksId by remember { mutableLongStateOf(currentBook?.id ?: -1L) }
+    // 日期范围
+    var selectedStartDate by remember { mutableLongStateOf(0L) }
+    var selectedEndDate by remember { mutableLongStateOf(0L) }
+    // 记录数量
+    var recordCount by remember { mutableIntStateOf(0) }
+    // 账本下拉菜单展开状态
+    var booksExpanded by remember { mutableStateOf(false) }
+    // 日期选择器显示状态
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val selectedBook = booksList.find { it.id == selectedBooksId }
+
+    // 初始化日期范围：根据选中账本获取最早记录时间
+    LaunchedEffect(selectedBooksId) {
+        if (selectedBooksId > 0) {
+            val earliest = onGetEarliestRecordTime(selectedBooksId)
+            if (earliest != null) {
+                // 截断到当天 00:00:00
+                val cal = Calendar.getInstance(TimeZone.getDefault()).apply {
+                    timeInMillis = earliest
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                selectedStartDate = cal.timeInMillis
+            } else {
+                selectedStartDate = 0L
+            }
+            // 结束日期设为今天 00:00:00
+            val todayCal = Calendar.getInstance(TimeZone.getDefault()).apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            selectedEndDate = todayCal.timeInMillis
+        }
+    }
+
+    // 响应式查询记录数量
+    LaunchedEffect(selectedBooksId, selectedStartDate, selectedEndDate) {
+        if (selectedBooksId > 0 && selectedStartDate > 0 && selectedEndDate >= selectedStartDate) {
+            // endDate 查询使用 exclusive，+1 天
+            val queryEndDate = selectedEndDate + 86_400_000L
+            recordCount = onCountExportRecords(selectedBooksId, selectedStartDate, queryEndDate)
+        } else {
+            recordCount = 0
+        }
+    }
+
+    // 处理导出结果
+    val exportSuccessText = stringResource(id = R.string.export_success)
+    val exportFailedText = stringResource(id = R.string.export_failed)
+    LaunchedEffect(exportState) {
+        when (val state = exportState) {
+            is ExportState.Done -> {
+                val file = File(state.filePath)
+                if (file.exists()) {
+                    val uri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.FileProvider",
+                        file,
+                    )
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/csv"
+                        putExtra(Intent.EXTRA_STREAM, uri)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, null))
+                }
+                onShowSnackbar(
+                    String.format(exportSuccessText, state.count),
+                    null,
+                )
+                onResetExportState()
+                onDismissRequest()
+            }
+
+            is ExportState.Error -> {
+                onShowSnackbar(
+                    String.format(exportFailedText, state.message),
+                    null,
+                )
+                onResetExportState()
+            }
+
+            else -> {}
+        }
+    }
+
+    // 日期范围选择器
+    if (showDatePicker) {
+        val selection = if (selectedStartDate > 0 && selectedEndDate > 0) {
+            Pair.create(selectedStartDate, selectedEndDate)
+        } else {
+            null
+        }
+        DateRangePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            onPositiveButtonClick = { pair ->
+                showDatePicker = false
+                pair.first?.let { start ->
+                    // DateRangePickerDialog 内部加了一天的偏移，需要减回来
+                    val cal = Calendar.getInstance(TimeZone.getDefault()).apply {
+                        timeInMillis = start
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+                    selectedStartDate = cal.timeInMillis
+                }
+                pair.second?.let { end ->
+                    val cal = Calendar.getInstance(TimeZone.getDefault()).apply {
+                        timeInMillis = end
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+                    selectedEndDate = cal.timeInMillis
+                }
+            },
+            onNegativeButtonClick = { showDatePicker = false },
+            selection = selection,
+        )
+    }
+
+    CbModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 24.dp),
+        ) {
+            // 标题
+            Text(
+                text = stringResource(id = R.string.export_sheet_title),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .semantics { heading() },
+            )
+
+            // 账本选择器
+            Text(
+                text = stringResource(id = R.string.export_target_book),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Box {
+                CbListItem(
+                    headlineContent = {
+                        Text(text = selectedBook?.name ?: "")
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = CbIcons.ArrowDropDown,
+                            contentDescription = stringResource(id = R.string.export_target_book),
+                        )
+                    },
+                    modifier = Modifier.clickable { booksExpanded = true },
+                )
+                DropdownMenu(
+                    expanded = booksExpanded,
+                    onDismissRequest = { booksExpanded = false },
+                ) {
+                    booksList.forEach { book ->
+                        DropdownMenuItem(
+                            text = { Text(text = book.name) },
+                            onClick = {
+                                selectedBooksId = book.id
+                                booksExpanded = false
+                            },
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 日期范围
+            Text(
+                text = stringResource(id = R.string.export_date_range),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showDatePicker = true }
+                    .padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (selectedStartDate > 0) {
+                        selectedStartDate.toDateString()
+                    } else {
+                        stringResource(id = R.string.export_start_date)
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = "—",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+                Text(
+                    text = if (selectedEndDate > 0) {
+                        selectedEndDate.toDateString()
+                    } else {
+                        stringResource(id = R.string.export_end_date)
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f),
+                )
+                Icon(
+                    imageVector = CbIcons.DateRange,
+                    contentDescription = stringResource(id = R.string.export_date_range),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 导出按钮
+            val isExporting = exportState is ExportState.Exporting
+            Button(
+                onClick = {
+                    if (selectedBooksId > 0 && selectedStartDate > 0 && selectedEndDate >= selectedStartDate) {
+                        val queryEndDate = selectedEndDate + 86_400_000L
+                        onExportRecords(
+                            selectedBooksId,
+                            selectedStartDate,
+                            queryEndDate,
+                            selectedBook?.name ?: "",
+                            selectedStartDate,
+                            selectedEndDate,
+                            context.cacheDir,
+                        )
+                    }
+                },
+                enabled = recordCount > 0 && !isExporting,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                if (isExporting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                    Text(
+                        text = stringResource(id = R.string.export_exporting),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                } else if (recordCount > 0) {
+                    Text(
+                        text = stringResource(id = R.string.export_confirm, recordCount),
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.export_confirm_empty),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -722,6 +1174,7 @@ private fun BackupAndRecoveryScreenPreview() {
         BackupAndRecoveryRoute(
             onRequestPopBackStack = {},
             onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
+            onRequestNaviToRecordImport = {},
         )
     }
 }

@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
@@ -135,19 +136,19 @@ class GetRecordTypeListUseCaseTest {
 
     @Test
     fun given_income_category_when_has_need_related_types_then_marked() = runTest {
+        // 使用固定退款类型 ID，自动判断为 needRelated
         typeRepository.addType(
             createRecordTypeModel(
-                id = 1L,
-                name = "报销",
+                id = FIXED_TYPE_ID_REFUND,
+                name = "退款",
                 typeCategory = RecordTypeCategoryEnum.INCOME,
             ),
         )
-        typeRepository.setNeedRelated(1L)
 
-        val result = useCase(RecordTypeCategoryEnum.INCOME, 1L)
+        val result = useCase(RecordTypeCategoryEnum.INCOME, FIXED_TYPE_ID_REFUND)
 
-        val reimburseType = result.firstOrNull { it.name == "报销" }
-        assertThat(reimburseType).isNotNull()
-        assertThat(reimburseType!!.needRelated).isTrue()
+        val refundType = result.firstOrNull { it.name == "退款" }
+        assertThat(refundType).isNotNull()
+        assertThat(refundType!!.needRelated).isTrue()
     }
 }

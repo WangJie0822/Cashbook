@@ -18,8 +18,13 @@ package cn.wj.android.cashbook.core.database.table
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_CREDIT_CARD_PAYMENT
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
+import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 
@@ -37,7 +42,13 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/8
  */
-@Entity(tableName = TABLE_TYPE)
+@Entity(
+    tableName = TABLE_TYPE,
+    indices = [
+        Index("type_category"),
+        Index("parent_id"),
+    ],
+)
 data class TypeTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = TABLE_TYPE_ID)
@@ -74,5 +85,44 @@ val TYPE_TABLE_BALANCE_INCOME: TypeTable
         typeLevel = TypeLevelEnum.FIRST.ordinal,
         typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
         protected = SWITCH_INT_OFF,
+        sort = 0,
+    )
+
+/** 固定类型 - 退款（收入） */
+val TYPE_TABLE_REFUND: TypeTable
+    get() = TypeTable(
+        id = FIXED_TYPE_ID_REFUND,
+        parentId = -1L,
+        name = "退款",
+        iconName = "vector_type_refund_24",
+        typeLevel = TypeLevelEnum.FIRST.ordinal,
+        typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
+        protected = SWITCH_INT_ON,
+        sort = 0,
+    )
+
+/** 固定类型 - 报销（收入） */
+val TYPE_TABLE_REIMBURSE: TypeTable
+    get() = TypeTable(
+        id = FIXED_TYPE_ID_REIMBURSE,
+        parentId = -1L,
+        name = "报销",
+        iconName = "vector_type_reimburse_24",
+        typeLevel = TypeLevelEnum.FIRST.ordinal,
+        typeCategory = RecordTypeCategoryEnum.INCOME.ordinal,
+        protected = SWITCH_INT_ON,
+        sort = 0,
+    )
+
+/** 固定类型 - 信用卡还款（转账） */
+val TYPE_TABLE_CREDIT_CARD_PAYMENT: TypeTable
+    get() = TypeTable(
+        id = FIXED_TYPE_ID_CREDIT_CARD_PAYMENT,
+        parentId = -1L,
+        name = "信用卡还款",
+        iconName = "vector_type_credit_card_payment_24",
+        typeLevel = TypeLevelEnum.FIRST.ordinal,
+        typeCategory = RecordTypeCategoryEnum.TRANSFER.ordinal,
+        protected = SWITCH_INT_ON,
         sort = 0,
     )

@@ -30,6 +30,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.sync.initializers.AutoBackupWorkName
 import cn.wj.android.cashbook.sync.initializers.SyncWorkName
@@ -51,6 +52,7 @@ class InitWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val settingRepository: SettingRepository,
+    private val typeRepository: TypeRepository,
     @Dispatcher(CashbookDispatchers.IO) private val ioDispatcher: CoroutineContext,
 ) : CoroutineWorker(appContext, workerParams) {
 
@@ -59,6 +61,8 @@ class InitWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         this@InitWorker.logger().i("doWork(), init worker")
+        // 一次性迁移特殊类型（幂等操作）
+        typeRepository.migrateSpecialTypes()
         settingRepository.appSettingsModel.first().let { appDateModel ->
             WorkManager.getInstance(appContext).apply {
                 // 执行数据同步

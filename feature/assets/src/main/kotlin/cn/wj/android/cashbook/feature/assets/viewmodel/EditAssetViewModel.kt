@@ -22,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.toAmountCent
+import cn.wj.android.cashbook.core.common.ext.toMoneyFormat
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
@@ -81,8 +83,8 @@ class EditAssetViewModel @Inject constructor(
                 isCreditCard = it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
                 classification = it.classification,
                 assetName = it.name,
-                totalAmount = it.totalAmount,
-                balance = it.balance,
+                totalAmount = it.totalAmount.toMoneyFormat(),
+                balance = it.balance.toMoneyFormat(),
                 openBank = it.openBank,
                 cardNo = it.cardNo,
                 remark = it.remark,
@@ -199,8 +201,8 @@ class EditAssetViewModel @Inject constructor(
             try {
                 val assetModel = _displayAssetInfo.first().copy(
                     name = assetName,
-                    totalAmount = totalAmount,
-                    balance = balance,
+                    totalAmount = totalAmount.toAmountCent(),
+                    balance = balance.toAmountCent(),
                     openBank = openBank,
                     cardNo = cardNo,
                     remark = remark,
@@ -215,7 +217,7 @@ class EditAssetViewModel @Inject constructor(
                 onSuccess()
             } catch (throwable: Throwable) {
                 this@EditAssetViewModel.logger().e(throwable, "save()")
-                doSaving = true
+                doSaving = false
             }
         }
     }

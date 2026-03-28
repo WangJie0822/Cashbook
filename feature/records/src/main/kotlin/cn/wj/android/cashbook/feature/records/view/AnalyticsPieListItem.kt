@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.withCNY
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
@@ -65,7 +65,7 @@ internal fun AnalyticsPieListItem(
                         .weight(1f),
                 )
                 Text(
-                    text = item.totalAmount.withCNY(),
+                    text = item.totalAmount.toMoneyCNY(),
                     style = MaterialTheme.typography.labelLarge,
                 )
             }

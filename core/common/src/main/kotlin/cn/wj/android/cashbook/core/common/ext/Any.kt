@@ -48,3 +48,8 @@ inline fun <T> T.ifCondition(condition: Boolean, crossinline defaultValue: () ->
 fun <T> T?.decimalFormat(pattern: String = "#.##"): String {
     return DecimalFormat(pattern).format(this?.toString()?.toBigDecimalOrNull() ?: return "")
 }
+
+/** 对金额数据进行格式化，始终显示两位小数 */
+fun <T> T?.moneyFormat(): String {
+    return DecimalFormat("0.00").format(this?.toString()?.toBigDecimalOrNull() ?: return "0.00")
+}

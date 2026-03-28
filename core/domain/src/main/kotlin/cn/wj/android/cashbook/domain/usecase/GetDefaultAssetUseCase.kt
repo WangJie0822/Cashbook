@@ -18,7 +18,6 @@ package cn.wj.android.cashbook.domain.usecase
 
 import android.content.Context
 import cn.wj.android.cashbook.core.common.ext.string
-import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.helper.iconResId
 import cn.wj.android.cashbook.core.data.helper.nameResId
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
@@ -26,7 +25,6 @@ import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -46,7 +44,7 @@ class GetDefaultAssetUseCase @Inject constructor(
             booksId = -1L,
             name = AssetClassificationEnum.CASH.nameResId.string(context),
             iconResId = AssetClassificationEnum.CASH.iconResId,
-            totalAmount = "",
+            totalAmount = 0L,
             billingDate = "",
             repaymentDate = "",
             type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
@@ -56,8 +54,8 @@ class GetDefaultAssetUseCase @Inject constructor(
             cardNo = "",
             remark = "",
             sort = 0,
-            modifyTime = Date().dateFormat(),
-            balance = "",
+            modifyTime = System.currentTimeMillis(),
+            balance = 0L,
         )
     }
 }

@@ -52,7 +52,7 @@ class SaveAssetUseCaseTest {
 
     @Test
     fun when_save_new_asset_then_directly_inserts() = runTest {
-        val asset = createAssetModel(id = -1L, name = "新资产", balance = "1000")
+        val asset = createAssetModel(id = -1L, name = "新资产", balance = 100000L)
 
         useCase(asset)
 
@@ -63,7 +63,7 @@ class SaveAssetUseCaseTest {
 
     @Test
     fun when_modify_asset_without_balance_change_then_no_record_generated() = runTest {
-        val oldAsset = createAssetModel(id = 1L, name = "旧资产", balance = "1000")
+        val oldAsset = createAssetModel(id = 1L, name = "旧资产", balance = 100000L)
         assetRepository.addAsset(oldAsset)
 
         val newAsset = oldAsset.copy(name = "改名资产")
@@ -77,19 +77,19 @@ class SaveAssetUseCaseTest {
     fun given_capital_account_when_balance_increases_then_generates_income_record() = runTest {
         val oldAsset = createAssetModel(
             id = 1L,
-            balance = "1000",
+            balance = 100000L,
             type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
         )
         assetRepository.addAsset(oldAsset)
 
-        val newAsset = oldAsset.copy(balance = "1500")
+        val newAsset = oldAsset.copy(balance = 150000L)
         useCase(newAsset)
 
         // 资金账户余额增加 → 收入平账记录
         val record = recordRepository.lastUpdatedRecord
         assertThat(record).isNotNull()
         assertThat(record!!.typeId).isEqualTo(RECORD_TYPE_BALANCE_INCOME.id)
-        assertThat(record.amount).isEqualTo("500")
+        assertThat(record.amount).isEqualTo(50000L)
         assertThat(record.assetId).isEqualTo(1L)
     }
 
@@ -97,57 +97,57 @@ class SaveAssetUseCaseTest {
     fun given_capital_account_when_balance_decreases_then_generates_expenditure_record() = runTest {
         val oldAsset = createAssetModel(
             id = 1L,
-            balance = "1000",
+            balance = 100000L,
             type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
         )
         assetRepository.addAsset(oldAsset)
 
-        val newAsset = oldAsset.copy(balance = "700")
+        val newAsset = oldAsset.copy(balance = 70000L)
         useCase(newAsset)
 
         // 资金账户余额减少 → 支出平账记录
         val record = recordRepository.lastUpdatedRecord
         assertThat(record).isNotNull()
         assertThat(record!!.typeId).isEqualTo(RECORD_TYPE_BALANCE_EXPENDITURE.id)
-        assertThat(record.amount).isEqualTo("300")
+        assertThat(record.amount).isEqualTo(30000L)
     }
 
     @Test
     fun given_credit_card_when_used_amount_increases_then_generates_expenditure_record() = runTest {
         val oldAsset = createAssetModel(
             id = 1L,
-            balance = "500",
+            balance = 50000L,
             type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
         )
         assetRepository.addAsset(oldAsset)
 
-        val newAsset = oldAsset.copy(balance = "800")
+        val newAsset = oldAsset.copy(balance = 80000L)
         useCase(newAsset)
 
         // 信用卡已使用额度增加 → 支出平账记录
         val record = recordRepository.lastUpdatedRecord
         assertThat(record).isNotNull()
         assertThat(record!!.typeId).isEqualTo(RECORD_TYPE_BALANCE_EXPENDITURE.id)
-        assertThat(record.amount).isEqualTo("300")
+        assertThat(record.amount).isEqualTo(30000L)
     }
 
     @Test
     fun given_credit_card_when_used_amount_decreases_then_generates_income_record() = runTest {
         val oldAsset = createAssetModel(
             id = 1L,
-            balance = "800",
+            balance = 80000L,
             type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
         )
         assetRepository.addAsset(oldAsset)
 
-        val newAsset = oldAsset.copy(balance = "500")
+        val newAsset = oldAsset.copy(balance = 50000L)
         useCase(newAsset)
 
         // 信用卡已使用额度减少 → 收入平账记录
         val record = recordRepository.lastUpdatedRecord
         assertThat(record).isNotNull()
         assertThat(record!!.typeId).isEqualTo(RECORD_TYPE_BALANCE_INCOME.id)
-        assertThat(record.amount).isEqualTo("300")
+        assertThat(record.amount).isEqualTo(30000L)
     }
 
     @Test
@@ -156,7 +156,7 @@ class SaveAssetUseCaseTest {
             id = 1L,
             name = "旧名称",
             openBank = "旧银行",
-            balance = "1000",
+            balance = 100000L,
         )
         assetRepository.addAsset(oldAsset)
 

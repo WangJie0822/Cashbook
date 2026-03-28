@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.model.model.ResultModel
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,9 +37,9 @@ class ConfirmDeleteRecordDialogViewModel @Inject constructor(
     private val deleteRecordUseCase: DeleteRecordUseCase,
 ) : ViewModel() {
 
-    fun onDeleteRecordConfirm(hintText: String, recordId: Long, onResult: (ResultModel) -> Unit) {
+    fun onDeleteRecordConfirm(controller: ProgressDialogController, hintText: String, recordId: Long, onResult: (ResultModel) -> Unit) {
         viewModelScope.launch {
-            runCatchWithProgress(hint = hintText, cancelable = false) {
+            runCatchWithProgress(controller, hint = hintText, cancelable = false) {
                 deleteRecordUseCase(recordId)
                 // 删除成功
                 onResult.invoke(ResultModel.success())

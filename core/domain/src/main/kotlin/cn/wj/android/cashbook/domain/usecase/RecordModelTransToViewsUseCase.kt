@@ -18,8 +18,6 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
@@ -30,7 +28,6 @@ import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -62,14 +59,14 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                     recordRepository.queryById(id)
                 }
             }
-            var totalRelated = BigDecimal.ZERO
+            var totalRelated = 0L
             relatedRecord.forEach { record ->
                 if (type.typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
                     // 支出类型，关联的是收入
-                    totalRelated += record.amount.toBigDecimalOrZero()
+                    totalRelated += record.amount
                 } else if (type.typeCategory == RecordTypeCategoryEnum.INCOME) {
                     // 收入类型，关联的是支出
-                    totalRelated += (record.amount.toBigDecimalOrZero() + record.charges.toBigDecimalOrZero() - record.concessions.toBigDecimalOrZero())
+                    totalRelated += (record.amount + record.charges - record.concessions)
                 }
             }
             RecordViewsModel(
@@ -87,7 +84,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 relatedTags = tagRepository.getRelatedTag(recordModel.id),
                 relatedImage = recordRepository.queryImagesByRecordId(recordModel.id),
                 relatedRecord = relatedRecord,
-                relatedAmount = totalRelated.decimalFormat(),
+                relatedAmount = totalRelated,
                 recordTime = recordModel.recordTime,
             )
         }

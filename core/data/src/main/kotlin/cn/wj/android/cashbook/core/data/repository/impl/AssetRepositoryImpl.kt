@@ -18,8 +18,6 @@ package cn.wj.android.cashbook.core.data.repository.impl
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toBigDecimalOrZero
 import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.helper.AssetHelper
@@ -36,7 +34,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -62,15 +59,15 @@ class AssetRepositoryImpl @Inject constructor(
             ClassificationTypeEnum.entries.forEach { type ->
                 val assetList = list.filter { it.type == type }
                 if (assetList.isNotEmpty()) {
-                    var totalAmount = BigDecimal.ZERO
+                    var totalAmount = 0L
                     assetList.forEach { asset ->
-                        totalAmount += asset.balance.toBigDecimalOrZero()
+                        totalAmount += asset.balance
                     }
                     result.add(
                         AssetTypeViewsModel(
                             type = type,
                             nameResId = AssetHelper.getNameResIdByType(type),
-                            totalAmount = totalAmount.decimalFormat(),
+                            totalAmount = totalAmount,
                             assetList = assetList,
                         ),
                     )
@@ -90,15 +87,15 @@ class AssetRepositoryImpl @Inject constructor(
             ClassificationTypeEnum.entries.forEach { type ->
                 val assetList = list.filter { it.type == type }
                 if (assetList.isNotEmpty()) {
-                    var totalAmount = BigDecimal.ZERO
+                    var totalAmount = 0L
                     assetList.forEach { asset ->
-                        totalAmount += asset.balance.toBigDecimalOrZero()
+                        totalAmount += asset.balance
                     }
                     result.add(
                         AssetTypeViewsModel(
                             type = type,
                             nameResId = AssetHelper.getNameResIdByType(type),
-                            totalAmount = totalAmount.decimalFormat(),
+                            totalAmount = totalAmount,
                             assetList = assetList,
                         ),
                     )

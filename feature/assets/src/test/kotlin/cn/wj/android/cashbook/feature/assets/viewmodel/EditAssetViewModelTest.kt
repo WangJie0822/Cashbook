@@ -269,7 +269,7 @@ class EditAssetViewModelTest {
         booksId = 1L,
         name = name,
         iconResId = 0,
-        totalAmount = "",
+        totalAmount = 0L,
         billingDate = "",
         repaymentDate = "",
         type = ClassificationTypeEnum.CAPITAL_ACCOUNT,
@@ -279,7 +279,7 @@ class EditAssetViewModelTest {
         cardNo = "",
         remark = "",
         sort = 0,
-        modifyTime = "2024-01-01",
-        balance = "0",
+        modifyTime = 1704067200000L,
+        balance = 0L,
     )
 }

@@ -17,11 +17,11 @@
 package cn.wj.android.cashbook.domain.usecase
 
 import android.util.ArrayMap
-import cn.wj.android.cashbook.core.common.ext.decimalFormat
-import cn.wj.android.cashbook.core.common.ext.toDoubleOrZero
+import cn.wj.android.cashbook.core.common.tools.toLocalDate
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import java.time.LocalDate
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -33,11 +33,10 @@ import javax.inject.Inject
 class GetCurrentMonthRecordViewsMapUseCase @Inject constructor() {
 
     operator fun invoke(list: List<RecordViewsEntity>): Map<RecordDayEntity, List<RecordViewsEntity>> {
-        val map = ArrayMap<String, ArrayList<RecordViewsEntity>>()
-        list.sortedBy { it.recordTime }
-            .reversed()
+        val map = ArrayMap<LocalDate, ArrayList<RecordViewsEntity>>()
+        list.sortedByDescending { it.recordTime }
             .forEach {
-                val key = it.recordTime.split(" ").first()
+                val key = it.recordTime.toLocalDate()
                 if (map.containsKey(key)) {
                     map[key]?.add(it)
                 } else {
@@ -45,35 +44,38 @@ class GetCurrentMonthRecordViewsMapUseCase @Inject constructor() {
                 }
             }
         return map.mapKeys {
-            var totalExpenditure = 0.0
-            var totalIncome = 0.0
+            var totalExpenditure = 0L
+            var totalIncome = 0L
             it.value.forEach { record ->
+                // 跳过平账记录
+                if (record.isBalanceRecord) {
+                    return@forEach
+                }
                 when (record.typeCategory) {
                     RecordTypeCategoryEnum.EXPENDITURE -> {
                         // 支出
-                        totalExpenditure += record.finalAmount.toDoubleOrZero()
+                        totalExpenditure += record.finalAmount
                     }
 
                     RecordTypeCategoryEnum.INCOME -> {
                         // 收入
-                        totalIncome += record.finalAmount.toDoubleOrZero()
+                        totalIncome += record.finalAmount
                     }
 
                     RecordTypeCategoryEnum.TRANSFER -> {
-                        // 转账
-                        totalExpenditure += record.charges.toDoubleOrZero()
-                        totalIncome += record.concessions.toDoubleOrZero()
+                        // 转账，优惠冲减支出
+                        totalExpenditure += record.charges - record.concessions
                     }
                 }
             }
-            val dateArray = it.key.split("-")
+            val date = it.key
             val calendar = Calendar.getInstance()
             val currentYear = calendar[Calendar.YEAR]
             val currentMonth = (calendar[Calendar.MONTH] + 1)
             val currentDay = calendar[Calendar.DAY_OF_MONTH]
-            val dateDay = dateArray.last().toInt()
+            val dateDay = date.dayOfMonth
             val dayType =
-                if (currentYear == dateArray[0].toIntOrNull() && currentMonth == dateArray[1].toIntOrNull()) {
+                if (currentYear == date.year && currentMonth == date.monthValue) {
                     when (dateDay) {
                         currentDay -> 0
                         currentDay - 1 -> -1
@@ -86,8 +88,8 @@ class GetCurrentMonthRecordViewsMapUseCase @Inject constructor() {
             RecordDayEntity(
                 day = dateDay,
                 dayType = dayType,
-                dayIncome = totalIncome.decimalFormat(),
-                dayExpand = totalExpenditure.decimalFormat(),
+                dayIncome = totalIncome,
+                dayExpand = totalExpenditure,
             )
         }
     }

@@ -26,6 +26,8 @@ import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
+import cn.wj.android.cashbook.core.ui.ProgressDialogState
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
 import com.google.common.truth.Truth.assertThat
@@ -48,6 +50,7 @@ class AssetInfoViewModelTest {
     private lateinit var recordRepository: FakeRecordRepository
     private lateinit var tagRepository: FakeTagRepository
     private lateinit var viewModel: AssetInfoViewModel
+    private lateinit var fakeController: FakeProgressDialogController
 
     @Before
     fun setup() {
@@ -59,6 +62,17 @@ class AssetInfoViewModelTest {
             recordRepository = recordRepository,
             tagRepository = tagRepository,
         )
+        fakeController = FakeProgressDialogController()
+    }
+
+    private class FakeProgressDialogController : ProgressDialogController {
+        override var dialogState: DialogState = DialogState.Dismiss
+        override fun show(hint: String?, cancelable: Boolean, onDismiss: () -> Unit) {
+            dialogState = DialogState.Shown(ProgressDialogState(hint, cancelable, onDismiss))
+        }
+        override fun dismiss() {
+            dialogState = DialogState.Dismiss
+        }
     }
 
     @Test
@@ -78,7 +92,7 @@ class AssetInfoViewModelTest {
         val asset = createAssetModel(
             id = 1L,
             name = "测试现金",
-            balance = "1000.00",
+            balance = 100000L,
             openBank = "中国银行",
             cardNo = "1234",
             remark = "测试备注",
@@ -110,7 +124,7 @@ class AssetInfoViewModelTest {
             id = 2L,
             type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT,
             classification = AssetClassificationEnum.CREDIT_CARD,
-            totalAmount = "50000",
+            totalAmount = 5000000L,
             billingDate = "15",
             repaymentDate = "5",
         )
@@ -120,7 +134,7 @@ class AssetInfoViewModelTest {
 
         val state = viewModel.uiState.value as AssetInfoUiState.Success
         assertThat(state.isCreditCard).isTrue()
-        assertThat(state.totalAmount).isEqualTo("50000")
+        assertThat(state.totalAmount).isEqualTo("50000.00")
         assertThat(state.billingDate).isEqualTo("15")
         assertThat(state.repaymentDate).isEqualTo("5")
     }
@@ -204,7 +218,7 @@ class AssetInfoViewModelTest {
         viewModel.setProgressDialogHintText("删除中...")
 
         var successCalled = false
-        viewModel.deleteAsset { successCalled = true }
+        viewModel.deleteAsset(fakeController) { successCalled = true }
 
         assertThat(successCalled).isTrue()
     }
@@ -224,7 +238,7 @@ class AssetInfoViewModelTest {
         // assetInfo 为 null 时使用 orEmpty() 等默认值
         val success = state as AssetInfoUiState.Success
         assertThat(success.title).isEmpty()
-        assertThat(success.balance).isEqualTo("0")
+        assertThat(success.balance).isEqualTo("0.00")
     }
 
     /**
@@ -233,10 +247,10 @@ class AssetInfoViewModelTest {
     private fun createAssetModel(
         id: Long = 1L,
         name: String = "测试资产",
-        balance: String = "0",
+        balance: Long = 0L,
         type: ClassificationTypeEnum = ClassificationTypeEnum.CAPITAL_ACCOUNT,
         classification: AssetClassificationEnum = AssetClassificationEnum.CASH,
-        totalAmount: String = "",
+        totalAmount: Long = 0L,
         billingDate: String = "",
         repaymentDate: String = "",
         openBank: String = "",
@@ -257,7 +271,7 @@ class AssetInfoViewModelTest {
         cardNo = cardNo,
         remark = remark,
         sort = 0,
-        modifyTime = "2024-01-01",
+        modifyTime = 1704067200000L,
         balance = balance,
     )
 
@@ -266,6 +280,7 @@ class AssetInfoViewModelTest {
      */
     private fun createRecordViewsEntity(id: Long = 1L): RecordViewsEntity = RecordViewsEntity(
         id = id,
+        typeId = 1L,
         typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         typeName = "餐饮",
         typeIconResName = "ic_type_food",
@@ -275,16 +290,16 @@ class AssetInfoViewModelTest {
         relatedAssetId = null,
         relatedAssetName = null,
         relatedAssetIconResId = null,
-        amount = "100.00",
-        finalAmount = "100.00",
-        charges = "0",
-        concessions = "0",
+        amount = 10000L,
+        finalAmount = 10000L,
+        charges = 0L,
+        concessions = 0L,
         remark = "",
         reimbursable = false,
         relatedTags = emptyList(),
         relatedImage = emptyList(),
         relatedRecord = emptyList(),
-        relatedAmount = "0",
-        recordTime = "2024-01-01 12:00",
+        relatedAmount = 0L,
+        recordTime = 1704110400000L,
     )
 }

@@ -85,7 +85,7 @@ internal fun SearchRoute(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun SearchScreen(
+internal fun SearchScreen(
     viewRecord: RecordViewsEntity?,
     onRequestShowRecordDetailSheet: (RecordViewsEntity) -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
@@ -149,14 +149,14 @@ private fun SearchScreen(
                         ) {
                             Icon(
                                 imageVector = CbIcons.ArrowBack,
-                                contentDescription = null,
+                                contentDescription = stringResource(id = R.string.cd_navigate_back),
                             )
                         }
                     },
                     trailingIcon = {
                         if (expanded && query.isNotBlank()) {
                             CbIconButton(onClick = { query = "" }) {
-                                Icon(imageVector = CbIcons.Cancel, contentDescription = null)
+                                Icon(imageVector = CbIcons.Cancel, contentDescription = stringResource(id = R.string.cd_clear))
                             }
                         }
                     },
@@ -204,7 +204,10 @@ private fun SearchScreen(
                         )
                     }
                 } else {
-                    items(count = recordList.itemCount) { index ->
+                    items(
+                        count = recordList.itemCount,
+                        key = { index -> recordList.peek(index)?.id ?: "placeholder_$index" },
+                    ) { index ->
                         recordList[index]?.let { item ->
                             RecordListItem(
                                 item = item,

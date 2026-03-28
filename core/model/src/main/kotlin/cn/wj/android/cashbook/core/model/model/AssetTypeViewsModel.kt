@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 data class AssetTypeViewsModel(
     val type: ClassificationTypeEnum,
     val nameResId: Int,
-    val totalAmount: String,
+    /** 总金额，单位：分 */
+    val totalAmount: Long,
     val assetList: List<AssetModel>,
 )

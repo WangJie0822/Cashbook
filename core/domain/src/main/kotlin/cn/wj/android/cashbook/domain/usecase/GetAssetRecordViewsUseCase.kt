@@ -45,8 +45,7 @@ class GetAssetRecordViewsUseCase @Inject constructor(
             return@withContext emptyList()
         }
         recordRepository.queryPagingRecordListByAssetId(assetId, pageNum, pageSize)
-            .sortedBy { it.recordTime }
-            .reversed()
+            .sortedByDescending { it.recordTime }
             .map {
                 recordModelTransToViewsUseCase(it).asEntity()
             }

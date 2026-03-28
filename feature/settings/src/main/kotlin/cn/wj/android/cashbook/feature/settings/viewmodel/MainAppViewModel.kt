@@ -114,7 +114,7 @@ class MainAppViewModel @Inject constructor(
         }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
+                started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = false,
             )
 
@@ -143,7 +143,7 @@ class MainAppViewModel @Inject constructor(
     }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = MainAppUiState.Loading,
         )
 
@@ -411,26 +411,35 @@ class MainAppViewModel @Inject constructor(
     }
 
     /** 根据网络返回的版本信息判断是否需要更新 */
-    private fun needUpdate(versionName: String?): Boolean {
-        if (versionName.isNullOrBlank()) {
-            return false
-        }
+    private fun needUpdate(versionName: String?): Boolean = runCatching {
+        if (versionName.isNullOrBlank()) return false
         val localSplits = ApplicationInfo.versionName.split("_")
-        val splits = versionName.replace("Pre Release ", "")
+        val remoteSplits = versionName.replace("Pre Release ", "")
             .replace("Release ", "")
             .split("_")
-        val localVersions = localSplits.first().replace("v", "").split(".")
-        val versions = splits.first().replace("v", "").split(".")
-        if (localSplits.first() == splits.first()) {
-            return splits[1].toInt() > localSplits[1].toInt()
+
+        val localVersionPart = localSplits.first().replace("v", "")
+        val remoteVersionPart = remoteSplits.first().replace("v", "")
+
+        if (localVersionPart == remoteVersionPart) {
+            // 相同主版本号，比较构建号
+            val localBuild = localSplits.getOrNull(1)?.toIntOrNull() ?: 0
+            val remoteBuild = remoteSplits.getOrNull(1)?.toIntOrNull() ?: 0
+            return remoteBuild > localBuild
         }
-        for (i in localVersions.indices) {
-            if (versions[i] > localVersions[i]) {
-                return true
-            }
+
+        // 比较主版本号各段，逐段解析为 Int 进行数值比较
+        val localVersions = localVersionPart.split(".").map { it.toIntOrNull() ?: 0 }
+        val remoteVersions = remoteVersionPart.split(".").map { it.toIntOrNull() ?: 0 }
+        val maxLen = maxOf(localVersions.size, remoteVersions.size)
+        for (i in 0 until maxLen) {
+            val local = localVersions.getOrElse(i) { 0 }
+            val remote = remoteVersions.getOrElse(i) { 0 }
+            if (remote > local) return true
+            if (remote < local) return false
         }
-        return false
-    }
+        false
+    }.getOrDefault(false)
 }
 
 /**

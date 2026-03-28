@@ -19,6 +19,8 @@ package cn.wj.android.cashbook.core.model.entity
 data class RecordDayEntity(
     val day: Int,
     val dayType: Int,
-    val dayIncome: String,
-    val dayExpand: String,
+    /** 日收入，单位：分 */
+    val dayIncome: Long,
+    /** 日支出，单位：分 */
+    val dayExpand: Long,
 ) : RecordViews

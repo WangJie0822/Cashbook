@@ -16,7 +16,6 @@
 
 package cn.wj.android.cashbookcatalog
 
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
@@ -33,10 +32,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import cn.wj.android.cashbook.core.design.component.CbScaffold
-import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
-import com.xxmassdeveloper.mpchartexample.notimportant.MainActivity as ChartMainActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -80,18 +77,6 @@ class MainActivity : AppCompatActivity() {
                                 .fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            CbTextButton(
-                                onClick = {
-                                    startActivity(
-                                        Intent(
-                                            this@MainActivity,
-                                            ChartMainActivity::class.java,
-                                        ),
-                                    )
-                                },
-                            ) {
-                                Text(text = "图标控件预览")
-                            }
                         }
                     },
                 )

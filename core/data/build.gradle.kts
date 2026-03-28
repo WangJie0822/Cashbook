@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.documentfile)
     implementation(libs.androidx.room.runtime)
+    api(libs.androidx.paging.common)
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.google.truth)

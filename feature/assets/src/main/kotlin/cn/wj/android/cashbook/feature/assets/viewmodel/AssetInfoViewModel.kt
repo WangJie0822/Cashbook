@@ -22,11 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.core.ui.runCatchWithProgress
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoBookmarkEnum
 import cn.wj.android.cashbook.feature.assets.enums.AssetInfoDialogEnum
@@ -73,8 +75,8 @@ class AssetInfoViewModel @Inject constructor(
         AssetInfoUiState.Success(
             assetName = assetInfo?.name.orEmpty(),
             isCreditCard = assetInfo?.type?.isCreditCard ?: false,
-            balance = assetInfo?.balance ?: "0",
-            totalAmount = assetInfo?.totalAmount ?: "0",
+            balance = assetInfo?.balance?.toMoneyString() ?: "0.00",
+            totalAmount = assetInfo?.totalAmount?.toMoneyString() ?: "0.00",
             billingDate = assetInfo?.billingDate.orEmpty(),
             repaymentDate = assetInfo?.repaymentDate.orEmpty(),
             openBank = assetInfo?.openBank.orEmpty(),
@@ -124,10 +126,11 @@ class AssetInfoViewModel @Inject constructor(
         dialogState = DialogState.Shown(AssetInfoDialogEnum.DELETE_ASSET)
     }
 
-    fun deleteAsset(onSuccess: () -> Unit) {
+    fun deleteAsset(controller: ProgressDialogController, onSuccess: () -> Unit) {
         // 删除资产
         viewModelScope.launch {
             runCatchWithProgress(
+                controller,
                 hint = progressDialogHintText,
                 cancelable = false,
             ) {

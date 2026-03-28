@@ -28,10 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cn.wj.android.cashbook.core.design.component.CbCard
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
@@ -65,32 +65,33 @@ data class ProgressDialogState(
 )
 
 /**
- * 全局进度条弹窗管理对象
- *
- * > [王杰](mailto:15555650921@163.com) 创建于 2023/10/8
+ * 进度弹窗控制器接口
  */
-object ProgressDialogManager {
-
-    /** 弹窗状态 */
-    var dialogState: DialogState by mutableStateOf(DialogState.Dismiss)
-        private set
-
-    /** 隐藏弹窗 */
-    fun dismiss() {
-        dialogState = DialogState.Dismiss
-    }
-
-    /**
-     * 显示弹窗
-     *
-     * @param hint 提示文本
-     * @param cancelable 是否可取消
-     * @param onDismiss 隐藏回调
-     */
+interface ProgressDialogController {
+    val dialogState: DialogState
+    fun dismiss()
     fun show(
         hint: String? = null,
         cancelable: Boolean = true,
         onDismiss: () -> Unit = {},
+    )
+}
+
+/**
+ * 进度弹窗控制器默认实现
+ */
+class DefaultProgressDialogController : ProgressDialogController {
+    override var dialogState: DialogState by mutableStateOf(DialogState.Dismiss)
+        private set
+
+    override fun dismiss() {
+        dialogState = DialogState.Dismiss
+    }
+
+    override fun show(
+        hint: String?,
+        cancelable: Boolean,
+        onDismiss: () -> Unit,
     ) {
         dialogState = DialogState.Shown(
             ProgressDialogState(
@@ -102,8 +103,13 @@ object ProgressDialogManager {
     }
 }
 
+val LocalProgressDialogController = staticCompositionLocalOf<ProgressDialogController> {
+    error("No ProgressDialogController provided")
+}
+
 /** 显示提示文本为[hint]，能否取消[cancelable]的进度弹窗，并执行[block]逻辑，最低显示[minInterval]ms，最高显示[timeout]ms，逻辑执行完成、异常或超时返回结果，并执行回调[onDismiss] */
 suspend inline fun <R> runCatchWithProgress(
+    controller: ProgressDialogController,
     hint: String? = null,
     cancelable: Boolean = true,
     noinline onDismiss: () -> Unit = {},
@@ -113,7 +119,7 @@ suspend inline fun <R> runCatchWithProgress(
 ): Result<R> {
     val result: Result<R>
     val ms = measureTimeMillis {
-        ProgressDialogManager.show(hint, cancelable, onDismiss)
+        controller.show(hint, cancelable, onDismiss)
         result = runCatching {
             val timeMillis = if (timeout < 0L) {
                 Long.MAX_VALUE
@@ -126,7 +132,7 @@ suspend inline fun <R> runCatchWithProgress(
     if (ms < minInterval) {
         delay(minInterval - ms)
     }
-    ProgressDialogManager.dismiss()
+    controller.dismiss()
     return result
 }
 
@@ -140,20 +146,22 @@ suspend inline fun <R> runCatchWithProgress(
  * ```
  */
 val LocalProgressDialogHint =
-    staticCompositionLocalOf<String> { error("No Back Dispatcher provided") }
+    staticCompositionLocalOf<String> { error("No ProgressDialogHint provided") }
 
 /**
  * 全局进度条弹窗
- * - 状态依赖 [ProgressDialogManager]
+ * - 状态依赖 [LocalProgressDialogController]
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/10/8
  */
 @Composable
 fun ProgressDialog() {
-    ((ProgressDialogManager.dialogState as? DialogState.Shown<*>)?.data as? ProgressDialogState)?.let { state ->
+    val controller = LocalProgressDialogController.current
+    val spacing = LocalSpacing.current
+    ((controller.dialogState as? DialogState.Shown<*>)?.data as? ProgressDialogState)?.let { state ->
         Dialog(
             onDismissRequest = {
-                ProgressDialogManager.dismiss()
+                controller.dismiss()
                 state.onDismiss()
             },
             properties = DialogProperties(
@@ -163,7 +171,7 @@ fun ProgressDialog() {
             content = {
                 CbCard {
                     Column(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
+                        modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.extraLarge),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         LinearProgressIndicator()
@@ -173,7 +181,7 @@ fun ProgressDialog() {
                             } else {
                                 state.hint
                             },
-                            modifier = Modifier.padding(top = 32.dp),
+                            modifier = Modifier.padding(top = spacing.extraLarge),
                         )
                     }
                 }

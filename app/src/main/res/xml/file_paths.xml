@@ -27,4 +27,7 @@
     <external-files-path
         name="Pictures"
         path="Pictures" />
+    <cache-path
+        name="export"
+        path="export/" />
 </paths>

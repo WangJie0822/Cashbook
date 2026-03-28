@@ -16,11 +16,16 @@
 
 package cn.wj.android.cashbook.core.testing.repository
 
+import androidx.paging.PagingData
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
+import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
+import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 
 class FakeRecordRepository : RecordRepository {
 
@@ -108,6 +113,7 @@ class FakeRecordRepository : RecordRepository {
         typeId: Long,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean,
     ): List<RecordModel> {
         return records.filter { it.typeId == typeId }
             .drop(page * pageSize)
@@ -116,9 +122,10 @@ class FakeRecordRepository : RecordRepository {
 
     override suspend fun queryPagingRecordListByTypeIdBetweenDate(
         typeId: Long,
-        date: String,
+        dateRange: String,
         page: Int,
         pageSize: Int,
+        includeChildTypes: Boolean,
     ): List<RecordModel> {
         return records.filter { it.typeId == typeId }
             .drop(page * pageSize)
@@ -144,8 +151,8 @@ class FakeRecordRepository : RecordRepository {
     }
 
     override suspend fun queryRecordListBetweenDate(
-        from: String,
-        to: String,
+        from: Long,
+        to: Long,
     ): List<RecordModel> {
         return records
     }
@@ -157,6 +164,26 @@ class FakeRecordRepository : RecordRepository {
         return MutableStateFlow(records.toList())
     }
 
+    override fun getRecordPagingData(
+        startDate: Long,
+        endDate: Long,
+    ): Flow<PagingData<RecordModel>> {
+        return flowOf(PagingData.from(records.toList()))
+    }
+
+    private val _summaryData = MutableStateFlow<List<RecordViewSummaryModel>>(emptyList())
+
+    fun setSummaryData(data: List<RecordViewSummaryModel>) {
+        _summaryData.value = data
+    }
+
+    override fun queryRecordViewSummariesFlow(
+        startDate: Long,
+        endDate: Long,
+    ): Flow<List<RecordViewSummaryModel>> {
+        return _summaryData
+    }
+
     override suspend fun getDefaultRecord(typeId: Long): RecordModel {
         return RecordModel(
             id = -1L,
@@ -164,13 +191,13 @@ class FakeRecordRepository : RecordRepository {
             typeId = typeId,
             assetId = -1L,
             relatedAssetId = -1L,
-            amount = "0",
-            finalAmount = "0",
-            charges = "0",
-            concessions = "0",
+            amount = 0L,
+            finalAmount = 0L,
+            charges = 0L,
+            concessions = 0L,
             remark = "",
             reimbursable = false,
-            recordTime = "2024-01-01 00:00",
+            recordTime = 1704067200000L, // 2024-01-01 00:00:00 UTC+8
         )
     }
 
@@ -241,5 +268,47 @@ class FakeRecordRepository : RecordRepository {
 
     override suspend fun queryImagesByRecordId(id: Long): List<ImageModel> {
         return imageMap[id] ?: emptyList()
+    }
+
+    override suspend fun queryByWechatTransactionId(
+        booksId: Long,
+        transactionId: String,
+    ): List<RecordModel> {
+        return emptyList()
+    }
+
+    override suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordModel> {
+        return emptyList()
+    }
+
+    override suspend fun batchImportRecords(records: List<RecordTable>): List<Long> {
+        return emptyList()
+    }
+
+    override suspend fun queryExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<ExportRecordModel> {
+        return emptyList()
+    }
+
+    override suspend fun countExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Int {
+        return 0
+    }
+
+    override suspend fun queryEarliestRecordTime(booksId: Long): Long? {
+        return records.filter { it.booksId == booksId }
+            .minByOrNull { it.recordTime }
+            ?.recordTime
     }
 }

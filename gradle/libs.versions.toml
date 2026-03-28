@@ -246,7 +246,9 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "androidx-room" }
 androidx-room-gradle-plugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "androidx-room" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "androidx-room" }
 # Paging 相关 [版本查询(https://developer.android.google.cn/jetpack/androidx/releases/paging)
+androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "androidx-paging" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
 # Navigation 相关 [版本查询](https://developer.android.google.cn/jetpack/androidx/releases/navigation)
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "androidx-navigation" }

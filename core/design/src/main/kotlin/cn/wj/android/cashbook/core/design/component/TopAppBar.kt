@@ -31,8 +31,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import cn.wj.android.cashbook.core.common.TestTag
+import cn.wj.android.cashbook.core.design.R
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 
@@ -50,6 +52,7 @@ fun CbTopAppBar(
     title: @Composable () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    navigationIconContentDescription: String? = stringResource(id = R.string.cd_design_navigate_back),
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
@@ -62,7 +65,7 @@ fun CbTopAppBar(
             CbIconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = CbIcons.ArrowBack,
-                    contentDescription = null,
+                    contentDescription = navigationIconContentDescription,
                 )
             }
         },

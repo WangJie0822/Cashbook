@@ -28,12 +28,15 @@ import cn.wj.android.cashbook.core.data.repository.impl.RecordRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.SettingRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TagRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TypeRepositoryImpl
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
+import cn.wj.android.cashbook.core.data.uitl.impl.BackupRecoveryManagerImpl
 import cn.wj.android.cashbook.core.data.uitl.impl.ConnectivityManagerNetworkMonitor
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Suppress("unused")
 @Module
@@ -41,36 +44,49 @@ import dagger.hilt.components.SingletonComponent
 interface DataModule {
 
     @Binds
+    @Singleton
+    fun bindBackupRecoveryManager(
+        manager: BackupRecoveryManagerImpl,
+    ): BackupRecoveryManager
+
+    @Binds
+    @Singleton
     fun bindNetworkMonitor(
         networkMonitor: ConnectivityManagerNetworkMonitor,
     ): NetworkMonitor
 
     @Binds
+    @Singleton
     fun bindTypeRepository(
         repository: TypeRepositoryImpl,
     ): TypeRepository
 
     @Binds
+    @Singleton
     fun bindTagRepository(
         repository: TagRepositoryImpl,
     ): TagRepository
 
     @Binds
+    @Singleton
     fun bindAssetRepository(
         repository: AssetRepositoryImpl,
     ): AssetRepository
 
     @Binds
+    @Singleton
     fun bindRecordRepository(
         repository: RecordRepositoryImpl,
     ): RecordRepository
 
     @Binds
+    @Singleton
     fun bindBooksRepository(
         repository: BooksRepositoryImpl,
     ): BooksRepository
 
     @Binds
+    @Singleton
     fun bindSettingRepository(
         repository: SettingRepositoryImpl,
     ): SettingRepository

@@ -1,0 +1,564 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 12,
+    "identityHash": "1d427ac0dbc1cd84b20bd0327dbf4eb6",
+    "entities": [
+      {
+        "tableName": "db_books",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `bg_uri` TEXT NOT NULL, `modify_time` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bgUri",
+            "columnName": "bg_uri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modifyTime",
+            "columnName": "modify_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "db_asset",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `books_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `balance` INTEGER NOT NULL, `total_amount` INTEGER NOT NULL, `billing_date` TEXT NOT NULL, `repayment_date` TEXT NOT NULL, `type` INTEGER NOT NULL, `classification` INTEGER NOT NULL, `invisible` INTEGER NOT NULL, `open_bank` TEXT NOT NULL, `card_no` TEXT NOT NULL, `remark` TEXT NOT NULL, `sort` INTEGER NOT NULL, `modify_time` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "booksId",
+            "columnName": "books_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "balance",
+            "columnName": "balance",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalAmount",
+            "columnName": "total_amount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "billingDate",
+            "columnName": "billing_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "repaymentDate",
+            "columnName": "repayment_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "classification",
+            "columnName": "classification",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "invisible",
+            "columnName": "invisible",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "openBank",
+            "columnName": "open_bank",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cardNo",
+            "columnName": "card_no",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remark",
+            "columnName": "remark",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sort",
+            "columnName": "sort",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modifyTime",
+            "columnName": "modify_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_db_asset_books_id",
+            "unique": false,
+            "columnNames": [
+              "books_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_asset_books_id` ON `${TABLE_NAME}` (`books_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "db_type",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `icon_name` TEXT NOT NULL, `type_level` INTEGER NOT NULL, `type_category` INTEGER NOT NULL, `protected` INTEGER NOT NULL, `sort` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parent_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "iconName",
+            "columnName": "icon_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeLevel",
+            "columnName": "type_level",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeCategory",
+            "columnName": "type_category",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "protected",
+            "columnName": "protected",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sort",
+            "columnName": "sort",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_db_type_type_category",
+            "unique": false,
+            "columnNames": [
+              "type_category"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_type_type_category` ON `${TABLE_NAME}` (`type_category`)"
+          },
+          {
+            "name": "index_db_type_parent_id",
+            "unique": false,
+            "columnNames": [
+              "parent_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_type_parent_id` ON `${TABLE_NAME}` (`parent_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "db_record",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `type_id` INTEGER NOT NULL, `asset_id` INTEGER NOT NULL, `into_asset_id` INTEGER NOT NULL, `books_id` INTEGER NOT NULL, `amount` INTEGER NOT NULL, `final_amount` INTEGER NOT NULL, `concessions` INTEGER NOT NULL, `charge` INTEGER NOT NULL, `remark` TEXT NOT NULL, `reimbursable` INTEGER NOT NULL, `record_time` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "typeId",
+            "columnName": "type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "asset_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intoAssetId",
+            "columnName": "into_asset_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "booksId",
+            "columnName": "books_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "finalAmount",
+            "columnName": "final_amount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "concessions",
+            "columnName": "concessions",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "charge",
+            "columnName": "charge",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remark",
+            "columnName": "remark",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reimbursable",
+            "columnName": "reimbursable",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordTime",
+            "columnName": "record_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_db_record_books_id",
+            "unique": false,
+            "columnNames": [
+              "books_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_books_id` ON `${TABLE_NAME}` (`books_id`)"
+          },
+          {
+            "name": "index_db_record_type_id",
+            "unique": false,
+            "columnNames": [
+              "type_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_type_id` ON `${TABLE_NAME}` (`type_id`)"
+          },
+          {
+            "name": "index_db_record_asset_id",
+            "unique": false,
+            "columnNames": [
+              "asset_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_asset_id` ON `${TABLE_NAME}` (`asset_id`)"
+          },
+          {
+            "name": "index_db_record_into_asset_id",
+            "unique": false,
+            "columnNames": [
+              "into_asset_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_into_asset_id` ON `${TABLE_NAME}` (`into_asset_id`)"
+          },
+          {
+            "name": "index_db_record_record_time",
+            "unique": false,
+            "columnNames": [
+              "record_time"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_record_time` ON `${TABLE_NAME}` (`record_time`)"
+          },
+          {
+            "name": "index_db_record_books_id_record_time",
+            "unique": false,
+            "columnNames": [
+              "books_id",
+              "record_time"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_books_id_record_time` ON `${TABLE_NAME}` (`books_id`, `record_time`)"
+          }
+        ]
+      },
+      {
+        "tableName": "db_tag",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `books_id` INTEGER NOT NULL, `invisible` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "booksId",
+            "columnName": "books_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "invisible",
+            "columnName": "invisible",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "db_tag_with_record",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `record_id` INTEGER NOT NULL, `tag_id` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "recordId",
+            "columnName": "record_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tagId",
+            "columnName": "tag_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_db_tag_with_record_record_id",
+            "unique": false,
+            "columnNames": [
+              "record_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_tag_with_record_record_id` ON `${TABLE_NAME}` (`record_id`)"
+          },
+          {
+            "name": "index_db_tag_with_record_tag_id",
+            "unique": false,
+            "columnNames": [
+              "tag_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_tag_with_record_tag_id` ON `${TABLE_NAME}` (`tag_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "db_record_with_related",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `record_id` INTEGER NOT NULL, `related_record_id` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "recordId",
+            "columnName": "record_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "relatedRecordId",
+            "columnName": "related_record_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_db_record_with_related_record_id",
+            "unique": false,
+            "columnNames": [
+              "record_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_with_related_record_id` ON `${TABLE_NAME}` (`record_id`)"
+          },
+          {
+            "name": "index_db_record_with_related_related_record_id",
+            "unique": false,
+            "columnNames": [
+              "related_record_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_record_with_related_related_record_id` ON `${TABLE_NAME}` (`related_record_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "db_image_with_related",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `record_id` INTEGER NOT NULL, `image_path` TEXT NOT NULL, `image_bytes` BLOB NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "recordId",
+            "columnName": "record_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "image_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bytes",
+            "columnName": "image_bytes",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_db_image_with_related_record_id",
+            "unique": false,
+            "columnNames": [
+              "record_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_db_image_with_related_record_id` ON `${TABLE_NAME}` (`record_id`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1d427ac0dbc1cd84b20bd0327dbf4eb6')"
+    ]
+  }
+}

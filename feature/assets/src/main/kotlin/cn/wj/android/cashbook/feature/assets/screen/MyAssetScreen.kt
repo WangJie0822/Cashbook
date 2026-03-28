@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.feature.assets.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -56,6 +57,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.ext.withCNY
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.component.CbFloatingActionButton
@@ -68,7 +70,6 @@ import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
-import cn.wj.android.cashbook.core.ui.BackPressHandler
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
 import cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetUiState
@@ -99,10 +100,8 @@ internal fun MyAssetRoute(
     val showMoreDialog = viewModel.showMoreDialog
 
     // 显示更多显示时返回隐藏弹窗
-    if (showMoreDialog) {
-        BackPressHandler {
-            viewModel.dismissShowMoreDialog()
-        }
+    BackHandler(enabled = showMoreDialog) {
+        viewModel.dismissShowMoreDialog()
     }
 
     MyAssetScreen(
@@ -164,7 +163,7 @@ internal fun MyAssetScreen(
                 CbFloatingActionButton(onClick = onRequestDisplayShowMoreDialog) {
                     Icon(
                         imageVector = CbIcons.MoreVert,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.cd_more_options),
                     )
                 }
             },
@@ -242,7 +241,7 @@ private fun ShowMoreContent(
                         onCloseClick.invoke()
                     },
                 ) {
-                    Icon(imageVector = CbIcons.Add, contentDescription = null)
+                    Icon(imageVector = CbIcons.Add, contentDescription = stringResource(id = R.string.cd_add))
                 }
             }
 
@@ -274,7 +273,7 @@ private fun ShowMoreContent(
                 ) {
                     Icon(
                         imageVector = CbIcons.VisibilityOff,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.cd_visibility_toggle),
                     )
                 }
             }
@@ -282,7 +281,7 @@ private fun ShowMoreContent(
             CbFloatingActionButton(
                 onClick = onCloseClick,
             ) {
-                Icon(imageVector = CbIcons.Close, contentDescription = null)
+                Icon(imageVector = CbIcons.Close, contentDescription = stringResource(id = R.string.cd_close))
             }
         }
     }
@@ -396,7 +395,7 @@ internal fun AssetTypedInfoItem(
             )
         }
         Text(
-            text = assetTypedInfo.totalAmount.withCNY(),
+            text = assetTypedInfo.totalAmount.toMoneyCNY(),
             style = MaterialTheme.typography.bodyLarge,
         )
         Icon(

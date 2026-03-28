@@ -109,7 +109,7 @@ internal fun ImagePreviewDialog(
                 modifier = Modifier
                     .align(Alignment.TopEnd),
             ) {
-                Icon(imageVector = CbIcons.Cancel, contentDescription = null)
+                Icon(imageVector = CbIcons.Cancel, contentDescription = stringResource(id = R.string.cd_close))
             }
         }
     }

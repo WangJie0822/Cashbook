@@ -16,10 +16,12 @@
 
 package cn.wj.android.cashbook.core.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
+import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -43,7 +45,7 @@ interface RecordDao {
 
     @Query(
         value = """
-        SELECT * FROM db_record WHERE id IN (SELECT record_id FROM db_record_with_related WHERE record_id=:recordId)
+        SELECT * FROM db_record WHERE id IN (SELECT related_record_id FROM db_record_with_related WHERE record_id=:recordId)
     """,
     )
     suspend fun queryRelatedById(recordId: Long): List<RecordTable>
@@ -69,6 +71,46 @@ interface RecordDao {
         endDate: Long,
     ): List<RecordTable>
 
+    /** 分页查询日期范围内的记录，按时间倒序 */
+    @Query(
+        value = """
+            SELECT * FROM db_record
+            WHERE record_time>=:startDate
+            AND record_time<:endDate
+            AND books_id=:booksId
+            ORDER BY record_time DESC
+        """,
+    )
+    fun pagingQueryByBooksIdBetweenDate(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): PagingSource<Int, RecordTable>
+
+    /** 查询日期范围内的轻量记录视图（含类型分类），用于计算收支汇总 */
+    @Query(
+        value = """
+            SELECT db_record.id as id, db_record.type_id as typeId, db_record.amount as amount, db_record.final_amount as finalAmount,
+            db_record.charge as charges, db_record.concessions as concessions,
+            db_record.remark as remark, db_record.reimbursable as reimbursable, db_record.record_time as recordTime,
+            db_type.type_category as typeCategory, db_type.name as typeName, db_type.icon_name as typeIconResName,
+            db_asset.name as assetName, db_asset.classification as assetClassification,
+            related.name as relatedAssetName, related.classification as relatedAssetClassification
+            FROM db_record
+            JOIN db_type ON db_type.id = db_record.type_id
+            LEFT JOIN db_asset ON db_asset.id = db_record.asset_id
+            LEFT JOIN db_asset AS related ON related.id = db_record.into_asset_id
+            WHERE db_record.books_id = :booksId
+            AND db_record.record_time >= :startDate
+            AND db_record.record_time < :endDate
+        """,
+    )
+    suspend fun queryViewsBetweenDate(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<RecordViewsRelation>
+
     @Query(
         value = """
         SELECT * FROM db_record WHERE books_id=:booksId AND reimbursable=$SWITCH_INT_ON AND record_time>=:dateTime
@@ -78,9 +120,10 @@ interface RecordDao {
 
     @Query(
         value = """
-        SELECT db_record.id as id, db_record.amount as amount, db_record.charge as charges, db_record.concessions as  concessions, 
+        SELECT db_record.id as id, db_record.type_id as typeId, db_record.amount as amount, db_record.final_amount as finalAmount,
+        db_record.charge as charges, db_record.concessions as concessions,
         db_record.remark as remark, db_record.reimbursable as reimbursable, db_record.record_time as recordTime,
-        db_type.type_category as typeCategory,db_type.name as typeName, db_type.icon_name as typeIconResName,
+        db_type.type_category as typeCategory, db_type.name as typeName, db_type.icon_name as typeIconResName,
         db_asset.name as assetName, db_asset.classification as assetClassification,
         related.name as relatedAssetName, related.classification as relatedAssetClassification
         FROM db_record
@@ -92,8 +135,8 @@ interface RecordDao {
     )
     suspend fun query(booksId: Long): List<RecordViewsRelation>
 
-    /** 资产 id 为 [assetId] 的第 [pageNum] 页 [pageSize] 条记录 */
-    @Query("SELECT * FROM db_record WHERE books_id=:booksId AND asset_id=:assetId ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
+    /** 资产 id 为 [assetId]（含转入资产）的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query("SELECT * FROM db_record WHERE books_id=:booksId AND (asset_id=:assetId OR into_asset_id=:assetId) ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum")
     suspend fun queryRecordByAssetId(
         booksId: Long,
         assetId: Long,
@@ -101,12 +144,12 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
-    /** 类型 id 为 [typeId] 的第 [pageNum] 页 [pageSize] 条记录 */
+    /** 类型 id 为 [typeId]（包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
     @Query(
         """
-        SELECT * FROM db_record 
-        WHERE books_id=:booksId 
-        AND (type_id=:typeId 
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND (type_id=:typeId
         OR type_id IN (SELECT id FROM db_type WHERE parent_id=:typeId))
         ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
     """,
@@ -118,19 +161,55 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
-    /** 类型 id 为 [typeId] 的第 [pageNum] 页 [pageSize] 条记录 */
+    /** 类型 id 精确为 [typeId]（不包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
     @Query(
         """
-        SELECT * FROM db_record 
-        WHERE books_id=:booksId 
-        AND record_time>=:startDate 
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND type_id=:typeId
+        ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
+    """,
+    )
+    suspend fun queryRecordByTypeIdExact(
+        booksId: Long,
+        typeId: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
+    /** 类型 id 为 [typeId]（包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query(
+        """
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND record_time>=:startDate
         AND record_time<:endDate
-        AND (type_id=:typeId 
+        AND (type_id=:typeId
         OR type_id IN (SELECT id FROM db_type WHERE parent_id=:typeId))
         ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
     """,
     )
     suspend fun queryRecordByTypeIdBetween(
+        booksId: Long,
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
+    /** 类型 id 精确为 [typeId]（不包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query(
+        """
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND record_time>=:startDate
+        AND record_time<:endDate
+        AND type_id=:typeId
+        ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
+    """,
+    )
+    suspend fun queryRecordByTypeIdExactBetween(
         booksId: Long,
         typeId: Long,
         startDate: Long,
@@ -162,14 +241,11 @@ interface RecordDao {
 
     @Query(
         value = """
-        SELECT * FROM db_record 
-        WHERE books_id=:booksId 
-        AND (remark LIKE '%'||:keyword||'%'
-        OR amount LIKE '%'||:keyword||'%'
-        OR charge  LIKE '%'||:keyword||'%'
-        OR concessions LIKE '%'||:keyword||'%') 
-        ORDER BY record_time 
-        DESC LIMIT :pageSize 
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND remark LIKE '%'||:keyword||'%'
+        ORDER BY record_time
+        DESC LIMIT :pageSize
         OFFSET :pageNum
     """,
     )
@@ -180,8 +256,11 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
+    @Query("SELECT * FROM db_record WHERE id IN (:ids)")
+    suspend fun queryByIds(ids: List<Long>): List<RecordTable>
+
     @Query("SELECT * FROM db_record WHERE type_id=:id")
-    fun queryByTypeId(id: Long): List<RecordTable>
+    suspend fun queryByTypeId(id: Long): List<RecordTable>
 
     @Query(
         """
@@ -194,15 +273,15 @@ interface RecordDao {
         )
     """,
     )
-    fun queryByTypeCategory(
+    suspend fun queryByTypeCategory(
         typeCategoryId: Int,
     ): List<RecordTable>
 
     @Query("SELECT * FROM db_record_with_related")
-    fun queryRelatedRecord(): List<RecordWithRelatedTable>
+    suspend fun queryRelatedRecord(): List<RecordWithRelatedTable>
 
     @Query("SELECT COUNT(*) FROM db_record_with_related WHERE related_record_id=:id OR record_id=:id")
-    fun queryRelatedRecordCountByID(id: Long): Int
+    suspend fun queryRelatedRecordCountByID(id: Long): Int
 
     @Update
     suspend fun updateRecord(list: List<RecordTable>): Int
@@ -225,7 +304,7 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getExpenditureRecordListAfterTime(
+    suspend fun getExpenditureRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
         incomeCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
@@ -240,22 +319,22 @@ interface RecordDao {
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getExpenditureReimburseRecordListAfterTime(
+    suspend fun getExpenditureReimburseRecordListAfterTime(
         booksId: Long,
         recordTime: Long,
     ): List<RecordTable>
 
     @Query(
         """
-        SELECT * FROM db_record 
-        WHERE record_time>=:recordTime 
+        SELECT * FROM db_record
+        WHERE record_time>=:recordTime
         AND type_id IN (SELECT id FROM db_type WHERE type_category=:incomeCategory)
         AND books_id=:booksId
-        AND (remark LIKE :keyword OR amount LIKE :keyword)
+        AND remark LIKE :keyword
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getExpenditureRecordListByKeywordAfterTime(
+    suspend fun getExpenditureRecordListByKeywordAfterTime(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -264,27 +343,27 @@ interface RecordDao {
 
     @Query(
         """
-        SELECT COUNT(*) FROM db_record 
-        WHERE record_time>=:recordTime 
-        AND asset_id=:assetId
+        SELECT COUNT(*) FROM db_record
+        WHERE record_time>=:recordTime
+        AND (asset_id=:assetId OR into_asset_id=:assetId)
     """,
     )
-    fun getRecordCountByAssetIdAfterTime(
+    suspend fun getRecordCountByAssetIdAfterTime(
         assetId: Long,
         recordTime: Long,
     ): Int
 
     @Query(
         """
-        SELECT * FROM db_record 
-        WHERE record_time>=:recordTime 
+        SELECT * FROM db_record
+        WHERE record_time>=:recordTime
         AND reimbursable=$SWITCH_INT_ON
-        AND books_id=:booksId 
-        AND (remark LIKE :keyword OR amount LIKE :keyword)
+        AND books_id=:booksId
+        AND remark LIKE :keyword
         ORDER BY record_time DESC LIMIT 50
     """,
     )
-    fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
+    suspend fun getLastThreeMonthExpenditureReimburseRecordListByKeyword(
         keyword: String,
         booksId: Long,
         recordTime: Long,
@@ -296,7 +375,7 @@ interface RecordDao {
         WHERE asset_id=:assetId OR into_asset_id=:assetId
     """,
     )
-    fun deleteWithAsset(assetId: Long)
+    suspend fun deleteWithAsset(assetId: Long)
 
     @Query(
         value = """
@@ -305,7 +384,7 @@ interface RecordDao {
         OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
     """,
     )
-    fun deleteRelatedWithAsset(assetId: Long)
+    suspend fun deleteRelatedWithAsset(assetId: Long)
 
     @Query(
         """
@@ -313,4 +392,82 @@ interface RecordDao {
     """,
     )
     suspend fun queryImagesByRecordId(recordId: Long): List<ImageWithRelatedTable>
+
+    @Query(
+        """
+    SELECT * FROM db_record
+    WHERE books_id=:booksId
+    AND remark LIKE '%[微信单号:' || :transactionId || ']%'
+""",
+    )
+    suspend fun queryByWechatTransactionId(booksId: Long, transactionId: String): List<RecordTable>
+
+    @Query(
+        """
+    SELECT * FROM db_record
+    WHERE books_id=:booksId
+    AND record_time>=:startTime
+    AND record_time<=:endTime
+    AND amount=:amount
+""",
+    )
+    suspend fun queryByTimeAndAmount(
+        booksId: Long,
+        startTime: Long,
+        endTime: Long,
+        amount: Double,
+    ): List<RecordTable>
+
+    /** 查询指定账本和日期范围内的记录用于导出（排除转账），含类型父子关系和资产名 */
+    @Query(
+        value = """
+        SELECT db_record.record_time AS recordTime,
+               db_type.type_category AS typeCategory,
+               COALESCE(db_asset.name, '') AS assetName,
+               CASE WHEN db_type.parent_id = -1 THEN db_type.name
+                    ELSE COALESCE(parent_type.name, db_type.name)
+               END AS categoryName,
+               CASE WHEN db_type.parent_id = -1 THEN ''
+                    ELSE db_type.name
+               END AS subCategoryName,
+               db_record.amount AS amount,
+               db_record.remark AS remark
+        FROM db_record
+        JOIN db_type ON db_type.id = db_record.type_id
+        LEFT JOIN db_type AS parent_type ON parent_type.id = db_type.parent_id
+        LEFT JOIN db_asset ON db_asset.id = db_record.asset_id
+        WHERE db_record.books_id = :booksId
+          AND db_record.record_time >= :startDate
+          AND db_record.record_time < :endDate
+          AND db_type.type_category != 2
+        ORDER BY db_record.record_time ASC
+    """,
+    )
+    suspend fun queryExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<ExportRecordRelation>
+
+    /** 查询导出记录数量（排除转账），用于 Bottom Sheet 按钮显示 */
+    @Query(
+        value = """
+        SELECT COUNT(*)
+        FROM db_record
+        JOIN db_type ON db_type.id = db_record.type_id
+        WHERE db_record.books_id = :booksId
+          AND db_record.record_time >= :startDate
+          AND db_record.record_time < :endDate
+          AND db_type.type_category != 2
+    """,
+    )
+    suspend fun countExportRecords(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Int
+
+    /** 查询指定账本中最早的记录时间，用于日期选择器的默认起始日期 */
+    @Query("SELECT MIN(record_time) FROM db_record WHERE books_id = :booksId")
+    suspend fun queryEarliestRecordTime(booksId: Long): Long?
 }

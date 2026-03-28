@@ -87,7 +87,7 @@ class SelectRelatedRecordViewModel @Inject constructor(
         }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
+                started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = SelectRelatedRecordUiState.Loading,
             )
 

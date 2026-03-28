@@ -155,6 +155,7 @@ dependencies {
     implementation(projects.feature.assets)
     implementation(projects.feature.records)
     implementation(projects.feature.settings)
+    implementation(projects.feature.recordImport)
 
     // 架构
     implementation(projects.core.common)

@@ -34,10 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.design.R
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.design.util.CalculatorUtils
 
 /**
@@ -51,11 +54,12 @@ import cn.wj.android.cashbook.core.design.util.CalculatorUtils
  */
 @Composable
 fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String) -> Unit) {
+    val spacing = LocalSpacing.current
     var text: String by remember { mutableStateOf(defaultText.ifBlank { "0" }) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(spacing.medium),
     ) {
         TextField(
             value = text,
@@ -175,7 +179,7 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { text = CalculatorUtils.onBackPressed(text) },
                 ) {
-                    Icon(imageVector = CbIcons.Backspace, contentDescription = null)
+                    Icon(imageVector = CbIcons.Backspace, contentDescription = stringResource(id = R.string.cd_design_backspace))
                 }
                 CbTextButton(
                     modifier = Modifier.fillMaxWidth(),
@@ -193,7 +197,7 @@ fun Calculator(defaultText: String, primaryColor: Color, onConfirmClick: (String
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp)
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .padding(horizontal = 12.dp, vertical = spacing.small)
                         .background(primaryColor),
                     onClick = {
                         if (CalculatorUtils.needShowEqualSign(text)) {
