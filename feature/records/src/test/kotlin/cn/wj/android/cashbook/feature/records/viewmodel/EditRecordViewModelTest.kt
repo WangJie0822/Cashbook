@@ -29,6 +29,7 @@ import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.core.ui.ProgressDialogController
 import cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCase
 import cn.wj.android.cashbook.domain.usecase.SaveRecordUseCase
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
@@ -62,6 +63,9 @@ class EditRecordViewModelTest {
     private lateinit var recordRepository: FakeRecordRepository
     private lateinit var settingRepository: FakeSettingRepository
     private lateinit var viewModel: EditRecordViewModel
+
+    /** 测试用 ProgressDialogController 空实现 */
+    private val fakeProgressDialogController = FakeProgressDialogController()
 
     @Before
     fun setup() {
@@ -596,7 +600,7 @@ class EditRecordViewModelTest {
 
         // 金额为 0 不修改
         var successCalled = false
-        viewModel.trySave("保存中") { successCalled = true }
+        viewModel.trySave(fakeProgressDialogController, "保存中") { successCalled = true }
         advanceUntilIdle()
 
         assertThat(viewModel.shouldDisplayBookmark)
@@ -625,7 +629,7 @@ class EditRecordViewModelTest {
         advanceUntilIdle()
 
         var successCalled = false
-        viewModel.trySave("保存中") { successCalled = true }
+        viewModel.trySave(fakeProgressDialogController, "保存中") { successCalled = true }
         advanceUntilIdle()
 
         assertThat(viewModel.shouldDisplayBookmark)
@@ -656,7 +660,7 @@ class EditRecordViewModelTest {
         advanceUntilIdle()
 
         var successCalled = false
-        viewModel.trySave("保存中") { successCalled = true }
+        viewModel.trySave(fakeProgressDialogController, "保存中") { successCalled = true }
         advanceUntilIdle()
 
         assertThat(successCalled).isTrue()
@@ -687,7 +691,7 @@ class EditRecordViewModelTest {
         viewModel.switchReimbursable()
         advanceUntilIdle()
 
-        viewModel.trySave("保存中") {}
+        viewModel.trySave(fakeProgressDialogController, "保存中") {}
         advanceUntilIdle()
 
         // 支出类型应保留 reimbursable
@@ -720,7 +724,7 @@ class EditRecordViewModelTest {
         viewModel.switchReimbursable()
         advanceUntilIdle()
 
-        viewModel.trySave("保存中") {}
+        viewModel.trySave(fakeProgressDialogController, "保存中") {}
         advanceUntilIdle()
 
         // 收入类型 reimbursable 强制为 false
@@ -752,7 +756,7 @@ class EditRecordViewModelTest {
         viewModel.updateConcessions("5")
         advanceUntilIdle()
 
-        viewModel.trySave("保存中") {}
+        viewModel.trySave(fakeProgressDialogController, "保存中") {}
         advanceUntilIdle()
 
         // 收入类型优惠强制为 0
@@ -782,7 +786,7 @@ class EditRecordViewModelTest {
         viewModel.updateRelatedAsset(10L)
         advanceUntilIdle()
 
-        viewModel.trySave("保存中") {}
+        viewModel.trySave(fakeProgressDialogController, "保存中") {}
         advanceUntilIdle()
 
         // 非转账类型关联资产强制为 -1
@@ -974,4 +978,11 @@ class EditRecordViewModelTest {
     }
 
     // endregion
+}
+
+/** ProgressDialogController 测试用空实现 */
+private class FakeProgressDialogController : ProgressDialogController {
+    override val dialogState: DialogState = DialogState.Dismiss
+    override fun dismiss() = Unit
+    override fun show(hint: String?, cancelable: Boolean, onDismiss: () -> Unit) = Unit
 }
