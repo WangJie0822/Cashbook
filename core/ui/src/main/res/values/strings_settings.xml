@@ -166,4 +166,19 @@
     <string name="import_deselect_all">取消全选</string>
     <string name="import_select_asset">选择资产</string>
     <string name="import_select_category">选择分类</string>
+
+    <!-- 导出 -->
+    <string name="export_bill">导出账单</string>
+    <string name="export_to_daily_account">导出到一日记账</string>
+    <string name="export_to_daily_account_hint">导出记录为一日记账通用导入格式(.csv)</string>
+    <string name="export_sheet_title">导出到一日记账</string>
+    <string name="export_target_book">账本</string>
+    <string name="export_date_range">日期范围</string>
+    <string name="export_start_date">开始日期</string>
+    <string name="export_end_date">结束日期</string>
+    <string name="export_confirm">导出 (%1$d条)</string>
+    <string name="export_confirm_empty">导出 (0条)</string>
+    <string name="export_exporting">正在导出…</string>
+    <string name="export_success">成功导出 %1$d 条记录</string>
+    <string name="export_failed">导出失败：%1$s</string>
 </resources>
