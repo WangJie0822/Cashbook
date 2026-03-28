@@ -45,4 +45,7 @@ dependencies {
 
     // HTML 解析
     implementation(libs.jsoup)
+
+    testImplementation(projects.core.testing)
+    testImplementation(libs.squareup.okhttp3.mockwebserver)
 }

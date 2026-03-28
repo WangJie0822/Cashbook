@@ -281,6 +281,7 @@ androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profi
 squareup-javapoet = { group = "com.squareup", name = "javapoet", version.ref = "squareup-javapoet" }
 # okhttp3 [Github](https://github.com/square/okhttp) [指南](https://square.github.io/okhttp)
 squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "squareup-okhttp3" }
+squareup-okhttp3-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "squareup-okhttp3" }
 # Retrofit2 [Github](https://github.com/square/retrofit) [指南](https://square.github.io/retrofit/)
 squareup-retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "squareup-retrofit2" }
 jakewharton-retrofit2-converter-kotlin = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "jakewharton-retrofit2-converter-kotlin" }
