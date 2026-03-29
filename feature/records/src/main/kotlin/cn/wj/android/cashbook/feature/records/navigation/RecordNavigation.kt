@@ -52,6 +52,7 @@ data class TypedAnalytics(
     val tagId: Long = -1L,
     val typeId: Long = -1L,
     val date: String = "",
+    val includeChildTypes: Boolean = true,
 )
 
 /** 路由 - 选择关联记录 */
@@ -85,6 +86,7 @@ fun NavController.naviToTypedAnalytics(
             tagId = tagId,
             typeId = typeId,
             date = date.orEmpty(),
+            includeChildTypes = includeChildTypes,
         ),
     )
 }
@@ -153,6 +155,7 @@ fun NavGraphBuilder.typedAnalyticsScreen(
             typeId = route.typeId,
             tagId = route.tagId,
             date = route.date,
+            includeChildTypes = route.includeChildTypes,
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
             onRequestPopBackStack = onRequestPopBackStack,
