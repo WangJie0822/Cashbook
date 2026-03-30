@@ -20,7 +20,7 @@ kotlinx-serialization-json = "1.8.1"
 
 # Google 相关
 # Material [版本查询]((https://mvnrepository.com/artifact/com.google.android.material)
-google-material = "1.12.0"
+google-material = "1.13.0"
 # accompanist 组件库 [指南](https://google.github.io/accompanist/)
 # [版本查询](https://mvnrepository.com/artifact/com.google.accompanist)
 google-accompanist = "0.36.0"
