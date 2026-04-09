@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.NO_ASSET_ID
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
@@ -43,10 +44,17 @@ class SaveRecordUseCase @Inject constructor(
         require(recordModel.charges >= 0) { "手续费不能为负数" }
         require(recordModel.concessions >= 0) { "优惠不能为负数" }
         require(recordModel.recordTime > 0) { "记录时间无效" }
+        // 处理无效 assetId：历史版本升级可能导致 assetId 为 0 或其他无效值
+        // 将其统一设为 NO_ASSET_ID（-1L），表示不关联资产
+        val normalizedRecord = if (recordModel.assetId > 0 || recordModel.assetId == NO_ASSET_ID) {
+            recordModel
+        } else {
+            recordModel.copy(assetId = NO_ASSET_ID)
+        }
         // 向数据库内更新最新记录信息及关联信息
-        val needRelated = typeRepository.needRelated(recordModel.typeId)
+        val needRelated = typeRepository.needRelated(normalizedRecord.typeId)
         recordRepository.updateRecord(
-            record = recordModel,
+            record = normalizedRecord,
             tagIdList = tagIdList,
             needRelated = needRelated,
             relatedRecordIdList = relatedRecordIdList,
