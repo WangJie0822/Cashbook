@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.NO_ASSET_ID
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
@@ -111,5 +112,49 @@ class SaveRecordUseCaseTest {
     fun when_recordTime_is_zero_then_throws() = runTest {
         val record = createRecordModel(amount = 100L, recordTime = 0L)
         useCase(record, emptyList(), emptyList(), emptyList())
+    }
+
+    @Test
+    fun when_assetId_is_zero_then_normalized_to_no_asset_id() = runTest {
+        // 模拟历史版本升级后 assetId 为 0 的场景
+        val record = createRecordModel(amount = 100L, assetId = 0L)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 assetId 被转换为 NO_ASSET_ID（-1L）
+        assertThat(recordRepository.lastUpdatedRecord?.assetId).isEqualTo(NO_ASSET_ID)
+    }
+
+    @Test
+    fun when_assetId_is_negative_but_not_no_asset_id_then_normalized() = runTest {
+        // 模拟 assetId 为其他无效负数的场景
+        val record = createRecordModel(amount = 100L, assetId = -2L)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 assetId 被转换为 NO_ASSET_ID（-1L）
+        assertThat(recordRepository.lastUpdatedRecord?.assetId).isEqualTo(NO_ASSET_ID)
+    }
+
+    @Test
+    fun when_assetId_is_valid_positive_then_unchanged() = runTest {
+        // 模拟有效的 assetId
+        val record = createRecordModel(amount = 100L, assetId = 5L)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 assetId 保持不变
+        assertThat(recordRepository.lastUpdatedRecord?.assetId).isEqualTo(5L)
+    }
+
+    @Test
+    fun when_assetId_is_no_asset_id_then_unchanged() = runTest {
+        // 模拟 assetId 已经是 NO_ASSET_ID 的场景
+        val record = createRecordModel(amount = 100L, assetId = NO_ASSET_ID)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 assetId 保持为 NO_ASSET_ID（-1L）
+        assertThat(recordRepository.lastUpdatedRecord?.assetId).isEqualTo(NO_ASSET_ID)
     }
 }
