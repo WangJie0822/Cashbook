@@ -157,4 +157,48 @@ class SaveRecordUseCaseTest {
         // 验证 assetId 保持为 NO_ASSET_ID（-1L）
         assertThat(recordRepository.lastUpdatedRecord?.assetId).isEqualTo(NO_ASSET_ID)
     }
+
+    @Test
+    fun when_relatedAssetId_is_zero_then_normalized_to_no_asset_id() = runTest {
+        // 模拟历史版本升级后 relatedAssetId 为 0 的场景
+        val record = createRecordModel(amount = 100L, relatedAssetId = 0L)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 relatedAssetId 被转换为 NO_ASSET_ID（-1L）
+        assertThat(recordRepository.lastUpdatedRecord?.relatedAssetId).isEqualTo(NO_ASSET_ID)
+    }
+
+    @Test
+    fun when_relatedAssetId_is_negative_but_not_no_asset_id_then_normalized() = runTest {
+        // 模拟 relatedAssetId 为其他无效负数的场景
+        val record = createRecordModel(amount = 100L, relatedAssetId = -2L)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 relatedAssetId 被转换为 NO_ASSET_ID（-1L）
+        assertThat(recordRepository.lastUpdatedRecord?.relatedAssetId).isEqualTo(NO_ASSET_ID)
+    }
+
+    @Test
+    fun when_relatedAssetId_is_valid_positive_then_unchanged() = runTest {
+        // 模拟有效的 relatedAssetId
+        val record = createRecordModel(amount = 100L, relatedAssetId = 5L)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 relatedAssetId 保持不变
+        assertThat(recordRepository.lastUpdatedRecord?.relatedAssetId).isEqualTo(5L)
+    }
+
+    @Test
+    fun when_relatedAssetId_is_no_asset_id_then_unchanged() = runTest {
+        // 模拟 relatedAssetId 已经是 NO_ASSET_ID 的场景
+        val record = createRecordModel(amount = 100L, relatedAssetId = NO_ASSET_ID)
+
+        useCase(record, emptyList(), emptyList(), emptyList())
+
+        // 验证 relatedAssetId 保持为 NO_ASSET_ID（-1L）
+        assertThat(recordRepository.lastUpdatedRecord?.relatedAssetId).isEqualTo(NO_ASSET_ID)
+    }
 }

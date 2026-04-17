@@ -44,13 +44,12 @@ class SaveRecordUseCase @Inject constructor(
         require(recordModel.charges >= 0) { "手续费不能为负数" }
         require(recordModel.concessions >= 0) { "优惠不能为负数" }
         require(recordModel.recordTime > 0) { "记录时间无效" }
-        // 处理无效 assetId：历史版本升级可能导致 assetId 为 0 或其他无效值
+        // 处理无效 assetId / relatedAssetId：历史版本升级可能导致其为 0 或其他无效值
         // 将其统一设为 NO_ASSET_ID（-1L），表示不关联资产
-        val normalizedRecord = if (recordModel.assetId > 0 || recordModel.assetId == NO_ASSET_ID) {
-            recordModel
-        } else {
-            recordModel.copy(assetId = NO_ASSET_ID)
-        }
+        val normalizedRecord = recordModel.copy(
+            assetId = recordModel.assetId.normalizeAssetId(),
+            relatedAssetId = recordModel.relatedAssetId.normalizeAssetId(),
+        )
         // 向数据库内更新最新记录信息及关联信息
         val needRelated = typeRepository.needRelated(normalizedRecord.typeId)
         recordRepository.updateRecord(
@@ -61,4 +60,7 @@ class SaveRecordUseCase @Inject constructor(
             relatedImageList = relatedImageList,
         )
     }
+
+    private fun Long.normalizeAssetId(): Long =
+        if (this > 0 || this == NO_ASSET_ID) this else NO_ASSET_ID
 }
