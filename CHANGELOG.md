@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+## [1.0.10_26041709]
+### Fixed
+- 修复历史版本升级后，无效 assetId 导致新增/编辑记录保存失败的问题；
+- 补充 relatedAssetId 同类归一化处理，防止转账关联资产的相同问题；
+- 修复分类分析页面 includeChildTypes 导航参数丢失的问题；
+### Changed
+- 升级 Kotlin 至 2.3.20；
+- 升级依赖：core-ktx 1.18.0、test-core 1.7.0、hilt 1.3.0、protobuf 4.34.1、paging 3.4.2；
+### Tests
+- 新增多模块单元测试覆盖（app/datastore/network/record-import/types/domain/common/records 等）；
+
 ## [1.0.9_26032820]
 ### Add
 - 新增微信账单导入功能；
