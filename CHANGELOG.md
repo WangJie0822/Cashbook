@@ -4,13 +4,15 @@
 
 ## [Unreleased]
 
-## [1.0.10_26041709]
+## [1.0.10_26041711]
 ### Fixed
 - 修复历史版本升级后，无效 assetId 导致新增/编辑记录保存失败的问题；
 - 补充 relatedAssetId 同类归一化处理，防止转账关联资产的相同问题；
 - 修复分类分析页面 includeChildTypes 导航参数丢失的问题；
+- 修复 `painterDrawableResource` 在 Kotlin 2.3 下因 `runCatching` 包含 @Composable 调用导致的编译失败；
 ### Changed
-- 升级 Kotlin 至 2.3.20；
+- 升级 Kotlin 至 2.2.0、KSP 至 2.2.0-2.0.2（原 PR 升到 Kotlin 2.3.20 dev 版，与 KSP/Hilt 生态不兼容，回退至 2.2.0 正式版）；
+- 升级 compileSdk 至 36（适配 core-ktx 1.18.0 最低编译 SDK 要求），targetSdk 保持 35；
 - 升级依赖：core-ktx 1.18.0、test-core 1.7.0、hilt 1.3.0、protobuf 4.34.1、paging 3.4.2；
 ### Tests
 - 新增多模块单元测试覆盖（app/datastore/network/record-import/types/domain/common/records 等）；
