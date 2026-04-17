@@ -26,17 +26,14 @@ import cn.wj.android.cashbook.core.common.tools.funLogger
 @SuppressLint("DiscouragedApi")
 @Composable
 fun painterDrawableResource(idStr: String): Painter {
-    return runCatching {
-        val context = LocalContext.current
-        painterResource(
-            id = context.resources.getIdentifier(
-                idStr,
-                "drawable",
-                context.packageName,
-            ),
-        )
+    val context = LocalContext.current
+    // Kotlin 2.3 + Compose 编译器禁止 runCatching 中包含 @Composable 调用，
+    // 因此 LocalContext.current / painterResource 需移出 runCatching。
+    val resId = runCatching {
+        context.resources.getIdentifier(idStr, "drawable", context.packageName)
     }.getOrElse { throwable ->
         funLogger("ResourcesKt").e(throwable, "painterDrawableResource(idStr = <$idStr>)")
         throw throwable
     }
+    return painterResource(id = resId)
 }
