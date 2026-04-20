@@ -66,6 +66,7 @@ import cn.wj.android.cashbook.core.design.component.LineEntry
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.rememberCbPieChartPalette
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarTypeEnum
@@ -232,32 +233,9 @@ internal fun AnalyticsScreen(
                                 }
                             }
 
-                            val colorScheme = MaterialTheme.colorScheme
-                            val extendedColors = LocalExtendedColors.current
-                            val pieColorsCompose = remember(colorScheme, extendedColors) {
-                                listOf(
-                                    colorScheme.primary,
-                                    colorScheme.primaryContainer,
-                                    colorScheme.secondary,
-                                    colorScheme.secondaryContainer,
-                                    colorScheme.tertiary,
-                                    colorScheme.tertiaryContainer,
-                                    extendedColors.quaternary,
-                                    extendedColors.quaternaryContainer,
-                                )
-                            }
-                            val onPieColorsCompose = remember(colorScheme, extendedColors) {
-                                listOf(
-                                    colorScheme.onPrimary,
-                                    colorScheme.onPrimaryContainer,
-                                    colorScheme.onSecondary,
-                                    colorScheme.onSecondaryContainer,
-                                    colorScheme.onTertiary,
-                                    colorScheme.onTertiaryContainer,
-                                    extendedColors.onQuaternary,
-                                    extendedColors.onQuaternaryContainer,
-                                )
-                            }
+                            val palette = rememberCbPieChartPalette()
+                            val pieColorsCompose = palette.pieColors
+                            val onPieColorsCompose = palette.onPieColors
                             AnalyticsPieChart(
                                 barCenterText = sheetData.typeName,
                                 dataList = sheetData.dataList,
@@ -501,20 +479,8 @@ private fun AnalyticsPieChart(
                 .padding(top = 8.dp),
         )
 
-        val colorScheme = MaterialTheme.colorScheme
-        val extendedColors = LocalExtendedColors.current
-        val pieColorsCompose = remember(colorScheme, extendedColors) {
-            listOf(
-                colorScheme.primary,
-                colorScheme.primaryContainer,
-                colorScheme.secondary,
-                colorScheme.secondaryContainer,
-                colorScheme.tertiary,
-                colorScheme.tertiaryContainer,
-                extendedColors.quaternary,
-                extendedColors.quaternaryContainer,
-            )
-        }
+        val palette = rememberCbPieChartPalette()
+        val pieColorsCompose = palette.pieColors
 
         var selectedTab by remember {
             mutableStateOf(RecordTypeCategoryEnum.EXPENDITURE)
@@ -528,18 +494,7 @@ private fun AnalyticsPieChart(
                 RecordTypeCategoryEnum.TRANSFER -> uiState.transferPieDataList
             },
             pieColorsCompose = pieColorsCompose,
-            onPieColorsCompose = remember(colorScheme, extendedColors) {
-                listOf(
-                    colorScheme.onPrimary,
-                    colorScheme.onPrimaryContainer,
-                    colorScheme.onSecondary,
-                    colorScheme.onSecondaryContainer,
-                    colorScheme.onTertiary,
-                    colorScheme.onTertiaryContainer,
-                    extendedColors.onQuaternary,
-                    extendedColors.onQuaternaryContainer,
-                )
-            },
+            onPieColorsCompose = palette.onPieColors,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(260.dp)
