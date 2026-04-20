@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 
 @Composable
 fun CbFloatingActionButton(
@@ -40,7 +41,7 @@ fun CbFloatingActionButton(
     content: @Composable () -> Unit,
 ) {
     FloatingActionButton(
-        onClick = onClick,
+        onClick = rememberHapticOnClick(onClick = onClick),
         modifier = modifier,
         shape = shape,
         containerColor = containerColor,
@@ -63,7 +64,7 @@ fun CbSmallFloatingActionButton(
     content: @Composable () -> Unit,
 ) {
     SmallFloatingActionButton(
-        onClick = onClick,
+        onClick = rememberHapticOnClick(onClick = onClick),
         modifier = modifier,
         shape = shape,
         containerColor = containerColor,
