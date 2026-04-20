@@ -19,12 +19,14 @@ package cn.wj.android.cashbook.core.data.di
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
+import cn.wj.android.cashbook.core.data.repository.ScheduleRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.impl.AssetRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.BooksRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.RecordRepositoryImpl
+import cn.wj.android.cashbook.core.data.repository.impl.ScheduleRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.SettingRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TagRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TypeRepositoryImpl
@@ -90,4 +92,10 @@ interface DataModule {
     fun bindSettingRepository(
         repository: SettingRepositoryImpl,
     ): SettingRepository
+
+    @Binds
+    @Singleton
+    fun bindScheduleRepository(
+        repository: ScheduleRepositoryImpl,
+    ): ScheduleRepository
 }

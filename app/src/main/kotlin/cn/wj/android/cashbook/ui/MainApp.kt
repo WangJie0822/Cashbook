@@ -116,6 +116,10 @@ import cn.wj.android.cashbook.feature.records.navigation.naviToTypedAnalytics
 import cn.wj.android.cashbook.feature.records.navigation.searchScreen
 import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.typedAnalyticsScreen
+import cn.wj.android.cashbook.feature.schedule.navigation.editScheduleScreen
+import cn.wj.android.cashbook.feature.schedule.navigation.mySchedulesScreen
+import cn.wj.android.cashbook.feature.schedule.navigation.naviToEditSchedule
+import cn.wj.android.cashbook.feature.schedule.navigation.naviToMySchedules
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import cn.wj.android.cashbook.feature.settings.navigation.SettingsLauncher
@@ -413,6 +417,7 @@ fun CashbookNavHost(
             onRequestNaviToMyBooks = navController::naviToMyBooks,
             onRequestNaviToMyCategory = navController::naviToMyCategories,
             onRequestNaviToMyTags = navController::naviToMyTags,
+            onRequestNaviToMySchedules = navController::naviToMySchedules,
             onRequestNaviToSetting = navController::naviToSetting,
             onRequestNaviToAboutUs = navController::naviToAboutUs,
             content = { onRequestOpenDrawer ->
@@ -594,6 +599,39 @@ fun CashbookNavHost(
         // 我的分类
         myCategoriesScreen(
             onRequestNaviToTypeStatistics = { navController.naviToTypedAnalytics(typeId = it) },
+            onRequestPopBackStack = navController::popBackStackSafety,
+        )
+
+        // 周期记账
+        mySchedulesScreen(
+            onRequestNaviToEditSchedule = navController::naviToEditSchedule,
+            onRequestPopBackStack = navController::popBackStackSafety,
+        )
+        editScheduleScreen(
+            typeListContent = { typeCategory, defaultTypeId, onTypeSelect ->
+                EditRecordTypeListContent(
+                    typeCategory = typeCategory,
+                    defaultTypeId = defaultTypeId,
+                    onTypeSelect = onTypeSelect,
+                    onRequestNaviToTypeManager = navController::naviToMyCategories,
+                )
+            },
+            assetBottomSheetContent = { currentTypeId, selectedAssetId, onAssetChange ->
+                EditRecordSelectAssetBottomSheetContent(
+                    currentTypeId = currentTypeId,
+                    selectedAssetId = selectedAssetId,
+                    isRelated = false,
+                    onAssetChange = onAssetChange,
+                    onRequestNaviToEditAsset = navController::naviToEditAsset,
+                )
+            },
+            tagBottomSheetContent = { selectedTagIdList, onTagIdListChange, onRequestDismissSheet ->
+                EditRecordSelectTagBottomSheetContent(
+                    selectedTagIdList = selectedTagIdList,
+                    onTagIdListChange = onTagIdListChange,
+                    onRequestDismissSheet = onRequestDismissSheet,
+                )
+            },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
     }

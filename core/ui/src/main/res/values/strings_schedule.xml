@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright 2021 The Cashbook Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <string name="new_schedule">新建周期记账</string>
+    <string name="edit_schedule">编辑周期记账</string>
+    <string name="delete_schedule">删除周期记账</string>
+    <string name="delete_schedule_confirm">确认删除该周期记账规则？</string>
+    <string name="schedule_empty_hint">暂无周期记账规则</string>
+    <string name="schedule_frequency_daily">每天</string>
+    <string name="schedule_frequency_weekly">每周</string>
+    <string name="schedule_frequency_monthly">每月</string>
+    <string name="schedule_frequency_yearly">每年</string>
+    <string name="frequency">频率</string>
+    <string name="schedule_start_date">开始日期</string>
+    <string name="schedule_end_date">结束日期</string>
+    <string name="schedule_record_time">记账时间</string>
+    <string name="schedule_enabled">启用</string>
+    <string name="schedule_details">周期规则详情</string>
+    <string name="schedule_last_executed_date">上次执行日期</string>
+    <string name="select_frequency">选择频率</string>
+    <string name="saving">保存中…</string>
+    <string name="please_enter_amount">请输入金额</string>
+    <string name="selected">已选择</string>
+    <string name="delete_schedule_related_records">同时删除由该规则生成的所有记账</string>
+    <string name="delete_schedule_only">仅删除规则</string>
+    <string name="delete_schedule_with_records">删除规则及记账</string>
+</resources>

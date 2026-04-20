@@ -36,6 +36,7 @@ import androidx.room.PrimaryKey
  * @param remark 备注
  * @param reimbursable 能否报销
  * @param recordTime 修改时间
+ * @param scheduleId 关联的周期记账规则 id，-1 表示非周期记账生成
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
  */
@@ -48,6 +49,7 @@ import androidx.room.PrimaryKey
         Index("into_asset_id"),
         Index("record_time"),
         Index("books_id", "record_time"),
+        Index("schedule_id"),
     ],
 )
 data class RecordTable(
@@ -65,4 +67,5 @@ data class RecordTable(
     @ColumnInfo(name = TABLE_RECORD_REMARK) val remark: String,
     @ColumnInfo(name = TABLE_RECORD_REIMBURSABLE) val reimbursable: Int,
     @ColumnInfo(name = TABLE_RECORD_RECORD_TIME) val recordTime: Long,
+    @ColumnInfo(name = TABLE_RECORD_SCHEDULE_ID) val scheduleId: Long = -1L,
 )

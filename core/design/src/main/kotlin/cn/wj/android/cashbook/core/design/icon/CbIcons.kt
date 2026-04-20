@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -95,4 +96,5 @@ object CbIcons {
     val CleaningServices = Icons.Filled.CleaningServices
     val PhotoLibrary = Icons.Filled.PhotoLibrary
     val RemoveCircle = Icons.Filled.RemoveCircle
+    val Repeat = Icons.Filled.Repeat
 }

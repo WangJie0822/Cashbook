@@ -60,6 +60,7 @@ include(":feature:books")
 include(":feature:assets")
 include(":feature:records")
 include(":feature:settings")
+include(":feature:schedule")
 include(":feature:record-import")
 
 include(":core:domain")

@@ -28,6 +28,7 @@ import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.migration.Migration10To11
+import cn.wj.android.cashbook.core.database.migration.Migration12To13
 import cn.wj.android.cashbook.core.database.migration.Migration1To2
 import cn.wj.android.cashbook.core.database.migration.Migration2To3
 import cn.wj.android.cashbook.core.database.migration.Migration3To4
@@ -55,6 +56,7 @@ import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_RECORD_TIME
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REIMBURSABLE
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REMARK
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_TYPE_ID
+import cn.wj.android.cashbook.core.database.table.TABLE_SCHEDULE
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG_INVISIBLE
 import com.orhanobut.logger.AndroidLogAdapter
@@ -694,6 +696,40 @@ class DatabaseTest {
                 }
             }
         Assert.assertEquals(true, hasImageTable)
+    }
+
+    /**
+     * 测试数据库从 12 升级到 13
+     * - 新增 db_schedule 周期记账规则表
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate12_13() {
+        var hasScheduleTable: Boolean
+        helper.createDatabase(testDbName, 12).use { db ->
+            db.query(
+                "SELECT * FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                arrayOf("table", TABLE_SCHEDULE),
+            ).use { cursor ->
+                val count = cursor.count
+                log("migrate12_13() count = [$count]")
+                hasScheduleTable = count > 0
+            }
+        }
+        Assert.assertEquals(false, hasScheduleTable)
+
+        helper.runMigrationsAndValidate(testDbName, 13, true, Migration12To13)
+            .use { db ->
+                db.query(
+                    "SELECT * FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                    arrayOf("table", TABLE_SCHEDULE),
+                ).use { cursor ->
+                    val count = cursor.count
+                    log("migrate12_13() count = [$count]")
+                    hasScheduleTable = count > 0
+                }
+            }
+        Assert.assertEquals(true, hasScheduleTable)
     }
 
     @Test

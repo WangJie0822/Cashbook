@@ -113,6 +113,8 @@ interface RecordRepository {
 
     suspend fun deleteRecordRelatedWithAsset(assetId: Long)
 
+    suspend fun deleteRecordsByScheduleId(scheduleId: Long)
+
     suspend fun addSearchHistory(keyword: String)
 
     suspend fun clearSearchHistory()
@@ -167,6 +169,7 @@ internal fun RecordTable.asModel(): RecordModel {
         remark = this.remark,
         reimbursable = this.reimbursable == SWITCH_INT_ON,
         recordTime = this.recordTime,
+        scheduleId = this.scheduleId,
     )
 }
 
@@ -184,6 +187,7 @@ internal fun RecordModel.asTable(): RecordTable {
         remark = this.remark,
         reimbursable = if (this.reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
         recordTime = this.recordTime,
+        scheduleId = this.scheduleId,
     )
 }
 

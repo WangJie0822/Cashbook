@@ -342,6 +342,7 @@ class RecordRepositoryImpl @Inject constructor(
                 remark = "",
                 reimbursable = false,
                 recordTime = System.currentTimeMillis(),
+                scheduleId = -1L,
             )
         }
 
@@ -436,6 +437,13 @@ class RecordRepositoryImpl @Inject constructor(
     override suspend fun deleteRecordRelatedWithAsset(assetId: Long): Unit =
         withContext(coroutineContext) {
             // 已由 deleteRecordsWithAsset 中的事务方法统一处理，此处保留为空操作以兼容接口
+        }
+
+    override suspend fun deleteRecordsByScheduleId(scheduleId: Long): Unit =
+        withContext(coroutineContext) {
+            transactionDao.deleteScheduleRelatedData(scheduleId)
+            recordDataVersion.updateVersion()
+            assetDataVersion.updateVersion()
         }
 
     override suspend fun addSearchHistory(keyword: String): Unit = withContext(coroutineContext) {

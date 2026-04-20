@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
+import cn.wj.android.cashbook.core.database.dao.ScheduleDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
@@ -93,4 +94,10 @@ object DatabaseModule {
     fun providesTransactionDao(
         database: CashbookDatabase,
     ): TransactionDao = database.transactionDao()
+
+    @Provides
+    @Singleton
+    fun providesScheduleDao(
+        database: CashbookDatabase,
+    ): ScheduleDao = database.scheduleDao()
 }

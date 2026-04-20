@@ -729,6 +729,26 @@ interface TransactionDao {
     )
     suspend fun deleteRecordsByAssetId(assetId: Long)
 
+    @Query(
+        value = """
+        SELECT * FROM db_record WHERE schedule_id=:scheduleId
+    """,
+    )
+    suspend fun queryRecordsByScheduleId(scheduleId: Long): List<RecordTable>
+
+    /**
+     * 事务化删除周期记账关联的所有记录
+     *
+     * 逐条删除记录以确保正确回退资产余额及 finalAmount 重算
+     */
+    @Transaction
+    suspend fun deleteScheduleRelatedData(scheduleId: Long) {
+        val records = queryRecordsByScheduleId(scheduleId)
+        for (record in records) {
+            deleteRecordTransaction(record)
+        }
+    }
+
     /**
      * 事务化删除资产关联的所有数据
      *

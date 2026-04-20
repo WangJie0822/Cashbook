@@ -248,6 +248,10 @@ class FakeRecordRepository : RecordRepository {
         // no-op
     }
 
+    override suspend fun deleteRecordsByScheduleId(scheduleId: Long) {
+        records.removeAll { it.scheduleId == scheduleId }
+    }
+
     override suspend fun addSearchHistory(keyword: String) {
         if (keyword.isNotBlank()) {
             val current = _searchHistoryListData.value.toMutableList()

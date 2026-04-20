@@ -45,6 +45,9 @@ object DatabaseMigrations {
             Migration9To10,
             Migration10To11,
             Migration11To12,
+            Migration12To13,
+            Migration13To14,
+            Migration14To15,
         )
 
     /** 在数据库升级列表中找到开始版本为 [db] 版本号的迁移类，对数据库进行升级后返回升级后的版本 */

@@ -32,7 +32,9 @@ import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
+import cn.wj.android.cashbook.domain.usecase.GenerateScheduleRecordsUseCase
 import cn.wj.android.cashbook.sync.initializers.AutoBackupWorkName
+import cn.wj.android.cashbook.sync.initializers.ScheduleWorkName
 import cn.wj.android.cashbook.sync.initializers.SyncWorkName
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
@@ -53,6 +55,7 @@ class InitWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val settingRepository: SettingRepository,
     private val typeRepository: TypeRepository,
+    private val generateScheduleRecordsUseCase: GenerateScheduleRecordsUseCase,
     @Dispatcher(CashbookDispatchers.IO) private val ioDispatcher: CoroutineContext,
 ) : CoroutineWorker(appContext, workerParams) {
 
@@ -63,6 +66,13 @@ class InitWorker @AssistedInject constructor(
         this@InitWorker.logger().i("doWork(), init worker")
         // 一次性迁移特殊类型（幂等操作）
         typeRepository.migrateSpecialTypes()
+        // 立即检查并生成到期的周期记账记录
+        try {
+            val count = generateScheduleRecordsUseCase()
+            this@InitWorker.logger().i("doWork(), generated $count schedule records")
+        } catch (e: Exception) {
+            this@InitWorker.logger().e(e, "doWork(), generate schedule records failed")
+        }
         settingRepository.appSettingsModel.first().let { appDateModel ->
             WorkManager.getInstance(appContext).apply {
                 // 执行数据同步
@@ -109,6 +119,12 @@ class InitWorker @AssistedInject constructor(
                         cancelUniqueWork(AutoBackupWorkName)
                     }
                 }
+                // 注册周期记账每日检查任务
+                enqueueUniquePeriodicWork(
+                    ScheduleWorkName,
+                    ExistingPeriodicWorkPolicy.UPDATE,
+                    ScheduleWorker.startUpPeriodicScheduleWork(),
+                )
             }
         }
         Result.success()

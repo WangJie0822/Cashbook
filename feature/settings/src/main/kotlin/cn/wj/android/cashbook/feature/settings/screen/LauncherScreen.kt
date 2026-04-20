@@ -55,6 +55,7 @@ import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModel
  * @param onRequestNaviToMyBooks 导航到我的账本
  * @param onRequestNaviToMyCategory 导航到我的分类
  * @param onRequestNaviToMyTags 导航到我的标签
+ * @param onRequestNaviToMySchedules 导航到周期记账
  * @param onRequestNaviToSetting 导航到设置
  * @param onRequestNaviToAboutUs 导航到关于我们
  * @param content 显示内容，参数 (打开抽屉) -> [Unit]
@@ -65,6 +66,7 @@ internal fun LauncherRoute(
     onRequestNaviToMyBooks: () -> Unit,
     onRequestNaviToMyCategory: () -> Unit,
     onRequestNaviToMyTags: () -> Unit,
+    onRequestNaviToMySchedules: () -> Unit,
     onRequestNaviToSetting: () -> Unit,
     onRequestNaviToAboutUs: () -> Unit,
     modifier: Modifier = Modifier,
@@ -95,6 +97,10 @@ internal fun LauncherRoute(
             onRequestNaviToMyTags.invoke()
             viewModel.dismissDrawerSheet()
         },
+        onMyScheduleClick = {
+            onRequestNaviToMySchedules.invoke()
+            viewModel.dismissDrawerSheet()
+        },
         onSettingClick = {
             onRequestNaviToSetting.invoke()
             viewModel.dismissDrawerSheet()
@@ -120,6 +126,7 @@ internal fun LauncherRoute(
  * @param onMyBookClick 我的账本点击回调
  * @param onMyCategoryClick 我的分类点击回调
  * @param onMyTagClick 我的标签点击回调
+ * @param onMyScheduleClick 周期记账点击回调
  * @param onSettingClick 设置点击回调
  * @param onAboutUsClick 关于我们点击回调
  * @param content 显示内容，参数 (打开抽屉) -> [Unit]
@@ -135,6 +142,7 @@ internal fun LauncherScreen(
     onMyBookClick: () -> Unit,
     onMyCategoryClick: () -> Unit,
     onMyTagClick: () -> Unit,
+    onMyScheduleClick: () -> Unit,
     onSettingClick: () -> Unit,
     onAboutUsClick: () -> Unit,
     content: @Composable () -> Unit,
@@ -184,6 +192,7 @@ internal fun LauncherScreen(
                             onMyBookClick = onMyBookClick,
                             onMyCategoryClick = onMyCategoryClick,
                             onMyTagClick = onMyTagClick,
+                            onMyScheduleClick = onMyScheduleClick,
                             onSettingClick = onSettingClick,
                             onAboutUsClick = onAboutUsClick,
                         )
@@ -203,6 +212,7 @@ internal fun LauncherScreen(
  * @param onMyBookClick 我的账本点击回调
  * @param onMyCategoryClick 我的分类点击回调
  * @param onMyTagClick 我的标签点击回调
+ * @param onMyScheduleClick 周期记账点击回调
  * @param onSettingClick 设置点击回调
  * @param onAboutUsClick 关于我们点击回调
  */
@@ -213,6 +223,7 @@ internal fun LauncherSheet(
     onMyBookClick: () -> Unit,
     onMyCategoryClick: () -> Unit,
     onMyTagClick: () -> Unit,
+    onMyScheduleClick: () -> Unit,
     onSettingClick: () -> Unit,
     onAboutUsClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -260,6 +271,13 @@ internal fun LauncherSheet(
             icon = { Icon(imageVector = CbIcons.Layers, contentDescription = null) },
             selected = false,
             onClick = onMyTagClick,
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.my_schedules)) },
+            icon = { Icon(imageVector = CbIcons.Repeat, contentDescription = null) },
+            selected = false,
+            onClick = onMyScheduleClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         CbHorizontalDivider(modifier = Modifier.padding(horizontal = spacing.large))

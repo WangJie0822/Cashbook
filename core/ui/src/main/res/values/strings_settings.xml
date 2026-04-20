@@ -19,6 +19,7 @@
     <string name="my_books">我的账本</string>
     <string name="my_assets">我的资产</string>
     <string name="my_categories">我的分类</string>
+    <string name="my_schedules">周期记账</string>
     <string name="settings">设置</string>
     <string name="about_us">关于我们</string>
     <string name="about_us_description">这是一个免费的、开源的软件，目的是为了更加便捷、稳定的记录生活中的相关开支，当然你也可以自己为它添加个性化的功能。</string>

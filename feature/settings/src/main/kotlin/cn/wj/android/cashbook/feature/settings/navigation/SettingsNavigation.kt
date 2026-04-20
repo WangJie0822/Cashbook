@@ -66,6 +66,7 @@ fun NavController.naviToBackupAndRecovery() {
  * @param onRequestNaviToMyBooks 导航到我的账本
  * @param onRequestNaviToMyCategory 导航到我的分类
  * @param onRequestNaviToMyTags 导航到我的标签
+ * @param onRequestNaviToMySchedules 导航到周期记账
  * @param onRequestNaviToSetting 导航到设置
  * @param onRequestNaviToAboutUs 导航到关于我们
  * @param content 显示内容，参数 (打开抽屉) -> [Unit]
@@ -75,6 +76,7 @@ fun NavGraphBuilder.settingsLauncherScreen(
     onRequestNaviToMyBooks: () -> Unit,
     onRequestNaviToMyCategory: () -> Unit,
     onRequestNaviToMyTags: () -> Unit,
+    onRequestNaviToMySchedules: () -> Unit,
     onRequestNaviToSetting: () -> Unit,
     onRequestNaviToAboutUs: () -> Unit,
     content: @Composable (() -> Unit) -> Unit,
@@ -85,6 +87,7 @@ fun NavGraphBuilder.settingsLauncherScreen(
             onRequestNaviToMyBooks = onRequestNaviToMyBooks,
             onRequestNaviToMyCategory = onRequestNaviToMyCategory,
             onRequestNaviToMyTags = onRequestNaviToMyTags,
+            onRequestNaviToMySchedules = onRequestNaviToMySchedules,
             onRequestNaviToSetting = onRequestNaviToSetting,
             onRequestNaviToAboutUs = onRequestNaviToAboutUs,
             content = content,
