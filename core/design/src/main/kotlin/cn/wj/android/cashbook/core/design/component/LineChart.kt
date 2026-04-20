@@ -19,6 +19,7 @@ package cn.wj.android.cashbook.core.design.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import cn.wj.android.cashbook.core.design.theme.LocalMotion
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -78,10 +79,11 @@ fun CbLineChart(
     showZeroLine: Boolean = false,
     formatYValue: (Float) -> String = { formatLargeValue(it) },
 ) {
+    val motion = LocalMotion.current
     val animationProgress = remember { Animatable(0f) }
     LaunchedEffect(dataSets) {
         animationProgress.snapTo(0f)
-        animationProgress.animateTo(1f, animationSpec = tween(durationMillis = 250))
+        animationProgress.animateTo(1f, animationSpec = tween(durationMillis = motion.durationMedium))
     }
 
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface

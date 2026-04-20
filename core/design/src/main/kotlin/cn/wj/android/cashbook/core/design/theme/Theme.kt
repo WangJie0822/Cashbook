@@ -231,6 +231,7 @@ fun CashbookTheme(
         LocalBackgroundTheme provides backgroundTheme,
         LocalTintTheme provides tintTheme,
         LocalSpacing provides CbSpacing(),
+        LocalMotion provides CbMotion(),
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
