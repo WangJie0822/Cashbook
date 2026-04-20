@@ -21,6 +21,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import cn.wj.android.cashbook.core.design.theme.LocalMotion
+import cn.wj.android.cashbook.core.design.theme.rememberReducedMotion
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -98,10 +99,16 @@ fun CbPieChart(
 ) {
     // 入场动画
     val motion = LocalMotion.current
+    val reducedMotion = rememberReducedMotion()
     val animationProgress = remember { Animatable(0f) }
     LaunchedEffect(slices) {
         animationProgress.snapTo(0f)
-        animationProgress.animateTo(1f, animationSpec = tween(durationMillis = motion.durationMedium))
+        animationProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = motion.effectiveDuration(motion.durationMedium, reducedMotion),
+            ),
+        )
     }
 
     val surfaceColor = MaterialTheme.colorScheme.surface

@@ -19,7 +19,6 @@ package cn.wj.android.cashbook.core.design.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import cn.wj.android.cashbook.core.design.theme.LocalMotion
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -34,6 +33,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.sp
+import cn.wj.android.cashbook.core.design.theme.LocalMotion
+import cn.wj.android.cashbook.core.design.theme.rememberReducedMotion
 import kotlin.math.abs
 
 /**
@@ -80,10 +81,16 @@ fun CbLineChart(
     formatYValue: (Float) -> String = { formatLargeValue(it) },
 ) {
     val motion = LocalMotion.current
+    val reducedMotion = rememberReducedMotion()
     val animationProgress = remember { Animatable(0f) }
     LaunchedEffect(dataSets) {
         animationProgress.snapTo(0f)
-        animationProgress.animateTo(1f, animationSpec = tween(durationMillis = motion.durationMedium))
+        animationProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = motion.effectiveDuration(motion.durationMedium, reducedMotion),
+            ),
+        )
     }
 
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface

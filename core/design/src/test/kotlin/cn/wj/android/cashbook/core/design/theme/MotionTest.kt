@@ -57,4 +57,19 @@ class MotionTest {
         // 非线性校验：中段应该快于线性（emphasized 强调快启）
         assertThat(easing.transform(0.5f)).isGreaterThan(0.5f)
     }
+
+    @Test
+    fun effectiveDuration_returns_zero_when_reduced() {
+        // Reduced Motion 开启时必须为 0，tween 将瞬时完成
+        assertThat(motion.effectiveDuration(motion.durationShort, reduced = true)).isEqualTo(0)
+        assertThat(motion.effectiveDuration(motion.durationMedium, reduced = true)).isEqualTo(0)
+        assertThat(motion.effectiveDuration(motion.durationLong, reduced = true)).isEqualTo(0)
+    }
+
+    @Test
+    fun effectiveDuration_returns_default_when_not_reduced() {
+        assertThat(motion.effectiveDuration(motion.durationShort, reduced = false)).isEqualTo(200)
+        assertThat(motion.effectiveDuration(motion.durationMedium, reduced = false)).isEqualTo(250)
+        assertThat(motion.effectiveDuration(motion.durationLong, reduced = false)).isEqualTo(400)
+    }
 }
