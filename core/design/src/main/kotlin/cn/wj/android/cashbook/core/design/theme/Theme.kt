@@ -235,6 +235,7 @@ fun CashbookTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = CashbookTypography,
+            shapes = CashbookShapes,
             content = content,
         )
     }
