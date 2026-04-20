@@ -77,6 +77,7 @@ import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticate
 import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -761,7 +762,7 @@ internal fun UpdateHintDialog(
                 )
                 Row(
                     modifier = Modifier
-                        .clickable { ignore = !ignore }
+                        .clickable(onClick = rememberHapticOnClick { ignore = !ignore })
                         .padding(end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -809,7 +810,7 @@ internal fun NoWifiUpdateHintDialog(
                 )
                 Row(
                     modifier = Modifier
-                        .clickable { noMorePrompt = !noMorePrompt }
+                        .clickable(onClick = rememberHapticOnClick { noMorePrompt = !noMorePrompt })
                         .padding(end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

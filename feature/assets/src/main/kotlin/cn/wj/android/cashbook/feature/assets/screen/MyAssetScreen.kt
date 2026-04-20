@@ -69,6 +69,7 @@ import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.model.AssetTypeViewsModel
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.assets.component.AssetListItem
@@ -371,9 +372,11 @@ internal fun AssetTypedInfoItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable {
-                expand = !expand
-            }
+            .clickable(
+                onClick = rememberHapticOnClick {
+                    expand = !expand
+                },
+            )
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

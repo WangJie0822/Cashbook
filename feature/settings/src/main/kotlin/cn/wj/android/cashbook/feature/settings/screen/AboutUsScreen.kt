@@ -68,6 +68,7 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.enums.LogcatState
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -223,7 +224,7 @@ internal fun AboutUsScreen(
                     Text(
                         modifier = Modifier
                             .padding(top = 8.dp)
-                            .clickable(onClick = onNameClick),
+                            .clickable(onClick = rememberHapticOnClick(onClick = onNameClick)),
                         text = stringResource(id = R.string.app_name_shown),
                         style = MaterialTheme.typography.headlineMedium,
                     )
@@ -240,13 +241,15 @@ internal fun AboutUsScreen(
                     Text(
                         modifier = Modifier
                             .padding(vertical = 8.dp)
-                            .clickable {
-                                jumpSendEmail(
-                                    email = EMAIL_ADDRESS,
-                                    chooserTitle = pleaseSelectEmailText,
-                                    context = currentContext,
-                                )
-                            }
+                            .clickable(
+                                onClick = rememberHapticOnClick {
+                                    jumpSendEmail(
+                                        email = EMAIL_ADDRESS,
+                                        chooserTitle = pleaseSelectEmailText,
+                                        context = currentContext,
+                                    )
+                                },
+                            )
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         text = stringResource(id = R.string.contact_me),
                         style = MaterialTheme.typography.bodyLarge,
@@ -259,13 +262,15 @@ internal fun AboutUsScreen(
                     ) {
                         Text(
                             modifier = Modifier
-                                .clickable {
-                                    jumpBrowser(
-                                        url = GITHUB_HOMEPAGE,
-                                        chooserTitle = pleaseSelectWebBrowserText,
-                                        context = currentContext,
-                                    )
-                                }
+                                .clickable(
+                                    onClick = rememberHapticOnClick {
+                                        jumpBrowser(
+                                            url = GITHUB_HOMEPAGE,
+                                            chooserTitle = pleaseSelectWebBrowserText,
+                                            context = currentContext,
+                                        )
+                                    },
+                                )
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                             text = stringResource(id = R.string.github),
                             style = MaterialTheme.typography.bodyLarge,
@@ -273,13 +278,15 @@ internal fun AboutUsScreen(
                         )
                         Text(
                             modifier = Modifier
-                                .clickable {
-                                    jumpBrowser(
-                                        url = GITEE_HOMEPAGE,
-                                        chooserTitle = pleaseSelectWebBrowserText,
-                                        context = currentContext,
-                                    )
-                                }
+                                .clickable(
+                                    onClick = rememberHapticOnClick {
+                                        jumpBrowser(
+                                            url = GITEE_HOMEPAGE,
+                                            chooserTitle = pleaseSelectWebBrowserText,
+                                            context = currentContext,
+                                        )
+                                    },
+                                )
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                             text = stringResource(id = R.string.gitee),
                             style = MaterialTheme.typography.bodyLarge,
@@ -341,17 +348,19 @@ internal fun AboutUsScreen(
                     // 检查更新
                     val checkUpdateEnable = !inRequestUpdateData
                     val checkUpdateModifier = if (checkUpdateEnable) {
-                        Modifier.clickable {
-                            if (ApplicationInfo.isOffline) {
-                                jumpBrowser(
-                                    url = if (uiState.useGitee) GITEE_LATEST else GITHUB_LATEST,
-                                    chooserTitle = pleaseSelectWebBrowserText,
-                                    context = currentContext,
-                                )
-                            } else {
-                                onCheckUpdateClick()
-                            }
-                        }
+                        Modifier.clickable(
+                            onClick = rememberHapticOnClick {
+                                if (ApplicationInfo.isOffline) {
+                                    jumpBrowser(
+                                        url = if (uiState.useGitee) GITEE_LATEST else GITHUB_LATEST,
+                                        chooserTitle = pleaseSelectWebBrowserText,
+                                        context = currentContext,
+                                    )
+                                } else {
+                                    onCheckUpdateClick()
+                                }
+                            },
+                        )
                     } else {
                         Modifier
                     }
@@ -371,7 +380,7 @@ internal fun AboutUsScreen(
                     )
                     // 版本信息
                     CbListItem(
-                        modifier = Modifier.clickable { onVersionInfoClick.invoke() },
+                        modifier = Modifier.clickable(onClick = rememberHapticOnClick { onVersionInfoClick.invoke() }),
                         headlineContent = {
                             Text(text = stringResource(id = R.string.version_info))
                         },
@@ -394,7 +403,7 @@ internal fun AboutUsScreen(
                     )
                     // 用户协议和隐私政策
                     CbListItem(
-                        modifier = Modifier.clickable { onUserAgreementAndPrivacyPolicyClick.invoke() },
+                        modifier = Modifier.clickable(onClick = rememberHapticOnClick { onUserAgreementAndPrivacyPolicyClick.invoke() }),
                         headlineContent = {
                             Text(text = stringResource(id = R.string.user_agreement_and_privacy_policy))
                         },

@@ -65,6 +65,7 @@ import cn.wj.android.cashbook.core.design.security.biometric.BiometricAuthentica
 import cn.wj.android.cashbook.core.design.security.biometric.HW_AVAILABLE
 import cn.wj.android.cashbook.core.design.security.biometric.ProvideBiometricAuthenticateHintData
 import cn.wj.android.cashbook.core.design.security.biometric.checkBiometric
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.design.theme.supportsDynamicTheming
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
@@ -343,7 +344,7 @@ internal fun SettingContent(
                 CbListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .clickable { onImageQualityClick.invoke() },
+                        .clickable(onClick = rememberHapticOnClick { onImageQualityClick.invoke() }),
                     headlineContent = { Text(text = stringResource(id = R.string.record_image_quality)) },
                     supportingContent = { Text(text = stringResource(id = R.string.record_image_quality_hint)) },
                     trailingContent = {
@@ -379,7 +380,7 @@ internal fun SettingContent(
                 if (uiState.needSecurityVerificationWhenLaunch) {
                     CbListItem(
                         modifier = Modifier
-                            .clickable { onVerificationModeClick.invoke() },
+                            .clickable(onClick = rememberHapticOnClick { onVerificationModeClick.invoke() }),
                         headlineContent = { Text(text = stringResource(id = R.string.verification_mode)) },
                         trailingContent = {
                             Row(
@@ -411,7 +412,7 @@ internal fun SettingContent(
                     )
                 }
                 CbListItem(
-                    modifier = Modifier.clickable { onPasswordClick.invoke() },
+                    modifier = Modifier.clickable(onClick = rememberHapticOnClick { onPasswordClick.invoke() }),
                     headlineContent = {
                         if (uiState.hasPassword) {
                             Text(text = stringResource(id = R.string.modify_password))
@@ -422,7 +423,7 @@ internal fun SettingContent(
                 )
                 if (uiState.hasPassword) {
                     CbListItem(
-                        modifier = Modifier.clickable { onClearPasswordClick.invoke() },
+                        modifier = Modifier.clickable(onClick = rememberHapticOnClick { onClearPasswordClick.invoke() }),
                         headlineContent = { Text(text = stringResource(id = R.string.clear_password)) },
                     )
                 }
@@ -433,7 +434,7 @@ internal fun SettingContent(
                 CbListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .clickable { onDarkModeClick.invoke() },
+                        .clickable(onClick = rememberHapticOnClick { onDarkModeClick.invoke() }),
                     headlineContent = { Text(text = stringResource(id = R.string.dark_mode)) },
                     trailingContent = {
                         Row(
@@ -454,7 +455,7 @@ internal fun SettingContent(
                 )
                 if (supportsDynamicTheming()) {
                     CbListItem(
-                        modifier = Modifier.clickable { onDynamicColorClick.invoke() },
+                        modifier = Modifier.clickable(onClick = rememberHapticOnClick { onDynamicColorClick.invoke() }),
                         headlineContent = { Text(text = stringResource(id = R.string.dynamic_color)) },
                         supportingContent = { Text(text = stringResource(id = R.string.dynamic_color_hint)) },
                         trailingContent = {
@@ -482,7 +483,7 @@ internal fun SettingContent(
                 CbListItem(
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .clickable { onBackupAndRecoveryClick.invoke() },
+                        .clickable(onClick = rememberHapticOnClick { onBackupAndRecoveryClick.invoke() }),
                     headlineContent = { Text(text = stringResource(id = R.string.backup_and_recovery)) },
                     trailingContent = {
                         Icon(

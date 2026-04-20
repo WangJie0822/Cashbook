@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.feature.types.viewmodel.TypeIconGroupListViewModel
 
@@ -60,7 +61,7 @@ internal fun TypeIconGroupList(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(if (it.selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent)
-                            .clickable { viewModel.selectGroup(it.data.name) }
+                            .clickable(onClick = rememberHapticOnClick { viewModel.selectGroup(it.data.name) })
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 }
@@ -75,9 +76,11 @@ internal fun TypeIconGroupList(
                     Column(
                         modifier = Modifier
                             .padding(8.dp)
-                            .clickable {
-                                onTypeIconSelect(it.name, it.iconResIdStr)
-                            },
+                            .clickable(
+                                onClick = rememberHapticOnClick {
+                                    onTypeIconSelect(it.name, it.iconResIdStr)
+                                },
+                            ),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         val color = LocalExtendedColors.current.quaternary

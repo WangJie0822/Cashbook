@@ -39,6 +39,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.model.ImageViewModel
 import coil.compose.AsyncImage
@@ -73,7 +74,9 @@ internal fun ImagePreviewDialog(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable { onRequestDismissDialog.invoke() },
+                        .clickable(
+                            onClick = rememberHapticOnClick { onRequestDismissDialog.invoke() },
+                        ),
                 ) {
                     val placeholder = rememberAsyncImagePainter(list[index].bitmap)
                     AsyncImage(

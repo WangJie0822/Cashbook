@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.model.BillSummary
 import cn.wj.android.cashbook.core.model.model.BooksModel
 import cn.wj.android.cashbook.core.ui.R
@@ -103,7 +104,9 @@ internal fun ImportSummarySection(
         Row(
             modifier = Modifier
                 .padding(top = 8.dp)
-                .clickable { expanded = true },
+                .clickable(
+                    onClick = rememberHapticOnClick { expanded = true },
+                ),
         ) {
             Text(
                 text = stringResource(R.string.import_target_book) + "：",

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
@@ -66,7 +67,7 @@ internal fun AssetListItem(
         .fillMaxWidth()
         .defaultMinSize(minHeight = 70.dp)
         .combinedClickable(
-            onClick = onItemClick,
+            onClick = rememberHapticOnClick(onClick = onItemClick),
             onLongClick = onItemLongClick,
         )
         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -99,7 +100,7 @@ internal fun NotAssociatedAssetListItem(
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 70.dp)
-            .clickable(onClick = onNotAssociatedAssetClick)
+            .clickable(onClick = rememberHapticOnClick(onClick = onNotAssociatedAssetClick))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

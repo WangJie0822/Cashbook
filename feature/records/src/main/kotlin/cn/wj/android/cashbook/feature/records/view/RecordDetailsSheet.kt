@@ -55,6 +55,7 @@ import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -311,9 +312,11 @@ internal fun RecordDetailsSheet(
                                     AssetIconText(
                                         painter = painterResource(id = recordData.assetIconResId!!),
                                         assetName = assetName,
-                                        modifier = Modifier.clickable {
-                                            recordData.assetId?.let(onRequestNaviToAssetInfo)
-                                        },
+                                        modifier = Modifier.clickable(
+                                            onClick = rememberHapticOnClick {
+                                                recordData.assetId?.let(onRequestNaviToAssetInfo)
+                                            },
+                                        ),
                                     )
                                     // 关联资产
                                     recordData.relatedAssetName?.let { relatedName ->
@@ -325,11 +328,13 @@ internal fun RecordDetailsSheet(
                                         AssetIconText(
                                             painter = painterResource(id = recordData.relatedAssetIconResId!!),
                                             assetName = relatedName,
-                                            modifier = Modifier.clickable {
-                                                recordData.relatedAssetId?.let(
-                                                    onRequestNaviToAssetInfo,
-                                                )
-                                            },
+                                            modifier = Modifier.clickable(
+                                                onClick = rememberHapticOnClick {
+                                                    recordData.relatedAssetId?.let(
+                                                        onRequestNaviToAssetInfo,
+                                                    )
+                                                },
+                                            ),
                                         )
                                     }
                                 }
@@ -389,10 +394,12 @@ internal fun RecordDetailsSheet(
                                     )
                                 }
                             },
-                            modifier = Modifier.clickable {
-                                dialogState =
-                                    DialogState.Shown(RecordDetailsDialogEnum.IMAGE_PREVIEW)
-                            },
+                            modifier = Modifier.clickable(
+                                onClick = rememberHapticOnClick {
+                                    dialogState =
+                                        DialogState.Shown(RecordDetailsDialogEnum.IMAGE_PREVIEW)
+                                },
+                            ),
                         )
                     }
 

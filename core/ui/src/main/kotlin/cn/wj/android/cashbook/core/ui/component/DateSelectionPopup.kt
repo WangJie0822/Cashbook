@@ -52,6 +52,7 @@ import cn.wj.android.cashbook.core.design.component.CbTab
 import cn.wj.android.cashbook.core.design.component.CbTabRow
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbWheelPicker
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.DateSelectionTypeEnum
 import cn.wj.android.cashbook.core.ui.R
@@ -440,7 +441,7 @@ private fun DateRangeRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = rememberHapticOnClick(onClick = onClick))
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.small,

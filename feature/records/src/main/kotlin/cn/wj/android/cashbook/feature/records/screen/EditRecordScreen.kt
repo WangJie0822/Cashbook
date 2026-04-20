@@ -101,6 +101,7 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.component.rememberSnackbarHostState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -980,9 +981,11 @@ internal fun SelectImageSheetContent(
                                     }
                                     .aspectRatio(2f / 3f)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .clickable {
-                                        onImageItemClick.invoke(cacheImageList, index)
-                                    },
+                                    .clickable(
+                                        onClick = rememberHapticOnClick {
+                                            onImageItemClick.invoke(cacheImageList, index)
+                                        },
+                                    ),
                             )
                             CbIconButton(
                                 onClick = { cacheImageList.removeIf { item.path == it.path } },
@@ -1073,7 +1076,7 @@ internal fun Amount(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onAmountClick),
+            .clickable(onClick = rememberHapticOnClick(onClick = onAmountClick)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

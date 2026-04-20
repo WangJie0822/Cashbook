@@ -72,6 +72,7 @@ import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -271,7 +272,7 @@ internal fun EditAssetScreen(
                         CbListItem(
                             modifier = Modifier.clickable(
                                 enabled = uiState.typeEnable,
-                                onClick = onSelectClassificationClick,
+                                onClick = rememberHapticOnClick(onClick = onSelectClassificationClick),
                             ),
                             headlineContent = {
                                 Text(
@@ -392,7 +393,7 @@ internal fun EditAssetScreen(
 
                         if (uiState.isCreditCard) {
                             CbListItem(
-                                modifier = Modifier.clickable(onClick = onBillingDateClick),
+                                modifier = Modifier.clickable(onClick = rememberHapticOnClick(onClick = onBillingDateClick)),
                                 headlineContent = {
                                     Text(
                                         text = stringResource(id = R.string.billing_date),
@@ -422,7 +423,7 @@ internal fun EditAssetScreen(
                             )
 
                             CbListItem(
-                                modifier = Modifier.clickable(onClick = onRepaymentDateClick),
+                                modifier = Modifier.clickable(onClick = rememberHapticOnClick(onClick = onRepaymentDateClick)),
                                 headlineContent = {
                                     Text(
                                         text = stringResource(id = R.string.repayment_date),
@@ -525,7 +526,7 @@ internal fun SelectDayDialog(
                             val text = (c * 5 + r + 1).toString()
                             Text(
                                 modifier = Modifier
-                                    .clickable { onDaySelect.invoke(text) }
+                                    .clickable(onClick = rememberHapticOnClick { onDaySelect.invoke(text) })
                                     .weight(1f)
                                     .padding(vertical = 8.dp),
                                 text = text,
@@ -627,7 +628,7 @@ internal fun SingleLineListItem(iconResId: Int, nameResId: Int, onItemClick: () 
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 56.dp)
-            .clickable { onItemClick() },
+            .clickable(onClick = rememberHapticOnClick { onItemClick() }),
     ) {
         Icon(
             painter = painterResource(id = iconResId),

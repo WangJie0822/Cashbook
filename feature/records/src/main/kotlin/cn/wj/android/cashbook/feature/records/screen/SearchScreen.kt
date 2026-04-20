@@ -52,6 +52,7 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
@@ -211,9 +212,11 @@ internal fun SearchScreen(
                         recordList[index]?.let { item ->
                             RecordListItem(
                                 item = item,
-                                modifier = Modifier.clickable {
-                                    onRequestShowRecordDetailSheet(item)
-                                },
+                                modifier = Modifier.clickable(
+                                    onClick = rememberHapticOnClick {
+                                        onRequestShowRecordDetailSheet(item)
+                                    },
+                                ),
                             )
                         }
                     }

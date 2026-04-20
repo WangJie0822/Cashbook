@@ -42,6 +42,7 @@ import cn.wj.android.cashbook.core.common.RECORD_TYPE_COLUMNS
 import cn.wj.android.cashbook.core.design.component.CbVerticalGrid
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.theme.fixedContainerColorFor
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.RECORD_TYPE_SETTINGS
 import cn.wj.android.cashbook.core.model.entity.RecordTypeEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -196,7 +197,7 @@ internal fun TypeItem(
     Column(
         modifier = modifier
             .background(color = backgroundColor, shape = backgroundShape)
-            .clickable(onClick = onTypeClick)
+            .clickable(onClick = rememberHapticOnClick(onClick = onTypeClick))
             .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

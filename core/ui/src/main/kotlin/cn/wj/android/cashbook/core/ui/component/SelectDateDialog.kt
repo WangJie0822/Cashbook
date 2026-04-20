@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.theme.LocalSpacing
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.ui.R
 import java.time.YearMonth
 import java.util.Calendar
@@ -90,9 +91,11 @@ fun SelectDateDialog(
                                 text = "$year${stringResource(id = R.string.year)}",
                                 color = contentColorFor(backgroundColor = containerColor),
                                 modifier = Modifier
-                                    .clickable {
-                                        selectedYear = year
-                                    }
+                                    .clickable(
+                                        onClick = rememberHapticOnClick {
+                                            selectedYear = year
+                                        },
+                                    )
                                     .background(
                                         color = containerColor,
                                         shape = MaterialTheme.shapes.large,
@@ -127,15 +130,17 @@ fun SelectDateDialog(
                                             textAlign = TextAlign.Center,
                                             color = contentColorFor(backgroundColor = containerColor),
                                             modifier = Modifier
-                                                .clickable {
-                                                    onDateSelected(
-                                                        YearMonth.of(
-                                                            selectedYear,
-                                                            month,
-                                                        ),
-                                                        false,
-                                                    )
-                                                }
+                                                .clickable(
+                                                    onClick = rememberHapticOnClick {
+                                                        onDateSelected(
+                                                            YearMonth.of(
+                                                                selectedYear,
+                                                                month,
+                                                            ),
+                                                            false,
+                                                        )
+                                                    },
+                                                )
                                                 .background(
                                                     color = containerColor,
                                                     shape = MaterialTheme.shapes.large,
@@ -161,15 +166,17 @@ fun SelectDateDialog(
                         textAlign = TextAlign.Center,
                         color = contentColorFor(backgroundColor = containerColor),
                         modifier = Modifier
-                            .clickable {
-                                onDateSelected(
-                                    YearMonth.of(
-                                        selectedYear,
-                                        1,
-                                    ),
-                                    true,
-                                )
-                            }
+                            .clickable(
+                                onClick = rememberHapticOnClick {
+                                    onDateSelected(
+                                        YearMonth.of(
+                                            selectedYear,
+                                            1,
+                                        ),
+                                        true,
+                                    )
+                                },
+                            )
                             .fillMaxWidth()
                             .background(
                                 color = containerColor,

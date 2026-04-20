@@ -58,6 +58,7 @@ import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -164,13 +165,14 @@ internal fun CalendarScreen(
             CbTopAppBar(
                 onBackClick = onBackClick,
                 title = {
+                    val hapticOnDateClick = rememberHapticOnClick(onClick = onDateClick)
                     Row(
-                        modifier = Modifier.clickable(onClick = onDateClick),
+                        modifier = Modifier.clickable(onClick = hapticOnDateClick),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = "${selectedDate.year}-${selectedDate.monthValue.completeZero()}",
-                            modifier = Modifier.clickable(onClick = onDateClick),
+                            modifier = Modifier.clickable(onClick = hapticOnDateClick),
                         )
                         Icon(
                             imageVector = CbIcons.ArrowDropDown,
@@ -341,9 +343,11 @@ internal fun CalendarScreen(
                                     RecordListItem(
                                         item = it,
                                         showDate = false,
-                                        modifier = Modifier.clickable {
-                                            onRecordItemClick(it)
-                                        },
+                                        modifier = Modifier.clickable(
+                                            onClick = rememberHapticOnClick {
+                                                onRecordItemClick(it)
+                                            },
+                                        ),
                                     )
                                 }
                             }

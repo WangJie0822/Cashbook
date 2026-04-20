@@ -89,6 +89,7 @@ import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
@@ -331,7 +332,7 @@ internal fun LauncherTopBar(
             Box {
                 Row(
                     modifier = Modifier
-                        .clickable(onClick = onDateClick)
+                        .clickable(onClick = rememberHapticOnClick(onClick = onDateClick))
                         .testTag(TestTag.Launcher.LAUNCHER_TITLE),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -536,9 +537,11 @@ private fun FrontLayerContent(
                                 RecordListItem(
                                     item = item.entity,
                                     showDate = false,
-                                    modifier = Modifier.clickable {
-                                        onRecordItemClick(item.entity)
-                                    },
+                                    modifier = Modifier.clickable(
+                                        onClick = rememberHapticOnClick {
+                                            onRecordItemClick(item.entity)
+                                        },
+                                    ),
                                 )
                             }
 

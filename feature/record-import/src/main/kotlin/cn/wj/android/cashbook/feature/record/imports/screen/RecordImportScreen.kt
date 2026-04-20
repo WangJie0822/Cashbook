@@ -49,6 +49,7 @@ import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.model.BillDirection
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.record.imports.component.ImportPreviewList
@@ -146,10 +147,12 @@ internal fun RecordImportScreen(
                             text = asset.name,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    onUpdatePaymentMapping(selectedMappingName!!, asset.id, asset.name)
-                                    onDismissMappingDialog()
-                                }
+                                .clickable(
+                                    onClick = rememberHapticOnClick {
+                                        onUpdatePaymentMapping(selectedMappingName!!, asset.id, asset.name)
+                                        onDismissMappingDialog()
+                                    },
+                                )
                                 .padding(vertical = 8.dp, horizontal = 16.dp),
                         )
                     }
@@ -182,10 +185,12 @@ internal fun RecordImportScreen(
                             text = type.name,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    onUpdateItemType(selectedTypeIndex, type.id, type.name)
-                                    onDismissTypeDialog()
-                                }
+                                .clickable(
+                                    onClick = rememberHapticOnClick {
+                                        onUpdateItemType(selectedTypeIndex, type.id, type.name)
+                                        onDismissTypeDialog()
+                                    },
+                                )
                                 .padding(vertical = 8.dp, horizontal = 16.dp),
                         )
                     }

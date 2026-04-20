@@ -46,6 +46,7 @@ import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.navigation.EditRecord
@@ -155,7 +156,9 @@ internal fun SelectRelatedRecordScreen(
                             items(items = uiState.relatedRecordList) {
                                 RecordListItem(
                                     item = it,
-                                    modifier = Modifier.clickable { onRelatedRecordItemClick(it.id) },
+                                    modifier = Modifier.clickable(
+                                        onClick = rememberHapticOnClick { onRelatedRecordItemClick(it.id) },
+                                    ),
                                 )
                             }
                         }
@@ -180,7 +183,9 @@ internal fun SelectRelatedRecordScreen(
                             items(items = uiState.recordList) {
                                 RecordListItem(
                                     item = it,
-                                    modifier = Modifier.clickable { onRecordItemClick(it.id) },
+                                    modifier = Modifier.clickable(
+                                        onClick = rememberHapticOnClick { onRecordItemClick(it.id) },
+                                    ),
                                 )
                             }
                         }

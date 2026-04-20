@@ -67,6 +67,7 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.design.theme.rememberCbPieChartPalette
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarTypeEnum
@@ -146,7 +147,7 @@ internal fun AnalyticsScreen(
                 title = {
                     Box {
                         Row(
-                            modifier = Modifier.clickable(onClick = onDateClick),
+                            modifier = Modifier.clickable(onClick = rememberHapticOnClick(onClick = onDateClick)),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             if (dateSelection is DateSelectionEntity.DateRange) {
@@ -254,9 +255,11 @@ internal fun AnalyticsScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .defaultMinSize(minHeight = 70.dp)
-                                        .clickable {
-                                            onRequestNaviToTypeAnalytics(item.typeId, false)
-                                        }
+                                        .clickable(
+                                            onClick = rememberHapticOnClick {
+                                                onRequestNaviToTypeAnalytics(item.typeId, false)
+                                            },
+                                        )
                                         .padding(horizontal = 16.dp, vertical = 8.dp),
                                 )
                             }
@@ -539,9 +542,11 @@ private fun AnalyticsPieChart(
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(minHeight = 70.dp)
-                        .clickable {
-                            onRequestShowSheet(item.typeId)
-                        }
+                        .clickable(
+                            onClick = rememberHapticOnClick {
+                                onRequestShowSheet(item.typeId)
+                            },
+                        )
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                 )
             }

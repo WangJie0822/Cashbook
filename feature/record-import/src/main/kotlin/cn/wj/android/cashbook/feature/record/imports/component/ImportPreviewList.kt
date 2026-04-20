@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_NO_SECONDS
 import cn.wj.android.cashbook.core.common.tools.dateFormat
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.model.BillDirection
 import cn.wj.android.cashbook.core.model.model.DuplicateStatus
 import cn.wj.android.cashbook.core.model.model.ImportPreviewItem
@@ -82,7 +83,7 @@ private fun ImportPreviewRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onToggleSelection)
+            .clickable(onClick = rememberHapticOnClick(onClick = onToggleSelection))
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -158,7 +159,7 @@ private fun ImportPreviewRow(
                             shape = MaterialTheme.shapes.small,
                             modifier = Modifier
                                 .padding(start = 4.dp)
-                                .clickable(onClick = onTypeClick),
+                                .clickable(onClick = rememberHapticOnClick(onClick = onTypeClick)),
                         ) {
                             Text(
                                 text = item.mappedTypeName,

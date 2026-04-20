@@ -82,6 +82,7 @@ import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.design.theme.LocalSpacing
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -450,9 +451,11 @@ private fun SelectFirstTypeDialog(
                                 )
                             },
                             headlineContent = { Text(text = first.name) },
-                            modifier = Modifier.clickable {
-                                changeFirstTypeToSecond(data.id, first.id)
-                            },
+                            modifier = Modifier.clickable(
+                                onClick = rememberHapticOnClick {
+                                    changeFirstTypeToSecond(data.id, first.id)
+                                },
+                            ),
                         )
                     }
                 },
@@ -545,7 +548,7 @@ private fun DialogExpandableTypeList(
                                 }
                             }
                         },
-                        modifier = Modifier.clickable { onTypeItemClick(first.data.id) },
+                        modifier = Modifier.clickable(onClick = rememberHapticOnClick { onTypeItemClick(first.data.id) }),
                     )
                     if (first.expanded && hasChild) {
                         CbElevatedCard(Modifier.padding(horizontal = spacing.small)) {
@@ -567,9 +570,11 @@ private fun DialogExpandableTypeList(
                                                     modifier = Modifier
                                                         .weight(1f)
                                                         .padding(8.dp)
-                                                        .clickable {
-                                                            onTypeItemClick(second.data.id)
-                                                        },
+                                                        .clickable(
+                                                            onClick = rememberHapticOnClick {
+                                                                onTypeItemClick(second.data.id)
+                                                            },
+                                                        ),
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                 ) {
                                                     Icon(
@@ -647,11 +652,13 @@ private fun FirstTypeItem(
                 }
             },
 
-            modifier = Modifier.clickable {
-                if (!first.data.protected) {
-                    expandedMenu = true
-                }
-            },
+            modifier = Modifier.clickable(
+                onClick = rememberHapticOnClick {
+                    if (!first.data.protected) {
+                        expandedMenu = true
+                    }
+                },
+            ),
         )
         DropdownMenu(
             expanded = expandedMenu,
@@ -757,11 +764,13 @@ private fun SecondTypeItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-                .clickable {
-                    if (!second.data.protected) {
-                        expandedMenu = true
-                    }
-                },
+                .clickable(
+                    onClick = rememberHapticOnClick {
+                        if (!second.data.protected) {
+                            expandedMenu = true
+                        }
+                    },
+                ),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(

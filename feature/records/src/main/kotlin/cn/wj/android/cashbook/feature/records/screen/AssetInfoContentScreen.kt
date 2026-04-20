@@ -27,6 +27,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.viewmodel.AssetInfoContentViewModel
@@ -87,9 +88,11 @@ internal fun AssetInfoContentScreen(
                     recordList[index]?.let { item ->
                         RecordListItem(
                             item = item,
-                            modifier = Modifier.clickable {
-                                onRecordItemClick(item)
-                            },
+                            modifier = Modifier.clickable(
+                                onClick = rememberHapticOnClick {
+                                    onRecordItemClick(item)
+                                },
+                            ),
                         )
                     }
                 }

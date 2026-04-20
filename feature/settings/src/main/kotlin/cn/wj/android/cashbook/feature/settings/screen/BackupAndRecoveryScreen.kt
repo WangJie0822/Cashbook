@@ -95,6 +95,7 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.preview.PreviewTheme
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.model.BackupModel
 import cn.wj.android.cashbook.core.model.model.BooksModel
@@ -345,7 +346,7 @@ private fun BackupListDialog(
         confirmButton = {
             Text(
                 text = stringResource(id = R.string.cancel),
-                modifier = Modifier.clickable { onRequestDismissDialog() },
+                modifier = Modifier.clickable(onClick = rememberHapticOnClick { onRequestDismissDialog() }),
             )
         },
         text = {
@@ -358,7 +359,7 @@ private fun BackupListDialog(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
-                                .clickable { onBackupListItemClick(it.path) }
+                                .clickable(onClick = rememberHapticOnClick { onBackupListItemClick(it.path) })
                                 .padding(vertical = 4.dp),
                         )
                     }
@@ -448,7 +449,7 @@ internal fun NoWifiBackupHintDialog(
                 )
                 Row(
                     modifier = Modifier
-                        .clickable { noMorePrompt = !noMorePrompt }
+                        .clickable(onClick = rememberHapticOnClick { noMorePrompt = !noMorePrompt })
                         .padding(end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -629,10 +630,12 @@ internal fun BackupAndRecoveryScaffoldContent(
         CbListItem(
             headlineContent = { Text(text = stringResource(id = R.string.backup_path)) },
             supportingContent = { Text(text = uiState.backupPath.ifBlank { stringResource(id = R.string.click_to_select_backup_path) }) },
-            modifier = Modifier.clickable {
-                onSelectDirCallback = onBackupPathSelected
-                selectDirLauncher.launch(null)
-            },
+            modifier = Modifier.clickable(
+                onClick = rememberHapticOnClick {
+                    onSelectDirCallback = onBackupPathSelected
+                    selectDirLauncher.launch(null)
+                },
+            ),
         )
         CbListItem(
             overlineContent = if (uiState.lastBackupTime.isBlank()) {
@@ -657,18 +660,20 @@ internal fun BackupAndRecoveryScaffoldContent(
                     ),
                 )
             },
-            modifier = Modifier.clickable {
-                if (uiState.backupPath.isBlank()) {
-                    // 未设置备份路径，选择备份路径后进行备份
-                    onSelectDirCallback = { path ->
-                        onBackupPathSelected(path)
+            modifier = Modifier.clickable(
+                onClick = rememberHapticOnClick {
+                    if (uiState.backupPath.isBlank()) {
+                        // 未设置备份路径，选择备份路径后进行备份
+                        onSelectDirCallback = { path ->
+                            onBackupPathSelected(path)
+                            onBackupClick()
+                        }
+                        selectDirLauncher.launch(null)
+                    } else {
                         onBackupClick()
                     }
-                    selectDirLauncher.launch(null)
-                } else {
-                    onBackupClick()
-                }
-            },
+                },
+            ),
         )
         Box {
             var expended by remember {
@@ -688,7 +693,7 @@ internal fun BackupAndRecoveryScaffoldContent(
                     )
                 },
                 modifier = Modifier.combinedClickable(
-                    onClick = {
+                    onClick = rememberHapticOnClick {
                         onRecoveryClick(false, "")
                     },
                     onLongClick = {
@@ -732,7 +737,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             supportingContent = {
                 Text(text = uiState.autoBackup.text)
             },
-            modifier = Modifier.clickable(onClick = onAutoBackupClick),
+            modifier = Modifier.clickable(onClick = rememberHapticOnClick(onClick = onAutoBackupClick)),
         )
 
         CbListItem(
@@ -766,7 +771,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             supportingContent = {
                 Text(text = stringResource(id = R.string.db_data_migrate_hint))
             },
-            modifier = Modifier.clickable(onClick = onDbMigrateClick),
+            modifier = Modifier.clickable(onClick = rememberHapticOnClick(onClick = onDbMigrateClick)),
         )
 
         Spacer(
@@ -818,11 +823,13 @@ internal fun BackupAndRecoveryScaffoldContent(
             supportingContent = {
                 Text(text = stringResource(id = R.string.import_from_wechat_hint))
             },
-            modifier = Modifier.clickable {
-                selectFileLauncher.launch(
-                    arrayOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-                )
-            },
+            modifier = Modifier.clickable(
+                onClick = rememberHapticOnClick {
+                    selectFileLauncher.launch(
+                        arrayOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                    )
+                },
+            ),
         )
 
         Spacer(
@@ -845,7 +852,7 @@ internal fun BackupAndRecoveryScaffoldContent(
             supportingContent = {
                 Text(text = stringResource(id = R.string.export_to_daily_account_hint))
             },
-            modifier = Modifier.clickable { showExportSheet = true },
+            modifier = Modifier.clickable(onClick = rememberHapticOnClick { showExportSheet = true }),
         )
 
         if (showExportSheet) {
@@ -1048,7 +1055,7 @@ private fun ExportBottomSheet(
                             contentDescription = stringResource(id = R.string.export_target_book),
                         )
                     },
-                    modifier = Modifier.clickable { booksExpanded = true },
+                    modifier = Modifier.clickable(onClick = rememberHapticOnClick { booksExpanded = true }),
                 )
                 DropdownMenu(
                     expanded = booksExpanded,
@@ -1077,7 +1084,7 @@ private fun ExportBottomSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showDatePicker = true }
+                    .clickable(onClick = rememberHapticOnClick { showDatePicker = true })
                     .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
