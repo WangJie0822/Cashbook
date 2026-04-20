@@ -30,6 +30,8 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import cn.wj.android.cashbook.core.design.component.CbIconButton
+import cn.wj.android.cashbook.core.design.component.CbTextButton
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
@@ -105,5 +107,43 @@ class HapticTest {
 
         composeTestRule.onNodeWithText("long-btn").performClick()
         assertThat(recorder.events).containsExactly(HapticFeedbackType.LongPress)
+    }
+
+    @Test
+    fun cbTextButton_click_triggers_haptic() {
+        val recorder = RecordingHapticFeedback()
+        val callbackInvoked = mutableListOf<String>()
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalHapticFeedback provides recorder) {
+                CbTextButton(onClick = { callbackInvoked.add("tap") }) {
+                    Text("cb-text-btn")
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText("cb-text-btn").performClick()
+
+        assertThat(recorder.events).containsExactly(HapticFeedbackType.TextHandleMove)
+        assertThat(callbackInvoked).containsExactly("tap")
+    }
+
+    @Test
+    fun cbIconButton_click_triggers_haptic() {
+        val recorder = RecordingHapticFeedback()
+        val callbackInvoked = mutableListOf<String>()
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalHapticFeedback provides recorder) {
+                CbIconButton(onClick = { callbackInvoked.add("tap") }) {
+                    Text("cb-icon-btn")
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText("cb-icon-btn").performClick()
+
+        assertThat(recorder.events).containsExactly(HapticFeedbackType.TextHandleMove)
+        assertThat(callbackInvoked).containsExactly("tap")
     }
 }

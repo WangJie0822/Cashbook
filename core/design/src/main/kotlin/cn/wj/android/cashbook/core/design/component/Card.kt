@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 
 @Composable
 fun CbCard(
@@ -63,7 +64,7 @@ fun CbCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
-        onClick = onClick,
+        onClick = rememberHapticOnClick(onClick = onClick),
         modifier = modifier,
         enabled = enabled,
         shape = shape,
@@ -105,7 +106,7 @@ fun CbElevatedCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ElevatedCard(
-        onClick = onClick,
+        onClick = rememberHapticOnClick(onClick = onClick),
         modifier = modifier,
         enabled = enabled,
         shape = shape,

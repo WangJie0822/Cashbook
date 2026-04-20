@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 
 @Composable
 fun CbTab(
@@ -39,7 +40,7 @@ fun CbTab(
 ) {
     Tab(
         selected = selected,
-        onClick = onClick,
+        onClick = rememberHapticOnClick(onClick = onClick),
         modifier = modifier,
         enabled = enabled,
         text = text,
@@ -63,7 +64,7 @@ fun CbTab(
 ) {
     Tab(
         selected = selected,
-        onClick = onClick,
+        onClick = rememberHapticOnClick(onClick = onClick),
         modifier = modifier,
         enabled = enabled,
         selectedContentColor = selectedContentColor,

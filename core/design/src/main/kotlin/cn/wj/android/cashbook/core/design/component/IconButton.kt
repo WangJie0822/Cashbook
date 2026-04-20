@@ -21,6 +21,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 
 @Composable
 fun CbIconButton(
@@ -31,7 +32,7 @@ fun CbIconButton(
     content: @Composable () -> Unit,
 ) {
     IconButton(
-        onClick = onClick,
+        onClick = rememberHapticOnClick(onClick = onClick),
         modifier = modifier,
         enabled = enabled,
         interactionSource = interactionSource,
