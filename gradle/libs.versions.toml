@@ -77,7 +77,7 @@ androidx-multidex = "2.0.1"
 # core 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/core)
 # [版本查询](https://mvnrepository.com/artifact/androidx.core)
 androidx-core = "1.18.0"
-androidx-core-splashscreen = "1.0.1"
+androidx-core-splashscreen = "1.2.0"
 # Compose 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/compose)
 # [版本查询](https://mvnrepository.com/artifact/androidx.compose)
 androidx-compose-bom = "2025.06.00"
