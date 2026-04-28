@@ -30,7 +30,7 @@ google-devtools-ksp = "2.2.0-2.0.2"
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
 # [版本查询](https://mvnrepository.com/artifact/com.google.protobuf)
 google-protobuf = "4.34.1"
-google-protobuf-plugin = "0.9.6"
+google-protobuf-plugin = "0.10.0"
 # 测试断言 [Github](https://github.com/google/truth)
 # [版本查询](https://mvnrepository.com/artifact/com.google.truth)
 google-truth = "1.4.5"
