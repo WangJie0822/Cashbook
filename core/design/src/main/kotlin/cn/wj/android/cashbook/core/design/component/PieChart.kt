@@ -20,8 +20,6 @@ import android.text.TextUtils
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import cn.wj.android.cashbook.core.design.theme.LocalMotion
-import cn.wj.android.cashbook.core.design.theme.rememberReducedMotion
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +39,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cn.wj.android.cashbook.core.design.theme.LocalMotion
+import cn.wj.android.cashbook.core.design.theme.rememberReducedMotion
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
