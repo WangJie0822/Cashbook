@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +56,6 @@ import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
 import java.time.format.TextStyle
-import java.util.Locale
 
 /**
  * 日历视图
@@ -87,6 +87,7 @@ fun CalendarView(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
         ) {
+            val platformLocale = LocalLocale.current.platformLocale
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                 for (w in weekStart.ordinal until weekStart.ordinal + 7) {
                     val week = DayOfWeek.of(w % 7 + 1)
@@ -98,7 +99,7 @@ fun CalendarView(
                         Text(
                             text = week.getDisplayName(
                                 TextStyle.SHORT,
-                                Locale.getDefault(),
+                                platformLocale,
                             ),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.labelLarge,

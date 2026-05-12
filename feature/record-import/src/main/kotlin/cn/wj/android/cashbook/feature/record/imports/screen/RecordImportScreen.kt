@@ -39,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -115,19 +114,22 @@ internal fun RecordImportScreen(
     onDismissTypeDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // 处理导入完成和错误状态
-    val context = LocalContext.current
+    // 处理导入完成和错误状态，使用 stringResource 以保持 locale 可观察
+    val importErrorMessage = stringResource(R.string.import_file_format_error)
+    val importDoneMessage = if (uiState is RecordImportUiState.Done) {
+        stringResource(R.string.import_success, uiState.imported, uiState.skipped)
+    } else {
+        ""
+    }
 
     LaunchedEffect(uiState) {
         when (uiState) {
             is RecordImportUiState.Done -> {
-                onImportResult(
-                    context.getString(R.string.import_success, uiState.imported, uiState.skipped),
-                )
+                onImportResult(importDoneMessage)
             }
 
             is RecordImportUiState.Error -> {
-                onImportResult(context.getString(R.string.import_file_format_error))
+                onImportResult(importErrorMessage)
             }
 
             else -> {}
