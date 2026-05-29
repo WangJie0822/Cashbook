@@ -32,6 +32,7 @@ androidx.compose.material:material-icons-core-android:1.7.8
 androidx.compose.material:material-icons-core:1.7.8
 androidx.compose.material:material-icons-extended-android:1.7.8
 androidx.compose.material:material-icons-extended:1.7.8
+androidx.compose.material:material-ripple-android:1.11.2
 androidx.compose.material:material-ripple:1.11.2
 androidx.compose.material:material:1.11.2
 androidx.compose.runtime:runtime-android:1.11.2
