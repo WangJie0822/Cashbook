@@ -243,6 +243,7 @@ class RecordRepositoryImpl @Inject constructor(
         recordDao.queryRecordByKeyword(
             booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
             keyword = keyword,
+            amountCent = -1L,
             pageNum = page * pageSize,
             pageSize = pageSize,
         ).map {

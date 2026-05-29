@@ -137,10 +137,27 @@ class RecordRepositoryImplTest {
         val results = recordDao.queryRecordByKeyword(
             booksId = 1L,
             keyword = "消费",
+            amountCent = -1L,
             pageNum = 0,
             pageSize = 10,
         )
         assertThat(results).hasSize(2)
+    }
+
+    @Test
+    fun when_queryRecordByKeyword_with_amount_then_matches_amount() = runTest {
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, amount = 10000L, remark = "午餐"))
+        recordDao.addRecord(createRecord(id = 2L, booksId = 1L, amount = 5000L, remark = "晚餐"))
+        val results = recordDao.queryRecordByKeyword(booksId = 1L, keyword = "100", amountCent = 10000L, pageNum = 0, pageSize = 10)
+        assertThat(results).hasSize(1)
+        assertThat(results.first().id).isEqualTo(1L)
+    }
+
+    @Test
+    fun when_queryRecordByKeyword_amount_sentinel_minus_one_then_no_amount_match() = runTest {
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, amount = 0L, remark = "记账"))
+        val results = recordDao.queryRecordByKeyword(booksId = 1L, keyword = "不存在", amountCent = -1L, pageNum = 0, pageSize = 10)
+        assertThat(results).isEmpty()
     }
 
     @Test

@@ -243,7 +243,10 @@ interface RecordDao {
         value = """
         SELECT * FROM db_record
         WHERE books_id=:booksId
-        AND remark LIKE '%'||:keyword||'%'
+        AND (
+            remark LIKE '%'||:keyword||'%'
+            OR (:amountCent != -1 AND (amount = :amountCent OR final_amount = :amountCent))
+        )
         ORDER BY record_time
         DESC LIMIT :pageSize
         OFFSET :pageNum
@@ -252,6 +255,7 @@ interface RecordDao {
     suspend fun queryRecordByKeyword(
         booksId: Long,
         keyword: String,
+        amountCent: Long,
         pageNum: Int,
         pageSize: Int,
     ): List<RecordTable>

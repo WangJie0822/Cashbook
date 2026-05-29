@@ -187,15 +187,14 @@ class FakeRecordDao : RecordDao {
     override suspend fun queryRecordByKeyword(
         booksId: Long,
         keyword: String,
+        amountCent: Long,
         pageNum: Int,
         pageSize: Int,
     ): List<RecordTable> {
         return records.filter {
             it.booksId == booksId && (
                 it.remark.contains(keyword) ||
-                    it.amount.toString().contains(keyword) ||
-                    it.charge.toString().contains(keyword) ||
-                    it.concessions.toString().contains(keyword)
+                    (amountCent != -1L && (it.amount == amountCent || it.finalAmount == amountCent))
                 )
         }
             .sortedByDescending { it.recordTime }
