@@ -221,6 +221,42 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun queryPagingRecordListByAssetIdBetweenDate(
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryRecordByAssetIdBetween(
+            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
+            assetId = assetId,
+            startDate = startDate,
+            endDate = endDate,
+            pageNum = page * pageSize,
+            pageSize = pageSize,
+        ).map { it.asModel() }
+    }
+
+    override fun queryAssetRecordsBetweenDateFlow(
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Flow<List<RecordModel>> = combine(
+        recordDataVersion,
+        combineProtoDataSource.recordSettingsData,
+    ) { _, settings ->
+        // 全量（pageSize 取足够大）；资产月度记录量级有限
+        recordDao.queryRecordByAssetIdBetween(
+            booksId = settings.currentBookId,
+            assetId = assetId,
+            startDate = startDate,
+            endDate = endDate,
+            pageNum = 0,
+            pageSize = Int.MAX_VALUE,
+        ).map { it.asModel() }
+    }
+
     override suspend fun queryPagingRecordListByTagId(
         tagId: Long,
         page: Int,

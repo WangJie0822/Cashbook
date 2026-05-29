@@ -136,6 +136,33 @@ class FakeRecordRepository : RecordRepository {
             .take(pageSize)
     }
 
+    override suspend fun queryPagingRecordListByAssetIdBetweenDate(
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel> {
+        return records.filter {
+            (it.assetId == assetId || it.relatedAssetId == assetId) &&
+                it.recordTime >= startDate && it.recordTime < endDate
+        }
+            .sortedByDescending { it.recordTime }
+            .drop(page * pageSize)
+            .take(pageSize)
+    }
+
+    override fun queryAssetRecordsBetweenDateFlow(
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Flow<List<RecordModel>> = MutableStateFlow(
+        records.filter {
+            (it.assetId == assetId || it.relatedAssetId == assetId) &&
+                it.recordTime >= startDate && it.recordTime < endDate
+        },
+    )
+
     override suspend fun queryPagingRecordListByTagId(
         tagId: Long,
         page: Int,

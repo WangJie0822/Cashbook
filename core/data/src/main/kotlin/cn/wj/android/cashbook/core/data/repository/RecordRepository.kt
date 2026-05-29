@@ -69,6 +69,22 @@ interface RecordRepository {
         includeChildTypes: Boolean = true,
     ): List<RecordModel>
 
+    /** 资产 [assetId] 在 [startDate,endDate) 的分页记录（含转入） */
+    suspend fun queryPagingRecordListByAssetIdBetweenDate(
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel>
+
+    /** 资产 [assetId] 在 [startDate,endDate) 的全量记录（用于余额口径汇总），响应式 */
+    fun queryAssetRecordsBetweenDateFlow(
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): Flow<List<RecordModel>>
+
     suspend fun queryPagingRecordListByTagId(
         tagId: Long,
         page: Int,
