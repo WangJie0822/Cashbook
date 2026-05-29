@@ -89,4 +89,33 @@ class GetSearchRecordViewsUseCaseTest {
 
         assertThat(result).hasSize(10)
     }
+
+    @Test
+    fun when_search_by_amount_then_matches_record() = runTest {
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 10000L, finalAmount = 10000L, remark = "午餐"))
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, amount = 5000L, finalAmount = 5000L, remark = "晚餐"))
+
+        val result = useCase("100", 0, 10)
+
+        assertThat(result).hasSize(1)
+    }
+
+    @Test
+    fun when_search_non_numeric_then_not_match_zero_amount_record() = runTest {
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 0L, finalAmount = 0L, remark = "记账"))
+
+        val result = useCase("早餐", 0, 10)
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun when_search_by_final_amount_with_fee_then_matches() = runTest {
+        // amount 9000 含手续费后 finalAmount 10000，用户按所见 100 元搜应命中
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 9000L, finalAmount = 10000L, remark = "转账"))
+
+        val result = useCase("100", 0, 10)
+
+        assertThat(result).hasSize(1)
+    }
 }

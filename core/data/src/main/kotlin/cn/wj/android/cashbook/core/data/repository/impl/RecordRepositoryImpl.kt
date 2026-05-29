@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.toAmountCent
 import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
@@ -240,10 +241,11 @@ class RecordRepositoryImpl @Inject constructor(
         page: Int,
         pageSize: Int,
     ): List<RecordModel> = withContext(coroutineContext) {
+        val amountCent = if (keyword.toBigDecimalOrNull() != null) keyword.toAmountCent() else -1L
         recordDao.queryRecordByKeyword(
             booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
             keyword = keyword,
-            amountCent = -1L,
+            amountCent = amountCent,
             pageNum = page * pageSize,
             pageSize = pageSize,
         ).map {

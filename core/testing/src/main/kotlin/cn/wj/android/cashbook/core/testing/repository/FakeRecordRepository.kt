@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.core.testing.repository
 
 import androidx.paging.PagingData
+import cn.wj.android.cashbook.core.common.ext.toAmountCent
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.model.ExportRecordModel
@@ -148,7 +149,11 @@ class FakeRecordRepository : RecordRepository {
         page: Int,
         pageSize: Int,
     ): List<RecordModel> {
-        return records.filter { it.remark.contains(keyword) }
+        val amountCent = if (keyword.toBigDecimalOrNull() != null) keyword.toAmountCent() else -1L
+        return records.filter {
+            it.remark.contains(keyword) ||
+                (amountCent != -1L && (it.amount == amountCent || it.finalAmount == amountCent))
+        }
             .drop(page * pageSize)
             .take(pageSize)
     }
