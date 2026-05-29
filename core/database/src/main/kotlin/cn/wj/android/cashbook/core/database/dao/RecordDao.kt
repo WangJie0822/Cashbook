@@ -144,6 +144,26 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
+    /** 资产 id 为 [assetId]（含转入资产）在 [startDate,endDate) 的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query(
+        """
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND (asset_id=:assetId OR into_asset_id=:assetId)
+        AND record_time>=:startDate
+        AND record_time<:endDate
+        ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
+    """,
+    )
+    suspend fun queryRecordByAssetIdBetween(
+        booksId: Long,
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
     /** 类型 id 为 [typeId]（包含子类型）的第 [pageNum] 页 [pageSize] 条记录 */
     @Query(
         """

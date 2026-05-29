@@ -129,6 +129,24 @@ class RecordRepositoryImplTest {
     }
 
     @Test
+    fun when_queryRecordByAssetIdBetween_then_filters_asset_and_date() = runTest {
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, assetId = 5L, recordTime = 1500L))
+        recordDao.addRecord(createRecord(id = 2L, booksId = 1L, assetId = 5L, recordTime = 3000L)) // 区间外
+        recordDao.addRecord(createRecord(id = 3L, booksId = 1L, assetId = 9L, recordTime = 1500L)) // 别的资产
+
+        val results = recordDao.queryRecordByAssetIdBetween(
+            booksId = 1L,
+            assetId = 5L,
+            startDate = 1000L,
+            endDate = 2000L,
+            pageNum = 0,
+            pageSize = 10,
+        )
+        assertThat(results).hasSize(1)
+        assertThat(results.first().id).isEqualTo(1L)
+    }
+
+    @Test
     fun when_queryRecordByKeyword_then_matches_remark() = runTest {
         recordDao.addRecord(createRecord(id = 1L, booksId = 1L, remark = "午餐消费"))
         recordDao.addRecord(createRecord(id = 2L, booksId = 1L, remark = "晚餐消费"))

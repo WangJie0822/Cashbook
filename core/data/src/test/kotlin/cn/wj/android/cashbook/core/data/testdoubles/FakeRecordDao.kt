@@ -102,6 +102,24 @@ class FakeRecordDao : RecordDao {
             .take(pageSize)
     }
 
+    override suspend fun queryRecordByAssetIdBetween(
+        booksId: Long,
+        assetId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable> {
+        return records.filter {
+            it.booksId == booksId &&
+                (it.assetId == assetId || it.intoAssetId == assetId) &&
+                it.recordTime >= startDate && it.recordTime < endDate
+        }
+            .sortedByDescending { it.recordTime }
+            .drop(pageNum)
+            .take(pageSize)
+    }
+
     override suspend fun queryRecordByTypeId(
         booksId: Long,
         typeId: Long,
