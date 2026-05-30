@@ -159,7 +159,8 @@ class SettingViewModel @Inject constructor(
         val cipher = loadEncryptCipher(KEY_ALIAS_PASSWORD)
         val passwordInfo = cipher.doFinal(pwd.shaEncode().toByteArray()).toHexString()
         val passwordIv = cipher.iv.toHexString()
-        logger().i("onCreateConfirm(pwd), passwordInfo = <$passwordInfo>, passwordIv = <$passwordIv>")
+        // 安全：禁止记录口令明文/密文/IV，避免凭据泄露
+        logger().i("onCreateConfirm()")
         viewModelScope.launch {
             // 保存密码信息
             settingRepository.updatePasswordInfo(passwordInfo)
@@ -183,8 +184,8 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
             val passwordIv = passwordIv.first()
-            this@SettingViewModel.logger()
-                .i("onModifyConfirm(oldPwd = <$oldPwd>, newPwd = <$newPwd>), passwordIv = <$passwordIv>")
+            // 安全：禁止记录口令明文/IV，避免凭据泄露
+            this@SettingViewModel.logger().i("onModifyConfirm()")
             val bytes = passwordIv.hexToBytes()
             if (null == bytes) {
                 callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
@@ -216,8 +217,8 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
             val passwordIv = passwordIv.first()
-            this@SettingViewModel.logger()
-                .i("onVerityConfirm(pwd = <$pwd>), passwordIv = <$passwordIv>")
+            // 安全：禁止记录口令明文/IV，避免凭据泄露
+            this@SettingViewModel.logger().i("onVerityConfirm()")
             val bytes = passwordIv.hexToBytes()
             if (null == bytes) {
                 callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
@@ -243,8 +244,8 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             // 使用 AndroidKeyStore 解密密码信息
             val passwordIv = passwordIv.first()
-            this@SettingViewModel.logger()
-                .i("onClearConfirm(pwd = <$pwd>), passwordIv = <$passwordIv>")
+            // 安全：禁止记录口令明文/IV，避免凭据泄露
+            this@SettingViewModel.logger().i("onClearConfirm()")
             val bytes = passwordIv.hexToBytes()
             if (null == bytes) {
                 callback.invoke(SettingPasswordStateEnum.PASSWORD_DECODE_FAILED)
@@ -278,7 +279,8 @@ class SettingViewModel @Inject constructor(
         val fingerprintPasswordInfo =
             cipher.doFinal(printFingerprintPwdSha.toByteArray()).toHexString()
         val fingerprintPasswordIv = cipher.iv.toHexString()
-        logger().i("onFingerprintVerifySuccess(cipher), fingerprintPasswordInfo = <$fingerprintPasswordInfo>, fingerprintPasswordIv = <$fingerprintPasswordIv>")
+        // 安全：禁止记录指纹口令密文/IV，避免凭据泄露
+        logger().i("onFingerprintVerifySuccess()")
         viewModelScope.launch {
             // 保存密码信息
             settingRepository.updateFingerprintPasswordInfo(fingerprintPasswordInfo)
