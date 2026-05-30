@@ -1152,6 +1152,22 @@ git commit -m "[feat|feature|types][公共]一级分类长按拖动排序（reor
 
 ## 实施记录（执行时回填偏离）
 
-- （reorderable 方案 A/B 实际选择与原因）
-- （RecordModel 转入资产/手续费字段实际命名）
-- （④ 按日分组 list item 复用 LauncherListItem 还是新建）
+### ③.4 reorderable 方案选择
+- **采用方案 A**（reorderable 3.1.0）。PoC 实证：`:feature:types:compileDebugKotlin` 带代理通过，与 Compose BOM 2026.05.01 兼容（`rememberReorderableLazyListState{from,to->}` / `ReorderableItem` / `Modifier.longPressDraggableHandle` API 全有效）。
+- **依赖足迹（变更影响）**：reorderable 3.x 基于 Compose Multiplatform，引入 `org.jetbrains.compose.*`(1.7.0) + `org.jetbrains.androidx.lifecycle/savedstate` + atomicfu 等 ~18 个 runtime 工件，并将 androidx.savedstate 1.3.2→1.3.3。实证 `foundation-1.7.0.pom` 依赖 `androidx.compose.foundation`——CMP 工件为指向 androidx 的 **delegation 层，非重复 Compose 实现**，真实新增代码仅 reorderable-android 本身。依赖基线仅 3 份 app 基线变更（app-catalog 不依赖 feature:types，无 reorderable）。
+- **拖动持久化**：Screen 端 localList(mutableStateListOf) 本地镜像即时重排 + draggedFromIndex 捕获起点；onDragStopped 取终点净位移调 `onMoveFirstType(from,to)`（③.3 已建），ViewModel 端基于 uiState(DB 顺序) 重放净位移。reorderable 渲染 smoke 由现有 MyCategoriesScreen 截图测试覆盖。
+
+### ④ 字段命名 / 按日分组
+- RecordModel 转入资产 `relatedAssetId`、手续费 `charges`（复数）；RecordTable 为 `into_asset_id`/`charge`。
+- 按日分组 **复用** `LauncherListItem`（feature/records/viewmodel 模块级 sealed），并抽取共享 `RecordDayGrouping`（recordDaySeparator + computeDayType），Launcher 同步复用消除重复。AssetInfoContentScreen 渲染 DayHeader + Record(showDate=false)。
+
+### 修复上一会话 ④.5 预存破损（实测发现，handoff "11 commit 全真绿"对 feature:records/assets 不成立）
+- ④.5(ab97811f) 改了 AssetInfoContentScreen / AssetInfoScreen 的 slot 签名，但漏改对应截图测试 → feature:records + feature:assets 测试编译失败。已修（20ffed07 / 19c464ef）。上一会话未跑过这两模块 testDebugUnitTest。
+
+### full-review（节点 2）终审与修复
+- Phase 1-2 评审发现 2 条 High（均 ④.3 GetAssetMonthSummaryUseCase）：
+  - H1 正确性：getRecordTypeById 对平账合成类型(-1101/-1102)返回 null→跳过平账记录，结余口径与 verifyAssetBalance 不一致（controller hands-on 核验为真）。
+  - P1 性能：循环内 per-record getRecordTypeById N+1。
+- 用户选 H1+P1 一起修。fccd4e90：TypeRepository.getRecordTypeCategories 批量 IN 查询 + UseCase balanceCategoryOrNull 兜底纳入平账。**采用批量 IN 而非行投影 LEFT JOIN**——Fake 仓库按实体拆分使 DAO 级 JOIN 难干净测试，批量 IN 同为"单查询消除 N+1+纳入平账"，效果等价且保持 Fake 解耦。
+- Phase 3-5 经用户授权跳过。
+- 全量回归（修复后再次全绿）：5 模块单测 + dependencyGuard + assembleOnlineDebug + verifyRoborazziOnlineDebug。
