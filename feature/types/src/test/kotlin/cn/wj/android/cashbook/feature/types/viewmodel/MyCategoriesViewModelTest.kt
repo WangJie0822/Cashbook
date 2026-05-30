@@ -85,6 +85,25 @@ class MyCategoriesViewModelTest {
     }
 
     @Test
+    fun when_move_first_type_then_order_persisted() = runTest {
+        typeRepository.addType(
+            createRecordTypeModel(id = 1L, name = "A", typeCategory = RecordTypeCategoryEnum.EXPENDITURE),
+        )
+        typeRepository.addType(
+            createRecordTypeModel(id = 2L, name = "B", typeCategory = RecordTypeCategoryEnum.EXPENDITURE),
+        )
+        val collectJob = launch(UnconfinedTestDispatcher()) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.onMoveFirstType(fromIndex = 0, toIndex = 1)
+
+        val state = viewModel.uiState.value as MyCategoriesUiState.Success
+        assertThat(state.typeList.map { it.data.name }).containsExactly("B", "A").inOrder()
+        collectJob.cancel()
+    }
+
+    @Test
     fun when_select_income_category_then_tab_changes() = runTest {
         // 准备收入类型
         typeRepository.addType(

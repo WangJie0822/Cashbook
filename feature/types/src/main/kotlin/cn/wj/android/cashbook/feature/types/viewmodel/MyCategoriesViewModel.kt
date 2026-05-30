@@ -79,7 +79,7 @@ class MyCategoriesViewModel @Inject constructor(
                         )
                     },
             )
-        }
+        }.sortedBy { it.data.sort }
         MyCategoriesUiState.Success(
             selectedTab = _selectedTabData.first(),
             typeList = firstTypeList,
@@ -93,6 +93,17 @@ class MyCategoriesViewModel @Inject constructor(
 
     fun selectTypeCategory(category: RecordTypeCategoryEnum) {
         _selectedTabData.tryEmit(category)
+    }
+
+    /** 一级分类从 [fromIndex] 拖动到 [toIndex]，持久化新顺序 */
+    fun onMoveFirstType(fromIndex: Int, toIndex: Int) {
+        viewModelScope.launch {
+            val current = (uiState.value as? MyCategoriesUiState.Success)?.typeList ?: return@launch
+            val ids = current.map { it.data.id }.toMutableList()
+            if (fromIndex !in ids.indices || toIndex !in ids.indices) return@launch
+            ids.add(toIndex, ids.removeAt(fromIndex))
+            typeRepository.updateFirstTypeSort(ids)
+        }
     }
 
     fun dismissBookmark() {
