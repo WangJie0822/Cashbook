@@ -43,12 +43,25 @@ class AssetInfoContentViewModelTest {
     @Test
     fun when_update_asset_id_then_no_crash() {
         // 构造真实 ViewModel 并调用 updateAssetId，验证不抛异常
-        val fakeUseCase = buildFakeUseCase(emptyList())
-        val viewModel = AssetInfoContentViewModel(fakeUseCase)
+        val viewModel = buildViewModel()
         viewModel.updateAssetId(1L)
         viewModel.updateAssetId(0L)
         viewModel.updateAssetId(-1L)
         // 只要走到这里说明没有崩溃
+    }
+
+    @Test
+    fun when_update_month_and_credit_card_then_no_crash() {
+        // 调用月份切换与信用卡标记，验证不抛异常且 dateSelection 同步更新
+        val viewModel = buildViewModel()
+        viewModel.updateIsCreditCard(true)
+        viewModel.updateMonth(java.time.YearMonth.of(2024, 1))
+        assertThat(viewModel.dateSelection.value)
+            .isEqualTo(
+                cn.wj.android.cashbook.core.model.entity.DateSelectionEntity.ByMonth(
+                    java.time.YearMonth.of(2024, 1),
+                ),
+            )
     }
 
     // -------------------------------------------------------------------------
@@ -132,10 +145,8 @@ class AssetInfoContentViewModelTest {
     // 辅助方法
     // -------------------------------------------------------------------------
 
-    /** 构造仅返回固定数据的 FakeUseCase */
-    private fun buildFakeUseCase(
-        data: List<RecordViewsEntity>,
-    ): cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase {
+    /** 构造注入 Fake 用例的真实 [AssetInfoContentViewModel] */
+    private fun buildViewModel(): AssetInfoContentViewModel {
         val fakeRecordRepository = cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository()
         val fakeTypeRepository = cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository()
         val fakeAssetRepository = cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository()
@@ -147,10 +158,19 @@ class AssetInfoContentViewModelTest {
             tagRepository = fakeTagRepository,
             coroutineContext = dispatcherRule.testDispatcher,
         )
-        return cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase(
+        val getAssetRecordViewsUseCase = cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase(
             recordRepository = fakeRecordRepository,
             recordModelTransToViewsUseCase = transUseCase,
             coroutineContext = dispatcherRule.testDispatcher,
+        )
+        val getAssetMonthSummaryUseCase = cn.wj.android.cashbook.domain.usecase.GetAssetMonthSummaryUseCase(
+            recordRepository = fakeRecordRepository,
+            typeRepository = fakeTypeRepository,
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+        return AssetInfoContentViewModel(
+            getAssetRecordViewsUseCase = getAssetRecordViewsUseCase,
+            getAssetMonthSummaryUseCase = getAssetMonthSummaryUseCase,
         )
     }
 

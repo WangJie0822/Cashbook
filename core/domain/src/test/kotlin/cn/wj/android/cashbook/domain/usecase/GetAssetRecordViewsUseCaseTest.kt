@@ -59,7 +59,13 @@ class GetAssetRecordViewsUseCaseTest {
 
     @Test
     fun when_asset_id_is_invalid_then_returns_empty() = runTest {
-        val result = useCase(-1L, 0, 10)
+        val result = useCase(
+            assetId = -1L,
+            startDate = 0L,
+            endDate = Long.MAX_VALUE,
+            pageNum = 0,
+            pageSize = 10,
+        )
 
         assertThat(result).isEmpty()
     }
@@ -70,8 +76,24 @@ class GetAssetRecordViewsUseCaseTest {
         recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, assetId = 5L))
         recordRepository.addRecord(createRecordModel(id = 3L, typeId = 1L, assetId = 6L))
 
-        val result = useCase(5L, 0, 10)
+        val result = useCase(
+            assetId = 5L,
+            startDate = 0L,
+            endDate = Long.MAX_VALUE,
+            pageNum = 0,
+            pageSize = 10,
+        )
 
         assertThat(result).hasSize(2)
+    }
+
+    @Test
+    fun when_between_date_then_filters_by_time() = runTest {
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, assetId = 5L, recordTime = 1500L))
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, assetId = 5L, recordTime = 5000L))
+
+        val result = useCase(assetId = 5L, startDate = 1000L, endDate = 2000L, pageNum = 0, pageSize = 10)
+
+        assertThat(result).hasSize(1)
     }
 }

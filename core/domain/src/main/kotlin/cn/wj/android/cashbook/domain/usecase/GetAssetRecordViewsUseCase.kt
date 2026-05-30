@@ -38,13 +38,15 @@ class GetAssetRecordViewsUseCase @Inject constructor(
 
     suspend operator fun invoke(
         assetId: Long,
+        startDate: Long,
+        endDate: Long,
         pageNum: Int,
         pageSize: Int,
     ): List<RecordViewsEntity> = withContext(coroutineContext) {
         if (assetId == -1L) {
             return@withContext emptyList()
         }
-        recordRepository.queryPagingRecordListByAssetId(assetId, pageNum, pageSize)
+        recordRepository.queryPagingRecordListByAssetIdBetweenDate(assetId, startDate, endDate, pageNum, pageSize)
             .sortedByDescending { it.recordTime }
             .map {
                 recordModelTransToViewsUseCase(it).asEntity()
