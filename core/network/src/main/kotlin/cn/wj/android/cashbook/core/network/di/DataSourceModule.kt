@@ -50,23 +50,30 @@ object DataSourceModule {
 
     @Provides
     @Singleton
-    fun okHttpCallFactory(): Call.Factory = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .addNetworkInterceptor(
-            LoggerInterceptor(
-                { message ->
-                    funLogger("NET").d(message)
-                },
-                if (ApplicationInfo.debug) {
-                    LoggerInterceptor.LEVEL_BODY
-                } else {
-                    LoggerInterceptor.LEVEL_NONE
-                },
-            ),
-        )
-        .build()
+    fun okHttpCallFactory(): Call.Factory {
+        // 构造日志拦截器：debug 渠道打印完整 body，其余渠道关闭日志
+        val loggerInterceptor = LoggerInterceptor(
+            { message ->
+                funLogger("NET").d(message)
+            },
+            if (ApplicationInfo.debug) {
+                LoggerInterceptor.LEVEL_BODY
+            } else {
+                LoggerInterceptor.LEVEL_NONE
+            },
+        ).apply {
+            // 对敏感请求头脱敏，避免 WebDAV Basic 凭据等明文进入日志（redactHeader 返回 Unit，就地修改）
+            redactHeader("Authorization")
+            redactHeader("Cookie")
+            redactHeader("Proxy-Authorization")
+        }
+        return OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .addNetworkInterceptor(loggerInterceptor)
+            .build()
+    }
 
     @Provides
     fun providesNetworkMonitor(

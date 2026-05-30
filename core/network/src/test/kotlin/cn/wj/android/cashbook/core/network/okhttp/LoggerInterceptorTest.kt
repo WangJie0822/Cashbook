@@ -137,4 +137,39 @@ class LoggerInterceptorTest {
         // 日志中应出现脱敏占位符 ██
         assertThat(combined).contains("██")
     }
+
+    // ========== when_redact_multiple_sensitive_headers_then_all_hidden ==========
+
+    /**
+     * 验证生产装配（DataSourceModule.okHttpCallFactory）中对 Authorization / Cookie /
+     * Proxy-Authorization 三个敏感头同时脱敏的场景：原始凭据均不出现在日志中。
+     */
+    @Test
+    fun when_redact_multiple_sensitive_headers_then_all_hidden() {
+        mockWebServer.enqueue(MockResponse().setBody("ok"))
+
+        buildClient(LoggerInterceptor.LEVEL_HEADERS) {
+            redactHeader("Authorization")
+            redactHeader("Cookie")
+            redactHeader("Proxy-Authorization")
+        }
+            .newCall(
+                Request.Builder()
+                    .url(mockWebServer.url("/secure"))
+                    // 模拟 WebDAV Basic 凭据，可解码出原始账号密码
+                    .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
+                    .header("Cookie", "session=cookie-secret-value")
+                    .header("Proxy-Authorization", "Basic proxy-secret")
+                    .build(),
+            )
+            .execute()
+
+        val combined = logOutput.joinToString("\n")
+        // 三个敏感头的原始值均不得出现在日志中
+        assertThat(combined).doesNotContain("dXNlcjpwYXNzd29yZA==")
+        assertThat(combined).doesNotContain("cookie-secret-value")
+        assertThat(combined).doesNotContain("proxy-secret")
+        // 应出现脱敏占位符 ██
+        assertThat(combined).contains("██")
+    }
 }
