@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.testing.data.createAssetModel
+import cn.wj.android.cashbook.core.testing.data.createImageModel
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createTagModel
@@ -177,5 +178,111 @@ class RecordModelTransToViewsUseCaseTest {
 
         // 支出类型关联收入: amount = 8000
         assertThat(result.relatedAmount).isEqualTo(8000L)
+    }
+
+    /** 构造一组覆盖多种类型 / 资产 / 关联 / 标签 / 图片的混合数据，供批量等价性测试复用 */
+    private fun setupMixedRecords(): List<cn.wj.android.cashbook.core.model.model.RecordModel> {
+        // 类型：1=普通支出，2=普通收入，3=收入类型（带关联），4=支出类型（带关联）
+        typeRepository.addType(
+            createRecordTypeModel(id = 1L, name = "餐饮", typeCategory = RecordTypeCategoryEnum.EXPENDITURE),
+        )
+        typeRepository.addType(
+            createRecordTypeModel(id = 2L, name = "工资", typeCategory = RecordTypeCategoryEnum.INCOME),
+        )
+        typeRepository.addType(
+            createRecordTypeModel(id = 3L, name = "报销", typeCategory = RecordTypeCategoryEnum.INCOME),
+        )
+        typeRepository.addType(
+            createRecordTypeModel(id = 4L, name = "购物", typeCategory = RecordTypeCategoryEnum.EXPENDITURE),
+        )
+
+        // 资产
+        assetRepository.addAsset(createAssetModel(id = 10L, name = "支付宝"))
+        assetRepository.addAsset(createAssetModel(id = 11L, name = "银行卡"))
+
+        // 关联记录（被引用，类型 1 普通支出）
+        val relatedExpenditure = createRecordModel(
+            id = 100L,
+            typeId = 1L,
+            amount = 3000L,
+            charges = 200L,
+            concessions = 100L,
+        )
+        // 关联记录（被引用，类型 2 普通收入）
+        val relatedIncome = createRecordModel(id = 101L, typeId = 2L, amount = 5000L)
+
+        // 主记录们
+        val r1 = createRecordModel(id = 1L, typeId = 1L, assetId = 10L, amount = 1000L) // 普通支出，无关联
+        val r2 = createRecordModel(id = 2L, typeId = 1L, assetId = 10L, amount = 2000L) // 与 r1 共享类型/资产
+        val r3 = createRecordModel(id = 3L, typeId = 3L, assetId = 11L, amount = 8000L) // 收入类型，关联支出 100
+        val r4 = createRecordModel(
+            id = 4L,
+            typeId = 4L,
+            assetId = 11L,
+            relatedAssetId = 10L,
+            amount = 9000L,
+        ) // 支出类型，关联收入 101
+        val r5 = createRecordModel(
+            id = 5L,
+            typeId = RECORD_TYPE_BALANCE_INCOME.id,
+            amount = 500L,
+        ) // 平账收入合成类型
+
+        recordRepository.addRecord(relatedExpenditure)
+        recordRepository.addRecord(relatedIncome)
+        recordRepository.addRecord(r1)
+        recordRepository.addRecord(r2)
+        recordRepository.addRecord(r3)
+        recordRepository.addRecord(r4)
+        recordRepository.addRecord(r5)
+
+        // 收入类型 r3 关联支出 100
+        recordRepository.setRelatedIds(3L, listOf(100L))
+        // 支出类型 r4 关联收入 101
+        recordRepository.setRelatedFromIds(4L, listOf(101L))
+
+        // 标签：仅 r1 有标签
+        tagRepository.setRelatedTags(1L, listOf(createTagModel(id = 1L, name = "日常")))
+        // 图片：仅 r3 有图片
+        recordRepository.setImages(3L, listOf(createImageModel(id = 1L, recordId = 3L, path = "/p")))
+
+        return listOf(r1, r2, r3, r4, r5)
+    }
+
+    @Test
+    fun batch_produces_field_equivalent_result_to_single() = runTest {
+        val records = setupMixedRecords()
+
+        // 单条逐个转换作为黄金基准
+        val expected = records.map { useCase(it) }
+        // 批量转换
+        val actual = useCase(records)
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun batch_does_not_query_per_record_but_uses_batch_apis() = runTest {
+        val records = setupMixedRecords()
+
+        // 重置计数（setupMixedRecords 不调用查询接口，此处保险起见）
+        val imagesSingleBefore = recordRepository.queryImagesByRecordIdCount
+        val byIdsBefore = recordRepository.queryByIdsCount
+        val imagesBatchBefore = recordRepository.queryImagesByRecordIdsCount
+
+        useCase(records)
+
+        // 批量路径不应逐条调用 queryImagesByRecordId
+        assertThat(recordRepository.queryImagesByRecordIdCount).isEqualTo(imagesSingleBefore)
+        // 批量路径应调用批量图片查询恰好一次
+        assertThat(recordRepository.queryImagesByRecordIdsCount).isEqualTo(imagesBatchBefore + 1)
+        // 批量路径应调用批量记录查询恰好一次（解析关联记录）
+        assertThat(recordRepository.queryByIdsCount).isEqualTo(byIdsBefore + 1)
+    }
+
+    @Test
+    fun batch_empty_input_returns_empty() = runTest {
+        val result = useCase(emptyList())
+        assertThat(result).isEmpty()
     }
 }

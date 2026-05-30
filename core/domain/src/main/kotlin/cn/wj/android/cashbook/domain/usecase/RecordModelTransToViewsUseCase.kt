@@ -23,9 +23,11 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordModel
+import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -59,16 +61,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                     recordRepository.queryById(id)
                 }
             }
-            var totalRelated = 0L
-            relatedRecord.forEach { record ->
-                if (type.typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                    // 支出类型，关联的是收入
-                    totalRelated += record.amount
-                } else if (type.typeCategory == RecordTypeCategoryEnum.INCOME) {
-                    // 收入类型，关联的是支出
-                    totalRelated += (record.amount + record.charges - record.concessions)
-                }
-            }
+            val totalRelated = sumRelatedAmount(type.typeCategory, relatedRecord)
             RecordViewsModel(
                 id = recordModel.id,
                 booksId = recordModel.booksId,
@@ -88,4 +81,117 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 recordTime = recordModel.recordTime,
             )
         }
+
+    /**
+     * 批量转换：与单条 [invoke] 产出逐字段等价，但通过 IN 批量查询 + 去重 + 内存 Map 组装，
+     * 避免对每条记录单独发起 type / asset / 关联记录 / 图片 查询，消除 N+1。
+     *
+     * 注意：标签（[TagRepository.getRelatedTag]）按 recordId 查询，每条记录的 id 互不相同，
+     * 无法批量合并，仍逐条查询；这是当前接口约束下的固有 1-per-record 调用，非 N+1 放大。
+     */
+    suspend operator fun invoke(records: List<RecordModel>): List<RecordViewsModel> =
+        transBatch(records)
+
+    suspend fun transBatch(records: List<RecordModel>): List<RecordViewsModel> =
+        withContext(coroutineContext) {
+            if (records.isEmpty()) {
+                return@withContext emptyList()
+            }
+
+            // 1. 批量解析类型：去重 typeId，逐个解析后建 Map（平账合成类型走特判，不查库）
+            val typeMap: Map<Long, RecordTypeModel> = records
+                .map { it.typeId }
+                .distinct()
+                .associateWith { typeId ->
+                    when (typeId) {
+                        RECORD_TYPE_BALANCE_INCOME.id -> RECORD_TYPE_BALANCE_INCOME
+                        RECORD_TYPE_BALANCE_EXPENDITURE.id -> RECORD_TYPE_BALANCE_EXPENDITURE
+                        else -> typeRepository.getNoNullRecordTypeById(typeId)
+                    }
+                }
+
+            // 2. 批量解析资产：去重 assetId / relatedAssetId，逐个解析后建 Map（与单条版 getAssetById 一致，-1 返回 null）
+            val assetIds = records
+                .flatMap { listOf(it.assetId, it.relatedAssetId) }
+                .distinct()
+            val assetMap: Map<Long, AssetModel?> = assetIds.associateWith { id ->
+                assetRepository.getAssetById(id)
+            }
+
+            // 3. 按类型分组解析关联关系：收入侧用 getRelatedIdMapByIds，其余用 getRecordIdFromRelatedMapByIds
+            val incomeRecordIds = records
+                .filter { typeMap.getValue(it.typeId).typeCategory == RecordTypeCategoryEnum.INCOME }
+                .map { it.id }
+            val nonIncomeRecordIds = records
+                .filter { typeMap.getValue(it.typeId).typeCategory != RecordTypeCategoryEnum.INCOME }
+                .map { it.id }
+            val incomeRelatedIdMap = recordRepository.getRelatedIdMapByIds(incomeRecordIds)
+            val nonIncomeRelatedIdMap = recordRepository.getRecordIdFromRelatedMapByIds(nonIncomeRecordIds)
+
+            // 4. 批量取回所有被关联的记录，建 id -> RecordModel Map
+            val relatedRecordIds = (
+                incomeRelatedIdMap.values.flatten() + nonIncomeRelatedIdMap.values.flatten()
+                ).distinct()
+            val relatedRecordMap: Map<Long, RecordModel> = recordRepository
+                .queryByIds(relatedRecordIds)
+                .associateBy { it.id }
+
+            // 5. 批量取回图片
+            val allRecordIds = records.map { it.id }
+            val imageMap = recordRepository.queryImagesByRecordIds(allRecordIds)
+
+            // 6. 逐条组装（仅标签为逐条查询，见方法注释）
+            records.map { recordModel ->
+                val type = typeMap.getValue(recordModel.typeId)
+                val relatedIdList = if (type.typeCategory == RecordTypeCategoryEnum.INCOME) {
+                    incomeRelatedIdMap[recordModel.id].orEmpty()
+                } else {
+                    nonIncomeRelatedIdMap[recordModel.id].orEmpty()
+                }
+                // mapNotNull 复刻单条版 queryById 返回 null 时丢弃的语义
+                val relatedRecord = relatedIdList.mapNotNull { id -> relatedRecordMap[id] }
+                val totalRelated = sumRelatedAmount(type.typeCategory, relatedRecord)
+                RecordViewsModel(
+                    id = recordModel.id,
+                    booksId = recordModel.booksId,
+                    type = type,
+                    asset = assetMap[recordModel.assetId],
+                    relatedAsset = assetMap[recordModel.relatedAssetId],
+                    amount = recordModel.amount,
+                    finalAmount = recordModel.finalAmount,
+                    charges = recordModel.charges,
+                    concessions = recordModel.concessions,
+                    remark = recordModel.remark,
+                    reimbursable = recordModel.reimbursable,
+                    relatedTags = tagRepository.getRelatedTag(recordModel.id),
+                    relatedImage = imageMap[recordModel.id].orEmpty(),
+                    relatedRecord = relatedRecord,
+                    relatedAmount = totalRelated,
+                    recordTime = recordModel.recordTime,
+                )
+            }
+        }
+
+    /**
+     * 计算关联金额，单条与批量共用同一口径，保证两者逐字段等价。
+     * - 支出类型：关联的是收入，累加 [RecordModel.amount]
+     * - 收入类型：关联的是支出，累加 amount + charges - concessions
+     * - 其它类型：不累加
+     */
+    private fun sumRelatedAmount(
+        typeCategory: RecordTypeCategoryEnum,
+        relatedRecord: List<RecordModel>,
+    ): Long {
+        var totalRelated = 0L
+        relatedRecord.forEach { record ->
+            if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+                // 支出类型，关联的是收入
+                totalRelated += record.amount
+            } else if (typeCategory == RecordTypeCategoryEnum.INCOME) {
+                // 收入类型，关联的是支出
+                totalRelated += (record.amount + record.charges - record.concessions)
+            }
+        }
+        return totalRelated
+    }
 }

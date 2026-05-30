@@ -391,6 +391,18 @@ class FakeRecordDao : RecordDao {
         return images.filter { it.recordId == recordId }
     }
 
+    override suspend fun queryImagesByRecordIds(recordIds: List<Long>): List<ImageWithRelatedTable> {
+        return images.filter { it.recordId in recordIds }
+    }
+
+    override suspend fun queryRelatedByRecordIds(recordIds: List<Long>): List<RecordWithRelatedTable> {
+        return relatedRecords.filter { it.recordId in recordIds }
+    }
+
+    override suspend fun queryRelatedByRelatedRecordIds(recordIds: List<Long>): List<RecordWithRelatedTable> {
+        return relatedRecords.filter { it.relatedRecordId in recordIds }
+    }
+
     override suspend fun queryByWechatTransactionId(
         booksId: Long,
         transactionId: String,
@@ -404,12 +416,13 @@ class FakeRecordDao : RecordDao {
         booksId: Long,
         startTime: Long,
         endTime: Long,
-        amount: Double,
+        amount: Long,
     ): List<RecordTable> {
         return records.filter {
             it.booksId == booksId &&
                 it.recordTime in startTime..endTime &&
-                it.amount == amount.toLong()
+                // amount 列与入参都已是分（Long），按分精确相等比较
+                it.amount == amount
         }
     }
 

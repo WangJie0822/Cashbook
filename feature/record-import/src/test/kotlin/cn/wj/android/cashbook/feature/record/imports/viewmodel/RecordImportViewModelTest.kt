@@ -17,6 +17,10 @@
 package cn.wj.android.cashbook.feature.record.imports.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
+import cn.wj.android.cashbook.core.model.model.BillDirection
+import cn.wj.android.cashbook.core.model.model.DuplicateStatus
+import cn.wj.android.cashbook.core.model.model.ImportedBillItem
+import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
@@ -34,10 +38,13 @@ class RecordImportViewModelTest {
     @get:Rule
     val dispatcherRule = TestDispatcherRule()
 
-    private fun createViewModel(filePath: String = ""): RecordImportViewModel {
+    private fun createViewModel(
+        filePath: String = "",
+        recordRepository: FakeRecordRepository = FakeRecordRepository(),
+    ): RecordImportViewModel {
         return RecordImportViewModel(
             savedStateHandle = SavedStateHandle(mapOf("fileUri" to filePath)),
-            recordRepository = FakeRecordRepository(),
+            recordRepository = recordRepository,
             typeRepository = FakeTypeRepository(),
             assetRepository = FakeAssetRepository(),
             booksRepository = FakeBooksRepository(),
@@ -101,5 +108,111 @@ class RecordImportViewModelTest {
 
         // 状态保持不变
         assertThat(viewModel.uiState.value).isInstanceOf(RecordImportUiState.Error::class.java)
+    }
+
+    /**
+     * 回归测试：账单去重金额单位错配修复。
+     *
+     * 库中已有一条 99.80 元（9980 分）、当天的记录；导入条目同天同金额且无微信单号，
+     * 去重应判定为 POSSIBLE（可能重复）。
+     *
+     * 修复前：ViewModel 直接把 item.amount（元，Double=99.8）传给以分（Long）比对的查询，
+     * 口径不一致永不命中，会错误返回 NONE，该断言失败。
+     */
+    @Test
+    fun when_same_day_same_amount_no_transaction_id_then_possible_duplicate() = runTest {
+        val booksId = 1L
+        // 当天 12:00（毫秒），落在 dayStart..dayEnd 区间内
+        val recordTime = 86400000L + 12 * 3600000L
+        val repository = FakeRecordRepository().apply {
+            addRecord(
+                RecordModel(
+                    id = 1L,
+                    booksId = booksId,
+                    typeId = 1L,
+                    assetId = -1L,
+                    relatedAssetId = -1L,
+                    // 99.80 元 = 9980 分
+                    amount = 9980L,
+                    finalAmount = 9980L,
+                    charges = 0L,
+                    concessions = 0L,
+                    remark = "已有记录",
+                    reimbursable = false,
+                    recordTime = recordTime,
+                ),
+            )
+        }
+        val viewModel = createViewModel(recordRepository = repository)
+        advanceUntilIdle()
+
+        val item = ImportedBillItem(
+            transactionTime = recordTime,
+            transactionType = "商户消费",
+            counterparty = "某商户",
+            description = "",
+            direction = BillDirection.EXPENDITURE,
+            // 元（Double），与库中 9980 分对应
+            amount = 99.80,
+            paymentMethod = "",
+            status = "",
+            // 无微信单号，走模糊去重路径
+            transactionId = "",
+            merchantId = "",
+            remark = "",
+        )
+
+        val status = viewModel.checkDuplicate(item, booksId)
+
+        assertThat(status).isEqualTo(DuplicateStatus.POSSIBLE)
+    }
+
+    /**
+     * 对照测试：同天但金额不同（分值不相等）时不应判为重复，返回 NONE。
+     * 防止修复退化为"只要同天就算重复"的过宽匹配。
+     */
+    @Test
+    fun when_same_day_different_amount_then_not_duplicate() = runTest {
+        val booksId = 1L
+        val recordTime = 86400000L + 12 * 3600000L
+        val repository = FakeRecordRepository().apply {
+            addRecord(
+                RecordModel(
+                    id = 1L,
+                    booksId = booksId,
+                    typeId = 1L,
+                    assetId = -1L,
+                    relatedAssetId = -1L,
+                    amount = 9980L,
+                    finalAmount = 9980L,
+                    charges = 0L,
+                    concessions = 0L,
+                    remark = "已有记录",
+                    reimbursable = false,
+                    recordTime = recordTime,
+                ),
+            )
+        }
+        val viewModel = createViewModel(recordRepository = repository)
+        advanceUntilIdle()
+
+        val item = ImportedBillItem(
+            transactionTime = recordTime,
+            transactionType = "商户消费",
+            counterparty = "某商户",
+            description = "",
+            direction = BillDirection.EXPENDITURE,
+            // 88.00 元 = 8800 分，与库中 9980 分不同
+            amount = 88.00,
+            paymentMethod = "",
+            status = "",
+            transactionId = "",
+            merchantId = "",
+            remark = "",
+        )
+
+        val status = viewModel.checkDuplicate(item, booksId)
+
+        assertThat(status).isEqualTo(DuplicateStatus.NONE)
     }
 }

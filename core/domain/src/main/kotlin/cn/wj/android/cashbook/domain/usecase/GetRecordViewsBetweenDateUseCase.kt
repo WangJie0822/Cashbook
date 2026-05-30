@@ -40,9 +40,9 @@ class GetRecordViewsBetweenDateUseCase @Inject constructor(
         dateSelection: DateSelectionEntity,
     ): List<RecordViewsModel> = withContext(coroutineContext) {
         val (from, to) = dateSelection.toDateRange()
-        recordRepository.queryRecordListBetweenDate(from, to)
-            .map {
-                recordModelTransToViewsUseCase(it)
-            }
+        // 批量转换：一次性 IN 查询 type/asset/关联记录/图片，避免逐条放大的 N+1
+        recordModelTransToViewsUseCase(
+            recordRepository.queryRecordListBetweenDate(from, to),
+        )
     }
 }

@@ -167,7 +167,8 @@ class RecordImportViewModel @Inject constructor(
         }
     }
 
-    private suspend fun checkDuplicate(
+    /** 重复检测（暴露为 internal 以便同模块单元测试直接驱动去重逻辑） */
+    internal suspend fun checkDuplicate(
         item: ImportedBillItem,
         booksId: Long,
     ): DuplicateStatus {
@@ -180,7 +181,9 @@ class RecordImportViewModel @Inject constructor(
         // 模糊匹配：同天 + 同金额
         val dayStart = item.transactionTime / 86400000 * 86400000 // 当天0点
         val dayEnd = dayStart + 86400000 - 1 // 当天23:59:59
-        val similar = recordRepository.queryByTimeAndAmount(booksId, dayStart, dayEnd, item.amount)
+        // item.amount 为元（Double），DB amount 列为分（Long），需转分后再比对，否则口径不一致永不命中
+        val amountCent = item.amount.toCent()
+        val similar = recordRepository.queryByTimeAndAmount(booksId, dayStart, dayEnd, amountCent)
         if (similar.isNotEmpty()) return DuplicateStatus.POSSIBLE
 
         return DuplicateStatus.NONE

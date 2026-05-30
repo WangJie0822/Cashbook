@@ -68,6 +68,7 @@ class FakeRecordRepository : RecordRepository {
     }
 
     override suspend fun queryById(recordId: Long): RecordModel? {
+        queryByIdCount++
         return records.find { it.id == recordId }
     }
 
@@ -302,7 +303,48 @@ class FakeRecordRepository : RecordRepository {
     }
 
     override suspend fun queryImagesByRecordId(id: Long): List<ImageModel> {
+        queryImagesByRecordIdCount++
         return imageMap[id] ?: emptyList()
+    }
+
+    /** 逐条 [queryImagesByRecordId] 的调用次数，供测试断言批量路径未触发 N+1 */
+    var queryImagesByRecordIdCount: Int = 0
+        private set
+
+    /** 逐条 [queryById] 的调用次数，供测试断言批量路径未触发 N+1 */
+    var queryByIdCount: Int = 0
+        private set
+
+    /** 批量 [queryByIds] 的调用次数，供测试断言批量路径被使用 */
+    var queryByIdsCount: Int = 0
+        private set
+
+    /** 批量 [queryImagesByRecordIds] 的调用次数，供测试断言批量路径被使用 */
+    var queryImagesByRecordIdsCount: Int = 0
+        private set
+
+    override suspend fun queryByIds(ids: List<Long>): List<RecordModel> {
+        queryByIdsCount++
+        return records.filter { it.id in ids }
+    }
+
+    override suspend fun queryImagesByRecordIds(ids: List<Long>): Map<Long, List<ImageModel>> {
+        queryImagesByRecordIdsCount++
+        return ids.mapNotNull { id ->
+            imageMap[id]?.let { id to it }
+        }.toMap()
+    }
+
+    override suspend fun getRelatedIdMapByIds(ids: List<Long>): Map<Long, List<Long>> {
+        return ids.mapNotNull { id ->
+            relatedMap[id]?.takeIf { it.isNotEmpty() }?.let { id to it }
+        }.toMap()
+    }
+
+    override suspend fun getRecordIdFromRelatedMapByIds(ids: List<Long>): Map<Long, List<Long>> {
+        return ids.mapNotNull { id ->
+            relatedFromMap[id]?.takeIf { it.isNotEmpty() }?.let { id to it }
+        }.toMap()
     }
 
     override suspend fun queryByWechatTransactionId(
@@ -316,9 +358,14 @@ class FakeRecordRepository : RecordRepository {
         booksId: Long,
         startTime: Long,
         endTime: Long,
-        amount: Double,
+        amount: Long,
     ): List<RecordModel> {
-        return emptyList()
+        // 复刻真实 DAO 语义：同账本 + 时间区间 [startTime,endTime] + 金额（分，Long）精确相等
+        return records.filter {
+            it.booksId == booksId &&
+                it.recordTime in startTime..endTime &&
+                it.amount == amount
+        }
     }
 
     override suspend fun batchImportRecords(records: List<RecordTable>): List<Long> {

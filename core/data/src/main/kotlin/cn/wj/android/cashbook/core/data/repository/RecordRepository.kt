@@ -140,6 +140,29 @@ interface RecordRepository {
     suspend fun queryImagesByRecordId(id: Long): List<ImageModel>
 
     /**
+     * 批量按 id 查询记录（IN 查询），用于批量转换时解析关联记录，消除逐条 [queryById] 的 N+1。
+     */
+    suspend fun queryByIds(ids: List<Long>): List<RecordModel>
+
+    /**
+     * 批量查询多条记录的图片（IN 查询），消除逐条 [queryImagesByRecordId] 的 N+1。
+     * @return recordId -> 图片列表 的映射；无图片的记录不在结果中（调用方按需兜底空列表）
+     */
+    suspend fun queryImagesByRecordIds(ids: List<Long>): Map<Long, List<ImageModel>>
+
+    /**
+     * 批量查询「收入侧」关联关系：返回 recordId -> 关联记录 id 列表，
+     * 等价于对每个 id 调用 [getRelatedIdListById] 后聚合，消除 N+1。
+     */
+    suspend fun getRelatedIdMapByIds(ids: List<Long>): Map<Long, List<Long>>
+
+    /**
+     * 批量查询「支出侧」关联关系：返回 recordId -> 命中其为 related 的记录 id 列表，
+     * 等价于对每个 id 调用 [getRecordIdListFromRelatedId] 后聚合，消除 N+1。
+     */
+    suspend fun getRecordIdFromRelatedMapByIds(ids: List<Long>): Map<Long, List<Long>>
+
+    /**
      * 查询指定账本中是否存在包含微信交易单号的记录
      */
     suspend fun queryByWechatTransactionId(booksId: Long, transactionId: String): List<RecordModel>
@@ -151,7 +174,7 @@ interface RecordRepository {
         booksId: Long,
         startTime: Long,
         endTime: Long,
-        amount: Double,
+        amount: Long,
     ): List<RecordModel>
 
     /**

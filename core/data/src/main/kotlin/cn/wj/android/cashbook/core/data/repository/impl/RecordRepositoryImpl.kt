@@ -558,6 +558,35 @@ class RecordRepositoryImpl @Inject constructor(
             recordDao.queryImagesByRecordId(id).map { it.asModel() }
         }
 
+    override suspend fun queryByIds(ids: List<Long>): List<RecordModel> =
+        withContext(coroutineContext) {
+            // 分块查询，避免 IN 参数超过 SQLite 单条语句变量上限（旧版 999）导致崩溃
+            ids.distinct().chunked(SQL_IN_CHUNK_SIZE).flatMap { chunk ->
+                recordDao.queryByIds(chunk).map { it.asModel() }
+            }
+        }
+
+    override suspend fun queryImagesByRecordIds(ids: List<Long>): Map<Long, List<ImageModel>> =
+        withContext(coroutineContext) {
+            ids.distinct().chunked(SQL_IN_CHUNK_SIZE).flatMap { chunk ->
+                recordDao.queryImagesByRecordIds(chunk).map { it.asModel() }
+            }.groupBy { it.recordId }
+        }
+
+    override suspend fun getRelatedIdMapByIds(ids: List<Long>): Map<Long, List<Long>> =
+        withContext(coroutineContext) {
+            ids.distinct().chunked(SQL_IN_CHUNK_SIZE).flatMap { chunk ->
+                recordDao.queryRelatedByRecordIds(chunk)
+            }.groupBy({ it.recordId }, { it.relatedRecordId })
+        }
+
+    override suspend fun getRecordIdFromRelatedMapByIds(ids: List<Long>): Map<Long, List<Long>> =
+        withContext(coroutineContext) {
+            ids.distinct().chunked(SQL_IN_CHUNK_SIZE).flatMap { chunk ->
+                recordDao.queryRelatedByRelatedRecordIds(chunk)
+            }.groupBy({ it.relatedRecordId }, { it.recordId })
+        }
+
     override suspend fun queryByWechatTransactionId(
         booksId: Long,
         transactionId: String,
@@ -569,7 +598,7 @@ class RecordRepositoryImpl @Inject constructor(
         booksId: Long,
         startTime: Long,
         endTime: Long,
-        amount: Double,
+        amount: Long,
     ): List<RecordModel> = withContext(coroutineContext) {
         recordDao.queryByTimeAndAmount(booksId, startTime, endTime, amount).map { it.asModel() }
     }
@@ -613,4 +642,10 @@ class RecordRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             recordDao.queryEarliestRecordTime(booksId)
         }
+
+    companion object {
+
+        /** IN 查询单批最大参数数，低于 SQLite 旧版变量上限（999），避免大范围批量查询溢出崩溃 */
+        private const val SQL_IN_CHUNK_SIZE = 900
+    }
 }

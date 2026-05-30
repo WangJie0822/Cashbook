@@ -417,6 +417,22 @@ interface RecordDao {
     )
     suspend fun queryImagesByRecordId(recordId: Long): List<ImageWithRelatedTable>
 
+    /** 批量查询多条记录的图片（IN 查询），用于批量转换消除 N+1 */
+    @Query(
+        """
+        SELECT * FROM db_image_with_related WHERE record_id IN (:recordIds)
+    """,
+    )
+    suspend fun queryImagesByRecordIds(recordIds: List<Long>): List<ImageWithRelatedTable>
+
+    /** 批量查询关联关系：record_id 命中 [recordIds]（收入侧用），用于批量转换消除 N+1 */
+    @Query("SELECT * FROM db_record_with_related WHERE record_id IN (:recordIds)")
+    suspend fun queryRelatedByRecordIds(recordIds: List<Long>): List<RecordWithRelatedTable>
+
+    /** 批量查询关联关系：related_record_id 命中 [recordIds]（支出侧用），用于批量转换消除 N+1 */
+    @Query("SELECT * FROM db_record_with_related WHERE related_record_id IN (:recordIds)")
+    suspend fun queryRelatedByRelatedRecordIds(recordIds: List<Long>): List<RecordWithRelatedTable>
+
     @Query(
         """
     SELECT * FROM db_record
@@ -439,7 +455,7 @@ interface RecordDao {
         booksId: Long,
         startTime: Long,
         endTime: Long,
-        amount: Double,
+        amount: Long,
     ): List<RecordTable>
 
     /** 查询指定账本和日期范围内的记录用于导出（排除转账），含类型父子关系和资产名 */
