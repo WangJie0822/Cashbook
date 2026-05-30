@@ -17,8 +17,10 @@
 package cn.wj.android.cashbook.core.database
 
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
+import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -28,17 +30,20 @@ import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.migration.Migration10To11
+import cn.wj.android.cashbook.core.database.migration.Migration11To12
 import cn.wj.android.cashbook.core.database.migration.Migration1To2
 import cn.wj.android.cashbook.core.database.migration.Migration2To3
 import cn.wj.android.cashbook.core.database.migration.Migration3To4
 import cn.wj.android.cashbook.core.database.migration.Migration4To5
 import cn.wj.android.cashbook.core.database.migration.Migration5To6
+import cn.wj.android.cashbook.core.database.migration.Migration6To7
 import cn.wj.android.cashbook.core.database.migration.Migration7To8
 import cn.wj.android.cashbook.core.database.migration.Migration8To9
 import cn.wj.android.cashbook.core.database.migration.Migration9To10
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_BOOKS
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_RECORD
 import cn.wj.android.cashbook.core.database.migration.SQL_QUERY_ALL_FROM_TAG
+import cn.wj.android.cashbook.core.database.table.TABLE_ASSET
 import cn.wj.android.cashbook.core.database.table.TABLE_BOOKS
 import cn.wj.android.cashbook.core.database.table.TABLE_BOOKS_BG_URI
 import cn.wj.android.cashbook.core.database.table.TABLE_IMAGE_RELATED
@@ -57,6 +62,8 @@ import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_REMARK
 import cn.wj.android.cashbook.core.database.table.TABLE_RECORD_TYPE_ID
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG
 import cn.wj.android.cashbook.core.database.table.TABLE_TAG_INVISIBLE
+import cn.wj.android.cashbook.core.database.table.TABLE_TAG_RELATED
+import cn.wj.android.cashbook.core.database.table.TABLE_TYPE
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import org.junit.Assert
@@ -494,6 +501,167 @@ class DatabaseTest {
     @Test
     @Throws(IOException::class)
     fun migrate6_7() {
+        log("migrate6_7()")
+        // 资产创建时间（用于 MODIFY_BALANCE 记录的 record_time）
+        val modifyRecordTime = 1_600_000_000_000L
+        helper.createDatabase(testDbName, 6).use { db ->
+            // 账本数据，验证账本表字段裁剪
+            db.insert(
+                TABLE_BOOKS,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("name", "默认账本")
+                    put("imageUrl", "image")
+                    put("description", "desc")
+                    put("currency", "CNY")
+                    put("selected", 1)
+                    put("create_time", System.currentTimeMillis())
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
+            // 类型数据，验证 refund/reimburse -> protected 计算
+            db.insert(
+                TABLE_TYPE,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("parent_id", -1L)
+                    put("name", "餐饮")
+                    put("icon_res_name", "@drawable/vector_type_food_24")
+                    put("type", "FIRST")
+                    put("record_type", 0)
+                    put("child_enable", 1)
+                    put("refund", 1)
+                    put("reimburse", 0)
+                    put("sort", 0)
+                },
+            )
+            // 资产数据，类型为资金账户（非信用卡）
+            db.insert(
+                TABLE_ASSET,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("books_id", 1L)
+                    put("name", "现金")
+                    put("total_amount", 0.0)
+                    put("billing_date", "")
+                    put("repayment_date", "")
+                    put("type", "CAPITAL_ACCOUNT")
+                    put("classification", "CASH")
+                    put("invisible", 0)
+                    put("open_bank", "")
+                    put("card_no", "")
+                    put("remark", "")
+                    put("sort", 0)
+                    put("create_time", System.currentTimeMillis())
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
+            // 修改余额记录：迁移后应被丢弃，但会作为资产余额回算的基准（100 元）
+            db.insert(
+                TABLE_RECORD,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("type_enum", "MODIFY_BALANCE")
+                    put("type_id", 0L)
+                    put("asset_id", 1L)
+                    put("into_asset_id", -1L)
+                    put("books_id", 1L)
+                    put("record_id", 0L)
+                    put("amount", 100.0)
+                    put("charge", 0.0)
+                    put("remark", "")
+                    put("tag_ids", "")
+                    put("reimbursable", 0)
+                    put("system", 0)
+                    put("record_time", modifyRecordTime)
+                    put("create_time", System.currentTimeMillis())
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
+            // 普通支出记录：迁移后应保留，且 tag_ids 拆分为 3 条标签关联（早于 MODIFY_BALANCE，不影响余额回算）
+            db.insert(
+                TABLE_RECORD,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 2L)
+                    put("type_enum", "EXPENDITURE")
+                    put("type_id", 1L)
+                    put("asset_id", 1L)
+                    put("into_asset_id", -1L)
+                    put("books_id", 1L)
+                    put("record_id", 0L)
+                    put("amount", 20.0)
+                    put("charge", 0.0)
+                    put("remark", "午饭")
+                    put("tag_ids", "1,2,3")
+                    put("reimbursable", 0)
+                    put("system", 0)
+                    put("record_time", modifyRecordTime - 1000L)
+                    put("create_time", System.currentTimeMillis())
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
+        }
+
+        var recordCount = 0
+        var hasModifyBalanceRecord = false
+        var hasTypeEnumColumn = false
+        var tagRelatedCount = 0
+        var protectedValue = -1
+        var balance = -1.0
+        helper.runMigrationsAndValidate(testDbName, 7, true, Migration6To7)
+            .use { db ->
+                // db_record 表已移除 type_enum 字段
+                db.query(
+                    "SELECT `$columnNameSql` FROM `$tableName` WHERE `$columnNameType` = ? AND `$columnNameTableName` = ?",
+                    arrayOf("table", TABLE_RECORD),
+                ).use { cursor ->
+                    cursor.moveToFirst()
+                    val sqlStr = cursor.getString(cursor.getColumnIndexOrThrow(columnNameSql))
+                    log("migrate6_7() record sql = [$sqlStr]")
+                    hasTypeEnumColumn = sqlStr.contains("`type_enum`")
+                }
+                // db_record 中 MODIFY_BALANCE 记录已被丢弃，仅保留普通记录
+                db.query(SQL_QUERY_ALL_FROM_RECORD).use { cursor ->
+                    while (cursor.moveToNext()) {
+                        recordCount++
+                        val id = cursor.getLong(cursor.getColumnIndexOrThrow("id"))
+                        if (id == 1L) {
+                            hasModifyBalanceRecord = true
+                        }
+                    }
+                }
+                // 标签关联表行数与 tag_ids 拆分数量一致（"1,2,3" -> 3 条）
+                db.query("SELECT * FROM `$TABLE_TAG_RELATED`").use { cursor ->
+                    tagRelatedCount = cursor.count
+                }
+                // 类型表 refund(1)+reimburse(0) > 0 -> protected = 开启
+                db.query("SELECT * FROM `$TABLE_TYPE`").use { cursor ->
+                    cursor.moveToFirst()
+                    protectedValue = cursor.getInt(cursor.getColumnIndexOrThrow("protected"))
+                }
+                // 资产余额按最后一条 MODIFY_BALANCE 记录回算，无后续记录则为 100 元
+                db.query("SELECT * FROM `$TABLE_ASSET`").use { cursor ->
+                    cursor.moveToFirst()
+                    balance = cursor.getDouble(cursor.getColumnIndexOrThrow("balance"))
+                }
+            }
+        log("migrate6_7() recordCount=$recordCount, tagRelatedCount=$tagRelatedCount, protected=$protectedValue, balance=$balance")
+        // db_record 移除 type_enum 字段
+        Assert.assertEquals(false, hasTypeEnumColumn)
+        // 仅保留 1 条普通记录，MODIFY_BALANCE 被丢弃
+        Assert.assertEquals(1, recordCount)
+        Assert.assertEquals(false, hasModifyBalanceRecord)
+        // tag_ids "1,2,3" 拆分为 3 条标签关联
+        Assert.assertEquals(3, tagRelatedCount)
+        // refund=1 -> protected 开启（值为 1）
+        Assert.assertEquals(1, protectedValue)
+        // 余额回算为修改记录金额 100 元
+        Assert.assertEquals(100.0, balance, 0.0)
     }
 
     /**
@@ -696,23 +864,186 @@ class DatabaseTest {
         Assert.assertEquals(true, hasImageTable)
     }
 
+    /**
+     * 测试数据库从 11 升级到 12
+     * - db_record、db_asset 金额字段由 REAL（单位：元）整表重建为 INTEGER（单位：分），CAST(ROUND(amount*100) AS INTEGER)
+     * - 新增 14 个核心索引
+     * - 插入固定类型（退款 -2001 / 报销 -2002 / 信用卡还款 -2003）
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate11_12() {
+        log("migrate11_12()")
+        helper.createDatabase(testDbName, 11).use { db ->
+            // 普通记录：整数元金额，断言精确转换为分
+            db.insert(
+                TABLE_RECORD,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("type_id", 1L)
+                    put("asset_id", 1L)
+                    put("into_asset_id", -1L)
+                    put("books_id", 1L)
+                    put("amount", 12.34)
+                    put("final_amount", 10.00)
+                    put("concessions", 0.50)
+                    put("charge", 0.0)
+                    put("remark", "正常记录")
+                    put("reimbursable", 0)
+                    put("record_time", 1_600_000_000_000L)
+                },
+            )
+            // 边界记录：包含 1.005 / 0.005 浮点边界值，断言其变为非负整数（不断言精确 100/101，依赖 IEEE754）
+            db.insert(
+                TABLE_RECORD,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 2L)
+                    put("type_id", 1L)
+                    put("asset_id", 1L)
+                    put("into_asset_id", -1L)
+                    put("books_id", 1L)
+                    put("amount", 1.005)
+                    put("final_amount", 0.005)
+                    put("concessions", 0.0)
+                    put("charge", 0.0)
+                    put("remark", "边界记录")
+                    put("reimbursable", 0)
+                    put("record_time", 1_600_000_001_000L)
+                },
+            )
+            // 资产：余额、总额由元转分
+            db.insert(
+                TABLE_ASSET,
+                SQLiteDatabase.CONFLICT_FAIL,
+                ContentValues().apply {
+                    put("id", 1L)
+                    put("books_id", 1L)
+                    put("name", "现金")
+                    put("balance", 88.88)
+                    put("total_amount", 0.0)
+                    put("billing_date", "")
+                    put("repayment_date", "")
+                    put("type", 0)
+                    put("classification", 0)
+                    put("invisible", 0)
+                    put("open_bank", "")
+                    put("card_no", "")
+                    put("remark", "")
+                    put("sort", 0)
+                    put("modify_time", System.currentTimeMillis())
+                },
+            )
+        }
+
+        var amountType = -1
+        var amountValue = -1L
+        var finalAmountValue = -1L
+        var concessionsValue = -1L
+        var boundaryAmount = -1L
+        var boundaryFinalAmount = -1L
+        var assetBalanceType = -1
+        var assetBalance = -1L
+        var hasRecordBooksIdIndex = false
+        var hasRecordTimeIndex = false
+        var hasTagRecordIndex = false
+        var fixedTypeCount = 0
+        helper.runMigrationsAndValidate(testDbName, 12, true, Migration11To12)
+            .use { db ->
+                // 金额字段已变为 INTEGER（分），精确转换：12.34 -> 1234，10.00 -> 1000，0.50 -> 50
+                db.query("SELECT * FROM `$TABLE_RECORD` WHERE `id` = 1").use { cursor ->
+                    cursor.moveToFirst()
+                    val amountIndex = cursor.getColumnIndexOrThrow(TABLE_RECORD_AMOUNT)
+                    amountType = cursor.getType(amountIndex)
+                    amountValue = cursor.getLong(amountIndex)
+                    finalAmountValue =
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TABLE_RECORD_FINAL_AMOUNT))
+                    concessionsValue =
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TABLE_RECORD_CONCESSIONS))
+                }
+                // 边界记录：仅断言为非负整数
+                db.query("SELECT * FROM `$TABLE_RECORD` WHERE `id` = 2").use { cursor ->
+                    cursor.moveToFirst()
+                    boundaryAmount =
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TABLE_RECORD_AMOUNT))
+                    boundaryFinalAmount =
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TABLE_RECORD_FINAL_AMOUNT))
+                }
+                // 资产 balance 也已转为分：88.88 -> 8888
+                db.query("SELECT * FROM `$TABLE_ASSET` WHERE `id` = 1").use { cursor ->
+                    cursor.moveToFirst()
+                    val balanceIndex = cursor.getColumnIndexOrThrow("balance")
+                    assetBalanceType = cursor.getType(balanceIndex)
+                    assetBalance = cursor.getLong(balanceIndex)
+                }
+                // 核心索引已创建
+                db.query(
+                    "SELECT `name` FROM `$tableName` WHERE `$columnNameType` = ?",
+                    arrayOf("index"),
+                ).use { cursor ->
+                    while (cursor.moveToNext()) {
+                        when (cursor.getString(cursor.getColumnIndexOrThrow("name"))) {
+                            "index_db_record_books_id" -> hasRecordBooksIdIndex = true
+                            "index_db_record_record_time" -> hasRecordTimeIndex = true
+                            "index_db_tag_with_record_tag_id" -> hasTagRecordIndex = true
+                        }
+                    }
+                }
+                // 固定类型已插入（id 为 -2001 / -2002 / -2003）
+                db.query(
+                    "SELECT * FROM `$TABLE_TYPE` WHERE `id` IN (-2001, -2002, -2003)",
+                ).use { cursor ->
+                    fixedTypeCount = cursor.count
+                }
+            }
+        log(
+            "migrate11_12() amountType=$amountType, amount=$amountValue, finalAmount=$finalAmountValue, " +
+                "concessions=$concessionsValue, boundaryAmount=$boundaryAmount, boundaryFinalAmount=$boundaryFinalAmount, " +
+                "assetBalanceType=$assetBalanceType, assetBalance=$assetBalance, fixedTypeCount=$fixedTypeCount",
+        )
+        // amount 字段类型已变为 INTEGER
+        Assert.assertEquals(Cursor.FIELD_TYPE_INTEGER, amountType)
+        // 精确转换断言（单位：分）
+        Assert.assertEquals(1234L, amountValue)
+        Assert.assertEquals(1000L, finalAmountValue)
+        Assert.assertEquals(50L, concessionsValue)
+        // 边界值为非负整数（IEEE754 下 1.005/0.005 的精确取整不稳定，仅断言非负）
+        Assert.assertTrue(boundaryAmount >= 0L)
+        Assert.assertTrue(boundaryFinalAmount >= 0L)
+        // 资产 balance 同样为 INTEGER 且精确转换 88.88 -> 8888
+        Assert.assertEquals(Cursor.FIELD_TYPE_INTEGER, assetBalanceType)
+        Assert.assertEquals(8888L, assetBalance)
+        // 索引存在
+        Assert.assertEquals(true, hasRecordBooksIdIndex)
+        Assert.assertEquals(true, hasRecordTimeIndex)
+        Assert.assertEquals(true, hasTagRecordIndex)
+        // 三条固定类型均已插入
+        Assert.assertEquals(3, fixedTypeCount)
+    }
+
+    /**
+     * 端到端校验：从版本 1 依次执行全部迁移到最新 schema
+     * - 创建最早版本（1）数据库
+     * - 通过 Room.databaseBuilder + addMigrations 打开，Room 在所有迁移执行后校验最终 schema
+     */
     @Test
     @Throws(IOException::class)
     fun migrateAll() {
-//        // Create earliest version of the database.
-//        helper.createDatabase(testDbName, 1).apply {
-//            close()
-//        }
-//
-//        // Open latest version of the database. Room will validate the schema
-//        // once all migrations execute.
-//        Room.databaseBuilder(
-//            InstrumentationRegistry.getInstrumentation().targetContext,
-//            CashbookDatabase::class.java,
-//            testDbName
-//        ).addMigrations(*DatabaseMigrations.MIGRATION_LIST).build().apply {
-//            openHelper.writableDatabase.close()
-//        }
+        log("migrateAll()")
+        // 创建最早版本（1）的数据库
+        helper.createDatabase(testDbName, 1).apply {
+            close()
+        }
+
+        // 打开最新版本数据库，Room 会在全部迁移执行后校验 schema 是否与最新版本一致
+        Room.databaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            CashbookDatabase::class.java,
+            testDbName,
+        ).addMigrations(*DatabaseMigrations.MIGRATION_LIST).build().apply {
+            openHelper.writableDatabase.close()
+        }
     }
 
     private fun log(text: String) {
