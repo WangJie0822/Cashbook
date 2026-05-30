@@ -46,13 +46,21 @@ class FakeTypeRepository : TypeRepository {
     private fun updateFlows() {
         _firstExpenditureTypeListData.value = types.filter {
             it.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && it.typeLevel == TypeLevelEnum.FIRST
-        }
+        }.sortedBy { it.sort }
         _firstIncomeTypeListData.value = types.filter {
             it.typeCategory == RecordTypeCategoryEnum.INCOME && it.typeLevel == TypeLevelEnum.FIRST
-        }
+        }.sortedBy { it.sort }
         _firstTransferTypeListData.value = types.filter {
             it.typeCategory == RecordTypeCategoryEnum.TRANSFER && it.typeLevel == TypeLevelEnum.FIRST
+        }.sortedBy { it.sort }
+    }
+
+    override suspend fun updateFirstTypeSort(sortedIds: List<Long>) {
+        sortedIds.forEachIndexed { index, id ->
+            val i = types.indexOfFirst { it.id == id }
+            if (i >= 0) types[i] = types[i].copy(sort = index)
         }
+        updateFlows()
     }
 
     override suspend fun getRecordTypeById(typeId: Long): RecordTypeModel? {

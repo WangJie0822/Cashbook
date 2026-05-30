@@ -155,14 +155,23 @@ class TypeRepositoryImpl @Inject constructor(
             var sort = getRecordTypeById(id)?.sort ?: -1
             if (sort == -1) {
                 sort = if (parentId == -1L) {
-                    typeDao.countByLevel(TypeLevelEnum.FIRST.ordinal) + 1
+                    // 基于现有最大 sort + 1，避免与拖动重排后的连续 sort 撞值
+                    (typeDao.maxSortByLevel(TypeLevelEnum.FIRST.ordinal) ?: 0) + 1
                 } else {
                     val parentSort = getRecordTypeById(parentId)?.sort
-                        ?: (typeDao.countByLevel(TypeLevelEnum.FIRST.ordinal) + 1)
+                        ?: ((typeDao.maxSortByLevel(TypeLevelEnum.FIRST.ordinal) ?: 0) + 1)
                     parentSort * 1000 + typeDao.countByParentId(parentId)
                 }
             }
             sort
+        }
+
+    override suspend fun updateFirstTypeSort(sortedIds: List<Long>): Unit =
+        withContext(coroutineContext) {
+            sortedIds.forEachIndexed { index, id ->
+                typeDao.updateSortById(id, index)
+            }
+            typeDataVersion.updateVersion()
         }
 
     override suspend fun isCreditPaymentType(typeId: Long): Boolean =

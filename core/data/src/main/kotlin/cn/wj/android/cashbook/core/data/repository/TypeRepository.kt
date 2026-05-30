@@ -64,6 +64,9 @@ interface TypeRepository {
 
     suspend fun generateSortById(id: Long, parentId: Long): Int
 
+    /** 按 [sortedIds] 顺序为一级分类写入连续的 sort（0,1,2...） */
+    suspend fun updateFirstTypeSort(sortedIds: List<Long>)
+
     suspend fun isCreditPaymentType(typeId: Long): Boolean
 
     suspend fun migrateSpecialTypes()

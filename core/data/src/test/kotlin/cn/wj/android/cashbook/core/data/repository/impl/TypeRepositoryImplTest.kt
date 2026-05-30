@@ -75,6 +75,20 @@ class TypeRepositoryImplTest {
     }
 
     @Test
+    fun when_maxSortByLevel_then_returns_max_sort_of_level() = runTest {
+        typeDao.insertType(createTypeTable(name = "A", typeLevel = TypeLevelEnum.FIRST.ordinal, sort = 5))
+        typeDao.insertType(createTypeTable(name = "B", typeLevel = TypeLevelEnum.FIRST.ordinal, sort = 9))
+        typeDao.insertType(createTypeTable(name = "C", typeLevel = TypeLevelEnum.SECOND.ordinal, sort = 99))
+        // 仅统计一级分类的最大 sort（不含二级）
+        assertThat(typeDao.maxSortByLevel(TypeLevelEnum.FIRST.ordinal)).isEqualTo(9)
+    }
+
+    @Test
+    fun when_maxSortByLevel_empty_then_returns_null() = runTest {
+        assertThat(typeDao.maxSortByLevel(TypeLevelEnum.FIRST.ordinal)).isNull()
+    }
+
+    @Test
     fun when_queryByParentId_then_returns_child_types() = runTest {
         val parentId = typeDao.insertType(
             createTypeTable(name = "餐饮", typeLevel = TypeLevelEnum.FIRST.ordinal),

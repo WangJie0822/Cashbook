@@ -128,6 +128,10 @@ class FakeTypeDao : TypeDao {
         return typesFlow.value.count { it.typeLevel == level }
     }
 
+    override suspend fun maxSortByLevel(level: Int): Int? {
+        return typesFlow.value.filter { it.typeLevel == level }.maxOfOrNull { it.sort }
+    }
+
     override suspend fun countByParentId(parentId: Long): Int {
         return typesFlow.value.count { it.parentId == parentId }
     }

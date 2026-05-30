@@ -81,6 +81,10 @@ interface TypeDao {
     @Query("SELECT COUNT(*) FROM db_type WHERE type_level=:level")
     suspend fun countByLevel(level: Int): Int
 
+    /** 查询 [level] 层级类型的最大 sort 值，无记录返回 null */
+    @Query("SELECT MAX(sort) FROM db_type WHERE type_level=:level")
+    suspend fun maxSortByLevel(level: Int): Int?
+
     @Query("SELECT COUNT(*) FROM db_type WHERE parent_id=:parentId")
     suspend fun countByParentId(parentId: Long): Int
 
