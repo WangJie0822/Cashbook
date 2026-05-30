@@ -153,4 +153,5 @@ app → feature/* → core/*
 
 ## 规范（强制）
 - 所有修改新增功能必须确认是否新增对应测试，功能开发必须在测试通过才算完成
+- 修改 Composable 或 ViewModel 的签名（参数增删）时，必须同步更新该模块 `src/test` 下对应的截图测试（`*ScreenshotTests`）与 `*ViewModelTest` 的构造/调用——模块测试源集整体编译，任一测试文件签名不匹配会导致整个模块 `testDebugUnitTest` 编译失败（既往多次踩坑：feature:settings 的 BackupAndRecoveryScreen/ViewModel 签名漂移、feature:records/assets 截图测试）
 - 
