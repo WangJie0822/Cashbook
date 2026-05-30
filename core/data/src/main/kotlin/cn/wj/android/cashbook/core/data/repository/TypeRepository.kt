@@ -40,6 +40,12 @@ interface TypeRepository {
 
     suspend fun getRecordTypeById(typeId: Long): RecordTypeModel?
 
+    /**
+     * 批量查询 [typeIds] 对应的类型分类，一次查询避免逐条 N+1。
+     * 返回 typeId -> 分类的映射；库中不存在的类型（如平账合成类型 -1101/-1102）不在结果中，由调用方兜底解析。
+     */
+    suspend fun getRecordTypeCategories(typeIds: List<Long>): Map<Long, RecordTypeCategoryEnum>
+
     suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel
 
     suspend fun getNoNullDefaultRecordType(): RecordTypeModel

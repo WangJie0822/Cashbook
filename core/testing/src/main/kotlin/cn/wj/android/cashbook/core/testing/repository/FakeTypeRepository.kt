@@ -67,6 +67,10 @@ class FakeTypeRepository : TypeRepository {
         return types.find { it.id == typeId }
     }
 
+    override suspend fun getRecordTypeCategories(typeIds: List<Long>): Map<Long, RecordTypeCategoryEnum> {
+        return types.filter { it.id in typeIds }.associate { it.id to it.typeCategory }
+    }
+
     override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel {
         return types.first { it.id == typeId }
     }

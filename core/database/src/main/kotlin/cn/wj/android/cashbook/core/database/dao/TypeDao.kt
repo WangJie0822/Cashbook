@@ -62,6 +62,10 @@ interface TypeDao {
     @Query("SELECT * FROM db_type WHERE id=:typeId")
     suspend fun queryById(typeId: Long): TypeTable?
 
+    /** 批量按 id 查询类型，一次查询避免逐条 N+1 */
+    @Query("SELECT * FROM db_type WHERE id IN (:typeIds)")
+    suspend fun queryByIds(typeIds: List<Long>): List<TypeTable>
+
     @Query("SELECT * FROM db_type WHERE name=:name")
     suspend fun queryByName(name: String): TypeTable?
 

@@ -72,6 +72,19 @@ class TypeRepositoryImpl @Inject constructor(
             )
         }
 
+    override suspend fun getRecordTypeCategories(typeIds: List<Long>): Map<Long, RecordTypeCategoryEnum> =
+        withContext(coroutineContext) {
+            if (typeIds.isEmpty()) {
+                emptyMap()
+            } else {
+                typeDao.queryByIds(typeIds.distinct())
+                    .mapNotNull { table ->
+                        table.id?.let { id -> id to table.asModel(needRelated = false).typeCategory }
+                    }
+                    .toMap()
+            }
+        }
+
     override suspend fun getNoNullRecordTypeById(typeId: Long): RecordTypeModel =
         withContext(coroutineContext) {
             getRecordTypeById(typeId)

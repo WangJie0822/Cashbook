@@ -17,6 +17,8 @@
 package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
@@ -90,5 +92,24 @@ class GetAssetMonthSummaryUseCaseTest {
         assertThat(result.balance).isEqualTo(3000L)
         assertThat(result.income).isEqualTo(3000L)
         assertThat(result.expenditure).isEqualTo(0L)
+    }
+
+    @Test
+    fun balance_adjustment_records_are_included() = runTest {
+        // 平账记录使用合成类型 -1101/-1102，不在 db_type 表（FakeTypeRepository 未 addType），
+        // 须由 balanceCategoryOrNull 兜底解析纳入余额净变化，否则结余口径与 verifyAssetBalance 不一致
+        recordRepository.addRecord(
+            createRecordModel(id = 1L, typeId = RECORD_TYPE_BALANCE_INCOME.id, assetId = 5L, amount = 5000L, charges = 0L),
+        )
+        recordRepository.addRecord(
+            createRecordModel(id = 2L, typeId = RECORD_TYPE_BALANCE_EXPENDITURE.id, assetId = 5L, amount = 2000L, charges = 0L),
+        )
+
+        val result = useCase(assetId = 5L, isCreditCard = false, startDate = 0L, endDate = Long.MAX_VALUE)
+
+        // 平账收入 +5000 计入收入，平账支出 -2000 计入支出
+        assertThat(result.income).isEqualTo(5000L)
+        assertThat(result.expenditure).isEqualTo(2000L)
+        assertThat(result.balance).isEqualTo(3000L)
     }
 }
