@@ -21,6 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.common.ext.SCHEME_DAVS
+import cn.wj.android.cashbook.core.common.ext.SCHEME_HTTPS
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
@@ -136,6 +138,14 @@ class BackupAndRecoveryViewModel @Inject constructor(
     /** 保存 WebDAV 配置 */
     fun saveWebDAV(domain: String, account: String, password: String) {
         viewModelScope.launch {
+            // 地址输入校验：不合法（含明文 http://、空 host、非法 scheme）则不落库并提示
+            if (!isWebDAVDomainValid(domain)) {
+                // 复用现有 UI 状态提示（"未授权路径"），避免静默接受非法地址
+                backupRecoveryManager.updateBackupState(
+                    BackupRecoveryState.Failed(BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED),
+                )
+                return@launch
+            }
             val state = uiState.first()
             if (state is BackupAndRecoveryUiState.Success) {
                 if (state.webDAVDomain == domain && state.webDAVAccount == account && state.webDAVPassword == password) {
@@ -301,6 +311,32 @@ class BackupAndRecoveryViewModel @Inject constructor(
     /** 重置导出状态 */
     fun resetExportState() {
         _exportState.value = ExportState.Idle
+    }
+
+    companion object {
+
+        /**
+         * 校验 WebDAV 地址是否合法（纯函数，便于单测）。
+         *
+         * 合法条件（同时满足）：
+         * - 以 `https://`（[SCHEME_HTTPS]）或 `davs://`（[SCHEME_DAVS]）开头（强制加密通道，拒绝明文 `http://`）；
+         * - scheme 之后的 host 非空白。
+         *
+         * @param domain 用户填写的 WebDAV 地址
+         * @return `true` 表示合法可落库；`false` 表示非法应拒绝并提示
+         */
+        fun isWebDAVDomainValid(domain: String?): Boolean {
+            if (domain.isNullOrBlank()) {
+                return false
+            }
+            val trimmed = domain.trim()
+            val host = when {
+                trimmed.startsWith(SCHEME_HTTPS) -> trimmed.removePrefix(SCHEME_HTTPS)
+                trimmed.startsWith(SCHEME_DAVS) -> trimmed.removePrefix(SCHEME_DAVS)
+                else -> return false
+            }
+            return host.isNotBlank()
+        }
     }
 }
 

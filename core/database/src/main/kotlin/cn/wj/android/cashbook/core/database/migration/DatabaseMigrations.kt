@@ -81,7 +81,18 @@ object DatabaseMigrations {
         return true
     }
 
-    /** 从 [from] 数据库复制数据到 [to] 数据库，主键重复时覆盖 */
+    /**
+     * 从 [from] 数据库复制数据到 [to] 数据库。
+     *
+     * **恢复语义为「合并」而非「还原到备份时刻」**：
+     * - 遍历 [from] 中所有以 `db_` 开头的表，逐行 insert 到 [to]；
+     * - 主键重复时使用 [SQLiteDatabase.CONFLICT_REPLACE] **覆盖** [to] 中同主键的行（备份数据优先）；
+     * - [to] 中存在、而 [from] 中不存在的行（当前库独有的数据）**保留不删除**。
+     *
+     * 因此恢复后得到的是「备份数据 + 当前库独有数据」的并集，
+     * 不会把当前库回退/清空成备份那一刻的快照。
+     * 如需对当前库做安全兜底，请在调用方于恢复前先创建快照（见 BackupRecoveryManagerImpl 的恢复前安全备份）。
+     */
     @WorkerThread
     fun copyData(from: SupportSQLiteDatabase, to: SupportSQLiteDatabase) {
         from.getTableNameList()

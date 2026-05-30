@@ -329,9 +329,17 @@ class BackupRecoveryManagerImpl @Inject constructor(
 
     private val String.backupPath: String
         get() = runCatching {
-            val url = URL("$this${if (this.endsWith("/")) "" else "/"}$BACKUP_DIR_NAME/")
-            val raw =
-                url.toString().replace(SCHEME_DAVS, SCHEME_HTTPS).replace(SCHEME_DAV, SCHEME_HTTP)
+            // 先规范化并校验 scheme：dav/davs 统一映射到 https，明文 http 直接拒绝
+            val normalized = normalizeWebDAVScheme(this)
+            if (normalized == null) {
+                // 明文 http 或非法 scheme，拒绝构建 URL，避免携带 Basic 凭据走明文通道
+                this@BackupRecoveryManagerImpl.logger()
+                    .e("backupPath, rejected plaintext/illegal scheme: <$this>")
+                return@runCatching ""
+            }
+            val url =
+                URL("$normalized${if (normalized.endsWith("/")) "" else "/"}$BACKUP_DIR_NAME/")
+            val raw = url.toString()
             URLEncoder.encode(raw, "UTF-8")
                 .replace("\\+".toRegex(), "%20")
                 .replace("%3A".toRegex(), ":")
@@ -497,6 +505,54 @@ class BackupRecoveryManagerImpl @Inject constructor(
         this@BackupRecoveryManagerImpl.logger().i("startBackup(), result = <$result>")
     }
 
+    /**
+     * 恢复前安全快照：在改动当前库之前，把"当前库"完整复制到本地一个安全副本，
+     * 复用与 [startBackup] 相同的 WAL checkpoint + 文件复制能力（不发明高风险 IO）。
+     *
+     * 安全副本带 [PRE_RESTORE_PREFIX] 标记，文件名形如 `pre-restore-yyyyMMddHHmmss.db`，
+     * 落在 [PRE_RESTORE_DIR_NAME] 目录下（与恢复缓存目录解耦，避免恢复结束清理缓存时被删除），
+     * 供恢复失败/异常时人工回退兜底。每次仅保留最近一次快照。
+     *
+     * 当前库不存在（首次安装等）时无需保护，视为成功。
+     *
+     * @return `true` 表示已成功快照或无需快照，可安全继续恢复；
+     *         `false` 表示快照失败，调用方须中止恢复，不在无保护下覆盖当前库
+     */
+    private fun createPreRestoreBackup(): Boolean = runCatching {
+        val databaseFile = context.getDatabasePath(DB_FILE_NAME)
+        if (!databaseFile.exists()) {
+            // 当前库不存在（首次安装等），无需保护，视为快照成功
+            this@BackupRecoveryManagerImpl.logger()
+                .i("createPreRestoreBackup(), current db not exists, skip")
+            return@runCatching true
+        }
+        // 安全副本目录（独立于恢复缓存目录，恢复结束清理 cacheDir 时不会被删除）
+        val preRestoreDir = File(context.cacheDir, PRE_RESTORE_DIR_NAME)
+        // 仅保留最近一次快照，先清空旧快照再写入
+        preRestoreDir.deleteAllFiles()
+        preRestoreDir.mkdirs()
+        // 执行 checkpoint 确保所有 WAL 数据写入主库文件，再复制（与 startBackup 一致）
+        database.openHelper.writableDatabase.run {
+            query("PRAGMA wal_checkpoint(TRUNCATE)").use { cursor ->
+                cursor.moveToFirst()
+                val busy = cursor.getInt(0)
+                if (busy != 0) {
+                    this@BackupRecoveryManagerImpl.logger()
+                        .w("createPreRestoreBackup(), WAL checkpoint busy, snapshot may be incomplete")
+                }
+            }
+        }
+        val dateFormat = System.currentTimeMillis().dateFormat(DATE_FORMAT_BACKUP)
+        val preRestoreFile = File(preRestoreDir, "$PRE_RESTORE_PREFIX$dateFormat.db")
+        databaseFile.copyTo(preRestoreFile, overwrite = true)
+        this@BackupRecoveryManagerImpl.logger()
+            .i("createPreRestoreBackup(), snapshot saved to <${preRestoreFile.absolutePath}>")
+        true
+    }.getOrElse { throwable ->
+        this@BackupRecoveryManagerImpl.logger().e(throwable, "createPreRestoreBackup()")
+        false
+    }
+
     private suspend fun startRecovery(path: String) {
         if (path.isBlank()) {
             this@BackupRecoveryManagerImpl.logger()
@@ -600,6 +656,16 @@ class BackupRecoveryManagerImpl @Inject constructor(
                     null,
                 ),
             )
+
+            // 恢复前安全快照：在真正改动当前库（copyData）之前，先把当前库备份到本地安全副本。
+            // 由于恢复语义为"保守修正"（合并、非清空替换），此快照用于恢复异常时人工回退兜底。
+            if (!createPreRestoreBackup()) {
+                // 安全备份失败，中止恢复，避免在无保护的情况下覆盖当前库
+                this@BackupRecoveryManagerImpl.logger()
+                    .e("startRecovery(), pre-restore backup failed, abort recovery")
+                return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
+            }
+
             val currentDatabase = database.openHelper.writableDatabase
             if (DatabaseMigrations.recoveryFromDb(backupDatabase, currentDatabase)) {
                 // 确保固定类型行存在（旧版备份可能不包含）
@@ -618,7 +684,9 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 combineProtoDataSource.updateCreditCardPaymentTypeId(0L)
                 BackupRecoveryState.SUCCESS_RECOVERY
             } else {
-                BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
+                // recoveryFromDb 返回 false 表示数据库版本不兼容或迁移路径缺失，
+                // 与"路径未授权"无关，使用语义更准确的文件格式/版本错误码
+                BackupRecoveryState.FAILED_FILE_FORMAT_ERROR
             }
         }.getOrElse { throwable ->
             this@BackupRecoveryManagerImpl.logger().e(throwable, "startRecovery(), backup")
@@ -638,5 +706,55 @@ class BackupRecoveryManagerImpl @Inject constructor(
             BackupRecoveryState.Failed(result)
         }
         updateRecoveryState(state)
+    }
+
+    companion object {
+
+        /** 恢复前安全快照子目录名 */
+        private const val PRE_RESTORE_DIR_NAME = "pre-restore"
+
+        /** 恢复前安全快照文件名前缀 */
+        private const val PRE_RESTORE_PREFIX = "pre-restore-"
+
+        /**
+         * 规范化并校验 WebDAV 地址的 scheme（纯函数，便于单测）。
+         *
+         * - `dav://`、`davs://` 统一映射到 `https://`（加密通道）
+         * - `https://` 原样保留
+         * - `http://`（明文）显式拒绝，返回 `null`，避免携带 Basic 凭据走明文通道
+         * - 其它非 WebDAV scheme（空字符串、无 scheme 等）一律拒绝，返回 `null`
+         *
+         * @param raw 用户填写的原始 WebDAV 地址
+         * @return 规范化后以 `https://` 开头的地址；非法/明文输入返回 `null` 表示拒绝
+         */
+        fun normalizeWebDAVScheme(raw: String?): String? {
+            if (raw.isNullOrBlank()) {
+                return null
+            }
+            val trimmed = raw.trim()
+            val normalized = when {
+                // davs:// 与 dav:// 均映射到 https://（强制加密）
+                trimmed.startsWith(SCHEME_DAVS) ->
+                    SCHEME_HTTPS + trimmed.removePrefix(SCHEME_DAVS)
+
+                trimmed.startsWith(SCHEME_DAV) ->
+                    SCHEME_HTTPS + trimmed.removePrefix(SCHEME_DAV)
+
+                // 已经是 https，原样保留
+                trimmed.startsWith(SCHEME_HTTPS) -> trimmed
+
+                // 明文 http 显式拒绝
+                trimmed.startsWith(SCHEME_HTTP) -> null
+
+                // 其它（无 scheme 或非法 scheme）拒绝
+                else -> null
+            } ?: return null
+            // 校验映射后 host 非空（仅有 scheme 而无 host 视为非法）
+            return if (normalized.removePrefix(SCHEME_HTTPS).isBlank()) {
+                null
+            } else {
+                normalized
+            }
+        }
     }
 }
