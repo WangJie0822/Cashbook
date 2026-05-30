@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,6 +50,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -93,6 +96,8 @@ import cn.wj.android.cashbook.feature.types.view.TypeIconGroupList
 import cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesDialogData
 import cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesUiState
 import cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesViewModel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 internal fun MyCategoriesRoute(
@@ -110,6 +115,7 @@ internal fun MyCategoriesRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         uiState = uiState,
         onRequestSelectTypeCategory = viewModel::selectTypeCategory,
+        onMoveFirstType = viewModel::onMoveFirstType,
         onRequestEditType = { viewModel.requestEditType(it, -1L) },
         onRequestChangeFirstTypeToSecond = viewModel::requestChangeFirstTypeToSecond,
         onRequestAddFirstType = { viewModel.requestEditType(-1L, -1L) },
@@ -135,6 +141,7 @@ internal fun MyCategoriesScreen(
     uiState: MyCategoriesUiState,
     onRequestSelectTypeCategory: (RecordTypeCategoryEnum) -> Unit,
     onRequestEditType: (Long) -> Unit,
+    onMoveFirstType: (Int, Int) -> Unit = { _, _ -> },
     onRequestChangeFirstTypeToSecond: (Long) -> Unit,
     onRequestAddFirstType: () -> Unit,
     onRequestAddSecondType: (Long) -> Unit,
@@ -245,6 +252,7 @@ internal fun MyCategoriesScreen(
                             )
                             ExpandableTypeList(
                                 typeList = uiState.typeList,
+                                onMoveFirstType = onMoveFirstType,
                                 onRequestEditType = onRequestEditType,
                                 onRequestDeleteType = onRequestDeleteType,
                                 onRequestChangeFirstTypeToSecond = onRequestChangeFirstTypeToSecond,
@@ -472,6 +480,7 @@ private fun SelectFirstTypeDialog(
 @Composable
 private fun ExpandableTypeList(
     typeList: List<ExpandableRecordTypeModel>,
+    onMoveFirstType: (Int, Int) -> Unit,
     onRequestEditType: (Long) -> Unit,
     onRequestDeleteType: (Long) -> Unit,
     onRequestChangeFirstTypeToSecond: (Long) -> Unit,
@@ -480,29 +489,58 @@ private fun ExpandableTypeList(
     onRequestChangeSecondTypeToFirst: (Long) -> Unit,
     onRequestMoveSecondTypeToAnother: (Long, Long) -> Unit,
 ) {
+    // 本地可变副本：数据源经 DB Flow 异步刷新，拖动过程中需本地镜像即时重排以保证流畅
+    val localList = remember { mutableStateListOf<ExpandableRecordTypeModel>() }
+    LaunchedEffect(typeList) {
+        localList.clear()
+        localList.addAll(typeList)
+    }
+    // 拖动起始下标（拖动开始时基于原始顺序记录，结束时与最终下标一并持久化）
+    var draggedFromIndex by remember { mutableIntStateOf(-1) }
+
+    val lazyListState = rememberLazyListState()
+    val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        localList.add(to.index, localList.removeAt(from.index))
+    }
+
     LazyColumn(
+        state = lazyListState,
         content = {
-            typeList.forEach { first ->
+            items(items = localList, key = { it.data.id }) { first ->
                 val hasChild = first.list.isNotEmpty()
-                item {
-                    FirstTypeItem(
-                        first = first,
-                        hasChild = hasChild,
-                        onRequestEditType = onRequestEditType,
-                        onRequestDeleteType = onRequestDeleteType,
-                        onRequestChangeFirstTypeToSecond = onRequestChangeFirstTypeToSecond,
-                        onRequestAddSecondType = onRequestAddSecondType,
-                        onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
-                    )
-                    if (first.expanded && hasChild) {
-                        SecondTypeList(
+                ReorderableItem(reorderableState, key = first.data.id) { _ ->
+                    Column {
+                        FirstTypeItem(
                             first = first,
+                            hasChild = hasChild,
+                            dragHandleModifier = Modifier.longPressDraggableHandle(
+                                onDragStarted = {
+                                    draggedFromIndex = localList.indexOfFirst { it.data.id == first.data.id }
+                                },
+                                onDragStopped = {
+                                    val toIndex = localList.indexOfFirst { it.data.id == first.data.id }
+                                    if (draggedFromIndex >= 0 && toIndex >= 0 && draggedFromIndex != toIndex) {
+                                        onMoveFirstType(draggedFromIndex, toIndex)
+                                    }
+                                    draggedFromIndex = -1
+                                },
+                            ),
                             onRequestEditType = onRequestEditType,
                             onRequestDeleteType = onRequestDeleteType,
-                            onRequestChangeSecondTypeToFirst = onRequestChangeSecondTypeToFirst,
-                            onRequestMoveSecondTypeToAnother = onRequestMoveSecondTypeToAnother,
+                            onRequestChangeFirstTypeToSecond = onRequestChangeFirstTypeToSecond,
+                            onRequestAddSecondType = onRequestAddSecondType,
                             onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
                         )
+                        if (first.expanded && hasChild) {
+                            SecondTypeList(
+                                first = first,
+                                onRequestEditType = onRequestEditType,
+                                onRequestDeleteType = onRequestDeleteType,
+                                onRequestChangeSecondTypeToFirst = onRequestChangeSecondTypeToFirst,
+                                onRequestMoveSecondTypeToAnother = onRequestMoveSecondTypeToAnother,
+                                onRequestNaviToTypeStatistics = onRequestNaviToTypeStatistics,
+                            )
+                        }
                     }
                 }
             }
@@ -621,8 +659,9 @@ private fun FirstTypeItem(
     onRequestChangeFirstTypeToSecond: (Long) -> Unit,
     onRequestAddSecondType: (Long) -> Unit,
     onRequestNaviToTypeStatistics: (Long) -> Unit,
+    dragHandleModifier: Modifier = Modifier,
 ) {
-    Box {
+    Box(modifier = dragHandleModifier) {
         var expandedMenu by remember {
             mutableStateOf(false)
         }

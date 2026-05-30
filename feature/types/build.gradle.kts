@@ -33,6 +33,7 @@ dependencies {
     implementation(projects.core.data)
 
     implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.calvin.reorderable)
 
     testImplementation(projects.core.testing)
     testImplementation(libs.robolectric)
