@@ -244,17 +244,20 @@ fun LauncherContent(
  * 资产信息界面记录列表
  *
  * @param assetId 资产 id
+ * @param isCreditCard 当前资产是否为信用卡（影响收支方向口径）
  * @param topContent 列表头布局
  * @param onRecordItemClick 记录列表 item 点击回调
  */
 @Composable
 fun AssetInfoContent(
     assetId: Long,
+    isCreditCard: Boolean,
     topContent: @Composable () -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
 ) {
     AssetInfoContentRoute(
         assetId = assetId,
+        isCreditCard = isCreditCard,
         topContent = topContent,
         onRecordItemClick = onRecordItemClick,
     )

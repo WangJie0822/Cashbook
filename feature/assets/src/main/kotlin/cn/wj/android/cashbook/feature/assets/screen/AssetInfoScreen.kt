@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 /**
  * 资产信息界面
  *
- * @param assetRecordListContent 资产记录列表，参数：(资产id, 列表头布局, 列表item点击回调) -> [Unit]
+ * @param assetRecordListContent 资产记录列表，参数：(是否信用卡, 列表头布局, 列表item点击回调) -> [Unit]
  * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
  * @param onRequestNaviToEditAsset 导航到编辑资产
  * @param onRequestNaviToAddRecord 跳转添加记录
@@ -81,7 +81,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun AssetInfoRoute(
     assetId: Long,
-    assetRecordListContent: @Composable (@Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
+    assetRecordListContent: @Composable (Boolean, @Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
     onRequestNaviToEditAsset: () -> Unit,
     onRequestNaviToAddRecord: () -> Unit,
@@ -104,8 +104,8 @@ internal fun AssetInfoRoute(
         onRequestDismissDialog = viewModel::dismissDialog,
         uiState = uiState,
         viewRecord = viewModel.viewRecordData,
-        assetRecordListContent = { topContent ->
-            assetRecordListContent(topContent, viewModel::onRecordItemClick)
+        assetRecordListContent = { isCreditCard, topContent ->
+            assetRecordListContent(isCreditCard, topContent, viewModel::onRecordItemClick)
         },
         recordDetailSheetContent = { record ->
             recordDetailSheetContent(record, viewModel::dismissRecordDetailSheet)
@@ -142,7 +142,7 @@ internal fun AssetInfoScreen(
     onRequestDismissDialog: () -> Unit,
     uiState: AssetInfoUiState,
     viewRecord: RecordViewsEntity?,
-    assetRecordListContent: @Composable (@Composable () -> Unit) -> Unit,
+    assetRecordListContent: @Composable (Boolean, @Composable () -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?) -> Unit,
     onEditAssetClick: () -> Unit,
     onDeleteAssetClick: () -> Unit,
@@ -362,7 +362,7 @@ internal fun AssetInfoScreen(
                     }
 
                     is AssetInfoUiState.Success -> {
-                        assetRecordListContent {
+                        assetRecordListContent(uiState.isCreditCard) {
                             AssetInfoContent(
                                 isCreditCard = uiState.isCreditCard,
                                 balance = uiState.balance,

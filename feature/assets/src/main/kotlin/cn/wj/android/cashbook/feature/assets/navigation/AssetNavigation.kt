@@ -129,13 +129,13 @@ fun NavGraphBuilder.invisibleAssetScreen(
 /**
  * 资产信息界面
  *
- * @param assetRecordListContent 资产记录列表，参数：(资产id, 列表头布局, 列表item点击回调) -> [Unit]
+ * @param assetRecordListContent 资产记录列表，参数：(资产id, 是否信用卡, 列表头布局, 列表item点击回调) -> [Unit]
  * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
  * @param onRequestNaviToEditAsset 导航到编辑资产
  * @param onRequestPopBackStack 导航到上一级
  */
 fun NavGraphBuilder.assetInfoScreen(
-    assetRecordListContent: @Composable (Long, @Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
+    assetRecordListContent: @Composable (Long, Boolean, @Composable () -> Unit, (RecordViewsEntity) -> Unit) -> Unit,
     recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
     onRequestNaviToEditAsset: (Long) -> Unit,
     onRequestNaviToAddRecord: (Long) -> Unit,
@@ -146,9 +146,10 @@ fun NavGraphBuilder.assetInfoScreen(
         val assetId = route.assetId
         AssetInfoRoute(
             assetId = assetId,
-            assetRecordListContent = { topContent, onRecordItemClick ->
+            assetRecordListContent = { isCreditCard, topContent, onRecordItemClick ->
                 assetRecordListContent(
                     assetId,
+                    isCreditCard,
                     topContent,
                     onRecordItemClick,
                 )

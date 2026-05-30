@@ -558,9 +558,10 @@ fun CashbookNavHost(
         )
         // 资产信息
         assetInfoScreen(
-            assetRecordListContent = { assetId, topContent, onRecordItemClick ->
+            assetRecordListContent = { assetId, isCreditCard, topContent, onRecordItemClick ->
                 AssetInfoContent(
                     assetId = assetId,
+                    isCreditCard = isCreditCard,
                     topContent = topContent,
                     onRecordItemClick = onRecordItemClick,
                 )
