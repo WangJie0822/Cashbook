@@ -572,7 +572,13 @@ class BackupRecoveryManagerImpl @Inject constructor(
 
         val result = runCatching {
             val localPath = if (path.startsWith("https://") || path.startsWith("http://")) {
-                // 云端备份，下载
+                // 云端备份，下载——拒绝明文 http 携凭据下载（与备份上传侧 normalizeWebDAVScheme 对称，
+                // 防中间人在恢复时嗅探 Basic 凭据；存量 http 配置用户需改用 https 后重试）
+                if (path.startsWith(SCHEME_HTTP)) {
+                    this@BackupRecoveryManagerImpl.logger()
+                        .e("startRecovery(), reject cleartext http recovery download: <$path>")
+                    return@runCatching BackupRecoveryState.FAILED_RECOVERY_CLEARTEXT
+                }
                 getWebFile(path)
             } else {
                 path
@@ -663,7 +669,7 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 // 安全备份失败，中止恢复，避免在无保护的情况下覆盖当前库
                 this@BackupRecoveryManagerImpl.logger()
                     .e("startRecovery(), pre-restore backup failed, abort recovery")
-                return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
+                return@runCatching BackupRecoveryState.FAILED_PRE_RESTORE_SNAPSHOT
             }
 
             val currentDatabase = database.openHelper.writableDatabase

@@ -56,6 +56,12 @@ sealed class BackupRecoveryState(open val code: Int = 0) {
         const val FAILED_FILE_FORMAT_ERROR = -3015
         const val FAILED_BACKUP_PATH_EMPTY = -3016
 
+        /** 恢复前安全快照失败（磁盘满/IO 失败等），已中止恢复 */
+        const val FAILED_PRE_RESTORE_SNAPSHOT = -3017
+
+        /** 恢复下载地址为明文 http，已拒绝以保护凭据 */
+        const val FAILED_RECOVERY_CLEARTEXT = -3018
+
         const val SUCCESS_BACKUP = 2001
         const val SUCCESS_RECOVERY = 2002
     }

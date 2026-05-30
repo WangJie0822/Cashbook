@@ -80,6 +80,9 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILE
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_PATH_UNAUTHORIZED
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BACKUP_WEBDAV
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_BLANK_BACKUP_PATH
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_FILE_FORMAT_ERROR
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_PRE_RESTORE_SNAPSHOT
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.FAILED_RECOVERY_CLEARTEXT
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_BACKUP
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState.Companion.SUCCESS_RECOVERY
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
@@ -231,6 +234,9 @@ internal fun BackupAndRecoveryScreen(
     val backupSuccessHint = stringResource(id = R.string.backup_success)
     val recoverySuccessHint = stringResource(id = R.string.recovery_success)
     val backupPathEmptyHint = stringResource(id = R.string.backup_path_empty)
+    val fileFormatErrorHint = stringResource(id = R.string.backup_recovery_file_format_error)
+    val preRestoreFailedHint = stringResource(id = R.string.pre_restore_backup_failed)
+    val cleartextRejectedHint = stringResource(id = R.string.recovery_cleartext_rejected)
 
     LaunchedEffect(shouldDisplayBookmark) {
         if (shouldDisplayBookmark != 0) {
@@ -241,6 +247,9 @@ internal fun BackupAndRecoveryScreen(
                 SUCCESS_BACKUP -> backupSuccessHint
                 SUCCESS_RECOVERY -> recoverySuccessHint
                 FAILED_BACKUP_PATH_EMPTY -> backupPathEmptyHint
+                FAILED_FILE_FORMAT_ERROR -> fileFormatErrorHint
+                FAILED_PRE_RESTORE_SNAPSHOT -> preRestoreFailedHint
+                FAILED_RECOVERY_CLEARTEXT -> cleartextRejectedHint
                 else -> ""
             }
             if (tipText.isBlank()) {

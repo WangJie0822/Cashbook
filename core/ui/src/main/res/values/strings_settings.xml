@@ -140,6 +140,9 @@
     <string name="backup_success">备份成功</string>
     <string name="recovery_success">恢复成功</string>
     <string name="backup_path_empty">备份路径为空</string>
+    <string name="backup_recovery_file_format_error">备份文件格式错误或版本不兼容，恢复失败</string>
+    <string name="pre_restore_backup_failed">恢复前安全备份失败，已中止恢复以保护当前数据</string>
+    <string name="recovery_cleartext_rejected">WebDAV 地址为明文 http，已拒绝以保护账号密码，请改用 https</string>
 
     <string name="import_bill">导入账单</string>
     <string name="import_from_wechat">从微信导入</string>
