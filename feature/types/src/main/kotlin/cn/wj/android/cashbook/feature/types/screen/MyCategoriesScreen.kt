@@ -654,9 +654,7 @@ private fun FirstTypeItem(
 
             modifier = Modifier.clickable(
                 onClick = rememberHapticOnClick {
-                    if (!first.data.protected) {
-                        expandedMenu = true
-                    }
+                    expandedMenu = true
                 },
             ),
         )
@@ -664,34 +662,37 @@ private fun FirstTypeItem(
             expanded = expandedMenu,
             onDismissRequest = { expandedMenu = false },
         ) {
-            DropdownMenuItem(
-                text = { Text(text = stringResource(id = R.string.edit)) },
-                onClick = {
-                    expandedMenu = false
-                    onRequestEditType(first.data.id)
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(text = stringResource(id = R.string.delete)) },
-                onClick = {
-                    expandedMenu = false
-                    onRequestDeleteType(first.data.id)
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(text = stringResource(id = R.string.change_to_second_type)) },
-                onClick = {
-                    expandedMenu = false
-                    onRequestChangeFirstTypeToSecond(first.data.id)
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(text = stringResource(id = R.string.add_second_type)) },
-                onClick = {
-                    expandedMenu = false
-                    onRequestAddSecondType(first.data.id)
-                },
-            )
+            // 受保护类型仅保留「统计数据」，隐藏编辑/删除/转为二级/添加二级
+            if (!first.data.protected) {
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.edit)) },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestEditType(first.data.id)
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.delete)) },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestDeleteType(first.data.id)
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.change_to_second_type)) },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestChangeFirstTypeToSecond(first.data.id)
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.add_second_type)) },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestAddSecondType(first.data.id)
+                    },
+                )
+            }
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.statistic_data)) },
                 onClick = {
@@ -766,9 +767,7 @@ private fun SecondTypeItem(
                 .padding(8.dp)
                 .clickable(
                     onClick = rememberHapticOnClick {
-                        if (!second.data.protected) {
-                            expandedMenu = true
-                        }
+                        expandedMenu = true
                     },
                 ),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -795,42 +794,45 @@ private fun SecondTypeItem(
                 expandedMenu = false
             },
         ) {
-            DropdownMenuItem(
-                text = {
-                    Text(text = stringResource(id = R.string.edit))
-                },
-                onClick = {
-                    expandedMenu = false
-                    onRequestEditType(second.data.id)
-                },
-            )
-            DropdownMenuItem(
-                text = {
-                    Text(text = stringResource(id = R.string.delete))
-                },
-                onClick = {
-                    expandedMenu = false
-                    onRequestDeleteType(second.data.id)
-                },
-            )
-            DropdownMenuItem(
-                text = {
-                    Text(text = stringResource(id = R.string.change_to_first_type))
-                },
-                onClick = {
-                    expandedMenu = false
-                    onRequestChangeSecondTypeToFirst(second.data.id)
-                },
-            )
-            DropdownMenuItem(
-                text = {
-                    Text(text = stringResource(id = R.string.move_to_another_first_type))
-                },
-                onClick = {
-                    expandedMenu = false
-                    onRequestMoveSecondTypeToAnother(second.data.id, second.data.parentId)
-                },
-            )
+            // 受保护类型仅保留「统计数据」，隐藏编辑/删除/转为一级/移动到其它一级
+            if (!second.data.protected) {
+                DropdownMenuItem(
+                    text = {
+                        Text(text = stringResource(id = R.string.edit))
+                    },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestEditType(second.data.id)
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        Text(text = stringResource(id = R.string.delete))
+                    },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestDeleteType(second.data.id)
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        Text(text = stringResource(id = R.string.change_to_first_type))
+                    },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestChangeSecondTypeToFirst(second.data.id)
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        Text(text = stringResource(id = R.string.move_to_another_first_type))
+                    },
+                    onClick = {
+                        expandedMenu = false
+                        onRequestMoveSecondTypeToAnother(second.data.id, second.data.parentId)
+                    },
+                )
+            }
             DropdownMenuItem(
                 text = {
                     Text(text = stringResource(id = R.string.statistic_data))
