@@ -49,8 +49,12 @@ interface TypeDao {
     @Query("SELECT * FROM db_type WHERE type_level=:typeLevel AND type_category=:typeCategory")
     suspend fun queryByLevelAndTypeCategory(typeLevel: Int, typeCategory: Int): List<TypeTable>
 
-    @Query("SELECT * FROM db_type WHERE type_level=:typeLevel")
+    @Query("SELECT * FROM db_type WHERE type_level=:typeLevel ORDER BY sort ASC")
     suspend fun queryByLevel(typeLevel: Int): List<TypeTable>
+
+    /** 更新 [id] 类型的排序值为 [sort] */
+    @Query("UPDATE db_type SET sort=:sort WHERE id=:id")
+    suspend fun updateSortById(id: Long, sort: Int)
 
     @Query("SELECT * FROM db_type WHERE parent_id=:parentId")
     suspend fun queryByParentId(parentId: Long): List<TypeTable>

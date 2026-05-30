@@ -61,6 +61,20 @@ class TypeRepositoryImplTest {
     }
 
     @Test
+    fun when_updateSortById_then_queryByLevel_ordered_by_sort() = runTest {
+        val a = typeDao.insertType(
+            createTypeTable(name = "A", typeLevel = TypeLevelEnum.FIRST.ordinal, sort = 3),
+        )
+        val b = typeDao.insertType(
+            createTypeTable(name = "B", typeLevel = TypeLevelEnum.FIRST.ordinal, sort = 1),
+        )
+        typeDao.updateSortById(a, 0)
+        typeDao.updateSortById(b, 1)
+        val list = typeDao.queryByLevel(TypeLevelEnum.FIRST.ordinal)
+        assertThat(list.map { it.name }).containsExactly("A", "B").inOrder()
+    }
+
+    @Test
     fun when_queryByParentId_then_returns_child_types() = runTest {
         val parentId = typeDao.insertType(
             createTypeTable(name = "餐饮", typeLevel = TypeLevelEnum.FIRST.ordinal),

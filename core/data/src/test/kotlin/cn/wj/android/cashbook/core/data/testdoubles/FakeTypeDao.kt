@@ -83,7 +83,16 @@ class FakeTypeDao : TypeDao {
     }
 
     override suspend fun queryByLevel(typeLevel: Int): List<TypeTable> {
-        return typesFlow.value.filter { it.typeLevel == typeLevel }
+        return typesFlow.value.filter { it.typeLevel == typeLevel }.sortedBy { it.sort }
+    }
+
+    override suspend fun updateSortById(id: Long, sort: Int) {
+        val mutable = typesFlow.value.toMutableList()
+        val index = mutable.indexOfFirst { it.id == id }
+        if (index >= 0) {
+            mutable[index] = mutable[index].copy(sort = sort)
+            typesFlow.value = mutable
+        }
     }
 
     override suspend fun queryByParentId(parentId: Long): List<TypeTable> {
