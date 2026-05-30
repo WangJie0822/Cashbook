@@ -22,10 +22,13 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.core.testing.util.captureMultiDevice
 import cn.wj.android.cashbook.core.testing.util.captureMultiTheme
+import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
 import dagger.hilt.android.testing.HiltTestApplication
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Rule
@@ -35,6 +38,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import java.time.YearMonth
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -96,14 +100,34 @@ class AssetInfoContentScreenScreenshotTests {
         ),
     )
 
+    /** 按日分组后的列表项（日期头 + 记录），模拟 ViewModel 经 insertSeparators 生成的结果 */
+    private val sampleItems = listOf<LauncherListItem>(
+        LauncherListItem.DayHeader(dateStr = "2024-01-15", day = 15, dayType = 1),
+        LauncherListItem.Record(sampleRecords[0]),
+        LauncherListItem.DayHeader(dateStr = "2024-01-16", day = 16, dayType = 1),
+        LauncherListItem.Record(sampleRecords[1]),
+    )
+
+    private val sampleSummary = AssetMonthSummaryModel(
+        income = 5000_00L,
+        expenditure = 50_00L,
+        balance = 4950_00L,
+    )
+
+    private val sampleDateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1))
+
     @Test
     fun assetInfoContentScreen_withRecords_multipleThemes() {
         composeTestRule.captureMultiTheme(name = "AssetInfoContentScreen") {
-            val recordList = flowOf(PagingData.from(sampleRecords))
+            val recordList = flowOf(PagingData.from(sampleItems))
                 .collectAsLazyPagingItems()
             AssetInfoContentScreen(
                 topContent = { Text(text = "资产信息头部") },
+                dateSelection = sampleDateSelection,
+                summary = sampleSummary,
                 recordList = recordList,
+                onPreviousMonth = {},
+                onNextMonth = {},
                 onRecordItemClick = {},
             )
         }
@@ -115,11 +139,15 @@ class AssetInfoContentScreenScreenshotTests {
             name = "AssetInfoContentScreen",
             overrideFileName = "AssetInfoContentScreen_empty",
         ) {
-            val recordList = flowOf(PagingData.from(emptyList<RecordViewsEntity>()))
+            val recordList = flowOf(PagingData.from(emptyList<LauncherListItem>()))
                 .collectAsLazyPagingItems()
             AssetInfoContentScreen(
                 topContent = { Text(text = "资产信息头部") },
+                dateSelection = sampleDateSelection,
+                summary = AssetMonthSummaryModel(0L, 0L, 0L),
                 recordList = recordList,
+                onPreviousMonth = {},
+                onNextMonth = {},
                 onRecordItemClick = {},
             )
         }
@@ -129,11 +157,15 @@ class AssetInfoContentScreenScreenshotTests {
     fun assetInfoContentScreen_withRecords_multipleDevices() {
         composeTestRule.captureMultiDevice(screenshotName = "AssetInfoContentScreen") {
             CashbookTheme {
-                val recordList = flowOf(PagingData.from(sampleRecords))
+                val recordList = flowOf(PagingData.from(sampleItems))
                     .collectAsLazyPagingItems()
                 AssetInfoContentScreen(
                     topContent = { Text(text = "资产信息头部") },
+                    dateSelection = sampleDateSelection,
+                    summary = sampleSummary,
                     recordList = recordList,
+                    onPreviousMonth = {},
+                    onNextMonth = {},
                     onRecordItemClick = {},
                 )
             }
@@ -144,11 +176,15 @@ class AssetInfoContentScreenScreenshotTests {
     fun assetInfoContentScreen_empty_multipleDevices() {
         composeTestRule.captureMultiDevice(screenshotName = "AssetInfoContentScreen_empty") {
             CashbookTheme {
-                val recordList = flowOf(PagingData.from(emptyList<RecordViewsEntity>()))
+                val recordList = flowOf(PagingData.from(emptyList<LauncherListItem>()))
                     .collectAsLazyPagingItems()
                 AssetInfoContentScreen(
                     topContent = { Text(text = "资产信息头部") },
+                    dateSelection = sampleDateSelection,
+                    summary = AssetMonthSummaryModel(0L, 0L, 0L),
                     recordList = recordList,
+                    onPreviousMonth = {},
+                    onNextMonth = {},
                     onRecordItemClick = {},
                 )
             }

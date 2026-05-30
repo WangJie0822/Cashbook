@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.YearMonth
-import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -120,26 +119,7 @@ class LauncherContentViewModel @Inject constructor(
             }
             .map { pagingData ->
                 pagingData.insertSeparators { before, after ->
-                    val afterRecord = (after as? LauncherListItem.Record)?.entity
-                    val beforeRecord = (before as? LauncherListItem.Record)?.entity
-                    if (afterRecord != null) {
-                        val afterDate = afterRecord.recordTime.dateFormat(DATE_FORMAT_DATE)
-                        val beforeDate = beforeRecord?.recordTime?.dateFormat(DATE_FORMAT_DATE)
-                        if (afterDate != beforeDate) {
-                            val dateArray = afterDate.split("-")
-                            val day = dateArray.last().toIntOrNull() ?: 0
-                            val dayType = computeDayType(dateArray)
-                            LauncherListItem.DayHeader(
-                                dateStr = afterDate,
-                                day = day,
-                                dayType = dayType,
-                            )
-                        } else {
-                            null
-                        }
-                    } else {
-                        null
-                    }
+                    recordDaySeparator(before, after)
                 }
             }
     }.cachedIn(viewModelScope)
@@ -257,25 +237,6 @@ class LauncherContentViewModel @Inject constructor(
                 dayIncome = dayIncome,
                 dayExpand = dayExpenditure,
             )
-        }
-    }
-
-    /** 计算 dayType：0=今天, -1=昨天, -2=前天, 1=其它 */
-    private fun computeDayType(dateArray: List<String>): Int {
-        val calendar = Calendar.getInstance()
-        val currentYear = calendar[Calendar.YEAR]
-        val currentMonth = calendar[Calendar.MONTH] + 1
-        val currentDay = calendar[Calendar.DAY_OF_MONTH]
-        val dateDay = dateArray.last().toIntOrNull() ?: return 1
-        return if (currentYear == dateArray[0].toIntOrNull() && currentMonth == dateArray[1].toIntOrNull()) {
-            when (dateDay) {
-                currentDay -> 0
-                currentDay - 1 -> -1
-                currentDay - 2 -> -2
-                else -> 1
-            }
-        } else {
-            1
         }
     }
 }

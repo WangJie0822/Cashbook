@@ -23,6 +23,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
 import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.time.YearMonth
 import javax.inject.Inject
@@ -67,7 +70,7 @@ class AssetInfoContentViewModel @Inject constructor(
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
-    /** 记录列表数据（按资产 + 当前月份范围分页） */
+    /** 记录列表数据（按资产 + 当前月份范围分页，并按日插入 [LauncherListItem.DayHeader] 分组） */
     val recordList = combine(_assetIdData, _dateSelection, recordDataVersion) { assetId, selection, _ ->
         assetId to selection.toDateRange()
     }
@@ -86,6 +89,14 @@ class AssetInfoContentViewModel @Inject constructor(
                     )
                 },
             ).flow
+                .map { pagingData ->
+                    pagingData.map { LauncherListItem.Record(it) as LauncherListItem }
+                }
+                .map { pagingData ->
+                    pagingData.insertSeparators { before, after ->
+                        recordDaySeparator(before, after)
+                    }
+                }
         }
         .cachedIn(viewModelScope)
 
