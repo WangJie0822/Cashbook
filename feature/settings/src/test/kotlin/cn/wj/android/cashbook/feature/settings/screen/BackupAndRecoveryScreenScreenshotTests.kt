@@ -25,6 +25,7 @@ import cn.wj.android.cashbook.core.testing.util.captureMultiDevice
 import cn.wj.android.cashbook.core.testing.util.captureMultiTheme
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryUiState
+import cn.wj.android.cashbook.feature.settings.viewmodel.ExportState
 import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
 import org.junit.Test
@@ -89,6 +90,14 @@ class BackupAndRecoveryScreenScreenshotTests {
                 onNoWifiConfirmBackupClick = {},
                 onAutoBackupModeSelected = {},
                 onDbMigrateClick = {},
+                onRequestNaviToRecordImport = {},
+                booksList = emptyList(),
+                currentBook = null,
+                exportState = ExportState.Idle,
+                onGetEarliestRecordTime = { null },
+                onCountExportRecords = { _, _, _ -> 0 },
+                onExportRecords = { _, _, _, _, _, _, _ -> },
+                onResetExportState = {},
                 onBackClick = {},
                 onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             )
@@ -116,6 +125,14 @@ class BackupAndRecoveryScreenScreenshotTests {
                 onNoWifiConfirmBackupClick = {},
                 onAutoBackupModeSelected = {},
                 onDbMigrateClick = {},
+                onRequestNaviToRecordImport = {},
+                booksList = emptyList(),
+                currentBook = null,
+                exportState = ExportState.Idle,
+                onGetEarliestRecordTime = { null },
+                onCountExportRecords = { _, _, _ -> 0 },
+                onExportRecords = { _, _, _, _, _, _, _ -> },
+                onResetExportState = {},
                 onBackClick = {},
                 onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             )
@@ -146,6 +163,14 @@ class BackupAndRecoveryScreenScreenshotTests {
                 onNoWifiConfirmBackupClick = {},
                 onAutoBackupModeSelected = {},
                 onDbMigrateClick = {},
+                onRequestNaviToRecordImport = {},
+                booksList = emptyList(),
+                currentBook = null,
+                exportState = ExportState.Idle,
+                onGetEarliestRecordTime = { null },
+                onCountExportRecords = { _, _, _ -> 0 },
+                onExportRecords = { _, _, _, _, _, _, _ -> },
+                onResetExportState = {},
                 onBackClick = {},
                 onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
             )
@@ -174,6 +199,14 @@ class BackupAndRecoveryScreenScreenshotTests {
                     onNoWifiConfirmBackupClick = {},
                     onAutoBackupModeSelected = {},
                     onDbMigrateClick = {},
+                    onRequestNaviToRecordImport = {},
+                    booksList = emptyList(),
+                    currentBook = null,
+                    exportState = ExportState.Idle,
+                    onGetEarliestRecordTime = { null },
+                    onCountExportRecords = { _, _, _ -> 0 },
+                    onExportRecords = { _, _, _, _, _, _, _ -> },
+                    onResetExportState = {},
                     onBackClick = {},
                     onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
                 )
@@ -205,6 +238,14 @@ class BackupAndRecoveryScreenScreenshotTests {
                     onNoWifiConfirmBackupClick = {},
                     onAutoBackupModeSelected = {},
                     onDbMigrateClick = {},
+                    onRequestNaviToRecordImport = {},
+                    booksList = emptyList(),
+                    currentBook = null,
+                    exportState = ExportState.Idle,
+                    onGetEarliestRecordTime = { null },
+                    onCountExportRecords = { _, _, _ -> 0 },
+                    onExportRecords = { _, _, _, _, _, _, _ -> },
+                    onResetExportState = {},
                     onBackClick = {},
                     onShowSnackbar = { _, _ -> SnackbarResult.Dismissed },
                 )

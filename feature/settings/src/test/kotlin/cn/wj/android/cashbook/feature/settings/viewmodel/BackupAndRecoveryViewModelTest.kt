@@ -19,12 +19,16 @@ package cn.wj.android.cashbook.feature.settings.viewmodel
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.model.BackupModel
+import cn.wj.android.cashbook.core.testing.helper.FakeDailyAccountExporter
 import cn.wj.android.cashbook.core.testing.repository.FakeBackupRecoveryManager
+import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository
 import cn.wj.android.cashbook.core.testing.util.FakeNetworkMonitor
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
+import cn.wj.android.cashbook.core.ui.DefaultProgressDialogController
 import cn.wj.android.cashbook.core.ui.DialogState
+import cn.wj.android.cashbook.domain.usecase.ExportRecordUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -55,8 +59,14 @@ class BackupAndRecoveryViewModelTest {
         viewModel = BackupAndRecoveryViewModel(
             settingRepository = settingRepository,
             recordRepository = recordRepository,
+            booksRepository = FakeBooksRepository(),
             backupRecoveryManager = backupRecoveryManager,
             networkMonitor = networkMonitor,
+            exportRecordUseCase = ExportRecordUseCase(
+                recordRepository = recordRepository,
+                exporter = FakeDailyAccountExporter(),
+                coroutineContext = UnconfinedTestDispatcher(),
+            ),
         )
     }
 
@@ -507,7 +517,7 @@ class BackupAndRecoveryViewModelTest {
     @Test
     fun when_refresh_db_migrate_then_no_crash() = runTest {
         // 验证 refreshDbMigrate 不会崩溃
-        viewModel.refreshDbMigrate()
+        viewModel.refreshDbMigrate(DefaultProgressDialogController())
     }
 
     // endregion
