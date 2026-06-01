@@ -35,8 +35,6 @@ class GetCurrentMonthRecordViewsUseCase @Inject constructor(
 
     operator fun invoke(year: String, month: String): Flow<List<RecordViewsEntity>> =
         recordRepository.queryRecordByYearMonth(year, month).mapLatest { list ->
-            list.map {
-                recordModelTransToViewsUseCase(it).asEntity()
-            }
+            recordModelTransToViewsUseCase(list).map { it.asEntity() }
         }
 }

@@ -62,8 +62,8 @@ class GetRelatedRecordViewsUseCase @Inject constructor(
                 }
             }.filter {
                 recordRepository.queryRelatedRecordCountById(it.id) <= 0
-            }.map {
-                recordModelTransToViewsUseCase(it).asEntity()
+            }.let { filtered ->
+                recordModelTransToViewsUseCase(filtered).map { it.asEntity() }
             }
         }
     }
