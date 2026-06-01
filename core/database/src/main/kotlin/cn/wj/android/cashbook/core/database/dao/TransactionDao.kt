@@ -34,6 +34,7 @@ import cn.wj.android.cashbook.core.database.throwable.DataTransactionException
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ImageModel
+import cn.wj.android.cashbook.core.model.model.recordAmount
 
 /**
  * 事务数据库操作类
@@ -152,15 +153,7 @@ interface TransactionDao {
     fun calculateRecordAmount(
         record: RecordTable,
         category: RecordTypeCategoryEnum,
-    ): Long {
-        return if (category == RecordTypeCategoryEnum.INCOME) {
-            // 收入：金额 - 手续费
-            record.amount - record.charge
-        } else {
-            // 支出、转账：金额 + 手续费 - 优惠
-            record.amount + record.charge - record.concessions
-        }
-    }
+    ): Long = recordAmount(category, record.amount, record.charge, record.concessions)
 
     /**
      * 重算某个吸收者（收入记录）的 finalAmount
