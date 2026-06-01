@@ -76,4 +76,8 @@ class WechatBillParserTest {
     fun convertToItem_too_few_columns_returns_null() {
         assertThat(WechatBillParser.convertToItem(listOf("2026-03-26 11:50:04", "支出"))).isNull()
     }
+
+    // 注：parse() 端到端不在此单测——已 PoC 验证 org.xmlpull.v1.XmlPullParserFactory 在纯 JVM
+    // unit test 下抛 "not mocked"（android.jar stub）。端到端需 Robolectric/instrumented，
+    // 本次范围控制不引入；解析子逻辑由上方 parseDateTime/convertToItem 纯函数测试覆盖。
 }

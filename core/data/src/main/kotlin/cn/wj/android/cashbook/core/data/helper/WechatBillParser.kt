@@ -52,6 +52,11 @@ object WechatBillParser {
     /**
      * 解析微信支付 xlsx 账单文件
      *
+     * 注意：本方法依赖 [org.xmlpull.v1.XmlPullParserFactory]，在纯 JVM unit test 下
+     * （android.jar stub）会抛 "not mocked"，无法端到端单测（已 PoC 验证）。
+     * 端到端验证需 Robolectric / instrumented test；解析子逻辑 [parseDateTime] / [convertToItem]
+     * 已在 WechatBillParserTest 以纯函数方式单测覆盖。
+     *
      * @param inputStream xlsx 文件输入流
      * @return 解析结果，包含账单条目列表和汇总信息；解析失败返回 null
      */
