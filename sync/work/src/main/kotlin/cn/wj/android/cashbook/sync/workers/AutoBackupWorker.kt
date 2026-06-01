@@ -17,9 +17,11 @@
 package cn.wj.android.cashbook.sync.workers
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
+import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -28,6 +30,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
+import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -54,11 +57,13 @@ class AutoBackupWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         this@AutoBackupWorker.logger().i("doWork(), requestAutoBackup")
-        withContext(ioDispatcher) {
+        val state = withContext(ioDispatcher) {
             delay(2_000L)
             backupRecoveryManager.requestAutoBackup()
         }
-        return Result.success()
+        // 据备份终态返回:成功→success,WebDAV 网络类→retry,配置类→failure。
+        // 不附带 outputData(避免备份路径/异常信息泄露)。
+        return mapBackupStateToResult(state)
     }
 
     companion object {
@@ -75,4 +80,21 @@ class AutoBackupWorker @AssistedInject constructor(
                 .setInputData(AutoBackupWorker::class.delegatedData())
                 .build()
     }
+}
+
+/**
+ * 将备份终态映射为 WorkManager 执行结果（抽为顶层纯函数以便纯 JVM 单测，无需 Robolectric）。
+ * - 成功 → success；
+ * - WebDAV 网络类失败 → retry（WorkManager 默认指数退避，30s 起）；
+ * - 配置类失败（空路径/未授权/格式错等）→ failure（不重试，需用户修复配置）。
+ *
+ * 已知局限（#10a）：startBackup 的 catch-all 把瞬时 IO 异常也归 FAILED_BACKUP_PATH_UNAUTHORIZED，
+ * 这类会被判 failure 不重试；本次不细化异常分类（范围控制）。
+ */
+@VisibleForTesting
+internal fun mapBackupStateToResult(state: BackupRecoveryState): ListenableWorker.Result = when {
+    state is BackupRecoveryState.Success -> ListenableWorker.Result.success()
+    state is BackupRecoveryState.Failed &&
+        state.code == BackupRecoveryState.FAILED_BACKUP_WEBDAV -> ListenableWorker.Result.retry()
+    else -> ListenableWorker.Result.failure()
 }

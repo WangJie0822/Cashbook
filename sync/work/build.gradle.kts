@@ -47,4 +47,7 @@ dependencies {
 
     // okhttp
     implementation(libs.squareup.okhttp3)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.google.truth)
 }
