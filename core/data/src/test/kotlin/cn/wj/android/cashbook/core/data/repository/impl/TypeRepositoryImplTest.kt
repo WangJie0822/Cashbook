@@ -32,9 +32,11 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * TypeRepository 实现测试
+ * TypeRepository 测试。
  *
- * 测试类型仓库的核心业务逻辑，包括类型层级管理、特殊标记查询等
+ * 注意（#9b）：本测试**不实例化 TypeRepositoryImpl**（其依赖的 CombineProtoDataSource 是 final class，
+ * 无法构造测试替身）。实际覆盖 = FakeTypeDao/FakeCombineProtoDataSource 行为契约 + 手工复刻的 Impl 逻辑分支；
+ * 真实映射由 MappingTest 覆盖，业务逻辑由 core:domain 各 UseCase 测试覆盖。
  */
 class TypeRepositoryImplTest {
 

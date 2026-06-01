@@ -31,9 +31,11 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * AssetRepository 实现测试
+ * AssetRepository 测试。
  *
- * 测试资产仓库的核心业务逻辑，包括可见/不可见过滤、CRUD 操作等
+ * 注意（#9b）：本测试**不实例化 AssetRepositoryImpl**（其依赖的 CombineProtoDataSource 是 final class，
+ * 无法构造测试替身）。实际覆盖 = FakeAssetDao 行为契约 + 手工复刻的 Impl 逻辑分支（可见/不可见过滤、CRUD）；
+ * 真实 asModel/asTable 映射由 MappingTest 覆盖，Repository 业务逻辑由 core:domain 各 UseCase 测试覆盖。
  */
 class AssetRepositoryImplTest {
 

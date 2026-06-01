@@ -31,9 +31,11 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * BooksRepository 实现测试
+ * BooksRepository 测试。
  *
- * 测试账本仓库的核心业务逻辑，包括账本管理、当前账本切换等
+ * 注意（#9b）：本测试**不实例化 BooksRepositoryImpl**（其依赖的 CombineProtoDataSource 是 final class，
+ * 无法构造测试替身）。实际覆盖 = FakeBooksDao/FakeTransactionDao/FakeCombineProtoDataSource 行为契约
+ * + 手工复刻的 Impl 逻辑分支；真实映射由 MappingTest 覆盖，业务逻辑由 core:domain 各 UseCase 测试覆盖。
  */
 class BooksRepositoryImplTest {
 
