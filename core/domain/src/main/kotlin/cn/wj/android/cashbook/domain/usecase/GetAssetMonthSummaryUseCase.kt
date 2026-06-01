@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
+import cn.wj.android.cashbook.core.model.model.recordAmount
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -60,20 +61,15 @@ class GetAssetMonthSummaryUseCase @Inject constructor(
         for (record in records) {
             // 优先用库中类型分类；平账合成类型不在库中，兜底解析以纳入余额净变化（对齐 verifyAssetBalance）
             val category = categoryMap[record.typeId] ?: balanceCategoryOrNull(record.typeId) ?: continue
-            // 与 TransactionDao.calculateRecordAmount 同公式（字段名差异 charges/concessions vs charge 无法直接调用 DAO）：
-            // 收入=amount-charges；其余=amount+charges-concessions
-            val recordAmount = if (category == RecordTypeCategoryEnum.INCOME) {
-                record.amount - record.charges
-            } else {
-                record.amount + record.charges - record.concessions
-            }
+            // 复用 core/model recordAmount（DAO/月度口径）：收入=amount-charges；其余(含转账)=amount+charges-concessions
+            val realAmount = recordAmount(category, record.amount, record.charges, record.concessions)
             var delta = 0L
             // 本资产作为源资产
             if (record.assetId == assetId) {
                 delta += if (isCreditCard) {
-                    if (category == RecordTypeCategoryEnum.INCOME) -recordAmount else recordAmount
+                    if (category == RecordTypeCategoryEnum.INCOME) -realAmount else realAmount
                 } else {
-                    if (category == RecordTypeCategoryEnum.INCOME) recordAmount else -recordAmount
+                    if (category == RecordTypeCategoryEnum.INCOME) realAmount else -realAmount
                 }
             }
             // 本资产作为转账目标
