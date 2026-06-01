@@ -69,13 +69,19 @@ class FakeBackupRecoveryManager : BackupRecoveryManager {
         _recoveryState.value = state
     }
 
-    override suspend fun requestAutoBackup() {
+    /** 用于控制 requestAutoBackup / requestBackup 返回的状态 */
+    var autoBackupResult: BackupRecoveryState =
+        BackupRecoveryState.Success(BackupRecoveryState.SUCCESS_BACKUP)
+
+    override suspend fun requestAutoBackup(): BackupRecoveryState {
         requestBackupCalled = true
+        return autoBackupResult
     }
 
-    override suspend fun requestBackup(onlyLocal: Boolean) {
+    override suspend fun requestBackup(onlyLocal: Boolean): BackupRecoveryState {
         requestBackupCalled = true
         lastRequestBackupOnlyLocal = onlyLocal
+        return autoBackupResult
     }
 
     override suspend fun requestRecovery(path: String) {

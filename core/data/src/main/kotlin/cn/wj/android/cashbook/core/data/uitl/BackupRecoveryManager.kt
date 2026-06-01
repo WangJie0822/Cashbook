@@ -38,9 +38,9 @@ interface BackupRecoveryManager {
 
     fun updateRecoveryState(state: BackupRecoveryState)
 
-    suspend fun requestAutoBackup()
+    suspend fun requestAutoBackup(): BackupRecoveryState
 
-    suspend fun requestBackup(onlyLocal: Boolean = false)
+    suspend fun requestBackup(onlyLocal: Boolean = false): BackupRecoveryState
 
     suspend fun requestRecovery(path: String)
 
