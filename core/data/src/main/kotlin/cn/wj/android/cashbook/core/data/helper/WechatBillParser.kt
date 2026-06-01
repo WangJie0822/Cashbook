@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.core.data.helper
 
+import androidx.annotation.VisibleForTesting
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.model.model.BillDirection
 import cn.wj.android.cashbook.core.model.model.BillSummary
@@ -255,7 +256,8 @@ object WechatBillParser {
      * 0: 交易时间, 1: 交易类型, 2: 交易对方, 3: 商品, 4: 收/支,
      * 5: 金额(元), 6: 支付方式, 7: 当前状态, 8: 交易单号, 9: 商户单号, 10: 备注
      */
-    private fun convertToItem(row: List<String>): ImportedBillItem? {
+    @VisibleForTesting
+    internal fun convertToItem(row: List<String>): ImportedBillItem? {
         if (row.size < COLUMN_COUNT) return null
 
         val timeStr = row[0]
@@ -307,7 +309,8 @@ object WechatBillParser {
      * - 标准格式：2026-03-26 11:50:04
      * - Excel 序列号：46107.493101851855（xlsx 无 t 属性、通过 style 格式化的日期）
      */
-    private fun parseDateTime(dateStr: String): Long? {
+    @VisibleForTesting
+    internal fun parseDateTime(dateStr: String): Long? {
         val trimmed = dateStr.trim()
         // 先尝试标准日期格式
         try {
