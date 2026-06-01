@@ -238,8 +238,8 @@ class RecordImportViewModelTest {
                     finalAmount = 9980L,
                     charges = 0L,
                     concessions = 0L,
-                    // remark 含微信单号（DAO 用 remark LIKE 匹配）
-                    remark = "微信单号:1000050001",
+                    // remark 含方括号定界的微信单号，与真实写入(RecordImportViewModel)+ DAO SQL 一致
+                    remark = "某商户 [微信单号:1000050001]",
                     reimbursable = false,
                     recordTime = recordTime,
                 ),

@@ -351,10 +351,12 @@ class FakeRecordRepository : RecordRepository {
         booksId: Long,
         transactionId: String,
     ): List<RecordModel> {
-        // 忠实复刻 DAO 的 remark LIKE %单号%（同 booksId）语义，使 EXACT 去重路径可被单测覆盖
-        // （此前为 emptyList 桩，导致 checkDuplicate 的精确单号匹配从未被测试覆盖）
+        // 忠实复刻 DAO 的 remark LIKE '%[微信单号:<id>]%'（方括号定界，同 booksId）语义，
+        // 使 EXACT 去重路径可被单测覆盖（此前为 emptyList 桩，精确单号匹配从未被测试覆盖）。
+        // 注意:真实写入(RecordImportViewModel)与 DAO SQL 均用方括号定界,不可用裸 contains。
         if (transactionId.isBlank()) return emptyList()
-        return records.filter { it.booksId == booksId && it.remark.contains(transactionId) }
+        val marker = "[微信单号:$transactionId]"
+        return records.filter { it.booksId == booksId && it.remark.contains(marker) }
     }
 
     override suspend fun queryByTimeAndAmount(
