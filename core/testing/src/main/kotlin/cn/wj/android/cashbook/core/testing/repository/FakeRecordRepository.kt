@@ -351,7 +351,10 @@ class FakeRecordRepository : RecordRepository {
         booksId: Long,
         transactionId: String,
     ): List<RecordModel> {
-        return emptyList()
+        // 忠实复刻 DAO 的 remark LIKE %单号%（同 booksId）语义，使 EXACT 去重路径可被单测覆盖
+        // （此前为 emptyList 桩，导致 checkDuplicate 的精确单号匹配从未被测试覆盖）
+        if (transactionId.isBlank()) return emptyList()
+        return records.filter { it.booksId == booksId && it.remark.contains(transactionId) }
     }
 
     override suspend fun queryByTimeAndAmount(

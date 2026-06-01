@@ -215,4 +215,55 @@ class RecordImportViewModelTest {
 
         assertThat(status).isEqualTo(DuplicateStatus.NONE)
     }
+
+    /**
+     * happy-path：精确单号匹配走 EXACT 路径（优先于同天同额模糊匹配）。
+     *
+     * 库中记录 remark 含微信单号；导入条目带相同 transactionId 时去重应判定为 EXACT。
+     * 此前 FakeRecordRepository.queryByWechatTransactionId 为 emptyList 桩，EXACT 路径从未被覆盖。
+     */
+    @Test
+    fun when_transaction_id_matches_existing_then_exact_duplicate() = runTest {
+        val booksId = 1L
+        val recordTime = 86400000L + 12 * 3600000L
+        val repository = FakeRecordRepository().apply {
+            addRecord(
+                RecordModel(
+                    id = 1L,
+                    booksId = booksId,
+                    typeId = 1L,
+                    assetId = -1L,
+                    relatedAssetId = -1L,
+                    amount = 9980L,
+                    finalAmount = 9980L,
+                    charges = 0L,
+                    concessions = 0L,
+                    // remark 含微信单号（DAO 用 remark LIKE 匹配）
+                    remark = "微信单号:1000050001",
+                    reimbursable = false,
+                    recordTime = recordTime,
+                ),
+            )
+        }
+        val viewModel = createViewModel(recordRepository = repository)
+        advanceUntilIdle()
+
+        val item = ImportedBillItem(
+            transactionTime = recordTime,
+            transactionType = "商户消费",
+            counterparty = "某商户",
+            description = "",
+            direction = BillDirection.EXPENDITURE,
+            amount = 99.80,
+            paymentMethod = "",
+            status = "",
+            transactionId = "1000050001",
+            merchantId = "",
+            remark = "",
+        )
+
+        val status = viewModel.checkDuplicate(item, booksId)
+
+        assertThat(status).isEqualTo(DuplicateStatus.EXACT)
+    }
 }
