@@ -25,6 +25,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
+import cn.wj.android.cashbook.core.model.model.analyticsPieAmount
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -45,11 +46,7 @@ class TransRecordViewsToAnalyticsPieUseCase @Inject constructor(
         val addedTypeIds = mutableSetOf<Long>()
         categoryList.forEach { record ->
             // 计算总金额
-            total += if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                record.amount + record.charges - record.concessions
-            } else {
-                record.amount - record.charges
-            }
+            total += analyticsPieAmount(typeCategory, record.amount, record.charges, record.concessions)
             // 统计一级分类
             val type = record.type
             if (type.typeLevel == TypeLevelEnum.FIRST) {
@@ -71,11 +68,7 @@ class TransRecordViewsToAnalyticsPieUseCase @Inject constructor(
                 var typeTotal = 0L
                 categoryList.filter { it.type.id == type.id || it.type.parentId == type.id }
                     .forEach {
-                        typeTotal += if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                            it.amount + it.charges - it.concessions
-                        } else {
-                            it.amount - it.charges
-                        }
+                        typeTotal += analyticsPieAmount(typeCategory, it.amount, it.charges, it.concessions)
                     }
                 result.add(
                     AnalyticsRecordPieEntity(

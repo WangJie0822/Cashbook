@@ -20,9 +20,9 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
-import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
+import cn.wj.android.cashbook.core.model.model.analyticsPieAmount
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -45,11 +45,7 @@ class TransRecordViewsToAnalyticsPieSecondUseCase @Inject constructor(
             categoryList.firstOrNull()?.type?.typeCategory ?: return@withContext emptyList()
         categoryList.forEach { record ->
             // 计算总金额
-            total += if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                record.amount + record.charges - record.concessions
-            } else {
-                record.amount - record.charges
-            }
+            total += analyticsPieAmount(typeCategory, record.amount, record.charges, record.concessions)
             // 统计所有分类
             val type = record.type
             if (addedTypeIds.add(type.id)) {
@@ -63,11 +59,7 @@ class TransRecordViewsToAnalyticsPieSecondUseCase @Inject constructor(
                 var typeTotal = 0L
                 categoryList.filter { it.type.id == type.id }
                     .forEach {
-                        typeTotal += if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                            it.amount + it.charges - it.concessions
-                        } else {
-                            it.amount - it.charges
-                        }
+                        typeTotal += analyticsPieAmount(typeCategory, it.amount, it.charges, it.concessions)
                     }
                 result.add(
                     AnalyticsRecordPieEntity(

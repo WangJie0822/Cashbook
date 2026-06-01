@@ -146,6 +146,26 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
     }
 
     @Test
+    fun when_transfer_then_calculates_amount_minus_charges() = runTest {
+        // 金丝雀：Pie 口径 TRANSFER 走"非支出"分支 = amount - charges（与 recordAmount/DAO 口径相反，防 #10b 重构误用单一口径）
+        val type = createRecordTypeModel(
+            id = 1L,
+            name = "转账",
+            typeCategory = RecordTypeCategoryEnum.TRANSFER,
+        )
+        typeRepository.addType(type)
+
+        val records = listOf(
+            createRecordViewsModel(type = type, amount = 10000L, charges = 200L, concessions = 50L),
+        )
+
+        val result = useCase(RecordTypeCategoryEnum.TRANSFER, records)
+
+        // TRANSFER: amount - charges = 10000 - 200 = 9800（非 amount+charges-concessions=10150）
+        assertThat(result.first().totalAmount).isEqualTo(9800L)
+    }
+
+    @Test
     fun when_results_then_sorted_by_percent_descending() = runTest {
         val typeA = createRecordTypeModel(id = 1L, name = "A", typeCategory = RecordTypeCategoryEnum.EXPENDITURE)
         val typeB = createRecordTypeModel(id = 2L, name = "B", typeCategory = RecordTypeCategoryEnum.EXPENDITURE)
