@@ -44,10 +44,9 @@ class GetTagRecordViewsUseCase @Inject constructor(
         if (tagId == -1L) {
             return@withContext emptyList()
         }
-        recordRepository.queryPagingRecordListByTagId(tagId, pageNum, pageSize)
-            .sortedByDescending { it.recordTime }
-            .map {
-                recordModelTransToViewsUseCase(it).asEntity()
-            }
+        recordModelTransToViewsUseCase(
+            recordRepository.queryPagingRecordListByTagId(tagId, pageNum, pageSize)
+                .sortedByDescending { it.recordTime },
+        ).map { it.asEntity() }
     }
 }

@@ -46,10 +46,9 @@ class GetAssetRecordViewsUseCase @Inject constructor(
         if (assetId == -1L) {
             return@withContext emptyList()
         }
-        recordRepository.queryPagingRecordListByAssetIdBetweenDate(assetId, startDate, endDate, pageNum, pageSize)
-            .sortedByDescending { it.recordTime }
-            .map {
-                recordModelTransToViewsUseCase(it).asEntity()
-            }
+        recordModelTransToViewsUseCase(
+            recordRepository.queryPagingRecordListByAssetIdBetweenDate(assetId, startDate, endDate, pageNum, pageSize)
+                .sortedByDescending { it.recordTime },
+        ).map { it.asEntity() }
     }
 }

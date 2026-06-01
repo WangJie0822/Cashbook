@@ -46,7 +46,7 @@ class GetTypeRecordViewsUseCase @Inject constructor(
         if (typeId == -1L) {
             return@withContext emptyList()
         }
-        if (dateRange.isNotBlank()) {
+        val records = if (dateRange.isNotBlank()) {
             recordRepository.queryPagingRecordListByTypeIdBetweenDate(
                 typeId = typeId,
                 dateRange = dateRange,
@@ -61,10 +61,7 @@ class GetTypeRecordViewsUseCase @Inject constructor(
                 pageSize = pageSize,
                 includeChildTypes = includeChildTypes,
             )
-        }
-            .sortedByDescending { it.recordTime }
-            .map {
-                recordModelTransToViewsUseCase(it).asEntity()
-            }
+        }.sortedByDescending { it.recordTime }
+        recordModelTransToViewsUseCase(records).map { it.asEntity() }
     }
 }
