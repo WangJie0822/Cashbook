@@ -36,3 +36,22 @@ fun recordAmount(
 } else {
     amount + charges - concessions
 }
+
+/**
+ * Analytics 饼图金额口径（单位：分）。
+ * - 支出：金额 + 手续费 - 优惠
+ * - 收入 / 转账：金额 - 手续费
+ *
+ * 与 [recordAmount] 口径相反（见该函数注释）：本函数 TRANSFER 归"非支出"分支（当收入）。
+ * 仅用于收支分类饼图统计。
+ */
+fun analyticsPieAmount(
+    typeCategory: RecordTypeCategoryEnum,
+    amount: Long,
+    charges: Long,
+    concessions: Long,
+): Long = if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+    amount + charges - concessions
+} else {
+    amount - charges
+}
