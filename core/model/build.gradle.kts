@@ -16,3 +16,8 @@
 plugins {
     alias(conventionLibs.plugins.cashbook.jvm.library)
 }
+
+dependencies {
+    testImplementation(libs.junit)
+    testImplementation(libs.google.truth)
+}
