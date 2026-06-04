@@ -285,4 +285,21 @@ class RecordModelTransToViewsUseCaseTest {
         val result = useCase(emptyList())
         assertThat(result).isEmpty()
     }
+
+    @Test
+    fun given_expenditure_type_when_related_income_has_charges_then_related_amount_excludes_charges() = runTest {
+        val type = createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE)
+        typeRepository.addType(type)
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 20000L)
+        recordRepository.addRecord(record)
+        // 关联的收入记录（报销款）带手续费 500
+        val relatedRecord = createRecordModel(id = 2L, typeId = 2L, amount = 8000L, charges = 500L)
+        recordRepository.addRecord(relatedRecord)
+        recordRepository.setRelatedFromIds(1L, listOf(2L))
+
+        val result = useCase(record)
+
+        // A 修复后：支出主记录关联收入 = recordAmount(INCOME) = amount - charges = 8000 - 500 = 7500
+        assertThat(result.relatedAmount).isEqualTo(7500L)
+    }
 }

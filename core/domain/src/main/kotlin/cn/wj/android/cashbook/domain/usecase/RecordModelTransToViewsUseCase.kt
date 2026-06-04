@@ -29,6 +29,7 @@ import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
+import cn.wj.android.cashbook.core.model.model.recordAmount
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -174,24 +175,22 @@ class RecordModelTransToViewsUseCase @Inject constructor(
 
     /**
      * 计算关联金额，单条与批量共用同一口径，保证两者逐字段等价。
-     * - 支出类型：关联的是收入，累加 [RecordModel.amount]
-     * - 收入类型：关联的是支出，累加 amount + charges - concessions
-     * - 其它类型：不累加
+     * 关联 category 由主 category 取反推断（零额外查询）：
+     * - 主支出：关联收入，recordAmount(INCOME)=amount−charges
+     * - 主收入：关联支出，recordAmount(EXPENDITURE)=amount+charges−concessions
+     * - 其它（TRANSFER 等）：不累加
      */
     private fun sumRelatedAmount(
         typeCategory: RecordTypeCategoryEnum,
         relatedRecord: List<RecordModel>,
     ): Long {
-        var totalRelated = 0L
-        relatedRecord.forEach { record ->
-            if (typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                // 支出类型，关联的是收入
-                totalRelated += record.amount
-            } else if (typeCategory == RecordTypeCategoryEnum.INCOME) {
-                // 收入类型，关联的是支出
-                totalRelated += (record.amount + record.charges - record.concessions)
-            }
+        val relatedCategory = when (typeCategory) {
+            RecordTypeCategoryEnum.EXPENDITURE -> RecordTypeCategoryEnum.INCOME
+            RecordTypeCategoryEnum.INCOME -> RecordTypeCategoryEnum.EXPENDITURE
+            else -> return 0L
         }
-        return totalRelated
+        return relatedRecord.sumOf { record ->
+            recordAmount(relatedCategory, record.amount, record.charges, record.concessions)
+        }
     }
 }
