@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.feature.records.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.TagModel
@@ -94,6 +95,7 @@ object RecordDetailsSheetData {
         relatedImage = emptyList(),
         relatedRecord = relatedRecordList,
         relatedAmount = 2000L,
+        relatedNature = RecordRelatedNatureEnum.REIMBURSED,
         recordTime = 1711900800000L,
     )
 
@@ -144,6 +146,7 @@ object RecordDetailsSheetData {
         relatedImage = emptyList(),
         relatedRecord = relatedRecordList,
         relatedAmount = 2000L,
+        relatedNature = RecordRelatedNatureEnum.REFUNDED,
         recordTime = 1711900800000L,
     )
 

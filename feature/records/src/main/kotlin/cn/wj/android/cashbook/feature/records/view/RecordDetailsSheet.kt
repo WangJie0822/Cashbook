@@ -57,6 +57,7 @@ import cn.wj.android.cashbook.core.design.preview.PreviewTheme
 import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
 import cn.wj.android.cashbook.core.ui.R
@@ -189,17 +190,20 @@ internal fun RecordDetailsSheet(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                if (recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && recordData.reimbursable) {
-                                    // 支出类型，并且可报销
-                                    val text = if (recordData.relatedRecord.isEmpty()) {
-                                        // 未报销
-                                        stringResource(id = R.string.reimbursable)
-                                    } else {
-                                        // 已报销
-                                        stringResource(id = R.string.reimbursed)
+                                val statusRes = if (recordData.typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
+                                    when (recordData.relatedNature) {
+                                        RecordRelatedNatureEnum.REIMBURSED -> R.string.reimbursed
+                                        RecordRelatedNatureEnum.REFUNDED -> R.string.refunded
+                                        RecordRelatedNatureEnum.MIXED -> R.string.refund_reimbursed_simple
+                                        RecordRelatedNatureEnum.NONE ->
+                                            if (recordData.reimbursable) R.string.pending_reimbursement else null
                                     }
+                                } else {
+                                    null
+                                }
+                                statusRes?.let { res ->
                                     Text(
-                                        text = text,
+                                        text = stringResource(id = res),
                                         style = MaterialTheme.typography.labelMedium,
                                         modifier = Modifier.padding(end = 8.dp),
                                     )
@@ -268,29 +272,18 @@ internal fun RecordDetailsSheet(
                             )
                     ) {
                         // 有关联记录，且是收入、支出类型
-                        val list = recordData.relatedRecord
                         CbListItem(
                             headlineContent = { Text(text = stringResource(id = R.string.related_record)) },
                             trailingContent = {
                                 val text =
                                     if (recordData.typeCategory == RecordTypeCategoryEnum.INCOME) {
-                                        // 收入类型，报销 or 退款，计算关联记录的金额
-                                        var total = 0L
-                                        list.forEach {
-                                            total += (it.amount + it.charges - it.concessions)
-                                        }
                                         stringResource(id = R.string.related_record_display_format).format(
-                                            list.size,
-                                            total.toMoneyCNY(),
+                                            recordData.relatedRecord.size,
+                                            recordData.relatedAmount.toMoneyCNY(),
                                         )
                                     } else {
-                                        // 支出类型，被退款 or 被报销，计算金额
-                                        var total = 0L
-                                        list.forEach {
-                                            total += (it.amount - it.charges)
-                                        }
                                         stringResource(id = R.string.refund_reimbursed_format).format(
-                                            total.toMoneyCNY(),
+                                            recordData.relatedAmount.toMoneyCNY(),
                                         )
                                     }
                                 Text(
