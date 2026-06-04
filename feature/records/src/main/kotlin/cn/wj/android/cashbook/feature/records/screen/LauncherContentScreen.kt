@@ -720,7 +720,7 @@ internal fun RecordListItem(
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(end = 8.dp),
                         )
-                    } else if (item.reimbursable) {
+                    } else if (item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && item.reimbursable) {
                         Text(
                             text = stringResource(id = R.string.pending_reimbursement),
                             color = LocalContentColor.current.copy(alpha = 0.7f),
