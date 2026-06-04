@@ -108,8 +108,10 @@ enum class RecordRelatedNatureEnum {
 
 - [ ] **Step 5: 编译验证**
 
-Run: `./gradlew :core:model:compileDebugKotlin :core:model:testDebugUnitTest --offline --no-daemon --console=plain`
+Run: `./gradlew :core:model:test --offline --no-daemon --console=plain`
 Expected: `BUILD SUCCESSFUL`（字段有默认值，下游构造点无需改动即编译通过）
+
+> 勘误：`core:model` 为 JVM 库（`cashbook.jvm.library`），测试任务是 `test`，无 `compileDebugKotlin`/`testDebugUnitTest`。
 
 - [ ] **Step 6: Commit**
 
@@ -500,7 +502,7 @@ git commit -m "[fix|feature|record-display][公共]A:详情关联金额复用 re
 
 - [ ] **Step 1: 全量单测（含跨模块 H1 构造点）**
 
-Run: `./gradlew :core:model:testDebugUnitTest :core:domain:testDebugUnitTest :feature:records:testDebugUnitTest :feature:assets:testDebugUnitTest --offline --no-daemon --console=plain`
+Run: `./gradlew :core:model:test :core:domain:testDebugUnitTest :feature:records:testDebugUnitTest :feature:assets:testDebugUnitTest --offline --no-daemon --console=plain`
 Expected: `BUILD SUCCESSFUL`（`feature:assets` / `core:domain` 的 `RecordViewsEntity`/`RecordViewsModel` 构造点因默认值不破）。
 
 - [ ] **Step 2: Spotless 格式**
