@@ -16,6 +16,9 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
+import cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
@@ -301,5 +304,66 @@ class RecordModelTransToViewsUseCaseTest {
 
         // A 修复后：支出主记录关联收入 = recordAmount(INCOME) = amount - charges = 8000 - 500 = 7500
         assertThat(result.relatedAmount).isEqualTo(7500L)
+    }
+
+    @Test
+    fun given_expenditure_related_all_reimburse_then_nature_reimbursed() = runTest {
+        val type = createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE)
+        typeRepository.addType(type)
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 10000L)
+        recordRepository.addRecord(record)
+        // 关联收入为报销类型（固定负 ID）
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = FIXED_TYPE_ID_REIMBURSE, amount = 8000L))
+        recordRepository.setRelatedFromIds(1L, listOf(2L))
+
+        assertThat(useCase(record).relatedNature).isEqualTo(RecordRelatedNatureEnum.REIMBURSED)
+    }
+
+    @Test
+    fun given_expenditure_related_all_refund_then_nature_refunded() = runTest {
+        val type = createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE)
+        typeRepository.addType(type)
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 10000L)
+        recordRepository.addRecord(record)
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = FIXED_TYPE_ID_REFUND, amount = 8000L))
+        recordRepository.setRelatedFromIds(1L, listOf(2L))
+
+        assertThat(useCase(record).relatedNature).isEqualTo(RecordRelatedNatureEnum.REFUNDED)
+    }
+
+    @Test
+    fun given_expenditure_related_mixed_then_nature_mixed() = runTest {
+        val type = createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE)
+        typeRepository.addType(type)
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 10000L)
+        recordRepository.addRecord(record)
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = FIXED_TYPE_ID_REIMBURSE, amount = 4000L))
+        recordRepository.addRecord(createRecordModel(id = 3L, typeId = FIXED_TYPE_ID_REFUND, amount = 3000L))
+        recordRepository.setRelatedFromIds(1L, listOf(2L, 3L))
+
+        assertThat(useCase(record).relatedNature).isEqualTo(RecordRelatedNatureEnum.MIXED)
+    }
+
+    @Test
+    fun given_expenditure_no_related_then_nature_none() = runTest {
+        val type = createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE)
+        typeRepository.addType(type)
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 10000L)
+        recordRepository.addRecord(record)
+
+        assertThat(useCase(record).relatedNature).isEqualTo(RecordRelatedNatureEnum.NONE)
+    }
+
+    @Test
+    fun given_income_absorber_with_related_then_nature_none() = runTest {
+        // 收入吸收者（报销款主记录）relatedNature 恒 NONE（仅被吸收支出有性质）
+        val type = createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.INCOME)
+        typeRepository.addType(type)
+        val record = createRecordModel(id = 1L, typeId = 1L, amount = 8000L)
+        recordRepository.addRecord(record)
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 5L, amount = 10000L))
+        recordRepository.setRelatedIds(1L, listOf(2L))
+
+        assertThat(useCase(record).relatedNature).isEqualTo(RecordRelatedNatureEnum.NONE)
     }
 }

@@ -16,12 +16,15 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
+import cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
@@ -79,6 +82,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 relatedImage = recordRepository.queryImagesByRecordId(recordModel.id),
                 relatedRecord = relatedRecord,
                 relatedAmount = totalRelated,
+                relatedNature = computeRelatedNature(type.typeCategory, relatedRecord),
                 recordTime = recordModel.recordTime,
             )
         }
@@ -168,6 +172,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                     relatedImage = imageMap[recordModel.id].orEmpty(),
                     relatedRecord = relatedRecord,
                     relatedAmount = totalRelated,
+                    relatedNature = computeRelatedNature(type.typeCategory, relatedRecord),
                     recordTime = recordModel.recordTime,
                 )
             }
@@ -191,6 +196,27 @@ class RecordModelTransToViewsUseCase @Inject constructor(
         }
         return relatedRecord.sumOf { record ->
             recordAmount(relatedCategory, record.amount, record.charges, record.concessions)
+        }
+    }
+
+    /**
+     * 计算被吸收支出的关联性质（在已物化 relatedRecord 上判定，零额外查询）。
+     * 仅 EXPENDITURE 主记录有性质；relatedRecord 为吸收它的收入（报销/退款款），
+     * 其 typeId 经 migrateSpecialTypes 恒为固定负 ID。
+     */
+    private fun computeRelatedNature(
+        typeCategory: RecordTypeCategoryEnum,
+        relatedRecord: List<RecordModel>,
+    ): RecordRelatedNatureEnum {
+        if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE || relatedRecord.isEmpty()) {
+            return RecordRelatedNatureEnum.NONE
+        }
+        val allReimburse = relatedRecord.all { it.typeId == FIXED_TYPE_ID_REIMBURSE }
+        val allRefund = relatedRecord.all { it.typeId == FIXED_TYPE_ID_REFUND }
+        return when {
+            allReimburse -> RecordRelatedNatureEnum.REIMBURSED
+            allRefund -> RecordRelatedNatureEnum.REFUNDED
+            else -> RecordRelatedNatureEnum.MIXED
         }
     }
 }
