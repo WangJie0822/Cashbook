@@ -201,8 +201,9 @@ class RecordModelTransToViewsUseCase @Inject constructor(
 
     /**
      * 计算被吸收支出的关联性质（在已物化 relatedRecord 上判定，零额外查询）。
-     * 仅 EXPENDITURE 主记录有性质；relatedRecord 为吸收它的收入（报销/退款款），
-     * 其 typeId 经 migrateSpecialTypes 恒为固定负 ID。
+     * 仅 EXPENDITURE 主记录有性质；relatedRecord 为吸收它的收入（报销/退款款）。
+     * 标准链路下关联收入 typeId 经 migrateSpecialTypes 为固定负 ID（REIMBURSE/REFUND）；
+     * 若出现其它 typeId（未迁移/历史导入等），归 MIXED 兜底。
      */
     private fun computeRelatedNature(
         typeCategory: RecordTypeCategoryEnum,

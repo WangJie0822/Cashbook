@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.core.model.entity
 
+import cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
@@ -63,8 +64,7 @@ data class RecordViewsEntity(
     val relatedRecord: List<RecordModel>,
     /** 关联金额，单位：分 */
     val relatedAmount: Long,
-    val relatedNature: cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum =
-        cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum.NONE,
+    val relatedNature: RecordRelatedNatureEnum = RecordRelatedNatureEnum.NONE,
     /** 记录时间，毫秒时间戳 */
     val recordTime: Long,
 ) : RecordViews {
