@@ -49,6 +49,8 @@ data class RecordViewsModel(
     val relatedImage: List<ImageModel>,
     val relatedRecord: List<RecordModel>,
     val relatedAmount: Long,
+    val relatedNature: cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum =
+        cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum.NONE,
     val recordTime: Long,
 ) {
     /** 是否为平账记录 */

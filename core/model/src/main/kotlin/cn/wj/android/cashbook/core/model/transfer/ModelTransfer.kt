@@ -97,6 +97,7 @@ fun RecordViewsModel.asEntity(): RecordViewsEntity {
         relatedImage = this.relatedImage,
         relatedRecord = this.relatedRecord,
         relatedAmount = this.relatedAmount,
+        relatedNature = this.relatedNature,
         recordTime = this.recordTime,
     )
 }

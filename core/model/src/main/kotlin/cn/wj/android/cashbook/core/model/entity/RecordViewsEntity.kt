@@ -63,6 +63,8 @@ data class RecordViewsEntity(
     val relatedRecord: List<RecordModel>,
     /** 关联金额，单位：分 */
     val relatedAmount: Long,
+    val relatedNature: cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum =
+        cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum.NONE,
     /** 记录时间，毫秒时间戳 */
     val recordTime: Long,
 ) : RecordViews {
