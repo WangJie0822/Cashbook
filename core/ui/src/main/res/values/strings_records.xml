@@ -75,6 +75,8 @@
     <string name="delete_failed">删除失败</string>
     <string name="delete_failed_format">删除失败 code=%1$s</string>
     <string name="reimbursed">已报销</string>
+    <string name="refunded">已退款</string>
+    <string name="pending_reimbursement">待报销</string>
     <string name="type">类型</string>
     <string name="related_image">关联图片</string>
     <string name="asset">资产</string>

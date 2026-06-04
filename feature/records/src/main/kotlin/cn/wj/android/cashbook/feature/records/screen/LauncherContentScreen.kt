@@ -94,6 +94,7 @@ import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.DateSelectionTypeEnum
+import cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DevicePreviews
 import cn.wj.android.cashbook.core.ui.R
@@ -707,14 +708,21 @@ internal fun RecordListItem(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (item.relatedRecord.isNotEmpty()) {
+                        val prefixRes = when (item.relatedNature) {
+                            RecordRelatedNatureEnum.REIMBURSED -> R.string.reimbursed
+                            RecordRelatedNatureEnum.REFUNDED -> R.string.refunded
+                            RecordRelatedNatureEnum.MIXED -> R.string.refund_reimbursed_simple
+                            RecordRelatedNatureEnum.NONE -> R.string.related
+                        }
                         Text(
-                            text = stringResource(
-                                id = if (item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE) {
-                                    R.string.refund_reimbursed_simple
-                                } else {
-                                    R.string.related
-                                },
-                            ) + "(${item.relatedAmount.toMoneyCNY()})",
+                            text = stringResource(id = prefixRes) + "(${item.relatedAmount.toMoneyCNY()})",
+                            color = LocalContentColor.current.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                    } else if (item.reimbursable) {
+                        Text(
+                            text = stringResource(id = R.string.pending_reimbursement),
                             color = LocalContentColor.current.copy(alpha = 0.7f),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(end = 8.dp),
