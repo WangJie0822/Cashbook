@@ -45,7 +45,10 @@ Cashbook 是一个 Android 记账应用，使用 Kotlin + Jetpack Compose 构建
 ./gradlew testOnlineDebugUnitTest
 ./gradlew testOfflineDebugUnitTest
 
-# 运行单个模块的测试
+# 运行单个模块的测试（⚠️ 模块类型决定测试任务名）
+# JVM 库（cashbook.jvm.library，如 core:model）用 :test，无 compileDebugKotlin/testDebugUnitTest（误用会报 task not found）
+./gradlew :core:model:test
+# Android 库（cashbook.android.library，如 core:data/core:domain/feature:*）用 :testDebugUnitTest
 ./gradlew :core:data:testDebugUnitTest
 ./gradlew :feature:records:testDebugUnitTest
 
