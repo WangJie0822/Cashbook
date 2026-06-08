@@ -101,78 +101,63 @@ class TransactionDaoLogicTest {
         assertThat(result).isEqualTo(9700L)
     }
 
-    // ========== recalculateAbsorberFinalAmount 测试 ==========
+    // ========== recalculateAbsorberFinalAmount 测试（净自付：委托簇重算）==========
 
     @Test
-    fun when_absorber_has_single_absorbed_then_finalAmount_correct() = runTest {
-        // 设置：收入 I(60) 吸收支出 E(100)
+    fun when_absorber_recalc_single_absorbed_then_cluster_net_self_paid() = runTest {
+        // I(60) 吸收 E(100) → 净自付：E.fa=40, I.fa=0（旧吸收模型曾为 I.fa=-40）
         setupTypesForAbsorption()
-        val expense = insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
-        val income = insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 6000L)
-        dao.relatedRecords.add(
-            RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L),
-        )
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 6000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
 
         dao.recalculateAbsorberFinalAmount(2L)
 
-        // I.finalAmount = I.recordAmount(6000) - E.fullAmount(10000) = -4000
-        val updatedIncome = dao.queryRecordById(2L)!!
-        assertThat(updatedIncome.finalAmount).isEqualTo(-4000L)
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(4000L) // 净自付，非负
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L)
     }
 
     @Test
-    fun when_absorber_has_multiple_absorbed_then_finalAmount_sums_all() = runTest {
-        // 设置：收入 I(60) 吸收 E1(100) 和 E2(80)
+    fun when_absorber_recalc_multiple_absorbed_then_greedy_by_id() = runTest {
+        // I(60) 吸收 E1(100),E2(80)：I 先填 E1 → E1.fa=40,E2.fa=80,I.fa=0
         setupTypesForAbsorption()
         insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
         insertRecord(id = 2L, typeId = EXPENDITURE_TYPE_ID, amount = 8000L)
         insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 6000L)
-        dao.relatedRecords.add(
-            RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L),
-        )
-        dao.relatedRecords.add(
-            RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L),
-        )
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L))
 
         dao.recalculateAbsorberFinalAmount(3L)
 
-        // I.finalAmount = 6000 - (10000 + 8000) = -12000
-        val updatedIncome = dao.queryRecordById(3L)!!
-        assertThat(updatedIncome.finalAmount).isEqualTo(-12000L)
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(4000L)
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(8000L)
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(0L)
     }
 
     @Test
-    fun when_absorber_has_no_absorbed_then_finalAmount_is_own_amount() = runTest {
-        // 设置：收入 I(60) 无关联
+    fun when_absorber_recalc_no_absorbed_then_finalAmount_is_recordAmount() = runTest {
         setupTypesForAbsorption()
         insertRecord(id = 1L, typeId = INCOME_TYPE_ID, amount = 6000L)
 
         dao.recalculateAbsorberFinalAmount(1L)
 
-        val updated = dao.queryRecordById(1L)!!
-        assertThat(updated.finalAmount).isEqualTo(6000L)
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(6000L)
     }
 
     @Test
-    fun when_absorber_excludes_specific_absorbed_then_excluded_not_counted() = runTest {
-        // 设置：I 吸收 E1 和 E2，但重算时排除 E1
+    fun when_absorber_recalc_excludes_specific_absorbed_then_excluded_not_in_cluster() = runTest {
+        // I(60) 吸收 E1(100),E2(80)，排除 E1 → 簇={I,E2}：E2.fa=20,I.fa=0
         setupTypesForAbsorption()
         insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
         insertRecord(id = 2L, typeId = EXPENDITURE_TYPE_ID, amount = 8000L)
         insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 6000L)
-        dao.relatedRecords.add(
-            RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L),
-        )
-        dao.relatedRecords.add(
-            RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L),
-        )
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L))
 
-        // 排除 E1(id=1)
         dao.recalculateAbsorberFinalAmount(3L, excludeAbsorbedId = 1L)
 
-        // I.finalAmount = 6000 - 8000 = -2000（只计 E2）
-        val updated = dao.queryRecordById(3L)!!
-        assertThat(updated.finalAmount).isEqualTo(-2000L)
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(2000L) // 6000 填 E2 → 8000-6000
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(0L)
     }
 
     // ========== 净自付簇算法 recalculateFinalAmountForCluster 测试 ==========

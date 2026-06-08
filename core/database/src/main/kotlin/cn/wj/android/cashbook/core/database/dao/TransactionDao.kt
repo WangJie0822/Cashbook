@@ -229,33 +229,19 @@ interface TransactionDao {
     }
 
     /**
-     * 重算某个吸收者（收入记录）的 finalAmount
+     * 重算受影响吸收簇的 finalAmount（净自付语义）。
      *
-     * finalAmount = 吸收者自身的 recordAmount - 其所吸收的所有支出记录的 fullAmount 之和
-     *
-     * @param absorberId 吸收者记录 ID
-     * @param excludeAbsorbedId 需要排除的被吸收记录 ID（用于删除场景，该记录即将被删除但关联尚未清除）
+     * 兼容旧签名：从 [absorberId] 所在簇重算，可排除即将删除的被吸收记录 [excludeAbsorbedId]。
+     * 实际委托 [recalculateFinalAmountForCluster]——不再是「仅算吸收者」，而是整簇净自付重算。
      */
     suspend fun recalculateAbsorberFinalAmount(
         absorberId: Long,
         excludeAbsorbedId: Long = -1L,
     ) {
-        val absorber = queryRecordById(absorberId) ?: return
-        val absorberType = resolveType(absorber.typeId) ?: return
-        val absorberCategory = RecordTypeCategoryEnum.ordinalOf(absorberType.typeCategory)
-        val absorberRecordAmount = calculateRecordAmount(absorber, absorberCategory)
-
-        var totalAbsorbedFullAmount = 0L
-        queryRelatedByRecordId(absorberId)
-            .filter { it.relatedRecordId != excludeAbsorbedId }
-            .forEach { relation ->
-                val absorbed = queryRecordById(relation.relatedRecordId) ?: return@forEach
-                val absorbedType = resolveType(absorbed.typeId) ?: return@forEach
-                val absorbedCategory = RecordTypeCategoryEnum.ordinalOf(absorbedType.typeCategory)
-                totalAbsorbedFullAmount += calculateRecordAmount(absorbed, absorbedCategory)
-            }
-
-        updateRecordFinalAmountById(absorberId, absorberRecordAmount - totalAbsorbedFullAmount)
+        recalculateFinalAmountForCluster(
+            seedRecordId = absorberId,
+            excludeRecordIds = if (excludeAbsorbedId != -1L) setOf(excludeAbsorbedId) else emptySet(),
+        )
     }
 
     /**
