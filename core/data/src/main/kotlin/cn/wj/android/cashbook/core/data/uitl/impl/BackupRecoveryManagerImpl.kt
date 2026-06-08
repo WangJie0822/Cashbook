@@ -44,6 +44,7 @@ import cn.wj.android.cashbook.core.common.model.dataVersion
 import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_BACKUP
 import cn.wj.android.cashbook.core.common.tools.dateFormat
+import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
@@ -83,6 +84,7 @@ import kotlin.coroutines.CoroutineContext
 class BackupRecoveryManagerImpl @Inject constructor(
     private val networkMonitor: NetworkMonitor,
     private val settingRepository: SettingRepository,
+    private val recordRepository: RecordRepository,
     private val webDAVHandler: WebDAVHandler,
     private val database: CashbookDatabase,
     private val combineProtoDataSource: CombineProtoDataSource,
@@ -696,7 +698,8 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 combineProtoDataSource.updateCreditCardPaymentTypeId(0L)
                 // 净自付（H3）：恢复是 CONFLICT_REPLACE 合并、恢复后无进程重启，
                 // 合并后 finalAmount 为「备份旧语义行 + 当前库新语义行」混合，须同步对全表重算覆盖
-                database.transactionDao().recalculateAllFinalAmount()
+                // F2：走 Repository 统一副作用（重算 + 置 finalAmountNetRecalcDone + bump recordDataVersion）
+                recordRepository.recalculateAllFinalAmount()
                 BackupRecoveryState.SUCCESS_RECOVERY
             } else {
                 // recoveryFromDb 返回 false 表示数据库版本不兼容或迁移路径缺失，
