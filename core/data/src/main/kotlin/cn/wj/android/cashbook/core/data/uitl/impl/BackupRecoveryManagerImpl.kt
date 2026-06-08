@@ -694,6 +694,9 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 combineProtoDataSource.updateRefundTypeId(0L)
                 combineProtoDataSource.updateReimburseTypeId(0L)
                 combineProtoDataSource.updateCreditCardPaymentTypeId(0L)
+                // 净自付（H3）：恢复是 CONFLICT_REPLACE 合并、恢复后无进程重启，
+                // 合并后 finalAmount 为「备份旧语义行 + 当前库新语义行」混合，须同步对全表重算覆盖
+                database.transactionDao().recalculateAllFinalAmount()
                 BackupRecoveryState.SUCCESS_RECOVERY
             } else {
                 // recoveryFromDb 返回 false 表示数据库版本不兼容或迁移路径缺失，
