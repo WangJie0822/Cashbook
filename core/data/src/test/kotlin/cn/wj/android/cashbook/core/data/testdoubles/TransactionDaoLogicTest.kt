@@ -259,6 +259,82 @@ class TransactionDaoLogicTest {
         assertThat(dao.queryRecordById(incomeId)!!.finalAmount).isEqualTo(0L)
     }
 
+    // ========== deleteRecordTransaction 净自付测试 ==========
+
+    @Test
+    fun when_delete_absorber_income_single_then_expense_restores_full() = runTest {
+        // I(80) 吸收 E(100)：删 I → E 恢复全额 100
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        val income = insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.recalculateFinalAmountForCluster(2L) // E.fa=20
+
+        dao.deleteRecordTransaction(income)
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(10000L) // 恢复全额
+        assertThat(dao.queryRecordById(2L)).isNull()
+    }
+
+    @Test
+    fun when_delete_one_of_two_absorbers_then_remaining_recalc_excludes_deleted() = runTest {
+        // E(100) 被 I1(30,id=2),I2(40,id=3) 吸收：删 I1 → E 只被 I2 吸收 → E.fa=60,I2.fa=0
+        // 判别性用例：旧 INCOME 删分支经簇化后会误把待删 I1 算进簇得 E.fa=30，新分支排除 I1 得 60
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        val income1 = insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 3000L)
+        insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 4000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 1L))
+        dao.recalculateFinalAmountForCluster(1L) // E.fa=30,I1.fa=0,I2.fa=0
+
+        dao.deleteRecordTransaction(income1)
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(6000L) // 100-40（只剩 I2）
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(0L)
+        assertThat(dao.queryRecordById(2L)).isNull()
+    }
+
+    @Test
+    fun when_delete_shared_expense_then_remaining_absorbers_restore() = runTest {
+        // E(100) 被 I1(30),I2(40)：删 E → I1,I2 恢复各自 recordAmount
+        setupTypesForAbsorption()
+        val expense = insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 3000L)
+        insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 4000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 1L))
+        dao.recalculateFinalAmountForCluster(1L) // E.fa=30,I1.fa=0,I2.fa=0
+
+        dao.deleteRecordTransaction(expense)
+
+        assertThat(dao.queryRecordById(1L)).isNull()
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(3000L) // 恢复 recordAmount
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(4000L)
+    }
+
+    @Test
+    fun when_update_absorbed_expense_then_relation_broken_both_standalone() = runTest {
+        // H4：I(80) 吸收 E(100)（E.fa=20）；编辑 E 金额为 120 → 关联断开，E 独立 120，I 独立 80
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.recalculateFinalAmountForCluster(2L)
+
+        dao.updateRecordTransaction(
+            record = createRecordTable(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 12000L),
+            tagIdList = emptyList(),
+            needRelated = false,
+            relatedRecordIdList = emptyList(),
+            relatedImageList = emptyList(),
+        )
+
+        assertThat(dao.relatedRecords).isEmpty()
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(12000L)
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(8000L)
+    }
+
     // ========== deleteBookTransaction 测试 ==========
 
     @Test

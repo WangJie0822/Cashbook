@@ -581,27 +581,13 @@ interface TransactionDao {
                 recalculateAbsorberFinalAmount(relation.recordId, excludeAbsorbedId = recordId)
             }
         } else if (category == RecordTypeCategoryEnum.INCOME) {
-            // 删除收入（吸收者）记录，需要更新被关联的支出记录
+            // 删除收入（吸收者）：对其曾吸收的每个支出所在簇重算（排除即将删除的吸收者）
             val absorbedRelations = queryRelatedByRecordId(recordId)
             for (relation in absorbedRelations) {
-                val expenseId = relation.relatedRecordId
-                val expense = queryRecordById(expenseId) ?: continue
-                // 检查该支出是否还有其他吸收者
-                val remainingAbsorbers = queryRelatedByRelatedRecordId(expenseId)
-                    .filter { it.recordId != recordId }
-                if (remainingAbsorbers.isEmpty()) {
-                    // 无其他吸收者，恢复支出的完整金额
-                    val expenseType = resolveType(expense.typeId) ?: continue
-                    val expenseCategory = RecordTypeCategoryEnum.ordinalOf(expenseType.typeCategory)
-                    val fullAmount = calculateRecordAmount(expense, expenseCategory)
-                    updateRecordFinalAmountById(expenseId, fullAmount)
-                } else {
-                    // 还有其他吸收者，支出保持 finalAmount = 0
-                    // 重算每个剩余吸收者的 finalAmount
-                    for (absorber in remainingAbsorbers) {
-                        recalculateAbsorberFinalAmount(absorber.recordId)
-                    }
-                }
+                recalculateFinalAmountForCluster(
+                    seedRecordId = relation.relatedRecordId,
+                    excludeRecordIds = setOf(recordId),
+                )
             }
         }
 
