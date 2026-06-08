@@ -36,7 +36,6 @@ import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
-import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
@@ -497,55 +496,20 @@ class RecordRepositoryImpl @Inject constructor(
     }
 
     override suspend fun migrateAfter9To10() = withContext(coroutineContext) {
-        // 更新转账记录
-        val transferCount = recordDao.updateRecord(
-            recordDao.queryByTypeCategory(RecordTypeCategoryEnum.TRANSFER.ordinal).map {
-                // 转账记录最终金额计算为 优惠 - 手续费
-                it.copy(finalAmount = it.concessions - it.charge)
-            },
-        )
-        this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), transferCount $transferCount")
-        val relatedRecordList = recordDao.queryRelatedRecord()
-        val expandList =
-            recordDao.queryByTypeCategory(RecordTypeCategoryEnum.EXPENDITURE.ordinal).map {
-                if (relatedRecordList.count { related -> related.relatedRecordId == it.id } > 0) {
-                    // 已退款、已报销记录，最终金额为 0
-                    it.copy(finalAmount = 0L)
-                } else {
-                    // 普通支出，最终金额为 金额 + 手续费 - 优惠
-                    it.copy(finalAmount = it.amount + it.charge - it.concessions)
-                }
-            }
-        // 更新支出记录
-        val expandCount = recordDao.updateRecord(expandList)
-        this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), expandCount $expandCount")
-        val appData = combineProtoDataSource.recordSettingsData.first()
-        val incomeCount = recordDao.updateRecord(
-            recordDao.queryByTypeCategory(RecordTypeCategoryEnum.INCOME.ordinal).map {
-                if (it.typeId == appData.refundTypeId || it.typeId == appData.reimburseTypeId) {
-                    // 退款、报销类型
-                    val relatedIdList =
-                        relatedRecordList.filter { related -> related.recordId == it.id }
-                            .map { related -> related.relatedRecordId }
-                    if (relatedIdList.isNotEmpty()) {
-                        // 已关联记录，最终金额为 金额 - 手续费 - 关联记录金额
-                        var expandAmount = 0L
-                        expandList.filter { expand -> expand.id in relatedIdList }
-                            .forEach { expand -> expandAmount += (expand.amount + expand.charge - expand.concessions) }
-                        it.copy(finalAmount = it.amount - it.charge - expandAmount)
-                    } else {
-                        // 未关联记录，最终金额计算为 金额 - 手续费
-                        it.copy(finalAmount = it.amount - it.charge)
-                    }
-                } else {
-                    // 其它收入记录，最终金额计算为 金额 - 手续费
-                    it.copy(finalAmount = it.amount - it.charge)
-                }
-            },
-        )
-        this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), incomeCount $incomeCount")
-        // 标记已完成迁移
+        // 改造（H1）：统一走净自付全量重算，替换旧吸收语义逐字段计算。
+        // 转账由 recalculateAllFinalAmount 内部保持 concessions-charge。
+        transactionDao.recalculateAllFinalAmount()
+        this@RecordRepositoryImpl.logger().i("migrateAfter9To10(), net self-paid recalc done")
+        // 标记两个迁移标志（净自付重算已含旧 db9To10 全量重算职责，避免首启重复跑）
         combineProtoDataSource.updateDb9To10DataMigrated(true)
+        combineProtoDataSource.updateFinalAmountNetRecalcDone(true)
+        recordDataVersion.updateVersion()
+    }
+
+    override suspend fun recalculateAllFinalAmount() = withContext(coroutineContext) {
+        transactionDao.recalculateAllFinalAmount()
+        combineProtoDataSource.updateFinalAmountNetRecalcDone(true)
+        recordDataVersion.updateVersion()
     }
 
     override suspend fun queryRelatedRecordCountById(id: Long): Int =

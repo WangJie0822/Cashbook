@@ -298,6 +298,10 @@ class FakeRecordRepository : RecordRepository {
         // no-op
     }
 
+    override suspend fun recalculateAllFinalAmount() {
+        // no-op（feature/domain 层测试不触发真实重算）
+    }
+
     override suspend fun queryRelatedRecordCountById(id: Long): Int {
         return relatedMap[id]?.size ?: 0
     }

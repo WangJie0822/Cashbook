@@ -135,6 +135,9 @@ interface RecordRepository {
 
     suspend fun migrateAfter9To10()
 
+    /** 全表净自付重算（迁移 gate / 备份恢复复用），完成后置 finalAmountNetRecalcDone 标记 */
+    suspend fun recalculateAllFinalAmount()
+
     suspend fun queryRelatedRecordCountById(id: Long): Int
 
     suspend fun queryImagesByRecordId(id: Long): List<ImageModel>
