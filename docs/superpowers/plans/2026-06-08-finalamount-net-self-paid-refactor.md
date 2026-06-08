@@ -10,6 +10,21 @@
 
 ---
 
+## 执行勘误（2026-06-08 executing-plans 实战，全 13 Task 已完成）
+
+实施于 `feature/finalamount-net-self-paid` 分支，controller 串行 TDD，12 commit。执行中据实修正以下偏差（保留供后续会话凭文档复现）：
+
+1. **feature 测试任务名**：plan/spec §10 写 `:feature:records:testOnlineDebugUnitTest` **错误**——feature 模块无 flavor（Online/Offline 仅 app 模块），正确为 `:feature:records:testDebugUnitTest`。
+2. **Task 10 饼图口径（重大）**：plan「blanket 改 `record.finalAmount` + 删 analyticsPieAmount」**与现实冲突**——Pie usecase 生产中对 EXPENDITURE/INCOME/**TRANSFER** 三者都调用（`AnalyticsViewModel.kt:103/105/107`），且有 #10b TRANSFER 金丝雀守 `amount-charges`。停下与用户确认 → **选项 A 有条件改造**：新增 `analyticsPieNetAmount(typeCategory,finalAmount,...)`（RecordAmount.kt），EXPENDITURE/INCOME 用 finalAmount、TRANSFER 保留 analyticsPieAmount。`analyticsPieAmount` 函数**保留**（TRANSFER 仍用，非 dead code）。更新 5 个 EXPENDITURE/INCOME pie 测试为 finalAmount 语义 + 2 个判别性测试，TRANSFER 金丝雀保留。
+3. **Task 4/5 测试修正**：plan Task 4 测试有 id 碰撞隐患（局部 `insertRecord` helper 直加不增 nextRecordId）→ 改用 `dao.insertRecord`；plan Task 5 原「单吸收者删收入」非有效 red（旧「恢复全额」分支也过）→ 改为**多吸收者删其一**判别性用例（旧 INCOME 簇化误把待删收入算进簇）。
+4. **Task 12 androidTest**：本机无模拟器，instrumented **compile-verified 但未 run**（算法 run 验证由 Task 2-6 JVM 测试承担）；编译时暴露 **pre-existing `RecordDaoTest.kt:540` drift**（`queryRecordByKeyword` 漏 `amountCent`），顺手最小修复（补 `amountCent=-1L`）。
+5. **Task 7 repo 测试降级**：`RecordRepositoryImplTest`（#9b）不实例化 Impl（CombineProtoDataSource final 无法构造替身），migrate/recalc repo 包装无专用单测——算法由 Task 6 DAO 测试、标记由 Task 1 覆盖，接线靠编译验证。
+6. **proto 位置 / 触发入口 / RecordListItem 屏数**：见上「与 spec v2 的事实校正」节（实施前已校正，落地无新增偏差）。
+
+全量回归：`:core:model:test`+`:core:data:testDebugUnitTest`+`:core:domain:testDebugUnitTest`+`:feature:records:testDebugUnitTest` **`--rerun-tasks` 强制执行 BUILD SUCCESSFUL**；spotlessApply 零改动。
+
+---
+
 ## 与 spec v2 的事实校正（实施前必读）
 
 撰写本 plan 时对 spec v2（`2026-06-05-finalamount-net-self-paid-refactor-design.md`）引用的代码做了 hands-on 核验，发现 3 处偏差，已在本 plan 校正：
