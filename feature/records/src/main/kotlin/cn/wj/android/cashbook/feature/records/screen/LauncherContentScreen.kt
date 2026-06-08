@@ -60,7 +60,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -732,24 +731,18 @@ internal fun RecordListItem(
                         item.typeCategory == RecordTypeCategoryEnum.TRANSFER -> {
                             item.amount
                         }
-                        item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE &&
+                        // INCOME 吸收者（报销/退款款）：显实收额 amount（聚合用 finalAmount 溢出不虚增收入）
+                        item.typeCategory == RecordTypeCategoryEnum.INCOME &&
                             item.relatedRecord.isNotEmpty() -> {
                             item.amount
                         }
+                        // 其它（含被吸收支出）：显净自付 finalAmount（去整额删除线，配合「已报销(¥X)」标签）
                         else -> item.finalAmount
                     }
-                    val isReimbursed = item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE &&
-                        item.relatedRecord.isNotEmpty()
                     Text(
                         text = displayAmount.toMoneyCNY(),
                         color = item.typeCategory.typeColor,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            textDecoration = if (isReimbursed) {
-                                TextDecoration.LineThrough
-                            } else {
-                                TextDecoration.None
-                            },
-                        ),
+                        style = MaterialTheme.typography.labelLarge,
                     )
                 }
                 item.assetName?.let { assetName ->
