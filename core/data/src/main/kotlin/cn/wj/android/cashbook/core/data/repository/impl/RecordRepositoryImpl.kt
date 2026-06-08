@@ -331,6 +331,8 @@ class RecordRepositoryImpl @Inject constructor(
         startDate: Long,
         endDate: Long,
     ): Flow<PagingData<RecordModel>> {
+        // 刷新依赖 Room PagingSource 对 db_record 写自动 invalidate，故不显式订阅 recordDataVersion
+        //（区别于 queryRecordViewSummariesFlow 手动 combine version）；勿加 version，否则每次增删改重建 Pager 回顶。
         return combineProtoDataSource.recordSettingsData
             .flatMapLatest { settings ->
                 Pager(
