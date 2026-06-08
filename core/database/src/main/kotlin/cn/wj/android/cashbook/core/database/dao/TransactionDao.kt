@@ -229,6 +229,55 @@ interface TransactionDao {
     }
 
     /**
+     * 全表净自付重算（迁移 / 启动 gate / 备份恢复后复用）。
+     *
+     * - 转账：finalAmount = concessions - charge（保持既有 migrate 语义，转账不参与吸收）
+     * - 收入/支出：先初始化 recordAmount，再按全表吸收者 id 升序顺序贪心填充（§5）
+     *
+     * 与 [recalculateFinalAmountForCluster] 同算法同序，全量与增量结果一致；幂等（连跑结果一致）。
+     */
+    @Transaction
+    suspend fun recalculateAllFinalAmount() {
+        val allRecords = queryAllRecords()
+        val allRelations = queryAllRelatedRecords()
+
+        // 1. 初始化 finalAmount
+        val finalAmounts = HashMap<Long, Long>(allRecords.size)
+        for (record in allRecords) {
+            val id = record.id ?: continue
+            val type = resolveType(record.typeId) ?: continue
+            val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
+            finalAmounts[id] = if (category == RecordTypeCategoryEnum.TRANSFER) {
+                record.concessions - record.charge
+            } else {
+                calculateRecordAmount(record, category)
+            }
+        }
+
+        // 2. 吸收者 id 升序，被吸收支出 id 升序，顺序贪心填充
+        val absorbedByAbsorber = allRelations.groupBy({ it.recordId }, { it.relatedRecordId })
+        for (absorberId in absorbedByAbsorber.keys.sorted()) {
+            var remaining = finalAmounts[absorberId] ?: continue
+            for (expenseId in (absorbedByAbsorber[absorberId] ?: emptyList()).sorted()) {
+                val current = finalAmounts[expenseId] ?: continue
+                val offset = minOf(remaining, current)
+                finalAmounts[expenseId] = current - offset
+                remaining -= offset
+            }
+            finalAmounts[absorberId] = remaining
+        }
+
+        // 3. 落库（仅写变化项）
+        for (record in allRecords) {
+            val id = record.id ?: continue
+            val finalAmount = finalAmounts[id] ?: continue
+            if (record.finalAmount != finalAmount) {
+                updateRecordFinalAmountById(id, finalAmount)
+            }
+        }
+    }
+
+    /**
      * 重算受影响吸收簇的 finalAmount（净自付语义）。
      *
      * 兼容旧签名：从 [absorberId] 所在簇重算，可排除即将删除的被吸收记录 [excludeAbsorbedId]。

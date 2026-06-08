@@ -335,6 +335,52 @@ class TransactionDaoLogicTest {
         assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(8000L)
     }
 
+    // ========== recalculateAllFinalAmount 全量测试 ==========
+
+    @Test
+    fun when_recalcAll_then_all_clusters_net_self_paid_and_idempotent() = runTest {
+        setupTypesForAbsorption()
+        // 簇A：E1(100) 被 I1(80)；独立支出 E2(50)；转账 T(amount200,charge5,concession2)
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L)
+        insertRecord(id = 3L, typeId = EXPENDITURE_TYPE_ID, amount = 5000L)
+        insertRecord(id = 4L, typeId = TRANSFER_TYPE_ID, amount = 20000L, charge = 500L, concessions = 200L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+
+        dao.recalculateAllFinalAmount()
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(2000L) // 净自付 100-80
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L) // 溢出 0
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(5000L) // 独立支出全额
+        assertThat(dao.queryRecordById(4L)!!.finalAmount).isEqualTo(-300L) // 转账 concessions-charge=200-500
+
+        // 幂等：连跑两次结果一致
+        dao.recalculateAllFinalAmount()
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(2000L)
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L)
+    }
+
+    @Test
+    fun when_recalcAll_equals_incremental_cluster_result() = runTest {
+        // M6/§5：全量与增量逐字段一致
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = EXPENDITURE_TYPE_ID, amount = 5000L)
+        insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 8000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L))
+
+        dao.recalculateAllFinalAmount()
+        val fullA = dao.queryRecordById(1L)!!.finalAmount
+        val fullB = dao.queryRecordById(2L)!!.finalAmount
+        val fullC = dao.queryRecordById(3L)!!.finalAmount
+
+        dao.recalculateFinalAmountForCluster(3L)
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(fullA)
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(fullB)
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(fullC)
+    }
+
     // ========== deleteBookTransaction 测试 ==========
 
     @Test
