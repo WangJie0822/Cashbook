@@ -319,10 +319,14 @@ class FakeRecordRepository : RecordRepository {
     /** [recalculateAllFinalAmount] 进入信号：入口 complete，供测试确认协程已停在挂起点 */
     var recalcStartedSignal: CompletableDeferred<Unit>? = null
 
+    /** 非 null 时 [recalculateAllFinalAmount] 在进入信号 + 放行后抛此异常（测试后台重算失败路径） */
+    var recalcThrowable: Throwable? = null
+
     override suspend fun recalculateAllFinalAmount() {
         recalculateAllFinalAmountCount++
         recalcStartedSignal?.complete(Unit)
         recalcSuspendGate?.await()
+        recalcThrowable?.let { throw it }
     }
 
     override suspend fun queryRelatedRecordCountById(id: Long): Int {

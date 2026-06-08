@@ -26,6 +26,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
+import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.dateFormat
@@ -40,6 +41,7 @@ import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -76,8 +78,17 @@ class LauncherContentViewModel @Inject constructor(
                 _migrationCompleted.value = true
                 if (!tempKeys.finalAmountNetRecalcDone) {
                     // 老用户净自付重算后台静默跑；完成后 recalculateAllFinalAmount 内部 bump recordDataVersion，
-                    // 汇总流（订阅 version）+ 列表（Room PagingSource 对 db_record UPDATE 自动 invalidate）刷新到净自付值
-                    recordRepository.recalculateAllFinalAmount()
+                    // 汇总流（订阅 version）+ 列表（Room PagingSource 对 db_record UPDATE 自动 invalidate）刷新到净自付值。
+                    // try/catch（M-1 节点2）：后台重算失败不连累已放行首屏——异常逃逸会触发全局
+                    // UncaughtExceptionHandler 的 finishAllActivity()；finalAmountNetRecalcDone 未置位，下次启动幂等重试。
+                    try {
+                        recordRepository.recalculateAllFinalAmount()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        this@LauncherContentViewModel.logger()
+                            .e(e, "background netRecalc failed, will retry next launch")
+                    }
                 }
             }
         }

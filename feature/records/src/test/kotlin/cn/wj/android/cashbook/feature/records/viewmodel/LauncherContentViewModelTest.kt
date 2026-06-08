@@ -144,8 +144,44 @@ class LauncherContentViewModelTest {
     }
 
     @Test
+    fun when_net_recalc_throws_then_uiState_success_and_no_crash() = runTest {
+        // M-1（节点2）：后台净自付重算抛异常不应逃逸到 viewModelScope（→全局 handler finishAllActivity），
+        // 首屏已放行为 Success 不受影响；finalAmountNetRecalcDone 未置位下次启动幂等重试。
+        // 无 try/catch 时异常逃逸会让本测试因未捕获异常 FAIL → 加 try/catch 后 PASS（区分力）。
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = false,
+            ),
+        )
+        val repo = FakeRecordRepository()
+        repo.recalcThrowable = RuntimeException("simulated background recalc failure")
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = repo,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+        val vm = LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = repo,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
+        assertThat(vm.uiState.value).isInstanceOf(LauncherContentUiState.Success::class.java)
+        assertThat(repo.recalculateAllFinalAmountCount).isEqualTo(1)
+        collectJob.cancel()
+    }
+
+    @Test
     fun when_db9To10_migrating_then_uiState_loading_until_done() = runTest {
-        // db9To10 分支保留 gate：migrate 进行中 uiState=Loading，完成后转 Success
+        // db9To10 分支保留 gate：migrate 进行中 uiState=Loading，完成后转 Success。
+        // 守 impact L-1：db9To10 分支不可被误改为"先置位"去 gate（否则首屏显 Migration DEFAULT 0 全 0.00）；
+        // 对 netRecalc 重排序无区分力，与 when_net_recalc_running 不同源。
         settingRepository.setTempKeys(
             TempKeysModel(
                 db9To10DataMigrated = false,
