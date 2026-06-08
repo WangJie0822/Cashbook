@@ -423,15 +423,8 @@ interface TransactionDao {
                 },
             )
 
-            // 更新关联记录的金额
-            var relatedAmount = 0L
-            queryRecordByIds(relatedRecordIdList).forEach { relatedRecord ->
-                relatedAmount += relatedRecord.finalAmount
-            }
-            relatedRecordIdList.forEach { relatedRecordId ->
-                updateRecordFinalAmountById(relatedRecordId, 0L)
-            }
-            updateRecordFinalAmountById(recordId, recordAmount - relatedAmount)
+            // 净自付：对新吸收者所在簇整体重算（替换旧的 recordAmount - Σ finalAmount 口径）
+            recalculateFinalAmountForCluster(recordId)
         }
     }
 

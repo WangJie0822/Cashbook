@@ -238,6 +238,27 @@ class TransactionDaoLogicTest {
         assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L)
     }
 
+    // ========== insertRecordTransaction 净自付测试 ==========
+
+    @Test
+    fun when_insert_income_absorber_then_cluster_net_self_paid() = runTest {
+        // 先存在支出 E(100)，再经 insertRecordTransaction 插入收入 I(80) 关联 E → E.fa=20, I.fa=0
+        setupTypesForAbsorption()
+        val expenseId = dao.insertRecord(createRecordTable(typeId = EXPENDITURE_TYPE_ID, amount = 10000L))
+
+        dao.insertRecordTransaction(
+            record = createRecordTable(typeId = INCOME_TYPE_ID, amount = 8000L),
+            tagIdList = emptyList(),
+            needRelated = true,
+            relatedRecordIdList = listOf(expenseId),
+            relatedImageList = emptyList(),
+        )
+        val incomeId = dao.records.first { it.amount == 8000L }.id!!
+
+        assertThat(dao.queryRecordById(expenseId)!!.finalAmount).isEqualTo(2000L)
+        assertThat(dao.queryRecordById(incomeId)!!.finalAmount).isEqualTo(0L)
+    }
+
     // ========== deleteBookTransaction 测试 ==========
 
     @Test
