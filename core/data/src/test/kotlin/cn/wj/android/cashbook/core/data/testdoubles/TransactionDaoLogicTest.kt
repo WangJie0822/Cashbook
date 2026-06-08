@@ -175,6 +175,84 @@ class TransactionDaoLogicTest {
         assertThat(updated.finalAmount).isEqualTo(-2000L)
     }
 
+    // ========== 净自付簇算法 recalculateFinalAmountForCluster 测试 ==========
+
+    @Test
+    fun when_cluster_1to1_partial_then_expense_net_income_zero() = runTest {
+        // E(100) 被 I(80) 部分吸收 → E.fa=20, I.fa=0
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+
+        dao.recalculateFinalAmountForCluster(2L)
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(2000L) // 净自付
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L) // 溢出
+    }
+
+    @Test
+    fun when_cluster_over_reimburse_then_floor_zero_and_overflow_to_income() = runTest {
+        // E(100) 被 I(120) 超额吸收 → E.fa=0, I.fa=20
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 12000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+
+        dao.recalculateFinalAmountForCluster(2L)
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(0L)
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(2000L)
+    }
+
+    @Test
+    fun when_cluster_1toN_then_greedy_fill_by_id_asc() = runTest {
+        // I(80) 吸收 E1(100),E2(50) → E1.fa=20,E2.fa=50,I.fa=0
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = EXPENDITURE_TYPE_ID, amount = 5000L)
+        insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 8000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L))
+
+        dao.recalculateFinalAmountForCluster(3L)
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(2000L) // 80 先填 E1 → 100-80
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(5000L) // 无剩余，E2 全额自付
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(0L)
+    }
+
+    @Test
+    fun when_cluster_Nto1_then_expense_offset_by_sum() = runTest {
+        // E(100) 被 I1(30),I2(40) 吸收 → E.fa=30,I1.fa=0,I2.fa=0
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 3000L)
+        insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 4000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 1L))
+
+        dao.recalculateFinalAmountForCluster(1L)
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(3000L) // 100-30-40
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L)
+        assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(0L)
+    }
+
+    @Test
+    fun when_cluster_charges_nonzero_then_net_self_paid_uses_recordAmount() = runTest {
+        // M9: E(amount100,charge0)=100；I(amount80,charge5)→recordAmount(I)=75 → E.fa=25,I.fa=0
+        setupTypesForAbsorption()
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L, charge = 500L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+
+        dao.recalculateFinalAmountForCluster(2L)
+
+        assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(2500L) // 100-75
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L)
+    }
+
     // ========== deleteBookTransaction 测试 ==========
 
     @Test

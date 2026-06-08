@@ -104,6 +104,12 @@ interface TransactionDao {
     )
     suspend fun queryRecordByIds(ids: List<Long>): List<RecordTable>
 
+    @Query(value = "SELECT * FROM db_record")
+    suspend fun queryAllRecords(): List<RecordTable>
+
+    @Query(value = "SELECT * FROM db_record_with_related")
+    suspend fun queryAllRelatedRecords(): List<RecordWithRelatedTable>
+
     @Query(
         value = """
         DELETE FROM db_record_with_related WHERE record_id=:id OR related_record_id=:id
@@ -154,6 +160,73 @@ interface TransactionDao {
         record: RecordTable,
         category: RecordTypeCategoryEnum,
     ): Long = recordAmount(category, record.amount, record.charge, record.concessions)
+
+    /**
+     * 重算一个吸收簇的 finalAmount（净自付语义，§5 顺序贪心填充）。
+     *
+     * 从 [seedRecordId] 沿关系表 BFS 发现整个连通簇（被吸收支出↔吸收者收入构成二部图连通分量），
+     * 将簇内所有记录 finalAmount 重置为 recordAmount，再按吸收者 id 升序、每个吸收者按被吸收支出 id 升序
+     * 顺序贪心填充。结果只依赖 id 顺序、与插入历史无关，故增量与全量逐字段一致。
+     *
+     * @param seedRecordId 簇内任一记录 id（受影响的吸收者或被吸收支出）
+     * @param excludeRecordIds 需从簇中排除的记录 id（删除场景：记录即将被删但关联尚未清除）
+     */
+    suspend fun recalculateFinalAmountForCluster(
+        seedRecordId: Long,
+        excludeRecordIds: Set<Long> = emptySet(),
+    ) {
+        // 1. BFS 发现连通簇（排除 excludeRecordIds，排除节点不入簇也不被遍历）
+        val clusterIds = LinkedHashSet<Long>()
+        val queue = ArrayDeque<Long>()
+        if (seedRecordId !in excludeRecordIds) {
+            clusterIds.add(seedRecordId)
+            queue.add(seedRecordId)
+        }
+        while (queue.isNotEmpty()) {
+            val cur = queue.removeFirst()
+            val neighbors = queryRelatedByRecordId(cur).map { it.relatedRecordId } +
+                queryRelatedByRelatedRecordId(cur).map { it.recordId }
+            for (n in neighbors) {
+                if (n !in excludeRecordIds && clusterIds.add(n)) {
+                    queue.add(n)
+                }
+            }
+        }
+        if (clusterIds.isEmpty()) return
+
+        // 2. 初始化簇内 finalAmount = recordAmount（簇内仅 income/expenditure，转账不参与吸收）
+        val finalAmounts = HashMap<Long, Long>(clusterIds.size)
+        for (id in clusterIds) {
+            val record = queryRecordById(id) ?: continue
+            val type = resolveType(record.typeId) ?: continue
+            val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
+            finalAmounts[id] = calculateRecordAmount(record, category)
+        }
+
+        // 3. 簇内吸收者（record_id 侧，有被吸收支出）按 id 升序，顺序贪心填充
+        val absorbers = clusterIds.filter { id ->
+            queryRelatedByRecordId(id).any { it.relatedRecordId in clusterIds }
+        }.sorted()
+        for (absorberId in absorbers) {
+            var remaining = finalAmounts[absorberId] ?: continue
+            val absorbedIds = queryRelatedByRecordId(absorberId)
+                .map { it.relatedRecordId }
+                .filter { it in clusterIds }
+                .sorted()
+            for (expenseId in absorbedIds) {
+                val current = finalAmounts[expenseId] ?: continue
+                val offset = minOf(remaining, current) // current/remaining 均不下穿 0，保证非负
+                finalAmounts[expenseId] = current - offset
+                remaining -= offset
+            }
+            finalAmounts[absorberId] = remaining // 溢出（通常 0）
+        }
+
+        // 4. 落库
+        for ((id, finalAmount) in finalAmounts) {
+            updateRecordFinalAmountById(id, finalAmount)
+        }
+    }
 
     /**
      * 重算某个吸收者（收入记录）的 finalAmount

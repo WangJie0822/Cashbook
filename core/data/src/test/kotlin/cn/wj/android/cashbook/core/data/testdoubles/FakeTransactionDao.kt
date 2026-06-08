@@ -172,6 +172,14 @@ class FakeTransactionDao : TransactionDao {
         return records.filter { it.id in ids }
     }
 
+    override suspend fun queryAllRecords(): List<RecordTable> {
+        return records.toList()
+    }
+
+    override suspend fun queryAllRelatedRecords(): List<RecordWithRelatedTable> {
+        return relatedRecords.toList()
+    }
+
     override suspend fun queryRecordListByBookId(bookId: Long): List<RecordTable> {
         return records.filter { it.booksId == bookId }
     }
