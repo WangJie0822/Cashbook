@@ -55,3 +55,22 @@ fun analyticsPieAmount(
 } else {
     amount - charges
 }
+
+/**
+ * Analytics 饼图净自付口径（单位：分）。
+ * - EXPENDITURE / INCOME：用净自付 [finalAmount]（被吸收支出显净自付、报销款溢出不虚增收入）
+ * - TRANSFER：保持 [analyticsPieAmount] 口径（amount - charges），转账不参与吸收
+ *
+ * finalAmount 净自付重构后饼图分类占比改用本口径；TRANSFER 仍走旧口径守 #10b 金丝雀（两口径对 TRANSFER 不可统一）。
+ */
+fun analyticsPieNetAmount(
+    typeCategory: RecordTypeCategoryEnum,
+    finalAmount: Long,
+    amount: Long,
+    charges: Long,
+    concessions: Long,
+): Long = if (typeCategory == RecordTypeCategoryEnum.TRANSFER) {
+    analyticsPieAmount(typeCategory, amount, charges, concessions)
+} else {
+    finalAmount
+}

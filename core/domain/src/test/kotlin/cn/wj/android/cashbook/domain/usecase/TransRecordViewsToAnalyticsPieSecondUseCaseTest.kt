@@ -65,9 +65,9 @@ class TransRecordViewsToAnalyticsPieSecondUseCaseTest {
         )
 
         val records = listOf(
-            createRecordViewsModel(type = parentType, amount = 2000L, charges = 0L, concessions = 0L),
-            createRecordViewsModel(type = lunchType, amount = 3000L, charges = 0L, concessions = 0L),
-            createRecordViewsModel(type = dinnerType, amount = 5000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = parentType, amount = 2000L, finalAmount = 2000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = lunchType, amount = 3000L, finalAmount = 3000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = dinnerType, amount = 5000L, finalAmount = 5000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(1L, records)
@@ -92,12 +92,37 @@ class TransRecordViewsToAnalyticsPieSecondUseCaseTest {
             typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
         )
         val records = listOf(
-            createRecordViewsModel(type = otherType, amount = 5000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = otherType, amount = 5000L, finalAmount = 5000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(1L, records)
 
         assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun when_expenditure_drilldown_then_uses_net_self_paid_finalAmount() = runTest {
+        // 净自付：二级钻取下被报销支出 amount=100、finalAmount=20 → 计 20（非 analyticsPieAmount 的 100）
+        val parentType = createRecordTypeModel(
+            id = 1L,
+            name = "餐饮",
+            typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        )
+        val lunchType = createRecordTypeModel(
+            id = 10L,
+            parentId = 1L,
+            name = "午餐",
+            typeLevel = TypeLevelEnum.SECOND,
+            typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        )
+
+        val records = listOf(
+            createRecordViewsModel(type = lunchType, amount = 10000L, finalAmount = 2000L, charges = 0L, concessions = 0L),
+        )
+
+        val result = useCase(1L, records)
+
+        assertThat(result.first().totalAmount).isEqualTo(2000L)
     }
 
     @Test

@@ -64,9 +64,9 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(transportType)
 
         val records = listOf(
-            createRecordViewsModel(type = foodType, amount = 10000L, charges = 0L, concessions = 0L),
-            createRecordViewsModel(type = foodType, amount = 5000L, charges = 0L, concessions = 0L),
-            createRecordViewsModel(type = transportType, amount = 3000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = foodType, amount = 10000L, finalAmount = 10000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = foodType, amount = 5000L, finalAmount = 5000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = transportType, amount = 3000L, finalAmount = 3000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
@@ -95,8 +95,8 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(lunchType)
 
         val records = listOf(
-            createRecordViewsModel(type = lunchType, amount = 3000L, charges = 0L, concessions = 0L),
-            createRecordViewsModel(type = foodType, amount = 2000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = lunchType, amount = 3000L, finalAmount = 3000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = foodType, amount = 2000L, finalAmount = 2000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
@@ -108,7 +108,8 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
     }
 
     @Test
-    fun when_expenditure_then_calculates_amount_plus_charges_minus_concessions() = runTest {
+    fun when_expenditure_then_uses_net_self_paid_finalAmount() = runTest {
+        // 净自付：被报销支出 amount=100、净自付 finalAmount=20 → 饼图计 20（非 analyticsPieAmount 的 100）
         val type = createRecordTypeModel(
             id = 1L,
             name = "餐饮",
@@ -117,17 +118,18 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(type)
 
         val records = listOf(
-            createRecordViewsModel(type = type, amount = 10000L, charges = 500L, concessions = 1000L),
+            createRecordViewsModel(type = type, amount = 10000L, finalAmount = 2000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
 
-        // 支出: amount + charges - concessions = 10000 + 500 - 1000 = 9500
-        assertThat(result.first().totalAmount).isEqualTo(9500L)
+        // 净自付口径：用 finalAmount=20，而非 amount+charges-concessions=100
+        assertThat(result.first().totalAmount).isEqualTo(2000L)
     }
 
     @Test
-    fun when_income_then_calculates_amount_minus_charges() = runTest {
+    fun when_income_then_uses_net_self_paid_finalAmount() = runTest {
+        // 净自付：收入 amount=5000、finalAmount=4800（如报销款溢出/普通收入）→ 饼图计 finalAmount
         val type = createRecordTypeModel(
             id = 1L,
             name = "工资",
@@ -136,13 +138,13 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(type)
 
         val records = listOf(
-            createRecordViewsModel(type = type, amount = 500000L, charges = 10000L, concessions = 0L),
+            createRecordViewsModel(type = type, amount = 500000L, finalAmount = 480000L, charges = 10000L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.INCOME, records)
 
-        // 收入: amount - charges = 500000 - 10000 = 490000
-        assertThat(result.first().totalAmount).isEqualTo(490000L)
+        // 净自付口径：用 finalAmount=480000，而非 amount-charges=490000
+        assertThat(result.first().totalAmount).isEqualTo(480000L)
     }
 
     @Test
@@ -175,9 +177,9 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(typeC)
 
         val records = listOf(
-            createRecordViewsModel(type = typeA, amount = 1000L, charges = 0L, concessions = 0L),
-            createRecordViewsModel(type = typeB, amount = 5000L, charges = 0L, concessions = 0L),
-            createRecordViewsModel(type = typeC, amount = 3000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = typeA, amount = 1000L, finalAmount = 1000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = typeB, amount = 5000L, finalAmount = 5000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = typeC, amount = 3000L, finalAmount = 3000L, charges = 0L, concessions = 0L),
         )
 
         val result = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
@@ -204,11 +206,11 @@ class TransRecordViewsToAnalyticsPieUseCaseTest {
         typeRepository.addType(foodType)
 
         val records = listOf(
-            createRecordViewsModel(type = foodType, amount = 10000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = foodType, amount = 10000L, finalAmount = 10000L, charges = 0L, concessions = 0L),
             // 平账支出记录
-            createRecordViewsModel(type = RECORD_TYPE_BALANCE_EXPENDITURE, amount = 5000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = RECORD_TYPE_BALANCE_EXPENDITURE, amount = 5000L, finalAmount = 5000L, charges = 0L, concessions = 0L),
             // 平账收入记录
-            createRecordViewsModel(type = RECORD_TYPE_BALANCE_INCOME, amount = 3000L, charges = 0L, concessions = 0L),
+            createRecordViewsModel(type = RECORD_TYPE_BALANCE_INCOME, amount = 3000L, finalAmount = 3000L, charges = 0L, concessions = 0L),
         )
 
         val expenditureResult = useCase(RecordTypeCategoryEnum.EXPENDITURE, records)
