@@ -171,12 +171,16 @@ interface TransactionDao {
      * @param seedRecordId 簇内任一记录 id（受影响的吸收者或被吸收支出）
      * @param excludeRecordIds 需从簇中排除的记录 id（删除场景：记录即将被删但关联尚未清除）
      */
+    @Transaction
     suspend fun recalculateFinalAmountForCluster(
         seedRecordId: Long,
         excludeRecordIds: Set<Long> = emptySet(),
     ) {
-        // 1. BFS 发现连通簇（排除 excludeRecordIds，排除节点不入簇也不被遍历）
+        // 1. BFS 发现连通簇（排除 excludeRecordIds，排除节点不入簇也不被遍历），
+        //    同时缓存每个节点的出边（record_id 侧被吸收支出），供 step3 复用，
+        //    避免对每个节点重复 queryRelatedByRecordId（消 N+1）。
         val clusterIds = LinkedHashSet<Long>()
+        val outEdges = HashMap<Long, List<Long>>() // record_id -> 其吸收的支出 id 列表
         val queue = ArrayDeque<Long>()
         if (seedRecordId !in excludeRecordIds) {
             clusterIds.add(seedRecordId)
@@ -184,8 +188,9 @@ interface TransactionDao {
         }
         while (queue.isNotEmpty()) {
             val cur = queue.removeFirst()
-            val neighbors = queryRelatedByRecordId(cur).map { it.relatedRecordId } +
-                queryRelatedByRelatedRecordId(cur).map { it.recordId }
+            val absorbed = queryRelatedByRecordId(cur).map { it.relatedRecordId }
+            outEdges[cur] = absorbed
+            val neighbors = absorbed + queryRelatedByRelatedRecordId(cur).map { it.recordId }
             for (n in neighbors) {
                 if (n !in excludeRecordIds && clusterIds.add(n)) {
                     queue.add(n)
@@ -194,23 +199,29 @@ interface TransactionDao {
         }
         if (clusterIds.isEmpty()) return
 
-        // 2. 初始化簇内 finalAmount = recordAmount（簇内仅 income/expenditure，转账不参与吸收）
+        // 2. 批量取簇内记录（消逐条 queryRecordById 的 N+1），初始化 finalAmount。
+        //    转账 = concessions - charge（与 recalculateAllFinalAmount 全量版口径一致，防增量/全量分叉）；
+        //    收入/支出 = recordAmount。簇内正常仅 income/expenditure（转账不参与吸收），TRANSFER 分支为一致性防御。
+        val records = queryRecordByIds(clusterIds.toList()).associateBy { it.id }
         val finalAmounts = HashMap<Long, Long>(clusterIds.size)
         for (id in clusterIds) {
-            val record = queryRecordById(id) ?: continue
+            val record = records[id] ?: continue
             val type = resolveType(record.typeId) ?: continue
             val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
-            finalAmounts[id] = calculateRecordAmount(record, category)
+            finalAmounts[id] = if (category == RecordTypeCategoryEnum.TRANSFER) {
+                record.concessions - record.charge
+            } else {
+                calculateRecordAmount(record, category)
+            }
         }
 
-        // 3. 簇内吸收者（record_id 侧，有被吸收支出）按 id 升序，顺序贪心填充
+        // 3. 簇内吸收者（record_id 侧有被吸收支出）按 id 升序，顺序贪心填充（用缓存 outEdges，零额外查询）
         val absorbers = clusterIds.filter { id ->
-            queryRelatedByRecordId(id).any { it.relatedRecordId in clusterIds }
+            (outEdges[id] ?: emptyList()).any { it in clusterIds }
         }.sorted()
         for (absorberId in absorbers) {
             var remaining = finalAmounts[absorberId] ?: continue
-            val absorbedIds = queryRelatedByRecordId(absorberId)
-                .map { it.relatedRecordId }
+            val absorbedIds = (outEdges[absorberId] ?: emptyList())
                 .filter { it in clusterIds }
                 .sorted()
             for (expenseId in absorbedIds) {
@@ -222,9 +233,11 @@ interface TransactionDao {
             finalAmounts[absorberId] = remaining // 溢出（通常 0）
         }
 
-        // 4. 落库
+        // 4. 落库（仅写变化项，对齐全量版，避免无谓 UPDATE 触发 Flow invalidation 风暴）
         for ((id, finalAmount) in finalAmounts) {
-            updateRecordFinalAmountById(id, finalAmount)
+            if (records[id]?.finalAmount != finalAmount) {
+                updateRecordFinalAmountById(id, finalAmount)
+            }
         }
     }
 
@@ -283,6 +296,7 @@ interface TransactionDao {
      * 兼容旧签名：从 [absorberId] 所在簇重算，可排除即将删除的被吸收记录 [excludeAbsorbedId]。
      * 实际委托 [recalculateFinalAmountForCluster]——不再是「仅算吸收者」，而是整簇净自付重算。
      */
+    @Transaction
     suspend fun recalculateAbsorberFinalAmount(
         absorberId: Long,
         excludeAbsorbedId: Long = -1L,
