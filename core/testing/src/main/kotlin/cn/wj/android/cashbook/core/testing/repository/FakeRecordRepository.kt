@@ -298,8 +298,12 @@ class FakeRecordRepository : RecordRepository {
         // no-op
     }
 
+    /** 净自付重算调用次数（供 gate 触发测试断言） */
+    var recalculateAllFinalAmountCount: Int = 0
+
     override suspend fun recalculateAllFinalAmount() {
-        // no-op（feature/domain 层测试不触发真实重算）
+        // no-op（feature/domain 层测试不触发真实重算），仅计数供 gate 测试
+        recalculateAllFinalAmountCount++
     }
 
     override suspend fun queryRelatedRecordCountById(id: Long): Int {

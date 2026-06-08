@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import cn.wj.android.cashbook.core.model.model.TempKeysModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
@@ -74,6 +75,35 @@ class LauncherContentViewModelTest {
             recordRepository = recordRepository,
             recordModelTransToViewsUseCase = recordModelTransToViewsUseCase,
         )
+    }
+
+    @Test
+    fun when_db9To10_done_but_net_recalc_not_done_then_recalculateAllFinalAmount_called() {
+        // 老用户 gate：db9To10 已迁移、净自付未重算 → 触发 recalculateAllFinalAmount 一次
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = false,
+            ),
+        )
+        val freshRecordRepository = FakeRecordRepository()
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = freshRecordRepository,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+
+        LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = freshRecordRepository,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        assertThat(freshRecordRepository.recalculateAllFinalAmountCount).isEqualTo(1)
     }
 
     @Test

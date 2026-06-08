@@ -68,7 +68,11 @@ class LauncherContentViewModel @Inject constructor(
         viewModelScope.launch {
             val tempKeys = settingRepository.tempKeysModel.first()
             if (!tempKeys.db9To10DataMigrated) {
+                // 改造后 migrateAfter9To10 内部已置 finalAmountNetRecalcDone，新用户不重复跑
                 recordRepository.migrateAfter9To10()
+            } else if (!tempKeys.finalAmountNetRecalcDone) {
+                // 老用户（已迁移 db9To10、但未做净自付重算）：触发一次净自付全量重算
+                recordRepository.recalculateAllFinalAmount()
             }
             _migrationCompleted.value = true
         }

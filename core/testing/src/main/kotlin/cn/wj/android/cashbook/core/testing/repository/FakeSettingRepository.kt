@@ -103,6 +103,10 @@ class FakeSettingRepository : SettingRepository {
         _recordSettingsModel.value = settings
     }
 
+    fun setTempKeys(tempKeys: TempKeysModel) {
+        _tempKeysModel.value = tempKeys
+    }
+
     override suspend fun splitAppPreferences() {
         // no-op
     }
