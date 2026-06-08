@@ -68,13 +68,18 @@ class LauncherContentViewModel @Inject constructor(
         viewModelScope.launch {
             val tempKeys = settingRepository.tempKeysModel.first()
             if (!tempKeys.db9To10DataMigrated) {
-                // 改造后 migrateAfter9To10 内部已置 finalAmountNetRecalcDone，新用户不重复跑
+                // final_amount 全为 Migration9To10 DEFAULT 0，首屏会显全 0 → 必须 gate（先迁移后置位，不可调换）
                 recordRepository.migrateAfter9To10()
-            } else if (!tempKeys.finalAmountNetRecalcDone) {
-                // 老用户（已迁移 db9To10、但未做净自付重算）：触发一次净自付全量重算
-                recordRepository.recalculateAllFinalAmount()
+                _migrationCompleted.value = true
+            } else {
+                // 已迁移：立即放行首屏（finalAmount 为旧吸收模型值——被吸收支出=0/吸收者可负，首屏短暂显旧值）
+                _migrationCompleted.value = true
+                if (!tempKeys.finalAmountNetRecalcDone) {
+                    // 老用户净自付重算后台静默跑；完成后 recalculateAllFinalAmount 内部 bump recordDataVersion，
+                    // 汇总流（订阅 version）+ 列表（Room PagingSource 对 db_record UPDATE 自动 invalidate）刷新到净自付值
+                    recordRepository.recalculateAllFinalAmount()
+                }
             }
-            _migrationCompleted.value = true
         }
     }
 

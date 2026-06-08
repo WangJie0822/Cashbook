@@ -32,6 +32,7 @@ import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -104,6 +105,79 @@ class LauncherContentViewModelTest {
         )
 
         assertThat(freshRecordRepository.recalculateAllFinalAmountCount).isEqualTo(1)
+    }
+
+    @Test
+    fun when_net_recalc_running_then_uiState_already_success() = runTest {
+        // M-D 区分力：净自付重算"进行中"时首屏应已放行为 Success（旧顺序此时为 Loading → 对旧实现 FAIL）
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = false,
+            ),
+        )
+        val repo = FakeRecordRepository()
+        repo.recalcStartedSignal = CompletableDeferred()
+        repo.recalcSuspendGate = CompletableDeferred() // 挂起重算，不放行
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = repo,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+        val vm = LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = repo,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
+        repo.recalcStartedSignal!!.await() // 确认重算已进入挂起点
+        assertThat(vm.uiState.value).isInstanceOf(LauncherContentUiState.Success::class.java)
+
+        repo.recalcSuspendGate!!.complete(Unit) // 放行重算
+        assertThat(repo.recalculateAllFinalAmountCount).isEqualTo(1)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun when_db9To10_migrating_then_uiState_loading_until_done() = runTest {
+        // db9To10 分支保留 gate：migrate 进行中 uiState=Loading，完成后转 Success
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = false,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = false,
+            ),
+        )
+        val repo = FakeRecordRepository()
+        repo.migrateStartedSignal = CompletableDeferred()
+        repo.migrateSuspendGate = CompletableDeferred() // 挂起 migrate
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = repo,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+        val vm = LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = repo,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
+        repo.migrateStartedSignal!!.await() // migrate 进入挂起点
+        assertThat(vm.uiState.value).isInstanceOf(LauncherContentUiState.Loading::class.java)
+
+        repo.migrateSuspendGate!!.complete(Unit) // 放行 migrate
+        assertThat(vm.uiState.value).isInstanceOf(LauncherContentUiState.Success::class.java)
+        assertThat(repo.migrateAfter9To10Count).isEqualTo(1)
+        collectJob.cancel()
     }
 
     @Test
