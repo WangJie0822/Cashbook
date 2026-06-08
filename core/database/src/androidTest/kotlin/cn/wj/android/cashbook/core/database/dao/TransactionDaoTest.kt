@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.BooksTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.TYPE_TABLE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.database.table.TYPE_TABLE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.database.table.TagTable
@@ -544,6 +545,94 @@ class TransactionDaoTest {
         val incomeRecords = transactionDao.queryRecordListByBookId(1L)
         val insertedIncome = incomeRecords.first { it.typeId == incomeTypeId }
         assertThat(insertedIncome.finalAmount).isEqualTo(12000L)
+    }
+
+    @Test
+    fun when_insertRecordWithRelated_partial_then_net_self_paid() = runTest {
+        // E(100) 被 I(80) 部分吸收 → E.finalAmount=20, I.finalAmount=0（真实 Room）
+        insertBook()
+        val expTypeId = insertType(createExpenditureType())
+        val incTypeId = insertType(createIncomeType())
+        val expenseId = transactionDao.insertRecord(createRecord(typeId = expTypeId, amount = 10000L))
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = incTypeId, amount = 8000L),
+            tagIdList = emptyList(),
+            needRelated = true,
+            relatedRecordIdList = listOf(expenseId),
+            relatedImageList = emptyList(),
+        )
+        assertThat(transactionDao.queryRecordById(expenseId)!!.finalAmount).isEqualTo(2000L)
+    }
+
+    @Test
+    fun when_recalculateAllFinalAmount_then_asset_balance_unchanged() = runTest {
+        // L8：recalcAll 只改 finalAmount，不动 asset.balance（余额全程用 recordAmount 口径，与 finalAmount 解耦）
+        insertBook()
+        val expTypeId = insertType(createExpenditureType())
+        val incTypeId = insertType(createIncomeType())
+        insertAsset(createNormalAsset(id = 10L, balance = 100000L))
+        val expenseId = transactionDao.insertRecord(createRecord(typeId = expTypeId, assetId = 10L, amount = 10000L))
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = incTypeId, assetId = 10L, amount = 8000L),
+            tagIdList = emptyList(),
+            needRelated = true,
+            relatedRecordIdList = listOf(expenseId),
+            relatedImageList = emptyList(),
+        )
+        val balanceBefore = transactionDao.queryAssetById(10L)!!.balance
+
+        transactionDao.recalculateAllFinalAmount()
+
+        assertThat(transactionDao.queryAssetById(10L)!!.balance).isEqualTo(balanceBefore)
+    }
+
+    @Test
+    fun when_large_cluster_50_expenses_one_absorber_then_completes() = runTest {
+        // M8：50 笔支出关联 1 报销款，recalculateFinalAmountForCluster 单事务内完成、结果守恒
+        insertBook()
+        val expTypeId = insertType(createExpenditureType())
+        val incTypeId = insertType(createIncomeType())
+        val expenseIds = (1..50).map {
+            transactionDao.insertRecord(createRecord(typeId = expTypeId, amount = 1000L))
+        }
+        val absorberId = transactionDao.insertRecord(createRecord(typeId = incTypeId, amount = 100000L))
+        transactionDao.insertRelatedRecord(
+            expenseIds.map { RecordWithRelatedTable(id = null, recordId = absorberId, relatedRecordId = it) },
+        )
+
+        transactionDao.recalculateFinalAmountForCluster(absorberId)
+
+        // 50×10=500 元 < 吸收者 1000 元：全部支出净自付归 0，吸收者溢出 50000 分
+        assertThat(expenseIds.all { transactionDao.queryRecordById(it)!!.finalAmount == 0L }).isTrue()
+        assertThat(transactionDao.queryRecordById(absorberId)!!.finalAmount).isEqualTo(50000L)
+    }
+
+    @Test
+    fun when_delete_book_with_absorption_cluster_then_records_cleared_others_intact() = runTest {
+        // M4：删账本逐条删记录走真实 deleteRecordTransaction，含吸收簇整簇重算不脏读
+        val bookA = insertBook(id = 1L, name = "A")
+        val bookB = insertBook(id = 2L, name = "B")
+        val expTypeId = insertType(createExpenditureType())
+        val incTypeId = insertType(createIncomeType())
+        // bookA：E 被 I 吸收
+        val expenseId = transactionDao.insertRecord(createRecord(typeId = expTypeId, booksId = bookA, amount = 10000L))
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = incTypeId, booksId = bookA, amount = 8000L),
+            tagIdList = emptyList(),
+            needRelated = true,
+            relatedRecordIdList = listOf(expenseId),
+            relatedImageList = emptyList(),
+        )
+        // bookB：独立支出
+        val bRecordId = transactionDao.insertRecord(
+            createRecord(typeId = expTypeId, booksId = bookB, amount = 5000L).copy(finalAmount = 5000L),
+        )
+
+        transactionDao.deleteBookTransaction(bookA)
+
+        assertThat(transactionDao.queryRecordListByBookId(bookA)).isEmpty()
+        // 其它账本不受影响
+        assertThat(transactionDao.queryRecordById(bRecordId)!!.finalAmount).isEqualTo(5000L)
     }
 
     // endregion

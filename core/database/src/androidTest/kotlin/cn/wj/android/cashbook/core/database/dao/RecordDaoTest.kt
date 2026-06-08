@@ -536,6 +536,7 @@ class RecordDaoTest {
         val result = recordDao.queryRecordByKeyword(
             booksId = testBookId,
             keyword = "星巴克",
+            amountCent = -1L,
             pageNum = 0,
             pageSize = 10,
         )
