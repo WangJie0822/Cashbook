@@ -26,4 +26,6 @@ data class TempKeysModel(
     val db9To10DataMigrated: Boolean,
     /** proto app_preferences 是否拆分 */
     val preferenceSplit: Boolean,
+    /** finalAmount 净自付重算是否已执行 */
+    val finalAmountNetRecalcDone: Boolean = false,
 )

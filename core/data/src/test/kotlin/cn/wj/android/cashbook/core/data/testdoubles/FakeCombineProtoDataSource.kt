@@ -275,6 +275,10 @@ class FakeCombineProtoDataSource {
         _tempKeys.update { it.copy(db9To10DataMigrated = migrated) }
     }
 
+    suspend fun updateFinalAmountNetRecalcDone(done: Boolean) {
+        _tempKeys.update { it.copy(finalAmountNetRecalcDone = done) }
+    }
+
     suspend fun needRelated(typeId: Long): Boolean {
         val settings = _recordSettings.value
         return typeId == settings.reimburseTypeId || typeId == settings.refundTypeId

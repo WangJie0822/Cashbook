@@ -686,6 +686,22 @@ class SettingRepositoryImplTest {
         assertThat(tempKeys.db9To10DataMigrated).isTrue()
     }
 
+    // ========== finalAmountNetRecalcDone 测试 ==========
+
+    @Test
+    fun when_finalAmountNetRecalcDone_default_then_false() = runTest {
+        val tempKeys = fakeDataSource.tempKeysData.first()
+        assertThat(tempKeys.finalAmountNetRecalcDone).isFalse()
+    }
+
+    @Test
+    fun when_updateFinalAmountNetRecalcDone_true_then_tempKeys_updated() = runTest {
+        fakeDataSource.updateFinalAmountNetRecalcDone(true)
+
+        val tempKeys = fakeDataSource.tempKeysData.first()
+        assertThat(tempKeys.finalAmountNetRecalcDone).isTrue()
+    }
+
     // ========== Git 版本数据更新测试 ==========
 
     @Test

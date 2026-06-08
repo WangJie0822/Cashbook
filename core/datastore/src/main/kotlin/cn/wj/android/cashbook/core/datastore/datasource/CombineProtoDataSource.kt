@@ -134,6 +134,7 @@ class CombineProtoDataSource @Inject constructor(
             TempKeysModel(
                 db9To10DataMigrated = it.db9To10DataMigrated,
                 preferenceSplit = it.preferenceSplit,
+                finalAmountNetRecalcDone = it.finalAmountNetRecalcDone,
             )
         }
 
@@ -190,6 +191,10 @@ class CombineProtoDataSource @Inject constructor(
 
     suspend fun updateDb9To10DataMigrated(db9To10DataMigrated: Boolean) {
         tempKeys.updateData { it.copy { this.db9To10DataMigrated = db9To10DataMigrated } }
+    }
+
+    suspend fun updateFinalAmountNetRecalcDone(done: Boolean) {
+        tempKeys.updateData { it.copy { this.finalAmountNetRecalcDone = done } }
     }
 
     suspend fun updateKeywords(keywords: List<String>) {
