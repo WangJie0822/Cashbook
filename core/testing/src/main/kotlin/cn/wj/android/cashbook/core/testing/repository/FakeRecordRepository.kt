@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -294,16 +295,34 @@ class FakeRecordRepository : RecordRepository {
         _searchHistoryListData.value = emptyList()
     }
 
+    /** db9To10 迁移调用次数（供 gate 测试断言） */
+    var migrateAfter9To10Count: Int = 0
+
+    /** 非 null 时 [migrateAfter9To10] 挂起在此 deferred；默认 null=不挂起立即返回（保持 32 个复用测试不破） */
+    var migrateSuspendGate: CompletableDeferred<Unit>? = null
+
+    /** [migrateAfter9To10] 进入信号：入口 complete，供测试确认协程已停在挂起点 */
+    var migrateStartedSignal: CompletableDeferred<Unit>? = null
+
     override suspend fun migrateAfter9To10() {
-        // no-op
+        migrateAfter9To10Count++
+        migrateStartedSignal?.complete(Unit)
+        migrateSuspendGate?.await()
     }
 
     /** 净自付重算调用次数（供 gate 触发测试断言） */
     var recalculateAllFinalAmountCount: Int = 0
 
+    /** 非 null 时 [recalculateAllFinalAmount] 挂起在此 deferred；默认 null=不挂起立即返回 */
+    var recalcSuspendGate: CompletableDeferred<Unit>? = null
+
+    /** [recalculateAllFinalAmount] 进入信号：入口 complete，供测试确认协程已停在挂起点 */
+    var recalcStartedSignal: CompletableDeferred<Unit>? = null
+
     override suspend fun recalculateAllFinalAmount() {
-        // no-op（feature/domain 层测试不触发真实重算），仅计数供 gate 测试
         recalculateAllFinalAmountCount++
+        recalcStartedSignal?.complete(Unit)
+        recalcSuspendGate?.await()
     }
 
     override suspend fun queryRelatedRecordCountById(id: Long): Int {
