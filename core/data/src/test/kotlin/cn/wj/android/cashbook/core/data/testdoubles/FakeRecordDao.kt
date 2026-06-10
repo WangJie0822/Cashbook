@@ -233,10 +233,6 @@ class FakeRecordDao : RecordDao {
         return records.filter { it.typeId in typeIds }
     }
 
-    override suspend fun queryRelatedRecord(): List<RecordWithRelatedTable> {
-        return relatedRecords.toList()
-    }
-
     override suspend fun queryRelatedRecordCountByID(id: Long): Int {
         return relatedRecords.count { it.relatedRecordId == id || it.recordId == id }
     }

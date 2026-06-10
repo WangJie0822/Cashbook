@@ -772,27 +772,7 @@ class RecordDaoTest {
 
     // endregion
 
-    // region 补充测试：queryRelatedRecord, queryRelatedRecordCountByID, getRelatedIdListById, getRecordIdListFromRelatedId
-
-    @Test
-    fun when_queryRelatedRecord_then_returnsAllRelations() = runTest {
-        testBookId = createTestBook()
-        val typeId = typeDao.insertType(createType())
-
-        val id1 = insertRecord(createRecord(typeId = typeId))
-        val id2 = insertRecord(createRecord(typeId = typeId))
-        val id3 = insertRecord(createRecord(typeId = typeId))
-
-        transactionDao.insertRelatedRecord(
-            listOf(
-                RecordWithRelatedTable(id = null, recordId = id1, relatedRecordId = id2),
-                RecordWithRelatedTable(id = null, recordId = id1, relatedRecordId = id3),
-            ),
-        )
-
-        val result = recordDao.queryRelatedRecord()
-        assertThat(result).hasSize(2)
-    }
+    // region 补充测试：queryRelatedRecordCountByID, getRelatedIdListById, getRecordIdListFromRelatedId
 
     @Test
     fun when_queryRelatedRecordCountByID_then_countsCorrectly() = runTest {
@@ -949,7 +929,7 @@ class RecordDaoTest {
         recordDao.deleteRelatedWithAsset(targetAssetId)
 
         // 验证：recordWithAsset 的关联被删除，thirdRecord 的关联保留
-        val allRelated = recordDao.queryRelatedRecord()
+        val allRelated = transactionDao.queryAllRelatedRecords()
         assertThat(allRelated).hasSize(1)
         assertThat(allRelated[0].recordId).isEqualTo(thirdRecord)
     }

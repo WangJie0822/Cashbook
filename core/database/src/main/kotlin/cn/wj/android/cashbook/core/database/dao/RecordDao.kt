@@ -301,9 +301,6 @@ interface RecordDao {
         typeCategoryId: Int,
     ): List<RecordTable>
 
-    @Query("SELECT * FROM db_record_with_related")
-    suspend fun queryRelatedRecord(): List<RecordWithRelatedTable>
-
     @Query("SELECT COUNT(*) FROM db_record_with_related WHERE related_record_id=:id OR record_id=:id")
     suspend fun queryRelatedRecordCountByID(id: Long): Int
 
