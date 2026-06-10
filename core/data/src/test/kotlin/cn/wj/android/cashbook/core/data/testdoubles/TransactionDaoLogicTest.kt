@@ -101,7 +101,7 @@ class TransactionDaoLogicTest {
         assertThat(result).isEqualTo(9700L)
     }
 
-    // ========== recalculateAbsorberFinalAmount 测试（净自付：委托簇重算）==========
+    // ========== recalculateFinalAmountForCluster 委托/排除场景测试（净自付）==========
 
     @Test
     fun when_absorber_recalc_single_absorbed_then_cluster_net_self_paid() = runTest {
@@ -111,7 +111,7 @@ class TransactionDaoLogicTest {
         insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 6000L)
         dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
 
-        dao.recalculateAbsorberFinalAmount(2L)
+        dao.recalculateFinalAmountForCluster(2L)
 
         assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(4000L) // 净自付，非负
         assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(0L)
@@ -127,7 +127,7 @@ class TransactionDaoLogicTest {
         dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L))
         dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L))
 
-        dao.recalculateAbsorberFinalAmount(3L)
+        dao.recalculateFinalAmountForCluster(3L)
 
         assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(4000L)
         assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(8000L)
@@ -139,7 +139,7 @@ class TransactionDaoLogicTest {
         setupTypesForAbsorption()
         insertRecord(id = 1L, typeId = INCOME_TYPE_ID, amount = 6000L)
 
-        dao.recalculateAbsorberFinalAmount(1L)
+        dao.recalculateFinalAmountForCluster(1L)
 
         assertThat(dao.queryRecordById(1L)!!.finalAmount).isEqualTo(6000L)
     }
@@ -154,7 +154,7 @@ class TransactionDaoLogicTest {
         dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L))
         dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L))
 
-        dao.recalculateAbsorberFinalAmount(3L, excludeAbsorbedId = 1L)
+        dao.recalculateFinalAmountForCluster(3L, excludeRecordIds = setOf(1L))
 
         assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(2000L) // 6000 填 E2 → 8000-6000
         assertThat(dao.queryRecordById(3L)!!.finalAmount).isEqualTo(0L)

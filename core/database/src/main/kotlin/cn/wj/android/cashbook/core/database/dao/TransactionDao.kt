@@ -322,23 +322,6 @@ interface TransactionDao {
     }
 
     /**
-     * 重算受影响吸收簇的 finalAmount（净自付语义）。
-     *
-     * 兼容旧签名：从 [absorberId] 所在簇重算，可排除即将删除的被吸收记录 [excludeAbsorbedId]。
-     * 实际委托 [recalculateFinalAmountForCluster]——不再是「仅算吸收者」，而是整簇净自付重算。
-     */
-    @Transaction
-    suspend fun recalculateAbsorberFinalAmount(
-        absorberId: Long,
-        excludeAbsorbedId: Long = -1L,
-    ) {
-        recalculateFinalAmountForCluster(
-            seedRecordId = absorberId,
-            excludeRecordIds = if (excludeAbsorbedId != -1L) setOf(excludeAbsorbedId) else emptySet(),
-        )
-    }
-
-    /**
      * 校验资产余额的一致性
      *
      * 遍历资产的所有关联记录，计算余额应有的净变化量，与当前余额对比。
@@ -673,27 +656,13 @@ interface TransactionDao {
     }
 
     /**
-     * 删除已有记录（单删，UI 路径）。
-     * 先捕获与本记录关联的对端记录（删除会清关联），删除核心后对存活簇逐簇重算一次。
+     * 删除已有记录（单删，UI 路径）。委托 [deleteRecordsBatch]（单元素列表）——
+     * 复用同一套「捕获 survivors → deleteRecordCore → 存活簇去重重算」逻辑，避免重复（DRY）。
      */
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteRecordTransaction(record: RecordTable) {
-        val recordId = record.id ?: return
-        // 捕获两个方向上的对端记录 id（排除自身），删除前先捕获
-        val survivors = (
-            queryRelatedByRecordId(recordId).map { it.relatedRecordId } +
-                queryRelatedByRelatedRecordId(recordId).map { it.recordId }
-            ).filter { it != recordId }.toSet()
-        deleteRecordCore(record)
-        // 对存活簇逐簇重算一次（去重；删后关联已清、记录已删，BFS 见裁剪簇）
-        val visited = HashSet<Long>()
-        for (sid in survivors) {
-            if (sid in visited) continue
-            val (clusterIds, outEdges) = discoverClusterIds(sid)
-            visited += clusterIds
-            recalculateFinalAmountFromCluster(clusterIds, outEdges)
-        }
+        deleteRecordsBatch(listOf(record))
     }
 
     @Query(
