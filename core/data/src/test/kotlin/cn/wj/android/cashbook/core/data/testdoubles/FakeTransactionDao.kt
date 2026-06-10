@@ -168,7 +168,11 @@ class FakeTransactionDao : TransactionDao {
         }
     }
 
+    /** queryRecordByIds 调用计数（区分力测试用：净自付重算每簇调一次，删除路径据此判重算次数）。可手动重置。 */
+    var queryRecordByIdsCallCount = 0
+
     override suspend fun queryRecordByIds(ids: List<Long>): List<RecordTable> {
+        queryRecordByIdsCallCount++
         return records.filter { it.id in ids }
     }
 
@@ -241,26 +245,6 @@ class FakeTransactionDao : TransactionDao {
         return records.filter { it.assetId == assetId || it.intoAssetId == assetId }
     }
 
-    override suspend fun deleteBookTransaction(bookId: Long) {
-        // 简化实现：批量删除账本下的关联数据、记录、资产
-        deleteTagRelationsByBookId(bookId)
-        deleteRecordRelationsByBookId(bookId)
-        deleteImageRelationsByBookId(bookId)
-        deleteRecordsByBookId(bookId)
-        deleteAssetsByBookId(bookId)
-        deleteTagsByBookId(bookId)
-        deleteBookById(bookId)
-        deleteBookCalled = true
-    }
-
-    override suspend fun deleteAssetRelatedData(assetId: Long) {
-        // 简化实现：批量删除资产关联数据
-        deleteTagRelationsByAssetId(assetId)
-        deleteRecordRelationsByAssetId(assetId)
-        deleteImageRelationsByAssetId(assetId)
-        deleteRecordsByAssetId(assetId)
-    }
-
     override suspend fun deleteTag(id: Long) {
         deleteTagRelationByTagId(id)
         deleteTagById(id)
@@ -313,8 +297,7 @@ class FakeTransactionDao : TransactionDao {
         types.removeAll { it.id == typeId }
     }
 
-    // 注意：insertRecordTransaction、updateRecordTransaction、deleteRecordTransaction、deleteAssetRelatedData、migrateTypeRecords
-    // 使用了默认实现（@Transaction 注解方法），会调用上面的基础方法
-    // 在 Fake 中不需要重新实现事务方法，因为测试不会直接调用它们
-    // Repository 层通过调用这些事务方法来间接使用基础方法
+    // 注意：所有 @Transaction 默认方法（insert/update/deleteRecordTransaction、deleteRecordCore、
+    // deleteRecordsBatch、deleteBookTransaction、deleteAssetRelatedData、recalculate* 等）均不在此 override，
+    // 由 Fake 继承真实默认实现、跑在上面忠实建模的基础方法上——测试据此验证真实算法。
 }
