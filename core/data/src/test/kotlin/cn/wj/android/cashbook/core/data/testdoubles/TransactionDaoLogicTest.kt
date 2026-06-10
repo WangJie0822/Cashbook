@@ -335,6 +335,25 @@ class TransactionDaoLogicTest {
         assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(8000L)
     }
 
+    // ========== discoverClusterIds 测试 ==========
+
+    @Test
+    fun when_discoverClusterIds_then_returns_cluster_and_outEdges() = runTest {
+        setupTypesForAbsorption()
+        // E1(1),E2(2) 被 I(3) 吸收
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L)
+        insertRecord(id = 2L, typeId = EXPENDITURE_TYPE_ID, amount = 5000L)
+        insertRecord(id = 3L, typeId = INCOME_TYPE_ID, amount = 8000L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 3L, relatedRecordId = 1L))
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 3L, relatedRecordId = 2L))
+
+        val result = dao.discoverClusterIds(3L)
+
+        assertThat(result.clusterIds).containsExactly(1L, 2L, 3L)
+        // outEdges 缓存：吸收者 I(3) 的出边是其吸收的支出 [1,2]
+        assertThat(result.outEdges[3L]).containsExactly(1L, 2L)
+    }
+
     // ========== recalculateAllFinalAmount 全量测试 ==========
 
     @Test

@@ -37,6 +37,15 @@ import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.recordAmount
 
 /**
+ * 簇 BFS 发现结果：簇成员 id 集 + 每个节点的出边缓存（record_id → 其吸收的支出 id 列表）。
+ * outEdges 供净自付重算 step3 复用，避免对每个吸收者重新 queryRelatedByRecordId（消 N+1）。
+ */
+data class ClusterDiscovery(
+    val clusterIds: Set<Long>,
+    val outEdges: Map<Long, List<Long>>,
+)
+
+/**
  * 事务数据库操作类
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/20
@@ -162,23 +171,17 @@ interface TransactionDao {
     ): Long = recordAmount(category, record.amount, record.charge, record.concessions)
 
     /**
-     * 重算一个吸收簇的 finalAmount（净自付语义，§5 顺序贪心填充）。
-     *
-     * 从 [seedRecordId] 沿关系表 BFS 发现整个连通簇（被吸收支出↔吸收者收入构成二部图连通分量），
-     * 将簇内所有记录 finalAmount 重置为 recordAmount，再按吸收者 id 升序、每个吸收者按被吸收支出 id 升序
-     * 顺序贪心填充。结果只依赖 id 顺序、与插入历史无关，故增量与全量逐字段一致。
+     * 从 [seedRecordId] 沿关系表 BFS 发现连通簇（被吸收支出↔吸收者收入二部图连通分量）。
+     * 返回簇成员 + outEdges 缓存（record_id 侧被吸收支出），供重算复用避免 N+1。
      *
      * @param seedRecordId 簇内任一记录 id（受影响的吸收者或被吸收支出）
      * @param excludeRecordIds 需从簇中排除的记录 id（删除场景：记录即将被删但关联尚未清除）
      */
     @Transaction
-    suspend fun recalculateFinalAmountForCluster(
+    suspend fun discoverClusterIds(
         seedRecordId: Long,
         excludeRecordIds: Set<Long> = emptySet(),
-    ) {
-        // 1. BFS 发现连通簇（排除 excludeRecordIds，排除节点不入簇也不被遍历），
-        //    同时缓存每个节点的出边（record_id 侧被吸收支出），供 step3 复用，
-        //    避免对每个节点重复 queryRelatedByRecordId（消 N+1）。
+    ): ClusterDiscovery {
         val clusterIds = LinkedHashSet<Long>()
         val outEdges = HashMap<Long, List<Long>>() // record_id -> 其吸收的支出 id 列表
         val queue = ArrayDeque<Long>()
@@ -197,9 +200,21 @@ interface TransactionDao {
                 }
             }
         }
+        return ClusterDiscovery(clusterIds, outEdges)
+    }
+
+    /**
+     * 对已发现的簇 [clusterIds]（含 [outEdges] 缓存）执行净自付重算（§5 顺序贪心填充）。
+     * 复用 outEdges 零额外查询；只写变化项。与全量版 [recalculateAllFinalAmount] 同口径。
+     */
+    @Transaction
+    suspend fun recalculateFinalAmountFromCluster(
+        clusterIds: Set<Long>,
+        outEdges: Map<Long, List<Long>>,
+    ) {
         if (clusterIds.isEmpty()) return
 
-        // 2. 批量取簇内记录（消逐条 queryRecordById 的 N+1），初始化 finalAmount。
+        // 1. 批量取簇内记录（消逐条 queryRecordById 的 N+1），初始化 finalAmount。
         //    转账 = concessions - charge（与 recalculateAllFinalAmount 全量版口径一致，防增量/全量分叉）；
         //    收入/支出 = recordAmount。簇内正常仅 income/expenditure（转账不参与吸收），TRANSFER 分支为一致性防御。
         val records = queryRecordByIds(clusterIds.toList()).associateBy { it.id }
@@ -215,7 +230,7 @@ interface TransactionDao {
             }
         }
 
-        // 3. 簇内吸收者（record_id 侧有被吸收支出）按 id 升序，顺序贪心填充（用缓存 outEdges，零额外查询）
+        // 2. 簇内吸收者（record_id 侧有被吸收支出）按 id 升序，顺序贪心填充（用缓存 outEdges，零额外查询）
         val absorbers = clusterIds.filter { id ->
             (outEdges[id] ?: emptyList()).any { it in clusterIds }
         }.sorted()
@@ -233,12 +248,28 @@ interface TransactionDao {
             finalAmounts[absorberId] = remaining // 溢出（通常 0）
         }
 
-        // 4. 落库（仅写变化项，对齐全量版，避免无谓 UPDATE 触发 Flow invalidation 风暴）
+        // 3. 落库（仅写变化项，对齐全量版，避免无谓 UPDATE 触发 Flow invalidation 风暴）
         for ((id, finalAmount) in finalAmounts) {
             if (records[id]?.finalAmount != finalAmount) {
                 updateRecordFinalAmountById(id, finalAmount)
             }
         }
+    }
+
+    /**
+     * 重算一个吸收簇的 finalAmount（净自付语义）。从 [seedRecordId] BFS 发现整簇再重算。
+     * 内部拆为 [discoverClusterIds] + [recalculateFinalAmountFromCluster]，对外签名行为不变。
+     *
+     * @param seedRecordId 簇内任一记录 id（受影响的吸收者或被吸收支出）
+     * @param excludeRecordIds 需从簇中排除的记录 id（删除场景：记录即将被删但关联尚未清除）
+     */
+    @Transaction
+    suspend fun recalculateFinalAmountForCluster(
+        seedRecordId: Long,
+        excludeRecordIds: Set<Long> = emptySet(),
+    ) {
+        val (clusterIds, outEdges) = discoverClusterIds(seedRecordId, excludeRecordIds)
+        recalculateFinalAmountFromCluster(clusterIds, outEdges)
     }
 
     /**
