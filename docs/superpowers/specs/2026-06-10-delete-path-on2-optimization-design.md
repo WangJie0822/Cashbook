@@ -138,7 +138,7 @@ deleteBookTransaction(bookId) / deleteAssetRelatedData(assetId):
 3. **删资产转账对方资产余额回退（AUDIT-2b / M1 / R-2）**：建 assets + types，构造「删资产 A，A 是某转账 intoAsset、源资产 B 存活」场景，断言 B 余额正确回退（与 deleteBook 守卫对称）。**注**：现有 `when_deleteAssetRelatedData_then_all_related_records_deleted`（420-432）`dao.assets` 为空 → 真实路径 `queryAssetById` 返 null → 余额回退 `?.let` 跳过 = 假阳性，须补带 assets 的新用例。
 4. 删资产后**目标资产存活 + 余额回退**（守 AUDIT-2）。
 5. **存活簇成员正向断言（L2，无 FK 兜底下的回归网）**：schema 零外键（全靠应用层维护一致性），须断言「删后存活簇成员 finalAmount 被裁剪到正确值」（跨账本吸收场景）。
-6. **中途失败回滚（L3）**：批量删中途模拟 `deleteRecord` 失败，断言全部回滚（余额/记录/关联均未变）。
+6. ~~中途失败回滚（L3）~~ **移至 androidTest（§5.4），非 JVM**：`FakeTransactionDao` 是内存替身、**无事务回滚语义**（`deleteRecord` 直接 `removeAll`，抛异常也不回滚），JVM 无法验证回滚。该用例放真实 Room androidTest（`TransactionDaoTest.when_deleteBookTransaction_with_failure_then_rolled_back`：批量删中途插一条引用不存在 type 的记录触发 `DataTransactionException`，断言记录/账本整体回滚），本机 compile-only、有设备时 run。【节点2 full-review A-M2 订正：原列为 JVM 测试与 Fake 能力不符】
 
 ### 5.3 既有测试回归审计（AUDIT-3 / H1，清单订正）
 
@@ -195,7 +195,7 @@ deleteBookTransaction(bookId) / deleteAssetRelatedData(assetId):
 | M7 | feasibility F-5 + impact I-5 | Medium | §6 RecordDaoTest:793 整测删除、仅 952 swap |
 | L1 | reverse R-4 + feasibility F-6 | Low | §5.2#2 区分力指标改计 queryRecordByIds 次数 |
 | L2 | security | Low | §5.2#5 无 FK 下存活簇正向断言 |
-| L3 | security | Low | §4.1/§4.4 deleteRecordCore 保留抛异常 + §5.2#6 回滚测试 |
+| L3 | security | Low | §4.1/§4.4 deleteRecordCore 保留抛异常 + §5.4 androidTest 回滚测试（JVM Fake 无回滚语义，节点2 A-M2 订正） |
 | L4 | security | Low | §5.3 断言用真实回退新值 |
 | L5 | reverse R-5 | Low | §4.1 多吸收者等价性补强 |
 | L6 | reverse R-6 | Low | §4.2 批量收尾硬顺序约束 |
