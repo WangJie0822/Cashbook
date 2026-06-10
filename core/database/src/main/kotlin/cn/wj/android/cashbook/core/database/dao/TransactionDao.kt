@@ -602,17 +602,12 @@ interface TransactionDao {
     }
 
     /**
-     * 删除已有记录
-     *
-     * - 计算金额（非finalAmount）后更新资产金额
-     * - 转账类型更新目标资产金额
-     * - 移除和记录关联的所有标签数据
-     * - 更新与记录关联的所有记录 finalAmount 字段
-     * - 移除和记录关联的所有关联记录数据
+     * 删除单条记录的核心：余额回退 + 删标签/图片关联 + 清关联 + 删记录，**不含** finalAmount 重算。
+     * 供单删与批量删（账本/资产）复用——批量删时由调用方在所有 core 完成后统一对存活簇重算。
      */
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun deleteRecordTransaction(record: RecordTable) {
+    suspend fun deleteRecordCore(record: RecordTable) {
         val recordId = record.id ?: return
         val type = resolveType(record.typeId)
             ?: throw DataTransactionException("Type must not be null")
@@ -667,24 +662,6 @@ interface TransactionDao {
         // 移除关联照片
         deleteOldRelatedImages(recordId)
 
-        // 更新关联记录的 finalAmount
-        if (category == RecordTypeCategoryEnum.EXPENDITURE) {
-            // 删除支出记录，重算所有吸收了该支出的收入记录的 finalAmount
-            queryRelatedByRelatedRecordId(recordId).forEach { relation ->
-                // 排除即将被删除的支出记录（关联尚未清除）
-                recalculateAbsorberFinalAmount(relation.recordId, excludeAbsorbedId = recordId)
-            }
-        } else if (category == RecordTypeCategoryEnum.INCOME) {
-            // 删除收入（吸收者）：对其曾吸收的每个支出所在簇重算（排除即将删除的吸收者）
-            val absorbedRelations = queryRelatedByRecordId(recordId)
-            for (relation in absorbedRelations) {
-                recalculateFinalAmountForCluster(
-                    seedRecordId = relation.relatedRecordId,
-                    excludeRecordIds = setOf(recordId),
-                )
-            }
-        }
-
         // 移除关联记录
         clearRelatedRecordById(recordId)
 
@@ -692,6 +669,30 @@ interface TransactionDao {
         val result = deleteRecord(record)
         if (result <= 0) {
             throw DataTransactionException("Record delete failed!")
+        }
+    }
+
+    /**
+     * 删除已有记录（单删，UI 路径）。
+     * 先捕获与本记录关联的对端记录（删除会清关联），删除核心后对存活簇逐簇重算一次。
+     */
+    @Throws(DataTransactionException::class)
+    @Transaction
+    suspend fun deleteRecordTransaction(record: RecordTable) {
+        val recordId = record.id ?: return
+        // 捕获两个方向上的对端记录 id（排除自身），删除前先捕获
+        val survivors = (
+            queryRelatedByRecordId(recordId).map { it.relatedRecordId } +
+                queryRelatedByRelatedRecordId(recordId).map { it.recordId }
+            ).filter { it != recordId }.toSet()
+        deleteRecordCore(record)
+        // 对存活簇逐簇重算一次（去重；删后关联已清、记录已删，BFS 见裁剪簇）
+        val visited = HashSet<Long>()
+        for (sid in survivors) {
+            if (sid in visited) continue
+            val (clusterIds, outEdges) = discoverClusterIds(sid)
+            visited += clusterIds
+            recalculateFinalAmountFromCluster(clusterIds, outEdges)
         }
     }
 
