@@ -792,6 +792,32 @@ class TransactionDaoTest {
         assertThat(database.booksDao().queryAll()).isEmpty()
     }
 
+    @Test
+    fun when_deleteBookTransaction_with_failure_then_rolled_back() = runTest {
+        // L3：批量删中途异常 → 整事务回滚（删一条引用了不存在 type 的记录触发 DataTransactionException）
+        val bookId = insertBook(name = "回滚账本")
+        val typeId = insertType(createExpenditureType())
+        insertAsset(createNormalAsset(id = 1L, booksId = bookId, balance = 100000L))
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = typeId, assetId = 1L, booksId = bookId, amount = 5000L),
+            tagIdList = emptyList(),
+            needRelated = false,
+            relatedRecordIdList = emptyList(),
+            relatedImageList = emptyList(),
+        )
+        // 直插一条 type_id 指向不存在类型的记录，使 deleteRecordCore 的 resolveType 抛异常
+        transactionDao.insertRecord(
+            createRecord(typeId = 999999L, assetId = 1L, booksId = bookId, amount = 1000L),
+        )
+        val before = transactionDao.queryRecordListByBookId(bookId).size
+
+        runCatching { transactionDao.deleteBookTransaction(bookId) }
+
+        // 事务回滚：记录与账本应原样保留
+        assertThat(transactionDao.queryRecordListByBookId(bookId)).hasSize(before)
+        assertThat(database.booksDao().queryAll().any { it.id == bookId }).isTrue()
+    }
+
     // endregion
 
     // region 6. deleteAssetRelatedData 测试
