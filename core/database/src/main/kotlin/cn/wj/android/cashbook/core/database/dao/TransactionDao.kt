@@ -763,19 +763,45 @@ interface TransactionDao {
     suspend fun deleteRecordsByBookId(bookId: Long)
 
     /**
-     * 事务化删除账本及其所有关联数据
-     *
-     * 逐条删除记录以确保正确回退所有资产余额（包括跨账本转账的对方资产）
-     * 并正确处理关联记录的 finalAmount 重算
+     * 批量删除一组记录：逐条余额回退+清关联+删记录（无逐条重算），
+     * 删完后对「存活簇」（不在待删集、与待删记录关联的记录所在簇）只重算一次。
+     * 消除「每条都整簇重算」的 O(N²)；存活引用为备份恢复/导入异常的安全网（正常数据 survivors 为空）。
+     */
+    @Throws(DataTransactionException::class)
+    @Transaction
+    suspend fun deleteRecordsBatch(records: List<RecordTable>) {
+        if (records.isEmpty()) return
+        val deletedIds = records.mapNotNull { it.id }.toSet()
+        val affectedSurvivors = LinkedHashSet<Long>()
+        for (record in records) {
+            val recordId = record.id ?: continue
+            // 删除会清关联，先捕获两个方向上不在待删集的对端 id
+            queryRelatedByRecordId(recordId).forEach {
+                if (it.relatedRecordId !in deletedIds) affectedSurvivors.add(it.relatedRecordId)
+            }
+            queryRelatedByRelatedRecordId(recordId).forEach {
+                if (it.recordId !in deletedIds) affectedSurvivors.add(it.recordId)
+            }
+            deleteRecordCore(record)
+        }
+        // 收尾：存活簇逐簇重算一次（必须在所有 deleteRecordCore 之后，否则 BFS 脏读未删记录）
+        val visited = HashSet<Long>()
+        for (sid in affectedSurvivors) {
+            if (sid in visited) continue
+            val (clusterIds, outEdges) = discoverClusterIds(sid)
+            visited += clusterIds
+            recalculateFinalAmountFromCluster(clusterIds, outEdges)
+        }
+    }
+
+    /**
+     * 事务化删除账本及其所有关联数据。
+     * 逐条删记录正确回退资产余额（含跨账本转账对方资产），删后统一对存活簇重算（去 O(N²)）。
      */
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteBookTransaction(bookId: Long) {
-        // 逐条删除记录，正确回退所有关联资产余额及 finalAmount
-        val records = queryRecordListByBookId(bookId)
-        for (record in records) {
-            deleteRecordTransaction(record)
-        }
+        deleteRecordsBatch(queryRecordListByBookId(bookId))
         // 删除该账本下的所有标签
         deleteTagsByBookId(bookId)
         // 删除该账本下的所有资产
@@ -856,17 +882,11 @@ interface TransactionDao {
     suspend fun deleteRecordsByAssetId(assetId: Long)
 
     /**
-     * 事务化删除资产关联的所有数据
-     *
-     * 逐条删除记录以确保正确回退对方资产余额（特别是转账场景）
-     * 并正确处理关联记录的 finalAmount 重算
+     * 事务化删除资产关联的所有数据（不删资产行本身，守 AUDIT-2 契约：目标资产存活+余额回退）。
+     * 逐条删记录正确回退对方资产余额（转账场景），删后统一对存活簇重算（去 O(N²)）。
      */
     @Transaction
     suspend fun deleteAssetRelatedData(assetId: Long) {
-        // 逐条删除，正确回退对方资产余额及 finalAmount
-        val records = queryRecordsByAssetId(assetId)
-        for (record in records) {
-            deleteRecordTransaction(record)
-        }
+        deleteRecordsBatch(queryRecordsByAssetId(assetId))
     }
 }

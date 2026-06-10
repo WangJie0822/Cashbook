@@ -403,6 +403,58 @@ class TransactionDaoLogicTest {
     // ========== deleteBookTransaction 测试 ==========
 
     @Test
+    fun when_deleteBook_all_in_book_cluster_then_no_survivor_recalc() = runTest {
+        // 区分力：全簇随账本同删 → 无存活簇 → 重算 0 次（旧逐条路径会 >0）
+        setupTypesForAbsorption()
+        val bookId = 1L
+        dao.books.add(createBooksTable(id = bookId))
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L, booksId = bookId)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L, booksId = bookId)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.recalculateFinalAmountForCluster(2L)
+        dao.queryRecordByIdsCallCount = 0 // 重置，只测删除阶段
+
+        dao.deleteBookTransaction(bookId)
+
+        assertThat(dao.queryRecordByIdsCallCount).isEqualTo(0)
+        assertThat(dao.records).isEmpty()
+    }
+
+    @Test
+    fun when_deleteAsset_clears_absorbed_expense_then_surviving_absorber_recalced() = runTest {
+        // 存活簇正向守卫（L2）：删资产清掉被吸收支出 → 存活吸收者恢复 recordAmount
+        setupTypesForAbsorption()
+        dao.assets.add(createAssetTable(id = 10L, balance = 0L))
+        dao.assets.add(createAssetTable(id = 20L, balance = 0L))
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L, assetId = 10L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L, assetId = 20L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.recalculateFinalAmountForCluster(2L) // E.fa=2000, I.fa=0
+
+        dao.deleteAssetRelatedData(10L) // 删 E（asset=10）
+
+        assertThat(dao.queryRecordById(1L)).isNull()
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(8000L) // 恢复 recordAmount
+    }
+
+    @Test
+    fun when_deleteAsset_with_transfer_then_surviving_counterpart_balance_reverted() = runTest {
+        // AUDIT-2/2b：删资产 A(10)，转账 B(20)→A，源资产 B 存活余额回退；A 行存活余额回退
+        setupTypesForAbsorption()
+        // 转账后状态：B=80000(被扣 20000), A=20000(被加 20000)
+        dao.assets.add(createAssetTable(id = 10L, balance = 20000L))
+        dao.assets.add(createAssetTable(id = 20L, balance = 80000L))
+        insertRecord(id = 1L, typeId = TRANSFER_TYPE_ID, amount = 20000L, assetId = 20L, intoAssetId = 10L)
+
+        dao.deleteAssetRelatedData(10L)
+
+        assertThat(dao.queryRecordById(1L)).isNull()
+        assertThat(dao.queryAssetById(20L)!!.balance).isEqualTo(100000L) // 源 B 回退 +20000
+        assertThat(dao.queryAssetById(10L)).isNotNull() // A 行存活(AUDIT-2)
+        assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(0L) // A 回退 -20000
+    }
+
+    @Test
     fun when_deleteBookTransaction_then_assets_also_deleted() = runTest {
         setupTypesForAbsorption()
         val bookId = 1L
