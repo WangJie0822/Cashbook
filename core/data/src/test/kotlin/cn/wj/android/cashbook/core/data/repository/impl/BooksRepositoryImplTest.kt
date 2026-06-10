@@ -23,6 +23,8 @@ import cn.wj.android.cashbook.core.data.testdoubles.FakeCombineProtoDataSource
 import cn.wj.android.cashbook.core.data.testdoubles.FakeTransactionDao
 import cn.wj.android.cashbook.core.database.table.BooksTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
+import cn.wj.android.cashbook.core.database.table.TypeTable
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.BooksModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
@@ -191,6 +193,18 @@ class BooksRepositoryImplTest {
     fun when_deleteBookTransaction_then_book_and_records_deleted() = runTest {
         // 准备数据
         val bookId = 1L
+        transactionDao.types.add(
+            TypeTable(
+                id = 1L,
+                parentId = -1L,
+                name = "支出",
+                iconName = "icon",
+                typeLevel = 0,
+                typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
+                protected = 0,
+                sort = 0,
+            ),
+        )
         transactionDao.books.add(createBooksTable(id = bookId, name = "待删除"))
         transactionDao.records.add(createRecordTable(id = 1L, booksId = bookId))
         transactionDao.records.add(createRecordTable(id = 2L, booksId = bookId))

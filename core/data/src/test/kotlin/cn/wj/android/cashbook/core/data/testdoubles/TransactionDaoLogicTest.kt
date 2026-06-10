@@ -404,6 +404,7 @@ class TransactionDaoLogicTest {
 
     @Test
     fun when_deleteBookTransaction_then_assets_also_deleted() = runTest {
+        setupTypesForAbsorption()
         val bookId = 1L
         dao.books.add(createBooksTable(id = bookId))
         dao.records.add(createRecordTable(id = 1L, booksId = bookId))
@@ -421,6 +422,7 @@ class TransactionDaoLogicTest {
 
     @Test
     fun when_deleteBookTransaction_then_only_book_records_deleted() = runTest {
+        setupTypesForAbsorption()
         val bookId = 1L
         dao.books.add(createBooksTable(id = bookId))
         dao.records.add(createRecordTable(id = 1L, booksId = bookId))
@@ -437,6 +439,7 @@ class TransactionDaoLogicTest {
 
     @Test
     fun when_deleteAssetRelatedData_then_all_related_records_deleted() = runTest {
+        setupTypesForAbsorption()
         val assetId = 10L
         // 包含源资产和目标资产（转账）的记录都应被删除
         dao.records.add(createRecordTable(id = 1L, assetId = assetId, intoAssetId = 20L))
@@ -452,6 +455,7 @@ class TransactionDaoLogicTest {
 
     @Test
     fun when_deleteAssetRelatedData_then_tag_and_image_relations_cleaned() = runTest {
+        setupTypesForAbsorption()
         val assetId = 10L
         dao.records.add(createRecordTable(id = 1L, assetId = assetId))
         dao.tagWithRecords.add(
