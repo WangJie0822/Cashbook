@@ -229,3 +229,102 @@ core/database 测试**写得好、覆盖全**（Migration 无缺口、DAO 充分
 
 ### T2 小结
 core/common 的金额/数字/字符串 ext 与 core/network 的序列化/拦截器脱敏覆盖优秀。**核心缺口**：①`OkHttpWebDAVHandler` 备份网络底座零覆盖（High，呼应 T1 备份恢复缺口）②`needRelated` 测试 x==x 假阳性（High，必须重写）③多个纯 JVM 可测逻辑（LunarUtils/Time/MimeType/Regex/Serializer 损坏路径）裸奔（Medium）。无 active 致命 bug，但假阳性测试 + 备份层裸奔是要点。
+
+---
+
+# Phase 3 — T3 广度扫描（Workflow 只读 fan-out + Controller 核验）
+
+> **核验声明**：11 模块只读 fan-out（广度模式：只查覆盖缺口 + 明显反向，截图不深审渲染）。controller 抽样 hands-on 核验代表性 High + 连接 T1 的桩：`CalculatorUtils`/`DesignDetector` grep 确认无测试 ✓、`EditAssetViewModelTest` 中 `.save(`/`lastUpdatedAsset`=0 次 ✓、`FakeRecordRepository.batchImportRecords:407-409` 确为 `emptyList()` 空桩 ✓。agent 报告**无虚报**。
+
+## T3 跨模块共性主题（最值得 action 的发现）
+
+T3 的 ViewModel/UI 缺口高度集中在 4 个**系统性模式**，比单条 finding 更值得优先处理：
+
+1. **「写入/成功路径」零覆盖，「事件处理/早退守卫」却覆盖好**：多个 ViewModel 的核心写入方法无测试触达——`EditAssetViewModel.save`（核实 0 次调用）、`EditBookViewModel.onSaveClick` 成功路径、`RecordImportViewModel.confirmImport` 成功路径、`feature/settings exportRecords`、`CalendarViewModel.uiState` 月度聚合、`AnalyticsViewModel.showSheet`。测试多停在初始态/dismiss/早退守卫。
+2. **「名实不符」弱断言（假阳性风险）**：测试方法名声称 `then_type_created`/`data_removed`/`type_to_second`，但断言只检查 `dialogState==Dismiss` 或 `successCalled==true`，**从不断言真实状态变更**。集中在 feature/types（3 条）、feature/assets（2 条：`when_delete_asset_then_data_removed` 只断言 successCalled 不断言 getAssetById==null）。
+3. **失败/反向分支因 Fake 永不抛异常而零覆盖**：删除/保存失败的错误回调（bookmark/ResultModel.failure）路径在 ConfirmDeleteRecordDialog/DeleteTagDialog/EditTagDialog/AssetInfo/MyBooks 等普遍未测——根因是 Fake（FakeRecordRepository/FakeTagRepository 等）的 delete/update 是 no-op 永不抛。**统一修法：给 Fake 加可注入异常钩子**（参照已有 `recalcThrowable`）。
+4. **设计/UI 纯逻辑仅截图覆盖、行为零单测**：`CalculatorUtils`（计算器引擎！）、`runCatchWithProgress`、`DefaultProgressDialogController`、`formatLargeValue`、`Cipher` hex 工具、`PieChart` 命中测试、`TextFieldState` 错误态机、`popBackStackSafety`——均纯 JVM 可测却只有截图测试（截图不验逻辑/计算正确性）。
+
+## T3 各模块 finding（紧凑）
+
+### feature/records（强覆盖，少量缺口）
+优点：EditRecordViewModelTest（trySave 三校验 + 口径强制规则）、LauncherContentViewModelTest（首屏 gate 区分力 + totals 三口径）覆盖极强。
+- **[High] coverage** `CalendarViewModel.kt:76-104`：uiState 月度 totalIncome/Expenditure/balance + selectedDay 过滤 + schemas 映射零覆盖（仅测事件处理器，未订阅 uiState）。与 LauncherContent 同构但后者全测。
+- **[High] coverage** `AnalyticsViewModel.kt:153-168`：`showSheet`（下钻二级饼图，三分支）整方法零覆盖。
+- **[Medium] reverse** `ConfirmDeleteRecordDialogViewModel.kt:46-52`：删除失败回调（ResultModel.failure）零覆盖（FakeRecordRepository.deleteRecord 永不抛）。
+- **[Low] reverse** `TypedAnalyticsViewModel.kt:129-134`：日期区间 `~` 分支 + tagId==typeId→Loading 未覆盖。
+
+### feature/settings（ViewModel 充分，更新/导出链路缺口）
+优点：6 ViewModel 全有测试；BackupAndRecoveryDomainValidationTest 拒明文 http 安全约束反向充分。
+- **[High] coverage** `BackupAndRecoveryViewModel.kt:287-309`：`exportRecords` 导出状态机（Exporting→Done/catch→Error）零 ViewModel 测试（截图只静态传 ExportState.Idle）。
+- **[High] coverage** `MainAppViewModel.kt:414-442`：`needUpdate` 版本号数值化比较（防 '1.10'<'1.9' 字典序陷阱）零覆盖——FakeSettingRepository.getLatestUpdateInfo 硬编码 versionName="" 使比较算法从未执行。建议抽纯函数。
+- **[Medium] coverage** `MainAppViewModel.kt:338-376`：confirmUpdate/confirmDownload happy path 未覆盖（Fake 空版本致结构性不可达）。
+- **[Medium] reverse** `BackupAndRecoveryViewModel.kt:142-148`：saveWebDAV 非法地址拒绝（明文 http→不落库 + Failed）集成层未覆盖。
+- **[Low] reverse** `MainAppViewModel.kt:358-363`：dismissUpdateDialog ignore=true（持久化忽略版本）分支未覆盖。
+
+### feature/assets（ViewModel 齐全，save + 弱断言）
+优点：MyAsset 资产/负债分类反向好；InvisibleAsset/EditRecordSelectAsset 反向到位。
+- **[High] coverage** `EditAssetViewModel.kt:187`：`save()`（保存/新建资产核心写入）**零测试触达**（核实 0 次调用）——doSaving 重入守卫/无变化跳过/落库/onSuccess/catch 恢复全未测。
+- **[Medium] logic** `AssetInfoViewModel.kt:129`：`when_delete_asset_then_data_removed` 只断言 successCalled，不断言 getAssetById==null（名实不符弱断言）。
+- **[Medium] logic** `EditAssetViewModel.kt:127`：updateClassification 非银行卡只断言 sheet dismiss，不断言资产名/分类写入 uiState。
+- **[Medium] reverse** `AssetInfoViewModel.kt:144`：deleteAsset 失败路径（ASSET_DELETE_FAILED bookmark）零覆盖（Fake no-op）。
+- **[Medium] reverse** `MyAssetViewModel.kt:59`：资产+负债**并存**混合用例缺失（现均单一类型，netAsset 相减逻辑未实质验证）。
+
+### feature/types（覆盖充分，3 条名实不符弱断言）
+优点：MyCategoriesViewModel 21 测覆盖增删改 + 受保护反向；FakeTypeRepository 忠实复刻 DAO。
+- **[Medium] logic** `MyCategoriesViewModel.kt:233-264`：`when_save_new_record_type_then_type_created` 只断言 Dismiss，不断言新类型创建（typeLevel/typeCategory/sort 派生未验证）。
+- **[Medium] logic** `MyCategoriesViewModel.kt:135-140`：`when_change_type_to_second` 只断言 Dismiss，不断言 typeLevel==SECOND/parentId==2L。
+- **[Medium] reverse** `MyCategoriesViewModel.kt:99-107`：onMoveFirstType 越界保护分支零覆盖。
+- **[Medium] coverage** `EditRecordTypeListViewModel.kt:58-80`：INCOME/TRANSFER typeListData 填充路径未覆盖（仅 EXPENDITURE）。
+- **[Low] coverage** `MyCategoriesViewModel.kt:222-231`：requestEditType 新增路径（type/parentType 均 null）未覆盖。
+
+### feature/tags（核心选择逻辑缺口 + 潜在 bug）
+优点：MyTags/EditTagDialog 重名校验正反向；FakeTagRepository 忠实复刻。
+- **[High] reverse** `EditRecordSelectTagBottomSheetViewModel.kt:77-96`：核心标签选择逻辑（updateSelectedTags firstSet guard/toggle/隐藏标签过滤）零覆盖（仅测 dialog/初始态）。
+- **[Medium] reverse** `DeleteTagDialogViewModel.kt:65-69` / `EditTagDialogViewModel.kt:71-75`：delete/save 失败分支零覆盖（Fake 永不抛）。
+- **[Medium] reverse（潜在 bug）** `EditTagDialogViewModel.kt:59`：编辑已有标签不改名时 `countTagByName(name)>0` 含自身→误报 NAME_EXIST 拦截保存。现有测试改名规避了该路径，既是覆盖缺口也可能掩盖去重逻辑 bug（应 countByNameExcludingId）。**建议与开发确认预期语义**。
+
+### feature/books（写入成功路径缺口）
+优点：EditBook NAME_DUPLICATED 反向 + updateBookId 状态流转；FakeBooksRepository 忠实复刻 isDuplicated。
+- **[Medium] reverse** `MyBooksViewModel.kt:70`：confirmDeleteBook 失败分支（返 false→dialog 保持 Shown）零覆盖。
+- **[Medium] coverage** `EditBookViewModel.kt:111`：onSaveClick 成功路径（updateBook+onSuccess）零覆盖。
+- **[Medium] reverse** `EditBookViewModel.kt:103`：背景图 BG_IMG_TYPE_ERROR/BG_IMG_SAVE_FAILED 两失败分支零覆盖。
+- **[Low] logic** `FakeBooksRepository.kt:66`：deleteBook 删当前账本未 re-select（与真实 BooksRepositoryImpl re-select list.first() 不一致，潜在保真隐患）。
+
+### feature/record-import（导入链路缺口，连接 T1）
+优点：checkDuplicate 三路径（EXACT/POSSIBLE/NONE）断言强 + 元/分单位错配回归 + FakeRecordRepository wechat 桩忠实（方括号定界）。
+- **[High] coverage** `RecordImportViewModel.kt:265-316`：`confirmImport` 成功路径（Ready→Importing→Done）零覆盖——remark 拼接 `[微信单号]`、toCent、finalAmount、skipped 计算全未触达。**T1 batchImport 缺口的 UI 层同源**。
+- **[High] coverage** `RecordImportViewModel.kt:142-262`：整个 Ready 状态及交互（buildPreviewItems/selectBook/updatePaymentMapping/toggle）零覆盖——**缺 .xlsx fixture**（WechatBillParser 可测但 test/resources 无账单）。
+- **[Medium] reverse** `RecordImportViewModel.kt:176-187`：单号非空但库无匹配→回落模糊匹配分支未覆盖。
+- **[Medium] logic** `FakeRecordRepository.kt:407-409`：`batchImportRecords` 空桩（`emptyList()`，核实属实）——补 Done 路径测试时会致 Done.imported 恒 0 假阳性。**需先改忠实桩**（存入 records + 返递增 id）。
+
+### core/ui（进度弹窗逻辑零覆盖）
+优点：3 截图测试齐全（DateSelectionPopup/SelectDateDialog/TypeIcon）。
+- **[High] coverage** `DialogState.kt:110-137`：`runCatchWithProgress`（minInterval 补偿延迟 + timeout + Result 包装）纯 suspend 逻辑零单测（UX 关键，写错→弹窗闪烁/永不超时）。
+- **[High] coverage** `DialogState.kt:83-104`：`DefaultProgressDialogController`（show/dismiss 状态机）纯 JVM 零单测。
+- **[Medium] coverage** `Navigation.kt:42-48`：popBackStackSafety（防首页弹空）两分支零覆盖。
+- **[Medium] coverage** `WindowAdaptiveInfo.kt:27-40`：bookImageRatio 三档 when 映射零覆盖。
+- **[Low]** Color.colorInt 舍入 + DateSelectionPopup 区间约束（内联 @Composable，建议抽纯函数）。
+
+### core/design（计算器引擎零覆盖 — 注意）
+优点：theme token（Motion/Shape/Haptic）纯 JVM 单测；LineChart 截图含 empty/负值反向。
+- **[High] coverage** `util/CalculatorUtils.kt:30`：**计算器引擎**（表达式解析 + 运算符优先级 + BigDecimal 精度 + 括号配对态机）**零单测**（核实无测试）——截图只用静态 defaultText 从不点按钮。算错金额输入静默无网。**建议补 CalculatorUtilsTest（纯 junit，internal 同模块可测）**。
+- **[Medium] coverage** `LineChart.kt:343 formatLargeValue`（M/K 后缀阈值边界）纯函数零断言。
+- **[Medium] coverage** `Cipher.kt:159` toHexString/hexToBytes/shaEncode（纯 JVM，往返一致 + WebDAV 兼容契约）零覆盖。
+- **[Medium] coverage** `TextFieldState.kt:36`：错误展示态机（被 9 个源文件使用，「未聚焦不显示错误」契约）零行为单测。
+- **[Medium] reverse** `PieChart.kt:150`：命中测试几何（atan2 角度规范化/孔洞返 -1）内联 Composable 未抽函数、零测试（建议抽 hitTestSlice 纯函数）。
+- **[Low] reverse** `CalendarView.kt:186`：月历网格 weekStart 偏移/跨月 off-by-one（内联，建议抽 buildMonthGrid）。
+
+### app（基本充分）
+优点：MainViewModel/ActivityUiState 状态流转 + dark/dynamic 分支覆盖好；FakeSettingRepository 忠实。
+- **[Low] logic** `ActivityUiState.kt:72`：shouldUseDarkTheme 的 setDefaultNightMode 副作用未纳入断言（只断布尔）。
+- **[Low] coverage** `ExampleUnitTest.kt:27-32`：模板空占位测试（2+2=4），建议删除清理。
+
+### lint（load-bearing 门禁零覆盖 — 注意）
+优点：TestMethodNameDetectorTest 对 detectPrefix/detectFormat 覆盖强（行号 + quickfix diff）。
+- **[High] coverage** `design/DesignDetector.kt:35-117`：**DesignDetector 零测试**（核实无 DesignDetectorTest）——这是 CLAUDE.md 声明的硬门禁（app/feature/core:ui 误用 Material3 触发 `Design` ERROR 中止构建），最 load-bearing 的自定义规则，两扫描分支（METHOD_NAMES 18 映射 + RECEIVER_NAMES Icons）失效则静默停止拦截。**建议补 DesignDetectorTest（复用 TestLintTask 范式）**。
+- **[Medium] reverse** `TestMethodNameDetector.kt:83`：detectFormat 的 `isAndroidTest()` gate 无反向覆盖（无非-androidTest 路径用例断言 0 告警，gate 破坏会让 JVM 单测反引号命名误报爆炸）。
+- **[Low] reverse** detectFormat 正则 `{1,2}` 上界边界差一断言。
+
+### T3 小结
+ViewModel/UI 层覆盖整体不错（事件处理 + 状态流转多有覆盖），但**写入成功路径 + 失败反向分支 + 设计层纯逻辑**三类系统性裸奔。**最该优先**：①`CalculatorUtils` 计算器引擎零测试（High，影响金额输入正确性）②`DesignDetector` load-bearing 门禁零测试（High，门禁静默失效风险）③`confirmImport`/Ready + batchImportRecords 空桩（High/Medium，连接 T1 导入缺口）。无 Critical（UI 层无 active 致命 bug）。
