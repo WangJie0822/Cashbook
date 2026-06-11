@@ -157,3 +157,75 @@ core/database 测试**写得好、覆盖全**（Migration 无缺口、DAO 充分
 1. **金额核心逻辑（三口径 + 簇重算 + 删除/余额回退）覆盖优秀且判别性强**，#10b TRANSFER 金丝雀多层守护，无 Critical/无 active 假阳性。
 2. **唯一 High**：`batchImportRecordsTransaction`（微信批量导入余额聚合）零覆盖。
 3. **系统性结构问题（贯穿 core/data + core/database）**：大量数据层覆盖（insert 余额、verifyAssetBalance、全部 DAO SQL、全部 Migration）仅在设备门控 androidTest，日常 JVM/CI 不执行 → 实际回归保护远低于「覆盖率」表象。这是 T1 最值得决策的发现。
+
+---
+
+# Phase 2 — T2 深审（Workflow 只读 fan-out + Controller 核验）
+
+> **核验声明**：以下 finding 由 4 个只读 agent fan-out 产出，**每条强断言已由 controller hands-on 核验**（Read 标的 file:line / grep 确认无测试）。agent 报告**无虚报**（x==x 恒真、复制版方法、零测试均经核实属实）。controller 对部分 agent 严重度做了**爆炸半径校准**（见各条「校准」注记）——金融/数据完整性路径维持高，纯展示/周期性/平凡函数下调。
+
+## T2 sync/work
+
+**优点（核实）**：`AutoBackupWorker.mapBackupStateToResult`（`AutoBackupWorker.kt:94-100`，`@VisibleForTesting` 抽为顶层纯函数脱离 Worker/Context 依赖）被 `AutoBackupWorkerTest` 4 用例覆盖全 3 个 when 分支，else 用两个不同 Failed code 验证（避免单 code 假阳性），isEqualTo 强断言。**可测性设计典范**。
+
+**[Medium] coverage | `SyncWorker.kt:58-76` ↔ none**（agent 报 High，controller 核验属实→校准 Medium）
+- 核实（Read SyncWorker.kt:53,67-68）：`retryCount` 实例变量，doWork 内 `retryCount++; if (retryCount >= 5) Result.failure() else Result.retry()`——真实重试阈值分支，零测试。与同模块已抽纯函数+测全分支的 `mapBackupStateToResult` 形成反差。
+- 校准理由：周期性版本同步重试（非金融、低爆炸半径，且 WorkManager 自身有 runAttemptCount 重试）→ Medium 而非 High。
+- 修复建议：把重试决策抽为纯函数 `nextSyncResult(success, retryCount)` + 5 提为常量，测成功/retryCount<4→retry/达 4→failure 边界。
+
+**[Low] reverse | `AutoBackupWorker.kt:95-100` ↔ `AutoBackupWorkerTest.kt:45-59`**：else 分支未对 `BackupRecoveryState.None/InProgress` 与其它 Failed code 钉死契约用例（行为正确但无守护）。建议补 None/InProgress→failure 反向用例。
+
+## T2 core/common
+
+**优点（核实）**：`ext/Money.kt`/`ext/Number.kt`/`ext/String.kt` 覆盖优秀且反向充分——Money 的 HALF_UP 舍入边界精确钉死（`MoneyTest.kt:178-187` 19.995→2000/19.994→1999）、往返一致性（`:238-260`）、Long.MIN_VALUE 不崩溃、空串/非数字归零；Number 六方法 null/空/非法/有效四类全覆盖。
+
+**[Medium] coverage | `util/LunarUtils.kt:199`（`getLunarTextWithFestival`）↔ none**（agent 报 High→校准 Medium）
+- 核实（Read LunarUtils.kt:199-203 + grep 全仓无 LunarUtils 测试）：真实公历转农历算法（solarToLunar 位运算解码 + 闰月判定 + 节日优先级），零测试，算法表/位移写错会静默输出错误农历。
+- 校准理由：纯展示（CalendarView 显示农历/节日），无金融/数据影响 → Medium。但算法复杂易错难察觉，建议补已知公历-农历对照测试（春节/中秋/闰月/母亲节）。
+
+**[Medium] coverage | `tools/Time.kt:119`（时间解析/格式化方法群）↔ none**（agent 报 High→校准 Medium）
+- 核实（grep 无 Time 测试）：toLongTime/toLocalDate/toMs/toDateString 等纯 JVM 时间转换零测试；agent 指出 `toMs` 用 ZoneOffset 而 `toLocalDate` 用 ZoneId（:124,128）+ `paresDate`/`parseDate` 拼写不一致（:77,108）易误用。
+- 修复建议：固定时区下测往返一致 + 非法串 parseDate→null + parseDateLong 回退。
+
+**[Medium] coverage | `ext/Any.kt:53`（`moneyFormat`）↔ none**：另一金额显示口径（与 Money.kt 并存），null/空/有效三分支 + 两位小数无守护。建议补 AnyExtTest。**注**：项目存在 ≥2 套金额格式化口径（Money.kt + Any.moneyFormat），后者无测试，潜在不一致风险。
+
+**[Medium] reverse | `enums/MimeType.kt:56`（`parse`）↔ none**：真实解析逻辑（null/size!=2/未知 type 三反向分支 + 自定义 equals），非纯 data class，无测试。建议测 `parse("image/png")`/null/`"a/b/c"`/未知。
+
+**[Medium] reverse | `tools/Regex.kt:30`（`isMatch`）↔ none**：密码/金额校验底层（null/blank 短路 + Pattern.matches），配合 `Patterns.PASSWORD_REGEX`/`PATTERN_SIGN_MONEY`，无测试。建议测 null/空白→false + 合法/非法密码与金额串。
+
+**[Low] coverage**：`ext/Flow.kt:22 tryEmitNoRepeat`（去重语义可 runTest 测）、`ApplicationInfo.kt:71 setFlavor`（非法名 fallback Dev 无守护）——均纯 JVM 可测但无测试。
+
+## T2 core/network
+
+**优点（核实）**：`GitReleaseEntitySerializationTest` 反向充分（@SerialName 映射/未知字段忽略/全 null/空 assets）；`LoggerInterceptorTest` 用真实 MockWebServer 端到端 + 凭据脱敏强断言（Authorization/Cookie/Proxy-Authorization 三头验证「原始凭据不出现 + ██ 占位」，守护 DataSourceModule 脱敏）。
+
+**[High] coverage | `util/OkHttpWebDAVHandler.kt:44-227` ↔ none**（核实属实，维持 High）
+- 核实（grep 无 OkHttpWebDAVHandler 测试）：备份/恢复的 WebDAV 网络底座零测试——含 url.isBlank() 短路守卫、HTTP isSuccessful 映射、`list()` 的 PROPFIND 207 XML 解析（Jsoup 取 d:href、剔目录、仅留 .zip 构造 BackupModel）、`get()` !isSuccessful→null。
+- 维持 High 理由：① 备份数据完整性（数据丢失风险，呼应 T1 BackupRecoveryManager 缺口）② callFactory 构造注入 + 同模块 LoggerInterceptorTest 已证 MockWebServer 纯 JVM 可跑 + Jsoup 纯 JVM → **完全可测却裸奔**。
+- 修复建议：MockWebServer 注入，测 list() 喂 PROPFIND XML 断言只解析 .zip、get() 200→bytes/404→null、exists/put 2xx→true/5xx→false/空 url→false。
+
+**[Medium] logic | `datasource/NetworkDataSource.kt:54-67` ↔ `NetworkDataSourceTest.kt:37-42`**（agent 报 High→校准 Medium）
+- 核实（Read 两文件）：`NetworkDataSourceTest` 测的是测试内 `private fun filterRelease`（**复制版**，docstring 明说"复现 checkUpdate 筛选逻辑"），5 用例全调复制版**从不调真实 `checkUpdate()`**；真实方法的 useGitee 分支（gitee vs github）完全未触达。属确认的假阳性（复制版与源码并行，源码筛选改坏测试仍绿）。
+- 校准理由：筛选逻辑仅 3 行 firstOrNull + 测试作者已文档化限制（完整 URL 致 MockWebServer 无法拦截）+ 复制版自身反向覆盖好 → Medium。
+- 修复建议：注入 Fake Call.Factory 返回预置 JSON 让真实 checkUpdate 跑过 Retrofit 解码+筛选，useGitee true/false 各测。
+
+**[Medium] reverse | `entity/GitContentsEntity.kt:26-32` ↔ none**：与已测 GitReleaseEntity 不同，4 字段全非空无默认值，ignoreUnknownKeys 但无 coerceInputValues 下缺字段会抛异常，无序列化测试。建议比照 GitReleaseEntitySerializationTest 补合法+缺必填字段抛异常用例。
+
+**[Medium] coverage | `okhttp/LoggerInterceptor.kt:219-237` ↔ `LoggerInterceptorTest.kt:99-117`**：LEVEL_BODY 的 JSON 格式化 + >200 字符截断分支从未触达（现有 body 测试故意用 plain-text 规避 JVM 无 org.json）；chain.proceed 抛异常的 HTTP FAILED 日志+rethrow 也未覆盖。建议 Robolectric（模块已 isIncludeAndroidResources）或提供 org.json 测格式化/截断 + MockWebServer 触发 IOException 测 rethrow。
+
+## T2 core/datastore
+
+**优点（核实）**：`CombineProtoDataSourceTest` 对 `encryptWebDAVPassword`/`decryptWebDAVPassword` 的反向短路（空串、不含冒号旧明文向后兼容）**忠实直调真实静态方法**（`CombineProtoDataSource.kt:415/431` 短路分支），isEqualTo 强断言；测试头注释自觉划界 AndroidKeyStore round-trip 需真机不测，未用假桩冒充。
+
+**[High] logic（假阳性）| `CombineProtoDataSource.kt:368-370`（`needRelated`）↔ `CombineProtoDataSourceTest.kt:38-60`**（agent 报 Critical→校准 High）
+- 核实（Read 测试 + 源）**完全属实**：3 个 needRelated 测试**从不调真实 `suspend fun needRelated`**，而是测试体内内联复刻表达式；更甚 `CombineProtoDataSourceTest.kt:41` 写成 `FIXED_TYPE_ID_REFUND == FIXED_TYPE_ID_REFUND`（**x==x 恒真同义反复**）。即使把源码 `||` 改 `&&`/比错常量/返反值，3 测仍全绿——教科书级假阳性，比 CLAUDE.md 历史案例更恶劣（含字面 x==x）。
+- 校准理由：维持「确认的假阳性」定性，但 needRelated 仅 2 行平凡比较 + 生产吸收边界实走 `TypeRepositoryImpl.needRelated`（CLAUDE.md 记载）+ 此 CombineProtoDataSource.needRelated 可能是次要路径 → 爆炸半径 High 而非 Critical。**但该测试必须删除/重写**（x==x 是硬伤）。
+- 修复建议：构造 CombineProtoDataSource 实例（注入 Fake DataStore）runTest 实调 `needRelated(FIXED_TYPE_ID_REFUND/REIMBURSE/1L)`；或重构为顶层纯函数直调。禁止内联复刻 + x==x。
+
+**[Medium] reverse | `serializer/AppSettingsSerializer.kt:36-40`（6 个 Serializer 同结构）↔ none**（agent 报 High→校准 Medium）
+- 核实（grep 无 Serializer 测试）：6 个 Serializer（AppPreferences/AppSettings/GitInfos/RecordSettings/SearchHistory/TempKeys）readFrom 对损坏 proto 捕获 InvalidProtocolBufferException 抛 CorruptionException 的反向路径（DataStore 自愈契约入口）零测试；纯 JVM 可测（无 Android 依赖）。
+- 校准理由：设置数据损坏（可恢复，非金融记录）+ 易测 → Medium。
+- 修复建议：参数化测 6 个 Serializer：非法字节→assertThrows<CorruptionException>、空流→defaultValue、writeTo 往返相等。
+
+### T2 小结
+core/common 的金额/数字/字符串 ext 与 core/network 的序列化/拦截器脱敏覆盖优秀。**核心缺口**：①`OkHttpWebDAVHandler` 备份网络底座零覆盖（High，呼应 T1 备份恢复缺口）②`needRelated` 测试 x==x 假阳性（High，必须重写）③多个纯 JVM 可测逻辑（LunarUtils/Time/MimeType/Regex/Serializer 损坏路径）裸奔（Medium）。无 active 致命 bug，但假阳性测试 + 备份层裸奔是要点。
