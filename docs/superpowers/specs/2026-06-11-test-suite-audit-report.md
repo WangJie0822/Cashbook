@@ -3,7 +3,7 @@
 > 日期：2026-06-11 ｜ 分支：main ｜ 性质：纯审计（未改任何代码）
 > 方案：[审计设计](2026-06-11-test-suite-audit-design.md) ｜ 计划：[执行计划](../plans/2026-06-11-test-suite-audit.md)
 > 审计方式：T1 金额核心 controller 亲审 ｜ T2/T3 Workflow 只读 fan-out + controller 核验
-> **报告生成中**——各 Phase 完成后增量追加 section，末尾 Phase 4 出总表/矩阵/统计。
+> **报告完成** ｜ **结论速览见文末 [Phase 4 执行摘要](#phase-4--综合报告执行摘要)**：0 Critical / 15 High / 39 Medium / 16 Low，两个系统性结构问题（androidTest 设备门控 + 假阳性/弱断言测试）。
 
 ## Finding 格式与严重度
 
@@ -328,3 +328,91 @@ T3 的 ViewModel/UI 缺口高度集中在 4 个**系统性模式**，比单条 f
 
 ### T3 小结
 ViewModel/UI 层覆盖整体不错（事件处理 + 状态流转多有覆盖），但**写入成功路径 + 失败反向分支 + 设计层纯逻辑**三类系统性裸奔。**最该优先**：①`CalculatorUtils` 计算器引擎零测试（High，影响金额输入正确性）②`DesignDetector` load-bearing 门禁零测试（High，门禁静默失效风险）③`confirmImport`/Ready + batchImportRecords 空桩（High/Medium，连接 T1 导入缺口）。无 Critical（UI 层无 active 致命 bug）。
+
+---
+
+# Phase 4 — 综合报告（执行摘要）
+
+## 1. 总体结论
+
+- **测试套件总量 157 文件**，覆盖 21 模块。整体质量**中上**：金额核心链路（三口径 + 簇重算 + 删除/余额）覆盖**优秀且判别性强**，无 Critical、无 active 致命 bug。
+- **finding 总计 70 条**：0 Critical / 15 High / 39 Medium / 16 Low。
+- **两个系统性结构问题比单条 finding 更值得决策**（见 §4）。
+- 全部 finding 带 `file:line` 证据；fan-out agent 强断言均经 controller hands-on 核验，无虚报。
+
+## 2. 严重度总表
+
+| 严重度 | 数量 | 含义 |
+|---|---|---|
+| Critical | 0 | 无假阳性致 active bug 当下漏网 |
+| High | 15 | 关键路径零覆盖 / 假阳性 / load-bearing 逻辑裸奔 |
+| Medium | 39 | 反向边界缺失 / 弱断言 / 纯 JVM 逻辑裸奔 |
+| Low | 16 | 边角缺口 / locality / 模板清理 |
+
+## 3. 覆盖矩阵（按模块）
+
+| 模块 | 覆盖评级 | 关键缺口 |
+|---|---|---|
+| core/domain | ★★★★★ | 无（满广度 + 判别性金额口径 + 反向） |
+| core/model | ★★★★☆ | analyticsPieNetAmount model 级 locality（已由 usecase 判别性覆盖） |
+| core/data | ★★★★☆ | batchImport 零覆盖(H)；insert 余额仅 androidTest |
+| core/database | ★★★★☆* | *覆盖全但**全 androidTest 设备门控**（结构问题） |
+| core/common | ★★★☆☆ | Money/Number/String 优秀；LunarUtils/Time/Regex/MimeType 裸奔 |
+| core/network | ★★★☆☆ | 序列化/脱敏好；OkHttpWebDAVHandler 零覆盖(H)；filterRelease 测复制版 |
+| core/datastore | ★★☆☆☆ | needRelated x==x 假阳性(H)；6 Serializer 损坏路径裸奔 |
+| sync/work | ★★★☆☆ | AutoBackup 典范；SyncWorker 重试逻辑裸奔 |
+| feature/records | ★★★★☆ | Calendar/Analytics.showSheet 零覆盖(H) |
+| feature/settings | ★★★★☆ | exportRecords/needUpdate 零覆盖(H) |
+| feature/assets | ★★★☆☆ | save() 零覆盖(H)；2 条名实不符弱断言 |
+| feature/types | ★★★★☆ | 3 条名实不符弱断言（只断 Dismiss） |
+| feature/tags | ★★★☆☆ | 选择逻辑零覆盖(H)；潜在去重 bug |
+| feature/books | ★★★☆☆ | onSaveClick 成功路径零覆盖 |
+| feature/record-import | ★★☆☆☆ | confirmImport/Ready 零覆盖(H)；batchImport 空桩 |
+| core/ui | ★★★☆☆ | 进度弹窗逻辑零覆盖(H×2) |
+| core/design | ★★★☆☆ | **CalculatorUtils 计算器引擎零覆盖(H)** |
+| app | ★★★★☆ | 基本充分；ExampleUnitTest 模板噪声 |
+| lint | ★★★☆☆ | **DesignDetector load-bearing 门禁零覆盖(H)** |
+
+## 4. 两个系统性结构问题（最值得决策）
+
+### 结构问题 A：大量数据层覆盖仅在设备门控 androidTest
+core/database 全部 103 个测试（全部 DAO SQL + 12 个 Migration）+ TransactionDao 的 insert/transfer 余额 + verifyAssetBalance 均为 androidTest，**本机无设备不跑、CI 通常也不跑 instrumented**。这批覆盖充分、质量高的数据层测试在日常 JVM/CI 路径**零回归保护**——「覆盖率」表象远高于实际护栏。
+- 建议（择一/组合）：① CI 增 emulator/instrumented job；② 关键 DAO `@Query` 语义用 Robolectric + in-memory Room 迁入 JVM；③ 至少 CI 文档显式声明数据层回归依赖 instrumented，合并前须真机/emulator 跑过。
+
+### 结构问题 B：假阳性 / 弱断言测试（测试存在但不验证真实行为）
+本次审计抓出 ≥6 处「测试绿但不验证 SUT」：
+- `CombineProtoDataSourceTest` needRelated **x==x 恒真**（最恶劣）
+- `NetworkDataSourceTest` 测 `filterRelease` **复制版**而非真实 checkUpdate
+- feature/types 3 条 + feature/assets 2 条**名实不符**（只断 dialogState==Dismiss / successCalled，不断真实状态变更）
+- 多处失败反向分支因 **Fake 永不抛异常**而零覆盖（需给 Fake 加可注入异常钩子）
+- `FakeRecordRepository.batchImportRecords` **emptyList 空桩**（补 Done 测试时会假绿）
+- 建议：建立「测试必须调用真实 SUT + 断言关键输出」的评审 checklist；统一给 core/testing 的 Fake 增加异常注入能力。
+
+## 5. 15 个 High 的建议补齐顺序（仅建议，不实施）
+
+> 按「风险 × 可测性」排序，分两档。**用户已确认先报告后分批补**，以下为优先级参考。
+
+**第一档（数据完整性 / load-bearing，强烈建议优先）**
+1. `core/datastore` **needRelated x==x 假阳性**（删除/重写该测试，成本极低）
+2. `core/design` **CalculatorUtils 计算器引擎**（纯 junit 可测，影响金额输入正确性）
+3. `lint` **DesignDetector**（load-bearing 设计门禁，TestLintTask 范式可测）
+4. `core/data` **batchImportRecordsTransaction**（微信导入余额聚合，Fake 继承真实事务可 JVM 测）
+5. `core/network` **OkHttpWebDAVHandler**（备份网络底座，MockWebServer 可测，呼应备份恢复缺口）
+
+**第二档（ViewModel 写入/核心路径覆盖）**
+6. `feature/record-import` confirmImport 成功路径 + Ready 状态（先补 batchImportRecords 忠实桩 + .xlsx fixture）
+7. `feature/assets` EditAssetViewModel.save()
+8. `feature/settings` exportRecords 导出状态机 + needUpdate 版本比较（建议抽纯函数）
+9. `feature/records` CalendarViewModel uiState + AnalyticsViewModel.showSheet
+10. `feature/tags` EditRecordSelectTagBottomSheetViewModel 选择逻辑
+11. `core/ui` runCatchWithProgress + DefaultProgressDialogController（纯 JVM 可测）
+
+## 6. 边界与免责
+
+- **androidTest 未实跑**：core/database 覆盖结论基于测试源码静态分析（本机无设备）。
+- 截图测试（Roborazzi）按广度模式只确认存在性，未深审渲染像素正确性。
+- 本审计**未改任何代码**；以上修复建议待用户分批决策。
+
+---
+
+*报告完成。审计方式：Phase 1 controller 亲审（T1 金额核心）+ Phase 2/3 Workflow 只读 fan-out + controller 逐条核验（T2/T3）+ Phase 4 综合。*
