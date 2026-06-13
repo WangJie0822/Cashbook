@@ -117,6 +117,9 @@ interface RecordRepository {
 
     suspend fun getLastThreeMonthReimbursableRecordList(): List<RecordModel>
 
+    /** 当前账本全部「可报销且未关联任何报销/退款款」的支出记录（待报销管理界面用） */
+    suspend fun getReimbursableUnrelatedRecordList(): List<RecordModel>
+
     suspend fun getLastThreeMonthRefundableRecordList(): List<RecordModel>
 
     suspend fun getLastThreeMonthReimbursableRecordListByKeyword(keyword: String): List<RecordModel>

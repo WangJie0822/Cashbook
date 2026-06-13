@@ -423,6 +423,13 @@ class RecordRepositoryImpl @Inject constructor(
             ).map { it.asModel() }
         }
 
+    override suspend fun getReimbursableUnrelatedRecordList(): List<RecordModel> =
+        withContext(coroutineContext) {
+            val appDataModel = combineProtoDataSource.recordSettingsData.first()
+            recordDao.queryReimbursableUnrelated(booksId = appDataModel.currentBookId)
+                .map { it.asModel() }
+        }
+
     override suspend fun getLastThreeMonthRefundableRecordListByKeyword(keyword: String): List<RecordModel> =
         withContext(coroutineContext) {
             // 获取最近三个月开始时间

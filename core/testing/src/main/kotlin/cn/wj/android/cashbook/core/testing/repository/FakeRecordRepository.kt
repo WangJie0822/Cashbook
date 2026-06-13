@@ -254,6 +254,15 @@ class FakeRecordRepository : RecordRepository {
         return records.filter { it.reimbursable }
     }
 
+    override suspend fun getReimbursableUnrelatedRecordList(): List<RecordModel> {
+        // 忠实桩：可报销 + 双向（relatedMap 吸收者侧 / relatedFromMap 被吸收侧）都空才算未关联
+        return records.filter { record ->
+            record.reimbursable &&
+                relatedMap[record.id].isNullOrEmpty() &&
+                relatedFromMap[record.id].isNullOrEmpty()
+        }
+    }
+
     override suspend fun getLastThreeMonthRefundableRecordList(): List<RecordModel> {
         return records
     }

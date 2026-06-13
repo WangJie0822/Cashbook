@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.data.testdoubles.FakeRecordDao
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -416,6 +417,28 @@ class RecordRepositoryImplTest {
         val results = recordDao.queryReimburseByBooksIdAfterDate(booksId = 1L, dateTime = 1000L)
         assertThat(results).hasSize(1)
         assertThat(results[0].id).isEqualTo(1L)
+    }
+
+    @Test
+    fun when_queryReimbursableUnrelated_then_filters_reimbursable_expenditure_unrelated() = runTest {
+        // 类型：1=支出，2=收入
+        recordDao.types.add(
+            FakeRecordDao.FakeTypeEntry(id = 1L, parentId = -1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal),
+        )
+        recordDao.types.add(
+            FakeRecordDao.FakeTypeEntry(id = 2L, parentId = -1L, typeCategory = RecordTypeCategoryEnum.INCOME.ordinal),
+        )
+
+        recordDao.addRecord(createRecord(id = 1L, typeId = 1L, booksId = 1L, reimbursable = SWITCH_INT_ON, recordTime = 9000L)) // 命中
+        recordDao.addRecord(createRecord(id = 2L, typeId = 1L, booksId = 1L, reimbursable = SWITCH_INT_OFF, recordTime = 8000L)) // 不可报销
+        recordDao.addRecord(createRecord(id = 3L, typeId = 2L, booksId = 1L, reimbursable = SWITCH_INT_ON, recordTime = 7000L)) // 收入类型
+        recordDao.addRecord(createRecord(id = 4L, typeId = 1L, booksId = 1L, reimbursable = SWITCH_INT_ON, recordTime = 6000L)) // 被吸收
+        // id=4 作为被吸收支出被关联 → 双向 NOT EXISTS 排除
+        recordDao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 99L, relatedRecordId = 4L))
+
+        val result = recordDao.queryReimbursableUnrelated(booksId = 1L)
+
+        assertThat(result.map { it.id }).containsExactly(1L)
     }
 
     // ========== 辅助方法 ==========

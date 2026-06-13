@@ -291,6 +291,21 @@ class FakeRecordDao : RecordDao {
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
+    override suspend fun queryReimbursableUnrelated(
+        booksId: Long,
+        expenditureCategory: Int,
+    ): List<RecordTable> {
+        val expenditureTypeIds = types
+            .filter { it.typeCategory == expenditureCategory }
+            .mapNotNull { it.id }
+        return records.filter { record ->
+            record.booksId == booksId &&
+                record.reimbursable == SWITCH_INT_ON &&
+                record.typeId in expenditureTypeIds &&
+                relatedRecords.none { it.recordId == record.id || it.relatedRecordId == record.id }
+        }.sortedByDescending { it.recordTime }
+    }
+
     override suspend fun getExpenditureRecordListByKeywordAfterTime(
         keyword: String,
         booksId: Long,
