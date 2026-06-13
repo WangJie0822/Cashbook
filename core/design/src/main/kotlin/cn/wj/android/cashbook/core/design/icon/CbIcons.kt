@@ -45,6 +45,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.icons.filled.Search
@@ -94,5 +95,6 @@ object CbIcons {
     val DonutSmall = Icons.Filled.DonutSmall
     val CleaningServices = Icons.Filled.CleaningServices
     val PhotoLibrary = Icons.Filled.PhotoLibrary
+    val ReceiptLong = Icons.Filled.ReceiptLong
     val RemoveCircle = Icons.Filled.RemoveCircle
 }
