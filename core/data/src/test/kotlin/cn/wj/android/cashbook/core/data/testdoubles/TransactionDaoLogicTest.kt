@@ -648,6 +648,47 @@ class TransactionDaoLogicTest {
         assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(-5000L)
     }
 
+    @Test
+    fun when_batchImport_transfer_then_debits_source_only_and_ignores_into_asset() = runTest {
+        setupTypesForAbsorption()
+        dao.assets.add(createAssetTable(id = 10L, balance = 50000L)) // 源资产
+        dao.assets.add(createAssetTable(id = 20L, balance = 30000L)) // 目标资产
+
+        val ids = dao.batchImportRecordsTransaction(
+            listOf(
+                createRecordTable(
+                    typeId = TRANSFER_TYPE_ID,
+                    amount = 10000L,
+                    assetId = 10L,
+                    intoAssetId = 20L,
+                ),
+            ),
+        )
+
+        // TRANSFER recordAmount = amount + charge - concessions = 10000
+        assertThat(dao.queryRecordById(ids[0])!!.finalAmount).isEqualTo(10000L)
+        // 转账按支出借记源资产：50000 - 10000 = 40000
+        assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(40000L)
+        // 批量导入不处理 intoAssetId（与单条 insertRecordTransaction 不同），目标资产不变
+        assertThat(dao.queryAssetById(20L)!!.balance).isEqualTo(30000L)
+    }
+
+    @Test
+    fun when_batchImport_record_with_zero_asset_id_then_no_balance_update() = runTest {
+        setupTypesForAbsorption()
+        dao.assets.add(createAssetTable(id = 10L, balance = 50000L))
+
+        // assetId == 0 与 assetId == -1 同走 (assetId > 0) 守卫的否定分支
+        val ids = dao.batchImportRecordsTransaction(
+            listOf(
+                createRecordTable(typeId = EXPENDITURE_TYPE_ID, amount = 5000L, assetId = 0L),
+            ),
+        )
+
+        assertThat(ids).hasSize(1)
+        assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(50000L)
+    }
+
     // ========== 辅助方法 ==========
 
     companion object {
