@@ -111,9 +111,11 @@ import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.naviToAnalytics
 import cn.wj.android.cashbook.feature.records.navigation.naviToCalendar
 import cn.wj.android.cashbook.feature.records.navigation.naviToEditRecord
+import cn.wj.android.cashbook.feature.records.navigation.naviToReimbursement
 import cn.wj.android.cashbook.feature.records.navigation.naviToSearch
 import cn.wj.android.cashbook.feature.records.navigation.naviToSelectRelatedRecord
 import cn.wj.android.cashbook.feature.records.navigation.naviToTypedAnalytics
+import cn.wj.android.cashbook.feature.records.navigation.reimbursementScreen
 import cn.wj.android.cashbook.feature.records.navigation.searchScreen
 import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.typedAnalyticsScreen
@@ -414,6 +416,7 @@ fun CashbookNavHost(
             onRequestNaviToMyBooks = navController::naviToMyBooks,
             onRequestNaviToMyCategory = navController::naviToMyCategories,
             onRequestNaviToMyTags = navController::naviToMyTags,
+            onRequestNaviToReimbursement = navController::naviToReimbursement,
             onRequestNaviToSetting = navController::naviToSetting,
             onRequestNaviToAboutUs = navController::naviToAboutUs,
             content = { onRequestOpenDrawer ->
@@ -505,6 +508,18 @@ fun CashbookNavHost(
         )
         // 选择关联记录
         selectRelatedRecordScreen(
+            onRequestPopBackStack = navController::popBackStackSafety,
+        )
+        // 待报销管理
+        reimbursementScreen(
+            recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
+                RecordDetailSheetContent(
+                    recordEntity = recordEntity,
+                    onRequestNaviToEditRecord = navController::naviToEditRecord,
+                    onRequestNaviToAssetInfo = navController::naviToAssetInfo,
+                    onRequestDismissSheet = onRequestDismissSheet,
+                )
+            },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
         // 记录日历
