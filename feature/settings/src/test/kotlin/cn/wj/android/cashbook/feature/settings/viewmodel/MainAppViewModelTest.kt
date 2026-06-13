@@ -466,9 +466,14 @@ class MainAppViewModelTest {
     }
 
     @Test
-    fun when_version_unparseable_then_no_update() {
-        // 解析异常或非数字段按 0 处理，不应误报更新
+    fun when_remote_version_unparseable_then_no_update() {
+        // 远端非数字段按 0 处理，不应误报更新
         assertThat(computeNeedUpdate("v1.0_1", "乱码")).isFalse()
+    }
+
+    @Test
+    fun when_local_version_blank_then_update() {
+        // 本地版本为空（解析为 0）→ 任意有效远端版本需更新
         assertThat(computeNeedUpdate("", "v1.0_1")).isTrue()
     }
 

@@ -378,6 +378,9 @@ class AnalyticsViewModelTest {
                 recordTime = 1704067200000L,
             ),
         )
+        // 对齐选择窗口到记录所在月（2024-01）：使测试在 Fake 忽略日期窗口与真实 DAO 按
+        // queryByBooksIdBetweenDate 过滤两种语义下都成立，避免依赖 Fake 不过滤的假阳性
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
 
         viewModel.showSheet(DefaultProgressDialogController(), typeId = 1L)
 
