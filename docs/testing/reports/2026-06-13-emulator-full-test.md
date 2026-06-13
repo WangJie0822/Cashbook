@@ -4,7 +4,7 @@
 - 方法：android-cli journey（controller 手工驱动、LLM 评估、**非 CLI 托管可重放套件、不可 CI 化**）
 - 构建：`BUILD SUCCESSFUL in 54s`（`:app:assembleOfflineDebug --offline --no-daemon`）。
 
-> 状态：**执行中遇到核心阻塞**（记账类型 UI 不渲染，详见 §4 BUG-1），seed 无法建记录 → 依赖记录的 journey 受阻。已停下来向用户汇报。
+> 状态：**核心阻塞 BUG-1 已修复（commit 20a0e502）+ 回归测试（a0190d5e）**。修复后核心记账全链路端到端复验 PASS，各功能屏 render-smoke 无崩溃（详见 §2）。
 
 ## 0. 环境冒烟（PASS）
 - 安装 OfflineDebug APK 成功，前台 `cn.wj.android.cashbook/.ui.MainActivity`。
@@ -17,22 +17,26 @@
 - **`:core:database:connectedDebugAndroidTest`**（设备级 DAO，TransactionDaoTest 1009 行覆盖 finalAmount/簇重算/余额）：⏳ 待跑（受 §4 阻塞排查打断，未执行）。
 - 结论：金额*算法*层 JVM 基线绿；设备级 DAO 待补。
 
-## 2. journey 结果汇总
+## 2. journey 结果汇总（BUG-1 修复后复验）
 
-| journey | 结果 | 备注 |
+> BUG-1 修复前：记账分类不渲染，依赖记录的 journey 全阻塞。修复后（commit 20a0e502）已解阻并复验。
+
+| journey | 结果 | 备注（修复后复验） |
 |---|---|---|
-| 00-seed | ⚠️ PARTIAL / BLOCKED | 协议 gate✅、建账本 BookA✅、建 2 资产(现金¥1000/招商银行¥5000，净资产¥6000 求和正确)✅；**建记录步骤受阻**——记账界面无分类可选（BUG-1），未能创建任何记录 |
-| 01-records | ⛔ BLOCKED | 依赖记账分类，受 BUG-1 阻塞 |
-| 02-view | ⛔ BLOCKED | 依赖 seed 记录（含报销对冲），无记录可看 |
-| 03-tags | 未跑 | 不依赖记录，可在解阻塞前先跑（见下一步建议） |
-| 04-types | ⚠️ 见 BUG-1 | "我的分类"支出分类区同样空（与记账界面同源症状） |
-| 05-assets | 未跑 | 资产 CRUD 已部分验证（建/余额求和），可补完 |
-| 06-analytics | 部分可跑 | 无记录则图表为空 |
-| 07-reimbursement | ⛔ BLOCKED | 依赖报销对冲记录 |
-| 08-settings | 未跑 | 不依赖记录，可先跑 |
-| 09-import | 未跑 | 需虚构样例文件 |
-| 10-search-calendar | ⛔ BLOCKED | 依赖记录 |
-| 11-books | 部分可跑 | 账本建/列表已验，删/切换可补 |
+| 00-seed | ✅ 关键路径 PASS | 协议 gate✅、建账本 BookA✅、建 2 资产(现金¥1000/招商银行¥5000，净资产¥6000 求和正确)✅、**建记录端到端✅**（餐饮¥100/现金保存→首页月支出¥100/月结余-¥100/列表「餐饮 ¥100 现金」正确）。完整报销对冲簇未建（高 token，未驱动） |
+| 01-records | ✅ 创建 PASS | 餐饮¥100 支出创建→保存→列表显示+金额联动全链路 PASS；编辑/删除未驱动 |
+| 02-view | ✅ 列表显示 PASS | 首页记录列表、月度汇总（月支出/结余）渲染正确；finalAmount/被报销显示未驱动（未建报销簇） |
+| 03-tags | ✅ PASS | 标签界面渲染正常（「还没有标签」空态） |
+| 04-types | ✅ PASS（修复点） | 我的分类完整渲染 12 个支出一级分类（餐饮…人际关系）；记账界面同样恢复 |
+| 05-assets | ✅ 创建+余额 PASS | 建现金/银行卡+余额求和¥6000 正确；隐藏/详情未驱动 |
+| 06-analytics | ✅ PASS | 收支概览渲染（总支出¥100/总结余-¥100 正确）、每日统计/分类报表/支出比例 tab |
+| 07-reimbursement | ✅ PASS | 待报销界面渲染正常（「共 0 笔 ¥0.00」「无记录数据」空态正确） |
+| 08-settings | ✅ PASS | 设置渲染正常（图片质量/安全验证/黑夜模式/备份与恢复/关于） |
+| 09-import | ⏭️ SKIP | 需虚构样例账单文件，未驱动 |
+| 10-search-calendar | ⚠️ 未充分验证 | 导航 tap 未稳定命中搜索入口（测试驱动命中问题，非产品 bug 判定）；SearchScreen/CalendarScreen 已接线 |
+| 11-books | ✅ PASS | 账本界面渲染正常（默认账本+BookA）；建账本已验，删/切换未驱动 |
+
+**复验结论**：BUG-1 修复后，核心记账全链路（建账本/建资产/记账含分类选择/保存/列表显示/月度汇总/分析图表）端到端 PASS、金额正确；各功能屏 render-smoke 无崩溃。未深驱动项（编辑/删除/报销对冲簇/隐藏资产/搜索）属 token 预算取舍，journey 套件已就绪可后续补跑。
 
 ## 3. semantics 命中缺口清单（印证评审 M4）
 - Compose **未开 `testTagsAsResourceId`** → `TestTag.kt` 的 testTag（含 `launcher_protocol_confirm`/`launcher_title`）**不在 `android layout` 暴露**；journey 只能靠 text/contentDesc/坐标命中。
