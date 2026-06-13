@@ -65,6 +65,7 @@ internal fun LauncherRoute(
     onRequestNaviToMyBooks: () -> Unit,
     onRequestNaviToMyCategory: () -> Unit,
     onRequestNaviToMyTags: () -> Unit,
+    onRequestNaviToReimbursement: () -> Unit,
     onRequestNaviToSetting: () -> Unit,
     onRequestNaviToAboutUs: () -> Unit,
     modifier: Modifier = Modifier,
@@ -93,6 +94,10 @@ internal fun LauncherRoute(
         },
         onMyTagClick = {
             onRequestNaviToMyTags.invoke()
+            viewModel.dismissDrawerSheet()
+        },
+        onReimbursementClick = {
+            onRequestNaviToReimbursement.invoke()
             viewModel.dismissDrawerSheet()
         },
         onSettingClick = {
@@ -135,6 +140,7 @@ internal fun LauncherScreen(
     onMyBookClick: () -> Unit,
     onMyCategoryClick: () -> Unit,
     onMyTagClick: () -> Unit,
+    onReimbursementClick: () -> Unit,
     onSettingClick: () -> Unit,
     onAboutUsClick: () -> Unit,
     content: @Composable () -> Unit,
@@ -184,6 +190,7 @@ internal fun LauncherScreen(
                             onMyBookClick = onMyBookClick,
                             onMyCategoryClick = onMyCategoryClick,
                             onMyTagClick = onMyTagClick,
+                            onReimbursementClick = onReimbursementClick,
                             onSettingClick = onSettingClick,
                             onAboutUsClick = onAboutUsClick,
                         )
@@ -213,6 +220,7 @@ internal fun LauncherSheet(
     onMyBookClick: () -> Unit,
     onMyCategoryClick: () -> Unit,
     onMyTagClick: () -> Unit,
+    onReimbursementClick: () -> Unit,
     onSettingClick: () -> Unit,
     onAboutUsClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -260,6 +268,13 @@ internal fun LauncherSheet(
             icon = { Icon(imageVector = CbIcons.Layers, contentDescription = null) },
             selected = false,
             onClick = onMyTagClick,
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.pending_reimbursement)) },
+            icon = { Icon(imageVector = CbIcons.ReceiptLong, contentDescription = null) },
+            selected = false,
+            onClick = onReimbursementClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         CbHorizontalDivider(modifier = Modifier.padding(horizontal = spacing.large))
