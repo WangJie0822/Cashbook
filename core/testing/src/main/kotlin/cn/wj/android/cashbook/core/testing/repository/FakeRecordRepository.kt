@@ -404,8 +404,14 @@ class FakeRecordRepository : RecordRepository {
         }
     }
 
+    /** 最近一次 [batchImportRecords] 传入的记录（供导入路径测试断言 remark/金额/finalAmount 等） */
+    var lastImportedRecords: List<RecordTable> = emptyList()
+        private set
+
     override suspend fun batchImportRecords(records: List<RecordTable>): List<Long> {
-        return emptyList()
+        // 忠实复刻真实 DAO：插入 N 条返回 N 个行 id（旧空桩返 emptyList 会致 Done.imported 恒 0 假阳性）
+        lastImportedRecords = records
+        return records.indices.map { (it + 1).toLong() }
     }
 
     override suspend fun queryExportRecords(
