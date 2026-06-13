@@ -16,9 +16,11 @@
 
 package cn.wj.android.cashbook.feature.settings.viewmodel
 
+import cn.wj.android.cashbook.core.data.helper.DailyAccountExporter
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.model.BackupModel
+import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.testing.helper.FakeDailyAccountExporter
 import cn.wj.android.cashbook.core.testing.repository.FakeBackupRecoveryManager
 import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
@@ -38,11 +40,16 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import java.io.File
 
 class BackupAndRecoveryViewModelTest {
 
     @get:Rule
     val testDispatcher = TestDispatcherRule()
+
+    @get:Rule
+    val tempFolder = TemporaryFolder()
 
     private lateinit var settingRepository: FakeSettingRepository
     private lateinit var recordRepository: FakeRecordRepository
@@ -519,6 +526,78 @@ class BackupAndRecoveryViewModelTest {
         // 验证 refreshDbMigrate 不会崩溃
         viewModel.refreshDbMigrate(DefaultProgressDialogController())
     }
+
+    // endregion
+
+    // region 导出记录
+
+    @Test
+    fun when_export_records_succeeds_then_export_state_done_with_count() = runTest {
+        // 导出成功：Exporting → Done(filePath, count)
+        recordRepository.exportRecordsList = listOf(createExportRecord(), createExportRecord())
+
+        viewModel.exportRecords(
+            booksId = 1L,
+            startDate = 0L,
+            endDate = 0L,
+            bookName = "测试账本",
+            displayStartDate = 1704067200000L,
+            displayEndDate = 1704067200000L,
+            cacheDir = tempFolder.root,
+        )
+
+        val state = viewModel.exportState.value
+        assertThat(state).isInstanceOf(ExportState.Done::class.java)
+        // count 来自导出器返回（FakeDailyAccountExporter 返回记录数）
+        assertThat((state as ExportState.Done).count).isEqualTo(2)
+        assertThat(state.filePath).contains("测试账本")
+    }
+
+    @Test
+    fun when_export_records_throws_then_export_state_error() = runTest {
+        // 导出抛异常：catch → Error(message)
+        val throwingExporter = object : DailyAccountExporter() {
+            override fun export(records: List<ExportRecordModel>, outputFile: File): Int {
+                throw RuntimeException("导出磁盘错误")
+            }
+        }
+        val failingViewModel = BackupAndRecoveryViewModel(
+            settingRepository = settingRepository,
+            recordRepository = recordRepository,
+            booksRepository = FakeBooksRepository(),
+            backupRecoveryManager = backupRecoveryManager,
+            networkMonitor = networkMonitor,
+            exportRecordUseCase = ExportRecordUseCase(
+                recordRepository = recordRepository,
+                exporter = throwingExporter,
+                coroutineContext = UnconfinedTestDispatcher(),
+            ),
+        )
+
+        failingViewModel.exportRecords(
+            booksId = 1L,
+            startDate = 0L,
+            endDate = 0L,
+            bookName = "测试账本",
+            displayStartDate = 1704067200000L,
+            displayEndDate = 1704067200000L,
+            cacheDir = tempFolder.root,
+        )
+
+        val state = failingViewModel.exportState.value
+        assertThat(state).isInstanceOf(ExportState.Error::class.java)
+        assertThat((state as ExportState.Error).message).isEqualTo("导出磁盘错误")
+    }
+
+    private fun createExportRecord(): ExportRecordModel = ExportRecordModel(
+        recordTime = 1704067200000L,
+        typeCategory = 0,
+        assetName = "现金",
+        categoryName = "餐饮",
+        subCategoryName = "",
+        amount = 10000L,
+        remark = "",
+    )
 
     // endregion
 }
