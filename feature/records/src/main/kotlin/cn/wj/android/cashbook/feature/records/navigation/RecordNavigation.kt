@@ -29,6 +29,7 @@ import cn.wj.android.cashbook.feature.records.screen.AssetInfoContentRoute
 import cn.wj.android.cashbook.feature.records.screen.CalendarRoute
 import cn.wj.android.cashbook.feature.records.screen.EditRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.LauncherContentRoute
+import cn.wj.android.cashbook.feature.records.screen.ReimbursementRoute
 import cn.wj.android.cashbook.feature.records.screen.SearchRoute
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.TypedAnalyticsRoute
@@ -67,6 +68,10 @@ object RecordCalendar
 @Serializable
 object RecordSearch
 
+/** 路由 - 待报销管理 */
+@Serializable
+object Reimbursement
+
 fun NavController.naviToAnalytics() {
     this.navigate(Analytics)
 }
@@ -101,6 +106,10 @@ fun NavController.naviToCalendar() {
 
 fun NavController.naviToSearch() {
     this.navigate(RecordSearch)
+}
+
+fun NavController.naviToReimbursement() {
+    this.navigate(Reimbursement)
 }
 
 /**
@@ -203,6 +212,24 @@ fun NavGraphBuilder.searchScreen(
         SearchRoute(
             onRequestNaviToEditRecord = onRequestNaviToEditRecord,
             onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
+            onRequestPopBackStack = onRequestPopBackStack,
+        )
+    }
+}
+
+/**
+ * 待报销管理界面
+ *
+ * @param recordDetailSheetContent 记录详情 sheet，参数：(记录数据，隐藏sheet回调) -> [Unit]
+ * @param onRequestPopBackStack 导航到上一级
+ */
+fun NavGraphBuilder.reimbursementScreen(
+    recordDetailSheetContent: @Composable (RecordViewsEntity?, () -> Unit) -> Unit,
+    onRequestPopBackStack: () -> Unit,
+) {
+    composable<Reimbursement> {
+        ReimbursementRoute(
+            recordDetailSheetContent = recordDetailSheetContent,
             onRequestPopBackStack = onRequestPopBackStack,
         )
     }
