@@ -1019,4 +1019,94 @@ class RecordDaoTest {
     }
 
     // endregion
+
+    // region queryReimbursableUnrelated（待报销管理界面）
+
+    @Test
+    fun when_queryReimbursableUnrelated_then_returnsReimbursableUnrelatedExpenditureOnly() = runTest {
+        testBookId = createTestBook()
+        val expTypeId = typeDao.insertType(
+            createType(typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal),
+        )
+        val incomeTypeId = typeDao.insertType(
+            createType(name = "工资", typeCategory = RecordTypeCategoryEnum.INCOME.ordinal),
+        )
+
+        // 命中：可报销 + 支出 + 未关联
+        val hit = insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_ON, recordTime = 9000L, remark = "待报销A"),
+        )
+        // 排除：不可报销
+        insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_OFF, recordTime = 8000L, remark = "不可报销"),
+        )
+        // 排除：可报销但是收入类型（reimbursable 误置）
+        insertRecord(
+            createRecord(typeId = incomeTypeId, reimbursable = SWITCH_INT_ON, recordTime = 7000L, remark = "收入误置"),
+        )
+
+        val result = recordDao.queryReimbursableUnrelated(testBookId)
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0].id).isEqualTo(hit)
+        assertThat(result[0].remark).isEqualTo("待报销A")
+    }
+
+    @Test
+    fun when_queryReimbursableUnrelated_then_excludesRecordsRelatedEitherDirection() = runTest {
+        testBookId = createTestBook()
+        val expTypeId = typeDao.insertType(
+            createType(typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal),
+        )
+        val incomeTypeId = typeDao.insertType(
+            createType(name = "报销款", typeCategory = RecordTypeCategoryEnum.INCOME.ordinal),
+        )
+
+        // 作为被吸收支出（related_record_id）被关联 → 应排除
+        val absorbed = insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_ON, recordTime = 9000L, remark = "已被报销"),
+        )
+        val absorber = insertRecord(
+            createRecord(typeId = incomeTypeId, reimbursable = SWITCH_INT_ON, recordTime = 9500L, remark = "报销款"),
+        )
+        // 建立关联：absorber(record_id) -> absorbed(related_record_id)
+        transactionDao.insertRelatedRecord(
+            listOf(RecordWithRelatedTable(id = null, recordId = absorber, relatedRecordId = absorbed)),
+        )
+
+        // 未关联可报销支出 → 命中
+        val free = insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_ON, recordTime = 8000L, remark = "未报销"),
+        )
+
+        val result = recordDao.queryReimbursableUnrelated(testBookId)
+
+        assertThat(result.map { it.id }).containsExactly(free)
+    }
+
+    @Test
+    fun when_queryReimbursableUnrelated_then_excludesOtherBooksAndSortsDesc() = runTest {
+        testBookId = createTestBook()
+        val otherBookId = createTestBook()
+        val expTypeId = typeDao.insertType(
+            createType(typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal),
+        )
+
+        val older = insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_ON, recordTime = 1000L, remark = "早"),
+        )
+        val newer = insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_ON, recordTime = 9000L, remark = "晚"),
+        )
+        // 他账本可报销 → 排除
+        insertRecord(
+            createRecord(typeId = expTypeId, booksId = otherBookId, reimbursable = SWITCH_INT_ON, recordTime = 5000L, remark = "他账本"),
+        )
+
+        val result = recordDao.queryReimbursableUnrelated(testBookId)
+
+        assertThat(result.map { it.id }).containsExactly(newer, older).inOrder()
+    }
+
+    // endregion
 }

@@ -345,6 +345,25 @@ interface RecordDao {
         recordTime: Long,
     ): List<RecordTable>
 
+    /** 查询当前账本全部「可报销支出且未关联任何报销/退款款」的记录（待报销管理界面用），按时间倒序、无 LIMIT */
+    @Query(
+        """
+        SELECT * FROM db_record
+        WHERE books_id = :booksId
+        AND reimbursable = $SWITCH_INT_ON
+        AND type_id IN (SELECT id FROM db_type WHERE type_category = :expenditureCategory)
+        AND NOT EXISTS (
+            SELECT 1 FROM db_record_with_related r
+            WHERE r.record_id = db_record.id OR r.related_record_id = db_record.id
+        )
+        ORDER BY record_time DESC
+    """,
+    )
+    suspend fun queryReimbursableUnrelated(
+        booksId: Long,
+        expenditureCategory: Int = RecordTypeCategoryEnum.EXPENDITURE.ordinal,
+    ): List<RecordTable>
+
     @Query(
         """
         SELECT * FROM db_record
