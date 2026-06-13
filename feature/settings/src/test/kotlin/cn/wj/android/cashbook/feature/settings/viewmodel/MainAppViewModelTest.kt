@@ -424,6 +424,56 @@ class MainAppViewModelTest {
 
     // endregion
 
+    // region 版本号比较（computeNeedUpdate 纯函数）
+
+    @Test
+    fun when_remote_version_blank_then_no_update() {
+        assertThat(computeNeedUpdate("v1.0_1", null)).isFalse()
+        assertThat(computeNeedUpdate("v1.0_1", "")).isFalse()
+        assertThat(computeNeedUpdate("v1.0_1", "   ")).isFalse()
+    }
+
+    @Test
+    fun when_same_main_version_then_compare_build_number() {
+        // 主版本号相同，比较构建号
+        assertThat(computeNeedUpdate("v1.0_10", "v1.0_20")).isTrue()
+        assertThat(computeNeedUpdate("v1.0_20", "v1.0_10")).isFalse()
+        assertThat(computeNeedUpdate("v1.0_10", "v1.0_10")).isFalse()
+    }
+
+    @Test
+    fun when_remote_main_version_numerically_higher_then_update_avoiding_lexicographic_trap() {
+        // 字典序陷阱：'1.10' 字符串比较会误判 < '1.9'，数值比较应判 1.10 > 1.9 需更新
+        assertThat(computeNeedUpdate("v1.9_1", "v1.10_1")).isTrue()
+        assertThat(computeNeedUpdate("v1.10_1", "v1.9_1")).isFalse()
+    }
+
+    @Test
+    fun when_main_version_segments_differ_then_numeric_compare() {
+        assertThat(computeNeedUpdate("v1.0_1", "v2.0_1")).isTrue()
+        assertThat(computeNeedUpdate("v2.0_1", "v1.0_1")).isFalse()
+        // 段数不等：远端多一段且为正 → 更新
+        assertThat(computeNeedUpdate("v1.0_1", "v1.0.1_1")).isTrue()
+        assertThat(computeNeedUpdate("v1.0.1_1", "v1.0_1")).isFalse()
+    }
+
+    @Test
+    fun when_remote_has_release_prefix_then_stripped_before_compare() {
+        // 远端带 Release / Pre Release 前缀应被剥离
+        assertThat(computeNeedUpdate("v1.0_1", "Release v1.0_2")).isTrue()
+        assertThat(computeNeedUpdate("v1.0_1", "Pre Release v1.0_2")).isTrue()
+        assertThat(computeNeedUpdate("v1.0_2", "Release v1.0_2")).isFalse()
+    }
+
+    @Test
+    fun when_version_unparseable_then_no_update() {
+        // 解析异常或非数字段按 0 处理，不应误报更新
+        assertThat(computeNeedUpdate("v1.0_1", "乱码")).isFalse()
+        assertThat(computeNeedUpdate("", "v1.0_1")).isTrue()
+    }
+
+    // endregion
+
     // region 内联 Fake 实现
 
     /** 测试用的 NetworkMonitor 实现 */

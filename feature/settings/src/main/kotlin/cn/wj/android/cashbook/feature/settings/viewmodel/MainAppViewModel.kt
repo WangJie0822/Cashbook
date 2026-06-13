@@ -411,36 +411,48 @@ class MainAppViewModel @Inject constructor(
     }
 
     /** 根据网络返回的版本信息判断是否需要更新 */
-    private fun needUpdate(versionName: String?): Boolean = runCatching {
-        if (versionName.isNullOrBlank()) return false
-        val localSplits = ApplicationInfo.versionName.split("_")
-        val remoteSplits = versionName.replace("Pre Release ", "")
-            .replace("Release ", "")
-            .split("_")
-
-        val localVersionPart = localSplits.first().replace("v", "")
-        val remoteVersionPart = remoteSplits.first().replace("v", "")
-
-        if (localVersionPart == remoteVersionPart) {
-            // 相同主版本号，比较构建号
-            val localBuild = localSplits.getOrNull(1)?.toIntOrNull() ?: 0
-            val remoteBuild = remoteSplits.getOrNull(1)?.toIntOrNull() ?: 0
-            return remoteBuild > localBuild
-        }
-
-        // 比较主版本号各段，逐段解析为 Int 进行数值比较
-        val localVersions = localVersionPart.split(".").map { it.toIntOrNull() ?: 0 }
-        val remoteVersions = remoteVersionPart.split(".").map { it.toIntOrNull() ?: 0 }
-        val maxLen = maxOf(localVersions.size, remoteVersions.size)
-        for (i in 0 until maxLen) {
-            val local = localVersions.getOrElse(i) { 0 }
-            val remote = remoteVersions.getOrElse(i) { 0 }
-            if (remote > local) return true
-            if (remote < local) return false
-        }
-        false
-    }.getOrDefault(false)
+    private fun needUpdate(versionName: String?): Boolean =
+        computeNeedUpdate(ApplicationInfo.versionName, versionName)
 }
+
+/**
+ * 比较本地版本 [localVersionName] 与远端版本 [remoteVersionName]，判断是否需要更新（纯函数，便于单测）。
+ *
+ * - [remoteVersionName] 为空白 → false。
+ * - 远端版本先去掉 `Pre Release `/`Release ` 前缀，本地/远端各段去前缀 `v`。
+ * - 主版本号相同 → 比较构建号（`_` 后第一段，缺省 0）。
+ * - 主版本号不同 → 按 `.` 分段逐段数值比较（防 `1.10` < `1.9` 字典序陷阱）。
+ * - 任意解析异常 → false。
+ */
+internal fun computeNeedUpdate(localVersionName: String, remoteVersionName: String?): Boolean = runCatching {
+    if (remoteVersionName.isNullOrBlank()) return false
+    val localSplits = localVersionName.split("_")
+    val remoteSplits = remoteVersionName.replace("Pre Release ", "")
+        .replace("Release ", "")
+        .split("_")
+
+    val localVersionPart = localSplits.first().replace("v", "")
+    val remoteVersionPart = remoteSplits.first().replace("v", "")
+
+    if (localVersionPart == remoteVersionPart) {
+        // 相同主版本号，比较构建号
+        val localBuild = localSplits.getOrNull(1)?.toIntOrNull() ?: 0
+        val remoteBuild = remoteSplits.getOrNull(1)?.toIntOrNull() ?: 0
+        return remoteBuild > localBuild
+    }
+
+    // 比较主版本号各段，逐段解析为 Int 进行数值比较
+    val localVersions = localVersionPart.split(".").map { it.toIntOrNull() ?: 0 }
+    val remoteVersions = remoteVersionPart.split(".").map { it.toIntOrNull() ?: 0 }
+    val maxLen = maxOf(localVersions.size, remoteVersions.size)
+    for (i in 0 until maxLen) {
+        val local = localVersions.getOrElse(i) { 0 }
+        val remote = remoteVersions.getOrElse(i) { 0 }
+        if (remote > local) return true
+        if (remote < local) return false
+    }
+    false
+}.getOrDefault(false)
 
 /**
  * 界面 UI 状态
