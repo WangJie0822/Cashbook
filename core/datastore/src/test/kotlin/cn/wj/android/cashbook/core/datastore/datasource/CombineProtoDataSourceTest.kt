@@ -16,16 +16,21 @@
 
 package cn.wj.android.cashbook.core.datastore.datasource
 
+import androidx.datastore.core.DataStore
+import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_CREDIT_CARD_PAYMENT
 import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
 import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 /**
  * CombineProtoDataSource 单元测试
  *
  * 覆盖范围：
- * - needRelated() 对退款/报销/普通类型 ID 的判断逻辑
+ * - needRelated() 对退款/报销/普通类型 ID 的判断逻辑（真实构造 SUT 实例调用）
  * - decryptWebDAVPassword() 对空字符串和不含冒号旧明文的向后兼容逻辑
  * - encryptWebDAVPassword() 对空字符串的短路逻辑
  *
@@ -34,29 +39,34 @@ import org.junit.Test
 class CombineProtoDataSourceTest {
 
     // ------------------- needRelated -------------------
+    // needRelated 仅比较 typeId 与固定常量、不读取任何 DataStore，
+    // 故注入发射空流的假 DataStore 即可真实构造 SUT 并直调 suspend 方法。
 
     @Test
-    fun when_type_is_refund_then_need_related_true() {
-        // FIXED_TYPE_ID_REFUND 应被识别为需要关联记录的类型
-        val result = FIXED_TYPE_ID_REFUND == FIXED_TYPE_ID_REFUND ||
-            FIXED_TYPE_ID_REFUND == FIXED_TYPE_ID_REIMBURSE
-        assertThat(result).isTrue()
+    fun when_type_is_refund_then_need_related_true() = runTest {
+        assertThat(createDataSource().needRelated(FIXED_TYPE_ID_REFUND)).isTrue()
     }
 
     @Test
-    fun when_type_is_reimburse_then_need_related_true() {
-        // FIXED_TYPE_ID_REIMBURSE 应被识别为需要关联记录的类型
-        val result = FIXED_TYPE_ID_REIMBURSE == FIXED_TYPE_ID_REFUND ||
-            FIXED_TYPE_ID_REIMBURSE == FIXED_TYPE_ID_REIMBURSE
-        assertThat(result).isTrue()
+    fun when_type_is_reimburse_then_need_related_true() = runTest {
+        assertThat(createDataSource().needRelated(FIXED_TYPE_ID_REIMBURSE)).isTrue()
     }
 
     @Test
-    fun when_type_is_normal_then_need_related_false() {
-        // 普通类型 ID 不应被识别为需要关联记录的类型
-        val typeId = 1L
-        val result = typeId == FIXED_TYPE_ID_REFUND || typeId == FIXED_TYPE_ID_REIMBURSE
-        assertThat(result).isFalse()
+    fun when_type_is_credit_card_payment_then_need_related_false() = runTest {
+        // 相邻负固定类型 ID（信用卡还款 -2003）应为 false，
+        // 区分"精确匹配 REFUND/REIMBURSE"与"所有负 ID 都为 true"的错误实现。
+        assertThat(createDataSource().needRelated(FIXED_TYPE_ID_CREDIT_CARD_PAYMENT)).isFalse()
+    }
+
+    @Test
+    fun when_type_is_normal_positive_then_need_related_false() = runTest {
+        assertThat(createDataSource().needRelated(1L)).isFalse()
+    }
+
+    @Test
+    fun when_type_is_zero_then_need_related_false() = runTest {
+        assertThat(createDataSource().needRelated(0L)).isFalse()
     }
 
     // ------------------- decryptWebDAVPassword -------------------
@@ -84,4 +94,23 @@ class CombineProtoDataSourceTest {
         val result = CombineProtoDataSource.encryptWebDAVPassword("")
         assertThat(result).isEqualTo("")
     }
+
+    // ------------------- 测试辅助 -------------------
+
+    /** 发射空流、updateData 不被使用的假 DataStore（needRelated 路径不触达）。 */
+    private fun <T> emptyDataStore(): DataStore<T> = object : DataStore<T> {
+        override val data: Flow<T> = emptyFlow()
+        override suspend fun updateData(transform: suspend (t: T) -> T): T =
+            throw UnsupportedOperationException("DataStore not exercised by needRelated tests")
+    }
+
+    @Suppress("DEPRECATION")
+    private fun createDataSource(): CombineProtoDataSource = CombineProtoDataSource(
+        appPreferences = emptyDataStore(),
+        appSettings = emptyDataStore(),
+        recordSettings = emptyDataStore(),
+        gitInfos = emptyDataStore(),
+        searchHistory = emptyDataStore(),
+        tempKeys = emptyDataStore(),
+    )
 }
