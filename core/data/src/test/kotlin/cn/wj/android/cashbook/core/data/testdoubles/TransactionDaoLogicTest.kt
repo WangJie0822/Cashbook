@@ -532,6 +532,122 @@ class TransactionDaoLogicTest {
         assertThat(dao.imageWithRecords).isEmpty()
     }
 
+    // ========== batchImportRecordsTransaction 测试 ==========
+
+    @Test
+    fun when_batchImport_capital_asset_then_balance_aggregated_and_ids_returned() = runTest {
+        setupTypesForAbsorption()
+        dao.assets.add(createAssetTable(id = 10L, balance = 50000L))
+
+        val ids = dao.batchImportRecordsTransaction(
+            listOf(
+                createRecordTable(typeId = INCOME_TYPE_ID, amount = 8000L, assetId = 10L),
+                createRecordTable(typeId = EXPENDITURE_TYPE_ID, amount = 3000L, assetId = 10L),
+            ),
+        )
+
+        // 返回两条插入 id
+        assertThat(ids).hasSize(2)
+        // 非信用卡：余额 + 收入 - 支出 = 50000 + 8000 - 3000 = 55000
+        assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(55000L)
+        // finalAmount = recordAmount（无吸收关联）
+        assertThat(dao.queryRecordById(ids[0])!!.finalAmount).isEqualTo(8000L) // 收入 = amount - charge
+        assertThat(dao.queryRecordById(ids[1])!!.finalAmount).isEqualTo(3000L) // 支出 = amount + charge - concessions
+    }
+
+    @Test
+    fun when_batchImport_credit_card_asset_then_balance_uses_inverted_sign() = runTest {
+        setupTypesForAbsorption()
+        dao.assets.add(
+            createAssetTable(
+                id = 20L,
+                balance = 10000L,
+                type = ClassificationTypeEnum.CREDIT_CARD_ACCOUNT.ordinal,
+            ),
+        )
+
+        dao.batchImportRecordsTransaction(
+            listOf(
+                createRecordTable(typeId = EXPENDITURE_TYPE_ID, amount = 5000L, assetId = 20L),
+                createRecordTable(typeId = INCOME_TYPE_ID, amount = 2000L, assetId = 20L),
+            ),
+        )
+
+        // 信用卡：已用额度 - 收入 + 支出 = 10000 - 2000 + 5000 = 13000
+        // （非信用卡同输入会得 10000 + 2000 - 5000 = 7000，符号相反，用于区分两分支）
+        assertThat(dao.queryAssetById(20L)!!.balance).isEqualTo(13000L)
+    }
+
+    @Test
+    fun when_batchImport_with_charge_and_concessions_then_recordAmount_and_per_asset_grouping() =
+        runTest {
+            setupTypesForAbsorption()
+            dao.assets.add(createAssetTable(id = 10L, balance = 0L))
+            dao.assets.add(createAssetTable(id = 20L, balance = 0L))
+
+            val ids = dao.batchImportRecordsTransaction(
+                listOf(
+                    createRecordTable(
+                        typeId = EXPENDITURE_TYPE_ID,
+                        amount = 10000L,
+                        charge = 200L,
+                        concessions = 500L,
+                        assetId = 10L,
+                    ),
+                    createRecordTable(
+                        typeId = INCOME_TYPE_ID,
+                        amount = 8000L,
+                        charge = 300L,
+                        assetId = 20L,
+                    ),
+                ),
+            )
+
+            // 支出 recordAmount = 10000 + 200 - 500 = 9700；资产10 = 0 - 9700
+            assertThat(dao.queryRecordById(ids[0])!!.finalAmount).isEqualTo(9700L)
+            assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(-9700L)
+            // 收入 recordAmount = 8000 - 300 = 7700；资产20 = 0 + 7700（按资产独立聚合）
+            assertThat(dao.queryRecordById(ids[1])!!.finalAmount).isEqualTo(7700L)
+            assertThat(dao.queryAssetById(20L)!!.balance).isEqualTo(7700L)
+        }
+
+    @Test
+    fun when_batchImport_record_without_asset_then_no_balance_update() = runTest {
+        setupTypesForAbsorption()
+        dao.assets.add(createAssetTable(id = 10L, balance = 50000L))
+
+        val ids = dao.batchImportRecordsTransaction(
+            listOf(
+                // assetId 默认 -1，不关联资产
+                createRecordTable(typeId = EXPENDITURE_TYPE_ID, amount = 5000L),
+            ),
+        )
+
+        assertThat(ids).hasSize(1)
+        // assetId <= 0 不参与余额聚合，资产余额不变
+        assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(50000L)
+        assertThat(dao.queryRecordById(ids[0])!!.finalAmount).isEqualTo(5000L)
+    }
+
+    @Test
+    fun when_batchImport_unknown_type_then_skipped_and_not_inserted() = runTest {
+        setupTypesForAbsorption()
+        dao.assets.add(createAssetTable(id = 10L, balance = 0L))
+
+        val ids = dao.batchImportRecordsTransaction(
+            listOf(
+                createRecordTable(typeId = EXPENDITURE_TYPE_ID, amount = 5000L, assetId = 10L),
+                // typeId 无对应 type，queryTypeById 返 null → continue 跳过
+                createRecordTable(typeId = 999L, amount = 3000L, assetId = 10L),
+            ),
+        )
+
+        // 仅合法记录被插入
+        assertThat(ids).hasSize(1)
+        // 余额仅累计合法记录的支出：0 - 5000
+        assertThat(dao.queryAssetById(10L)!!.balance).isEqualTo(-5000L)
+    }
+
     // ========== 辅助方法 ==========
 
     companion object {
