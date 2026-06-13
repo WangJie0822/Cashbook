@@ -44,14 +44,16 @@
 
 ## 4. Bug 清单
 
-### BUG-1【High｜核心阻塞｜根因待代码级确认】记账/我的分类 界面支出分类区不渲染（DB 有 97 类型）
+### BUG-1【High｜核心阻塞｜✅已修复 commit 20a0e502】记账/我的分类 界面支出分类区不渲染
 - **现象**：记账编辑界面（EditRecord）收起金额键盘后，类型 tab（支出/收入/转账）下方分类网格**空白无任何分类**；"我的分类"界面 支出 tab 同样空。tab/返回箭头异常地位于屏幕**垂直中部**（y≈1230）而非顶部，上下大片空白。
 - **实证（决定性）**：从设备 pull 出 `cashbook.db` 用 sqlite3 查：`db_type = 97`（`type_category`: EXPENDITURE=83 / INCOME=9 / TRANSFER=5；`type_level`: 一级 29 / 二级 68），`db_type` **无 booksId 列**（类型全局、不按账本过滤）。即 **83 个支出类型存在于库，但 UI 渲染 0 个**。
 - **复现**：跨页面（记账界面 + 我的分类）一致；app `force-stop` 重启后仍空；多次截图 + `android layout` 均无分类元素。
 - **logcat**：无 exception/fatal/crash（静默空渲染）。
 - **影响**：阻断核心记账流程——无分类可选 → 无法创建支出/收入记录 → seed 无法建记录 → 依赖记录的 journey（01/02/06/07/10）全部受阻。
-- **根因**：未定。DB 有数据、无报错 → 疑 Compose 分类网格/列表的渲染或 inset 布局异常（tab 被挤到垂直中部是线索），或 ViewModel 类型 Flow 返回空。需 systematic-debugging 代码级排查（读 EditRecordScreen/MyCategoriesScreen 的类型加载与布局），非 journey 黑盒可定论。
-- **证据文件**（本地，未入库）：`D:/Temp/editrec_body.png`、`D:/Temp/cats_final.png`、`D:/Temp/cashbook.db`（db_type 查询）。
+- **诊断决定性证据**：加 println 重建后 logcat `CASHBOOK_DBG firstExp raw=29 exp=15` → 数据层运行时正常发射 15 个支出类型到 UI（排除数据/Flow/枚举映射）。`MyCategoriesTopBar:914` 仅 Success 才渲染 tabs，而 tabs 可见 → uiState=Success、typeList 非空 → body 被挤成 0 高。
+- **根因（确认）**：`CbTabRow(Modifier.fillMaxSize())` 置于 `CbTopAppBar`（Material3 `TopAppBar`）title 槽——`fillMaxSize` 含 `fillMaxHeight`，该 Compose/Material3 版本下使 TopAppBar 按 title 撑满**全屏高**，`CbScaffold` body 被挤成 ~0 高 → 列表/空态都不渲染、tab 浮于垂直中部。**与数据无关**。结构对比：坏屏 `MyCategoriesScreen:917`+`EditRecordScreen:1036` 用 fillMaxSize TabRow；正常屏 MyBooks/MyAsset 用 `title={Text}`。
+- **修复（commit 20a0e502）**：两处 `fillMaxSize()`→`fillMaxWidth()`。设备验证：MyCategories 渲染 12 个支出一级分类；EditRecord 渲染完整记账表单（分类网格+金额+资产+备注+标签+可报销/手续费/优惠）。核心记账流程恢复。
+- **回归测试缺口**：现有 `MyCategoriesScreenScreenshotTests`/`EditRecordScreenScreenshotTests` 渲染 Success+非空 typeList 却未抓到此回归——基线 PNG 是带 bug 状态录入（回归被烘进基线掩盖）。已 re-record 校正基线使其今后能守此回归。
 
 ### BUG-2【Low｜仅 Debug 构建】DoKit 调试浮窗拦截首屏左上"菜单"点击
 - **现象**：首屏 DoKit 浮窗（`float_icon_id`）默认停在左上 [76,139]，与"菜单"按钮 [74,147] 重叠；点"菜单"打开的是 DoKit 调试面板而非 app 抽屉。
