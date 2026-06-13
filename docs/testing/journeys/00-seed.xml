@@ -1,0 +1,44 @@
+<journey name="00-seed">
+  <description>
+    建立基线虚构测试数据供后续 journey 复用。第一步必须处理首启隐私协议 gate。
+    末尾逐项校验数据建成，任一缺失则本 journey FAILED、后续全 SKIP。
+    所有数据均为虚构，禁止填入任何真实账户/WebDAV 凭据。
+  </description>
+  <actions>
+    <action>If a privacy-protocol agreement dialog is shown on first launch, tap its agree/confirm button (testTag launcher_protocol_confirm, text "确定")</action>
+    <action>Verify the home screen is shown (an element with testTag launcher_title is present)</action>
+
+    <action>Open the navigation drawer by tapping the menu icon at the top-left of the home screen</action>
+    <action>Navigate to the books (账本) management screen</action>
+    <action>Create a new book named "测试账本A"</action>
+    <action>Verify a book named "测试账本A" appears in the books list</action>
+    <action>Navigate back to the home screen</action>
+
+    <action>Open the navigation drawer and navigate to the assets (资产) management screen</action>
+    <action>Create a new cash (现金) asset named "测试现金" with an initial balance of 1000</action>
+    <action>Create a new savings-card (储蓄卡) asset named "测试储蓄卡" with an initial balance of 5000</action>
+    <action>Create a new credit-card (信用卡) asset named "测试信用卡"</action>
+    <action>Verify all three assets "测试现金", "测试储蓄卡", "测试信用卡" appear in the assets list</action>
+    <action>Navigate back to the home screen</action>
+
+    <action>Tap the add-record floating action button on the home screen</action>
+    <action>Create an EXPENDITURE record: amount 100, select a category, select asset "测试现金", then save</action>
+    <action>Verify the record list on the home screen shows a 100 expenditure</action>
+
+    <action>Tap the add-record floating action button</action>
+    <action>Create an INCOME record: amount 200, select an income category, select asset "测试储蓄卡", then save</action>
+    <action>Verify the record list shows a 200 income</action>
+
+    <action>Tap the add-record floating action button</action>
+    <action>Create a TRANSFER record from "测试储蓄卡" to "测试现金" with amount 300, then save</action>
+    <action>Verify a transfer record appears in the record list</action>
+
+    <action>Tap the add-record floating action button</action>
+    <action>Create an EXPENDITURE record amount 500 to be reimbursed later (select a category and asset, save). Note its description for later reimbursement.</action>
+    <action>Tap the add-record floating action button</action>
+    <action>Create an INCOME record of type 报销款 (reimbursement) amount 500, and in its related-record selection relate it to the 500 expenditure created above, then save</action>
+    <action>Verify the 500 expenditure now shows as reimbursed (struck-through original amount with a reimbursed tag) in the record list</action>
+
+    <action>Verify seed completeness: the books list contains "测试账本A"; the assets list contains "测试现金"/"测试储蓄卡"/"测试信用卡"; the record list contains at least one expenditure, one income, one transfer, and one reimbursed record</action>
+  </actions>
+</journey>
