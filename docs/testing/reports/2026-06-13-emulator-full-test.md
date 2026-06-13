@@ -7,10 +7,11 @@
 
 > 状态：执行中，逐 journey 即时落盘。
 
-## 0. 环境冒烟
-（Task 0.3 Step 4 结果：协议 gate 是否过、主界面是否渲染）
-
-- 待填
+## 0. 环境冒烟（PASS）
+- 安装 OfflineDebug APK 成功，包名 `cn.wj.android.cashbook`，前台 `cn.wj.android.cashbook/.ui.MainActivity`。
+- 首启隐私协议对话框正常弹出（标题"用户协议和隐私政策"，按钮"取消"/"确认"）；点"确认"后进入主界面。
+- 主界面渲染正常：月收入/月支出/月结余 ¥0.00（全新安装空库），添加 FAB、菜单、搜索、日历、分析入口均在。
+- 结论：构建→安装→启动→过协议→主界面 全链路 PASS。
 
 ## 1. 金额基线（现有测试）
 - JVM 金额单测（`:core:model:test` / `:core:data:testDebugUnitTest` / `:core:domain:testDebugUnitTest` / `:feature:records:testDebugUnitTest`）：待填
@@ -37,7 +38,12 @@
 ## 3. semantics 命中缺口清单
 （seed 阶段盘点：各 Screen 可命中元素 / 需 annotate 兜底的元素）
 
-- 待填
+**全局实证（印证评审 M4）**：
+- Compose **未开 `testTagsAsResourceId`** → `core/common/TestTag.kt` 的 testTag（含 `launcher_protocol_confirm`/`launcher_title`）**不在 `android layout` 输出暴露**，journey 无法用 testTag 命中，只能靠 text/contentDesc/坐标。
+- **好于预期**：首屏关键图标带 `content-desc`（添加/菜单/搜索/日历/分析），文本元素（金额 ¥x.xx、月份）可读 → 主要导航与金额回显可命中。
+- 协议同意按钮实际文本 **"确认"**（journey/seed 中描述的"确定"应按"确认"解析）。
+- ⚠️ **DoKit 调试浮窗**（`float_icon_id` ~[76,139]、`dokit_contentview_id`）叠加在左上角，与"菜单"[74,147] 重叠，可能拦截点击——执行抽屉导航时若菜单点击无效，先处理/拖开浮窗。
+- 各管理界面（账本/资产/标签/类型/统计/报销/设置）的命中元素在对应 journey 执行时增量补录。
 
 ## 4. Bug 清单
 （journey 暴露的崩溃/错屏/逻辑异常，含界面/复现步骤/证据图文件名/严重度）
