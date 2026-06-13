@@ -1033,7 +1033,7 @@ internal fun EditRecordTopBar(
         title = {
             if (uiState is EditRecordUiState.Success) {
                 CbTabRow(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     selectedTabIndex = selectedTab.ordinal,
                     containerColor = Color.Unspecified,
                     contentColor = Color.Unspecified,

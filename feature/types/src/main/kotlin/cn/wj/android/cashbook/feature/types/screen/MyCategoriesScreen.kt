@@ -914,7 +914,7 @@ internal fun MyCategoriesTopBar(
             if (uiState is MyCategoriesUiState.Success) {
                 val selectedTab = uiState.selectedTab
                 CbTabRow(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     selectedTabIndex = selectedTab.ordinal,
                     containerColor = Color.Unspecified,
                     contentColor = Color.Unspecified,
