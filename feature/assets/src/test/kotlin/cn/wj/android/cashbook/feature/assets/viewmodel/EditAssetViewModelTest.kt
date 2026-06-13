@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.feature.assets.viewmodel
 
 import androidx.test.core.app.ApplicationProvider
+import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.model.enums.AssetClassificationEnum
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
@@ -256,6 +257,188 @@ class EditAssetViewModelTest {
 
         val state = viewModel.uiState.value as EditAssetUiState.Success
         assertThat(state.invisible).isTrue()
+    }
+
+    @Test
+    fun when_save_new_asset_then_persisted_and_on_success() = runTest {
+        var successCount = 0
+        // 新建资产（id 默认 -1）保存：应落库并回调成功
+        viewModel.save(
+            assetName = "工资卡",
+            totalAmount = "0",
+            balance = "1000",
+            openBank = "招商银行",
+            cardNo = "6225",
+            remark = "备注",
+            onSuccess = { successCount++ },
+        )
+
+        val saved = assetRepository.lastUpdatedAsset
+        assertThat(saved).isNotNull()
+        assertThat(saved!!.name).isEqualTo("工资卡")
+        assertThat(saved.openBank).isEqualTo("招商银行")
+        assertThat(saved.cardNo).isEqualTo("6225")
+        assertThat(saved.remark).isEqualTo("备注")
+        // 1000 元 → 100000 分
+        assertThat(saved.balance).isEqualTo(100000L)
+        assertThat(successCount).isEqualTo(1)
+    }
+
+    @Test
+    fun when_save_then_amount_strings_converted_to_cent() = runTest {
+        // 元字符串入参经 toAmountCent 转分（HALF_UP）落库
+        viewModel.save(
+            assetName = "现金",
+            totalAmount = "200.50",
+            balance = "99.99",
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            onSuccess = {},
+        )
+
+        val saved = assetRepository.lastUpdatedAsset
+        assertThat(saved).isNotNull()
+        assertThat(saved!!.totalAmount).isEqualTo(20050L)
+        assertThat(saved.balance).isEqualTo(9999L)
+    }
+
+    @Test
+    fun when_save_existing_asset_without_change_then_skip_persist() = runTest {
+        // 已有资产且全字段未变：跳过落库但仍回调成功
+        val asset = createAssetModel(id = 1L, name = "已有资产")
+        assetRepository.addAsset(asset)
+        viewModel.updateAssetId(1L)
+
+        var successCount = 0
+        viewModel.save(
+            assetName = "已有资产",
+            totalAmount = "0",
+            balance = "0",
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            onSuccess = { successCount++ },
+        )
+
+        // addAsset 不写 lastUpdatedAsset，未变化时 updateAsset 不应被调用
+        assertThat(assetRepository.lastUpdatedAsset).isNull()
+        assertThat(successCount).isEqualTo(1)
+    }
+
+    @Test
+    fun when_save_existing_asset_with_name_change_then_persisted() = runTest {
+        // 已有资产改名：落库新名
+        val asset = createAssetModel(id = 1L, name = "旧名")
+        assetRepository.addAsset(asset)
+        viewModel.updateAssetId(1L)
+
+        var successCount = 0
+        viewModel.save(
+            assetName = "新名",
+            totalAmount = "0",
+            balance = "0",
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            onSuccess = { successCount++ },
+        )
+
+        val saved = assetRepository.lastUpdatedAsset
+        assertThat(saved).isNotNull()
+        assertThat(saved!!.name).isEqualTo("新名")
+        assertThat(successCount).isEqualTo(1)
+    }
+
+    @Test
+    fun when_save_in_progress_then_reentrant_call_ignored() = runTest {
+        var successCount = 0
+        // 成功路径不复位 doSaving，二次调用应被重入守卫拦截
+        viewModel.save(
+            assetName = "首次",
+            totalAmount = "0",
+            balance = "0",
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            onSuccess = { successCount++ },
+        )
+        viewModel.save(
+            assetName = "二次",
+            totalAmount = "0",
+            balance = "0",
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            onSuccess = { successCount++ },
+        )
+
+        assertThat(successCount).isEqualTo(1)
+        assertThat(assetRepository.lastUpdatedAsset!!.name).isEqualTo("首次")
+    }
+
+    @Test
+    fun when_save_fails_then_doSaving_reset_allows_retry() = runTest {
+        // 落库抛异常：catch 复位 doSaving，不回调成功；复位后可重试成功
+        val backing = FakeAssetRepository()
+        val throwingRepo = ThrowingAssetRepository(backing, shouldThrow = true)
+        val failingViewModel = EditAssetViewModel(
+            assetRepository = throwingRepo,
+            saveAssetUseCase = SaveAssetUseCase(
+                recordRepository = recordRepository,
+                assetRepository = throwingRepo,
+                coroutineContext = UnconfinedTestDispatcher(),
+            ),
+            getDefaultAssetUseCase = GetDefaultAssetUseCase(
+                context = ApplicationProvider.getApplicationContext(),
+                assetRepository = throwingRepo,
+            ),
+        )
+
+        var successCount = 0
+        failingViewModel.save(
+            assetName = "失败",
+            totalAmount = "0",
+            balance = "0",
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            onSuccess = { successCount++ },
+        )
+        // 失败：不落库、不回调成功
+        assertThat(successCount).isEqualTo(0)
+        assertThat(backing.lastUpdatedAsset).isNull()
+
+        // doSaving 已复位 → 重试落库成功
+        throwingRepo.shouldThrow = false
+        failingViewModel.save(
+            assetName = "重试",
+            totalAmount = "0",
+            balance = "0",
+            openBank = "",
+            cardNo = "",
+            remark = "",
+            onSuccess = { successCount++ },
+        )
+        assertThat(successCount).isEqualTo(1)
+        assertThat(backing.lastUpdatedAsset).isNotNull()
+        assertThat(backing.lastUpdatedAsset!!.name).isEqualTo("重试")
+    }
+
+    /**
+     * 可注入 updateAsset 异常的 AssetRepository 装饰器，用于覆盖 save() 的 catch/重试路径。
+     * core/testing 的 FakeAssetRepository 永不抛异常，无法触达失败分支。
+     */
+    private class ThrowingAssetRepository(
+        private val delegate: FakeAssetRepository,
+        var shouldThrow: Boolean = true,
+    ) : AssetRepository by delegate {
+        override suspend fun updateAsset(asset: AssetModel) {
+            if (shouldThrow) {
+                throw RuntimeException("save failed")
+            }
+            delegate.updateAsset(asset)
+        }
     }
 
     /**
