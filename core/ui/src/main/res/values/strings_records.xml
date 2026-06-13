@@ -77,6 +77,7 @@
     <string name="reimbursed">已报销</string>
     <string name="refunded">已退款</string>
     <string name="pending_reimbursement">待报销</string>
+    <string name="reimbursement_summary_format">共 %1$d 笔，合计 %2$s</string>
     <string name="type">类型</string>
     <string name="related_image">关联图片</string>
     <string name="asset">资产</string>
