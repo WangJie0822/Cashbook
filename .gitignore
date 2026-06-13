@@ -103,3 +103,6 @@ RELEASE.md
 
 # Superpowers brainstorm 临时文件
 .superpowers/
+
+# 模拟器功能测试截图/layout 证据（不入库，避免仓库膨胀与隐私）
+docs/testing/reports/evidence/
