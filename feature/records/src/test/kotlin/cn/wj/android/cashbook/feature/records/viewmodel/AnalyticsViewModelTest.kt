@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
+import cn.wj.android.cashbook.core.ui.DefaultProgressDialogController
 import cn.wj.android.cashbook.domain.usecase.GetRecordViewsBetweenDateUseCase
 import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCase
@@ -332,6 +333,59 @@ class AnalyticsViewModelTest {
         val state = viewModel.uiState.value as AnalyticsUiState.Success
         assertThat(state.expenditurePieDataList).isNotEmpty()
         assertThat(state.incomePieDataList).isEmpty()
+    }
+
+    @Test
+    fun when_showSheet_with_unknown_type_then_sheetData_null() {
+        // type 不存在 → 直接 return，不设置 sheetData
+        viewModel.showSheet(DefaultProgressDialogController(), typeId = 999L)
+
+        assertThat(viewModel.sheetData).isNull()
+    }
+
+    @Test
+    fun when_showSheet_with_type_but_no_records_then_sheetData_null() {
+        // type 存在但无匹配记录 → 二级饼图为空 → 不设置 sheetData
+        typeRepository.addType(
+            createRecordTypeModel(
+                id = 1L,
+                name = "餐饮",
+                typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+            ),
+        )
+
+        viewModel.showSheet(DefaultProgressDialogController(), typeId = 1L)
+
+        assertThat(viewModel.sheetData).isNull()
+    }
+
+    @Test
+    fun when_showSheet_with_matching_records_then_sheetData_set() {
+        // type 存在且有匹配二级记录 → 设置 sheetData（下钻二级饼图）
+        typeRepository.addType(
+            createRecordTypeModel(
+                id = 1L,
+                name = "餐饮",
+                typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+            ),
+        )
+        recordRepository.addRecord(
+            createRecordModel(
+                id = 1L,
+                typeId = 1L,
+                amount = 5000L,
+                finalAmount = 5000L,
+                recordTime = 1704067200000L,
+            ),
+        )
+
+        viewModel.showSheet(DefaultProgressDialogController(), typeId = 1L)
+
+        val data = viewModel.sheetData
+        assertThat(data).isNotNull()
+        assertThat(data!!.typeId).isEqualTo(1L)
+        assertThat(data.typeName).isEqualTo("餐饮")
+        assertThat(data.dataList).isNotEmpty()
     }
 
     @Test

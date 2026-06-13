@@ -18,6 +18,8 @@ package cn.wj.android.cashbook.feature.records.viewmodel
 
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.testing.data.createRecordModel
+import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
@@ -28,13 +30,19 @@ import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsMapUseCas
 import cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCase
 import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
 
 /**
  * CalendarViewModel 的单元测试
@@ -48,12 +56,14 @@ class CalendarViewModelTest {
     @get:Rule
     val dispatcherRule = TestDispatcherRule()
 
+    private lateinit var recordRepository: FakeRecordRepository
+    private lateinit var typeRepository: FakeTypeRepository
     private lateinit var viewModel: CalendarViewModel
 
     @Before
     fun setup() {
-        val recordRepository = FakeRecordRepository()
-        val typeRepository = FakeTypeRepository()
+        recordRepository = FakeRecordRepository()
+        typeRepository = FakeTypeRepository()
         val assetRepository = FakeAssetRepository()
         val tagRepository = FakeTagRepository()
 
@@ -163,6 +173,96 @@ class CalendarViewModelTest {
     fun when_initialized_then_view_record_is_null() {
         // 初始状态 viewRecord 应为 null
         assertThat(viewModel.viewRecord).isNull()
+    }
+
+    @Test
+    fun when_month_has_income_and_expenditure_then_uiState_totals_and_record_list() = runTest {
+        // 同一日一条支出 100 元 + 一条收入 300 元
+        typeRepository.addType(
+            createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE),
+        )
+        typeRepository.addType(
+            createRecordTypeModel(id = 2L, typeCategory = RecordTypeCategoryEnum.INCOME),
+        )
+        val recordTime = 1718200000000L
+        recordRepository.addRecord(
+            createRecordModel(id = 1L, typeId = 1L, finalAmount = 10000L, recordTime = recordTime),
+        )
+        recordRepository.addRecord(
+            createRecordModel(id = 2L, typeId = 2L, finalAmount = 30000L, recordTime = recordTime),
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        // 选中记录所在日，激活 selectedDay 过滤
+        val targetDate = Instant.ofEpochMilli(recordTime).atZone(ZoneId.systemDefault()).toLocalDate()
+        viewModel.onDateSelected(targetDate)
+
+        val state = viewModel.uiState.value as CalendarUiState.Success
+        assertThat(state.monthIncome).isEqualTo("300.00")
+        assertThat(state.monthExpand).isEqualTo("100.00")
+        assertThat(state.monthBalance).isEqualTo("200.00")
+        // selectedDay 命中：两条记录都进 recordList
+        assertThat(state.recordList.map { it.id }).containsExactly(1L, 2L)
+        // schemas 含该日
+        assertThat(state.schemas).isNotEmpty()
+        collectJob.cancel()
+    }
+
+    @Test
+    fun when_records_on_different_days_then_record_list_filtered_by_selected_day() = runTest {
+        typeRepository.addType(
+            createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE),
+        )
+        val timeA = 1718200000000L
+        val timeB = timeA + 2 * 86_400_000L // 2 天后，确保不同日（跨时区也成立）
+        recordRepository.addRecord(
+            createRecordModel(id = 10L, typeId = 1L, finalAmount = 10000L, recordTime = timeA),
+        )
+        recordRepository.addRecord(
+            createRecordModel(id = 20L, typeId = 1L, finalAmount = 5000L, recordTime = timeB),
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        val dayA = Instant.ofEpochMilli(timeA).atZone(ZoneId.systemDefault()).toLocalDate()
+        viewModel.onDateSelected(dayA)
+
+        val state = viewModel.uiState.value as CalendarUiState.Success
+        // recordList 仅含选中日 A 的记录
+        assertThat(state.recordList.map { it.id }).containsExactly(10L)
+        // 月度合计涵盖两天（100 + 50）
+        assertThat(state.monthExpand).isEqualTo("150.00")
+        // schemas 含两日
+        assertThat(state.schemas).hasSize(2)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun when_transfer_record_then_charges_minus_concessions_counted_as_expenditure() = runTest {
+        // 转账：手续费 5 元 - 优惠 2 元 = 净支出 3 元（守 TRANSFER 口径）
+        typeRepository.addType(
+            createRecordTypeModel(id = 3L, typeCategory = RecordTypeCategoryEnum.TRANSFER),
+        )
+        val recordTime = 1718200000000L
+        recordRepository.addRecord(
+            createRecordModel(
+                id = 1L,
+                typeId = 3L,
+                finalAmount = 10000L,
+                charges = 500L,
+                concessions = 200L,
+                recordTime = recordTime,
+            ),
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        viewModel.onDateSelected(
+            Instant.ofEpochMilli(recordTime).atZone(ZoneId.systemDefault()).toLocalDate(),
+        )
+
+        val state = viewModel.uiState.value as CalendarUiState.Success
+        assertThat(state.monthExpand).isEqualTo("3.00")
+        assertThat(state.monthIncome).isEqualTo("0.00")
+        collectJob.cancel()
     }
 
     /** 创建测试用的 RecordViewsEntity */
