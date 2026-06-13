@@ -1,0 +1,12 @@
+<journey name="03-tags">
+  <description>标签管理：增删改。</description>
+  <actions>
+    <action>Open the navigation drawer and navigate to the tags (标签) management screen</action>
+    <action>Create a new tag named "测试标签"</action>
+    <action>Verify "测试标签" appears in the tag list</action>
+    <action>Rename "测试标签" to "测试标签改"</action>
+    <action>Verify the tag now shows "测试标签改"</action>
+    <action>Delete "测试标签改"</action>
+    <action>Verify it no longer appears and the app does not crash</action>
+  </actions>
+</journey>

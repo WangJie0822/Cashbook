@@ -1,0 +1,10 @@
+<journey name="10-search-calendar">
+  <description>记录搜索与日历查看。</description>
+  <actions>
+    <action>Open the search (搜索) screen from the home screen</action>
+    <action>Search for a keyword matching a seeded record's note/category</action>
+    <action>Verify search results render without crashing</action>
+    <action>Open the calendar (日历) view of records</action>
+    <action>Verify the calendar screen renders records for a day without crashing</action>
+  </actions>
+</journey>

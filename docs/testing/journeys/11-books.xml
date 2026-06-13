@@ -1,0 +1,13 @@
+<journey name="11-books">
+  <description>账本管理：新建/编辑/切换/删除。删除为不可逆破坏性操作，置于全套最后。</description>
+  <actions>
+    <action>Open the navigation drawer and navigate to the books (账本) management screen</action>
+    <action>Create a new book named "测试账本B"</action>
+    <action>Edit "测试账本B": change its description, then save</action>
+    <action>Switch the current book to "测试账本B"</action>
+    <action>Verify the home screen reflects the switched book (empty or B-specific records)</action>
+    <action>Switch back to "测试账本A"</action>
+    <action>Delete "测试账本B"</action>
+    <action>Verify "测试账本B" no longer appears in the books list and the app does not crash</action>
+  </actions>
+</journey>

@@ -1,0 +1,11 @@
+<journey name="06-analytics">
+  <description>统计图表：饼图/折线/分类统计/切换月份。</description>
+  <actions>
+    <action>Open the navigation drawer and navigate to the analytics/statistics (统计) screen</action>
+    <action>Verify a pie chart and/or line chart renders without crashing</action>
+    <action>Switch the time period to a different month</action>
+    <action>Verify the chart updates without crashing</action>
+    <action>Tap into a category to open the typed/per-category analytics screen</action>
+    <action>Verify the per-category analytics screen renders without crashing</action>
+  </actions>
+</journey>

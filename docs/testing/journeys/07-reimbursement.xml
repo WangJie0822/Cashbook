@@ -1,0 +1,10 @@
+<journey name="07-reimbursement">
+  <description>报销管理：待报销抽屉项 + 报销/退款对冲。</description>
+  <actions>
+    <action>Open the navigation drawer and locate the pending-reimbursement (待报销) entry</action>
+    <action>Tap the pending-reimbursement entry to open the reimbursement screen</action>
+    <action>Verify the reimbursement screen renders without crashing</action>
+    <action>Verify the previously reimbursed 500 expenditure and its reimbursement relationship are reflected correctly (no crash, amounts non-negative)</action>
+    <action>Navigate back to the home screen</action>
+  </actions>
+</journey>

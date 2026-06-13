@@ -1,0 +1,13 @@
+<journey name="01-records">
+  <description>记账增删改：支出/收入/转账 + 手续费/优惠/标签/关联资产。前置：00-seed 已建基线。</description>
+  <actions>
+    <action>Tap the add-record floating action button on the home screen</action>
+    <action>Create an EXPENDITURE record: amount 88, add a charge (手续费) of 2, add a concession (优惠) of 8, select a category, select asset "测试现金", attach a tag, then save</action>
+    <action>Verify the new record appears in the record list</action>
+    <action>Open the record just created to view its detail</action>
+    <action>Edit the record: change amount to 99, then save</action>
+    <action>Verify the record now shows amount 99 in the list</action>
+    <action>Delete the edited record</action>
+    <action>Verify the record no longer appears in the list and the app does not crash</action>
+  </actions>
+</journey>

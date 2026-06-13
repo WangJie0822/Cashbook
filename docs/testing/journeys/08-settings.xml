@@ -1,0 +1,12 @@
+<journey name="08-settings">
+  <description>设置：主题切换/安全设置入口/关于/协议。WebDAV 备份恢复超范围，不进入填写。</description>
+  <actions>
+    <action>Open the navigation drawer and navigate to the settings (设置) screen</action>
+    <action>Verify the settings screen renders without crashing</action>
+    <action>Toggle a theme/appearance setting and verify the UI responds without crashing</action>
+    <action>Open the about (关于) screen and verify it renders without crashing</action>
+    <action>Open the user-protocol/markdown (协议) screen and verify it renders without crashing</action>
+    <action>Do NOT enter any real WebDAV domain/account/password anywhere</action>
+    <action>Navigate back to the home screen</action>
+  </actions>
+</journey>

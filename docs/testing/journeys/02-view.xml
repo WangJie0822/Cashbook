@@ -1,0 +1,11 @@
+<journey name="02-view">
+  <description>记录查看：列表/详情。重点核对被报销支出的 finalAmount 净自付回显（在列表项渲染）。</description>
+  <actions>
+    <action>On the home screen, verify the record list renders without crashing</action>
+    <action>Locate the reimbursed 500 expenditure created in seed; verify it shows the original amount struck through and a reimbursed (已报销) indicator</action>
+    <action>Tap that reimbursed expenditure to open its detail</action>
+    <action>Verify the detail screen opens without crashing and shows the related reimbursement record</action>
+    <action>Navigate back to the home screen</action>
+    <action>Verify the monthly total/summary area on the home screen renders a number without crashing</action>
+  </actions>
+</journey>

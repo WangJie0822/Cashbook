@@ -1,0 +1,12 @@
+<journey name="04-types">
+  <description>类型/分类管理：一级与二级类型增删改。</description>
+  <actions>
+    <action>Open the navigation drawer and navigate to the categories/types (分类/类型) management screen</action>
+    <action>Create a new first-level category named "测试一级类型"</action>
+    <action>Verify "测试一级类型" appears in the category list</action>
+    <action>Add a second-level category named "测试二级类型" under "测试一级类型"</action>
+    <action>Verify "测试二级类型" appears under "测试一级类型"</action>
+    <action>Delete "测试一级类型"</action>
+    <action>Verify it no longer appears and the app does not crash</action>
+  </actions>
+</journey>

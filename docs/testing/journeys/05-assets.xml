@@ -1,0 +1,15 @@
+<journey name="05-assets">
+  <description>资产管理：编辑/详情/隐藏-显示。隐藏操作在本 journey 内自恢复，避免污染后续。</description>
+  <actions>
+    <action>Open the navigation drawer and navigate to the assets (资产) management screen</action>
+    <action>Open "测试信用卡" to view its asset detail</action>
+    <action>Verify the asset detail screen renders the balance and record history without crashing</action>
+    <action>Navigate back to the assets list</action>
+    <action>Edit "测试信用卡": change its name to "测试信用卡改", then save</action>
+    <action>Verify the asset now shows "测试信用卡改"</action>
+    <action>Hide the asset "测试现金"</action>
+    <action>Open the invisible/hidden assets screen and verify "测试现金" is listed there</action>
+    <action>Unhide "测试现金" so it returns to the visible assets list (restore state)</action>
+    <action>Verify "测试现金" is back in the visible assets list</action>
+  </actions>
+</journey>

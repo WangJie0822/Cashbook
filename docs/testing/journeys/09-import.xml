@@ -1,0 +1,8 @@
+<journey name="09-import">
+  <description>账单导入。若无可用虚构样例账单文件，标记 SKIP 而非 FAIL。</description>
+  <actions>
+    <action>Open the navigation drawer and navigate to the record-import (导入) entry if present</action>
+    <action>If no fabricated sample bill file is available on the device, mark this journey SKIPPED and stop</action>
+    <action>Otherwise, import the fabricated sample bill file and verify imported records appear without crashing</action>
+  </actions>
+</journey>
