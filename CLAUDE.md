@@ -153,6 +153,7 @@ app → feature/* → core/*
 
   > 访问 `MaterialTheme.colorScheme`/`.typography`/`.shapes` 属性是允许的，仅禁止作为 composable 调用。
   > 违反此规则会触发 lint `Design` error，构建将中止。
+- **`CbTabRow`（或任何内容）放进 `CbTopAppBar` 的 `title` 槽时，modifier 必须用 `Modifier.fillMaxWidth()`，禁止 `fillMaxSize()`**：`fillMaxSize` 含 `fillMaxHeight`，在 Material3 `TopAppBar` title 槽下会使 TopAppBar 按 title 撑满全屏高度、`CbScaffold` body 区塌陷为 0 高 → 该屏内容（如分类网格）完全不渲染、tab 浮于屏幕垂直中部。曾致 Critical bug（记账/我的分类支出分类不渲染、无法记账，main `20a0e502` 修复，回归测试 `a0190d5e` 用 `assertIsDisplayed` 守护）。lint 不覆盖此 modifier 误用，靠本规则 + 回归测试防回归。
 - `compose_compiler_config.conf` 声明了 `core/model` 中模型类的 Compose 稳定性
 - 测试使用自定义 TestRunner: `cn.wj.android.cashbook.core.testing.CashbookTestRunner`
 - 包名: `cn.wj.android.cashbook`
