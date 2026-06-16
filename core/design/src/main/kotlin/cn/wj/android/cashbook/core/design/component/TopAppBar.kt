@@ -20,8 +20,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
@@ -95,6 +98,54 @@ fun CbTopAppBar(
         windowInsets = windowInsets,
         colors = colors,
         scrollBehavior = scrollBehavior,
+    )
+}
+
+/**
+ * 顶部标题栏 + title 槽内 Tab 行的封装。
+ *
+ * 固化 [CbTopAppBar] 的 title 槽放一个 `Modifier.fillMaxWidth()` 的 [CbTabRow]——
+ * fillMaxWidth 写死、不暴露给调用方，从 API 层杜绝 fillMaxSize 误用（BUG-1：fillMaxSize
+ * 含 fillMaxHeight 会使 TopAppBar 撑满全屏高、CbScaffold body 塌陷 0 高、内容不渲染）。
+ *
+ * @param selectedTabIndex 选中 tab 下标
+ * @param indicatorColor 指示器颜色（必填，无默认——各调用方用色不同）
+ * @param onBackClick 返回事件
+ * @param actions 标题菜单
+ * @param tabs tab 内容槽，调用方放 [CbTab]
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CbTabTopAppBar(
+    selectedTabIndex: Int,
+    indicatorColor: Color,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
+    tabs: @Composable () -> Unit,
+) {
+    CbTopAppBar(
+        onBackClick = onBackClick,
+        modifier = modifier,
+        actions = actions,
+        title = {
+            CbTabRow(
+                modifier = Modifier.fillMaxWidth(),
+                selectedTabIndex = selectedTabIndex,
+                containerColor = Color.Unspecified,
+                contentColor = Color.Unspecified,
+                indicator = { tabPositions ->
+                    if (selectedTabIndex < tabPositions.size) {
+                        TabRowDefaults.SecondaryIndicator(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                            color = indicatorColor,
+                        )
+                    }
+                },
+                divider = {},
+                tabs = tabs,
+            )
+        },
     )
 }
 
