@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,8 +42,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -74,7 +71,7 @@ import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbOutlinedTextField
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTab
-import cn.wj.android.cashbook.core.design.component.CbTabRow
+import cn.wj.android.cashbook.core.design.component.CbTabTopAppBar
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
@@ -908,35 +905,24 @@ internal fun MyCategoriesTopBar(
     onTabSelected: (RecordTypeCategoryEnum) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    CbTopAppBar(
-        onBackClick = onBackClick,
-        title = {
-            if (uiState is MyCategoriesUiState.Success) {
-                val selectedTab = uiState.selectedTab
-                CbTabRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    selectedTabIndex = selectedTab.ordinal,
-                    containerColor = Color.Unspecified,
-                    contentColor = Color.Unspecified,
-                    indicator = { tabPositions ->
-                        TabRowDefaults.SecondaryIndicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.ordinal]),
-                            color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        )
-                    },
-                    divider = {},
-                ) {
-                    RecordTypeCategoryEnum.entries.forEach { enum ->
-                        CbTab(
-                            selected = selectedTab == enum,
-                            onClick = { onTabSelected(enum) },
-                            text = { Text(text = enum.text) },
-                            selectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            unselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        )
-                    }
-                }
+    if (uiState is MyCategoriesUiState.Success) {
+        val selectedTab = uiState.selectedTab
+        CbTabTopAppBar(
+            selectedTabIndex = selectedTab.ordinal,
+            indicatorColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            onBackClick = onBackClick,
+        ) {
+            RecordTypeCategoryEnum.entries.forEach { enum ->
+                CbTab(
+                    selected = selectedTab == enum,
+                    onClick = { onTabSelected(enum) },
+                    text = { Text(text = enum.text) },
+                    selectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    unselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
             }
-        },
-    )
+        }
+    } else {
+        CbTopAppBar(title = {}, onBackClick = onBackClick)
+    }
 }
