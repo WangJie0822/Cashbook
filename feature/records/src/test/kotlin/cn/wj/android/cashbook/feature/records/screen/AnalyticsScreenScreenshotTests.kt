@@ -120,7 +120,7 @@ class AnalyticsScreenScreenshotTests {
             overrideFileName = "AnalyticsScreen_loading",
         ) {
             AnalyticsScreen(
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
                 showDatePopup = false,
                 onDateClick = {},
                 onDateSelected = {},
@@ -139,7 +139,7 @@ class AnalyticsScreenScreenshotTests {
     fun analyticsScreen_success_multipleThemes() {
         composeTestRule.captureMultiTheme(name = "AnalyticsScreen") {
             AnalyticsScreen(
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
                 showDatePopup = false,
                 onDateClick = {},
                 onDateSelected = {},
@@ -161,7 +161,7 @@ class AnalyticsScreenScreenshotTests {
             overrideFileName = "AnalyticsScreen_noData",
         ) {
             AnalyticsScreen(
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
                 showDatePopup = false,
                 onDateClick = {},
                 onDateSelected = {},
@@ -181,7 +181,7 @@ class AnalyticsScreenScreenshotTests {
         composeTestRule.captureMultiDevice(screenshotName = "AnalyticsScreen") {
             CashbookTheme {
                 AnalyticsScreen(
-                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
                     showDatePopup = false,
                     onDateClick = {},
                     onDateSelected = {},
@@ -202,7 +202,7 @@ class AnalyticsScreenScreenshotTests {
         composeTestRule.captureMultiDevice(screenshotName = "AnalyticsScreen_loading") {
             CashbookTheme {
                 AnalyticsScreen(
-                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
                     showDatePopup = false,
                     onDateClick = {},
                     onDateSelected = {},
