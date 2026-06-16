@@ -53,8 +53,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
@@ -92,7 +90,7 @@ import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.component.CbModalBottomSheet
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTab
-import cn.wj.android.cashbook.core.design.component.CbTabRow
+import cn.wj.android.cashbook.core.design.component.CbTabTopAppBar
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
@@ -1028,36 +1026,25 @@ internal fun EditRecordTopBar(
     onTabSelected: (RecordTypeCategoryEnum) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    CbTopAppBar(
-        onBackClick = onBackClick,
-        title = {
-            if (uiState is EditRecordUiState.Success) {
-                CbTabRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    selectedTabIndex = selectedTab.ordinal,
-                    containerColor = Color.Unspecified,
-                    contentColor = Color.Unspecified,
-                    indicator = { tabPositions ->
-                        TabRowDefaults.SecondaryIndicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.ordinal]),
-                            color = selectedTab.typeColor,
-                        )
-                    },
-                    divider = {},
-                ) {
-                    RecordTypeCategoryEnum.entries.forEach { enum ->
-                        CbTab(
-                            selected = selectedTab == enum,
-                            onClick = { onTabSelected(enum) },
-                            text = { Text(text = enum.text) },
-                            selectedContentColor = selectedTab.typeColor,
-                            unselectedContentColor = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                }
+    if (uiState is EditRecordUiState.Success) {
+        CbTabTopAppBar(
+            selectedTabIndex = selectedTab.ordinal,
+            indicatorColor = selectedTab.typeColor,
+            onBackClick = onBackClick,
+        ) {
+            RecordTypeCategoryEnum.entries.forEach { enum ->
+                CbTab(
+                    selected = selectedTab == enum,
+                    onClick = { onTabSelected(enum) },
+                    text = { Text(text = enum.text) },
+                    selectedContentColor = selectedTab.typeColor,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurface,
+                )
             }
-        },
-    )
+        }
+    } else {
+        CbTopAppBar(title = {}, onBackClick = onBackClick)
+    }
 }
 
 /**
