@@ -56,7 +56,13 @@ class EditTagDialogViewModel @Inject constructor(
 
     fun saveTag(controller: ProgressDialogController, tag: TagModel, dismissDialog: () -> Unit) {
         viewModelScope.launch {
-            if (tagRepository.countTagByName(tag.name) > 0) {
+            var count = tagRepository.countTagByName(tag.name)
+            val existingTag = tagRepository.getTagById(tag.id)
+            if (existingTag?.name == tag.name) {
+                // 编辑已有标签且未改名时，重名计数含自身，需排除避免误报
+                count--
+            }
+            if (count > 0) {
                 // 已存在相同名称标签
                 bookmark = EditTagDialogBookmarkEnum.NAME_EXIST
                 return@launch

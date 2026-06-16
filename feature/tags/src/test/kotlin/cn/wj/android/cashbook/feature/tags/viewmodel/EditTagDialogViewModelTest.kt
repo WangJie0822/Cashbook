@@ -114,4 +114,35 @@ class EditTagDialogViewModelTest {
         assertThat(dismissed).isTrue()
         assertThat(viewModel.bookmark).isEqualTo(EditTagDialogBookmarkEnum.DISMISS)
     }
+
+    @Test
+    fun when_save_existing_tag_without_renaming_then_saved_not_name_exist() = runTest {
+        // 已有标签 id=1 name="工作"
+        val existingTag = TagModel(id = 1L, name = "工作", invisible = false)
+        tagRepository.addTag(existingTag)
+
+        // 编辑该标签但不改名（仍叫"工作"，仅切换可见性），重名计数含自身不应拦截
+        val sameNameTag = TagModel(id = 1L, name = "工作", invisible = true)
+        var dismissed = false
+        viewModel.saveTag(fakeController, sameNameTag) { dismissed = true }
+
+        // 不应误报 NAME_EXIST，应正常保存关闭弹窗
+        assertThat(viewModel.bookmark).isEqualTo(EditTagDialogBookmarkEnum.DISMISS)
+        assertThat(dismissed).isTrue()
+    }
+
+    @Test
+    fun when_edit_tag_rename_to_another_existing_name_then_name_exist() = runTest {
+        // 库中已有两个标签 A、B
+        tagRepository.addTag(TagModel(id = 1L, name = "A", invisible = false))
+        tagRepository.addTag(TagModel(id = 2L, name = "B", invisible = false))
+
+        // 编辑标签 A 改名为已存在的 "B"，排除自身后仍重名应拦截
+        val renamed = TagModel(id = 1L, name = "B", invisible = false)
+        var dismissed = false
+        viewModel.saveTag(fakeController, renamed) { dismissed = true }
+
+        assertThat(viewModel.bookmark).isEqualTo(EditTagDialogBookmarkEnum.NAME_EXIST)
+        assertThat(dismissed).isFalse()
+    }
 }
