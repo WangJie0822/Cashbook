@@ -61,4 +61,27 @@ class CbTabTopAppBarScreenshotTests {
             }
         }
     }
+
+    @Test
+    fun cbTabTopAppBar_selectedSecondTab_multipleThemes() {
+        // 覆盖非首位选中：indicator 偏移到第 2 个 tab（守卫 true 分支的另一路径）
+        composeTestRule.captureMultiTheme(
+            name = "CbTabTopAppBar",
+            overrideFileName = "CbTabTopAppBar_selectedSecond",
+        ) {
+            CbTabTopAppBar(
+                selectedTabIndex = 1,
+                indicatorColor = MaterialTheme.colorScheme.primary,
+                onBackClick = {},
+            ) {
+                listOf("支出", "收入", "转账").forEachIndexed { index, text ->
+                    CbTab(
+                        selected = index == 1,
+                        onClick = {},
+                        text = { Text(text = text) },
+                    )
+                }
+            }
+        }
+    }
 }

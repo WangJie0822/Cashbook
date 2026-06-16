@@ -108,6 +108,8 @@ fun CbTopAppBar(
  * fillMaxWidth 写死、不暴露给调用方，从 API 层杜绝 fillMaxSize 误用（BUG-1：fillMaxSize
  * 含 fillMaxHeight 会使 TopAppBar 撑满全屏高、CbScaffold body 塌陷 0 高、内容不渲染）。
  *
+ * indicator 含越界守卫（[selectedTabIndex] 越界时静默不绘制而非崩溃），当前调用方 tab 数固定不触发，属防御性收敛。
+ *
  * @param selectedTabIndex 选中 tab 下标
  * @param indicatorColor 指示器颜色（必填，无默认——各调用方用色不同）
  * @param onBackClick 返回事件
