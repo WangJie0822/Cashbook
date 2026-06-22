@@ -154,6 +154,7 @@ app → feature/* → core/*
   > 访问 `MaterialTheme.colorScheme`/`.typography`/`.shapes` 属性是允许的，仅禁止作为 composable 调用。
   > 违反此规则会触发 lint `Design` error，构建将中止。
 - **`CbTabRow`（或任何内容）放进 `CbTopAppBar` 的 `title` 槽时，modifier 必须用 `Modifier.fillMaxWidth()`，禁止 `fillMaxSize()`**：`fillMaxSize` 含 `fillMaxHeight`，在 Material3 `TopAppBar` title 槽下会使 TopAppBar 按 title 撑满全屏高度、`CbScaffold` body 区塌陷为 0 高 → 该屏内容（如分类网格）完全不渲染、tab 浮于屏幕垂直中部。曾致 Critical bug（记账/我的分类支出分类不渲染、无法记账，main `20a0e502` 修复，回归测试 `a0190d5e` 用 `assertIsDisplayed` 守护）。lint 不覆盖此 modifier 误用，靠本规则 + 回归测试防回归。**新增此类「topbar title 内 tab 行」优先用 `core/design` 的 `CbTabTopAppBar`（fillMaxWidth 已写死在封装内、不暴露 modifier，从 API 层杜绝误用；ARCH-1 引入），勿再手写 title 内 CbTabRow。**
+- **抽屉/导航回调聚合阈值**：当同一组相关点击/事件回调 **≥4 个** 且需跨 **≥3 层** Composable/navigation 透传时，聚合为单个 `XxxActions` data class 整体透传，避免逐参透传导致的签名漂移与参数爆炸；`dismiss`/导航后副作用在 `Route` 层用 `wrap` 包装（先执行回调再副作用）。**聚合类置于 `navigation` 包**（紧邻消费它的 `xxxScreen` navigation 函数）。被 public 跨模块 navigation 函数（如 `settingsLauncherScreen`）引用时**必须 public**，否则 `compileDebugKotlin` 报 `'public' function exposes its 'internal' parameter type`。实证：M1 抽屉 7 回调 4 层透传聚合为 `LauncherDrawerActions`（2026-06-22 main `49ac8c60`）。
 - `compose_compiler_config.conf` 声明了 `core/model` 中模型类的 Compose 稳定性
 - 测试使用自定义 TestRunner: `cn.wj.android.cashbook.core.testing.CashbookTestRunner`
 - 包名: `cn.wj.android.cashbook`
@@ -163,4 +164,5 @@ app → feature/* → core/*
 - 修改 Composable 或 ViewModel 的签名（参数增删）时，必须同步更新该模块 `src/test` 下对应的截图测试（`*ScreenshotTests`）与 `*ViewModelTest` 的构造/调用——模块测试源集整体编译，任一测试文件签名不匹配会导致整个模块 `testDebugUnitTest` 编译失败（既往多次踩坑：feature:settings 的 BackupAndRecoveryScreen/ViewModel 签名漂移、feature:records/assets 截图测试）
 - 测试替身（`core/testing` 的 `FakeXxxRepository` / `core/data` test 的 `FakeXxxDao`）的方法必须**忠实复刻真实 DAO/SQL 的匹配语义**，禁止用 `emptyList()` 桩或宽松 `contains` 替代真实条件——否则该路径成"假阳性覆盖"（测试绿但真实代码不这样执行，回归抓不到）。既往踩坑：`queryByTimeAndAmount`（元/分单位错配桩使去重永不命中）、`queryByWechatTransactionId`（`emptyList` 桩使 EXACT 路径从未覆盖 + 裸 `contains` 偏离真实 `remark LIKE '%[微信单号:<id>]%'` 方括号定界），均在评审时才暴露
 - 注：`core/data` 的 test 源集**不依赖 `core:testing`**（仅 junit+truth），各测试文件自带 `private fun createXxx` 构造数据；`core/domain`/`feature` 的 test 才用 `core:testing` 的 `FakeXxxRepository`/`createXxxModel`
+- **抽纯函数便于单测的惯例**：为可测性把逻辑从 ViewModel/全局耦合中抽出为纯函数时，优先 **top-level `internal fun`**（同模块 test 源集可直接调用、无需实例化宿主类或反射私有成员）；仅当该逻辑强依赖宿主类的私有状态/常量、抽成 top-level 反而需传一长串参数时，才放 `companion object` 内 `internal fun`。原 `private` 方法保留为对纯函数的薄委托，维持调用方与行为不变。实证：`computeNeedUpdate` 纯函数 + `private needUpdate` 委托之（main `f7b548ca`）。
 - 
