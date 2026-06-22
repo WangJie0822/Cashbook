@@ -21,6 +21,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import cn.wj.android.cashbook.core.database.relation.TagWithRecordIdRelation
 import cn.wj.android.cashbook.core.database.table.TagTable
 
 /**

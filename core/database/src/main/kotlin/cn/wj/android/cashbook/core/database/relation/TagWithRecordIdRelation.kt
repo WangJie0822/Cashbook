@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.core.database.dao
+package cn.wj.android.cashbook.core.database.relation
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

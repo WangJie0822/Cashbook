@@ -82,6 +82,9 @@ class TagRepositoryImpl @Inject constructor(
             recordIds.distinct().chunked(SQL_IN_CHUNK_SIZE).flatMap { chunk ->
                 tagDao.queryByRecordIds(chunk).map { it.recordId to it.tag.asModel() }
             }.groupBy({ it.first }, { it.second })
+                // 对每条记录的标签去重，与单条 queryByRecordId（id IN 子查询天然去重）语义对齐，
+                // 防御重复 (record_id, tag_id) 关联行经 INNER JOIN 产生的重复标签
+                .mapValues { (_, tags) -> tags.distinct() }
         }
 
     override suspend fun getTagById(tagId: Long): TagModel? =
@@ -98,9 +101,4 @@ class TagRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             tagDao.countByName(name)
         }
-
-    private companion object {
-        /** SQLite 单条 IN 查询参数上限保护（与 RecordRepositoryImpl 一致） */
-        private const val SQL_IN_CHUNK_SIZE = 900
-    }
 }

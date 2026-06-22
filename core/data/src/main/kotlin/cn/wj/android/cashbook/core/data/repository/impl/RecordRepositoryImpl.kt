@@ -615,10 +615,4 @@ class RecordRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             recordDao.queryEarliestRecordTime(booksId)
         }
-
-    companion object {
-
-        /** IN 查询单批最大参数数，低于 SQLite 旧版变量上限（999），避免大范围批量查询溢出崩溃 */
-        private const val SQL_IN_CHUNK_SIZE = 900
-    }
 }

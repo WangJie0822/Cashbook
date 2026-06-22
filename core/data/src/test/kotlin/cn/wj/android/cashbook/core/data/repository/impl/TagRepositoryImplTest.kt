@@ -165,6 +165,19 @@ class TagRepositoryImplTest {
         assertThat(result).doesNotContainKey(999L)
     }
 
+    @Test
+    fun given_duplicate_relation_when_getRelatedTags_then_tag_deduplicated() = runTest {
+        val repository = TagRepositoryImpl(tagDao, transactionDao, UnconfinedTestDispatcher())
+        tagDao.insert(createTagTable(name = "标签1"))
+        // 异常数据：重复 (record_id=10, tag_id=1) 关联行
+        tagDao.tagWithRecords.add(FakeTagDao.FakeTagWithRecord(recordId = 10L, tagId = 1L))
+        tagDao.tagWithRecords.add(FakeTagDao.FakeTagWithRecord(recordId = 10L, tagId = 1L))
+
+        val result = repository.getRelatedTags(listOf(10L))
+        // 与单条 queryByRecordId（id IN 子查询去重）语义对齐：标签只出现一次
+        assertThat(result.getValue(10L).map { it.name }).containsExactly("标签1")
+    }
+
     // ========== 计数查询测试 ==========
 
     @Test

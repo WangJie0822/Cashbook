@@ -17,7 +17,7 @@
 package cn.wj.android.cashbook.core.data.testdoubles
 
 import cn.wj.android.cashbook.core.database.dao.TagDao
-import cn.wj.android.cashbook.core.database.dao.TagWithRecordIdRelation
+import cn.wj.android.cashbook.core.database.relation.TagWithRecordIdRelation
 import cn.wj.android.cashbook.core.database.table.TagTable
 
 /**
