@@ -48,26 +48,36 @@ import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModel
 
 /**
+ * 首页抽屉菜单点击回调聚合
+ *
+ * @param onMyAssetClick 我的资产点击回调
+ * @param onMyBookClick 我的账本点击回调
+ * @param onMyCategoryClick 我的分类点击回调
+ * @param onMyTagClick 我的标签点击回调
+ * @param onReimbursementClick 待报销点击回调
+ * @param onSettingClick 设置点击回调
+ * @param onAboutUsClick 关于我们点击回调
+ */
+data class LauncherDrawerActions(
+    val onMyAssetClick: () -> Unit,
+    val onMyBookClick: () -> Unit,
+    val onMyCategoryClick: () -> Unit,
+    val onMyTagClick: () -> Unit,
+    val onReimbursementClick: () -> Unit,
+    val onSettingClick: () -> Unit,
+    val onAboutUsClick: () -> Unit,
+)
+
+/**
  * 首页显示
  * - 首页显示主体，提供左侧抽屉菜单、用户隐私协议弹窗、安全校验功能，具体内容显示通过 [content] 参数提供
  *
- * @param onRequestNaviToMyAsset 导航到我的资产
- * @param onRequestNaviToMyBooks 导航到我的账本
- * @param onRequestNaviToMyCategory 导航到我的分类
- * @param onRequestNaviToMyTags 导航到我的标签
- * @param onRequestNaviToSetting 导航到设置
- * @param onRequestNaviToAboutUs 导航到关于我们
+ * @param actions 抽屉菜单点击回调聚合
  * @param content 显示内容，参数 (打开抽屉) -> [Unit]
  */
 @Composable
 internal fun LauncherRoute(
-    onRequestNaviToMyAsset: () -> Unit,
-    onRequestNaviToMyBooks: () -> Unit,
-    onRequestNaviToMyCategory: () -> Unit,
-    onRequestNaviToMyTags: () -> Unit,
-    onRequestNaviToReimbursement: () -> Unit,
-    onRequestNaviToSetting: () -> Unit,
-    onRequestNaviToAboutUs: () -> Unit,
+    actions: LauncherDrawerActions,
     modifier: Modifier = Modifier,
     viewModel: LauncherViewModel = hiltViewModel(),
     content: @Composable (() -> Unit) -> Unit,
@@ -75,39 +85,26 @@ internal fun LauncherRoute(
     // 界面 UI 状态数据
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // 点击后关闭抽屉：先执行导航再关闭抽屉（与原内联 lambda 语义一致）
+    fun wrap(action: () -> Unit): () -> Unit = {
+        action()
+        viewModel.dismissDrawerSheet()
+    }
+
     LauncherScreen(
         shouldDisplayDrawerSheet = viewModel.shouldDisplayDrawerSheet,
         onRequestDisplayDrawerSheet = viewModel::displayDrawerSheet,
         onRequestDismissDrawerSheet = viewModel::dismissDrawerSheet,
         uiState = uiState,
-        onMyAssetClick = {
-            onRequestNaviToMyAsset.invoke()
-            viewModel.dismissDrawerSheet()
-        },
-        onMyBookClick = {
-            onRequestNaviToMyBooks.invoke()
-            viewModel.dismissDrawerSheet()
-        },
-        onMyCategoryClick = {
-            onRequestNaviToMyCategory.invoke()
-            viewModel.dismissDrawerSheet()
-        },
-        onMyTagClick = {
-            onRequestNaviToMyTags.invoke()
-            viewModel.dismissDrawerSheet()
-        },
-        onReimbursementClick = {
-            onRequestNaviToReimbursement.invoke()
-            viewModel.dismissDrawerSheet()
-        },
-        onSettingClick = {
-            onRequestNaviToSetting.invoke()
-            viewModel.dismissDrawerSheet()
-        },
-        onAboutUsClick = {
-            onRequestNaviToAboutUs.invoke()
-            viewModel.dismissDrawerSheet()
-        },
+        actions = LauncherDrawerActions(
+            onMyAssetClick = wrap(actions.onMyAssetClick),
+            onMyBookClick = wrap(actions.onMyBookClick),
+            onMyCategoryClick = wrap(actions.onMyCategoryClick),
+            onMyTagClick = wrap(actions.onMyTagClick),
+            onReimbursementClick = wrap(actions.onReimbursementClick),
+            onSettingClick = wrap(actions.onSettingClick),
+            onAboutUsClick = wrap(actions.onAboutUsClick),
+        ),
         content = { content { viewModel.displayDrawerSheet() } },
         modifier = modifier,
     )
@@ -121,12 +118,7 @@ internal fun LauncherRoute(
  * @param onRequestDisplayDrawerSheet 显示抽屉菜单
  * @param onRequestDismissDrawerSheet 隐藏抽屉菜单
  * @param uiState UI 显示数据
- * @param onMyAssetClick 我的资产点击回调
- * @param onMyBookClick 我的账本点击回调
- * @param onMyCategoryClick 我的分类点击回调
- * @param onMyTagClick 我的标签点击回调
- * @param onSettingClick 设置点击回调
- * @param onAboutUsClick 关于我们点击回调
+ * @param actions 抽屉菜单点击回调聚合
  * @param content 显示内容，参数 (打开抽屉) -> [Unit]
  * @param drawerState 抽屉状态，默认关闭，状态变化时在回调中更新数据状态
  */
@@ -136,13 +128,7 @@ internal fun LauncherScreen(
     onRequestDisplayDrawerSheet: () -> Unit,
     onRequestDismissDrawerSheet: () -> Unit,
     uiState: LauncherUiState,
-    onMyAssetClick: () -> Unit,
-    onMyBookClick: () -> Unit,
-    onMyCategoryClick: () -> Unit,
-    onMyTagClick: () -> Unit,
-    onReimbursementClick: () -> Unit,
-    onSettingClick: () -> Unit,
-    onAboutUsClick: () -> Unit,
+    actions: LauncherDrawerActions,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(
@@ -186,13 +172,7 @@ internal fun LauncherScreen(
                     drawerContent = {
                         LauncherSheet(
                             currentBookName = uiState.currentBookName,
-                            onMyAssetClick = onMyAssetClick,
-                            onMyBookClick = onMyBookClick,
-                            onMyCategoryClick = onMyCategoryClick,
-                            onMyTagClick = onMyTagClick,
-                            onReimbursementClick = onReimbursementClick,
-                            onSettingClick = onSettingClick,
-                            onAboutUsClick = onAboutUsClick,
+                            actions = actions,
                         )
                     },
                     content = content,
@@ -206,23 +186,12 @@ internal fun LauncherScreen(
  * 首页抽屉菜单
  *
  * @param currentBookName 当前账本名
- * @param onMyAssetClick 我的资产点击回调
- * @param onMyBookClick 我的账本点击回调
- * @param onMyCategoryClick 我的分类点击回调
- * @param onMyTagClick 我的标签点击回调
- * @param onSettingClick 设置点击回调
- * @param onAboutUsClick 关于我们点击回调
+ * @param actions 抽屉菜单点击回调聚合
  */
 @Composable
 internal fun LauncherSheet(
     currentBookName: String,
-    onMyAssetClick: () -> Unit,
-    onMyBookClick: () -> Unit,
-    onMyCategoryClick: () -> Unit,
-    onMyTagClick: () -> Unit,
-    onReimbursementClick: () -> Unit,
-    onSettingClick: () -> Unit,
-    onAboutUsClick: () -> Unit,
+    actions: LauncherDrawerActions,
     modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
@@ -246,35 +215,35 @@ internal fun LauncherSheet(
                 )
             },
             selected = false,
-            onClick = onMyBookClick,
+            onClick = actions.onMyBookClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_assets)) },
             icon = { Icon(imageVector = CbIcons.WebAsset, contentDescription = null) },
             selected = false,
-            onClick = onMyAssetClick,
+            onClick = actions.onMyAssetClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_categories)) },
             icon = { Icon(imageVector = CbIcons.Category, contentDescription = null) },
             selected = false,
-            onClick = onMyCategoryClick,
+            onClick = actions.onMyCategoryClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.my_tags)) },
             icon = { Icon(imageVector = CbIcons.Layers, contentDescription = null) },
             selected = false,
-            onClick = onMyTagClick,
+            onClick = actions.onMyTagClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.pending_reimbursement)) },
             icon = { Icon(imageVector = CbIcons.ReceiptLong, contentDescription = null) },
             selected = false,
-            onClick = onReimbursementClick,
+            onClick = actions.onReimbursementClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         CbHorizontalDivider(modifier = Modifier.padding(horizontal = spacing.large))
@@ -282,14 +251,14 @@ internal fun LauncherSheet(
             label = { Text(text = stringResource(id = R.string.settings)) },
             icon = { Icon(imageVector = CbIcons.Settings, contentDescription = null) },
             selected = false,
-            onClick = onSettingClick,
+            onClick = actions.onSettingClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         NavigationDrawerItem(
             label = { Text(text = stringResource(id = R.string.about_us)) },
             icon = { Icon(imageVector = CbIcons.Info, contentDescription = null) },
             selected = false,
-            onClick = onAboutUsClick,
+            onClick = actions.onAboutUsClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
     }

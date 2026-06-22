@@ -23,6 +23,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import cn.wj.android.cashbook.feature.settings.screen.AboutUsRoute
 import cn.wj.android.cashbook.feature.settings.screen.BackupAndRecoveryRoute
+import cn.wj.android.cashbook.feature.settings.screen.LauncherDrawerActions
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
 import cn.wj.android.cashbook.feature.settings.screen.SettingRoute
 import kotlinx.serialization.Serializable
@@ -62,33 +63,16 @@ fun NavController.naviToBackupAndRecovery() {
  * 首页显示
  * - 首页显示主体，提供左侧抽屉菜单、用户隐私协议弹窗、安全校验功能，具体内容显示通过 [content] 参数提供
  *
- * @param onRequestNaviToMyAsset 导航到我的资产
- * @param onRequestNaviToMyBooks 导航到我的账本
- * @param onRequestNaviToMyCategory 导航到我的分类
- * @param onRequestNaviToMyTags 导航到我的标签
- * @param onRequestNaviToSetting 导航到设置
- * @param onRequestNaviToAboutUs 导航到关于我们
+ * @param actions 抽屉菜单点击回调聚合
  * @param content 显示内容，参数 (打开抽屉) -> [Unit]
  */
 fun NavGraphBuilder.settingsLauncherScreen(
-    onRequestNaviToMyAsset: () -> Unit,
-    onRequestNaviToMyBooks: () -> Unit,
-    onRequestNaviToMyCategory: () -> Unit,
-    onRequestNaviToMyTags: () -> Unit,
-    onRequestNaviToReimbursement: () -> Unit,
-    onRequestNaviToSetting: () -> Unit,
-    onRequestNaviToAboutUs: () -> Unit,
+    actions: LauncherDrawerActions,
     content: @Composable (() -> Unit) -> Unit,
 ) {
     composable<SettingsLauncher> {
         LauncherRoute(
-            onRequestNaviToMyAsset = onRequestNaviToMyAsset,
-            onRequestNaviToMyBooks = onRequestNaviToMyBooks,
-            onRequestNaviToMyCategory = onRequestNaviToMyCategory,
-            onRequestNaviToMyTags = onRequestNaviToMyTags,
-            onRequestNaviToReimbursement = onRequestNaviToReimbursement,
-            onRequestNaviToSetting = onRequestNaviToSetting,
-            onRequestNaviToAboutUs = onRequestNaviToAboutUs,
+            actions = actions,
             content = content,
         )
     }

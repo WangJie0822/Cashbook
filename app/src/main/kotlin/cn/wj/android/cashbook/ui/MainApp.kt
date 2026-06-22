@@ -129,6 +129,7 @@ import cn.wj.android.cashbook.feature.settings.navigation.naviToBackupAndRecover
 import cn.wj.android.cashbook.feature.settings.navigation.naviToSetting
 import cn.wj.android.cashbook.feature.settings.navigation.settingScreen
 import cn.wj.android.cashbook.feature.settings.navigation.settingsLauncherScreen
+import cn.wj.android.cashbook.feature.settings.screen.LauncherDrawerActions
 import cn.wj.android.cashbook.feature.settings.viewmodel.MainAppUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.MainAppViewModel
 import cn.wj.android.cashbook.feature.tags.navigation.EditRecordSelectTagBottomSheetContent
@@ -412,13 +413,15 @@ fun CashbookNavHost(
     ) {
         // 启动页
         settingsLauncherScreen(
-            onRequestNaviToMyAsset = navController::naviToMyAsset,
-            onRequestNaviToMyBooks = navController::naviToMyBooks,
-            onRequestNaviToMyCategory = navController::naviToMyCategories,
-            onRequestNaviToMyTags = navController::naviToMyTags,
-            onRequestNaviToReimbursement = navController::naviToReimbursement,
-            onRequestNaviToSetting = navController::naviToSetting,
-            onRequestNaviToAboutUs = navController::naviToAboutUs,
+            actions = LauncherDrawerActions(
+                onMyAssetClick = navController::naviToMyAsset,
+                onMyBookClick = navController::naviToMyBooks,
+                onMyCategoryClick = navController::naviToMyCategories,
+                onMyTagClick = navController::naviToMyTags,
+                onReimbursementClick = navController::naviToReimbursement,
+                onSettingClick = navController::naviToSetting,
+                onAboutUsClick = navController::naviToAboutUs,
+            ),
             content = { onRequestOpenDrawer ->
                 LauncherContent(
                     recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->
