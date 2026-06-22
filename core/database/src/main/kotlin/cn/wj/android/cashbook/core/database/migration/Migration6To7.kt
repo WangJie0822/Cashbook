@@ -522,5 +522,7 @@ object Migration6To7 : Migration(6, 7) {
                 }
             }
         }
+        // 删除旧表
+        execSQL(SQL_DROP_TABLE_RECORD_TEMP)
     }
 }
