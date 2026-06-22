@@ -591,13 +591,12 @@ interface TransactionDao {
     }
 
     /**
-     * 删除单条记录的核心：余额回退 + 删标签/图片关联 + 清关联 + 删记录，**不含** finalAmount 重算。
-     * 供单删与批量删（账本/资产）复用——批量删时由调用方在所有 core 完成后统一对存活簇重算。
+     * 仅回退单条记录涉及的资产余额（主资产 + 转账对方资产），不删任何关联/记录。
+     * 符号逻辑与原 deleteRecordCore 余额回退部分逐字符一致（信用卡/非信用卡 × INCOME/支出转账 × 主/转账对方）。
+     * 供 deleteRecordsBatch 逐条调用（A2：余额逐条回退、关联/记录批量删）。
      */
     @Throws(DataTransactionException::class)
-    @Transaction
-    suspend fun deleteRecordCore(record: RecordTable) {
-        val recordId = record.id ?: return
+    suspend fun revertRecordBalanceOnly(record: RecordTable) {
         val type = resolveType(record.typeId)
             ?: throw DataTransactionException("Type must not be null")
         val category = RecordTypeCategoryEnum.ordinalOf(type.typeCategory)
@@ -644,6 +643,18 @@ interface TransactionDao {
                 updateAsset(asset.copy(balance = balance))
             }
         }
+    }
+
+    /**
+     * 删除单条记录的核心：余额回退 + 删标签/图片关联 + 清关联 + 删记录，**不含** finalAmount 重算。
+     * 供单删与批量删（账本/资产）复用——批量删时由调用方在所有 core 完成后统一对存活簇重算。
+     */
+    @Throws(DataTransactionException::class)
+    @Transaction
+    suspend fun deleteRecordCore(record: RecordTable) {
+        val recordId = record.id ?: return
+        // 余额回退（抽出复用）
+        revertRecordBalanceOnly(record)
 
         // 移除关联标签
         deleteOldRelatedTags(recordId)
