@@ -90,4 +90,31 @@ sealed class DateSelectionEntity(val type: DateSelectionTypeEnum) {
         is DateRange -> "${from.year}-${from.monthValue.toString().padStart(2, '0')}-${from.dayOfMonth.toString().padStart(2, '0')}~${to.year}-${to.monthValue.toString().padStart(2, '0')}-${to.dayOfMonth.toString().padStart(2, '0')}"
         is All -> "全部"
     }
+
+    companion object {
+        /**
+         * 将 [getDisplayText] 产出的显示文本逆向解析为 [DateSelectionEntity]。
+         * 空白/非法 → null；`全部` → [All]；`YYYY-MM` → [ByMonth]；`YYYY` → [ByYear]；
+         * `YYYY-MM-DD~YYYY-MM-DD` → [DateRange]；`YYYY-MM-DD` → [ByDay]。
+         */
+        fun fromDisplayTextOrNull(text: String): DateSelectionEntity? {
+            val s = text.trim()
+            if (s.isBlank()) return null
+            if (s == "全部") return All
+            return runCatching {
+                if (s.contains("~")) {
+                    val parts = s.split("~", limit = 2)
+                    DateRange(LocalDate.parse(parts[0].trim()), LocalDate.parse(parts[1].trim()))
+                } else {
+                    val seg = s.split("-")
+                    when (seg.size) {
+                        1 -> ByYear(seg[0].toInt())
+                        2 -> ByMonth(YearMonth.of(seg[0].toInt(), seg[1].toInt()))
+                        3 -> ByDay(LocalDate.of(seg[0].toInt(), seg[1].toInt(), seg[2].toInt()))
+                        else -> null
+                    }
+                }
+            }.getOrNull()
+        }
+    }
 }
