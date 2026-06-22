@@ -805,7 +805,8 @@ class TransactionDaoTest {
             relatedRecordIdList = emptyList(),
             relatedImageList = emptyList(),
         )
-        // 直插一条 type_id 指向不存在类型的记录，使 deleteRecordCore 的 resolveType 抛异常
+        // 直插一条 type_id 指向不存在类型的记录，使 revertRecordBalanceOnly 的 resolveType 抛异常
+        // （A2 后余额回退提前到批量删之前，throw 点仍在删记录前，@Transaction 整体回滚）
         transactionDao.insertRecord(
             createRecord(typeId = 999999L, assetId = 1L, booksId = bookId, amount = 1000L),
         )
@@ -816,6 +817,23 @@ class TransactionDaoTest {
         // 事务回滚：记录与账本应原样保留
         assertThat(transactionDao.queryRecordListByBookId(bookId)).hasSize(before)
         assertThat(database.booksDao().queryAll().any { it.id == bookId }).isTrue()
+    }
+
+    @Test
+    fun when_deleteRecordsByIds_then_returnsActualDeletedCount() = runTest {
+        // P-M1 H1 真机首验：@Query DELETE ... WHERE id IN (:ids) 返回实际删除行数（项目首引）+ IN 批量删真实 SQLite 执行
+        val bookId = insertBook()
+        val typeId = insertType(createExpenditureType())
+        val id1 = transactionDao.insertRecord(createRecord(typeId = typeId, booksId = bookId, amount = 1000L))
+        val id2 = transactionDao.insertRecord(createRecord(typeId = typeId, booksId = bookId, amount = 2000L))
+        val id3 = transactionDao.insertRecord(createRecord(typeId = typeId, booksId = bookId, amount = 3000L))
+
+        val deleted = transactionDao.deleteRecordsByIds(listOf(id1, id2))
+
+        assertThat(deleted).isEqualTo(2)
+        assertThat(transactionDao.queryRecordById(id1)).isNull()
+        assertThat(transactionDao.queryRecordById(id2)).isNull()
+        assertThat(transactionDao.queryRecordById(id3)).isNotNull()
     }
 
     // endregion
