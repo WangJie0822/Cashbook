@@ -182,6 +182,16 @@ class TypedAnalyticsViewModelTest {
     }
 
     @Test
+    fun when_updateData_repeated_with_same_args_after_updateMonth_then_month_preserved() = runTest {
+        // 模拟 Route 重组导致的重复 updateData（相同入口参数）：翻月结果不应被重置
+        viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
+        viewModel.updateMonth(YearMonth.of(2024, 8))
+        viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
+        assertThat(viewModel.dateSelection.value)
+            .isEqualTo(DateSelectionEntity.ByMonth(YearMonth.of(2024, 8)))
+    }
+
+    @Test
     fun when_transfer_type_then_isTransferType_true() = runTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}

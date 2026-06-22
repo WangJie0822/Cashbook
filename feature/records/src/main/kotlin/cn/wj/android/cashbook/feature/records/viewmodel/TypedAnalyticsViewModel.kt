@@ -77,6 +77,9 @@ class TypedAnalyticsViewModel @Inject constructor(
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
+    /** 已应用的入口参数 key：避免 Route 重组时 apply{updateData} 重复执行把用户翻月结果重置回入口周期 */
+    private var appliedDateKey: String? = null
+
     val uiState = combine(_tagIdData, _typeIdData) { tagId, typeId ->
         if (tagId == typeId) {
             TypedAnalyticsUiState.Loading
@@ -158,9 +161,14 @@ class TypedAnalyticsViewModel @Inject constructor(
         _tagIdData.tryEmit(tagId)
         _typeIdData.tryEmit(typeId)
         _includeChildTypes.tryEmit(includeChildTypes)
-        _dateSelection.tryEmit(
-            DateSelectionEntity.fromDisplayTextOrNull(date) ?: DateSelectionEntity.ByMonth(YearMonth.now()),
-        )
+        // 仅在入口参数变化时初始化周期；重组导致的重复 updateData（相同入口）不重置，保住用户翻月结果
+        val key = "$tagId|$typeId|$date"
+        if (key != appliedDateKey) {
+            appliedDateKey = key
+            _dateSelection.tryEmit(
+                DateSelectionEntity.fromDisplayTextOrNull(date) ?: DateSelectionEntity.ByMonth(YearMonth.now()),
+            )
+        }
         logger().i("updateData(tagId=<$tagId>, typeId=<$typeId>, date=<$date>, includeChildTypes=<$includeChildTypes>)")
     }
 
