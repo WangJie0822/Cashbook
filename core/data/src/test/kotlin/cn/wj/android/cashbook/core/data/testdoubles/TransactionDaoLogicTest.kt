@@ -492,6 +492,24 @@ class TransactionDaoLogicTest {
     // ========== deleteAssetRelatedData 测试 ==========
 
     @Test
+    fun when_deleteAssetRelatedData_clears_dangling_relation_and_recalcs_survivor() = runTest {
+        // 存活吸收者 S(id=2,asset=20) 吸收被删支出 D(id=1,asset=10)；删 asset=10 → D 删、悬空关联清、S 重算
+        setupTypesForAbsorption()
+        dao.assets.add(createAssetTable(id = 10L, balance = 0L))
+        dao.assets.add(createAssetTable(id = 20L, balance = 0L))
+        insertRecord(id = 1L, typeId = EXPENDITURE_TYPE_ID, amount = 10000L, assetId = 10L)
+        insertRecord(id = 2L, typeId = INCOME_TYPE_ID, amount = 8000L, assetId = 20L)
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        dao.recalculateFinalAmountForCluster(2L) // E.fa=2000, I.fa=0
+
+        dao.deleteAssetRelatedData(10L)
+
+        assertThat(dao.queryRecordById(1L)).isNull() // 被删支出删除
+        assertThat(dao.relatedRecords).isEmpty() // 悬空关联清（双向 IN-OR）
+        assertThat(dao.queryRecordById(2L)!!.finalAmount).isEqualTo(8000L) // 存活吸收者重算恢复 recordAmount
+    }
+
+    @Test
     fun when_deleteAssetRelatedData_then_all_related_records_deleted() = runTest {
         setupTypesForAbsorption()
         val assetId = 10L

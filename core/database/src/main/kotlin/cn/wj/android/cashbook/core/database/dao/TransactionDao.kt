@@ -646,35 +646,8 @@ interface TransactionDao {
     }
 
     /**
-     * 删除单条记录的核心：余额回退 + 删标签/图片关联 + 清关联 + 删记录，**不含** finalAmount 重算。
-     * 供单删与批量删（账本/资产）复用——批量删时由调用方在所有 core 完成后统一对存活簇重算。
-     */
-    @Throws(DataTransactionException::class)
-    @Transaction
-    suspend fun deleteRecordCore(record: RecordTable) {
-        val recordId = record.id ?: return
-        // 余额回退（抽出复用）
-        revertRecordBalanceOnly(record)
-
-        // 移除关联标签
-        deleteOldRelatedTags(recordId)
-
-        // 移除关联照片
-        deleteOldRelatedImages(recordId)
-
-        // 移除关联记录
-        clearRelatedRecordById(recordId)
-
-        // 删除当前记录
-        val result = deleteRecord(record)
-        if (result <= 0) {
-            throw DataTransactionException("Record delete failed!")
-        }
-    }
-
-    /**
      * 删除已有记录（单删，UI 路径）。委托 [deleteRecordsBatch]（单元素列表）——
-     * 复用同一套「捕获 survivors → deleteRecordCore → 存活簇去重重算」逻辑，避免重复（DRY）。
+     * 复用同一套「捕获 survivors → 余额回退 → 批量删关联/记录 → 存活簇去重重算」逻辑，避免重复（DRY）。
      */
     @Throws(DataTransactionException::class)
     @Transaction
@@ -765,28 +738,44 @@ interface TransactionDao {
     suspend fun deleteRecordsByIds(ids: List<Long>): Int
 
     /**
-     * 批量删除一组记录：逐条余额回退+清关联+删记录（无逐条重算），
-     * 删完后对「存活簇」（不在待删集、与待删记录关联的记录所在簇）只重算一次。
-     * 消除「每条都整簇重算」的 O(N²)；存活引用为备份恢复/导入异常的安全网（正常数据 survivors 为空）。
+     * 批量删除一组记录：删前捕获 survivors → 逐条余额回退 → 批量删关联/记录（byIds IN + chunk）→
+     * L3 行数校验 → 删后对「存活簇」只重算一次。消除逐条 per-record DB 往返（A2，P-M1）。
+     * 存活引用为备份恢复/导入异常的安全网（正常数据 survivors 为空）。
      */
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteRecordsBatch(records: List<RecordTable>) {
         if (records.isEmpty()) return
         val deletedIds = records.mapNotNull { it.id }.toSet()
+        // L7：survivors 必须删前捕获（删后关联已清无法查）
         val affectedSurvivors = LinkedHashSet<Long>()
         for (record in records) {
             val recordId = record.id ?: continue
-            // 删除会清关联，先捕获两个方向上不在待删集的对端 id
             queryRelatedByRecordId(recordId).forEach {
                 if (it.relatedRecordId !in deletedIds) affectedSurvivors.add(it.relatedRecordId)
             }
             queryRelatedByRelatedRecordId(recordId).forEach {
                 if (it.recordId !in deletedIds) affectedSurvivors.add(it.recordId)
             }
-            deleteRecordCore(record)
         }
-        // 收尾：存活簇逐簇重算一次（必须在所有 deleteRecordCore 之后，否则 BFS 脏读未删记录）
+        // 逐条余额回退（零符号改动；过滤 id==null 与逐条版 record.id ?: return 对齐）
+        for (record in records) {
+            if (record.id == null) continue
+            revertRecordBalanceOnly(record)
+        }
+        // L8：三类关联删 + 删记录遍历同一完整 deletedIds 全集
+        val idList = deletedIds.toList()
+        idList.chunked(DELETE_IN_CHUNK_SIZE).forEach { chunk ->
+            deleteTagRelationsByRecordIds(chunk)
+            deleteImageRelationsByRecordIds(chunk)
+            deleteRecordRelationsByRecordIds(chunk)
+        }
+        // 批量删记录 + L3 行数校验（去重 size）
+        val deleted = idList.chunked(DELETE_IN_CHUNK_SIZE).sumOf { deleteRecordsByIds(it) }
+        if (deleted < deletedIds.size) {
+            throw DataTransactionException("Record delete failed!")
+        }
+        // L6：存活簇重算必须在所有删除之后
         val visited = HashSet<Long>()
         for (sid in affectedSurvivors) {
             if (sid in visited) continue
