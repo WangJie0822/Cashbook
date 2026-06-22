@@ -191,7 +191,10 @@ class FakeRecordRepository : RecordRepository {
         from: Long,
         to: Long,
     ): List<RecordModel> {
-        return records
+        // 忠实复刻真实 SQL（RecordDao.queryByBooksIdBetweenDate）日期语义：
+        // record_time >= from AND record_time < to（左闭右开）。
+        // 注：真实实现另按 currentBookId 过滤，Fake 默认单账本不模拟账本维度。
+        return records.filter { it.recordTime in from until to }
     }
 
     override fun queryRecordByYearMonth(
