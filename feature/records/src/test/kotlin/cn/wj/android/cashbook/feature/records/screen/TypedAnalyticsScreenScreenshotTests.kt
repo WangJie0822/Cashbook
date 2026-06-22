@@ -21,10 +21,13 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.core.testing.util.captureMultiDevice
 import cn.wj.android.cashbook.core.testing.util.captureMultiTheme
+import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
 import cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsUiState
 import dagger.hilt.android.testing.HiltTestApplication
 import kotlinx.coroutines.flow.flowOf
@@ -35,6 +38,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import java.time.YearMonth
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -45,37 +49,42 @@ class TypedAnalyticsScreenScreenshotTests {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val sampleRecords = listOf(
-        RecordViewsEntity(
-            id = 1L,
-            typeId = 1L,
-            typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
-            typeName = "餐饮",
-            typeIconResName = "vector_type_three_meals_24",
-            assetId = null,
-            assetName = null,
-            assetIconResId = null,
-            relatedAssetId = null,
-            relatedAssetName = null,
-            relatedAssetIconResId = null,
-            amount = 50_00L,
-            finalAmount = 50_00L,
-            charges = 0L,
-            concessions = 0L,
-            remark = "午餐",
-            reimbursable = false,
-            relatedTags = emptyList(),
-            relatedImage = emptyList(),
-            relatedRecord = emptyList(),
-            relatedAmount = 0L,
-            recordTime = 1705276800000L,
-        ),
+    private val sampleRecord = RecordViewsEntity(
+        id = 1L,
+        typeId = 1L,
+        typeCategory = RecordTypeCategoryEnum.EXPENDITURE,
+        typeName = "餐饮",
+        typeIconResName = "vector_type_three_meals_24",
+        assetId = null,
+        assetName = null,
+        assetIconResId = null,
+        relatedAssetId = null,
+        relatedAssetName = null,
+        relatedAssetIconResId = null,
+        amount = 50_00L,
+        finalAmount = 50_00L,
+        charges = 0L,
+        concessions = 0L,
+        remark = "午餐",
+        reimbursable = false,
+        relatedTags = emptyList(),
+        relatedImage = emptyList(),
+        relatedRecord = emptyList(),
+        relatedAmount = 0L,
+        recordTime = 1705276800000L,
     )
+
+    private val sampleItems = listOf<LauncherListItem>(
+        LauncherListItem.DayHeader(dateStr = "2024-01-15", day = 15, dayType = 1),
+        LauncherListItem.Record(sampleRecord),
+    )
+
+    private val summary = AssetMonthSummaryModel(income = 0L, expenditure = 50_00L, balance = -50_00L)
 
     private val successUiState = TypedAnalyticsUiState.Success(
         isType = true,
         titleText = "餐饮",
-        subTitleText = "2024年1月",
+        isTransferType = false,
     )
 
     @Test
@@ -84,7 +93,7 @@ class TypedAnalyticsScreenScreenshotTests {
             name = "TypedAnalyticsScreen",
             overrideFileName = "TypedAnalyticsScreen_loading",
         ) {
-            val recordList = flowOf(PagingData.from(emptyList<RecordViewsEntity>()))
+            val recordList = flowOf(PagingData.from(emptyList<LauncherListItem>()))
                 .collectAsLazyPagingItems()
             TypedAnalyticsScreen(
                 viewRecord = null,
@@ -92,6 +101,11 @@ class TypedAnalyticsScreenScreenshotTests {
                 onRequestDismissBottomSheet = {},
                 uiState = TypedAnalyticsUiState.Loading,
                 recordList = recordList,
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                monthSwitchable = true,
+                summary = summary,
+                onPreviousMonth = {},
+                onNextMonth = {},
                 onRequestNaviToEditRecord = {},
                 onRequestNaviToAssetInfo = {},
                 onRequestPopBackStack = {},
@@ -102,7 +116,7 @@ class TypedAnalyticsScreenScreenshotTests {
     @Test
     fun typedAnalyticsScreen_success_multipleThemes() {
         composeTestRule.captureMultiTheme(name = "TypedAnalyticsScreen") {
-            val recordList = flowOf(PagingData.from(sampleRecords))
+            val recordList = flowOf(PagingData.from(sampleItems))
                 .collectAsLazyPagingItems()
             TypedAnalyticsScreen(
                 viewRecord = null,
@@ -110,6 +124,63 @@ class TypedAnalyticsScreenScreenshotTests {
                 onRequestDismissBottomSheet = {},
                 uiState = successUiState,
                 recordList = recordList,
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                monthSwitchable = true,
+                summary = summary,
+                onPreviousMonth = {},
+                onNextMonth = {},
+                onRequestNaviToEditRecord = {},
+                onRequestNaviToAssetInfo = {},
+                onRequestPopBackStack = {},
+            )
+        }
+    }
+
+    @Test
+    fun typedAnalyticsScreen_fixedPeriod_multipleThemes() {
+        composeTestRule.captureMultiTheme(
+            name = "TypedAnalyticsScreen",
+            overrideFileName = "TypedAnalyticsScreen_fixedPeriod",
+        ) {
+            val recordList = flowOf(PagingData.from(sampleItems))
+                .collectAsLazyPagingItems()
+            TypedAnalyticsScreen(
+                viewRecord = null,
+                onRequestShowRecordDetailsSheet = {},
+                onRequestDismissBottomSheet = {},
+                uiState = successUiState,
+                recordList = recordList,
+                dateSelection = DateSelectionEntity.ByYear(2024),
+                monthSwitchable = false,
+                summary = summary,
+                onPreviousMonth = {},
+                onNextMonth = {},
+                onRequestNaviToEditRecord = {},
+                onRequestNaviToAssetInfo = {},
+                onRequestPopBackStack = {},
+            )
+        }
+    }
+
+    @Test
+    fun typedAnalyticsScreen_transferHint_multipleThemes() {
+        composeTestRule.captureMultiTheme(
+            name = "TypedAnalyticsScreen",
+            overrideFileName = "TypedAnalyticsScreen_transferHint",
+        ) {
+            val recordList = flowOf(PagingData.from(sampleItems))
+                .collectAsLazyPagingItems()
+            TypedAnalyticsScreen(
+                viewRecord = null,
+                onRequestShowRecordDetailsSheet = {},
+                onRequestDismissBottomSheet = {},
+                uiState = successUiState.copy(isTransferType = true),
+                recordList = recordList,
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                monthSwitchable = true,
+                summary = AssetMonthSummaryModel(0L, 0L, 0L),
+                onPreviousMonth = {},
+                onNextMonth = {},
                 onRequestNaviToEditRecord = {},
                 onRequestNaviToAssetInfo = {},
                 onRequestPopBackStack = {},
@@ -121,7 +192,7 @@ class TypedAnalyticsScreenScreenshotTests {
     fun typedAnalyticsScreen_success_multipleDevices() {
         composeTestRule.captureMultiDevice(screenshotName = "TypedAnalyticsScreen") {
             CashbookTheme {
-                val recordList = flowOf(PagingData.from(sampleRecords))
+                val recordList = flowOf(PagingData.from(sampleItems))
                     .collectAsLazyPagingItems()
                 TypedAnalyticsScreen(
                     viewRecord = null,
@@ -129,6 +200,11 @@ class TypedAnalyticsScreenScreenshotTests {
                     onRequestDismissBottomSheet = {},
                     uiState = successUiState,
                     recordList = recordList,
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                    monthSwitchable = true,
+                    summary = summary,
+                    onPreviousMonth = {},
+                    onNextMonth = {},
                     onRequestNaviToEditRecord = {},
                     onRequestNaviToAssetInfo = {},
                     onRequestPopBackStack = {},
@@ -141,7 +217,7 @@ class TypedAnalyticsScreenScreenshotTests {
     fun typedAnalyticsScreen_loading_multipleDevices() {
         composeTestRule.captureMultiDevice(screenshotName = "TypedAnalyticsScreen_loading") {
             CashbookTheme {
-                val recordList = flowOf(PagingData.from(emptyList<RecordViewsEntity>()))
+                val recordList = flowOf(PagingData.from(emptyList<LauncherListItem>()))
                     .collectAsLazyPagingItems()
                 TypedAnalyticsScreen(
                     viewRecord = null,
@@ -149,6 +225,11 @@ class TypedAnalyticsScreenScreenshotTests {
                     onRequestDismissBottomSheet = {},
                     uiState = TypedAnalyticsUiState.Loading,
                     recordList = recordList,
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                    monthSwitchable = true,
+                    summary = summary,
+                    onPreviousMonth = {},
+                    onNextMonth = {},
                     onRequestNaviToEditRecord = {},
                     onRequestNaviToAssetInfo = {},
                     onRequestPopBackStack = {},

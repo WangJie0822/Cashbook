@@ -18,12 +18,10 @@ package cn.wj.android.cashbook.feature.records.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -32,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
@@ -44,15 +41,20 @@ import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Footer
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.records.view.RecordDayHeader
 import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
+import cn.wj.android.cashbook.feature.records.view.RecordMonthSummaryHeader
+import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
 import cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsViewModel
+import java.time.YearMonth
 
 /**
- * 分类数据分析
- * - TODO 待完善，按日拆分，饼状图，日期
+ * 分类 / 标签数据分析：月份切换器 + 收支结余汇总卡 + 按日分组记录列表。
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/10/27
  */
@@ -72,6 +74,11 @@ internal fun TypedAnalyticsRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val recordList = viewModel.recordList.collectAsLazyPagingItems()
+    val dateSelection by viewModel.dateSelection.collectAsStateWithLifecycle()
+    val summary by viewModel.summary.collectAsStateWithLifecycle()
+
+    val monthSwitchable = dateSelection is DateSelectionEntity.ByMonth
+    val currentMonth = (dateSelection as? DateSelectionEntity.ByMonth)?.yearMonth ?: YearMonth.now()
 
     TypedAnalyticsScreen(
         viewRecord = viewModel.viewRecord,
@@ -79,6 +86,11 @@ internal fun TypedAnalyticsRoute(
         onRequestDismissBottomSheet = viewModel::dismissRecordDetailSheet,
         uiState = uiState,
         recordList = recordList,
+        dateSelection = dateSelection,
+        monthSwitchable = monthSwitchable,
+        summary = summary,
+        onPreviousMonth = { viewModel.updateMonth(currentMonth.minusMonths(1)) },
+        onNextMonth = { viewModel.updateMonth(currentMonth.plusMonths(1)) },
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
         onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
         onRequestPopBackStack = onRequestPopBackStack,
@@ -93,7 +105,12 @@ internal fun TypedAnalyticsScreen(
     onRequestShowRecordDetailsSheet: (RecordViewsEntity) -> Unit,
     onRequestDismissBottomSheet: () -> Unit,
     uiState: TypedAnalyticsUiState,
-    recordList: LazyPagingItems<RecordViewsEntity>,
+    recordList: LazyPagingItems<LauncherListItem>,
+    dateSelection: DateSelectionEntity,
+    monthSwitchable: Boolean,
+    summary: AssetMonthSummaryModel,
+    onPreviousMonth: () -> Unit,
+    onNextMonth: () -> Unit,
     onRequestNaviToEditRecord: (Long) -> Unit,
     onRequestNaviToAssetInfo: (Long) -> Unit,
     onRequestPopBackStack: () -> Unit,
@@ -105,16 +122,7 @@ internal fun TypedAnalyticsScreen(
             CbTopAppBar(
                 title = {
                     if (uiState is TypedAnalyticsUiState.Success) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = uiState.titleText)
-                            if (uiState.subTitleText.isNotBlank()) {
-                                Text(
-                                    text = uiState.subTitleText,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    modifier = Modifier.padding(start = 16.dp),
-                                )
-                            }
-                        }
+                        Text(text = uiState.titleText)
                     }
                 },
                 onBackClick = onRequestPopBackStack,
@@ -152,6 +160,17 @@ internal fun TypedAnalyticsScreen(
                     is TypedAnalyticsUiState.Success -> {
                         LazyColumn(
                             content = {
+                                item {
+                                    RecordMonthSummaryHeader(
+                                        periodText = dateSelection.getDisplayText(),
+                                        monthSwitchable = monthSwitchable,
+                                        summary = summary,
+                                        showTransferHint = uiState.isTransferType,
+                                        onPreviousMonth = onPreviousMonth,
+                                        onNextMonth = onNextMonth,
+                                    )
+                                }
+
                                 if (recordList.itemCount <= 0) {
                                     item {
                                         Empty(
@@ -162,17 +181,34 @@ internal fun TypedAnalyticsScreen(
                                 } else {
                                     items(
                                         count = recordList.itemCount,
-                                        key = { index -> recordList.peek(index)?.id ?: "placeholder_$index" },
+                                        key = { index ->
+                                            when (val item = recordList.peek(index)) {
+                                                is LauncherListItem.DayHeader -> "header_${item.dateStr}"
+                                                is LauncherListItem.Record -> "record_${item.entity.id}"
+                                                null -> "placeholder_$index"
+                                            }
+                                        },
                                     ) { index ->
-                                        recordList[index]?.let { item ->
-                                            RecordListItem(
-                                                item = item,
-                                                modifier = Modifier.clickable(
-                                                    onClick = rememberHapticOnClick {
-                                                        onRequestShowRecordDetailsSheet(item)
-                                                    },
-                                                ),
-                                            )
+                                        when (val item = recordList[index]) {
+                                            is LauncherListItem.DayHeader -> {
+                                                RecordDayHeader(item = item)
+                                            }
+
+                                            is LauncherListItem.Record -> {
+                                                RecordListItem(
+                                                    item = item.entity,
+                                                    showDate = false,
+                                                    modifier = Modifier.clickable(
+                                                        onClick = rememberHapticOnClick {
+                                                            onRequestShowRecordDetailsSheet(item.entity)
+                                                        },
+                                                    ),
+                                                )
+                                            }
+
+                                            null -> {
+                                                // 占位
+                                            }
                                         }
                                     }
                                     item {
