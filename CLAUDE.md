@@ -55,7 +55,12 @@ Cashbook 是一个 Android 记账应用，使用 Kotlin + Jetpack Compose 构建
 # 截图测试 (Roborazzi)
 ./gradlew verifyRoborazziOnlineDebug   # 校验
 ./gradlew recordRoborazziOnlineDebug   # 生成基准截图
+
+# DAO instrumented 测试（需模拟器/真机；如 TransactionDao 余额回退/批量删/回滚真机验证）
+./gradlew :core:database:connectedDebugAndroidTest
 ```
+
+> **`connectedDebugAndroidTest` 首次运行需联网拉 UTP（Unified Test Platform）依赖**（`_internal-unified-test-platform-*` 配置，offline 缓存无，故不能加 `--offline`）。本机经代理拉 Maven Central（repo1.maven.org）时注意 TLS 传输稳定性——探活 `curl -x 代理 -sI` 返回 `200 Connection established` 仅代表 CONNECT 隧道建立，**不代表能完整下载**（实下载 `curl -o` 才暴露隧道内 HTTPS 传输被 reset、`HTTP=000`）。代理传输不稳时 instrumented 测试无法跑，属环境问题（非代码）。
 
 ## 架构
 
