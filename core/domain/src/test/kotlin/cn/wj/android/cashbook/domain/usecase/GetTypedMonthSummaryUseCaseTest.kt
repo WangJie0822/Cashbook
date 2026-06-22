@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.recordAmount
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
@@ -79,6 +80,22 @@ class GetTypedMonthSummaryUseCaseTest {
         assertThat(s.income).isEqualTo(500L)
         assertThat(s.expenditure).isEqualTo(200L)
         assertThat(s.balance).isEqualTo(300L)
+    }
+
+    @Test
+    fun net_amount_differs_from_recordAmount_for_absorbed_expense() = runTest {
+        // 金丝雀：被报销支出在净自付口径(本 UseCase)与 recordAmount(资产余额口径)结果刻意不同，防口径混用
+        typeRepository.addType(createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE))
+        val repo = FakeRecordRepository()
+        repo.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 500L, finalAmount = 0L, recordTime = 1_000L))
+
+        val s = useCase(repo)(isType = true, id = 1L, startDate = 0L, endDate = Long.MAX_VALUE, includeChildTypes = true)
+
+        // 净自付：按 finalAmount=0 计
+        assertThat(s.expenditure).isEqualTo(0L)
+        // 对照 recordAmount(资产口径)=500，二者必须不同
+        assertThat(recordAmount(RecordTypeCategoryEnum.EXPENDITURE, 500L, 0L, 0L)).isEqualTo(500L)
+        assertThat(s.expenditure).isNotEqualTo(recordAmount(RecordTypeCategoryEnum.EXPENDITURE, 500L, 0L, 0L))
     }
 
     @Test
