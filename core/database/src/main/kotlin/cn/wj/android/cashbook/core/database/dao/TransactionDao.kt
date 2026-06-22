@@ -127,13 +127,6 @@ interface TransactionDao {
 
     @Query(
         value = """
-        DELETE FROM db_record_with_related WHERE record_id=:id OR related_record_id=:id
-    """,
-    )
-    suspend fun clearRelatedRecordById(id: Long)
-
-    @Query(
-        value = """
         SELECT * FROM db_record_with_related WHERE related_record_id=:id
     """,
     )

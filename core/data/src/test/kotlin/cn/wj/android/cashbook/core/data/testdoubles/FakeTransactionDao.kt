@@ -141,10 +141,6 @@ class FakeTransactionDao : TransactionDao {
         return records.firstOrNull { it.id == recordId }
     }
 
-    override suspend fun clearRelatedRecordById(id: Long) {
-        relatedRecords.removeAll { it.recordId == id || it.relatedRecordId == id }
-    }
-
     override suspend fun queryRelatedByRelatedRecordId(id: Long): List<RecordWithRelatedTable> {
         return relatedRecords.filter { it.relatedRecordId == id }
     }
