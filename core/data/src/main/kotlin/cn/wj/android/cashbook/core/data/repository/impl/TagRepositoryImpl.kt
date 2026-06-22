@@ -77,6 +77,13 @@ class TagRepositoryImpl @Inject constructor(
                 .map { it.asModel() }
         }
 
+    override suspend fun getRelatedTags(recordIds: List<Long>): Map<Long, List<TagModel>> =
+        withContext(coroutineContext) {
+            recordIds.distinct().chunked(SQL_IN_CHUNK_SIZE).flatMap { chunk ->
+                tagDao.queryByRecordIds(chunk).map { it.recordId to it.tag.asModel() }
+            }.groupBy({ it.first }, { it.second })
+        }
+
     override suspend fun getTagById(tagId: Long): TagModel? =
         withContext(coroutineContext) {
             tagListData.first().firstOrNull { it.id == tagId }
@@ -91,4 +98,9 @@ class TagRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             tagDao.countByName(name)
         }
+
+    private companion object {
+        /** SQLite 单条 IN 查询参数上限保护（与 RecordRepositoryImpl 一致） */
+        private const val SQL_IN_CHUNK_SIZE = 900
+    }
 }

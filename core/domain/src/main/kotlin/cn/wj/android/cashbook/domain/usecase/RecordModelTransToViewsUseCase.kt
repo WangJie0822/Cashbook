@@ -89,10 +89,10 @@ class RecordModelTransToViewsUseCase @Inject constructor(
 
     /**
      * 批量转换：与单条 [invoke] 产出逐字段等价，但通过 IN 批量查询 + 去重 + 内存 Map 组装，
-     * 避免对每条记录单独发起 type / asset / 关联记录 / 图片 查询，消除 N+1。
+     * 避免对每条记录单独发起 type / asset / 关联记录 / 图片 / 标签 查询，消除 N+1。
      *
-     * 注意：标签（[TagRepository.getRelatedTag]）按 recordId 查询，每条记录的 id 互不相同，
-     * 无法批量合并，仍逐条查询；这是当前接口约束下的固有 1-per-record 调用，非 N+1 放大。
+     * 标签经 [TagRepository.getRelatedTags] 批量 JOIN 查询（F-4），按 recordId 建 Map 后内存 lookup，
+     * 已消除原逐条 [TagRepository.getRelatedTag] 的 1-per-record 调用。
      */
     suspend operator fun invoke(records: List<RecordModel>): List<RecordViewsModel> =
         transBatch(records)
@@ -145,7 +145,10 @@ class RecordModelTransToViewsUseCase @Inject constructor(
             val allRecordIds = records.map { it.id }
             val imageMap = recordRepository.queryImagesByRecordIds(allRecordIds)
 
-            // 6. 逐条组装（仅标签为逐条查询，见方法注释）
+            // 5b. 批量取回标签（F-4：消除逐条 getRelatedTag 的 1-per-record 调用）
+            val tagMap = tagRepository.getRelatedTags(allRecordIds)
+
+            // 6. 逐条组装（所有关联数据已批量预取，此处仅内存 Map lookup）
             records.map { recordModel ->
                 val type = typeMap.getValue(recordModel.typeId)
                 val relatedIdList = if (type.typeCategory == RecordTypeCategoryEnum.INCOME) {
@@ -168,7 +171,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                     concessions = recordModel.concessions,
                     remark = recordModel.remark,
                     reimbursable = recordModel.reimbursable,
-                    relatedTags = tagRepository.getRelatedTag(recordModel.id),
+                    relatedTags = tagMap[recordModel.id].orEmpty(),
                     relatedImage = imageMap[recordModel.id].orEmpty(),
                     relatedRecord = relatedRecord,
                     relatedAmount = totalRelated,

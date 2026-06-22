@@ -32,6 +32,12 @@ interface TagRepository {
 
     suspend fun getRelatedTag(recordId: Long): List<TagModel>
 
+    /**
+     * 批量查询多条记录的关联标签（IN + JOIN），消除逐条 [getRelatedTag] 的 1-per-record 调用。
+     * @return recordId -> 标签列表 的映射；无标签的记录不在结果中（调用方按需兜底空列表）
+     */
+    suspend fun getRelatedTags(recordIds: List<Long>): Map<Long, List<TagModel>>
+
     suspend fun getTagById(tagId: Long): TagModel?
 
     suspend fun deleteRelatedWithAsset(assetId: Long)

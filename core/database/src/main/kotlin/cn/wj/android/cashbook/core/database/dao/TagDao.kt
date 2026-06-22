@@ -46,6 +46,21 @@ interface TagDao {
     @Query("SELECT * FROM db_tag WHERE id IN (SELECT tag_id FROM db_tag_with_record WHERE record_id=:recordId)")
     suspend fun queryByRecordId(recordId: Long): List<TagTable>
 
+    /**
+     * 批量按 recordId 查询关联标签：JOIN db_tag_with_record 与 db_tag，每行携带 record_id，
+     * 用于批量转换消除逐条 [queryByRecordId] 的 1-per-record 调用。
+     * INNER JOIN 保证仅返回存在对应标签的关联行。
+     */
+    @Query(
+        value = """
+        SELECT twr.record_id AS record_id, t.*
+        FROM db_tag_with_record twr
+        INNER JOIN db_tag t ON t.id = twr.tag_id
+        WHERE twr.record_id IN (:recordIds)
+    """,
+    )
+    suspend fun queryByRecordIds(recordIds: List<Long>): List<TagWithRecordIdRelation>
+
     @Query(
         value = """
         DELETE FROM db_tag_with_record

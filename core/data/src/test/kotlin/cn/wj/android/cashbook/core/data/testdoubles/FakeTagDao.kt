@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.core.data.testdoubles
 
 import cn.wj.android.cashbook.core.database.dao.TagDao
+import cn.wj.android.cashbook.core.database.dao.TagWithRecordIdRelation
 import cn.wj.android.cashbook.core.database.table.TagTable
 
 /**
@@ -58,6 +59,17 @@ class FakeTagDao : TagDao {
     override suspend fun queryByRecordId(recordId: Long): List<TagTable> {
         val tagIds = tagWithRecords.filter { it.recordId == recordId }.map { it.tagId }
         return tags.filter { it.id in tagIds }
+    }
+
+    override suspend fun queryByRecordIds(recordIds: List<Long>): List<TagWithRecordIdRelation> {
+        // 忠实复刻 INNER JOIN 语义：每条 (record_id, tag) 关联，仅保留存在对应 tag 的行
+        return tagWithRecords
+            .filter { it.recordId in recordIds }
+            .mapNotNull { twr ->
+                tags.find { it.id == twr.tagId }?.let { tag ->
+                    TagWithRecordIdRelation(recordId = twr.recordId, tag = tag)
+                }
+            }
     }
 
     override suspend fun deleteRelatedWithAsset(assetId: Long) {

@@ -27,6 +27,14 @@ class FakeTagRepository : TagRepository {
     private val recordTagMap = mutableMapOf<Long, List<TagModel>>()
     private val _tagListData = MutableStateFlow<List<TagModel>>(emptyList())
 
+    /** [getRelatedTag] 单条调用次数，供测试断言批量路径未走逐条查询 */
+    var getRelatedTagCount: Int = 0
+        private set
+
+    /** [getRelatedTags] 批量调用次数，供测试断言批量路径被使用 */
+    var getRelatedTagsCount: Int = 0
+        private set
+
     override val tagListData: Flow<List<TagModel>> = _tagListData
 
     fun addTag(tag: TagModel) {
@@ -54,7 +62,15 @@ class FakeTagRepository : TagRepository {
     }
 
     override suspend fun getRelatedTag(recordId: Long): List<TagModel> {
+        getRelatedTagCount++
         return recordTagMap[recordId] ?: emptyList()
+    }
+
+    override suspend fun getRelatedTags(recordIds: List<Long>): Map<Long, List<TagModel>> {
+        getRelatedTagsCount++
+        return recordIds.mapNotNull { id ->
+            recordTagMap[id]?.let { id to it }
+        }.toMap()
     }
 
     override suspend fun getTagById(tagId: Long): TagModel? {

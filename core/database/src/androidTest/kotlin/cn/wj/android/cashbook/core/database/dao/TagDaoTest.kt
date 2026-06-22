@@ -186,6 +186,80 @@ class TagDaoTest {
     }
 
     @Test
+    fun when_queryByRecordIds_then_returnsRelationsWithRecordId() = runTest {
+        val typeId = typeDao.insertType(
+            TypeTable(
+                id = null,
+                parentId = -1L,
+                name = "支出类型",
+                iconName = "icon",
+                typeLevel = 0,
+                typeCategory = 0,
+                protected = SWITCH_INT_OFF,
+                sort = 0,
+            ),
+        )
+        val tagId1 = tagDao.insert(
+            TagTable(id = null, name = "标签A", booksId = 1L, invisible = SWITCH_INT_OFF),
+        )
+        val tagId2 = tagDao.insert(
+            TagTable(id = null, name = "标签B", booksId = 1L, invisible = SWITCH_INT_OFF),
+        )
+        val tagId3 = tagDao.insert(
+            TagTable(id = null, name = "标签C", booksId = 1L, invisible = SWITCH_INT_OFF),
+        )
+
+        val recordId1 = transactionDao.insertRecord(
+            RecordTable(
+                id = null,
+                typeId = typeId,
+                assetId = -1L,
+                intoAssetId = -1L,
+                booksId = 1L,
+                amount = 10000L,
+                finalAmount = 10000L,
+                concessions = 0L,
+                charge = 0L,
+                remark = "记录1",
+                reimbursable = SWITCH_INT_OFF,
+                recordTime = System.currentTimeMillis(),
+            ),
+        )
+        val recordId2 = transactionDao.insertRecord(
+            RecordTable(
+                id = null,
+                typeId = typeId,
+                assetId = -1L,
+                intoAssetId = -1L,
+                booksId = 1L,
+                amount = 20000L,
+                finalAmount = 20000L,
+                concessions = 0L,
+                charge = 0L,
+                remark = "记录2",
+                reimbursable = SWITCH_INT_OFF,
+                recordTime = System.currentTimeMillis(),
+            ),
+        )
+        // 记录1 关联标签A、B；记录2 关联标签C
+        transactionDao.insertRelatedTags(
+            listOf(
+                TagWithRecordTable(id = null, recordId = recordId1, tagId = tagId1),
+                TagWithRecordTable(id = null, recordId = recordId1, tagId = tagId2),
+                TagWithRecordTable(id = null, recordId = recordId2, tagId = tagId3),
+            ),
+        )
+
+        val relations = tagDao.queryByRecordIds(listOf(recordId1, recordId2))
+        // 共 3 条 (record_id, tag) 关联行
+        assertThat(relations).hasSize(3)
+        // 每行携带正确的 recordId，按 recordId 分组验证标签
+        val byRecord = relations.groupBy({ it.recordId }, { it.tag.name })
+        assertThat(byRecord.getValue(recordId1)).containsExactly("标签A", "标签B")
+        assertThat(byRecord.getValue(recordId2)).containsExactly("标签C")
+    }
+
+    @Test
     fun when_deleteRelatedWithAsset_then_removesTagRelationsForAssetRecords() = runTest {
         // 先插入类型
         val typeId = typeDao.insertType(

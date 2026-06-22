@@ -272,6 +272,8 @@ class RecordModelTransToViewsUseCaseTest {
         val imagesSingleBefore = recordRepository.queryImagesByRecordIdCount
         val byIdsBefore = recordRepository.queryByIdsCount
         val imagesBatchBefore = recordRepository.queryImagesByRecordIdsCount
+        val tagsSingleBefore = tagRepository.getRelatedTagCount
+        val tagsBatchBefore = tagRepository.getRelatedTagsCount
 
         useCase(records)
 
@@ -281,6 +283,10 @@ class RecordModelTransToViewsUseCaseTest {
         assertThat(recordRepository.queryImagesByRecordIdsCount).isEqualTo(imagesBatchBefore + 1)
         // 批量路径应调用批量记录查询恰好一次（解析关联记录）
         assertThat(recordRepository.queryByIdsCount).isEqualTo(byIdsBefore + 1)
+        // 批量路径不应逐条调用 getRelatedTag（F-4）
+        assertThat(tagRepository.getRelatedTagCount).isEqualTo(tagsSingleBefore)
+        // 批量路径应调用批量标签查询恰好一次（F-4）
+        assertThat(tagRepository.getRelatedTagsCount).isEqualTo(tagsBatchBefore + 1)
     }
 
     @Test

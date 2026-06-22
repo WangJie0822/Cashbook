@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.database.table.TagTable
 import cn.wj.android.cashbook.core.database.table.TagWithRecordTable
 import cn.wj.android.cashbook.core.model.model.TagModel
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -33,9 +34,10 @@ import org.junit.Test
 /**
  * TagRepository 测试。
  *
- * 注意（#9b）：本测试**不实例化 TagRepositoryImpl**（其依赖的 CombineProtoDataSource 是 final class，
- * 无法构造测试替身）。实际覆盖 = FakeTagDao/FakeTransactionDao 行为契约 + 手工复刻的 Impl 逻辑分支；
- * 真实映射由 MappingTest 覆盖，业务逻辑由 core:domain 各 UseCase 测试覆盖。
+ * 注意（#9b）：CRUD/映射逻辑测试不实例化 TagRepositoryImpl，改以 FakeTagDao/FakeTransactionDao 行为契约
+ * + 手工复刻的 Impl 逻辑分支覆盖；真实映射由 MappingTest 覆盖，业务逻辑由 core:domain 各 UseCase 测试覆盖。
+ * F-4 的 [TagRepositoryImpl.getRelatedTags] 因当前 Impl 仅依赖 tagDao/transactionDao/dispatcher（无
+ * CombineProtoDataSource）已可构造，故直接实例化真测其 chunk + groupBy 映射；真实 JOIN SQL 由 androidTest 覆盖。
  */
 class TagRepositoryImplTest {
 
@@ -122,6 +124,45 @@ class TagRepositoryImplTest {
 
         val result = tagDao.queryByRecordId(999L)
         assertThat(result).isEmpty()
+    }
+
+    // ========== 批量关联查询测试（F-4）==========
+
+    @Test
+    fun when_getRelatedTags_then_returns_recordId_to_tags_map() = runTest {
+        val repository = TagRepositoryImpl(tagDao, transactionDao, UnconfinedTestDispatcher())
+        tagDao.insert(createTagTable(name = "标签1"))
+        tagDao.insert(createTagTable(name = "标签2"))
+        tagDao.insert(createTagTable(name = "标签3"))
+        // 记录 10 关联标签 1、3；记录 20 关联标签 2
+        tagDao.tagWithRecords.add(FakeTagDao.FakeTagWithRecord(recordId = 10L, tagId = 1L))
+        tagDao.tagWithRecords.add(FakeTagDao.FakeTagWithRecord(recordId = 10L, tagId = 3L))
+        tagDao.tagWithRecords.add(FakeTagDao.FakeTagWithRecord(recordId = 20L, tagId = 2L))
+
+        val result = repository.getRelatedTags(listOf(10L, 20L, 30L))
+
+        // 30L 无关联，不在结果 map 中（与真实 groupBy 语义一致）
+        assertThat(result.keys).containsExactly(10L, 20L)
+        assertThat(result.getValue(10L).map { it.name }).containsExactly("标签1", "标签3")
+        assertThat(result.getValue(20L).map { it.name }).containsExactly("标签2")
+    }
+
+    @Test
+    fun given_empty_recordIds_when_getRelatedTags_then_returns_empty_map() = runTest {
+        val repository = TagRepositoryImpl(tagDao, transactionDao, UnconfinedTestDispatcher())
+        val result = repository.getRelatedTags(emptyList())
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun given_record_with_no_tags_when_getRelatedTags_then_record_absent_from_map() = runTest {
+        val repository = TagRepositoryImpl(tagDao, transactionDao, UnconfinedTestDispatcher())
+        tagDao.insert(createTagTable(name = "标签1"))
+        tagDao.tagWithRecords.add(FakeTagDao.FakeTagWithRecord(recordId = 10L, tagId = 1L))
+
+        val result = repository.getRelatedTags(listOf(10L, 999L))
+        assertThat(result.keys).containsExactly(10L)
+        assertThat(result).doesNotContainKey(999L)
     }
 
     // ========== 计数查询测试 ==========
