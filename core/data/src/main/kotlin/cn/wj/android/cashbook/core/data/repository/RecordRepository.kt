@@ -91,6 +91,30 @@ interface RecordRepository {
         pageSize: Int,
     ): List<RecordModel>
 
+    /** 标签 [tagId] 在 [[startDate], [endDate]) 的分页记录 */
+    suspend fun queryPagingRecordListByTagIdBetween(
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel>
+
+    /** 类型 [typeId]（按 [includeChildTypes]）在 [[startDate], [endDate]) 的全量记录（汇总用，非分页） */
+    suspend fun queryRecordsByTypeIdInRange(
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        includeChildTypes: Boolean,
+    ): List<RecordModel>
+
+    /** 标签 [tagId] 在 [[startDate], [endDate]) 的全量记录（汇总用，非分页） */
+    suspend fun queryRecordsByTagIdInRange(
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<RecordModel>
+
     suspend fun queryPagingRecordListByKeyword(
         keyword: String,
         page: Int,

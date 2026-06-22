@@ -202,6 +202,26 @@ class FakeRecordDao : RecordDao {
             .take(pageSize)
     }
 
+    override suspend fun queryRecordByTagIdBetween(
+        booksId: Long,
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable> {
+        val recordIds = tagWithRecords.filter { it.tagId == tagId }.map { it.recordId }
+        return records.filter {
+            it.booksId == booksId &&
+                it.id in recordIds &&
+                it.recordTime >= startDate &&
+                it.recordTime < endDate
+        }
+            .sortedByDescending { it.recordTime }
+            .drop(pageNum)
+            .take(pageSize)
+    }
+
     override suspend fun queryRecordByKeyword(
         booksId: Long,
         keyword: String,

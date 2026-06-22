@@ -271,6 +271,52 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun queryPagingRecordListByTagIdBetween(
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryRecordByTagIdBetween(
+            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
+            tagId = tagId,
+            startDate = startDate,
+            endDate = endDate,
+            pageNum = page * pageSize,
+            pageSize = pageSize,
+        ).map { it.asModel() }
+    }
+
+    override suspend fun queryRecordsByTypeIdInRange(
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        includeChildTypes: Boolean,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        val booksId = combineProtoDataSource.recordSettingsData.first().currentBookId
+        if (includeChildTypes) {
+            recordDao.queryRecordByTypeIdBetween(booksId, typeId, startDate, endDate, pageNum = 0, pageSize = Int.MAX_VALUE)
+        } else {
+            recordDao.queryRecordByTypeIdExactBetween(booksId, typeId, startDate, endDate, pageNum = 0, pageSize = Int.MAX_VALUE)
+        }.map { it.asModel() }
+    }
+
+    override suspend fun queryRecordsByTagIdInRange(
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryRecordByTagIdBetween(
+            booksId = combineProtoDataSource.recordSettingsData.first().currentBookId,
+            tagId = tagId,
+            startDate = startDate,
+            endDate = endDate,
+            pageNum = 0,
+            pageSize = Int.MAX_VALUE,
+        ).map { it.asModel() }
+    }
+
     override suspend fun queryPagingRecordListByKeyword(
         keyword: String,
         page: Int,

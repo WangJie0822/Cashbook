@@ -35,6 +35,7 @@ class FakeRecordRepository : RecordRepository {
     private val relatedMap = mutableMapOf<Long, List<Long>>()
     private val relatedFromMap = mutableMapOf<Long, List<Long>>()
     private val imageMap = mutableMapOf<Long, List<ImageModel>>()
+    private val tagRecordIds = mutableMapOf<Long, MutableSet<Long>>()
     private val _searchHistoryListData = MutableStateFlow<List<String>>(emptyList())
 
     /** 用于测试验证的记录 */
@@ -66,6 +67,16 @@ class FakeRecordRepository : RecordRepository {
 
     fun setImages(recordId: Long, images: List<ImageModel>) {
         imageMap[recordId] = images
+    }
+
+    /** 建立标签-记录关联（测试辅助，对应 db_tag_with_record） */
+    fun addTagRelation(tagId: Long, recordId: Long) {
+        tagRecordIds.getOrPut(tagId) { mutableSetOf() }.add(recordId)
+    }
+
+    private fun recordsOfTag(tagId: Long): List<RecordModel> {
+        val ids = tagRecordIds[tagId].orEmpty()
+        return records.filter { it.id in ids }
     }
 
     override suspend fun queryById(recordId: Long): RecordModel? {
@@ -170,7 +181,42 @@ class FakeRecordRepository : RecordRepository {
         page: Int,
         pageSize: Int,
     ): List<RecordModel> {
-        return records.drop(page * pageSize).take(pageSize)
+        return recordsOfTag(tagId)
+            .sortedByDescending { it.recordTime }
+            .drop(page * pageSize)
+            .take(pageSize)
+    }
+
+    override suspend fun queryPagingRecordListByTagIdBetween(
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel> {
+        return recordsOfTag(tagId)
+            .filter { it.recordTime >= startDate && it.recordTime < endDate }
+            .sortedByDescending { it.recordTime }
+            .drop(page * pageSize)
+            .take(pageSize)
+    }
+
+    override suspend fun queryRecordsByTypeIdInRange(
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        includeChildTypes: Boolean,
+    ): List<RecordModel> {
+        // Fake 不建模父子类型，按精确 typeId + 半开区间过滤（测试用直接 typeId）
+        return records.filter { it.typeId == typeId && it.recordTime >= startDate && it.recordTime < endDate }
+    }
+
+    override suspend fun queryRecordsByTagIdInRange(
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): List<RecordModel> {
+        return recordsOfTag(tagId).filter { it.recordTime >= startDate && it.recordTime < endDate }
     }
 
     override suspend fun queryPagingRecordListByKeyword(
