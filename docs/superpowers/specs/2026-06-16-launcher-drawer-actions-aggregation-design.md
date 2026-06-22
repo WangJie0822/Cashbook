@@ -37,10 +37,10 @@
 
 ### 4.1 数据类
 
-`LauncherScreen.kt` 顶层新增（`internal`，与现有 Composable 一致）：
+`LauncherScreen.kt` 顶层新增（**`public`**，见下方勘误）：
 
 ```kotlin
-internal data class LauncherDrawerActions(
+data class LauncherDrawerActions(
     val onMyAssetClick: () -> Unit,
     val onMyBookClick: () -> Unit,
     val onMyCategoryClick: () -> Unit,
@@ -50,6 +50,8 @@ internal data class LauncherDrawerActions(
     val onAboutUsClick: () -> Unit,
 )
 ```
+
+> **勘误（实施期实证，2026-06-22）**：本节原写 `internal data class`（"与现有 Composable 一致"），实测 `:feature:settings:compileDebugKotlin` 报错 `SettingsNavigation.kt 'public' function exposes its 'internal' parameter type 'LauncherDrawerActions'`。原因：跨模块 API `settingsLauncherScreen` 为 `public`（app/MainApp.kt 跨模块调用并构造该类型），public 函数不能暴露 internal 参数类型。`LauncherRoute/Screen/Sheet` 可保持 `internal`（仅模块内用），但 `LauncherDrawerActions` 作为穿过 public 边界 + 在 app 构造的契约类型必须 `public`。非目标 #2「不下沉 core/ui」仍成立——public 仅限 feature/settings 内声明。
 
 字段命名采用 `onXxxClick`（跟随叶子节点 `LauncherSheet`/`LauncherScreen` 现有命名 + Composable 社区惯例：actions 抽象为 UI 事件 click，调用方实现恰为 nav 仅是偶然）。
 
