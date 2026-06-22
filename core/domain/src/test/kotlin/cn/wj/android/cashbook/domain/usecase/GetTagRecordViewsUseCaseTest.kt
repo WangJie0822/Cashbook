@@ -59,18 +59,44 @@ class GetTagRecordViewsUseCaseTest {
 
     @Test
     fun when_tag_id_is_invalid_then_returns_empty() = runTest {
-        val result = useCase(-1L, 0, 10)
+        val result = useCase(tagId = -1L, startDate = 0L, endDate = Long.MAX_VALUE, pageNum = 0, pageSize = 10)
 
         assertThat(result).isEmpty()
     }
 
     @Test
-    fun when_tag_id_valid_then_returns_records() = runTest {
-        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L))
-        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L))
+    fun when_full_range_then_returns_all_of_tag() = runTest {
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, recordTime = 1_000L))
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, recordTime = 9_000L))
+        recordRepository.addTagRelation(10L, 1L)
+        recordRepository.addTagRelation(10L, 2L)
 
-        val result = useCase(1L, 0, 10)
+        val result = useCase(tagId = 10L, startDate = 0L, endDate = Long.MAX_VALUE, pageNum = 0, pageSize = 10)
 
-        assertThat(result).hasSize(2)
+        assertThat(result.map { it.id }).containsExactly(1L, 2L)
+    }
+
+    @Test
+    fun when_range_given_then_filters_by_halfOpen_range() = runTest {
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, recordTime = 1_000L)) // in
+        recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, recordTime = 9_000L)) // out
+        recordRepository.addTagRelation(10L, 1L)
+        recordRepository.addTagRelation(10L, 2L)
+
+        val result = useCase(tagId = 10L, startDate = 0L, endDate = 5_000L, pageNum = 0, pageSize = 10)
+
+        assertThat(result.map { it.id }).containsExactly(1L)
+    }
+
+    @Test
+    fun when_tag_not_matched_then_excluded() = runTest {
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, recordTime = 1_000L))
+        recordRepository.addRecord(createRecordModel(id = 3L, typeId = 1L, recordTime = 1_000L))
+        recordRepository.addTagRelation(10L, 1L)
+        recordRepository.addTagRelation(20L, 3L)
+
+        val result = useCase(tagId = 10L, startDate = 0L, endDate = Long.MAX_VALUE, pageNum = 0, pageSize = 10)
+
+        assertThat(result.map { it.id }).containsExactly(1L)
     }
 }

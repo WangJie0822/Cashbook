@@ -38,6 +38,8 @@ class GetTagRecordViewsUseCase @Inject constructor(
 
     suspend operator fun invoke(
         tagId: Long,
+        startDate: Long,
+        endDate: Long,
         pageNum: Int,
         pageSize: Int,
     ): List<RecordViewsEntity> = withContext(coroutineContext) {
@@ -45,7 +47,7 @@ class GetTagRecordViewsUseCase @Inject constructor(
             return@withContext emptyList()
         }
         recordModelTransToViewsUseCase(
-            recordRepository.queryPagingRecordListByTagId(tagId, pageNum, pageSize)
+            recordRepository.queryPagingRecordListByTagIdBetween(tagId, startDate, endDate, pageNum, pageSize)
                 .sortedByDescending { it.recordTime },
         ).map { it.asEntity() }
     }
