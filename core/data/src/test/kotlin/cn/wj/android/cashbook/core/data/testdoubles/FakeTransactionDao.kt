@@ -273,6 +273,24 @@ class FakeTransactionDao : TransactionDao {
         records.removeAll { it.assetId == assetId || it.intoAssetId == assetId }
     }
 
+    override suspend fun deleteTagRelationsByRecordIds(ids: List<Long>) {
+        tagWithRecords.removeAll { it.recordId in ids }
+    }
+
+    override suspend fun deleteImageRelationsByRecordIds(ids: List<Long>) {
+        imageWithRecords.removeAll { it.recordId in ids }
+    }
+
+    override suspend fun deleteRecordRelationsByRecordIds(ids: List<Long>) {
+        relatedRecords.removeAll { it.recordId in ids || it.relatedRecordId in ids }
+    }
+
+    override suspend fun deleteRecordsByIds(ids: List<Long>): Int {
+        val before = records.size
+        records.removeAll { it.id in ids }
+        return before - records.size
+    }
+
     override suspend fun updateRecordTypeId(oldTypeId: Long, newTypeId: Long) {
         val updated = records.mapIndexed { index, record ->
             if (record.typeId == oldTypeId) record.copy(typeId = newTypeId) else record

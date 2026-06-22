@@ -17,10 +17,12 @@
 package cn.wj.android.cashbook.core.data.testdoubles
 
 import cn.wj.android.cashbook.core.database.table.AssetTable
+import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.TYPE_TABLE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.database.table.TYPE_TABLE_BALANCE_INCOME
+import cn.wj.android.cashbook.core.database.table.TagWithRecordTable
 import cn.wj.android.cashbook.core.database.table.TypeTable
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
@@ -690,6 +692,49 @@ class TransactionDaoLogicTest {
     }
 
     // ========== 辅助方法 ==========
+
+    // ========== byIds 批量删 SQL 测试（P-M1）==========
+
+    @Test
+    fun when_deleteRecordsByIds_then_returns_deleted_row_count() = runTest {
+        dao.records.add(createRecordTable(id = 1L))
+        dao.records.add(createRecordTable(id = 2L))
+        dao.records.add(createRecordTable(id = 3L))
+
+        val deleted = dao.deleteRecordsByIds(listOf(1L, 2L))
+
+        assertThat(deleted).isEqualTo(2)
+        assertThat(dao.records.map { it.id }).containsExactly(3L)
+    }
+
+    @Test
+    fun when_deleteRecordRelationsByRecordIds_then_clears_both_directions() = runTest {
+        // 吸收者 2（存活）指向被删支出 1：record_id=2, related_record_id=1
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 1L, recordId = 2L, relatedRecordId = 1L))
+        // 反向：record_id=1（被删）指向 3
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 2L, recordId = 1L, relatedRecordId = 3L))
+        // 无关边
+        dao.relatedRecords.add(RecordWithRelatedTable(id = 3L, recordId = 5L, relatedRecordId = 6L))
+
+        dao.deleteRecordRelationsByRecordIds(listOf(1L))
+
+        // 含 1 的两条（任一方向）被清，无关边保留
+        assertThat(dao.relatedRecords.map { it.id }).containsExactly(3L)
+    }
+
+    @Test
+    fun when_deleteTagAndImageRelationsByRecordIds_then_only_matching_cleared() = runTest {
+        dao.tagWithRecords.add(TagWithRecordTable(id = 1L, recordId = 1L, tagId = 100L))
+        dao.tagWithRecords.add(TagWithRecordTable(id = 2L, recordId = 2L, tagId = 100L))
+        dao.imageWithRecords.add(ImageWithRelatedTable(id = 1L, recordId = 1L, path = "/a", bytes = ByteArray(0)))
+        dao.imageWithRecords.add(ImageWithRelatedTable(id = 2L, recordId = 2L, path = "/b", bytes = ByteArray(0)))
+
+        dao.deleteTagRelationsByRecordIds(listOf(1L))
+        dao.deleteImageRelationsByRecordIds(listOf(1L))
+
+        assertThat(dao.tagWithRecords.map { it.recordId }).containsExactly(2L)
+        assertThat(dao.imageWithRecords.map { it.recordId }).containsExactly(2L)
+    }
 
     companion object {
         private const val EXPENDITURE_TYPE_ID = 1L

@@ -46,6 +46,12 @@ data class ClusterDiscovery(
 )
 
 /**
+ * 批量 IN 删除单批最大参数数，低于 SQLite 旧版变量上限（999）；
+ * 与 core:data 的 SQL_IN_CHUNK_SIZE 同值同义，因 core:database 不能依赖 core:data 故独立定义。
+ */
+private const val DELETE_IN_CHUNK_SIZE = 900
+
+/**
  * 事务数据库操作类
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2023/2/20
@@ -730,6 +736,22 @@ interface TransactionDao {
 
     @Query("DELETE FROM db_record WHERE books_id = :bookId")
     suspend fun deleteRecordsByBookId(bookId: Long)
+
+    /** 批量删除一组记录的标签关联（IN，删账本/资产/单删共用，消逐条 deleteOldRelatedTags） */
+    @Query("DELETE FROM db_tag_with_record WHERE record_id IN (:ids)")
+    suspend fun deleteTagRelationsByRecordIds(ids: List<Long>)
+
+    /** 批量删除一组记录的图片关联（IN） */
+    @Query("DELETE FROM db_image_with_related WHERE record_id IN (:ids)")
+    suspend fun deleteImageRelationsByRecordIds(ids: List<Long>)
+
+    /** 批量删除一组记录的关联记录关系（双向 IN-OR，等价逐条 clearRelatedRecordById） */
+    @Query("DELETE FROM db_record_with_related WHERE record_id IN (:ids) OR related_record_id IN (:ids)")
+    suspend fun deleteRecordRelationsByRecordIds(ids: List<Long>)
+
+    /** 批量删除一组记录（IN），返回实际删除行数（L3 校验用） */
+    @Query("DELETE FROM db_record WHERE id IN (:ids)")
+    suspend fun deleteRecordsByIds(ids: List<Long>): Int
 
     /**
      * 批量删除一组记录：逐条余额回退+清关联+删记录（无逐条重算），
