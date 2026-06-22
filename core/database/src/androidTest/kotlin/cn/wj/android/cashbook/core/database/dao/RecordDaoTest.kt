@@ -519,6 +519,44 @@ class RecordDaoTest {
         assertThat(result[0].remark).isEqualTo("有标签记录")
     }
 
+    @Test
+    fun when_queryRecordByTagIdBetween_then_filtersByTagAndHalfOpenRange() = runTest {
+        testBookId = createTestBook()
+        val typeId = typeDao.insertType(createType())
+
+        val tagId = tagDao.insert(TagTable(id = null, name = "工作", booksId = testBookId, invisible = SWITCH_INT_OFF))
+        val otherTagId = tagDao.insert(TagTable(id = null, name = "生活", booksId = testBookId, invisible = SWITCH_INT_OFF))
+
+        // tag 命中且在区间内 [1000, 3000)
+        val inRangeId = insertRecord(createRecord(typeId = typeId, remark = "区间内", recordTime = 2000L))
+        // tag 命中但等于 endDate（半开区间应排除）
+        val atEndId = insertRecord(createRecord(typeId = typeId, remark = "区间右端", recordTime = 3000L))
+        // tag 命中但在区间外
+        val outRangeId = insertRecord(createRecord(typeId = typeId, remark = "区间外", recordTime = 5000L))
+        // 区间内但 tag 不匹配
+        val otherTagInRangeId = insertRecord(createRecord(typeId = typeId, remark = "他标签", recordTime = 2500L))
+
+        transactionDao.insertRelatedTags(
+            listOf(
+                TagWithRecordTable(id = null, recordId = inRangeId, tagId = tagId),
+                TagWithRecordTable(id = null, recordId = atEndId, tagId = tagId),
+                TagWithRecordTable(id = null, recordId = outRangeId, tagId = tagId),
+                TagWithRecordTable(id = null, recordId = otherTagInRangeId, tagId = otherTagId),
+            ),
+        )
+
+        val result = recordDao.queryRecordByTagIdBetween(
+            booksId = testBookId,
+            tagId = tagId,
+            startDate = 1000L,
+            endDate = 3000L,
+            pageNum = 0,
+            pageSize = 10,
+        )
+        assertThat(result).hasSize(1)
+        assertThat(result[0].remark).isEqualTo("区间内")
+    }
+
     // endregion
 
     // region 13. queryRecordByKeyword

@@ -259,6 +259,28 @@ interface RecordDao {
         pageSize: Int,
     ): List<RecordTable>
 
+    /** 标签 id 为 [tagId] 且 record_time 在 [[startDate], [endDate]) 半开区间的第 [pageNum] 页 [pageSize] 条记录 */
+    @Query(
+        """
+        SELECT * FROM db_record
+        WHERE books_id=:booksId
+        AND record_time>=:startDate AND record_time<:endDate
+        AND id IN (
+            SELECT record_id FROM db_tag_with_record
+            WHERE tag_id=:tagId
+        )
+        ORDER BY record_time DESC LIMIT :pageSize OFFSET :pageNum
+    """,
+    )
+    suspend fun queryRecordByTagIdBetween(
+        booksId: Long,
+        tagId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordTable>
+
     @Query(
         value = """
         SELECT * FROM db_record
