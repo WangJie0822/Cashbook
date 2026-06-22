@@ -709,18 +709,6 @@ interface TransactionDao {
     )
     suspend fun deleteBookById(bookId: Long)
 
-    @Query("DELETE FROM db_tag_with_record WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
-    suspend fun deleteTagRelationsByBookId(bookId: Long)
-
-    @Query("DELETE FROM db_record_with_related WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId) OR related_record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
-    suspend fun deleteRecordRelationsByBookId(bookId: Long)
-
-    @Query("DELETE FROM db_image_with_related WHERE record_id IN (SELECT id FROM db_record WHERE books_id = :bookId)")
-    suspend fun deleteImageRelationsByBookId(bookId: Long)
-
-    @Query("DELETE FROM db_record WHERE books_id = :bookId")
-    suspend fun deleteRecordsByBookId(bookId: Long)
-
     /** 批量删除一组记录的标签关联（IN，删账本/资产/单删共用，消逐条 deleteOldRelatedTags） */
     @Query("DELETE FROM db_tag_with_record WHERE record_id IN (:ids)")
     suspend fun deleteTagRelationsByRecordIds(ids: List<Long>)
@@ -834,43 +822,6 @@ interface TransactionDao {
         deleteTagRelationByTagId(id)
         deleteTagById(id)
     }
-
-    /** 删除资产关联的标签记录关联 */
-    @Query(
-        value = """
-        DELETE FROM db_tag_with_record
-        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-    """,
-    )
-    suspend fun deleteTagRelationsByAssetId(assetId: Long)
-
-    /** 删除资产关联的记录关联数据 */
-    @Query(
-        value = """
-        DELETE FROM db_record_with_related
-        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-        OR related_record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-    """,
-    )
-    suspend fun deleteRecordRelationsByAssetId(assetId: Long)
-
-    /** 删除资产关联的图片关联数据 */
-    @Query(
-        value = """
-        DELETE FROM db_image_with_related
-        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-    """,
-    )
-    suspend fun deleteImageRelationsByAssetId(assetId: Long)
-
-    /** 删除资产关联的记录 */
-    @Query(
-        value = """
-        DELETE FROM db_record
-        WHERE asset_id=:assetId OR into_asset_id=:assetId
-    """,
-    )
-    suspend fun deleteRecordsByAssetId(assetId: Long)
 
     /**
      * 事务化删除资产关联的所有数据（不删资产行本身，守 AUDIT-2 契约：目标资产存活+余额回退）。

@@ -210,25 +210,6 @@ class FakeTransactionDao : TransactionDao {
         deleteBookCalled = true
     }
 
-    override suspend fun deleteTagRelationsByBookId(bookId: Long) {
-        val recordIds = records.filter { it.booksId == bookId }.mapNotNull { it.id }
-        tagWithRecords.removeAll { it.recordId in recordIds }
-    }
-
-    override suspend fun deleteRecordRelationsByBookId(bookId: Long) {
-        val recordIds = records.filter { it.booksId == bookId }.mapNotNull { it.id }
-        relatedRecords.removeAll { it.recordId in recordIds || it.relatedRecordId in recordIds }
-    }
-
-    override suspend fun deleteImageRelationsByBookId(bookId: Long) {
-        val recordIds = records.filter { it.booksId == bookId }.mapNotNull { it.id }
-        imageWithRecords.removeAll { it.recordId in recordIds }
-    }
-
-    override suspend fun deleteRecordsByBookId(bookId: Long) {
-        records.removeAll { it.booksId == bookId }
-    }
-
     override suspend fun queryAllAssetsByBookId(bookId: Long): List<AssetTable> {
         return assets.filter { it.booksId == bookId }
     }
@@ -249,28 +230,6 @@ class FakeTransactionDao : TransactionDao {
         deleteTagRelationByTagId(id)
         deleteTagById(id)
         deleteTagCalled = true
-    }
-
-    override suspend fun deleteTagRelationsByAssetId(assetId: Long) {
-        val recordIds = records.filter { it.assetId == assetId || it.intoAssetId == assetId }
-            .mapNotNull { it.id }
-        tagWithRecords.removeAll { it.recordId in recordIds }
-    }
-
-    override suspend fun deleteRecordRelationsByAssetId(assetId: Long) {
-        val recordIds = records.filter { it.assetId == assetId || it.intoAssetId == assetId }
-            .mapNotNull { it.id }
-        relatedRecords.removeAll { it.recordId in recordIds || it.relatedRecordId in recordIds }
-    }
-
-    override suspend fun deleteImageRelationsByAssetId(assetId: Long) {
-        val recordIds = records.filter { it.assetId == assetId || it.intoAssetId == assetId }
-            .mapNotNull { it.id }
-        imageWithRecords.removeAll { it.recordId in recordIds }
-    }
-
-    override suspend fun deleteRecordsByAssetId(assetId: Long) {
-        records.removeAll { it.assetId == assetId || it.intoAssetId == assetId }
     }
 
     override suspend fun deleteTagRelationsByRecordIds(ids: List<Long>) {
@@ -315,7 +274,7 @@ class FakeTransactionDao : TransactionDao {
         types.removeAll { it.id == typeId }
     }
 
-    // 注意：所有 @Transaction 默认方法（insert/update/deleteRecordTransaction、deleteRecordCore、
+    // 注意：所有 @Transaction 默认方法（insert/update/deleteRecordTransaction、revertRecordBalanceOnly、
     // deleteRecordsBatch、deleteBookTransaction、deleteAssetRelatedData、recalculate* 等）均不在此 override，
     // 由 Fake 继承真实默认实现、跑在上面忠实建模的基础方法上——测试据此验证真实算法。
 }
