@@ -23,7 +23,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import cn.wj.android.cashbook.feature.settings.screen.AboutUsRoute
 import cn.wj.android.cashbook.feature.settings.screen.BackupAndRecoveryRoute
-import cn.wj.android.cashbook.feature.settings.screen.LauncherDrawerActions
 import cn.wj.android.cashbook.feature.settings.screen.LauncherRoute
 import cn.wj.android.cashbook.feature.settings.screen.SettingRoute
 import kotlinx.serialization.Serializable

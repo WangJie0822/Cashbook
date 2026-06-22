@@ -22,6 +22,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.testing.util.captureMultiDevice
 import cn.wj.android.cashbook.core.testing.util.captureMultiTheme
+import cn.wj.android.cashbook.feature.settings.navigation.LauncherDrawerActions
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherUiState
 import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule

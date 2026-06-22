@@ -44,29 +44,9 @@ import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.settings.navigation.LauncherDrawerActions
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModel
-
-/**
- * 首页抽屉菜单点击回调聚合
- *
- * @param onMyAssetClick 我的资产点击回调
- * @param onMyBookClick 我的账本点击回调
- * @param onMyCategoryClick 我的分类点击回调
- * @param onMyTagClick 我的标签点击回调
- * @param onReimbursementClick 待报销点击回调
- * @param onSettingClick 设置点击回调
- * @param onAboutUsClick 关于我们点击回调
- */
-data class LauncherDrawerActions(
-    val onMyAssetClick: () -> Unit,
-    val onMyBookClick: () -> Unit,
-    val onMyCategoryClick: () -> Unit,
-    val onMyTagClick: () -> Unit,
-    val onReimbursementClick: () -> Unit,
-    val onSettingClick: () -> Unit,
-    val onAboutUsClick: () -> Unit,
-)
 
 /**
  * 首页显示
