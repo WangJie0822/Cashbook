@@ -55,6 +55,7 @@ class SettingScreenScreenshotTests {
         hasPassword = false,
         darkMode = DarkModeEnum.FOLLOW_SYSTEM,
         dynamicColor = false,
+        monthStartDay = 1,
     )
 
     @Test
@@ -73,6 +74,8 @@ class SettingScreenScreenshotTests {
                 onMobileNetworkDownloadEnableChanged = {},
                 onImageQualityClick = {},
                 onImageQualitySelected = {},
+                onMonthStartDayClick = {},
+                onMonthStartDaySelected = {},
                 onNeedSecurityVerificationWhenLaunchChanged = {},
                 onVerificationModeClick = {},
                 onEnableFingerprintVerificationChanged = {},
@@ -109,6 +112,8 @@ class SettingScreenScreenshotTests {
                 onMobileNetworkDownloadEnableChanged = {},
                 onImageQualityClick = {},
                 onImageQualitySelected = {},
+                onMonthStartDayClick = {},
+                onMonthStartDaySelected = {},
                 onNeedSecurityVerificationWhenLaunchChanged = {},
                 onVerificationModeClick = {},
                 onEnableFingerprintVerificationChanged = {},
@@ -146,6 +151,8 @@ class SettingScreenScreenshotTests {
                     onMobileNetworkDownloadEnableChanged = {},
                     onImageQualityClick = {},
                     onImageQualitySelected = {},
+                    onMonthStartDayClick = {},
+                    onMonthStartDaySelected = {},
                     onNeedSecurityVerificationWhenLaunchChanged = {},
                     onVerificationModeClick = {},
                     onEnableFingerprintVerificationChanged = {},
@@ -184,6 +191,8 @@ class SettingScreenScreenshotTests {
                     onMobileNetworkDownloadEnableChanged = {},
                     onImageQualityClick = {},
                     onImageQualitySelected = {},
+                    onMonthStartDayClick = {},
+                    onMonthStartDaySelected = {},
                     onNeedSecurityVerificationWhenLaunchChanged = {},
                     onVerificationModeClick = {},
                     onEnableFingerprintVerificationChanged = {},

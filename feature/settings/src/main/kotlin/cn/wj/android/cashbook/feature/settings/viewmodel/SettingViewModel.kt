@@ -30,6 +30,7 @@ import cn.wj.android.cashbook.core.design.security.loadDecryptCipher
 import cn.wj.android.cashbook.core.design.security.loadEncryptCipher
 import cn.wj.android.cashbook.core.design.security.shaEncode
 import cn.wj.android.cashbook.core.design.security.toHexString
+import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
 import cn.wj.android.cashbook.core.model.enums.VerificationModeEnum
@@ -38,6 +39,7 @@ import cn.wj.android.cashbook.feature.settings.enums.SettingDialogEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -63,19 +65,22 @@ class SettingViewModel @Inject constructor(
     var shouldDisplayBookmark by mutableStateOf("")
         private set
 
-    val uiState = settingRepository.appSettingsModel
-        .mapLatest {
-            SettingUiState.Success(
-                mobileNetworkDownloadEnable = it.mobileNetworkDownloadEnable,
-                imageQuality = it.imageQuality,
-                needSecurityVerificationWhenLaunch = it.needSecurityVerificationWhenLaunch,
-                verificationMode = it.verificationMode,
-                enableFingerprintVerification = it.enableFingerprintVerification,
-                hasPassword = it.passwordInfo.isNotBlank(),
-                darkMode = it.darkMode,
-                dynamicColor = it.dynamicColor,
-            )
-        }
+    val uiState = combine(
+        settingRepository.appSettingsModel,
+        settingRepository.recordSettingsModel,
+    ) { app, record ->
+        SettingUiState.Success(
+            mobileNetworkDownloadEnable = app.mobileNetworkDownloadEnable,
+            imageQuality = app.imageQuality,
+            needSecurityVerificationWhenLaunch = app.needSecurityVerificationWhenLaunch,
+            verificationMode = app.verificationMode,
+            enableFingerprintVerification = app.enableFingerprintVerification,
+            hasPassword = app.passwordInfo.isNotBlank(),
+            darkMode = app.darkMode,
+            dynamicColor = app.dynamicColor,
+            monthStartDay = normalizeMonthStartDay(record.monthStartDay),
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -107,6 +112,17 @@ class SettingViewModel @Inject constructor(
     fun onImageQualitySelected(imageQuality: ImageQualityEnum) {
         viewModelScope.launch {
             settingRepository.updateImageQuality(imageQuality)
+        }
+    }
+
+    fun onMonthStartDayClick() {
+        dialogState = DialogState.Shown(SettingDialogEnum.MONTH_START_DAY)
+    }
+
+    fun onMonthStartDaySelected(day: Int) {
+        viewModelScope.launch {
+            settingRepository.updateMonthStartDay(day)
+            dismissDialog()
         }
     }
 
@@ -352,6 +368,7 @@ sealed class SettingUiState(
     open val hasPassword: Boolean = false,
     open val darkMode: DarkModeEnum = DarkModeEnum.FOLLOW_SYSTEM,
     open val dynamicColor: Boolean = false,
+    open val monthStartDay: Int = 1,
 ) {
     data object Loading : SettingUiState()
 
@@ -364,5 +381,6 @@ sealed class SettingUiState(
         override val hasPassword: Boolean,
         override val darkMode: DarkModeEnum,
         override val dynamicColor: Boolean,
+        override val monthStartDay: Int,
     ) : SettingUiState()
 }

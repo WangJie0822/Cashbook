@@ -46,4 +46,7 @@ enum class SettingDialogEnum {
 
     /** 安全验证模式 */
     VERIFICATION_MODE,
+
+    /** 月起始日 */
+    MONTH_START_DAY,
 }

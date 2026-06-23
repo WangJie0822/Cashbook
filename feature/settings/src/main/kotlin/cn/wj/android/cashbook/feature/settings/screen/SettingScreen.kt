@@ -23,10 +23,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -110,6 +113,8 @@ internal fun SettingRoute(
         onMobileNetworkDownloadEnableChanged = viewModel::onMobileNetworkDownloadEnableChanged,
         onImageQualityClick = viewModel::onImageQualityClick,
         onImageQualitySelected = viewModel::onImageQualitySelected,
+        onMonthStartDayClick = viewModel::onMonthStartDayClick,
+        onMonthStartDaySelected = viewModel::onMonthStartDaySelected,
         onNeedSecurityVerificationWhenLaunchChanged = viewModel::onNeedSecurityVerificationWhenLaunchChanged,
         onEnableFingerprintVerificationChanged = viewModel::onEnableFingerprintVerificationChanged,
         onPasswordClick = viewModel::onPasswordClick,
@@ -175,6 +180,8 @@ internal fun SettingScreen(
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
     onImageQualityClick: () -> Unit,
     onImageQualitySelected: (ImageQualityEnum) -> Unit,
+    onMonthStartDayClick: () -> Unit,
+    onMonthStartDaySelected: (Int) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -230,6 +237,8 @@ internal fun SettingScreen(
             onMobileNetworkDownloadEnableChanged = onMobileNetworkDownloadEnableChanged,
             onImageQualityClick = onImageQualityClick,
             onImageQualitySelected = onImageQualitySelected,
+            onMonthStartDayClick = onMonthStartDayClick,
+            onMonthStartDaySelected = onMonthStartDaySelected,
             onNeedSecurityVerificationWhenLaunchChanged = onNeedSecurityVerificationWhenLaunchChanged,
             onEnableFingerprintVerificationChanged = onEnableFingerprintVerificationChanged,
             onPasswordClick = onPasswordClick,
@@ -281,6 +290,8 @@ internal fun SettingContent(
     onMobileNetworkDownloadEnableChanged: (Boolean) -> Unit,
     onImageQualityClick: () -> Unit,
     onImageQualitySelected: (ImageQualityEnum) -> Unit,
+    onMonthStartDayClick: () -> Unit,
+    onMonthStartDaySelected: (Int) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -310,7 +321,9 @@ internal fun SettingContent(
             verificationMode = uiState.verificationMode,
             darkMode = uiState.darkMode,
             dynamicColor = uiState.dynamicColor,
+            monthStartDay = uiState.monthStartDay,
             onImageQualitySelected = onImageQualitySelected,
+            onMonthStartDaySelected = onMonthStartDaySelected,
             onCreateConfirmClick = onCreateConfirmClick,
             onModifyConfirmClick = onModifyConfirmClick,
             onVerifyConfirmClick = onVerifyConfirmClick,
@@ -364,6 +377,32 @@ internal fun SettingContent(
                         }
                     },
                 )
+            }
+
+            item {
+                CbListItem(
+                    modifier = Modifier
+                        .clickable(onClick = rememberHapticOnClick { onMonthStartDayClick.invoke() }),
+                    headlineContent = { Text(text = stringResource(id = R.string.month_start_day)) },
+                    supportingContent = { Text(text = stringResource(id = R.string.month_start_day_hint)) },
+                    trailingContent = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(end = 8.dp),
+                                text = "${uiState.monthStartDay}",
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Icon(
+                                imageVector = CbIcons.KeyboardArrowRight,
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                )
+                CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
             }
 
             item {
@@ -525,7 +564,9 @@ internal fun DialogContent(
     verificationMode: VerificationModeEnum,
     darkMode: DarkModeEnum,
     dynamicColor: Boolean,
+    monthStartDay: Int,
     onImageQualitySelected: (ImageQualityEnum) -> Unit,
+    onMonthStartDaySelected: (Int) -> Unit,
     onCreateConfirmClick: (String) -> SettingPasswordStateEnum,
     onModifyConfirmClick: (String, String, (SettingPasswordStateEnum) -> Unit) -> Unit,
     onVerifyConfirmClick: (String, (SettingPasswordStateEnum) -> Unit) -> Unit,
@@ -575,6 +616,15 @@ internal fun DialogContent(
                 ImageQualityDialog(
                     imageQuality = imageQuality,
                     onImageQualitySelected = onImageQualitySelected,
+                    onDismissClick = onRequestDismissDialog,
+                )
+            }
+
+            SettingDialogEnum.MONTH_START_DAY -> {
+                // 月起始日
+                MonthStartDayDialog(
+                    monthStartDay = monthStartDay,
+                    onMonthStartDaySelected = onMonthStartDaySelected,
                     onDismissClick = onRequestDismissDialog,
                 )
             }
@@ -1131,6 +1181,60 @@ internal fun ImageQualityDialog(
 }
 
 /**
+ * 月起始日选择弹窗（1-28，可滚动单选）
+ *
+ * @param monthStartDay 当前选择的月起始日
+ * @param onMonthStartDaySelected 选择回调
+ * @param onDismissClick 隐藏弹窗
+ */
+@Composable
+internal fun MonthStartDayDialog(
+    monthStartDay: Int,
+    onMonthStartDaySelected: (Int) -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    CbAlertDialog(
+        onDismissRequest = onDismissClick,
+        title = { Text(text = stringResource(id = R.string.month_start_day)) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 360.dp)
+                    .verticalScroll(rememberScrollState())
+                    .selectableGroup(),
+            ) {
+                (1..28).forEach { day ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .selectable(
+                                selected = (day == monthStartDay),
+                                onClick = { onMonthStartDaySelected.invoke(day) },
+                                role = Role.RadioButton,
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(selected = day == monthStartDay, onClick = null)
+                        Text(
+                            text = "$day",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 16.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            CbTextButton(onClick = onDismissClick) {
+                Text(text = stringResource(id = R.string.close))
+            }
+        },
+    )
+}
+
+/**
  * 动态配色模式选择弹窗
  *
  * @param dynamicColor 当前选择模式
@@ -1250,6 +1354,8 @@ private fun SettingScreenPreview() {
             onModifyConfirmClick = { _, _, _ -> },
             onImageQualityClick = { },
             onImageQualitySelected = { _ -> },
+            onMonthStartDayClick = { },
+            onMonthStartDaySelected = { _ -> },
             onVerifyConfirmClick = { _, _ -> },
             onClearConfirmClick = { _, _ -> },
             onFingerprintVerifySuccess = { },

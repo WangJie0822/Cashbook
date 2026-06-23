@@ -64,6 +64,8 @@
     <string name="image_quality">图片质量</string>
     <string name="record_image_quality_high">高质量</string>
     <string name="record_image_quality_medium">中等质量</string>
+    <string name="month_start_day">月起始日</string>
+    <string name="month_start_day_hint">影响本月统计的起止（如 15 表示每月 15 日至次月 14 日）</string>
     <string name="need_security_verification_when_launch">启动时安全验证</string>
     <string name="enable_fingerprint_verification">允许指纹验证</string>
     <string name="create_password">创建密码</string>
