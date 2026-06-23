@@ -61,7 +61,7 @@ class GetTypeRecordViewsUseCaseTest {
 
     @Test
     fun when_type_id_is_invalid_then_returns_empty() = runTest {
-        val result = useCase(-1L, "", 0, 10)
+        val result = useCase(-1L, 0L, Long.MAX_VALUE, 0, 10)
 
         assertThat(result).isEmpty()
     }
@@ -71,16 +71,17 @@ class GetTypeRecordViewsUseCaseTest {
         recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L))
         recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L))
 
-        val result = useCase(1L, "", 0, 10)
+        val result = useCase(1L, 0L, Long.MAX_VALUE, 0, 10)
 
         assertThat(result).hasSize(2)
     }
 
     @Test
-    fun when_date_not_blank_then_queries_with_date() = runTest {
+    fun when_month_range_then_returns_in_range_record() = runTest {
+        // 默认记录时间 = 2024-01-01，落在自然月区间 [2024-01-01, 2024-02-01)
         recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L))
 
-        val result = useCase(1L, "2024-01", 0, 10)
+        val result = useCase(1L, ms(2024, 1, 1), ms(2024, 2, 1), 0, 10)
 
         assertThat(result).hasSize(1)
     }

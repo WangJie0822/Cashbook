@@ -61,14 +61,6 @@ interface RecordRepository {
         includeChildTypes: Boolean = true,
     ): List<RecordModel>
 
-    suspend fun queryPagingRecordListByTypeIdBetweenDate(
-        typeId: Long,
-        dateRange: String,
-        page: Int,
-        pageSize: Int,
-        includeChildTypes: Boolean = true,
-    ): List<RecordModel>
-
     /** 类型 [typeId]（按 [includeChildTypes]）在 [[startDate], [endDate]) 半开区间的第 [page] 页 [pageSize] 条（分页，按时间倒序） */
     suspend fun queryPagingRecordListByTypeIdInRange(
         typeId: Long,

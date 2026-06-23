@@ -31,10 +31,12 @@ import androidx.paging.map
 import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
+import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.domain.usecase.GetTagRecordViewsUseCase
@@ -45,6 +47,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -60,6 +63,7 @@ import javax.inject.Inject
 class TypedAnalyticsViewModel @Inject constructor(
     private val typeRepository: TypeRepository,
     private val tagRepository: TagRepository,
+    private val settingRepository: SettingRepository,
     private val getTypeRecordViewsUseCase: GetTypeRecordViewsUseCase,
     private val getTagRecordViewsUseCase: GetTagRecordViewsUseCase,
     private val getTypedMonthSummaryUseCase: GetTypedMonthSummaryUseCase,
@@ -79,6 +83,15 @@ class TypedAnalyticsViewModel @Inject constructor(
 
     /** 已应用的入口参数 key：避免 Route 重组时 apply{updateData} 重复执行把用户翻月结果重置回入口周期 */
     private var appliedDateKey: String? = null
+
+    /** 月起始日（响应式）。归一化到 1..28，默认 1=自然月 */
+    private val _monthStartDay = settingRepository.recordSettingsModel
+        .map { normalizeMonthStartDay(it.monthStartDay) }
+        .distinctUntilChanged()
+
+    /** 选择 + 月起始日 → (选择, [start,end) 毫秒区间)；列表与汇总同源，保证同口径（C1） */
+    private val _selectionRange: kotlinx.coroutines.flow.Flow<Pair<DateSelectionEntity, Pair<Long, Long>>> =
+        combine(_dateSelection, _monthStartDay) { selection, d -> selection to selection.toDateRange(d) }
 
     val uiState = combine(_tagIdData, _typeIdData) { tagId, typeId ->
         if (tagId == typeId) {
@@ -104,14 +117,16 @@ class TypedAnalyticsViewModel @Inject constructor(
         _tagIdData,
         _typeIdData,
         _includeChildTypes,
-        _dateSelection,
+        _selectionRange,
         recordDataVersion,
-    ) { tagId, typeId, includeChild, selection, _ ->
+    ) { tagId, typeId, includeChild, selRange, _ ->
         val isType = typeId != -1L
+        val (start, end) = selRange.second
         GetTypedRecordData(
             isType = isType,
             id = if (isType) typeId else tagId,
-            selection = selection,
+            startDate = start,
+            endDate = end,
             includeChildTypes = includeChild,
         )
     }
@@ -123,9 +138,9 @@ class TypedAnalyticsViewModel @Inject constructor(
                 ),
                 pagingSourceFactory = {
                     if (data.isType) {
-                        TypeRecordPagingSource(data.id, data.selection, data.includeChildTypes, getTypeRecordViewsUseCase)
+                        TypeRecordPagingSource(data.id, data.startDate, data.endDate, data.includeChildTypes, getTypeRecordViewsUseCase)
                     } else {
-                        TagRecordPagingSource(data.id, data.selection, getTagRecordViewsUseCase)
+                        TagRecordPagingSource(data.id, data.startDate, data.endDate, getTagRecordViewsUseCase)
                     }
                 },
             ).flow
@@ -139,15 +154,15 @@ class TypedAnalyticsViewModel @Inject constructor(
         _tagIdData,
         _typeIdData,
         _includeChildTypes,
-        _dateSelection,
+        _selectionRange,
         recordDataVersion,
-    ) { tagId, typeId, includeChild, selection, _ ->
+    ) { tagId, typeId, includeChild, selRange, _ ->
         val isType = typeId != -1L
         val id = if (isType) typeId else tagId
         if (id == -1L) {
             AssetMonthSummaryModel(0L, 0L, 0L)
         } else {
-            val (start, end) = selection.toDateRange()
+            val (start, end) = selRange.second
             getTypedMonthSummaryUseCase(isType, id, start, end, includeChild)
         }
     }
@@ -189,7 +204,8 @@ class TypedAnalyticsViewModel @Inject constructor(
 data class GetTypedRecordData(
     val isType: Boolean,
     val id: Long,
-    val selection: DateSelectionEntity,
+    val startDate: Long,
+    val endDate: Long,
     val includeChildTypes: Boolean,
 )
 
@@ -207,7 +223,8 @@ sealed interface TypedAnalyticsUiState {
  */
 private class TypeRecordPagingSource(
     private val typeId: Long,
-    private val selection: DateSelectionEntity,
+    private val startDate: Long,
+    private val endDate: Long,
     private val includeChildTypes: Boolean,
     private val getTypeRecordViewsUseCase: GetTypeRecordViewsUseCase,
 ) : PagingSource<Int, RecordViewsEntity>() {
@@ -217,9 +234,8 @@ private class TypeRecordPagingSource(
         return runCatching {
             val page = params.key ?: 0
             val pageSize = params.loadSize
-            // All 态传空串走全量；其余传 getDisplayText() 由 Repository 解析为区间
-            val dateStr = if (selection is DateSelectionEntity.All) "" else selection.getDisplayText()
-            val items = getTypeRecordViewsUseCase(typeId, dateStr, page, pageSize, includeChildTypes)
+            // 统一走毫秒半开区间（含可配置月起始日），与汇总同口径（C1）；All 态区间为 [0, Long.MAX_VALUE)
+            val items = getTypeRecordViewsUseCase(typeId, startDate, endDate, page, pageSize, includeChildTypes)
             val prevKey = if (page > 0) page - 1 else null
             val nextKey = if (items.isNotEmpty()) page + 1 else null
             LoadResult.Page(items, prevKey, nextKey)
@@ -235,7 +251,8 @@ private class TypeRecordPagingSource(
  */
 private class TagRecordPagingSource(
     private val tagId: Long,
-    private val selection: DateSelectionEntity,
+    private val startDate: Long,
+    private val endDate: Long,
     private val getTagRecordViewsUseCase: GetTagRecordViewsUseCase,
 ) : PagingSource<Int, RecordViewsEntity>() {
     override fun getRefreshKey(state: PagingState<Int, RecordViewsEntity>): Int? = null
@@ -244,8 +261,7 @@ private class TagRecordPagingSource(
         return runCatching {
             val page = params.key ?: 0
             val pageSize = params.loadSize
-            val (start, end) = selection.toDateRange()
-            val items = getTagRecordViewsUseCase(tagId, start, end, page, pageSize)
+            val items = getTagRecordViewsUseCase(tagId, startDate, endDate, page, pageSize)
             val prevKey = if (page > 0) page - 1 else null
             val nextKey = if (items.isNotEmpty()) page + 1 else null
             LoadResult.Page(items, prevKey, nextKey)

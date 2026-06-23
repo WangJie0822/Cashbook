@@ -137,18 +137,6 @@ class FakeRecordRepository : RecordRepository {
             .take(pageSize)
     }
 
-    override suspend fun queryPagingRecordListByTypeIdBetweenDate(
-        typeId: Long,
-        dateRange: String,
-        page: Int,
-        pageSize: Int,
-        includeChildTypes: Boolean,
-    ): List<RecordModel> {
-        return records.filter { it.typeId == typeId }
-            .drop(page * pageSize)
-            .take(pageSize)
-    }
-
     override suspend fun queryPagingRecordListByTypeIdInRange(
         typeId: Long,
         startDate: Long,

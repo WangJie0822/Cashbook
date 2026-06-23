@@ -36,37 +36,9 @@ class GetTypeRecordViewsUseCase @Inject constructor(
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) {
 
-    suspend operator fun invoke(
-        typeId: Long,
-        dateRange: String,
-        pageNum: Int,
-        pageSize: Int,
-        includeChildTypes: Boolean = true,
-    ): List<RecordViewsEntity> = withContext(coroutineContext) {
-        if (typeId == -1L) {
-            return@withContext emptyList()
-        }
-        val records = if (dateRange.isNotBlank()) {
-            recordRepository.queryPagingRecordListByTypeIdBetweenDate(
-                typeId = typeId,
-                dateRange = dateRange,
-                page = pageNum,
-                pageSize = pageSize,
-                includeChildTypes = includeChildTypes,
-            )
-        } else {
-            recordRepository.queryPagingRecordListByTypeId(
-                typeId = typeId,
-                page = pageNum,
-                pageSize = pageSize,
-                includeChildTypes = includeChildTypes,
-            )
-        }.sortedByDescending { it.recordTime }
-        recordModelTransToViewsUseCase(records).map { it.asEntity() }
-    }
-
     /**
-     * 毫秒半开区间 [[startDate], [endDate]) 版本（可配置月周期统一走此口径，消除字符串自然月解析）。
+     * 类型 [typeId]（按 [includeChildTypes]）在毫秒半开区间 [[startDate], [endDate]) 的第 [pageNum] 页 [pageSize] 条。
+     * 统一月区间口径（含可配置月起始日），消除字符串自然月解析（原 dateRange:String 重载已删）。
      */
     suspend operator fun invoke(
         typeId: Long,

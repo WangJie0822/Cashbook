@@ -22,8 +22,10 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.TagModel
+import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
+import cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
@@ -47,11 +49,14 @@ class TypedAnalyticsViewModelTest {
 
     private lateinit var typeRepository: FakeTypeRepository
     private lateinit var tagRepository: FakeTagRepository
+    private lateinit var recordRepository: FakeRecordRepository
+    private lateinit var settingRepository: FakeSettingRepository
     private lateinit var viewModel: TypedAnalyticsViewModel
 
     @Before
     fun setup() {
-        val recordRepository = FakeRecordRepository()
+        recordRepository = FakeRecordRepository()
+        settingRepository = FakeSettingRepository()
         typeRepository = FakeTypeRepository()
         val assetRepository = FakeAssetRepository()
         tagRepository = FakeTagRepository()
@@ -82,6 +87,7 @@ class TypedAnalyticsViewModelTest {
         viewModel = TypedAnalyticsViewModel(
             typeRepository = typeRepository,
             tagRepository = tagRepository,
+            settingRepository = settingRepository,
             getTypeRecordViewsUseCase = getTypeRecordViewsUseCase,
             getTagRecordViewsUseCase = getTagRecordViewsUseCase,
             getTypedMonthSummaryUseCase = getTypedMonthSummaryUseCase,
@@ -207,6 +213,28 @@ class TypedAnalyticsViewModelTest {
         val state = viewModel.uiState.value as TypedAnalyticsUiState.Success
         assertThat(state.isTransferType).isTrue()
     }
+
+    @Test
+    fun when_monthStartDay_15_then_summary_uses_period_includes_cross_month_record() = runTest {
+        // C1/周期：D=15 时 ByMonth(2024-01) = [2024-01-15, 2024-02-15) 含 2024-02-03 记录；
+        // 汇总走 toDateRange(D)（Fake queryRecordsByTypeIdInRange 忠实过滤区间）→ 支出=5000；
+        // 列表路径毫秒区间正确性由 GetTypeRecordViewsUseCaseTest.when_millis_range_then_filters_half_open 覆盖
+        typeRepository.addType(expenditureType(1L, "餐饮"))
+        recordRepository.addRecord(
+            createRecordModel(id = 1L, typeId = 1L, amount = 5000L, finalAmount = 5000L, recordTime = ms(2024, 2, 3)),
+        )
+        settingRepository.updateMonthStartDay(15)
+        viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-01")
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.summary.collect {}
+        }
+
+        assertThat(viewModel.summary.value.expenditure).isEqualTo(5000L)
+    }
+
+    private fun ms(y: Int, m: Int, d: Int): Long =
+        java.time.LocalDate.of(y, m, d).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     /** 创建测试用的 RecordViewsEntity */
     private fun createTestRecordViewsEntity(id: Long): RecordViewsEntity {
