@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.tools.toLocalDate
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
+import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
@@ -37,6 +38,7 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
     suspend operator fun invoke(
         dateSelection: DateSelectionEntity,
         recordViewsList: List<RecordViewsModel>,
+        monthStartDay: Int = 1,
     ): List<AnalyticsRecordBarEntity> = withContext(coroutineContext) {
         val result = mutableListOf<AnalyticsRecordBarEntity>()
         val dateList = mutableListOf<String>()
@@ -68,10 +70,13 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
 
             is DateSelectionEntity.ByMonth -> {
                 granularity = AnalyticsBarGranularity.DAY
+                val d = normalizeMonthStartDay(monthStartDay)
                 val ym = dateSelection.yearMonth
-                val dayCount = ym.atEndOfMonth().dayOfMonth
-                repeat(dayCount) {
-                    dateList.add("${ym.year}-${ym.monthValue.completeZero()}-${(it + 1).completeZero()}")
+                var date = ym.atDay(d)
+                val endExclusive = ym.plusMonths(1).atDay(d)
+                while (date.isBefore(endExclusive)) {
+                    dateList.add("${date.year}-${date.monthValue.completeZero()}-${date.dayOfMonth.completeZero()}")
+                    date = date.plusDays(1L)
                 }
             }
 
