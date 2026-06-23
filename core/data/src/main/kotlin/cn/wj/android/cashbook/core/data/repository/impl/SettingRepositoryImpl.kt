@@ -245,4 +245,9 @@ class SettingRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             combineProtoDataSource.updateLogcatInRelease(logcatInRelease)
         }
+
+    override suspend fun updateMonthStartDay(monthStartDay: Int) =
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateMonthStartDay(monthStartDay)
+        }
 }

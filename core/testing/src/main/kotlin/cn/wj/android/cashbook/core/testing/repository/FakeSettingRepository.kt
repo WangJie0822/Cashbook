@@ -219,4 +219,8 @@ class FakeSettingRepository : SettingRepository {
     override suspend fun updateLogcatInRelease(logcatInRelease: Boolean) {
         _appSettingsModel.value = _appSettingsModel.value.copy(logcatInRelease = logcatInRelease)
     }
+
+    override suspend fun updateMonthStartDay(monthStartDay: Int) {
+        _recordSettingsModel.value = _recordSettingsModel.value.copy(monthStartDay = monthStartDay)
+    }
 }

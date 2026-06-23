@@ -36,4 +36,6 @@ data class RecordSettingsModel(
     val creditCardPaymentTypeId: Long,
     /** 充值账号计入总资产 */
     val topUpInTotal: Boolean,
+    /** 月起始日（1-28，1=自然月） */
+    val monthStartDay: Int = 1,
 )

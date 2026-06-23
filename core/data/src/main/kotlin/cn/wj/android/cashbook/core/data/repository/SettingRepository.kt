@@ -111,4 +111,7 @@ interface SettingRepository {
     suspend fun getContentByMarkdownType(type: MarkdownTypeEnum?): String
 
     suspend fun updateLogcatInRelease(logcatInRelease: Boolean)
+
+    /** 更新月起始日（1-28） */
+    suspend fun updateMonthStartDay(monthStartDay: Int)
 }

@@ -30,6 +30,7 @@ import cn.wj.android.cashbook.core.datastore.RecordSettings
 import cn.wj.android.cashbook.core.datastore.SearchHistory
 import cn.wj.android.cashbook.core.datastore.TempKeys
 import cn.wj.android.cashbook.core.datastore.copy
+import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
 import cn.wj.android.cashbook.core.model.enums.ImageQualityEnum
@@ -106,6 +107,7 @@ class CombineProtoDataSource @Inject constructor(
                 reimburseTypeId = it.reimburseTypeId,
                 creditCardPaymentTypeId = it.creditCardPaymentTypeId,
                 topUpInTotal = it.topUpInTotal,
+                monthStartDay = normalizeMonthStartDay(it.monthStartDay),
             )
         }
 
@@ -371,6 +373,10 @@ class CombineProtoDataSource @Inject constructor(
 
     suspend fun updateTopUpInTotal(topUpInTotal: Boolean) {
         recordSettings.updateData { it.copy { this.topUpInTotal = topUpInTotal } }
+    }
+
+    suspend fun updateMonthStartDay(monthStartDay: Int) {
+        recordSettings.updateData { it.copy { this.monthStartDay = normalizeMonthStartDay(monthStartDay) } }
     }
 
     suspend fun updateLogcatInRelease(logcatInRelease: Boolean) {

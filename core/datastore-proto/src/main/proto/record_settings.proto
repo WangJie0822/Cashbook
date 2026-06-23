@@ -12,4 +12,5 @@ message RecordSettings {
   sint64 reimburseTypeId = 5; // 报销类型 id
   sint64 creditCardPaymentTypeId = 6; // 信用卡还款类型 id
   bool topUpInTotal = 7; // 充值账号是否计入总资产
+  int32 monthStartDay = 8; // 月起始日（1-28，默认 0 视为 1=自然月）
 }
