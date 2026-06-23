@@ -21,6 +21,7 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
+import cn.wj.android.cashbook.core.model.model.RecordSettingsModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.model.TempKeysModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
@@ -40,6 +41,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
 import java.time.YearMonth
 
 class LauncherContentViewModelTest {
@@ -497,6 +499,42 @@ class LauncherContentViewModelTest {
         assertThat(selection).isInstanceOf(DateSelectionEntity.ByMonth::class.java)
         val byMonth = selection as DateSelectionEntity.ByMonth
         assertThat(byMonth.yearMonth).isEqualTo(YearMonth.now())
+    }
+
+    @Test
+    fun when_monthStartDay_configured_then_initial_period_uses_currentMonthPeriod() = runTest {
+        // 选 d = 今天的 dayOfMonth+1（<=28），使当前周期落到上月，与未配置 D 的 ByMonth(now) 不同 → 有区分力
+        val today = LocalDate.now()
+        val d = if (today.dayOfMonth < 28) today.dayOfMonth + 1 else 1
+        settingRepository.setRecordSettings(
+            RecordSettingsModel(
+                currentBookId = 1L,
+                defaultTypeId = 1L,
+                lastAssetId = -1L,
+                refundTypeId = -1L,
+                reimburseTypeId = -1L,
+                creditCardPaymentTypeId = -1L,
+                topUpInTotal = false,
+                monthStartDay = d,
+            ),
+        )
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = recordRepository,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+        val vm = LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = recordRepository,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        // init 应将当前周期初始化为 currentMonthPeriod(now, d)（D=d 走周期，而非裸 ByMonth(now)）
+        assertThat(vm.dateSelection.value)
+            .isEqualTo(DateSelectionEntity.currentMonthPeriod(today, d))
     }
 
     @Test

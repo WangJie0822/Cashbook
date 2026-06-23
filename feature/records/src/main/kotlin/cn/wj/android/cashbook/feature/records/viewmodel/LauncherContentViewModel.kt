@@ -36,6 +36,7 @@ import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordDayEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
@@ -47,11 +48,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -112,11 +115,26 @@ class LauncherContentViewModel @Inject constructor(
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
-    /** 轻量汇总数据（用于计算收支总额和每日汇总） */
-    private val _summaryData: Flow<List<RecordViewSummaryModel>> = _dateSelection.flatMapLatest { selection ->
-        val (startDate, endDate) = selection.toDateRange()
-        recordRepository.queryRecordViewSummariesFlow(startDate, endDate)
+    /** 月起始日（响应式：改设置后各周期流自动重算）。归一化到 1..28，默认 1=自然月 */
+    private val _monthStartDay = settingRepository.recordSettingsModel
+        .map { normalizeMonthStartDay(it.monthStartDay) }
+        .distinctUntilChanged()
+
+    init {
+        // 初始化为可配置月周期的当前周期（D=1 等价 ByMonth(YearMonth.now())，无回归）。
+        // 置于此处（_dateSelection 声明之后）：Unconfined 下构造时 init 立即执行，须保证 _dateSelection 已初始化。
+        viewModelScope.launch {
+            val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
+            _dateSelection.value = DateSelectionEntity.currentMonthPeriod(LocalDate.now(), monthStartDay)
+        }
     }
+
+    /** 轻量汇总数据（用于计算收支总额和每日汇总） */
+    private val _summaryData: Flow<List<RecordViewSummaryModel>> =
+        combine(_dateSelection, _monthStartDay) { selection, d -> selection.toDateRange(d) }
+            .flatMapLatest { (startDate, endDate) ->
+                recordRepository.queryRecordViewSummariesFlow(startDate, endDate)
+            }
 
     /** 每日汇总 Map（日期字符串 -> RecordDayEntity）*/
     val dailySummaries: StateFlow<Map<String, RecordDayEntity>> = _summaryData
@@ -128,21 +146,22 @@ class LauncherContentViewModel @Inject constructor(
         )
 
     /** 分页记录数据 */
-    val recordPagingData: Flow<PagingData<LauncherListItem>> = _dateSelection.flatMapLatest { selection ->
-        val (startDate, endDate) = selection.toDateRange()
-        recordRepository.getRecordPagingData(startDate, endDate)
-            .map { pagingData ->
-                pagingData.map { recordModel ->
-                    val views = recordModelTransToViewsUseCase(recordModel).asEntity()
-                    LauncherListItem.Record(views) as LauncherListItem
-                }
-            }
-            .map { pagingData ->
-                pagingData.insertSeparators { before, after ->
-                    recordDaySeparator(before, after)
-                }
-            }
-    }.cachedIn(viewModelScope)
+    val recordPagingData: Flow<PagingData<LauncherListItem>> =
+        combine(_dateSelection, _monthStartDay) { selection, d -> selection.toDateRange(d) }
+            .flatMapLatest { (startDate, endDate) ->
+                recordRepository.getRecordPagingData(startDate, endDate)
+                    .map { pagingData ->
+                        pagingData.map { recordModel ->
+                            val views = recordModelTransToViewsUseCase(recordModel).asEntity()
+                            LauncherListItem.Record(views) as LauncherListItem
+                        }
+                    }
+                    .map { pagingData ->
+                        pagingData.insertSeparators { before, after ->
+                            recordDaySeparator(before, after)
+                        }
+                    }
+            }.cachedIn(viewModelScope)
 
     /** 界面 UI 状态 */
     val uiState: StateFlow<LauncherContentUiState> = combine(
