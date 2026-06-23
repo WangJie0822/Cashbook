@@ -149,6 +149,21 @@ class FakeRecordRepository : RecordRepository {
             .take(pageSize)
     }
 
+    override suspend fun queryPagingRecordListByTypeIdInRange(
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+        includeChildTypes: Boolean,
+    ): List<RecordModel> {
+        // 忠实复刻半开区间 [start,end)（Fake 不建模父子类型，按精确 typeId 过滤）
+        return records.filter { it.typeId == typeId && it.recordTime >= startDate && it.recordTime < endDate }
+            .sortedByDescending { it.recordTime }
+            .drop(page * pageSize)
+            .take(pageSize)
+    }
+
     override suspend fun queryPagingRecordListByAssetIdBetweenDate(
         assetId: Long,
         startDate: Long,

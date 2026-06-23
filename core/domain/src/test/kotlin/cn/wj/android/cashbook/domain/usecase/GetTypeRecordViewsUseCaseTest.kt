@@ -29,6 +29,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
+import java.time.ZoneId
 
 class GetTypeRecordViewsUseCaseTest {
 
@@ -82,4 +84,19 @@ class GetTypeRecordViewsUseCaseTest {
 
         assertThat(result).hasSize(1)
     }
+
+    @Test
+    fun when_millis_range_then_filters_half_open() = runTest {
+        // 记录落在 2024-02-03（属周期 [2024-01-15, 2024-02-15)，不属自然 1 月）
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, recordTime = ms(2024, 2, 3)))
+
+        val inPeriod = useCase(1L, ms(2024, 1, 15), ms(2024, 2, 15), 0, 10)
+        val inNatural = useCase(1L, ms(2024, 1, 1), ms(2024, 2, 1), 0, 10)
+
+        assertThat(inPeriod).hasSize(1)
+        assertThat(inNatural).isEmpty()
+    }
+
+    private fun ms(y: Int, m: Int, d: Int): Long =
+        LocalDate.of(y, m, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }

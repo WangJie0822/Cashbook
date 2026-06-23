@@ -220,6 +220,36 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun queryPagingRecordListByTypeIdInRange(
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+        includeChildTypes: Boolean,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        val booksId = combineProtoDataSource.recordSettingsData.first().currentBookId
+        if (includeChildTypes) {
+            recordDao.queryRecordByTypeIdBetween(
+                booksId = booksId,
+                typeId = typeId,
+                startDate = startDate,
+                endDate = endDate,
+                pageNum = page * pageSize,
+                pageSize = pageSize,
+            )
+        } else {
+            recordDao.queryRecordByTypeIdExactBetween(
+                booksId = booksId,
+                typeId = typeId,
+                startDate = startDate,
+                endDate = endDate,
+                pageNum = page * pageSize,
+                pageSize = pageSize,
+            )
+        }.map { it.asModel() }
+    }
+
     override suspend fun queryPagingRecordListByAssetIdBetweenDate(
         assetId: Long,
         startDate: Long,

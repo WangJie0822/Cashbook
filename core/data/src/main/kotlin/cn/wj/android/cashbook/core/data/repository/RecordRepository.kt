@@ -69,6 +69,16 @@ interface RecordRepository {
         includeChildTypes: Boolean = true,
     ): List<RecordModel>
 
+    /** 类型 [typeId]（按 [includeChildTypes]）在 [[startDate], [endDate]) 半开区间的第 [page] 页 [pageSize] 条（分页，按时间倒序） */
+    suspend fun queryPagingRecordListByTypeIdInRange(
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        page: Int,
+        pageSize: Int,
+        includeChildTypes: Boolean = true,
+    ): List<RecordModel>
+
     /** 资产 [assetId] 在 [startDate,endDate) 的分页记录（含转入） */
     suspend fun queryPagingRecordListByAssetIdBetweenDate(
         assetId: Long,

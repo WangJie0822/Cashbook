@@ -64,4 +64,29 @@ class GetTypeRecordViewsUseCase @Inject constructor(
         }.sortedByDescending { it.recordTime }
         recordModelTransToViewsUseCase(records).map { it.asEntity() }
     }
+
+    /**
+     * 毫秒半开区间 [[startDate], [endDate]) 版本（可配置月周期统一走此口径，消除字符串自然月解析）。
+     */
+    suspend operator fun invoke(
+        typeId: Long,
+        startDate: Long,
+        endDate: Long,
+        pageNum: Int,
+        pageSize: Int,
+        includeChildTypes: Boolean = true,
+    ): List<RecordViewsEntity> = withContext(coroutineContext) {
+        if (typeId == -1L) {
+            return@withContext emptyList()
+        }
+        val records = recordRepository.queryPagingRecordListByTypeIdInRange(
+            typeId = typeId,
+            startDate = startDate,
+            endDate = endDate,
+            page = pageNum,
+            pageSize = pageSize,
+            includeChildTypes = includeChildTypes,
+        ).sortedByDescending { it.recordTime }
+        recordModelTransToViewsUseCase(records).map { it.asEntity() }
+    }
 }
