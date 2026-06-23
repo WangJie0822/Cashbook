@@ -1,7 +1,7 @@
 # 设计：预算管理（按账本 + 一级支出分类，可配置月周期）
 
 > 创建于 2026-06-23 · superpowers brainstorming 产出
-> 状态：待用户评审
+> 状态：待用户评审（v2：已纳入节点1 四维评审[feasibility/security/reverse/impact，team-review 设施缺失降级 ad-hoc]修订；reverse Critical 经 PoC 实测排除）
 > 本 spec 是「预算管理」需求（用户 2026-06-03 登记 #3，Cashbook 唯一未实施功能需求）的实施设计，**消费**前置子项目 [可配置月周期](./2026-06-23-configurable-month-cycle-design.md) 的能力。
 > 本 spec 范围（用户决策）= **预算管理 + F3 兜底 migration 搭车 + Low backlog ③（固定周期态月标签语义）**。journey 黑盒剩余路径不在本 spec（独立测试活动）。
 
@@ -28,11 +28,11 @@
 | **分类列表展示** | **仅展示已设预算的分类**，顶部「+ 添加分类预算」入口弹未设分类选择器 | 本次 |
 | **超支视觉档位** | **两级**：<80% 正常 / 80–100% 接近(橙) / >100% 超支(红+超支额) | 本次 |
 | **「已花」计算** | **方案 A**：查本周期 recordViews → `TransRecordViewsToAnalyticsPieUseCase` 聚合 | 本次 |
-| **总体预算角色** | 可选、与分类预算各自独立设限额（无「分类之和 ≤ 总体」约束）；总体已花 = Σ 各分类已花（计算关系，非约束） | 本次 |
+| **总体预算角色** | 可选、与分类预算各自独立设限额（无「分类之和 ≤ 总体」约束）；总体已花 = 本周期 Σ EXPENDITURE 净自付（直接求和，数值上等于无孤儿时各分类之和；见 §4.2） | 本次 |
 
 ### 2.1 方案选型记录：「已花」金额计算 = 方案 A（复用 Pie UseCase）
 
-- **方案 A（采纳）**：预算屏 VM 查本周期 EXPENDITURE recordViews → 喂 `TransRecordViewsToAnalyticsPieUseCase`（`core/domain/.../TransRecordViewsToAnalyticsPieUseCase.kt:48-80`，输出 `List<AnalyticsRecordPieEntity>`，按一级分类滚动汇总 `analyticsPieNetAmount` 净自付）→ 各分类已花，总体已花 = Σ。
+- **方案 A（采纳）**：预算屏 VM 查本周期 EXPENDITURE recordViews → 喂 `TransRecordViewsToAnalyticsPieUseCase`（`core/domain/.../TransRecordViewsToAnalyticsPieUseCase.kt:48-80`，输出 `List<AnalyticsRecordPieEntity>`，按一级分类滚动汇总 `analyticsPieNetAmount` 净自付）→ 各分类已花；总体已花另**直接对本周期 EXPENDITURE 求 Σ `analyticsPieNetAmount`**（不靠 Σ pieList，规避孤儿少算，见 §4.2 修订）。
   - 采纳依据：① 复用既有净自付聚合，与数据分析饼图口径同源、逐分一致；② 不在 SQL 重写 `finalAmount` 净自付口径，守「禁止自行用 BigDecimal/Double 重实现金额计算」约定，规避口径漂移；③ 月度记录量有限，全量查内存再聚合开销可接受（报销管理 `GetReimbursableUnrelatedRecordViewsUseCase` 已用同类「查 recordViews 再聚合」模式无性能问题）。
 - **方案 B（否决）**：新建 SQL 聚合 UseCase——净自付口径 SQL 重写复杂、易与 Pie 口径漂移、违背禁止重实现约定。
 - **方案 C（否决）**：总体 SQL + 分类 Pie 混合——两套口径来源，一致性风险。
@@ -54,7 +54,9 @@ data class BudgetTable(
 )
 ```
 
-**对附录的修正（feasibility，重要）**：附录原写「`type_id NULL=总体`」。但 **SQLite 的 UNIQUE 索引中 NULL 值互不相等**——同账本可插入多条 `type_id=NULL` 的总体预算，唯一约束对总体失效。故改用**哨兵 `type_id = -1L` 表总体**：真实 type id 由 autoGenerate ≥1，与 -1 不冲突；-1 是非 NULL 值，正常参与唯一约束 → 保证每账本最多一条总体预算 + 每个一级分类最多一条预算。
+**对附录的修正（feasibility，重要）**：附录原写「`type_id NULL=总体`」。但 **SQLite 的 UNIQUE 索引中 NULL 值互不相等**——同账本可插入多条 `type_id=NULL` 的总体预算，唯一约束对总体失效。故改用**哨兵 `type_id = -1L` 表总体**：-1 是非 NULL 值，正常参与唯一约束 → 保证每账本最多一条总体预算 + 每个一级分类最多一条预算。
+
+**哨兵安全性依据（节点1 feasibility/security 修正）**：附录原写「真实 type id ≥1」**事实错误**——项目存在负数固定 type id：报销/退款/信用卡还款（`FIXED_TYPE_ID_REFUND=-2001`/`REIMBURSE=-2002`/`CREDIT_CARD_PAYMENT=-2003`，`core/common/.../Constants.kt:83-89`）、平账（`TYPE_TABLE_BALANCE_EXPENDITURE.id=-1101`/`BALANCE_INCOME=-1102`，`TypeTable.kt:66+`）。`-1L` 哨兵仍安全的**真实依据**是：-1L 不与任何现存 type id 冲突（负数固定类型 -2001~-2003/-1101/-1102 + autoGenerate ≥1 的自定义分类均≠-1L）；且 -1L 不属 EXPENDITURE 一级分类集，§4.2 总体 spent 走独立 Σ 分支、`pieList.find{typeId==-1}` 永不命中，逻辑自洽。
 
 > `TypeTable.parentId = -1L` 表「无父」（`TypeTable.kt:69` 等），本表 `type_id = -1L` 表「总体」，二者在各自表语义独立、不交叉，无歧义。
 
@@ -88,26 +90,30 @@ data class BudgetTable(
 1. period   = DateSelectionEntity.currentMonthPeriod(today, D)             // 可配置周期「本月」
 2. records  = getRecordViewsBetweenDateUseCase(period, D)                  // 本周期全部 recordViews
 3. pieList  = transRecordViewsToAnalyticsPieUseCase(EXPENDITURE, records)  // 各一级分类已花(净自付)
-4. budgets  = budgetRepository.getBudgetsByBooks(currentBooksId)           // 已设限额(总体 type_id=-1 + 各分类)
+4. budgets  = budgetRepository.getBudgetsByBooks(currentBooksId)           // 已设限额(总体 type_id=-1L + 各分类)
 5. 组装 BudgetProgressEntity：
-   · 总体     : limit = budgets[-1]?.amount; spent = Σ pieList.totalAmount
-   · 各分类   : 仅遍历"已设预算"的 budget(type_id≠-1)，spent = pieList.find{ typeId==type_id }?.totalAmount ?: 0
-   · 每项     : progress = if(limit>0) spent/limit else 0; state = NORMAL(<80%)/NEAR(80–100%)/OVER(>100%, overAmount=spent−limit)
+   · 总体     : limit = budgets[-1L]?.amount
+                spent = Σ analyticsPieNetAmount(EXPENDITURE, records 各条)   // 直接对本周期 EXPENDITURE 求和(见下"总体 spent")
+   · 各分类   : 仅遍历"已设预算"的 budget(type_id≠-1L)，spent = pieList.find{ typeId==type_id }?.totalAmount ?: 0
+   · 每项     : progress = if(limit>0) (spent.toFloat()/limit).coerceAtMost(1f) else null
+                state    = NORMAL(<80%)/NEAR(80–100%)/OVER(>100%, overAmount=spent−limit)
 输出：BudgetProgressEntity(overall: BudgetItem?, categoryList: List<BudgetItem>)
 ```
 
-- **当前账本** `currentBooksId` 经 `BooksRepository` 当前账本流取（与报销管理同源；具体方法名 plan 阶段坐实）。
-- **响应式刷新**：`BudgetViewModel` `combine(recordDataVersion, settingRepository.recordSettingsModel.map{monthStartDay}.distinctUntilChanged(), budgetRepository.budgetsFlow)` → 记账 / 改限额 / 改月起始日 / 切账本均自动重算。settings 是 cold flow，必须订阅进流（不能 `.first()` 取一次）。
+- **总体 spent 不靠「Σ 各分类 pieList」**（节点1 reverse High 修正）：`TransRecordViewsToAnalyticsPieUseCase` 只返回 `List<AnalyticsRecordPieEntity>`、**不返回 total**；备份恢复合并致「记录引用已删 type」的孤儿场景下 `Σ pieList < 真实总额`。故总体 spent **直接对本周期 EXPENDITURE recordViews 求 Σ `analyticsPieNetAmount`**（与 Pie UseCase 内部 total 同算法、与各分类口径一致），与「仅展示已设预算分类」解耦。
+- **已花自动限当前账本**（节点1 feasibility）：`getRecordViewsBetweenDateUseCase` 内部走 `queryByBooksIdBetweenDate(currentBookId,...)`（`RecordRepositoryImpl.kt:322-326`）已按当前账本过滤；该 `currentBookId` 与 step4 `budgetRepository` 的 `currentBooksId` 同源（均取 `recordSettingsData.currentBookId`）→ 已花与 budgets 同账本，无需手动过滤 records。
+- **当前账本** `currentBooksId` 经 `BooksRepository.currentBook.map{ it.id }`（`BooksRepository.kt:27` 接口属性，与报销管理同源）。
+- **响应式刷新 + 账本竞态规避**（节点1 reverse Low）：`BudgetViewModel` 以**当前账本流为外层** `flatMapLatest`——`booksRepository.currentBook.flatMapLatest { book -> combine(recordDataVersion, settingRepository.recordSettingsModel.map{monthStartDay}.distinctUntilChanged(), budgetRepository.queryByBooksFlow(book.id)) { ... } }`，确保 booksId、budgets、records 三者由同一账本派生，避免快速切账本时「A 账本预算 + B 账本已花」错配帧。settings 是 cold flow，必须订阅进流（不能 `.first()` 取一次）。
 
 ### 4.3 `BudgetDao` 关键方法
 
 - `queryByBooksFlow(booksId): Flow<List<BudgetTable>>`（驱动 budgetsFlow）
 - `queryByBooks(booksId): List<BudgetTable>`（UseCase 一次性取）
 - `queryByBooksAndType(booksId, typeId): BudgetTable?`
-- `insertOrUpdate(budget)`（upsert 限额：按 (books_id,type_id) 存在则更新 amount，否则插入）
+- `upsert(budget)`（限额 upsert，**用 Room `@Upsert` 或 `@Insert(onConflict=REPLACE)` 依赖 `(books_id,type_id)` 唯一索引原子处理**，节点1 security Low：避免 Repository 层「先查后写」的并发竞态）
 - `deleteByBooksAndType(booksId, typeId)`（删单项预算）
 - `deleteByBooksId(booksId)`（删账本级联）
-- `deleteByTypeId(typeId)`（删一级分类级联）
+- `deleteByTypeId(typeId)`（删一级分类级联；对任意 typeId 幂等，命不中即 no-op）
 
 ## 5. 级联删除边界（数据一致性 impact，androidTest 守护）
 
@@ -132,8 +138,8 @@ data class BudgetTable(
 ```
 
 - **总体行**：未设总体预算时显「设置总体预算」引导；已设则显进度条。
-- **点总体/分类行** → 设·改限额对话框（`CbAlertDialog` + 金额输入，`String.toAmountCent()` 转分；对话框内含「删除」按钮删该项预算）。
-- **「+ 添加分类预算」** → 弹**未设预算的一级支出分类**选择器（数据源 `getFirstRecordTypeList().filter{ EXPENDITURE }` 减已设 type_id）→ 选后弹限额对话框。
+- **点总体/分类行** → 设·改限额对话框（`CbAlertDialog` + 金额输入）。**金额校验（节点1 security Med）**：经 `String.toAmountCent()` 转分后必须校验 `> 0`（拒绝 ≤0，`toAmountCent` 对负/非数字返 0、对超大输入静默低 64 位回绕）+ 设合理上界（如 ≤ `999999_00` 分=999 万元防溢出/误输入）；`KeyboardType` 限数字、过滤负号。校验不过给提示、不落库。对话框内含「删除」按钮删该项预算。
+- **「+ 添加分类预算」** → 弹**未设预算的一级支出分类**选择器：数据源 `TypeRepository.firstExpenditureTypeListData`（对外 Flow，已 `filter{ EXPENDITURE }`；节点1 feasibility：原 spec 引的 `getFirstRecordTypeList()` 是 private 不可调）→ **排除固定类型**（`it.id > 0`，剔除平账 -1101 等负 id 固定一级支出类型，避免「平账预算」无意义项；节点1 feasibility/security Med）→ 再减去已设 type_id → 选后弹限额对话框。
 - **空态**：未设任何预算（总体 + 分类皆无）→ 引导文案 + 「+ 添加预算」。
 - 金额显示用 `Long.toMoneyCNY()` / `toMoneyString()`（守金额约定）。
 
@@ -148,7 +154,7 @@ data class BudgetTable(
 ## 7. Low backlog ③：固定周期态月标签语义（独立小改，本 spec 含）
 
 - **现状**：`RecordMonthSummaryHeader.SummaryColumn`（`feature/records/.../view/RecordMonthSummaryHeader.kt:122,127,132`）硬编码 `month_income`/`month_expend`/`month_balance`（月收入/支出/结余），不随周期态变。固定周期态（年/全部/区间，`monthSwitchable=false`）时语义不对。
-- **处理**：该 header 已有 `monthSwitchable: Boolean` 参数（`:56`）。`monthSwitchable=true` → "月收入/月支出/月结余"；`=false` → 中性"收入/支出/结余"（去"月"前缀，复用现有中性 string 或新增）。
+- **处理**：该 header 已有 `monthSwitchable: Boolean` 参数（`:56`）。`monthSwitchable=true` → "月收入/月支出/月结余"；`=false` → 中性"收入/支出/结余"。**新增中性 string（如 `summary_income/expend/balance`），不得删/改现有 `month_income/expend/balance`**（节点1 impact Low：`CalendarScreen.kt:287,292,297` 与 `LauncherContentScreen.kt:411` 仍消费旧 `month_*`，误删会破坏日历/首页月份态）。
 - **影响**：`TypedAnalyticsScreen` / `AssetInfoContentScreen` 固定态截图基线需 re-record。
 - **不在此项**：首页 `LauncherContentScreen.kt:411` 已按 `DateSelectionTypeEnum` 派生标签。
 
@@ -156,30 +162,33 @@ data class BudgetTable(
 
 | 层 | 测试 |
 |---|---|
-| 纯函数(JVM) | `BudgetProgressEntity` 组装抽 top-level `internal fun`：progress/state(NORMAL/NEAR/OVER/limit=0/无总体预算/spent=0) + mutation 验证判别力 |
+| 纯函数(JVM) | `BudgetProgressEntity` 组装抽 top-level `internal fun`：progress/state(NORMAL/NEAR/OVER/limit=0→null/无总体预算/spent=0/spent 远超 limit 时 progress coerceAtMost 1f) + mutation 验证判别力 |
+| 校验(JVM) | 限额输入校验：负/0/非数字/超大(回绕)输入被拒、合法值通过、上界拒绝（节点1 security Med） |
 | Repository | `BudgetRepositoryImpl` CRUD + budgetsFlow（`FakeBudgetDao` 忠实复刻 upsert/(books_id,type_id) 唯一约束/级联删除语义，禁空桩） |
-| UseCase | `GetBudgetProgressUseCase` 端到端（Fake Record/Budget/Setting Repo）：净自付已花口径、总体=Σ分类、可配置周期 D 生效、仅 EXPENDITURE |
-| ViewModel | `BudgetViewModel` 响应式（记账/改限额/改 D/切账本→重算）、空态、设·改·删限额、添加分类选择器排除已设 |
-| androidTest(DAO) | `migrate12_13`(validateDroppedTables=true: db_record_temp 清 + db_budget 建 + 唯一索引) + 唯一约束冲突(同账本同 type_id) + 级联删除(删账本/删一级分类→预算清) |
-| 截图 | 预算屏四态(NORMAL/NEAR/OVER/空态)基线；Low backlog③ 受影响屏(TypedAnalytics/AssetInfoContent 固定态) re-record |
+| UseCase | `GetBudgetProgressUseCase` 端到端（Fake Record/Budget/Setting Repo）：净自付已花口径、**总体 spent = 直接 Σ EXPENDITURE（非 Σ pieList）**、可配置周期 D 生效、仅 EXPENDITURE、含负 id 固定类型(平账)被排除出选择器 |
+| ViewModel | `BudgetViewModel` 响应式（记账/改限额/改 D/切账本→重算、flatMapLatest 切账本无错配帧）、空态、设·改·删限额、添加分类选择器排除已设 |
+| androidTest(DAO) | `migrate12_13`(validateDroppedTables=true: db_record_temp 清 + db_budget 建 + 唯一索引) + 唯一约束冲突(同账本同 type_id) + upsert 二次调用为 update 非重复插入 + 级联删除(删账本/删一级分类→预算清) + **v12 备份 `recoveryFromDb`→v13 含空 db_budget 返 true**(防漏注册 migration 回归) |
+| 截图 | 预算屏四态(NORMAL/NEAR/OVER/空态)基线；`LauncherScreen` success 两态 re-record(新增抽屉项致 UI 变化、非 0 diff)；Low backlog③ 受影响屏(TypedAnalytics/AssetInfoContent 固定态) re-record |
 
 ## 9. 影响面 / 必须同步修改清单（impact，防编译失败/回归）
 
 - `settings.gradle.kts`（include `:feature:budget`）
+- **`app/build.gradle.kts`（加 `implementation(projects.feature.budget)`）**（节点1 impact High：现 `:152-158` 无 budget，MainApp 调 `budgetScreen` 必须先有此依赖，否则 `:app:compileDebugKotlin` unresolved）
 - `core/common/.../ApplicationInfo.kt`（`DB_VERSION` 12→13）
-- `core/database/`：`BudgetTable` + `BudgetDao` + `Migration12To13` + `DatabaseMigrations`(注册) + `CashbookDatabase`(加 entity/dao) + schema json
+- `core/database/`：`BudgetTable` + `BudgetDao` + `Migration12To13` + `DatabaseMigrations`(注册进 `MIGRATION_LIST`) + `CashbookDatabase`(加 entity/dao) + **`di/DatabaseModule.kt` 加 `providesBudgetDao`**（节点1 impact Med：每个 DAO 均在此显式 provide，缺则 Hilt KSP 报 missing binding） + schema json
 - `core/database/.../TransactionDao.kt`（`deleteBookTransaction` 加删 budget）
-- `core/model/`：`BudgetModel` + `BudgetProgressEntity` + `BudgetStateEnum`（Compose 稳定性标注 `compose_compiler_config.conf` 若需）
-- `core/data/`：`BudgetRepository` + `BudgetRepositoryImpl` + Hilt 绑定 module；`TypeRepositoryImpl.deleteById` 加级联
-- `core/domain/.../GetBudgetProgressUseCase.kt`
-- `feature/budget/`（全新模块：build.gradle.kts + Route/Screen/ViewModel/navigation/dialog）
+- `core/model/`：`BudgetModel` + `BudgetProgressEntity` + `BudgetStateEnum`（plan 阶段坐实是否需 `compose_compiler_config.conf` 稳定性标注）
+- `core/data/`：`BudgetRepository` + `BudgetRepositoryImpl` + Hilt 绑定 module；`TypeRepositoryImpl.deleteById` 加级联（构造增 `budgetRepository`/`budgetDao` 依赖；不破坏 `TypeRepositoryImplTest`——其不实例化 Impl）
+- `core/domain/.../GetBudgetProgressUseCase.kt`（包名 `cn.wj.android.cashbook.domain.usecase`，非 `core.domain`）
+- `feature/budget/`（全新模块：build.gradle.kts 照抄 feature/tags + Route/Screen/ViewModel/navigation/dialog）
 - `feature/settings/.../navigation/LauncherDrawerActions.kt`（加 `onBudgetClick`，public）
 - `feature/records/.../view/RecordMonthSummaryHeader.kt`（Low backlog③）
-- `app/.../MainApp.kt`（构造 `LauncherDrawerActions` 补 `onBudgetClick` + budget 导航接线）
+- `app/.../MainApp.kt`（`:416` 构造 `LauncherDrawerActions` 补 `onBudgetClick` + budget 导航接线）
+- **CI/baseline**：新增模块改 classpath → `app/build.gradle.kts:240` `dependencyGuard` baseline 须**走 PR 由 CI 自动回填**（节点1 impact Med：CLAUDE.md 既有约定，不可直接 push main）
 - **测试同步**（漏改则模块 `testDebugUnitTest` 整体编译失败）：
   - `core/testing/`：`FakeBudgetRepository`（若新增）
   - `core/data/src/test/`：`FakeBudgetDao`（忠实桩）
-  - 所有 `LauncherDrawerActions` 构造点（截图测试 `*ScreenshotTests` + MainApp）补 `onBudgetClick`
+  - **全部 4 个 `LauncherDrawerActions` 构造点补 `onBudgetClick`**（节点1 impact High：`MainApp.kt:416` + **`LauncherScreen.kt:79` Route wrap**[原漏列] + `LauncherScreenScreenshotTests.kt` ×?；实施时 Grep `LauncherDrawerActions(` 确认全覆盖）
   - `RecordMonthSummaryHeader` 相关截图测试
 
 ## 10. 未决 / Backlog（非本期阻塞）
@@ -189,6 +198,13 @@ data class BudgetTable(
 - 预算到期/超支通知（WorkManager + 权限）——附录已定仅视觉，不做。
 - 总体预算与分类预算的「分类之和 vs 总体」一致性校验/提示——本期各自独立，不做。
 - `monthSwitchable=false` 中性标签若需区分「年/区间/全部」更精确文案——本期统一中性「收入/支出/结余」，精确化列 backlog。
+
+### 10.1 节点1 评审衍生的显式记录（设计决策，非阻塞）
+
+- **「已花」用净自付而非毛支出（语义选择，节点1 reverse Med）**：已花口径为 `analyticsPieNetAmount`（净自付），与全应用/数据分析饼图一致。**反直觉表现需知晓**：① 本月某支出被当月报销吸收，「已花」按净额计（毛 ¥1500、被报销 ¥800 → 计 ¥700），与「我刷了 1500」的预算心智不同；② 报销款滞后录入（本月刷、下月录报销）时，因 `finalAmount` 重算，本月「已花」会在用户无新支出时自行回落。**本期保持净自付**（统一性优先），显式记录此语义选择，避免上线被当 bug；如用户反馈更需「毛支出预算」，可加口径开关（backlog）。
+- **DB v13 不支持降级（项目既有约束，非本 spec 新增，节点1 reverse Low）**：`DatabaseModule.kt:52-58` Room builder 未配 `fallbackToDestructiveMigrationOnDowngrade`，装 v13 后回退旧版 App 启动崩溃——所有 DB 版本升级共有，前 11 次 migration 同此。记录提示，不在本期改变此既有策略。
+- **备份恢复合并语义（节点1 reverse Critical 实测排除）**：db_budget 的 `(books_id,type_id)` 唯一索引是全库首个业务唯一约束。**PoC 实测（sqlite 3.50.4）**：`copyData` 用的 `INSERT OR REPLACE`(`CONFLICT_REPLACE`) 对唯一索引冲突**不抛异常**——删冲突行再插入、备份覆盖当前（符合 `copyData` KDoc `DatabaseMigrations.kt:87-94` 既定「备份优先合并」语义）。故 autoGenerate id + 唯一索引在备份恢复下工作正常，**无需改复合主键**。
+- **模块结构权衡（节点1 reverse Low）**：选「新建 `feature:budget` 独立模块」而非「挂靠 feature:settings/books 子屏」。代价是整套 build.gradle/截图/jacoco/navigation 样板 + `onBudgetClick` 须 public 跨模块暴露；收益是隔离、编译并行、与现有 feature 模块组织一致。本期取独立模块，记录此权衡。
 
 ---
 
