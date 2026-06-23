@@ -20,11 +20,18 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.testing.data.createRecordModel
+import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.ZoneId
 
 /**
  * [AssetInfoContentViewModel] 单元测试
@@ -63,6 +70,29 @@ class AssetInfoContentViewModelTest {
                 ),
             )
     }
+
+    @Test
+    fun when_monthStartDay_15_then_summary_uses_period_includes_cross_month_record() = runTest {
+        // 周期口径：D=15 时 ByMonth(2024-01) = [2024-01-15, 2024-02-15) 含 2024-02-03 记录；
+        // 资产余额口径 recordAmount，支出 10000；自然月 [01-01,02-01) 则不含 → 区分 D 是否生效
+        val viewModel = buildViewModel()
+        typeRepository.addType(createRecordTypeModel(id = 1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE))
+        recordRepository.addRecord(
+            createRecordModel(id = 1L, typeId = 1L, assetId = 1L, amount = 10000L, finalAmount = 10000L, recordTime = ms(2024, 2, 3)),
+        )
+        settingRepository.updateMonthStartDay(15)
+        viewModel.updateAssetId(1L)
+        viewModel.updateMonth(YearMonth.of(2024, 1))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.summary.collect {}
+        }
+
+        assertThat(viewModel.summary.value.expenditure).isEqualTo(10000L)
+    }
+
+    private fun ms(y: Int, m: Int, d: Int): Long =
+        LocalDate.of(y, m, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     // -------------------------------------------------------------------------
     // PagingSource 分页逻辑测试（通过本地镜像类）
@@ -145,32 +175,38 @@ class AssetInfoContentViewModelTest {
     // 辅助方法
     // -------------------------------------------------------------------------
 
+    private lateinit var recordRepository: cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
+    private lateinit var typeRepository: cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
+    private lateinit var settingRepository: cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository
+
     /** 构造注入 Fake 用例的真实 [AssetInfoContentViewModel] */
     private fun buildViewModel(): AssetInfoContentViewModel {
-        val fakeRecordRepository = cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository()
-        val fakeTypeRepository = cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository()
+        recordRepository = cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository()
+        typeRepository = cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository()
+        settingRepository = cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository()
         val fakeAssetRepository = cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository()
         val fakeTagRepository = cn.wj.android.cashbook.core.testing.repository.FakeTagRepository()
         val transUseCase = cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase(
-            recordRepository = fakeRecordRepository,
-            typeRepository = fakeTypeRepository,
+            recordRepository = recordRepository,
+            typeRepository = typeRepository,
             assetRepository = fakeAssetRepository,
             tagRepository = fakeTagRepository,
             coroutineContext = dispatcherRule.testDispatcher,
         )
         val getAssetRecordViewsUseCase = cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase(
-            recordRepository = fakeRecordRepository,
+            recordRepository = recordRepository,
             recordModelTransToViewsUseCase = transUseCase,
             coroutineContext = dispatcherRule.testDispatcher,
         )
         val getAssetMonthSummaryUseCase = cn.wj.android.cashbook.domain.usecase.GetAssetMonthSummaryUseCase(
-            recordRepository = fakeRecordRepository,
-            typeRepository = fakeTypeRepository,
+            recordRepository = recordRepository,
+            typeRepository = typeRepository,
             coroutineContext = dispatcherRule.testDispatcher,
         )
         return AssetInfoContentViewModel(
             getAssetRecordViewsUseCase = getAssetRecordViewsUseCase,
             getAssetMonthSummaryUseCase = getAssetMonthSummaryUseCase,
+            settingRepository = settingRepository,
         )
     }
 

@@ -28,8 +28,10 @@ import androidx.paging.map
 import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
+import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.domain.usecase.GetAssetMonthSummaryUseCase
 import cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCase
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -56,6 +59,7 @@ import javax.inject.Inject
 class AssetInfoContentViewModel @Inject constructor(
     getAssetRecordViewsUseCase: GetAssetRecordViewsUseCase,
     private val getAssetMonthSummaryUseCase: GetAssetMonthSummaryUseCase,
+    settingRepository: SettingRepository,
 ) : ViewModel() {
 
     /** 资产 id 数据 */
@@ -70,9 +74,14 @@ class AssetInfoContentViewModel @Inject constructor(
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
-    /** 记录列表数据（按资产 + 当前月份范围分页，并按日插入 [LauncherListItem.DayHeader] 分组） */
-    val recordList = combine(_assetIdData, _dateSelection, recordDataVersion) { assetId, selection, _ ->
-        assetId to selection.toDateRange()
+    /** 月起始日（响应式）。归一化到 1..28，默认 1=自然月 */
+    private val _monthStartDay = settingRepository.recordSettingsModel
+        .map { normalizeMonthStartDay(it.monthStartDay) }
+        .distinctUntilChanged()
+
+    /** 记录列表数据（按资产 + 当前周期范围分页，并按日插入 [LauncherListItem.DayHeader] 分组） */
+    val recordList = combine(_assetIdData, _dateSelection, _monthStartDay, recordDataVersion) { assetId, selection, d, _ ->
+        assetId to selection.toDateRange(d)
     }
         .flatMapLatest { (assetId, range) ->
             Pager(
@@ -100,10 +109,10 @@ class AssetInfoContentViewModel @Inject constructor(
         }
         .cachedIn(viewModelScope)
 
-    /** 当前月份的资产收支结余汇总 */
+    /** 当前周期的资产收支结余汇总 */
     val summary: StateFlow<AssetMonthSummaryModel> =
-        combine(_assetIdData, _isCreditCard, _dateSelection, recordDataVersion) { id, isCreditCard, selection, _ ->
-            val (startDate, endDate) = selection.toDateRange()
+        combine(_assetIdData, _isCreditCard, _dateSelection, _monthStartDay, recordDataVersion) { id, isCreditCard, selection, d, _ ->
+            val (startDate, endDate) = selection.toDateRange(d)
             getAssetMonthSummaryUseCase(id, isCreditCard, startDate, endDate)
         }
             .stateIn(
