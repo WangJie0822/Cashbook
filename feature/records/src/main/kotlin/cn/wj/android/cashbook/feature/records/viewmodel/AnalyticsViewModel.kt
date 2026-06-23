@@ -22,10 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.core.common.ext.toMoneyString
+import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordBarEntity
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
+import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.ui.DialogState
@@ -39,10 +41,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -54,6 +60,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
     private val typeRepository: TypeRepository,
+    settingRepository: SettingRepository,
     getRecordViewsBetweenDateUseCase: GetRecordViewsBetweenDateUseCase,
     transRecordViewsToAnalyticsBarUseCase: TransRecordViewsToAnalyticsBarUseCase,
     transRecordViewsToAnalyticsPieUseCase: TransRecordViewsToAnalyticsPieUseCase,
@@ -84,16 +91,31 @@ class AnalyticsViewModel @Inject constructor(
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
-    /** 将 dateSelection 和对应的记录数据绑定在一起，避免 combine 时新旧数据混用 */
-    private val _selectionWithRecords = _dateSelection.mapLatest { selection ->
-        selection to getRecordViewsBetweenDateUseCase(selection)
+    /** 月起始日（响应式）。归一化到 1..28，默认 1=自然月 */
+    private val _monthStartDay = settingRepository.recordSettingsModel
+        .map { normalizeMonthStartDay(it.monthStartDay) }
+        .distinctUntilChanged()
+
+    init {
+        // 初始化当前周期（D=1 等价 ByMonth(YearMonth.now())）。置于 _dateSelection 声明之后避免 init 早于属性初始化的 NPE。
+        viewModelScope.launch {
+            val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
+            _dateSelection.value = DateSelectionEntity.currentMonthPeriod(LocalDate.now(), monthStartDay)
+        }
     }
 
-    val uiState = _selectionWithRecords.mapLatest { (selection, list) ->
+    /** 将 dateSelection、月起始日 和对应的记录数据绑定在一起，避免 combine 时新旧数据混用 */
+    private val _selectionWithRecords =
+        combine(_dateSelection, _monthStartDay) { selection, d -> selection to d }
+            .mapLatest { (selection, d) ->
+                Triple(selection, d, getRecordViewsBetweenDateUseCase(selection, d))
+            }
+
+    val uiState = _selectionWithRecords.mapLatest { (selection, d, list) ->
         var totalIncome = 0L
         var totalExpenditure = 0L
         var totalBalance = 0L
-        val barList = transRecordViewsToAnalyticsBarUseCase(selection, list)
+        val barList = transRecordViewsToAnalyticsBarUseCase(selection, list, d)
         barList.forEach {
             totalIncome += it.income
             totalExpenditure += it.expenditure
@@ -155,7 +177,7 @@ class AnalyticsViewModel @Inject constructor(
             runCatchWithProgress(controller) {
                 val type = typeRepository.getRecordTypeById(typeId) ?: return@runCatchWithProgress
                 val ls =
-                    transRecordViewsToAnalyticsPieSecondUseCase(typeId, _selectionWithRecords.first().second)
+                    transRecordViewsToAnalyticsPieSecondUseCase(typeId, _selectionWithRecords.first().third)
                 if (ls.isNotEmpty()) {
                     sheetData = ShowSheetData(
                         typeId = typeId,

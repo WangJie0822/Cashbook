@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
+import cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
@@ -48,12 +49,14 @@ class AnalyticsViewModelTest {
 
     private lateinit var typeRepository: FakeTypeRepository
     private lateinit var recordRepository: FakeRecordRepository
+    private lateinit var settingRepository: FakeSettingRepository
     private lateinit var viewModel: AnalyticsViewModel
 
     @Before
     fun setup() {
         typeRepository = FakeTypeRepository()
         recordRepository = FakeRecordRepository()
+        settingRepository = FakeSettingRepository()
         val assetRepository = FakeAssetRepository()
         val tagRepository = FakeTagRepository()
 
@@ -86,12 +89,44 @@ class AnalyticsViewModelTest {
 
         viewModel = AnalyticsViewModel(
             typeRepository = typeRepository,
+            settingRepository = settingRepository,
             getRecordViewsBetweenDateUseCase = getRecordViewsBetweenDateUseCase,
             transRecordViewsToAnalyticsBarUseCase = transRecordViewsToAnalyticsBarUseCase,
             transRecordViewsToAnalyticsPieUseCase = transRecordViewsToAnalyticsPieUseCase,
             transRecordViewsToAnalyticsPieSecondUseCase = transRecordViewsToAnalyticsPieSecondUseCase,
         )
     }
+
+    @Test
+    fun when_monthStartDay_15_then_period_includes_cross_month_record() = runTest {
+        // 周期口径：D=15 时 ByMonth(2024-01) = [2024-01-15, 2024-02-15)，含 2024-02-03 记录；
+        // 若未走 D（自然月 [2024-01-01, 2024-02-01)）则不含 → 区分 D 是否生效
+        typeRepository.addType(
+            createRecordTypeModel(id = 1L, name = "餐饮", typeCategory = RecordTypeCategoryEnum.EXPENDITURE),
+        )
+        recordRepository.addRecord(
+            createRecordModel(
+                id = 1L,
+                typeId = 1L,
+                amount = 5000L,
+                finalAmount = 5000L,
+                recordTime = ms(2024, 2, 3),
+            ),
+        )
+        settingRepository.updateMonthStartDay(15)
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        val state = viewModel.uiState.value as AnalyticsUiState.Success
+        assertThat(state.noData).isFalse()
+        assertThat(state.totalExpenditure).isEqualTo("50.00")
+    }
+
+    private fun ms(y: Int, m: Int, d: Int): Long =
+        java.time.LocalDate.of(y, m, d).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     @Test
     fun when_initialized_then_uiState_is_loading() {
