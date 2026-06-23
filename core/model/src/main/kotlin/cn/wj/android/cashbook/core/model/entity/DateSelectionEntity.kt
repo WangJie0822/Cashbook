@@ -45,11 +45,14 @@ sealed class DateSelectionEntity(val type: DateSelectionTypeEnum) {
     data object All : DateSelectionEntity(DateSelectionTypeEnum.ALL)
 
     /**
-     * 将日期选择转换为时间戳范围（毫秒），使用半开区间 [start, end)
+     * 将日期选择转换为时间戳范围（毫秒），使用半开区间 [start, end)。
+     *
+     * [monthStartDay] 仅影响 [ByMonth]：周期为 [yearMonth.atDay(D), yearMonth.plusMonths(1).atDay(D))；
+     * D=1（默认）时与自然月一致。非法 D 经 [normalizeMonthStartDay] 归一化为 1。
      *
      * @return Pair<起始时间戳, 结束时间戳>
      */
-    fun toDateRange(): Pair<Long, Long> {
+    fun toDateRange(monthStartDay: Int = 1): Pair<Long, Long> {
         val zone = ZoneId.systemDefault()
         return when (this) {
             is ByDay -> {
@@ -59,8 +62,9 @@ sealed class DateSelectionEntity(val type: DateSelectionTypeEnum) {
             }
 
             is ByMonth -> {
-                val start = yearMonth.atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
-                val end = yearMonth.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
+                val d = normalizeMonthStartDay(monthStartDay)
+                val start = yearMonth.atDay(d).atStartOfDay(zone).toInstant().toEpochMilli()
+                val end = yearMonth.plusMonths(1).atDay(d).atStartOfDay(zone).toInstant().toEpochMilli()
                 start to end
             }
 
@@ -116,5 +120,18 @@ sealed class DateSelectionEntity(val type: DateSelectionTypeEnum) {
                 }
             }.getOrNull()
         }
+
+        /**
+         * 推导包含 [today] 的当前月周期（以 [monthStartDay] 为每月起点）。
+         * today.dayOfMonth >= D → 本月 label；否则 → 上月 label（跨年由 [YearMonth.minusMonths] 处理）。
+         */
+        fun currentMonthPeriod(today: LocalDate, monthStartDay: Int): ByMonth {
+            val d = normalizeMonthStartDay(monthStartDay)
+            val ym = YearMonth.from(today)
+            return if (today.dayOfMonth >= d) ByMonth(ym) else ByMonth(ym.minusMonths(1))
+        }
     }
 }
+
+/** 归一化月起始日：合法范围 1..28，否则回落为 1（自然月）。 */
+fun normalizeMonthStartDay(raw: Int): Int = if (raw in 1..28) raw else 1
