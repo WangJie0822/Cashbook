@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.common.DB_INIT_FILE_NAME
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
+import cn.wj.android.cashbook.core.database.dao.BudgetDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
@@ -93,4 +94,10 @@ object DatabaseModule {
     fun providesTransactionDao(
         database: CashbookDatabase,
     ): TransactionDao = database.transactionDao()
+
+    @Provides
+    @Singleton
+    fun providesBudgetDao(
+        database: CashbookDatabase,
+    ): BudgetDao = database.budgetDao()
 }

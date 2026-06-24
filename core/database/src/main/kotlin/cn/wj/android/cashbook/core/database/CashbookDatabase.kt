@@ -21,12 +21,14 @@ import androidx.room.RoomDatabase
 import cn.wj.android.cashbook.core.common.ApplicationInfo
 import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
+import cn.wj.android.cashbook.core.database.dao.BudgetDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.BooksTable
+import cn.wj.android.cashbook.core.database.table.BudgetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
@@ -49,6 +51,7 @@ import cn.wj.android.cashbook.core.database.table.TypeTable
         TagWithRecordTable::class,
         RecordWithRelatedTable::class,
         ImageWithRelatedTable::class,
+        BudgetTable::class,
     ],
     version = ApplicationInfo.DB_VERSION,
 )
@@ -71,4 +74,7 @@ abstract class CashbookDatabase : RoomDatabase() {
 
     /** 复杂事务数据库操作接口 */
     abstract fun transactionDao(): TransactionDao
+
+    /** 获取预算数据库操作接口 */
+    abstract fun budgetDao(): BudgetDao
 }

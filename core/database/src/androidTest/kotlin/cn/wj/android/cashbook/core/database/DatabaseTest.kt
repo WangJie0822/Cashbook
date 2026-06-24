@@ -31,6 +31,7 @@ import cn.wj.android.cashbook.core.common.third.MyFormatStrategy
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.migration.Migration10To11
 import cn.wj.android.cashbook.core.database.migration.Migration11To12
+import cn.wj.android.cashbook.core.database.migration.Migration12To13
 import cn.wj.android.cashbook.core.database.migration.Migration1To2
 import cn.wj.android.cashbook.core.database.migration.Migration2To3
 import cn.wj.android.cashbook.core.database.migration.Migration3To4
@@ -1020,6 +1021,46 @@ class DatabaseTest {
         Assert.assertEquals(true, hasTagRecordIndex)
         // 三条固定类型均已插入
         Assert.assertEquals(3, fixedTypeCount)
+    }
+
+    /**
+     * 测试数据库升级 12 -> 13
+     * - 新增 db_budget 表 + (books_id, type_id) 唯一索引
+     * - F3 搭车：清理残留的 db_record_temp（validateDroppedTables=true 校验无意外表）
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate12_13() {
+        log("migrate12_13()")
+        helper.createDatabase(testDbName, 12).use { db ->
+            // 模拟历史 Migration6To7 泄漏的 db_record_temp 残留
+            db.execSQL("CREATE TABLE IF NOT EXISTS `db_record_temp` (`id` INTEGER PRIMARY KEY)")
+        }
+        var budgetCount = -1
+        var hasBudgetIndex = false
+        helper.runMigrationsAndValidate(testDbName, 13, true, Migration12To13).use { db ->
+            // db_budget 建成（validateDroppedTables=true 同时保证 db_record_temp 已清 + 最终 schema 校验）
+            db.query("SELECT count(*) FROM `db_budget`").use { cursor ->
+                cursor.moveToFirst()
+                budgetCount = cursor.getInt(0)
+            }
+            // (books_id, type_id) 唯一索引存在
+            db.query(
+                "SELECT `name` FROM `$tableName` WHERE `$columnNameType` = ?",
+                arrayOf("index"),
+            ).use { cursor ->
+                while (cursor.moveToNext()) {
+                    if (cursor.getString(cursor.getColumnIndexOrThrow("name")) ==
+                        "index_db_budget_books_id_type_id"
+                    ) {
+                        hasBudgetIndex = true
+                    }
+                }
+            }
+        }
+        log("migrate12_13() budgetCount=$budgetCount, hasBudgetIndex=$hasBudgetIndex")
+        Assert.assertEquals(0, budgetCount)
+        Assert.assertEquals(true, hasBudgetIndex)
     }
 
     /**
