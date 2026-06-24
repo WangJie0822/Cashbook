@@ -84,9 +84,13 @@ internal fun AssetInfoContentRoute(
  * 资产信息界面记录列表
  *
  * @param topContent 列表头布局（资产信息卡片）
- * @param dateSelection 当前月份选择
- * @param summary 当前月份收支结余汇总
+ * @param dateSelection 当前周期选择（全部/年/月/时间段/按日）
+ * @param summary 当前周期收支结余汇总
  * @param recordList 记录列表数据
+ * @param showDatePopup 日期选择 Popup 是否展开
+ * @param onDateClick 点击周期区域（打开 Popup）回调
+ * @param onDismissDatePopup 关闭 Popup 回调
+ * @param onDateSelected 日期选择回调
  * @param onPreviousMonth 切换到上一月回调
  * @param onNextMonth 切换到下一月回调
  * @param onRecordItemClick 记录列表 item 点击回调
