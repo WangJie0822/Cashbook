@@ -372,4 +372,29 @@ class RecordModelTransToViewsUseCaseTest {
 
         assertThat(useCase(record).relatedNature).isEqualTo(RecordRelatedNatureEnum.NONE)
     }
+
+    @Test
+    fun invoke_single_preserves_reimbursed() = runTest {
+        val type = createRecordTypeModel(id = 1L)
+        typeRepository.addType(type)
+        val record = createRecordModel(id = 1L, typeId = 1L, reimbursed = true)
+        recordRepository.addRecord(record)
+
+        assertThat(useCase(record).reimbursed).isTrue()
+    }
+
+    @Test
+    fun transBatch_preserves_reimbursed() = runTest {
+        val type = createRecordTypeModel(id = 1L)
+        typeRepository.addType(type)
+        val marked = createRecordModel(id = 1L, typeId = 1L, reimbursed = true)
+        val unmarked = createRecordModel(id = 2L, typeId = 1L, reimbursed = false)
+        recordRepository.addRecord(marked)
+        recordRepository.addRecord(unmarked)
+
+        val result = useCase(listOf(marked, unmarked))
+
+        assertThat(result.first { it.id == 1L }.reimbursed).isTrue()
+        assertThat(result.first { it.id == 2L }.reimbursed).isFalse()
+    }
 }

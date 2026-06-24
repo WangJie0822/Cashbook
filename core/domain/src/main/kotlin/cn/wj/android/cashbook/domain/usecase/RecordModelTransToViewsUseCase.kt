@@ -84,6 +84,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 relatedAmount = totalRelated,
                 relatedNature = computeRelatedNature(type.typeCategory, relatedRecord),
                 recordTime = recordModel.recordTime,
+                reimbursed = recordModel.reimbursed,
             )
         }
 
@@ -177,6 +178,7 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                     relatedAmount = totalRelated,
                     relatedNature = computeRelatedNature(type.typeCategory, relatedRecord),
                     recordTime = recordModel.recordTime,
+                    reimbursed = recordModel.reimbursed,
                 )
             }
         }
