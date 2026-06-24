@@ -118,9 +118,10 @@ class RecordDaoTest {
         remark: String = "",
         reimbursable: Int = SWITCH_INT_OFF,
         recordTime: Long = 1000000L,
+        reimbursed: Int = SWITCH_INT_OFF,
     ) = RecordTable(
         id, typeId, assetId, intoAssetId, booksId,
-        amount, finalAmount, concessions, charge, remark, reimbursable, recordTime,
+        amount, finalAmount, concessions, charge, remark, reimbursable, recordTime, reimbursed,
     )
 
     /** 创建测试用资产 */
@@ -1144,6 +1145,57 @@ class RecordDaoTest {
         val result = recordDao.queryReimbursableUnrelated(testBookId)
 
         assertThat(result.map { it.id }).containsExactly(newer, older).inOrder()
+    }
+
+    @Test
+    fun when_queryReimbursableUnrelated_then_excludesManuallyReimbursed() = runTest {
+        testBookId = createTestBook()
+        val expTypeId = typeDao.insertType(
+            createType(typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal),
+        )
+        // 可报销 + 未关联 + 未标记 → 命中
+        val unmarked = insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_ON, recordTime = 9000L, remark = "待报销"),
+        )
+        // 可报销 + 未关联 + 已手动标记已报销 → 排除
+        insertRecord(
+            createRecord(
+                typeId = expTypeId,
+                reimbursable = SWITCH_INT_ON,
+                recordTime = 8000L,
+                remark = "已标记",
+                reimbursed = SWITCH_INT_ON,
+            ),
+        )
+
+        val result = recordDao.queryReimbursableUnrelated(testBookId)
+
+        assertThat(result.map { it.id }).containsExactly(unmarked)
+    }
+
+    // endregion
+
+    // region updateRecordReimbursed
+
+    @Test
+    fun when_updateRecordReimbursed_then_setsAndClearsScopedByBook() = runTest {
+        testBookId = createTestBook()
+        val expTypeId = typeDao.insertType(
+            createType(typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal),
+        )
+        val id = insertRecord(
+            createRecord(typeId = expTypeId, reimbursable = SWITCH_INT_ON, recordTime = 9000L),
+        )
+
+        recordDao.updateRecordReimbursed(recordId = id, booksId = testBookId, reimbursed = SWITCH_INT_ON)
+        assertThat(recordDao.queryById(id)!!.reimbursed).isEqualTo(SWITCH_INT_ON)
+
+        recordDao.updateRecordReimbursed(recordId = id, booksId = testBookId, reimbursed = SWITCH_INT_OFF)
+        assertThat(recordDao.queryById(id)!!.reimbursed).isEqualTo(SWITCH_INT_OFF)
+
+        // books_id 守护：错误账本不改
+        recordDao.updateRecordReimbursed(recordId = id, booksId = testBookId + 999L, reimbursed = SWITCH_INT_ON)
+        assertThat(recordDao.queryById(id)!!.reimbursed).isEqualTo(SWITCH_INT_OFF)
     }
 
     // endregion

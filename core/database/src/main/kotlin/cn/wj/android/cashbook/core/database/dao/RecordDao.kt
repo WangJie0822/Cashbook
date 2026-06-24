@@ -20,6 +20,7 @@ import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
@@ -329,6 +330,10 @@ interface RecordDao {
     @Update
     suspend fun updateRecord(list: List<RecordTable>): Int
 
+    /** 手动设置/清除「已报销」标记（按 books_id 守护，防跨账本误改） */
+    @Query("UPDATE db_record SET reimbursed=:reimbursed WHERE id=:recordId AND books_id=:booksId")
+    suspend fun updateRecordReimbursed(recordId: Long, booksId: Long, reimbursed: Int)
+
     @Query("UPDATE db_record SET type_id=:toId WHERE type_id=:fromId")
     suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long)
 
@@ -358,7 +363,8 @@ interface RecordDao {
         SELECT * FROM db_record 
         WHERE record_time>=:recordTime 
         AND reimbursable=$SWITCH_INT_ON
-        AND books_id=:booksId 
+        AND reimbursed=$SWITCH_INT_OFF
+        AND books_id=:booksId
         ORDER BY record_time DESC LIMIT 50
     """,
     )
@@ -373,6 +379,7 @@ interface RecordDao {
         SELECT * FROM db_record
         WHERE books_id = :booksId
         AND reimbursable = $SWITCH_INT_ON
+        AND reimbursed = $SWITCH_INT_OFF
         AND type_id IN (SELECT id FROM db_type WHERE type_category = :expenditureCategory)
         AND NOT EXISTS (
             SELECT 1 FROM db_record_with_related r
@@ -420,6 +427,7 @@ interface RecordDao {
         SELECT * FROM db_record
         WHERE record_time>=:recordTime
         AND reimbursable=$SWITCH_INT_ON
+        AND reimbursed=$SWITCH_INT_OFF
         AND books_id=:booksId
         AND remark LIKE :keyword
         ORDER BY record_time DESC LIMIT 50
