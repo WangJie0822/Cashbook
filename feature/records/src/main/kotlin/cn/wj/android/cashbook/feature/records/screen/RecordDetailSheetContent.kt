@@ -33,6 +33,9 @@ import kotlinx.coroutines.launch
  *
  * 标记/改回报销写库成功后关闭弹窗；失败则保留弹窗并 Toast 提示重试。
  *
+ * 注：本函数为 `public`（区别于经 NavGraph 注册的 internal `*Route`），因 app 模块 MainApp 将其
+ * 作为 sheet content slot 直接跨模块调用、不走路由注册；勿误收窄为 internal（会断 MainApp 编译）。
+ *
  * @param recordEntity 显示的记录数据
  * @param onRequestNaviToEditRecord 导航到编辑记录
  * @param onRequestNaviToAssetInfo 导航到资产信息
@@ -49,28 +52,22 @@ fun RecordDetailSheetContent(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val failedHint = stringResource(id = R.string.reimbursed_update_failed)
+    // 标记/改回共用：成功关弹窗，失败保留弹窗 + Toast 提示重试
+    val onReimbursedChange: (Long, Boolean) -> Unit = { id, reimbursed ->
+        scope.launch {
+            if (viewModel.markReimbursed(id, reimbursed)) {
+                onRequestDismissSheet()
+            } else {
+                Toast.makeText(context, failedHint, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
     RecordDetailsSheet(
         recordData = recordEntity,
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
         onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
-        onMarkReimbursed = { id ->
-            scope.launch {
-                if (viewModel.markReimbursed(id, reimbursed = true)) {
-                    onRequestDismissSheet()
-                } else {
-                    Toast.makeText(context, failedHint, Toast.LENGTH_SHORT).show()
-                }
-            }
-        },
-        onRevertReimbursed = { id ->
-            scope.launch {
-                if (viewModel.markReimbursed(id, reimbursed = false)) {
-                    onRequestDismissSheet()
-                } else {
-                    Toast.makeText(context, failedHint, Toast.LENGTH_SHORT).show()
-                }
-            }
-        },
+        onMarkReimbursed = { id -> onReimbursedChange(id, true) },
+        onRevertReimbursed = { id -> onReimbursedChange(id, false) },
         onRequestDismissSheet = onRequestDismissSheet,
     )
 }
