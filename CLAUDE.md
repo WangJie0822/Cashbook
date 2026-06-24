@@ -38,6 +38,8 @@ Cashbook 是一个 Android 记账应用，使用 Kotlin + Jetpack Compose 构建
 ./gradlew :app:lintOnlineRelease :app:lintOfflineRelease :app:lintDevRelease :lint:lint -Dlint.baselines.continue=true
 ```
 
+> **单 feature 模块 lint 用 `:feature:X:lintRelease`**（不是 `lintDevRelease`/`lintOnlineRelease`——flavor-specific lint 变体只在 `:app:` 级存在；feature 库模块误用报 `task 'lintDevRelease' not found`，候选 `lintFixRelease`/`lintRelease`）。**首次跑 lint 离线缓存缺 `com.android.tools.lint:lint-gradle`**（在 Google Maven `google()` 非 Maven Central），`--offline` 会报 `No cached version ... available for offline mode` → 去 `--offline` + 清继承代理后加 `-Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7897 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7897` 从 google() 拉暖缓存（之后增量可 `--offline`）。
+
 ### 测试
 
 ```bash
