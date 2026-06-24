@@ -77,7 +77,6 @@ internal fun TypedAnalyticsRoute(
     val dateSelection by viewModel.dateSelection.collectAsStateWithLifecycle()
     val summary by viewModel.summary.collectAsStateWithLifecycle()
 
-    val monthSwitchable = dateSelection is DateSelectionEntity.ByMonth
     val currentMonth = (dateSelection as? DateSelectionEntity.ByMonth)?.yearMonth ?: YearMonth.now()
 
     TypedAnalyticsScreen(
@@ -87,8 +86,11 @@ internal fun TypedAnalyticsRoute(
         uiState = uiState,
         recordList = recordList,
         dateSelection = dateSelection,
-        monthSwitchable = monthSwitchable,
         summary = summary,
+        showDatePopup = viewModel.showDatePopup,
+        onDateClick = viewModel::displayDatePopup,
+        onDismissDatePopup = viewModel::dismissDatePopup,
+        onDateSelected = viewModel::updateDateSelection,
         onPreviousMonth = { viewModel.updateMonth(currentMonth.minusMonths(1)) },
         onNextMonth = { viewModel.updateMonth(currentMonth.plusMonths(1)) },
         onRequestNaviToEditRecord = onRequestNaviToEditRecord,
@@ -107,8 +109,11 @@ internal fun TypedAnalyticsScreen(
     uiState: TypedAnalyticsUiState,
     recordList: LazyPagingItems<LauncherListItem>,
     dateSelection: DateSelectionEntity,
-    monthSwitchable: Boolean,
     summary: AssetMonthSummaryModel,
+    showDatePopup: Boolean = false,
+    onDateClick: () -> Unit = {},
+    onDismissDatePopup: () -> Unit = {},
+    onDateSelected: (DateSelectionEntity) -> Unit = {},
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onRequestNaviToEditRecord: (Long) -> Unit,
@@ -162,10 +167,13 @@ internal fun TypedAnalyticsScreen(
                             content = {
                                 item {
                                     RecordMonthSummaryHeader(
-                                        periodText = dateSelection.getDisplayText(),
-                                        monthSwitchable = monthSwitchable,
+                                        dateSelection = dateSelection,
                                         summary = summary,
                                         showTransferHint = uiState.isTransferType,
+                                        showDatePopup = showDatePopup,
+                                        onDateClick = onDateClick,
+                                        onDismissDatePopup = onDismissDatePopup,
+                                        onDateSelected = onDateSelected,
                                         onPreviousMonth = onPreviousMonth,
                                         onNextMonth = onNextMonth,
                                     )

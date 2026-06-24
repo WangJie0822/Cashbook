@@ -16,7 +16,9 @@
 
 package cn.wj.android.cashbook.feature.records.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,30 +37,41 @@ import cn.wj.android.cashbook.core.design.component.CbCard
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.icon.CbIcons
+import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
+import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.core.ui.component.DateSelectionPopup
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
 
 /**
  * 月份切换器 / 固定周期文字 + 收入/支出/结余 3 列汇总卡。
- * 供资产详情、分类统计、标签统计共用。
+ * 供资产详情、分类统计、标签统计共用。点击周期文本打开日期选择 [DateSelectionPopup]。
  *
- * @param periodText 当前周期显示文本
- * @param monthSwitchable true 显示前后翻月箭头；false 仅居中文字（固定周期）
+ * @param dateSelection 当前周期选择（内部派生显示文本与月份可切换性）
  * @param summary 收支结余汇总
  * @param showTransferHint true 时以提示文案代替 3 列（转账类型不计入收支）
- * @param onPreviousMonth 切换到上一月回调（仅 [monthSwitchable] 时使用）
- * @param onNextMonth 切换到下一月回调（仅 [monthSwitchable] 时使用）
+ * @param showDatePopup 日期选择 Popup 是否展开
+ * @param onDateClick 点击周期区域（打开 Popup）回调
+ * @param onDismissDatePopup 关闭 Popup 回调
+ * @param onDateSelected 日期选择回调
+ * @param onPreviousMonth 切换到上一月回调（仅 ByMonth 态箭头使用）
+ * @param onNextMonth 切换到下一月回调（仅 ByMonth 态箭头使用）
  */
 @Composable
 internal fun RecordMonthSummaryHeader(
-    periodText: String,
-    monthSwitchable: Boolean,
+    dateSelection: DateSelectionEntity,
     summary: AssetMonthSummaryModel,
     showTransferHint: Boolean,
+    showDatePopup: Boolean = false,
+    onDateClick: () -> Unit = {},
+    onDismissDatePopup: () -> Unit = {},
+    onDateSelected: (DateSelectionEntity) -> Unit = {},
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
 ) {
+    val monthSwitchable = dateSelection is DateSelectionEntity.ByMonth
+    val periodText = dateSelection.getDisplayText()
     CbCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,37 +82,67 @@ internal fun RecordMonthSummaryHeader(
                 .fillMaxWidth()
                 .padding(16.dp),
         ) {
-            // 周期行：月份模式保持「上一月 - 文字 - 下一月」原布局；固定周期模式仅居中文字
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                if (monthSwitchable) {
-                    CbIconButton(onClick = onPreviousMonth) {
-                        Icon(
-                            imageVector = CbIcons.ArrowBack,
-                            contentDescription = stringResource(id = R.string.cd_previous),
-                        )
+            // 周期行 + 内嵌日期选择 Popup（Popup 锚定在本 Box）
+            Box {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    if (monthSwitchable) {
+                        CbIconButton(onClick = onPreviousMonth) {
+                            Icon(
+                                imageVector = CbIcons.ArrowBack,
+                                contentDescription = stringResource(id = R.string.cd_previous),
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.clickable(
+                                onClick = rememberHapticOnClick(onClick = onDateClick),
+                            ),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = periodText,
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Icon(
+                                imageVector = CbIcons.ArrowDropDown,
+                                contentDescription = null,
+                            )
+                        }
+                        CbIconButton(onClick = onNextMonth) {
+                            Icon(
+                                imageVector = CbIcons.KeyboardArrowRight,
+                                contentDescription = stringResource(id = R.string.cd_next),
+                            )
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = rememberHapticOnClick(onClick = onDateClick)),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = periodText,
+                                style = MaterialTheme.typography.titleMedium,
+                                textAlign = TextAlign.Center,
+                            )
+                            Icon(
+                                imageVector = CbIcons.ArrowDropDown,
+                                contentDescription = null,
+                            )
+                        }
                     }
-                    Text(
-                        text = periodText,
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    CbIconButton(onClick = onNextMonth) {
-                        Icon(
-                            imageVector = CbIcons.KeyboardArrowRight,
-                            contentDescription = stringResource(id = R.string.cd_next),
-                        )
-                    }
-                } else {
-                    Text(
-                        text = periodText,
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
                 }
+                DateSelectionPopup(
+                    expanded = showDatePopup,
+                    onDismissRequest = onDismissDatePopup,
+                    currentSelection = dateSelection,
+                    onDateSelected = onDateSelected,
+                )
             }
 
             if (showTransferHint) {

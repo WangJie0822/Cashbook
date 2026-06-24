@@ -70,6 +70,10 @@ internal fun AssetInfoContentRoute(
         dateSelection = dateSelection,
         summary = summary,
         recordList = recordList,
+        showDatePopup = viewModel.showDatePopup,
+        onDateClick = viewModel::displayDatePopup,
+        onDismissDatePopup = viewModel::dismissDatePopup,
+        onDateSelected = viewModel::updateDateSelection,
         onPreviousMonth = { viewModel.updateMonth(currentMonth.minusMonths(1)) },
         onNextMonth = { viewModel.updateMonth(currentMonth.plusMonths(1)) },
         onRecordItemClick = onRecordItemClick,
@@ -93,6 +97,10 @@ internal fun AssetInfoContentScreen(
     dateSelection: DateSelectionEntity,
     summary: AssetMonthSummaryModel,
     recordList: LazyPagingItems<LauncherListItem>,
+    showDatePopup: Boolean = false,
+    onDateClick: () -> Unit = {},
+    onDismissDatePopup: () -> Unit = {},
+    onDateSelected: (DateSelectionEntity) -> Unit = {},
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
@@ -105,10 +113,13 @@ internal fun AssetInfoContentScreen(
 
             item {
                 RecordMonthSummaryHeader(
-                    periodText = dateSelection.getDisplayText(),
-                    monthSwitchable = true,
+                    dateSelection = dateSelection,
                     summary = summary,
                     showTransferHint = false,
+                    showDatePopup = showDatePopup,
+                    onDateClick = onDateClick,
+                    onDismissDatePopup = onDismissDatePopup,
+                    onDateSelected = onDateSelected,
                     onPreviousMonth = onPreviousMonth,
                     onNextMonth = onNextMonth,
                 )

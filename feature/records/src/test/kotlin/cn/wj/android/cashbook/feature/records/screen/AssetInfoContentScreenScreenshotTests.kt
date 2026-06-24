@@ -190,4 +190,24 @@ class AssetInfoContentScreenScreenshotTests {
             }
         }
     }
+
+    @Test
+    fun assetInfoContentScreen_fixedPeriod_multipleThemes() {
+        composeTestRule.captureMultiTheme(
+            name = "AssetInfoContentScreen",
+            overrideFileName = "AssetInfoContentScreen_fixedPeriod",
+        ) {
+            val recordList = flowOf(PagingData.from(sampleItems))
+                .collectAsLazyPagingItems()
+            AssetInfoContentScreen(
+                topContent = { Text(text = "资产信息头部") },
+                dateSelection = DateSelectionEntity.ByYear(2024),
+                summary = sampleSummary,
+                recordList = recordList,
+                onPreviousMonth = {},
+                onNextMonth = {},
+                onRecordItemClick = {},
+            )
+        }
+    }
 }
