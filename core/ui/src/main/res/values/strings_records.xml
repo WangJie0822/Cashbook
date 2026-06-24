@@ -81,6 +81,10 @@
     <string name="reimbursed">已报销</string>
     <string name="refunded">已退款</string>
     <string name="pending_reimbursement">待报销</string>
+    <string name="mark_as_reimbursed">标记已报销</string>
+    <string name="revert_to_pending_reimbursement">改回待报销</string>
+    <string name="mark_reimbursed_confirm_hint">确认将该记录标记为已报销？标记后将移出待报销列表，金额统计不变。</string>
+    <string name="revert_reimbursed_confirm_hint">确认改回待报销？</string>
     <string name="budget_entry">预算管理</string>
     <string name="reimbursement_summary_format">共 %1$d 笔，合计 %2$s</string>
     <string name="type">类型</string>
