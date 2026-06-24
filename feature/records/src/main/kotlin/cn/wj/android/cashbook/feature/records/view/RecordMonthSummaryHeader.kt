@@ -119,17 +119,23 @@ internal fun RecordMonthSummaryHeader(
                         .padding(top = 8.dp),
                 ) {
                     SummaryColumn(
-                        label = stringResource(id = R.string.month_income),
+                        label = stringResource(
+                            id = if (monthSwitchable) R.string.month_income else R.string.summary_income,
+                        ),
                         amount = summary.income,
                         modifier = Modifier.weight(1f),
                     )
                     SummaryColumn(
-                        label = stringResource(id = R.string.month_expend),
+                        label = stringResource(
+                            id = if (monthSwitchable) R.string.month_expend else R.string.summary_expend,
+                        ),
                         amount = summary.expenditure,
                         modifier = Modifier.weight(1f),
                     )
                     SummaryColumn(
-                        label = stringResource(id = R.string.month_balance),
+                        label = stringResource(
+                            id = if (monthSwitchable) R.string.month_balance else R.string.summary_balance,
+                        ),
                         amount = summary.balance,
                         modifier = Modifier.weight(1f),
                     )

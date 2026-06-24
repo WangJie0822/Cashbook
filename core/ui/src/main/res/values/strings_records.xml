@@ -22,6 +22,9 @@
     <string name="month_income">月收入</string>
     <string name="month_expend">月支出</string>
     <string name="month_balance">月结余</string>
+    <string name="summary_income">收入</string>
+    <string name="summary_expend">支出</string>
+    <string name="summary_balance">结余</string>
     <string name="transfer_not_counted_in_summary">转账不计入收支统计</string>
     <string name="overview_of_revenue_and_expenditure">收支概览</string>
     <string name="daily_statistics">每日统计</string>
