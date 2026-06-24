@@ -55,6 +55,7 @@ const val TABLE_RECORD_CONCESSIONS = "concessions"
 const val TABLE_RECORD_CHARGE = "charge"
 const val TABLE_RECORD_REMARK = "remark"
 const val TABLE_RECORD_REIMBURSABLE = "reimbursable"
+const val TABLE_RECORD_REIMBURSED = "reimbursed"
 const val TABLE_RECORD_RECORD_TIME = "record_time"
 
 /* 记录关联关系表 */

@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 
 /**
  * 记录数据库表
@@ -35,6 +36,7 @@ import androidx.room.PrimaryKey
  * @param charge 手续费
  * @param remark 备注
  * @param reimbursable 能否报销
+ * @param reimbursed 是否已手动标记已报销
  * @param recordTime 修改时间
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2021/6/10
@@ -65,4 +67,5 @@ data class RecordTable(
     @ColumnInfo(name = TABLE_RECORD_REMARK) val remark: String,
     @ColumnInfo(name = TABLE_RECORD_REIMBURSABLE) val reimbursable: Int,
     @ColumnInfo(name = TABLE_RECORD_RECORD_TIME) val recordTime: Long,
+    @ColumnInfo(name = TABLE_RECORD_REIMBURSED, defaultValue = "0") val reimbursed: Int = SWITCH_INT_OFF,
 )

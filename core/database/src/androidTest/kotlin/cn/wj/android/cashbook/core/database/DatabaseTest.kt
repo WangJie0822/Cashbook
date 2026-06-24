@@ -32,6 +32,7 @@ import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.migration.Migration10To11
 import cn.wj.android.cashbook.core.database.migration.Migration11To12
 import cn.wj.android.cashbook.core.database.migration.Migration12To13
+import cn.wj.android.cashbook.core.database.migration.Migration13To14
 import cn.wj.android.cashbook.core.database.migration.Migration1To2
 import cn.wj.android.cashbook.core.database.migration.Migration2To3
 import cn.wj.android.cashbook.core.database.migration.Migration3To4
@@ -1061,6 +1062,36 @@ class DatabaseTest {
         log("migrate12_13() budgetCount=$budgetCount, hasBudgetIndex=$hasBudgetIndex")
         Assert.assertEquals(0, budgetCount)
         Assert.assertEquals(true, hasBudgetIndex)
+    }
+
+    /**
+     * 测试数据库升级 13 -> 14
+     * - 新增 db_record.reimbursed 列（INTEGER NOT NULL DEFAULT 0）
+     * - 存量行迁移后默认值为 0
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate13_14() {
+        log("migrate13_14()")
+        helper.createDatabase(testDbName, 13).use { db ->
+            // v13 db_record 全列插入一行（无 reimbursed 列）
+            db.execSQL(
+                "INSERT INTO `db_record` " +
+                    "(`id`,`type_id`,`asset_id`,`into_asset_id`,`books_id`,`amount`,`final_amount`," +
+                    "`concessions`,`charge`,`remark`,`reimbursable`,`record_time`) " +
+                    "VALUES (1,1,-1,-1,1,1000,1000,0,0,'r',1,1704067200000)",
+            )
+        }
+        var reimbursedValue = -1
+        helper.runMigrationsAndValidate(testDbName, 14, true, Migration13To14).use { db ->
+            db.query("SELECT `reimbursed` FROM `db_record` WHERE `id`=1").use { cursor ->
+                cursor.moveToFirst()
+                reimbursedValue = cursor.getInt(0)
+            }
+        }
+        log("migrate13_14() reimbursedValue=$reimbursedValue")
+        // 存量行迁移后 reimbursed 默认 0
+        Assert.assertEquals(0, reimbursedValue)
     }
 
     /**
