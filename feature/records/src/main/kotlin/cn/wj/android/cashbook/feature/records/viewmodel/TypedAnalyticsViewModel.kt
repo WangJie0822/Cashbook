@@ -81,6 +81,10 @@ class TypedAnalyticsViewModel @Inject constructor(
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
+    /** 日期选择 Popup 是否展开（VM 持有，对齐 AnalyticsViewModel 范式） */
+    var showDatePopup by mutableStateOf(false)
+        private set
+
     /** 已应用的入口参数 key：避免 Route 重组时 apply{updateData} 重复执行把用户翻月结果重置回入口周期 */
     private var appliedDateKey: String? = null
 
@@ -190,6 +194,21 @@ class TypedAnalyticsViewModel @Inject constructor(
     /** 更新当前月份选择（月份模式翻月） */
     fun updateMonth(yearMonth: YearMonth) {
         _dateSelection.tryEmit(DateSelectionEntity.ByMonth(yearMonth))
+    }
+
+    /** 显示日期选择 Popup */
+    fun displayDatePopup() {
+        showDatePopup = true
+    }
+
+    /** 隐藏日期选择 Popup */
+    fun dismissDatePopup() {
+        showDatePopup = false
+    }
+
+    /** 更新日期选择（全部/年/月/时间段/按日） */
+    fun updateDateSelection(selection: DateSelectionEntity) {
+        _dateSelection.tryEmit(selection)
     }
 
     fun showRecordDetailsSheet(item: RecordViewsEntity) {

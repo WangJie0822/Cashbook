@@ -198,6 +198,31 @@ class TypedAnalyticsViewModelTest {
     }
 
     @Test
+    fun when_updateDateSelection_byYear_then_dateSelection_updates() = runTest {
+        viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
+        viewModel.updateDateSelection(DateSelectionEntity.ByYear(2024))
+        assertThat(viewModel.dateSelection.value).isEqualTo(DateSelectionEntity.ByYear(2024))
+    }
+
+    @Test
+    fun when_updateData_repeated_same_args_after_updateDateSelection_then_selection_preserved() = runTest {
+        // Route 重组重复 updateData（相同入口 key）不应把弹窗切换的周期重置回入口周期
+        viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
+        viewModel.updateDateSelection(DateSelectionEntity.ByYear(2024))
+        viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
+        assertThat(viewModel.dateSelection.value).isEqualTo(DateSelectionEntity.ByYear(2024))
+    }
+
+    @Test
+    fun when_display_and_dismiss_date_popup_then_flag_toggles() {
+        assertThat(viewModel.showDatePopup).isFalse()
+        viewModel.displayDatePopup()
+        assertThat(viewModel.showDatePopup).isTrue()
+        viewModel.dismissDatePopup()
+        assertThat(viewModel.showDatePopup).isFalse()
+    }
+
+    @Test
     fun when_transfer_type_then_isTransferType_true() = runTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}

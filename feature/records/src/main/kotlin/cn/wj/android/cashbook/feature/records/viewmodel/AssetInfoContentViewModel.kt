@@ -16,6 +16,9 @@
 
 package cn.wj.android.cashbook.feature.records.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -73,6 +76,10 @@ class AssetInfoContentViewModel @Inject constructor(
         DateSelectionEntity.ByMonth(YearMonth.now()),
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
+
+    /** 日期选择 Popup 是否展开（VM 持有，对齐 AnalyticsViewModel 范式） */
+    var showDatePopup by mutableStateOf(false)
+        private set
 
     /** 月起始日（响应式）。归一化到 1..28，默认 1=自然月 */
     private val _monthStartDay = settingRepository.recordSettingsModel
@@ -134,6 +141,21 @@ class AssetInfoContentViewModel @Inject constructor(
     /** 更新当前月份选择 */
     fun updateMonth(yearMonth: YearMonth) {
         _dateSelection.tryEmit(DateSelectionEntity.ByMonth(yearMonth))
+    }
+
+    /** 显示日期选择 Popup */
+    fun displayDatePopup() {
+        showDatePopup = true
+    }
+
+    /** 隐藏日期选择 Popup */
+    fun dismissDatePopup() {
+        showDatePopup = false
+    }
+
+    /** 更新日期选择（全部/年/月/时间段/按日） */
+    fun updateDateSelection(selection: DateSelectionEntity) {
+        _dateSelection.tryEmit(selection)
     }
 }
 

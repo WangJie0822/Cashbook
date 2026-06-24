@@ -91,6 +91,34 @@ class AssetInfoContentViewModelTest {
         assertThat(viewModel.summary.value.expenditure).isEqualTo(10000L)
     }
 
+    @Test
+    fun when_updateDateSelection_byYear_then_dateSelection_updates() {
+        val viewModel = buildViewModel()
+        viewModel.updateDateSelection(
+            cn.wj.android.cashbook.core.model.entity.DateSelectionEntity.ByYear(2024),
+        )
+        assertThat(viewModel.dateSelection.value)
+            .isEqualTo(cn.wj.android.cashbook.core.model.entity.DateSelectionEntity.ByYear(2024))
+    }
+
+    @Test
+    fun when_updateDateSelection_all_then_dateSelection_is_all() {
+        val viewModel = buildViewModel()
+        viewModel.updateDateSelection(cn.wj.android.cashbook.core.model.entity.DateSelectionEntity.All)
+        assertThat(viewModel.dateSelection.value)
+            .isEqualTo(cn.wj.android.cashbook.core.model.entity.DateSelectionEntity.All)
+    }
+
+    @Test
+    fun when_display_and_dismiss_date_popup_then_flag_toggles() {
+        val viewModel = buildViewModel()
+        assertThat(viewModel.showDatePopup).isFalse()
+        viewModel.displayDatePopup()
+        assertThat(viewModel.showDatePopup).isTrue()
+        viewModel.dismissDatePopup()
+        assertThat(viewModel.showDatePopup).isFalse()
+    }
+
     private fun ms(y: Int, m: Int, d: Int): Long =
         LocalDate.of(y, m, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
