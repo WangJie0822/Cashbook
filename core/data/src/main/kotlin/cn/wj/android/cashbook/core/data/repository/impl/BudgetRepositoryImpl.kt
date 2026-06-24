@@ -48,6 +48,10 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun upsertBudget(booksId: Long, typeId: Long, amount: Long): Unit =
         withContext(coroutineContext) {
+            // 先查 existing.id 再 @Upsert：@Upsert 按主键 id 冲突，已存在记录须带其 id 才走 UPDATE；
+            // 若传 id=null，会按 (books_id, type_id) 唯一索引撞约束抛 SQLiteConstraintException。
+            // 「先查后写」存在理论竞态窗口（查到 null 但写时已被插入），但单用户记账几乎不可能并发设同一预算，
+            // 故保留此正确清晰的实现，不改为 @Insert(onConflict=REPLACE)——后者删旧插新会改变 id 语义。
             val existing = budgetDao.queryByBooksAndType(booksId, typeId)
             budgetDao.upsert(
                 BudgetTable(id = existing?.id, booksId = booksId, typeId = typeId, amount = amount),
