@@ -37,6 +37,7 @@ fun RecordModel.asEntity(): RecordEntity {
         remark = this.remark,
         reimbursable = this.reimbursable,
         recordTime = this.recordTime,
+        reimbursed = this.reimbursed,
     )
 }
 
@@ -54,6 +55,7 @@ fun RecordEntity.asModel(): RecordModel {
         remark = this.remark,
         reimbursable = this.reimbursable,
         recordTime = this.recordTime,
+        reimbursed = this.reimbursed,
     )
 }
 
@@ -99,5 +101,6 @@ fun RecordViewsModel.asEntity(): RecordViewsEntity {
         relatedAmount = this.relatedAmount,
         relatedNature = this.relatedNature,
         recordTime = this.recordTime,
+        reimbursed = this.reimbursed,
     )
 }

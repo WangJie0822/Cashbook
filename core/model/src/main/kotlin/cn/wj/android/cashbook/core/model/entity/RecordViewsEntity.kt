@@ -67,6 +67,8 @@ data class RecordViewsEntity(
     val relatedNature: RecordRelatedNatureEnum = RecordRelatedNatureEnum.NONE,
     /** 记录时间，毫秒时间戳 */
     val recordTime: Long,
+    /** 是否已手动标记已报销 */
+    val reimbursed: Boolean = false,
 ) : RecordViews {
     val isBalanceRecord: Boolean
         get() = typeId == RECORD_TYPE_BALANCE_EXPENDITURE.id ||

@@ -53,6 +53,7 @@ data class RecordViewsModel(
     val relatedAmount: Long,
     val relatedNature: RecordRelatedNatureEnum = RecordRelatedNatureEnum.NONE,
     val recordTime: Long,
+    val reimbursed: Boolean = false,
 ) {
     /** 是否为平账记录 */
     val isBalanceRecord: Boolean get() = type.isBalanceType()
