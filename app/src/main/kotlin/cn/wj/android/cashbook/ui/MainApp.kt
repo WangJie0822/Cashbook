@@ -106,7 +106,6 @@ import cn.wj.android.cashbook.feature.record.imports.navigation.recordImportScre
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
 import cn.wj.android.cashbook.feature.records.navigation.EditRecord
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
-import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.records.navigation.analyticsScreen
 import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
@@ -121,6 +120,7 @@ import cn.wj.android.cashbook.feature.records.navigation.reimbursementScreen
 import cn.wj.android.cashbook.feature.records.navigation.searchScreen
 import cn.wj.android.cashbook.feature.records.navigation.selectRelatedRecordScreen
 import cn.wj.android.cashbook.feature.records.navigation.typedAnalyticsScreen
+import cn.wj.android.cashbook.feature.records.screen.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.settings.enums.MainAppBookmarkEnum
 import cn.wj.android.cashbook.feature.settings.enums.SettingPasswordStateEnum
 import cn.wj.android.cashbook.feature.settings.navigation.LauncherDrawerActions

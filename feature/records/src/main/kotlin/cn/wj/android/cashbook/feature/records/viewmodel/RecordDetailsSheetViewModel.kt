@@ -17,10 +17,9 @@
 package cn.wj.android.cashbook.feature.records.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import cn.wj.android.cashbook.domain.usecase.UpdateRecordReimbursedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 /**
@@ -35,9 +34,19 @@ class RecordDetailsSheetViewModel @Inject constructor(
     private val updateRecordReimbursedUseCase: UpdateRecordReimbursedUseCase,
 ) : ViewModel() {
 
-    fun markReimbursed(recordId: Long, reimbursed: Boolean) {
-        viewModelScope.launch {
+    /**
+     * 标记/改回报销状态。写库成功返回 `true`，失败（如 DB 异常）返回 `false` 供 UI 提示重试。
+     *
+     * 设计为 `suspend` 而非内部 `launch`：由调用方在自身协程作用域 await，成功后再关闭弹窗，
+     * 失败则保留弹窗并 Toast 提示，避免「fire-and-forget 静默吞异常」。
+     */
+    suspend fun markReimbursed(recordId: Long, reimbursed: Boolean): Boolean =
+        try {
             updateRecordReimbursedUseCase(recordId, reimbursed)
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            false
         }
-    }
 }

@@ -18,7 +18,6 @@ package cn.wj.android.cashbook.feature.records.navigation
 
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -34,8 +33,6 @@ import cn.wj.android.cashbook.feature.records.screen.ReimbursementRoute
 import cn.wj.android.cashbook.feature.records.screen.SearchRoute
 import cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordRoute
 import cn.wj.android.cashbook.feature.records.screen.TypedAnalyticsRoute
-import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
-import cn.wj.android.cashbook.feature.records.viewmodel.RecordDetailsSheetViewModel
 import kotlinx.serialization.Serializable
 
 /** 路由 - 编辑记录 */
@@ -289,37 +286,5 @@ fun AssetInfoContent(
         isCreditCard = isCreditCard,
         topContent = topContent,
         onRecordItemClick = onRecordItemClick,
-    )
-}
-
-/**
- * 记录详情 sheet 内容
- *
- * @param recordEntity 显示的记录数据
- * @param onRequestNaviToEditRecord 导航到编辑记录
- * @param onRequestNaviToAssetInfo 导航到资产信息
- * @param onRequestDismissSheet 隐藏 sheet
- */
-@Composable
-fun RecordDetailSheetContent(
-    recordEntity: RecordViewsEntity?,
-    onRequestNaviToEditRecord: (Long) -> Unit,
-    onRequestNaviToAssetInfo: (Long) -> Unit,
-    onRequestDismissSheet: () -> Unit,
-    viewModel: RecordDetailsSheetViewModel = hiltViewModel(),
-) {
-    RecordDetailsSheet(
-        recordData = recordEntity,
-        onRequestNaviToEditRecord = onRequestNaviToEditRecord,
-        onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
-        onMarkReimbursed = { id ->
-            viewModel.markReimbursed(id, reimbursed = true)
-            onRequestDismissSheet()
-        },
-        onRevertReimbursed = { id ->
-            viewModel.markReimbursed(id, reimbursed = false)
-            onRequestDismissSheet()
-        },
-        onRequestDismissSheet = onRequestDismissSheet,
     )
 }
