@@ -124,6 +124,11 @@ object RecordDetailsSheetData {
         recordTime = 1711900800000L,
     )
 
+    private val markedReimbursedExpenditureRecordViewsData = reimbursableExpenditureRecordViewsData.copy(
+        remark = "已手动标记已报销数据",
+        reimbursed = true,
+    )
+
     private val refundExpenditureRecordViewsData = RecordViewsEntity(
         id = 1L,
         typeId = 3L,
@@ -255,6 +260,7 @@ object RecordDetailsSheetData {
         expenditureRecordViewsData,
         reimbursedExpenditureRecordViewsData,
         reimbursableExpenditureRecordViewsData,
+        markedReimbursedExpenditureRecordViewsData,
         refundExpenditureRecordViewsData,
         incomeRecordViewsData,
         refundIncomeRecordViewsData,
