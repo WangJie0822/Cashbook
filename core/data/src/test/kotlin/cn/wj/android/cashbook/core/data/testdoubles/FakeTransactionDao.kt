@@ -218,6 +218,10 @@ class FakeTransactionDao : TransactionDao {
         // 简化实现：Fake 中标签不追踪 booksId
     }
 
+    override suspend fun deleteBudgetsByBookId(bookId: Long) {
+        // 简化实现：Fake 中预算不建模（预算级联删除由 TransactionDaoTest androidTest 真 DAO 验证）
+    }
+
     override suspend fun queryRecordsByAssetId(assetId: Long): List<RecordTable> {
         return records.filter { it.assetId == assetId || it.intoAssetId == assetId }
     }

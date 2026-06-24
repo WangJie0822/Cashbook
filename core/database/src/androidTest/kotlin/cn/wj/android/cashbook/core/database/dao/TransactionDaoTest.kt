@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.BooksTable
+import cn.wj.android.cashbook.core.database.table.BudgetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
@@ -790,6 +791,24 @@ class TransactionDaoTest {
 
         // 验证：账本已删除
         assertThat(database.booksDao().queryAll()).isEmpty()
+    }
+
+    @Test
+    fun when_deleteBookTransaction_then_budgetRemoved() = runTest {
+        val bookId = insertBook(name = "预算账本")
+        val otherBookId = insertBook(name = "其他账本")
+        // 该账本：总体(-1) + 某分类(10) 预算；另一账本：总体预算
+        database.budgetDao().upsert(BudgetTable(id = null, booksId = bookId, typeId = -1L, amount = 50000L))
+        database.budgetDao().upsert(BudgetTable(id = null, booksId = bookId, typeId = 10L, amount = 10000L))
+        database.budgetDao().upsert(BudgetTable(id = null, booksId = otherBookId, typeId = -1L, amount = 30000L))
+
+        // 执行：删除账本事务
+        transactionDao.deleteBookTransaction(bookId)
+
+        // 验证：该账本全部预算清空
+        assertThat(database.budgetDao().queryByBooks(bookId)).isEmpty()
+        // 验证：其他账本预算不受影响
+        assertThat(database.budgetDao().queryByBooks(otherBookId)).hasSize(1)
     }
 
     @Test

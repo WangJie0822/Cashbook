@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
+import cn.wj.android.cashbook.core.database.dao.BudgetDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
@@ -47,6 +48,7 @@ import kotlin.coroutines.CoroutineContext
 class TypeRepositoryImpl @Inject constructor(
     private val typeDao: TypeDao,
     private val transactionDao: TransactionDao,
+    private val budgetDao: BudgetDao,
     private val combineProtoDataSource: CombineProtoDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : TypeRepository {
@@ -151,6 +153,8 @@ class TypeRepositoryImpl @Inject constructor(
             "Cannot delete fixed type: $id"
         }
         typeDao.deleteById(id)
+        // 级联删除该一级支出分类的预算（命不中即 no-op）
+        budgetDao.deleteByTypeId(id)
         typeDataVersion.updateVersion()
     }
 

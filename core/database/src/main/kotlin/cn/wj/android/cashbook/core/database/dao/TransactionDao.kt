@@ -780,7 +780,12 @@ interface TransactionDao {
         deleteAssetsByBookId(bookId)
         // 删除账本
         deleteBookById(bookId)
+        // 删除该账本下的所有预算
+        deleteBudgetsByBookId(bookId)
     }
+
+    @Query("DELETE FROM db_budget WHERE books_id = :bookId")
+    suspend fun deleteBudgetsByBookId(bookId: Long)
 
     @Query("UPDATE db_record SET type_id = :newTypeId WHERE type_id = :oldTypeId")
     suspend fun updateRecordTypeId(oldTypeId: Long, newTypeId: Long)
