@@ -61,6 +61,7 @@ include(":feature:assets")
 include(":feature:records")
 include(":feature:settings")
 include(":feature:record-import")
+include(":feature:budget")
 
 include(":core:domain")
 include(":core:data")
