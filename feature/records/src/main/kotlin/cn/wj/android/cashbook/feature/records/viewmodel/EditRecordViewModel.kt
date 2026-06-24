@@ -470,6 +470,7 @@ class EditRecordViewModel @Inject constructor(
                         relatedAssetId = if (typeCategory != RecordTypeCategoryEnum.TRANSFER) -1L else recordEntity.relatedAssetId,
                         concessions = if (typeCategory == RecordTypeCategoryEnum.INCOME) 0L else recordEntity.concessions,
                         reimbursable = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursable,
+                        reimbursed = if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE) false else recordEntity.reimbursed,
                     ),
                     tagIdList = displayTagIdListData.first(),
                     relatedRecordIdList = _relatedRecordIdData.first(),

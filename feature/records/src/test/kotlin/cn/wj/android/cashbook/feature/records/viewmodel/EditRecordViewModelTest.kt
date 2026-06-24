@@ -733,6 +733,70 @@ class EditRecordViewModelTest {
     }
 
     @Test
+    fun when_trySave_expenditure_then_reimbursed_preserved() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.selectedTypeCategoryData.collect {}
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.displayTagIdListData.collect {}
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.displayImageData.collect {}
+        }
+
+        // 加载已有「已手动标记已报销」的支出记录（typeId=1L 为支出）
+        recordRepository.addRecord(
+            createRecordModel(id = 1L, typeId = 1L, amount = 10000L, reimbursable = true, reimbursed = true),
+        )
+        viewModel.initRecordId(1L)
+        advanceUntilIdle()
+
+        viewModel.trySave(fakeProgressDialogController, "保存中") {}
+        advanceUntilIdle()
+
+        // 支出类型应保留 reimbursed
+        assertThat(recordRepository.lastUpdatedRecord).isNotNull()
+        assertThat(recordRepository.lastUpdatedRecord!!.reimbursed).isTrue()
+    }
+
+    @Test
+    fun when_trySave_income_then_reimbursed_forced_false() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.selectedTypeCategoryData.collect {}
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.displayTagIdListData.collect {}
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.displayImageData.collect {}
+        }
+
+        // 加载已有「已手动标记已报销」的支出记录，后改为收入类型 → reimbursed 应清零
+        recordRepository.addRecord(
+            createRecordModel(id = 1L, typeId = 1L, amount = 10000L, reimbursable = true, reimbursed = true),
+        )
+        viewModel.initRecordId(1L)
+        advanceUntilIdle()
+
+        viewModel.updateType(2L)
+        viewModel.updateTypeCategory(RecordTypeCategoryEnum.INCOME)
+        advanceUntilIdle()
+
+        viewModel.trySave(fakeProgressDialogController, "保存中") {}
+        advanceUntilIdle()
+
+        // 改为收入类型 reimbursed 强制为 false
+        assertThat(recordRepository.lastUpdatedRecord).isNotNull()
+        assertThat(recordRepository.lastUpdatedRecord!!.reimbursed).isFalse()
+    }
+
+    @Test
     fun when_trySave_income_then_concessions_forced_zero() = runTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
