@@ -441,6 +441,47 @@ class RecordRepositoryImplTest {
         assertThat(result.map { it.id }).containsExactly(1L)
     }
 
+    @Test
+    fun when_queryReimbursableUnrelated_then_excludes_manually_reimbursed() = runTest {
+        recordDao.types.add(
+            FakeRecordDao.FakeTypeEntry(id = 1L, parentId = -1L, typeCategory = RecordTypeCategoryEnum.EXPENDITURE.ordinal),
+        )
+        // 未标记 → 命中
+        recordDao.addRecord(
+            createRecord(id = 1L, typeId = 1L, booksId = 1L, reimbursable = SWITCH_INT_ON, recordTime = 9000L),
+        )
+        // 已手动标记已报销 → 排除
+        recordDao.addRecord(
+            createRecord(
+                id = 2L,
+                typeId = 1L,
+                booksId = 1L,
+                reimbursable = SWITCH_INT_ON,
+                recordTime = 8000L,
+                reimbursed = SWITCH_INT_ON,
+            ),
+        )
+
+        val result = recordDao.queryReimbursableUnrelated(booksId = 1L)
+
+        assertThat(result.map { it.id }).containsExactly(1L)
+    }
+
+    @Test
+    fun when_updateRecordReimbursed_then_sets_and_clears_scoped_by_book() = runTest {
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, reimbursable = SWITCH_INT_ON))
+
+        recordDao.updateRecordReimbursed(recordId = 1L, booksId = 1L, reimbursed = SWITCH_INT_ON)
+        assertThat(recordDao.queryById(1L)!!.reimbursed).isEqualTo(SWITCH_INT_ON)
+
+        recordDao.updateRecordReimbursed(recordId = 1L, booksId = 1L, reimbursed = SWITCH_INT_OFF)
+        assertThat(recordDao.queryById(1L)!!.reimbursed).isEqualTo(SWITCH_INT_OFF)
+
+        // books_id 守护：错误账本不改
+        recordDao.updateRecordReimbursed(recordId = 1L, booksId = 999L, reimbursed = SWITCH_INT_ON)
+        assertThat(recordDao.queryById(1L)!!.reimbursed).isEqualTo(SWITCH_INT_OFF)
+    }
+
     // ========== 辅助方法 ==========
 
     private fun createRecord(
@@ -452,6 +493,7 @@ class RecordRepositoryImplTest {
         remark: String = "",
         reimbursable: Int = SWITCH_INT_OFF,
         recordTime: Long = 1000L,
+        reimbursed: Int = SWITCH_INT_OFF,
     ) = RecordTable(
         id = id,
         typeId = typeId,
@@ -465,5 +507,6 @@ class RecordRepositoryImplTest {
         remark = remark,
         reimbursable = reimbursable,
         recordTime = recordTime,
+        reimbursed = reimbursed,
     )
 }

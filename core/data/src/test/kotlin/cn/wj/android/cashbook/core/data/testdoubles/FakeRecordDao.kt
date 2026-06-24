@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.data.testdoubles
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
@@ -269,6 +270,13 @@ class FakeRecordDao : RecordDao {
         return count
     }
 
+    override suspend fun updateRecordReimbursed(recordId: Long, booksId: Long, reimbursed: Int) {
+        val index = records.indexOfFirst { it.id == recordId && it.booksId == booksId }
+        if (index >= 0) {
+            records[index] = records[index].copy(reimbursed = reimbursed)
+        }
+    }
+
     override suspend fun changeRecordTypeBeforeDeleteType(fromId: Long, toId: Long) {
         for (i in records.indices) {
             if (records[i].typeId == fromId) {
@@ -307,7 +315,8 @@ class FakeRecordDao : RecordDao {
         return records.filter {
             it.booksId == booksId &&
                 it.recordTime >= recordTime &&
-                it.reimbursable == SWITCH_INT_ON
+                it.reimbursable == SWITCH_INT_ON &&
+                it.reimbursed == SWITCH_INT_OFF
         }.sortedByDescending { it.recordTime }.take(50)
     }
 
@@ -321,6 +330,7 @@ class FakeRecordDao : RecordDao {
         return records.filter { record ->
             record.booksId == booksId &&
                 record.reimbursable == SWITCH_INT_ON &&
+                record.reimbursed == SWITCH_INT_OFF &&
                 record.typeId in expenditureTypeIds &&
                 relatedRecords.none { it.recordId == record.id || it.relatedRecordId == record.id }
         }.sortedByDescending { it.recordTime }
@@ -356,6 +366,7 @@ class FakeRecordDao : RecordDao {
             it.booksId == booksId &&
                 it.recordTime >= recordTime &&
                 it.reimbursable == SWITCH_INT_ON &&
+                it.reimbursed == SWITCH_INT_OFF &&
                 (it.remark.contains(keyword) || it.amount.toString().contains(keyword))
         }.sortedByDescending { it.recordTime }.take(50)
     }

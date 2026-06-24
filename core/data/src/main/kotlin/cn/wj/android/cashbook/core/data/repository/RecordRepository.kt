@@ -146,6 +146,9 @@ interface RecordRepository {
     /** 当前账本全部「可报销且未关联任何报销/退款款」的支出记录（待报销管理界面用） */
     suspend fun getReimbursableUnrelatedRecordList(): List<RecordModel>
 
+    /** 手动设置/清除「已报销」标记（按当前账本守护，写后 bump recordDataVersion） */
+    suspend fun updateRecordReimbursed(recordId: Long, reimbursed: Boolean)
+
     suspend fun getLastThreeMonthRefundableRecordList(): List<RecordModel>
 
     suspend fun getLastThreeMonthReimbursableRecordListByKeyword(keyword: String): List<RecordModel>
@@ -238,6 +241,7 @@ internal fun RecordTable.asModel(): RecordModel {
         remark = this.remark,
         reimbursable = this.reimbursable == SWITCH_INT_ON,
         recordTime = this.recordTime,
+        reimbursed = this.reimbursed == SWITCH_INT_ON,
     )
 }
 
@@ -255,6 +259,7 @@ internal fun RecordModel.asTable(): RecordTable {
         remark = this.remark,
         reimbursable = if (this.reimbursable) SWITCH_INT_ON else SWITCH_INT_OFF,
         recordTime = this.recordTime,
+        reimbursed = if (this.reimbursed) SWITCH_INT_ON else SWITCH_INT_OFF,
     )
 }
 

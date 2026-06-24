@@ -20,6 +20,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
+import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.completeZero
@@ -429,6 +431,17 @@ class RecordRepositoryImpl @Inject constructor(
             val appDataModel = combineProtoDataSource.recordSettingsData.first()
             recordDao.queryReimbursableUnrelated(booksId = appDataModel.currentBookId)
                 .map { it.asModel() }
+        }
+
+    override suspend fun updateRecordReimbursed(recordId: Long, reimbursed: Boolean): Unit =
+        withContext(coroutineContext) {
+            val booksId = combineProtoDataSource.recordSettingsData.first().currentBookId
+            recordDao.updateRecordReimbursed(
+                recordId = recordId,
+                booksId = booksId,
+                reimbursed = if (reimbursed) SWITCH_INT_ON else SWITCH_INT_OFF,
+            )
+            recordDataVersion.updateVersion()
         }
 
     override suspend fun getLastThreeMonthRefundableRecordListByKeyword(keyword: String): List<RecordModel> =
