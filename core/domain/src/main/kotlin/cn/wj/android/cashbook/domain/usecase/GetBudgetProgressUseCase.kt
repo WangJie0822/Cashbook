@@ -81,16 +81,11 @@ class GetBudgetProgressUseCase @Inject constructor(
 
             val categoryList = budgets
                 .filter { it.typeId != BUDGET_TYPE_ID_TOTAL }
-                .map { budget ->
+                .mapNotNull { budget ->
+                    // 防御孤儿：分类已删（type 为 null）则跳过，避免渲染空名预算项
+                    val type = typeRepository.getRecordTypeById(budget.typeId) ?: return@mapNotNull null
                     val spent = pieList.firstOrNull { it.typeId == budget.typeId }?.totalAmount ?: 0L
-                    val type = typeRepository.getRecordTypeById(budget.typeId)
-                    buildBudgetItem(
-                        budget.typeId,
-                        type?.name ?: "",
-                        type?.iconName ?: "",
-                        budget.amount,
-                        spent,
-                    )
+                    buildBudgetItem(budget.typeId, type.name, type.iconName, budget.amount, spent)
                 }
 
             BudgetProgressEntity(overall = overall, categoryList = categoryList)

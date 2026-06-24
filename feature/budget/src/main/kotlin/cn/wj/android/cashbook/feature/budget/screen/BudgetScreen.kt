@@ -47,19 +47,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
+import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
-import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
 import cn.wj.android.cashbook.core.model.entity.BUDGET_TYPE_ID_TOTAL
 import cn.wj.android.cashbook.core.model.entity.BudgetItem
 import cn.wj.android.cashbook.core.model.entity.BudgetStateEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
+import cn.wj.android.cashbook.core.model.model.parseBudgetAmountCent
 import cn.wj.android.cashbook.feature.budget.R
 import cn.wj.android.cashbook.feature.budget.viewmodel.BudgetUiState
 import cn.wj.android.cashbook.feature.budget.viewmodel.BudgetViewModel
@@ -119,62 +120,55 @@ internal fun BudgetScreen(
 
                     is BudgetUiState.Success -> {
                         val progress = uiState.progress
-                        val overallEmpty = progress.overall == null && progress.categoryList.isEmpty()
-                        if (overallEmpty) {
-                            Empty(
-                                hintText = stringResource(id = R.string.budget_empty),
-                                modifier = Modifier.align(Alignment.Center),
-                            )
-                        } else {
-                            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                                // 总体预算
-                                item {
-                                    BudgetSectionTitle(text = stringResource(id = R.string.budget_overall))
-                                    val overall = progress.overall
-                                    if (overall != null) {
-                                        BudgetProgressRow(
-                                            name = stringResource(id = R.string.budget_overall),
-                                            item = overall,
-                                            onClick = {
-                                                editTarget = BudgetEditTarget(BUDGET_TYPE_ID_TOTAL, "", overall.limit)
-                                            },
-                                        )
-                                    } else {
-                                        CbListItem(
-                                            headlineContent = { Text(text = stringResource(id = R.string.budget_set_overall)) },
-                                            modifier = Modifier.clickable {
-                                                editTarget = BudgetEditTarget(BUDGET_TYPE_ID_TOTAL, "", 0L)
-                                            },
-                                        )
-                                    }
-                                }
-                                // 分类预算标题 + 添加
-                                item {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(
-                                            text = stringResource(id = R.string.budget_category),
-                                            style = MaterialTheme.typography.titleSmall,
-                                        )
-                                        CbTextButton(onClick = { showTypePicker = true }) {
-                                            Text(text = stringResource(id = R.string.budget_add_category))
-                                        }
-                                    }
-                                }
-                                items(progress.categoryList) { item ->
+                        // 始终渲染列表：无预算时显「设置总体预算」+「添加分类预算」作为引导（避免空态死路）
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            // 总体预算
+                            item {
+                                BudgetSectionTitle(text = stringResource(id = R.string.budget_overall))
+                                val overall = progress.overall
+                                if (overall != null) {
                                     BudgetProgressRow(
-                                        name = item.typeName,
-                                        item = item,
+                                        name = stringResource(id = R.string.budget_overall),
+                                        item = overall,
                                         onClick = {
-                                            editTarget = BudgetEditTarget(item.typeId, item.typeName, item.limit)
+                                            editTarget = BudgetEditTarget(BUDGET_TYPE_ID_TOTAL, "", overall.limit)
+                                        },
+                                    )
+                                } else {
+                                    CbListItem(
+                                        headlineContent = { Text(text = stringResource(id = R.string.budget_set_overall)) },
+                                        modifier = Modifier.clickable {
+                                            editTarget = BudgetEditTarget(BUDGET_TYPE_ID_TOTAL, "", 0L)
                                         },
                                     )
                                 }
+                            }
+                            // 分类预算标题 + 添加
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.budget_category),
+                                        style = MaterialTheme.typography.titleSmall,
+                                    )
+                                    CbTextButton(onClick = { showTypePicker = true }) {
+                                        Text(text = stringResource(id = R.string.budget_add_category))
+                                    }
+                                }
+                            }
+                            items(progress.categoryList) { item ->
+                                BudgetProgressRow(
+                                    name = item.typeName,
+                                    item = item,
+                                    onClick = {
+                                        editTarget = BudgetEditTarget(item.typeId, item.typeName, item.limit)
+                                    },
+                                )
                             }
                         }
                     }
@@ -185,6 +179,7 @@ internal fun BudgetScreen(
 
     editTarget?.let { target ->
         BudgetEditDialog(
+            initialText = if (target.limit > 0) target.limit.toMoneyString() else "",
             canDelete = target.limit > 0,
             onConfirm = { input ->
                 onSetBudget(target.typeId, input)
@@ -267,12 +262,20 @@ private fun BudgetProgressRow(
 
 @Composable
 private fun BudgetEditDialog(
+    initialText: String,
     canDelete: Boolean,
     onConfirm: (String) -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val amountState = remember { TextFieldState(defaultText = "") }
+    val invalidHint = stringResource(id = R.string.budget_invalid_amount)
+    val amountState = remember {
+        TextFieldState(
+            defaultText = initialText,
+            validator = { parseBudgetAmountCent(it) != null },
+            errorFor = { invalidHint },
+        )
+    }
     CbAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(id = R.string.budget_limit_hint)) },
@@ -285,7 +288,13 @@ private fun BudgetEditDialog(
             )
         },
         confirmButton = {
-            CbTextButton(onClick = { onConfirm(amountState.text) }) {
+            CbTextButton(onClick = {
+                if (amountState.isValid) {
+                    onConfirm(amountState.text)
+                } else {
+                    amountState.requestErrors()
+                }
+            }) {
                 Text(text = stringResource(id = R.string.budget_confirm))
             }
         },

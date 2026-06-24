@@ -22,7 +22,6 @@
     <string name="budget_add_category">添加分类预算</string>
     <string name="budget_limit_hint">限额（元）</string>
     <string name="budget_over">已超支 %1$s</string>
-    <string name="budget_empty">暂无预算，点击右上角添加</string>
     <string name="budget_invalid_amount">请输入大于 0 的金额</string>
     <string name="budget_delete">删除</string>
     <string name="budget_confirm">确定</string>
