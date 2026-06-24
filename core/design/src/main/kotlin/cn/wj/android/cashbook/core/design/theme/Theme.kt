@@ -28,6 +28,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
@@ -109,6 +110,9 @@ val DarkAndroidColorScheme = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
+/** 预算接近超支提示色（橙），浅色/深色一致 */
+private val BudgetNearColor = Color(0xFFFF9800)
+
 val LightExtendedColors = ExtendedColors(
     quaternary = light_quaternary,
     onQuaternary = light_onQuaternary,
@@ -142,6 +146,7 @@ val LightExtendedColors = ExtendedColors(
     onGitee = light_onGitee,
     giteeContainer = light_giteeContainer,
     onGiteeContainer = light_onGiteeContainer,
+    budgetNear = BudgetNearColor,
 )
 
 val DarkExtendedColors = ExtendedColors(
@@ -177,6 +182,7 @@ val DarkExtendedColors = ExtendedColors(
     onGitee = dark_onGitee,
     giteeContainer = dark_giteeContainer,
     onGiteeContainer = dark_onGiteeContainer,
+    budgetNear = BudgetNearColor,
 )
 
 /**

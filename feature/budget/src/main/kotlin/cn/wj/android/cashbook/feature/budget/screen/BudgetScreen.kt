@@ -30,7 +30,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -49,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.design.component.CbAlertDialog
+import cn.wj.android.cashbook.core.design.component.CbLinearProgressIndicator
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbScaffold
 import cn.wj.android.cashbook.core.design.component.CbTextButton
@@ -56,6 +55,7 @@ import cn.wj.android.cashbook.core.design.component.CbTextField
 import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Loading
 import cn.wj.android.cashbook.core.design.component.TextFieldState
+import cn.wj.android.cashbook.core.design.theme.LocalExtendedColors
 import cn.wj.android.cashbook.core.model.entity.BUDGET_TYPE_ID_TOTAL
 import cn.wj.android.cashbook.core.model.entity.BudgetItem
 import cn.wj.android.cashbook.core.model.entity.BudgetStateEnum
@@ -64,9 +64,6 @@ import cn.wj.android.cashbook.core.model.model.parseBudgetAmountCent
 import cn.wj.android.cashbook.feature.budget.R
 import cn.wj.android.cashbook.feature.budget.viewmodel.BudgetUiState
 import cn.wj.android.cashbook.feature.budget.viewmodel.BudgetViewModel
-
-/** 接近预算阈值的橙色（80%~100%） */
-private val NearColor = Color(0xFFFF9800)
 
 /**
  * 预算管理界面入口
@@ -222,7 +219,7 @@ private fun BudgetProgressRow(
 ) {
     val color = when (item.state) {
         BudgetStateEnum.NORMAL -> MaterialTheme.colorScheme.primary
-        BudgetStateEnum.NEAR -> NearColor
+        BudgetStateEnum.NEAR -> LocalExtendedColors.current.budgetNear
         BudgetStateEnum.OVER -> MaterialTheme.colorScheme.error
     }
     Column(
@@ -242,7 +239,7 @@ private fun BudgetProgressRow(
                 color = color,
             )
         }
-        LinearProgressIndicator(
+        CbLinearProgressIndicator(
             progress = { item.progress ?: 0f },
             color = color,
             modifier = Modifier

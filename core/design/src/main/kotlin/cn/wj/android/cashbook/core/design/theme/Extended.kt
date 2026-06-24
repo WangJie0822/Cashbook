@@ -62,6 +62,8 @@ data class ExtendedColors(
     val onGitee: Color = Color.Unspecified,
     val giteeContainer: Color = Color.Unspecified,
     val onGiteeContainer: Color = Color.Unspecified,
+    /** 预算接近超支（80%~100%）提示色 */
+    val budgetNear: Color = Color.Unspecified,
 )
 
 /**
