@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.common.tools.toDateTimeString
 import cn.wj.android.cashbook.core.design.component.CashbookBackground
+import cn.wj.android.cashbook.core.design.component.CbAlertDialog
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
 import cn.wj.android.cashbook.core.design.component.CbListItem
 import cn.wj.android.cashbook.core.design.component.CbTextButton
@@ -82,6 +83,8 @@ internal fun RecordDetailsSheet(
     recordData: RecordViewsEntity?,
     onRequestNaviToEditRecord: (Long) -> Unit,
     onRequestNaviToAssetInfo: (Long) -> Unit,
+    onMarkReimbursed: (Long) -> Unit,
+    onRevertReimbursed: (Long) -> Unit,
     onRequestDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -113,6 +116,48 @@ internal fun RecordDetailsSheet(
                             dialogState = DialogState.Dismiss
                         },
                         list = recordData.relatedImage.map { it.asViewModel() },
+                    )
+                }
+
+                RecordDetailsDialogEnum.MARK_REIMBURSED_CONFIRM -> {
+                    // 标记已报销二次确认
+                    CbAlertDialog(
+                        onDismissRequest = { dialogState = DialogState.Dismiss },
+                        text = { Text(text = stringResource(id = R.string.mark_reimbursed_confirm_hint)) },
+                        confirmButton = {
+                            CbTextButton(
+                                onClick = {
+                                    onMarkReimbursed(recordData.id)
+                                    dialogState = DialogState.Dismiss
+                                },
+                            ) { Text(text = stringResource(id = R.string.confirm)) }
+                        },
+                        dismissButton = {
+                            CbTextButton(onClick = { dialogState = DialogState.Dismiss }) {
+                                Text(text = stringResource(id = R.string.cancel))
+                            }
+                        },
+                    )
+                }
+
+                RecordDetailsDialogEnum.REVERT_REIMBURSED_CONFIRM -> {
+                    // 改回待报销二次确认
+                    CbAlertDialog(
+                        onDismissRequest = { dialogState = DialogState.Dismiss },
+                        text = { Text(text = stringResource(id = R.string.revert_reimbursed_confirm_hint)) },
+                        confirmButton = {
+                            CbTextButton(
+                                onClick = {
+                                    onRevertReimbursed(recordData.id)
+                                    dialogState = DialogState.Dismiss
+                                },
+                            ) { Text(text = stringResource(id = R.string.confirm)) }
+                        },
+                        dismissButton = {
+                            CbTextButton(onClick = { dialogState = DialogState.Dismiss }) {
+                                Text(text = stringResource(id = R.string.cancel))
+                            }
+                        },
                     )
                 }
             }
@@ -155,6 +200,38 @@ internal fun RecordDetailsSheet(
                                     color = MaterialTheme.colorScheme.primary,
                                 )
                             }
+                        }
+
+                        when (recordData.reimbursementDisplayStatus()) {
+                            ReimbursementDisplayStatus.PENDING -> {
+                                CbTextButton(
+                                    onClick = {
+                                        dialogState =
+                                            DialogState.Shown(RecordDetailsDialogEnum.MARK_REIMBURSED_CONFIRM)
+                                    },
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.mark_as_reimbursed),
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            }
+
+                            ReimbursementDisplayStatus.MARKED_REIMBURSED -> {
+                                CbTextButton(
+                                    onClick = {
+                                        dialogState =
+                                            DialogState.Shown(RecordDetailsDialogEnum.REVERT_REIMBURSED_CONFIRM)
+                                    },
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.revert_to_pending_reimbursement),
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            }
+
+                            ReimbursementDisplayStatus.NONE -> Unit
                         }
 
                         CbTextButton(
@@ -489,6 +566,8 @@ fun RecordDetailsSheetWithData(
             recordData = recordData,
             onRequestNaviToEditRecord = {},
             onRequestNaviToAssetInfo = {},
+            onMarkReimbursed = {},
+            onRevertReimbursed = {},
             onRequestDismissSheet = {},
         )
     }

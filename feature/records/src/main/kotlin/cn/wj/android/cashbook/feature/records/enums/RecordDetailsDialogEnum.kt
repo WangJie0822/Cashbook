@@ -28,4 +28,10 @@ enum class RecordDetailsDialogEnum {
 
     /** 图片预览 */
     IMAGE_PREVIEW,
+
+    /** 标记已报销确认 */
+    MARK_REIMBURSED_CONFIRM,
+
+    /** 改回待报销确认 */
+    REVERT_REIMBURSED_CONFIRM,
 }

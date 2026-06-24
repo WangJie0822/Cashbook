@@ -45,8 +45,8 @@ import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.core.ui.R
+import cn.wj.android.cashbook.feature.records.navigation.RecordDetailSheetContent
 import cn.wj.android.cashbook.feature.records.view.RecordDayHeader
-import cn.wj.android.cashbook.feature.records.view.RecordDetailsSheet
 import cn.wj.android.cashbook.feature.records.view.RecordMonthSummaryHeader
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
 import cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsUiState
@@ -147,8 +147,8 @@ internal fun TypedAnalyticsScreen(
                             },
                         ),
                         content = {
-                            RecordDetailsSheet(
-                                recordData = viewRecord,
+                            RecordDetailSheetContent(
+                                recordEntity = viewRecord,
                                 onRequestNaviToEditRecord = onRequestNaviToEditRecord,
                                 onRequestNaviToAssetInfo = onRequestNaviToAssetInfo,
                                 onRequestDismissSheet = onRequestDismissBottomSheet,
