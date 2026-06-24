@@ -53,8 +53,8 @@ data class BudgetProgressEntity(
     val categoryList: List<BudgetItem>,
 )
 
-/** 组装单条预算进度（纯函数，便于单测） */
-internal fun buildBudgetItem(
+/** 组装单条预算进度（纯函数，便于单测；跨模块被 core:domain 复用，故 public） */
+fun buildBudgetItem(
     typeId: Long,
     typeName: String,
     typeIconName: String,
