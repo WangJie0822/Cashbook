@@ -48,6 +48,12 @@ class FakeRecordRepository : RecordRepository {
     var lastDeletedRecordId: Long = -1L
         private set
 
+    /** 最近一次 [updateRecordReimbursed] 入参，供测试断言 */
+    var lastReimbursedRecordId: Long = -1L
+        private set
+    var lastReimbursedValue: Boolean? = null
+        private set
+
     /** 可配置的导出记录列表 */
     var exportRecordsList: List<ExportRecordModel> = emptyList()
 
@@ -307,11 +313,21 @@ class FakeRecordRepository : RecordRepository {
     }
 
     override suspend fun getReimbursableUnrelatedRecordList(): List<RecordModel> {
-        // 忠实桩：可报销 + 双向（relatedMap 吸收者侧 / relatedFromMap 被吸收侧）都空才算未关联
+        // 忠实桩：可报销 + 未手动标记已报销 + 双向（relatedMap 吸收者侧 / relatedFromMap 被吸收侧）都空才算未关联
         return records.filter { record ->
             record.reimbursable &&
+                !record.reimbursed &&
                 relatedMap[record.id].isNullOrEmpty() &&
                 relatedFromMap[record.id].isNullOrEmpty()
+        }
+    }
+
+    override suspend fun updateRecordReimbursed(recordId: Long, reimbursed: Boolean) {
+        lastReimbursedRecordId = recordId
+        lastReimbursedValue = reimbursed
+        val index = records.indexOfFirst { it.id == recordId }
+        if (index >= 0) {
+            records[index] = records[index].copy(reimbursed = reimbursed)
         }
     }
 

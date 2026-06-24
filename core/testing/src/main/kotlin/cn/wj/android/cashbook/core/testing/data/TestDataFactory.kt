@@ -44,6 +44,7 @@ fun createRecordModel(
     remark: String = "",
     reimbursable: Boolean = false,
     recordTime: Long = 1704067200000L, // 2024-01-01 00:00:00 UTC+8
+    reimbursed: Boolean = false,
 ): RecordModel = RecordModel(
     id = id,
     booksId = booksId,
@@ -57,6 +58,7 @@ fun createRecordModel(
     remark = remark,
     reimbursable = reimbursable,
     recordTime = recordTime,
+    reimbursed = reimbursed,
 )
 
 fun createAssetModel(
@@ -170,6 +172,7 @@ fun createRecordViewsModel(
     relatedRecord: List<RecordModel> = emptyList(),
     relatedAmount: Long = 0L,
     recordTime: Long = 1704067200000L, // 2024-01-01 00:00:00 UTC+8
+    reimbursed: Boolean = false,
 ): RecordViewsModel = RecordViewsModel(
     id = id,
     booksId = booksId,
@@ -187,4 +190,5 @@ fun createRecordViewsModel(
     relatedRecord = relatedRecord,
     relatedAmount = relatedAmount,
     recordTime = recordTime,
+    reimbursed = reimbursed,
 )
