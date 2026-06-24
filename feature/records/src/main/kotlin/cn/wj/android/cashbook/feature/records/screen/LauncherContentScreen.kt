@@ -101,6 +101,8 @@ import cn.wj.android.cashbook.core.ui.component.DateSelectionPopup
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
 import cn.wj.android.cashbook.core.ui.expand.bookImageRatio
 import cn.wj.android.cashbook.core.ui.expand.typeColor
+import cn.wj.android.cashbook.feature.records.view.ReimbursementDisplayStatus
+import cn.wj.android.cashbook.feature.records.view.reimbursementDisplayStatus
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
@@ -719,13 +721,20 @@ internal fun RecordListItem(
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(end = 8.dp),
                         )
-                    } else if (item.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && item.reimbursable) {
-                        Text(
-                            text = stringResource(id = R.string.pending_reimbursement),
-                            color = LocalContentColor.current.copy(alpha = 0.7f),
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(end = 8.dp),
-                        )
+                    } else {
+                        val statusRes = when (item.reimbursementDisplayStatus()) {
+                            ReimbursementDisplayStatus.MARKED_REIMBURSED -> R.string.reimbursed
+                            ReimbursementDisplayStatus.PENDING -> R.string.pending_reimbursement
+                            ReimbursementDisplayStatus.NONE -> null
+                        }
+                        statusRes?.let { res ->
+                            Text(
+                                text = stringResource(id = res),
+                                color = LocalContentColor.current.copy(alpha = 0.7f),
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(end = 8.dp),
+                            )
+                        }
                     }
                     val displayAmount = when {
                         item.typeCategory == RecordTypeCategoryEnum.TRANSFER -> {

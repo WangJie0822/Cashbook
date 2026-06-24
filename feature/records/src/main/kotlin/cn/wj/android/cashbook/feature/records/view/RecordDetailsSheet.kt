@@ -196,7 +196,11 @@ internal fun RecordDetailsSheet(
                                         RecordRelatedNatureEnum.REFUNDED -> R.string.refunded
                                         RecordRelatedNatureEnum.MIXED -> R.string.refund_reimbursed_simple
                                         RecordRelatedNatureEnum.NONE ->
-                                            if (recordData.reimbursable) R.string.pending_reimbursement else null
+                                            when (recordData.reimbursementDisplayStatus()) {
+                                                ReimbursementDisplayStatus.MARKED_REIMBURSED -> R.string.reimbursed
+                                                ReimbursementDisplayStatus.PENDING -> R.string.pending_reimbursement
+                                                ReimbursementDisplayStatus.NONE -> null
+                                            }
                                     }
                                 } else {
                                     null
