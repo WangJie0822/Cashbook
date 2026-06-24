@@ -24,6 +24,7 @@ package cn.wj.android.cashbook.feature.settings.navigation
  * @param onMyCategoryClick 我的分类点击回调
  * @param onMyTagClick 我的标签点击回调
  * @param onReimbursementClick 待报销点击回调
+ * @param onBudgetClick 预算管理点击回调
  * @param onSettingClick 设置点击回调
  * @param onAboutUsClick 关于我们点击回调
  */
@@ -33,6 +34,7 @@ data class LauncherDrawerActions(
     val onMyCategoryClick: () -> Unit,
     val onMyTagClick: () -> Unit,
     val onReimbursementClick: () -> Unit,
+    val onBudgetClick: () -> Unit,
     val onSettingClick: () -> Unit,
     val onAboutUsClick: () -> Unit,
 )

@@ -99,6 +99,8 @@ import cn.wj.android.cashbook.feature.books.navigation.editBookScreen
 import cn.wj.android.cashbook.feature.books.navigation.myBooksScreen
 import cn.wj.android.cashbook.feature.books.navigation.naviToEditBook
 import cn.wj.android.cashbook.feature.books.navigation.naviToMyBooks
+import cn.wj.android.cashbook.feature.budget.navigation.ROUTE_BUDGET
+import cn.wj.android.cashbook.feature.budget.navigation.budgetScreen
 import cn.wj.android.cashbook.feature.record.imports.navigation.naviToRecordImport
 import cn.wj.android.cashbook.feature.record.imports.navigation.recordImportScreen
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
@@ -419,6 +421,7 @@ fun CashbookNavHost(
                 onMyCategoryClick = navController::naviToMyCategories,
                 onMyTagClick = navController::naviToMyTags,
                 onReimbursementClick = navController::naviToReimbursement,
+                onBudgetClick = { navController.navigate(ROUTE_BUDGET) },
                 onSettingClick = navController::naviToSetting,
                 onAboutUsClick = navController::naviToAboutUs,
             ),
@@ -525,6 +528,8 @@ fun CashbookNavHost(
             },
             onRequestPopBackStack = navController::popBackStackSafety,
         )
+        // 预算管理
+        budgetScreen(onBackClick = navController::popBackStackSafety)
         // 记录日历
         calendarScreen(
             recordDetailSheetContent = { recordEntity, onRequestDismissSheet ->

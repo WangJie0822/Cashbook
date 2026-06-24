@@ -82,6 +82,7 @@ internal fun LauncherRoute(
             onMyCategoryClick = wrap(actions.onMyCategoryClick),
             onMyTagClick = wrap(actions.onMyTagClick),
             onReimbursementClick = wrap(actions.onReimbursementClick),
+            onBudgetClick = wrap(actions.onBudgetClick),
             onSettingClick = wrap(actions.onSettingClick),
             onAboutUsClick = wrap(actions.onAboutUsClick),
         ),
@@ -224,6 +225,13 @@ internal fun LauncherSheet(
             icon = { Icon(imageVector = CbIcons.ReceiptLong, contentDescription = null) },
             selected = false,
             onClick = actions.onReimbursementClick,
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(id = R.string.budget_entry)) },
+            icon = { Icon(imageVector = CbIcons.Analytics, contentDescription = null) },
+            selected = false,
+            onClick = actions.onBudgetClick,
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
         CbHorizontalDivider(modifier = Modifier.padding(horizontal = spacing.large))
