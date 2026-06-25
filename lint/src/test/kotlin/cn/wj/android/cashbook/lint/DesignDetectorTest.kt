@@ -106,6 +106,27 @@ class DesignDetectorTest {
             .expectClean()
     }
 
+    @Test
+    fun progress_indicators_are_reported() {
+        lint().issues(DesignDetector.ISSUE)
+            .files(
+                MATERIAL3_STUB,
+                kotlin(
+                    """
+                    package com.example
+                    import androidx.compose.material3.LinearProgressIndicator
+                    import androidx.compose.material3.CircularProgressIndicator
+                    fun screen() {
+                        LinearProgressIndicator()
+                        CircularProgressIndicator()
+                    }
+                    """,
+                ).indented(),
+            )
+            .run()
+            .expectContains("Using LinearProgressIndicator instead of CbLinearProgressIndicator")
+    }
+
     private companion object {
         /** Material3 组件桩，使被测代码中的调用可解析、UCallExpression 能拿到 methodName。 */
         private val MATERIAL3_STUB: TestFile = kotlin(
@@ -116,6 +137,8 @@ class DesignDetectorTest {
             fun TextField() {}
             fun Card() {}
             fun AlertDialog() {}
+            fun LinearProgressIndicator() {}
+            fun CircularProgressIndicator() {}
             """,
         ).indented()
 

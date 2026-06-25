@@ -19,7 +19,6 @@ package cn.wj.android.cashbook.feature.records.view
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.decimalFormat
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
+import cn.wj.android.cashbook.core.design.component.CbLinearProgressIndicator
 import cn.wj.android.cashbook.core.design.component.painterDrawableResource
 import cn.wj.android.cashbook.core.model.entity.AnalyticsRecordPieEntity
 import cn.wj.android.cashbook.core.ui.component.TypeIcon
@@ -69,7 +69,7 @@ internal fun AnalyticsPieListItem(
                     style = MaterialTheme.typography.labelLarge,
                 )
             }
-            LinearProgressIndicator(
+            CbLinearProgressIndicator(
                 progress = { item.percent },
                 color = tintColor,
                 modifier = Modifier.padding(vertical = 4.dp),

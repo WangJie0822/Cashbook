@@ -95,6 +95,8 @@ class DesignDetector : Detector(), Detector.UastScanner {
             "BaseAlterDialog" to "CbBaseAlterDialog",
             "Tab" to "CbTab",
             "TabRow" to "CbTabRow",
+            "LinearProgressIndicator" to "CbLinearProgressIndicator",
+            "CircularProgressIndicator" to "CbCircularProgressIndicator",
         )
         val RECEIVER_NAMES = mapOf(
             "Icons" to "CbIcons",

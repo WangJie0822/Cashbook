@@ -16,11 +16,13 @@
 
 package cn.wj.android.cashbook.core.design.component
 
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 
 /**
  * 设计系统线性进度条（不确定进度）：薄封装 Material3 [LinearProgressIndicator]，用于加载等场景。
@@ -51,5 +53,21 @@ fun CbLinearProgressIndicator(
         progress = progress,
         modifier = modifier,
         color = color,
+    )
+}
+
+/**
+ * 设计系统圆形进度条（不确定进度）：薄封装 Material3 [CircularProgressIndicator]，用于按钮内联加载等场景。
+ */
+@Composable
+fun CbCircularProgressIndicator(
+    modifier: Modifier = Modifier,
+    color: Color = ProgressIndicatorDefaults.circularColor,
+    strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
+) {
+    CircularProgressIndicator(
+        modifier = modifier,
+        color = color,
+        strokeWidth = strokeWidth,
     )
 }

@@ -18,7 +18,6 @@ package cn.wj.android.cashbook.core.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
@@ -31,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cn.wj.android.cashbook.core.design.component.CbCard
+import cn.wj.android.cashbook.core.design.component.CbLinearProgressIndicator
 import cn.wj.android.cashbook.core.design.theme.LocalSpacing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -174,7 +174,7 @@ fun ProgressDialog() {
                         modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.extraLarge),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        LinearProgressIndicator()
+                        CbLinearProgressIndicator()
                         Text(
                             text = if (state.hint.isNullOrBlank()) {
                                 LocalProgressDialogHint.current

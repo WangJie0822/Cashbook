@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
+import cn.wj.android.cashbook.core.design.component.CbLinearProgressIndicator
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
@@ -194,7 +194,7 @@ private fun CreditCardAssetListItem(
                 } else {
                     1f - (balance.toFloat() / totalAmount.toFloat())
                 }
-            LinearProgressIndicator(
+            CbLinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier.padding(vertical = 4.dp),
             )
