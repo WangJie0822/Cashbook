@@ -38,11 +38,27 @@
 - **KSP 配对版 = `2.3.0`**（新版 KSP 已对齐 Kotlin 版本号、无 `-x.y.z` 后缀；旧格式 `2.2.0-2.0.2`）。
 - T2.1 实测 `BUILD SUCCESSFUL in 11m 53s`（AGP 8.12 + Gradle 9.5.0，assembleOnlineDebug）。残留告警：`KotlinAndroid.kt:80` `Project.provideDelegate` 在 Gradle 9.6 弃用（warning 非 error，warningsAsErrors 关，记后续清理）；core:design/core:ui 既有 Compose API 弃用（与升级无关）。
 
-## 下一步（按 plan 顺序）
-- **T2.2 内置Kotlin+Hilt2.59.2+KSP2 PoC（core:data，无 opt-out 退路的最高危点）**：切 AGP9.2/Kotlin2.3/KSP2.3/Hilt2.59.2/Gradle9.6.0 + 移 kotlin.android + 内置Kotlin，先 compile core:data 验证（PoC 改动并入 T2.3 commit）。
-- **T2.3 全量切**：AGP9.2/Kotlin2.3/KSP2.3/Hilt2.59.2 + Gradle 9.5.0→9.6.0（用上方 sha256）+ 移除 4 处 kotlin.android（含 `baselineProfile/build.gradle.kts:23`）+ KotlinAndroid.kt 内置Kotlin适配 + ProjectSetting.kt:72 javaVersion 11→17 + gradle.properties（enableJetifier 复核）。借 agp-9-upgrade skill。
-- **T2.4 第三方 pin + lint module 验证**。
-- **Phase 3**：T3.1 workflow（Release/PreRelease build-tools 36 + Build.yaml 复核）→ T3.2 全链路验收门 → T3.3 节点2 full-review + finishing-a-development-branch 人工合入。
+## Phase 2 完成（commit on upgrade-agp9）+ 执行期发现
+- **T2.1 Gradle 9.5.0 中间过渡**：`312aee0a`
+- **T2.3 全量切 AGP9.2.1/Kotlin2.3.20/KSP2.3.9/Hilt2.59.2/Gradle9.6.0/内置Kotlin/Java17**：`de9be59a`（17 文件）
+- **T2.4 纯验证（无新 pin）**：lint module(R6) `:lint:test` 绿 + 全量单测 online+offline 绿（Roborazzi/Robolectric 无需改版）
+- **T3.1 workflow build-tools 36.0.0**：`5737ab7a`
+
+### 执行期关键发现（实测，AGP9 迁移）
+- **确切版本**：AGP **9.2.1**（最新稳定，9.3+仅 alpha/rc；android-tools/lint 32.2.1 自然对齐无需改 = 验证 spec M10）；Kotlin **2.3.20**（KSP 2.3.9 内嵌 kotlin-stdlib 2.3.20，精确配对）；KSP **2.3.9**（新版纯 patch 号，无 `-x.y.z` 后缀；skill 要求 ≥2.3.6）；Hilt **2.59.2**。
+- **CommonExtension 去泛型**：AGP9 `CommonExtension` 移除 6 个类型参数，4 文件 `<*,*,*,*,*,*>`→`CommonExtension`（KotlinAndroid/AndroidCompose/GradleManagedDevices/Variants）。
+- **CommonExtension block 方法移除**：`defaultConfig{}`/`compileOptions{}`/`buildFeatures{}`/`testOptions{}`/`productFlavors{}` 等改属性 `.apply{}`（block 方法迁到 ApplicationExtension/LibraryExtension 等具体类型）。
+- **旧 DSL 类型移除**：`com.android.build.gradle.{Library,Test}Extension`→`com.android.build.api.dsl.*`（AndroidLibrary/Test/Feature/LibraryCompose 4 plugin，runtime cast 失败）。`HiltConventionPlugin` 移除 `com.android.build.gradle.api.AndroidBasePlugin` import（仅 KDoc 引用）。
+- **library targetSdk**：AGP9 库 `defaultConfig.targetSdk` 移除 → `testOptions.targetSdk`（Application/Test 的 defaultConfig.targetSdk 仍在）。
+- **compose BOM 必须 api**：Gradle9 约束传播更严，`implementation(platform(bom))` 不再泄漏给消费方 → core:data 经 core:ui 解析无版本 compose 失败；改 `api(platform(bom))`（AndroidCompose.kt）。
+- **baselineprofile 仅 alpha 兼容 AGP9**：稳定版 1.4.1 报 "Module :app is not a supported android module"；pin **1.5.0-alpha06**（技术债，待稳定回退）。per-buildType `baselineProfile.automaticGenerationDuringBuild` 移除 → 顶层 consumer DSL（producer 的 managedDevices/useConnectedDevices 仍兼容）。
+- **protobuf 0.10.0**（已最新）：经新 `AndroidComponentsExtension` 自动注册 proto 源 → 移除项目手动 `androidComponents.beforeVariants{ android.sourceSets...srcDir }`（旧 source set API cast 失败）。
+- **enableJetifier 保留**：运行时仍含 `com.android.support:support-annotations:27.1.0`（jetifier 替换中），按 Phase0 准则非空保留。
+- **本机 wrapper 分发下载**：`GRADLE_OPTS="-Dhttp.proxyHost=... -Dhttps.proxyHost=..."`（命令行 -D 不进 wrapper JVM）；代理 TLS 传输间歇不稳（CONNECT 200 但隧道内 reset），用重试循环暖缓存收敛。
+
+## 下一步
+- **T3.2 全链路验收门**：① 全 flavor×buildType `:app:assemble` ② spotless+lint+lint module ③ `dependencyGuardBaseline` 重生+人工 diff 审查 ④ `verifyRoborazziDevDebug`（dependency-guard 0.5.0 兼容此处验）⑤ android-cli 模拟器 `:core:database:connectedDebugAndroidTest`（Room 迁移）⑥ baseline profile 生成非空 ⑦ apksigner verify ⑧ commit 基线。
+- **T3.3**：节点2 `comprehensive-review:full-review` + `finishing-a-development-branch` 人工合入。
 
 ## T1.6 API 36 行为审查（M8，基于官方 behavior-changes-16）
 targetSdk 35→36 = Android 16 行为变更生效。对 Cashbook 适用性：
