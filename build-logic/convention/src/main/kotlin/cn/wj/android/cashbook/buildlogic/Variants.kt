@@ -18,11 +18,11 @@
 
 package cn.wj.android.cashbook.buildlogic
 
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.ApplicationProductFlavor
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.ProductFlavor
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
 import org.gradle.api.DefaultTask
@@ -56,7 +56,7 @@ fun configureFlavors(
                 create(it.name) {
                     dimension = it.dimension.name
                     flavorConfigurationBlock(this, it)
-                    if (this@apply is BaseAppModuleExtension && this is ApplicationProductFlavor) {
+                    if (this@apply is ApplicationExtension && this is ApplicationProductFlavor) {
                         it.applicationIdSuffix?.let { suffix ->
                             applicationIdSuffix = suffix
                         }
