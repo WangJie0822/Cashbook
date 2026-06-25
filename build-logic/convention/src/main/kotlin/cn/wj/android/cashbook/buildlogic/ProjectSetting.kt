@@ -41,7 +41,7 @@ object ProjectSetting {
         const val MIN_SDK = 24
 
         /** SDK 目标版本 */
-        const val TARGET_SDK = 35
+        const val TARGET_SDK = 36
 
         /** 大版本名 */
         private const val VERSION_NAME = "v1.2.0"

@@ -29,5 +29,16 @@
 - **Phase 2（风险核心，建议 fresh 会话专做）**：T2.1 Gradle 9.6.0+sha256（AGP 仍 8.12 验）→ T2.2 内置Kotlin+Hilt2.59.2+KSP2 PoC（core:data，无 opt-out 退路的最高危点）→ T2.3 全量切 AGP9.2/Kotlin2.3/KSP/Hilt+移除4处kotlin.android（含 `baselineProfile/build.gradle.kts:23`）+KotlinAndroid.kt 内置Kotlin适配+Java17+gradle.properties → T2.4 第三方 pin + lint module 验证。
 - **Phase 3**：T3.1 workflow（Release/PreRelease build-tools 36 + Build.yaml 复核）→ T3.2 全链路验收门 → T3.3 节点2 full-review + finishing-a-development-branch 人工合入。
 
+## T1.6 API 36 行为审查（M8，基于官方 behavior-changes-16）
+targetSdk 35→36 = Android 16 行为变更生效。对 Cashbook 适用性：
+- **edge-to-edge 强制（`windowOptOutEdgeToEdgeEnforcement` 弃用、不可 opt-out）** ★相关：Compose 应用，Phase 3 journey 验 UI 不被状态/导航栏裁切。
+- **predictive back 默认开（onBackPressed 不调、KEYCODE_BACK 不派发）** ★相关：Navigation Compose，Phase 3 验返回导航/拦截逻辑。
+- 大屏(smallestWidth≥600dp)忽略 screenOrientation/resizableActivity/aspectRatio：手机应用，低优先（平板/折叠才显）。
+- elegant font（elegantTextHeight 忽略）：中文 UI 轻微排版，低风险。
+- Local Network Permission（**opt-in、非 targetSdk 默认强制**）：WebDAV 若指 LAN 地址留意，当前无默认影响。
+- scheduleAtFixedRate 只补 1 次：Cashbook 用 WorkManager，N/A。
+- 蓝牙 bond / 健康权限 / GPU syscall / MediaStore.getVersion / Safer Intents(opt-in) / App-owned photos：Cashbook 不涉及或 opt-in，N/A。
+- **结论**：仅 edge-to-edge + predictive back 需 Phase 3 真机 journey 运行时验证；其余 N/A 或低风险。已显式核对，无遗漏阻断项。
+
 ## 合入
 全绿 + 节点2 full-review 通过后，由用户拍板 worktree `upgrade-agp9` 合入 main（`finishing-a-development-branch`）。
