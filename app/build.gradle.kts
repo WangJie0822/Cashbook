@@ -19,7 +19,6 @@ import cn.wj.android.cashbook.buildlogic.CashbookBuildType
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 import cn.wj.android.cashbook.buildlogic.configureOutputs
-import com.android.build.gradle.api.ApplicationVariant
 import java.io.FileWriter
 
 plugins {
@@ -129,9 +128,9 @@ android {
         baseline = file("lint-baseline.xml")
     }
 
-    configGenerateReleaseFile(applicationVariants)
-
 }
+
+configGenerateReleaseFile()
 
 val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
 androidComponents {
@@ -247,10 +246,10 @@ dependencyGuard {
 }
 
 
-/** 配置 CI 构建生成 RELEASE.md */
-fun Project.configGenerateReleaseFile(applicationVariants: DomainObjectSet<ApplicationVariant>) {
-    applicationVariants.all {
-        mergeAssetsProvider.get().doFirst {
+/** 配置 CI 构建生成 RELEASE.md（仅 BUILD_TAG_NAME 设置时；不依赖变体，AGP9 移除变体 API 后改普通 task + preBuild.dependsOn） */
+fun Project.configGenerateReleaseFile() {
+    val generateReleaseFile = tasks.register("generateReleaseFile") {
+        doLast {
             val buildTagName = System.getenv("BUILD_TAG_NAME")
             if (!buildTagName.isNullOrBlank()) {
                 // CI 构建流程，生成 RELEASE.md
@@ -295,4 +294,5 @@ fun Project.configGenerateReleaseFile(applicationVariants: DomainObjectSet<Appli
             }
         }
     }
+    tasks.named("preBuild").configure { dependsOn(generateReleaseFile) }
 }
