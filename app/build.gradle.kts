@@ -17,7 +17,6 @@
 
 import cn.wj.android.cashbook.buildlogic.CashbookBuildType
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
-import cn.wj.android.cashbook.buildlogic.FileSystemOperationsInjected
 import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 import com.android.build.gradle.api.ApplicationVariant
@@ -132,12 +131,15 @@ android {
 
     configGenerateReleaseFile(applicationVariants)
 
-    val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
+}
+
+val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
+androidComponents {
     configureOutputs(
+        project = project,
         condition = { buildTypeName ->
             buildTypeName.contains("release", true)
         },
-        injected = project.objects.newInstance<FileSystemOperationsInjected>(),
         toPath = "${project.rootDir}${sep}outputs${sep}apk",
         include = "**/*.apk",
         renamer = { versionName ->
