@@ -21,20 +21,22 @@ plugins {
 
 android {
     namespace = "cn.wj.android.cashbook.core.data"
-
-    libraryVariants.all {
-        preBuildProvider.get().doFirst {
-            val intoDir = File(projectDir, "/src/main/assets")
-            println("> Task :${project.name}:beforePreBuild copy .md files from $rootDir into $intoDir")
-            delete(intoDir)
-            copy {
-                from(rootDir)
-                into(intoDir)
-                include("PRIVACY_POLICY.md", "CHANGELOG.md")
-            }
-        }
-    }
 }
+
+// 将根目录 PRIVACY_POLICY.md / CHANGELOG.md 拷入 assets。
+// 原实现挂在 libraryVariants.preBuild.doFirst（AGP 9 移除变体 API），改为普通 Copy task 并让 preBuild 依赖它。
+val copyLegalDocsToAssets by tasks.registering(Copy::class) {
+    val intoDir = File(projectDir, "src/main/assets")
+    doFirst {
+        println("> Task :${project.name}:copyLegalDocsToAssets copy .md files from $rootDir into $intoDir")
+        delete(intoDir)
+    }
+    from(rootDir) {
+        include("PRIVACY_POLICY.md", "CHANGELOG.md")
+    }
+    into(intoDir)
+}
+tasks.named("preBuild").configure { dependsOn(copyLegalDocsToAssets) }
 
 dependencies {
 
