@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.feature.records.viewmodel
 
 import androidx.lifecycle.ViewModel
+import cn.wj.android.cashbook.core.common.tools.funLogger
 import cn.wj.android.cashbook.domain.usecase.UpdateRecordReimbursedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -47,6 +48,8 @@ class RecordDetailsSheetViewModel @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (t: Throwable) {
+            funLogger("RecordDetailsSheet")
+                .e(t, "markReimbursed(recordId = <$recordId>, reimbursed = <$reimbursed>) failed")
             false
         }
 }

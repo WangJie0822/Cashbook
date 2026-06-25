@@ -21,6 +21,7 @@ import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import cn.wj.android.cashbook.domain.usecase.UpdateRecordReimbursedUseCase
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -63,6 +64,23 @@ class RecordDetailsSheetViewModelTest {
         val result = failingViewModel.markReimbursed(recordId = 1L, reimbursed = true)
         assertThat(result).isFalse()
     }
+
+    @Test
+    fun markReimbursed_whenCancelled_rethrows() = runTest {
+        val cancellingViewModel = RecordDetailsSheetViewModel(
+            UpdateRecordReimbursedUseCase(
+                CancellingReimbursedRepository(repository),
+                Dispatchers.Unconfined,
+            ),
+        )
+        var rethrown = false
+        try {
+            cancellingViewModel.markReimbursed(recordId = 1L, reimbursed = true)
+        } catch (e: CancellationException) {
+            rethrown = true
+        }
+        assertThat(rethrown).isTrue()
+    }
 }
 
 /** [updateRecordReimbursed] 抛异常、其余委托 [delegate]，用于验证写失败时 ViewModel 返回 false */
@@ -71,5 +89,14 @@ private class ThrowingReimbursedRepository(
 ) : RecordRepository by delegate {
     override suspend fun updateRecordReimbursed(recordId: Long, reimbursed: Boolean) {
         throw RuntimeException("write failed")
+    }
+}
+
+/** [updateRecordReimbursed] 抛 [CancellationException]，用于验证写动作被协程取消时 ViewModel 向上 rethrow（不吞成 false） */
+private class CancellingReimbursedRepository(
+    delegate: RecordRepository,
+) : RecordRepository by delegate {
+    override suspend fun updateRecordReimbursed(recordId: Long, reimbursed: Boolean) {
+        throw CancellationException("cancelled")
     }
 }
