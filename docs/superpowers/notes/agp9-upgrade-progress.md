@@ -15,6 +15,7 @@
 - enableJetifier：源码 `com.android.support` 0 命中，倾向移除（Task 2.1 首构建 `:app:dependencies` 复核传递依赖后定）。
 - 迁移模式（已验证）：变体 API → `androidComponents.onVariants`；APK 命名 → `SingleArtifact.APK` + Copy task + `tasks.configureEach{if(name=="assemble$cap")finalizedBy(copy)}`（onVariants 时 assemble 任务未建，用 configureEach 懒挂）；不依赖变体的逻辑 → 普通 task + `preBuild.dependsOn`。
 - **KDoc 坑**：注释里 `**/*.apk` 的 `*/` 会提前闭合 `/** */`，示例里避开。
+- **Robolectric × targetSdk 36（重要环境项）**：targetSdk 36 → Robolectric 4.16.1 按 targetSdk 选 API 36 模拟，需 `org.robolectric:android-all-instrumented:16-robolectric-13921718-i7`（缓存 `~/.m2/repository/org/robolectric/android-all-instrumented/`）。Robolectric **测试 fork JVM 不继承 Gradle `-Dhttp.proxyHost`**，本机直连 Maven 不通 → offline/无代理下 `MavenArtifactFetcher` SocketException、`classMethod` FAILED（非代码回归、非 Robolectric 不兼容——它认识 API 36 坐标）。**CI 有直连网络自动下载无碍**。本机解法：经代理手动下该 jar+pom+sha1 到 ~/.m2（已做），之后 offline 命中。Robolectric 4.16.1 **支持 API 36**，无需升版。
 
 ## 已完成（commit on upgrade-agp9）
 - Phase 0：`7d58ee9b`（查证+基线）
