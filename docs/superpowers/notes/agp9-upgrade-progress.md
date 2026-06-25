@@ -19,15 +19,29 @@
 
 ## 已完成（commit on upgrade-agp9）
 - Phase 0：`7d58ee9b`（查证+基线）
-- T1.1 core:data libraryVariants → Copy task：`b5283780`（验证 assembleDebug 绿 + assets 生成）
-- T1.2 Outputs.kt APK 命名 → onVariants/SingleArtifact：`c4200504`（验证 assembleOnlineRelease 绿 + `outputs/apk/Cashbook_v1.2.0_26062517_online.apk`）
+- T1.1 core:data libraryVariants → Copy task：`b5283780`
+- T1.2 Outputs.kt APK 命名 → onVariants/SingleArtifact：`c4200504`
+- T1.3 Variants.kt 渠道枚举生成 → Variant sources API：`5b765165`
+- T1.4 app configGenerateReleaseFile 迁出变体 API：`914f3232`
+- T1.5 internal DSL（BaseExtension/BaseAppModuleExtension）迁新 DSL：`5cb81f40`
+- T1.6 targetSdk 35→36 + API36 行为审查：`3afccbd3`
+- **Phase 1 里程碑全绿**：`bd061468`（全 flavor assemble + 双 flavor 单测 + lint:test + roborazzi verify）
+- **T2.1 Gradle 8.13→9.5.0（中间过渡）+ pin sha256**：见下决策
+
+## Phase 2 关键决策（2026-06-25 执行期实测）
+- **AGP 8.12 ⊥ Gradle 9.6.0（实测，t2.1.log:40）**：Gradle 9.6.0 移除内部 API `org.gradle.api.problems.internal.InternalProblems`，AGP 8.12 的 `com.android.internal.application` 仍依赖它 → 配置阶段 `Could not create service of type InternalProblems` FAILED；官方提示 "or use Gradle 9.5"。
+- **决策（用户拍板，Option A）**：T2.1 先到 **Gradle 9.5.0**（AGP 8.12 下验证全绿，隔离 Gradle 核心迁移风险），T2.3 再把 Gradle 9.5.0→**9.6.0** 与 AGP 9.2/Kotlin2.3/KSP/Hilt 一起切。最终目标仍 Gradle 9.6.0。
+  - Gradle 9.5.0 `-all.zip` sha256 = `a3c4ba4aca8f0075688b9c5b18939fd28e8cb4357c227da5c1d9f38343791439`
+  - Gradle 9.6.0 `-all.zip` sha256 = `87a2216cc1f9122192d4e0fe905ffdf1b4c72cff797e9f733b174e157cadd396`（T2.3 用）
+  - AGP 9.2.0 要求 Gradle ≥9.4.1，9.6.0 满足。
+- **本机 wrapper 分发下载经代理**：Gradle wrapper 的分发下载**不读**命令行 `-Dhttps.proxyHost`（那是 GradleWrapperMain 程序参数非 JVM 系统属性）；`-all.zip` 经 301 重定向到 CDN 主机本机直连超时。解法：`GRADLE_OPTS="-Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7897 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7897"` 环境变量（进 wrapper JVM，分发下载与 --no-daemon 构建均生效）。
+- **KSP 配对版 = `2.3.0`**（新版 KSP 已对齐 Kotlin 版本号、无 `-x.y.z` 后缀；旧格式 `2.2.0-2.0.2`）。
+- T2.1 实测 `BUILD SUCCESSFUL in 11m 53s`（AGP 8.12 + Gradle 9.5.0，assembleOnlineDebug）。残留告警：`KotlinAndroid.kt:80` `Project.provideDelegate` 在 Gradle 9.6 弃用（warning 非 error，warningsAsErrors 关，记后续清理）；core:design/core:ui 既有 Compose API 弃用（与升级无关）。
 
 ## 下一步（按 plan 顺序）
-- **T1.3 Variants.kt configureGenerateFlavors 渠道枚举源码生成迁移（R2b，复杂）**：当前 `configureGenerateFlavors<LibraryExtension>()`（`AndroidGenerateFlavorsConventionPlugin.kt:29`）经 `generateBuildConfigProvider.doLast` 把 `CashbookFlavor.java`（javapoet，包 `<namespace>.buildlogic`）写入 BuildConfig sourceOutputDir。迁移目标：自定义 `DefaultTask`（@OutputDirectory + @Input packageName）调 `generateFlavor(pkg, outDir)`，经 `variant.sources.java?.addGeneratedSourceDirectory(taskProvider){it.outputDir}` 注入；`when(this){BaseAppModuleExtension/LibraryExtension}` 改新 DSL。先确认哪些模块 apply `cashbook.android.flavors.generate` + 引用 `.buildlogic.CashbookFlavor`（grep `buildlogic.CashbookFlavor`）。验证：`:app:assembleOnlineDebug` 绿 + 枚举类生成 + `BuildConfig.FLAVOR` 引用编译通过。
-- **T1.4 app configGenerateReleaseFile 迁移（C1）**：`app/build.gradle.kts:133,249-250`（`applicationVariants` + `mergeAssetsProvider`）。RELEASE.md 生成不依赖变体数据（只读 CHANGELOG + env），优先改普通 task。移除 `import ...api.ApplicationVariant`(:23) + 视情移 `@file:Suppress("DEPRECATION")`(:16)。验证：`BUILD_TAG_NAME=v1.2.0_26062514 :app:assembleOnlineRelease` 生成 RELEASE.md。
-- **T1.5 internal DSL 迁移（H1/H2）**：`AndroidApplicationConventionPlugin.kt:24,63`（BaseExtension）、`Badging.kt:22,111`（BaseExtension，确认 `:126,128` sdkDirectory/buildToolsVersion 在新类型可用）、`AndroidApplicationJacocoConventionPlugin.kt:20,30`（BaseAppModuleExtension）→ ApplicationExtension/CommonExtension。还有 `Variants.kt:25,52` 的 BaseAppModuleExtension（随 T1.3 一并处理）。验证 build-logic 编译 + assembleOnlineDebug。
-- **T1.6 targetSdk 35→36**（`ProjectSetting.kt:44`）+ API36 行为审查（见 plan §6）。
-- **Phase 2（风险核心，建议 fresh 会话专做）**：T2.1 Gradle 9.6.0+sha256（AGP 仍 8.12 验）→ T2.2 内置Kotlin+Hilt2.59.2+KSP2 PoC（core:data，无 opt-out 退路的最高危点）→ T2.3 全量切 AGP9.2/Kotlin2.3/KSP/Hilt+移除4处kotlin.android（含 `baselineProfile/build.gradle.kts:23`）+KotlinAndroid.kt 内置Kotlin适配+Java17+gradle.properties → T2.4 第三方 pin + lint module 验证。
+- **T2.2 内置Kotlin+Hilt2.59.2+KSP2 PoC（core:data，无 opt-out 退路的最高危点）**：切 AGP9.2/Kotlin2.3/KSP2.3/Hilt2.59.2/Gradle9.6.0 + 移 kotlin.android + 内置Kotlin，先 compile core:data 验证（PoC 改动并入 T2.3 commit）。
+- **T2.3 全量切**：AGP9.2/Kotlin2.3/KSP2.3/Hilt2.59.2 + Gradle 9.5.0→9.6.0（用上方 sha256）+ 移除 4 处 kotlin.android（含 `baselineProfile/build.gradle.kts:23`）+ KotlinAndroid.kt 内置Kotlin适配 + ProjectSetting.kt:72 javaVersion 11→17 + gradle.properties（enableJetifier 复核）。借 agp-9-upgrade skill。
+- **T2.4 第三方 pin + lint module 验证**。
 - **Phase 3**：T3.1 workflow（Release/PreRelease build-tools 36 + Build.yaml 复核）→ T3.2 全链路验收门 → T3.3 节点2 full-review + finishing-a-development-branch 人工合入。
 
 ## T1.6 API 36 行为审查（M8，基于官方 behavior-changes-16）
