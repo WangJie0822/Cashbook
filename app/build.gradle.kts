@@ -84,8 +84,6 @@ android {
             } else {
                 signingConfigs.findByName("debug")
             }
-            // Release 版本自动构建使用最新基线配置
-            baselineProfile.automaticGenerationDuringBuild = true
         }
         getByName("debug") {
             isMinifyEnabled = false
@@ -145,6 +143,13 @@ androidComponents {
             "Cashbook_${versionName}.apk"
         },
     )
+}
+
+// Release 版本自动构建使用最新基线配置
+// AGP9/baselineprofile 1.5.0-alpha：per-buildType 的 baselineProfile.automaticGenerationDuringBuild 已移除，
+// 改用顶层 consumer DSL（baseline profile 仅 release 消费，顶层设置等价原 release-only 行为）
+baselineProfile {
+    automaticGenerationDuringBuild = true
 }
 
 dependencies {

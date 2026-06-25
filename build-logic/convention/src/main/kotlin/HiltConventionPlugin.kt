@@ -16,7 +16,6 @@
 
 import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.libs
-import com.android.build.gradle.api.AndroidBasePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
@@ -30,7 +29,7 @@ class HiltConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("google-hilt-core").get())
             }
 
-            /** Add support for Android modules, based on [AndroidBasePlugin] */
+            /** Add support for Android modules, based on AndroidBasePlugin */
             pluginManager.withPlugin(ProjectSetting.Plugin.PLUGIN_ANDROID_BASE) {
                 pluginManager.apply(ProjectSetting.Plugin.PLUGIN_GOOGLE_HILT)
                 dependencies {

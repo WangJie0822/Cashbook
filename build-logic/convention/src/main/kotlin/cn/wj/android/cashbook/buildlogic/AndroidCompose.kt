@@ -30,25 +30,27 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginE
  */
 @Suppress("UnstableApiUsage")
 internal fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
-        buildFeatures {
+        buildFeatures.apply {
             // 开启 compose
             compose = true
         }
 
         dependencies {
             // 导入 compose bom，使用 bom 管理 compose 的统一版本
+            // BOM 用 api 暴露：compose 依赖以 api 导出（如 core:ui），消费方（core:data）须继承 BOM 版本约束。
+            // Gradle 9 约束传播更严格，implementation 作用域的 platform 不再泄漏给消费方（AGP8.12 曾容忍）。
             val bom = libs.findLibrary("androidx-compose-bom").get()
-            add("implementation", platform(bom))
+            add("api", platform(bom))
             add("androidTestImplementation", platform(bom))
             // 导入 compose ui 工具
             add("implementation", libs.findLibrary("androidx-compose-ui-tooling-preview").get())
             add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
         }
 
-        testOptions {
+        testOptions.apply {
             unitTests {
                 // unit 测试包含 Android 资源，用于 Robolectric 测试
                 isIncludeAndroidResources = true

@@ -43,7 +43,7 @@ import javax.lang.model.element.Modifier
  * - Application 使用，配置多渠道并生成渠道枚举类
  */
 fun configureFlavors(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
     flavorConfigurationBlock: ProductFlavor.(flavor: CashbookFlavor) -> Unit = {},
 ) {
     commonExtension.apply {
@@ -51,7 +51,7 @@ fun configureFlavors(
         flavorDimensions += CashbookFlavorDimension.values().map { it.name }
 
         // 多渠道配置
-        productFlavors {
+        productFlavors.apply {
             CashbookFlavor.values().forEach {
                 create(it.name) {
                     dimension = it.dimension.name

@@ -17,7 +17,7 @@
 import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
-import com.android.build.gradle.TestExtension
+import com.android.build.api.dsl.TestExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -32,7 +32,6 @@ class AndroidTestConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(ProjectSetting.Plugin.PLUGIN_ANDROID_TEST)
-                apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
             }
 
             extensions.configure<TestExtension> {

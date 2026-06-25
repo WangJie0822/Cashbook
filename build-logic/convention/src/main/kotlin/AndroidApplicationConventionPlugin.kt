@@ -37,7 +37,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(ProjectSetting.Plugin.PLUGIN_ANDROID_APPLICATION)
-                apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
                 apply(ProjectSetting.Plugin.PLUGIN_DEPENDENCY_GUARD)
                 apply(ProjectSetting.Plugin.PLUGIN_CASHBOOK_LINT)
             }
