@@ -52,8 +52,7 @@ jobs:
              -Pandroid.experimental.testOptions.managedDevices.maxConcurrentDevices=1
 
       - name: Android Sign
-        # You may pin to the exact commit or the version.
-        uses: Tlaster/android-sign@v1.2.2
+        uses: Tlaster/android-sign@1c5bf4b2fa309acb0c0ae0bf9379ab458f14d5b1 # v1.2.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_TOOLS_VERSION: "36.0.0"
@@ -88,9 +87,7 @@ jobs:
           prerelease: false
 
       - name: Upload Multiple Release Assets
-        # You may pin to the exact commit or the version.
-        # uses: NBTX/upload-release-assets@f68d1c91ca950f33ee35514883819c2bb053f487
-        uses: NBTX/upload-release-assets@v1
+        uses: NBTX/upload-release-assets@f68d1c91ca950f33ee35514883819c2bb053f487 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TZ: Asia/Shanghai
@@ -101,8 +98,7 @@ jobs:
           targets: outputs/signed_apk/*.apk
 
       - name: Publish Release
-        # You may pin to the exact commit or the version.
-        uses: eregon/publish-release@v1.0.6
+        uses: eregon/publish-release@01df127f5e9a3c26935118e22e738d95b59d10ce # v1.0.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TZ: Asia/Shanghai
