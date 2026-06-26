@@ -34,6 +34,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import javax.lang.model.element.Modifier
 
@@ -92,6 +93,7 @@ fun Project.configureGenerateFlavors() {
 }
 
 /** 生成渠道枚举类的 Task：写 [CashbookFlavor] 到 [outputDir]，包名 [packageName]。 */
+@DisableCachingByDefault(because = "生成小型枚举源文件，缓存收益不值；validatePlugins enableStricterValidation 要求显式缓存注解")
 abstract class GenerateFlavorTask : DefaultTask() {
     @get:Input
     abstract val packageName: Property<String>
