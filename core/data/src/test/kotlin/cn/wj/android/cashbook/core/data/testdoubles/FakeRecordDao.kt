@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
+import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
@@ -47,6 +48,9 @@ class FakeRecordDao : RecordDao {
 
     /** 标签关联数据列表 */
     val tagWithRecords = mutableListOf<FakeTagWithRecordEntry>()
+
+    /** 资产数据列表，用于 queryLastUsedAssetId 的资产归属/可见性子查询复刻 */
+    val assets = mutableListOf<AssetTable>()
 
     /** 自增主键计数器 */
     private var nextId = 1L
@@ -495,6 +499,23 @@ class FakeRecordDao : RecordDao {
         val withId = if (record.id == null) record.copy(id = nextId++) else record
         records.add(withId)
         return withId
+    }
+
+    /** 辅助方法：添加资产 */
+    fun addAsset(asset: AssetTable) {
+        assets.add(asset)
+    }
+
+    override suspend fun queryLastUsedAssetId(booksId: Long): Long? {
+        // 忠实复刻真实 SQL：asset_id IN（本账本可见在册资产）+ ORDER BY id DESC LIMIT 1
+        val visibleAssetIds = assets
+            .filter { it.booksId == booksId && it.invisible == SWITCH_INT_OFF }
+            .mapNotNull { it.id }
+            .toSet()
+        return records
+            .filter { it.booksId == booksId && it.assetId in visibleAssetIds }
+            .maxByOrNull { it.id ?: Long.MIN_VALUE }
+            ?.assetId
     }
 
     /** 类型简易数据，用于 Fake 中的类型查询 */

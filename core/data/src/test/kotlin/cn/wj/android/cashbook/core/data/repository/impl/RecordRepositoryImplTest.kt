@@ -21,6 +21,7 @@ import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.testdoubles.FakeCombineProtoDataSource
 import cn.wj.android.cashbook.core.data.testdoubles.FakeRecordDao
+import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.RecordWithRelatedTable
@@ -482,7 +483,89 @@ class RecordRepositoryImplTest {
         assertThat(recordDao.queryById(1L)!!.reimbursed).isEqualTo(SWITCH_INT_OFF)
     }
 
+    // ========== queryLastUsedAssetId（任务1：默认资产按账本隔离）==========
+
+    @Test
+    fun given_records_in_two_books_when_queryLastUsedAssetId_then_returns_current_book_asset() = runTest {
+        recordDao.addAsset(createAsset(id = 10L, booksId = 1L))
+        recordDao.addAsset(createAsset(id = 20L, booksId = 2L))
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, assetId = 10L))
+        recordDao.addRecord(createRecord(id = 2L, booksId = 2L, assetId = 20L))
+
+        assertThat(recordDao.queryLastUsedAssetId(1L)).isEqualTo(10L)
+        assertThat(recordDao.queryLastUsedAssetId(2L)).isEqualTo(20L)
+    }
+
+    @Test
+    fun given_latest_record_asset_deleted_when_queryLastUsedAssetId_then_falls_back_to_earlier_valid() = runTest {
+        recordDao.addAsset(createAsset(id = 10L, booksId = 1L))
+        // 资产 99 不在 assets（已删）
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, assetId = 10L))
+        recordDao.addRecord(createRecord(id = 2L, booksId = 1L, assetId = 99L))
+
+        assertThat(recordDao.queryLastUsedAssetId(1L)).isEqualTo(10L)
+    }
+
+    @Test
+    fun given_latest_record_asset_invisible_when_queryLastUsedAssetId_then_skips_to_visible() = runTest {
+        recordDao.addAsset(createAsset(id = 10L, booksId = 1L, invisible = SWITCH_INT_OFF))
+        recordDao.addAsset(createAsset(id = 11L, booksId = 1L, invisible = SWITCH_INT_ON))
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, assetId = 10L))
+        recordDao.addRecord(createRecord(id = 2L, booksId = 1L, assetId = 11L))
+
+        assertThat(recordDao.queryLastUsedAssetId(1L)).isEqualTo(10L)
+    }
+
+    @Test
+    fun given_latest_record_has_no_asset_when_queryLastUsedAssetId_then_skips_to_earlier_with_asset() = runTest {
+        recordDao.addAsset(createAsset(id = 10L, booksId = 1L))
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, assetId = 10L))
+        recordDao.addRecord(createRecord(id = 2L, booksId = 1L, assetId = -1L))
+
+        assertThat(recordDao.queryLastUsedAssetId(1L)).isEqualTo(10L)
+    }
+
+    @Test
+    fun given_no_records_when_queryLastUsedAssetId_then_returns_null() = runTest {
+        recordDao.addAsset(createAsset(id = 10L, booksId = 1L))
+
+        assertThat(recordDao.queryLastUsedAssetId(1L)).isNull()
+    }
+
+    @Test
+    fun given_multiple_valid_records_when_queryLastUsedAssetId_then_returns_max_id_asset() = runTest {
+        recordDao.addAsset(createAsset(id = 10L, booksId = 1L))
+        recordDao.addAsset(createAsset(id = 20L, booksId = 1L))
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, assetId = 10L))
+        recordDao.addRecord(createRecord(id = 5L, booksId = 1L, assetId = 20L))
+        recordDao.addRecord(createRecord(id = 3L, booksId = 1L, assetId = 10L))
+
+        assertThat(recordDao.queryLastUsedAssetId(1L)).isEqualTo(20L)
+    }
+
     // ========== 辅助方法 ==========
+
+    private fun createAsset(
+        id: Long,
+        booksId: Long = 1L,
+        invisible: Int = SWITCH_INT_OFF,
+    ) = AssetTable(
+        id = id,
+        booksId = booksId,
+        name = "资产$id",
+        balance = 0L,
+        totalAmount = 0L,
+        billingDate = "",
+        repaymentDate = "",
+        type = 0,
+        classification = 0,
+        invisible = invisible,
+        openBank = "",
+        cardNo = "",
+        remark = "",
+        sort = 0,
+        modifyTime = 0L,
+    )
 
     private fun createRecord(
         id: Long? = null,

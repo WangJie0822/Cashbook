@@ -556,4 +556,27 @@ interface RecordDao {
     /** 查询指定账本中最早的记录时间，用于日期选择器的默认起始日期 */
     @Query("SELECT MIN(record_time) FROM db_record WHERE books_id = :booksId")
     suspend fun queryEarliestRecordTime(booksId: Long): Long?
+
+    /**
+     * 查询当前账本 [booksId] 最近一条「资产仍存在、可见、属于本账本」记录的资产 id。
+     *
+     * 用于新建记录默认资产（按账本隔离，替代旧的全局 lastAssetId）。子查询保证：
+     * - 不串号：asset 的 books_id 与记录同账本二次过滤
+     * - 不悬空：已删资产不在 db_asset，自动排除
+     * - 不带出隐藏资产：invisible=$SWITCH_INT_OFF，与 queryVisibleAssetByBookId 一致
+     * - asset_id=-1（无资产记录）天然不命中子查询、被跳过
+     * - ORDER BY id DESC = 最近创建（id 为自增主键）；无匹配返回 null
+     */
+    @Query(
+        """
+        SELECT asset_id FROM db_record
+        WHERE books_id = :booksId
+          AND asset_id IN (
+            SELECT id FROM db_asset
+            WHERE books_id = :booksId AND invisible = $SWITCH_INT_OFF
+          )
+        ORDER BY id DESC LIMIT 1
+        """,
+    )
+    suspend fun queryLastUsedAssetId(booksId: Long): Long?
 }
