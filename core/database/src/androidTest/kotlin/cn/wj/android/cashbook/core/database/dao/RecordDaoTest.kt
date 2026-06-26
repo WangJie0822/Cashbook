@@ -1199,4 +1199,73 @@ class RecordDaoTest {
     }
 
     // endregion
+
+    // region queryLastUsedAssetId（任务1：默认资产按账本隔离）
+
+    @Test
+    fun queryLastUsedAssetId_isolatesByBook() = runTest {
+        val book1 = createTestBook()
+        val book2 = createTestBook()
+        assetDao.insert(createAsset(id = 10L, booksId = book1, name = "卡A"))
+        assetDao.insert(createAsset(id = 20L, booksId = book2, name = "卡B"))
+        insertRecord(createRecord(booksId = book1, assetId = 10L))
+        insertRecord(createRecord(booksId = book2, assetId = 20L))
+
+        assertThat(recordDao.queryLastUsedAssetId(book1)).isEqualTo(10L)
+        assertThat(recordDao.queryLastUsedAssetId(book2)).isEqualTo(20L)
+    }
+
+    @Test
+    fun queryLastUsedAssetId_skipsDeletedAsset() = runTest {
+        val book = createTestBook()
+        assetDao.insert(createAsset(id = 10L, booksId = book, name = "卡A"))
+        // 资产 99 不入库（已删）
+        insertRecord(createRecord(booksId = book, assetId = 10L))
+        insertRecord(createRecord(booksId = book, assetId = 99L)) // 后插入 = 更近，但资产已删
+
+        assertThat(recordDao.queryLastUsedAssetId(book)).isEqualTo(10L)
+    }
+
+    @Test
+    fun queryLastUsedAssetId_skipsInvisibleAsset() = runTest {
+        val book = createTestBook()
+        assetDao.insert(createAsset(id = 10L, booksId = book, name = "可见", invisible = SWITCH_INT_OFF))
+        assetDao.insert(createAsset(id = 11L, booksId = book, name = "隐藏", invisible = SWITCH_INT_ON))
+        insertRecord(createRecord(booksId = book, assetId = 10L))
+        insertRecord(createRecord(booksId = book, assetId = 11L)) // 后插入 = 更近，但隐藏
+
+        assertThat(recordDao.queryLastUsedAssetId(book)).isEqualTo(10L)
+    }
+
+    @Test
+    fun queryLastUsedAssetId_skipsNoAssetRecord() = runTest {
+        val book = createTestBook()
+        assetDao.insert(createAsset(id = 10L, booksId = book, name = "卡A"))
+        insertRecord(createRecord(booksId = book, assetId = 10L))
+        insertRecord(createRecord(booksId = book, assetId = -1L)) // 后插入 = 更近，但无资产
+
+        assertThat(recordDao.queryLastUsedAssetId(book)).isEqualTo(10L)
+    }
+
+    @Test
+    fun queryLastUsedAssetId_returnsNullWhenNoRecord() = runTest {
+        val book = createTestBook()
+        assetDao.insert(createAsset(id = 10L, booksId = book, name = "卡A"))
+
+        assertThat(recordDao.queryLastUsedAssetId(book)).isNull()
+    }
+
+    @Test
+    fun queryLastUsedAssetId_returnsMostRecentlyInserted() = runTest {
+        val book = createTestBook()
+        assetDao.insert(createAsset(id = 10L, booksId = book, name = "卡A"))
+        assetDao.insert(createAsset(id = 20L, booksId = book, name = "卡B"))
+        insertRecord(createRecord(booksId = book, assetId = 10L))
+        insertRecord(createRecord(booksId = book, assetId = 20L)) // 最后有效插入 = id 最大
+        insertRecord(createRecord(booksId = book, assetId = -1L)) // 更晚但无资产，应被跳过
+
+        assertThat(recordDao.queryLastUsedAssetId(book)).isEqualTo(20L)
+    }
+
+    // endregion
 }
