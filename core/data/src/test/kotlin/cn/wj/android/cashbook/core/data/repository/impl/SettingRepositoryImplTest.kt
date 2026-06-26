@@ -85,6 +85,20 @@ class SettingRepositoryImplTest {
     }
 
     @Test
+    fun when_read_tempKeys_then_imagesToFilesMigrated_default_false() = runTest {
+        val tempKeys = fakeDataSource.tempKeysData.first()
+
+        assertThat(tempKeys.imagesToFilesMigrated).isFalse()
+    }
+
+    @Test
+    fun when_updateImagesToFilesMigrated_then_flag_persisted() = runTest {
+        fakeDataSource.updateImagesToFilesMigrated(true)
+
+        assertThat(fakeDataSource.tempKeysData.first().imagesToFilesMigrated).isTrue()
+    }
+
+    @Test
     fun when_read_recordSettings_then_returns_default_values() = runTest {
         val recordSettings = fakeDataSource.recordSettingsData.first()
 

@@ -28,4 +28,6 @@ data class TempKeysModel(
     val preferenceSplit: Boolean,
     /** finalAmount 净自付重算是否已执行 */
     val finalAmountNetRecalcDone: Boolean = false,
+    /** 图片 BLOB→文件系统 backfill 是否已完成 */
+    val imagesToFilesMigrated: Boolean = false,
 )

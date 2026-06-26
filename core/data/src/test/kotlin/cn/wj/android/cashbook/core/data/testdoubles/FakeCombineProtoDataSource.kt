@@ -279,6 +279,10 @@ class FakeCombineProtoDataSource {
         _tempKeys.update { it.copy(finalAmountNetRecalcDone = done) }
     }
 
+    suspend fun updateImagesToFilesMigrated(migrated: Boolean) {
+        _tempKeys.update { it.copy(imagesToFilesMigrated = migrated) }
+    }
+
     suspend fun needRelated(typeId: Long): Boolean {
         val settings = _recordSettings.value
         return typeId == settings.reimburseTypeId || typeId == settings.refundTypeId

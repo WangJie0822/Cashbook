@@ -8,4 +8,5 @@ message TempKeys {
   bool db9To10dataMigrated = 1; // 数据库版本9升级到10之后是否进行数据迁移
   bool preferenceSplit = 2; // app_preferences 是否已拆分
   bool finalAmountNetRecalcDone = 3; // finalAmount 净自付重算是否已执行（proto3 默认 false，首启触发一次）
+  bool imagesToFilesMigrated = 4; // 图片 BLOB→文件系统 backfill 是否已完成（proto3 默认 false，首启触发一次）
 }
