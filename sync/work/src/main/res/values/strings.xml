@@ -31,4 +31,11 @@
     <string name="cancel">取消</string>
 
     <string name="update_progress_format" translatable="false">%1$s%%</string>
+
+    <string name="reminder_notification_channel_name">提醒</string>
+    <string name="reminder_notification_channel_description">信用卡账单/还款、待报销提醒</string>
+    <string name="reminder_credit_billing">%1$s 今日账单已出</string>
+    <string name="reminder_credit_repayment">%1$s 今日还款，别忘了</string>
+    <string name="reminder_reimbursement">你有 %1$d 笔支出待报销</string>
+    <string name="reminder_public_title">您有一条记账提醒</string>
 </resources>

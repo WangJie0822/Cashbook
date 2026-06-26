@@ -168,3 +168,41 @@ internal fun Context.upgradeNotificationBuilder(): NotificationCompat.Builder {
             cancelPendingIntent,
         )
 }
+
+internal const val ReminderNotificationChannelID = "ReminderNotificationChannel"
+
+/** 提醒通知 id 基址；N1 按 assetId 派生，N2 用 [ReminderNotificationBaseId] */
+internal const val ReminderNotificationBaseId = 20016
+
+/**
+ * 提醒任务通知（信用卡账单/还款、待报销）。
+ *
+ * 锁屏可见性设为 [Notification.VISIBILITY_PRIVATE]，发送时配合脱敏 publicVersion，避免锁屏泄露卡名/笔数。
+ */
+internal fun Context.reminderNotificationBuilder(): NotificationCompat.Builder {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            ReminderNotificationChannelID,
+            getString(R.string.reminder_notification_channel_name),
+            NotificationManager.IMPORTANCE_DEFAULT,
+        ).apply {
+            description = getString(R.string.reminder_notification_channel_description)
+            lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        }
+        // 注册通知通道
+        val notificationManager: NotificationManager? =
+            getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        notificationManager?.createNotificationChannel(channel)
+    }
+
+    return NotificationCompat.Builder(
+        this,
+        ReminderNotificationChannelID,
+    )
+        .setSmallIcon(R.drawable.ic_notification)
+        .setWhen(System.currentTimeMillis())
+        .setCategory(NotificationCompat.CATEGORY_REMINDER)
+        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setAutoCancel(true)
+}
