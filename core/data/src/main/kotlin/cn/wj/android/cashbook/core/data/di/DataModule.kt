@@ -32,6 +32,8 @@ import cn.wj.android.cashbook.core.data.repository.impl.TagRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TypeRepositoryImpl
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
+import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
+import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorageImpl
 import cn.wj.android.cashbook.core.data.uitl.impl.BackupRecoveryManagerImpl
 import cn.wj.android.cashbook.core.data.uitl.impl.ConnectivityManagerNetworkMonitor
 import dagger.Binds
@@ -56,6 +58,12 @@ interface DataModule {
     fun bindNetworkMonitor(
         networkMonitor: ConnectivityManagerNetworkMonitor,
     ): NetworkMonitor
+
+    @Binds
+    @Singleton
+    fun bindRecordImageFileStorage(
+        impl: RecordImageFileStorageImpl,
+    ): RecordImageFileStorage
 
     @Binds
     @Singleton
