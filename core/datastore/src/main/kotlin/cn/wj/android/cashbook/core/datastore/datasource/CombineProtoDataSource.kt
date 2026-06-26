@@ -93,6 +93,9 @@ class CombineProtoDataSource @Inject constructor(
             logcatInRelease = it.logcatInRelease,
             mobileNetworkBackupEnable = it.mobileNetworkBackupEnable,
             imageQuality = ImageQualityEnum.ordinalOf(it.imageQuality),
+            creditCardReminderEnable = it.creditCardReminderEnable,
+            reimbursementReminderEnable = it.reimbursementReminderEnable,
+            lastReminderCheckMs = it.lastReminderCheckMs,
         )
     }
 
@@ -381,6 +384,18 @@ class CombineProtoDataSource @Inject constructor(
 
     suspend fun updateLogcatInRelease(logcatInRelease: Boolean) {
         appSettings.updateData { it.copy { this.logcatInRelease = logcatInRelease } }
+    }
+
+    suspend fun updateCreditCardReminderEnable(enable: Boolean) {
+        appSettings.updateData { it.copy { this.creditCardReminderEnable = enable } }
+    }
+
+    suspend fun updateReimbursementReminderEnable(enable: Boolean) {
+        appSettings.updateData { it.copy { this.reimbursementReminderEnable = enable } }
+    }
+
+    suspend fun updateLastReminderCheckMs(ms: Long) {
+        appSettings.updateData { it.copy { this.lastReminderCheckMs = ms } }
     }
 
     companion object {

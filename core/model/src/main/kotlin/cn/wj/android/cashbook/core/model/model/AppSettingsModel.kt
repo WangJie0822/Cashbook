@@ -77,4 +77,10 @@ data class AppSettingsModel(
     val mobileNetworkBackupEnable: Boolean,
     /** 图片质量 */
     val imageQuality: ImageQualityEnum,
+    /** 信用卡账单/还款提醒开关 */
+    val creditCardReminderEnable: Boolean = false,
+    /** 待报销提醒开关 */
+    val reimbursementReminderEnable: Boolean = false,
+    /** 上次提醒检查日期(epoch ms)，0=从未 */
+    val lastReminderCheckMs: Long = 0L,
 )
