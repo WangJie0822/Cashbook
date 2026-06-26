@@ -17,6 +17,9 @@
 package cn.wj.android.cashbook.core.testing.repository
 
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.repository.SettingsBackup
+import cn.wj.android.cashbook.core.data.repository.decodeSettingsBackup
+import cn.wj.android.cashbook.core.data.repository.encodeSettingsBackup
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.core.model.enums.DarkModeEnum
@@ -113,6 +116,39 @@ class FakeSettingRepository : SettingRepository {
 
     override suspend fun updateUseGithub(useGithub: Boolean) {
         _appSettingsModel.value = _appSettingsModel.value.copy(useGithub = useGithub)
+    }
+
+    override suspend fun exportSettings(): String = encodeSettingsBackup(
+        SettingsBackup(
+            useGithub = _appSettingsModel.value.useGithub,
+            autoCheckUpdate = _appSettingsModel.value.autoCheckUpdate,
+            ignoreUpdateVersion = _appSettingsModel.value.ignoreUpdateVersion,
+            mobileNetworkDownloadEnable = _appSettingsModel.value.mobileNetworkDownloadEnable,
+            mobileNetworkBackupEnable = _appSettingsModel.value.mobileNetworkBackupEnable,
+            darkMode = _appSettingsModel.value.darkMode.ordinal,
+            dynamicColor = _appSettingsModel.value.dynamicColor,
+            imageQuality = _appSettingsModel.value.imageQuality.ordinal,
+            canary = _appSettingsModel.value.canary,
+            logcatInRelease = _appSettingsModel.value.logcatInRelease,
+            monthStartDay = _recordSettingsModel.value.monthStartDay,
+        ),
+    )
+
+    override suspend fun importSettings(json: String) {
+        val backup = decodeSettingsBackup(json) ?: return
+        _appSettingsModel.value = _appSettingsModel.value.copy(
+            useGithub = backup.useGithub,
+            autoCheckUpdate = backup.autoCheckUpdate,
+            ignoreUpdateVersion = backup.ignoreUpdateVersion,
+            mobileNetworkDownloadEnable = backup.mobileNetworkDownloadEnable,
+            mobileNetworkBackupEnable = backup.mobileNetworkBackupEnable,
+            darkMode = DarkModeEnum.ordinalOf(backup.darkMode),
+            dynamicColor = backup.dynamicColor,
+            imageQuality = ImageQualityEnum.ordinalOf(backup.imageQuality),
+            canary = backup.canary,
+            logcatInRelease = backup.logcatInRelease,
+        )
+        _recordSettingsModel.value = _recordSettingsModel.value.copy(monthStartDay = backup.monthStartDay)
     }
 
     override suspend fun updateAutoCheckUpdate(autoCheckUpdate: Boolean) {

@@ -114,4 +114,10 @@ interface SettingRepository {
 
     /** 更新月起始日（1-28） */
     suspend fun updateMonthStartDay(monthStartDay: Int)
+
+    /** 导出设备无关偏好白名单为 JSON（排除凭据 / WebDAV / 设备绑定项），用于备份 */
+    suspend fun exportSettings(): String
+
+    /** 导入白名单设置；任一校验失败整体跳过，绝不恢复 WebDAV / backupPath / autoBackup / 凭据 */
+    suspend fun importSettings(json: String)
 }

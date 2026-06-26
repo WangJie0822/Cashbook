@@ -21,6 +21,9 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.repository.SettingsBackup
+import cn.wj.android.cashbook.core.data.repository.decodeSettingsBackup
+import cn.wj.android.cashbook.core.data.repository.encodeSettingsBackup
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.entity.UpgradeInfoEntity
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
@@ -250,4 +253,40 @@ class SettingRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             combineProtoDataSource.updateMonthStartDay(monthStartDay)
         }
+
+    override suspend fun exportSettings(): String = withContext(coroutineContext) {
+        val app = appSettingsModel.first()
+        val record = recordSettingsModel.first()
+        encodeSettingsBackup(
+            SettingsBackup(
+                useGithub = app.useGithub,
+                autoCheckUpdate = app.autoCheckUpdate,
+                ignoreUpdateVersion = app.ignoreUpdateVersion,
+                mobileNetworkDownloadEnable = app.mobileNetworkDownloadEnable,
+                mobileNetworkBackupEnable = app.mobileNetworkBackupEnable,
+                darkMode = app.darkMode.ordinal,
+                dynamicColor = app.dynamicColor,
+                imageQuality = app.imageQuality.ordinal,
+                canary = app.canary,
+                logcatInRelease = app.logcatInRelease,
+                monthStartDay = record.monthStartDay,
+            ),
+        )
+    }
+
+    override suspend fun importSettings(json: String) {
+        // 校验失败整体跳过；仅覆盖设备无关偏好白名单，绝不恢复 WebDAV/backupPath/autoBackup/凭据
+        val backup = decodeSettingsBackup(json) ?: return
+        updateUseGithub(backup.useGithub)
+        updateAutoCheckUpdate(backup.autoCheckUpdate)
+        updateIgnoreUpdateVersion(backup.ignoreUpdateVersion)
+        updateMobileNetworkDownloadEnable(backup.mobileNetworkDownloadEnable)
+        updateMobileNetworkBackupEnable(backup.mobileNetworkBackupEnable)
+        updateDarkMode(DarkModeEnum.ordinalOf(backup.darkMode))
+        updateDynamicColor(backup.dynamicColor)
+        updateImageQuality(ImageQualityEnum.ordinalOf(backup.imageQuality))
+        updateCanary(backup.canary)
+        updateLogcatInRelease(backup.logcatInRelease)
+        updateMonthStartDay(backup.monthStartDay)
+    }
 }
