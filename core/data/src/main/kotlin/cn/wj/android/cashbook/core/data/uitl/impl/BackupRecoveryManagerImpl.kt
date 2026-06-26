@@ -51,10 +51,14 @@ import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
 import cn.wj.android.cashbook.core.data.uitl.MANIFEST_ENTRY
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
+import cn.wj.android.cashbook.core.data.uitl.RECORD_IMAGES_DIR
 import cn.wj.android.cashbook.core.data.uitl.RECORD_IMAGES_ENTRY_PREFIX
 import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
 import cn.wj.android.cashbook.core.data.uitl.SETTINGS_ENTRY
 import cn.wj.android.cashbook.core.data.uitl.buildManifestJson
+import cn.wj.android.cashbook.core.data.uitl.isAllowedBackupEntry
+import cn.wj.android.cashbook.core.data.uitl.isWithinDir
+import cn.wj.android.cashbook.core.data.uitl.parseManifestFormatVersion
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
@@ -601,6 +605,11 @@ class BackupRecoveryManagerImpl @Inject constructor(
         val dateFormat = System.currentTimeMillis().dateFormat(DATE_FORMAT_BACKUP)
         val preRestoreFile = File(preRestoreDir, "$PRE_RESTORE_PREFIX$dateFormat.db")
         databaseFile.copyTo(preRestoreFile, overwrite = true)
+        // 图片快照（与 db 快照同回滚单元）：把当前 filesDir/record_images 复制到 pre-restore-images/
+        val imagesDir = recordImageFileStorage.baseDir()
+        if (imagesDir.exists()) {
+            imagesDir.copyRecursively(File(preRestoreDir, "pre-restore-images"), overwrite = true)
+        }
         this@BackupRecoveryManagerImpl.logger()
             .i("createPreRestoreBackup(), snapshot saved to <${preRestoreFile.absolutePath}>")
         true
@@ -680,25 +689,25 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 val entries = zipFile.entries()
                 while (entries.hasMoreElements()) {
                     val entry = entries.nextElement() as ZipEntry
-                    val comment = entry.comment
-                    this@BackupRecoveryManagerImpl.logger()
-                        .i("startRecovery(), comment = <$comment>")
-                    if (comment.isNullOrBlank()) {
-                        continue
-                    }
                     val entryName = entry.name
-                    if (entry.isDirectory) {
+                    // entry 白名单（替代旧 comment 判据）：仅 db/record_images/settings/manifest 允许写出
+                    if (!isAllowedBackupEntry(entryName)) {
                         continue
                     }
                     val destFile = File(cacheDir, entryName)
-                    // Zip Slip 防护：校验解压目标路径是否在缓存目录内
-                    if (!destFile.canonicalPath.startsWith(cacheDir.canonicalPath + File.separator)) {
+                    // Zip Slip 防护（保留）：含嵌套 record_images/*
+                    if (!isWithinDir(destFile, cacheDir)) {
                         continue
                     }
-                    destFile.deleteAllFiles()
-                    if (!destFile.exists()) {
-                        destFile.createNewFile()
+                    if (entry.isDirectory) {
+                        destFile.mkdirs()
+                        continue
                     }
+                    destFile.parentFile?.mkdirs()
+                    if (destFile.exists()) {
+                        destFile.delete()
+                    }
+                    destFile.createNewFile()
                     BufferedInputStream(zipFile.getInputStream(entry)).use { bis ->
                         BufferedOutputStream(FileOutputStream(destFile)).use { bos ->
                             bos.write(bis.readBytes())
@@ -710,6 +719,16 @@ class BackupRecoveryManagerImpl @Inject constructor(
 
             val dbFile = destFiles.firstOrNull { it.name == DB_FILE_NAME }
                 ?: return@runCatching BackupRecoveryState.FAILED_FILE_FORMAT_ERROR
+
+            // 前向不兼容守护：manifest 格式版本 > 当前支持 → fail-fast，不静默部分恢复
+            // （旧 db-only 备份无 manifest，缺省视为版本 1，正常恢复）
+            val formatVersion = destFiles.firstOrNull { it.name == MANIFEST_ENTRY }
+                ?.let { parseManifestFormatVersion(it.readText()) } ?: 1
+            if (formatVersion > BACKUP_FORMAT_VERSION) {
+                this@BackupRecoveryManagerImpl.logger()
+                    .e("startRecovery(), backup formatVersion <$formatVersion> newer than supported <$BACKUP_FORMAT_VERSION>")
+                return@runCatching BackupRecoveryState.FAILED_FILE_FORMAT_ERROR
+            }
 
             val backupDatabase = DelegateSQLiteDatabase(
                 context.openOrCreateDatabase(
@@ -744,6 +763,19 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 combineProtoDataSource.updateRefundTypeId(0L)
                 combineProtoDataSource.updateReimburseTypeId(0L)
                 combineProtoDataSource.updateCreditCardPaymentTypeId(0L)
+                // 图片合并恢复：解压出的 record_images/ 叠加到 filesDir/record_images/（合并语义、不清空现有目录）
+                val restoredImagesDir = File(cacheDir, RECORD_IMAGES_DIR)
+                if (restoredImagesDir.exists()) {
+                    restoredImagesDir.copyRecursively(recordImageFileStorage.baseDir(), overwrite = true)
+                }
+                // settings 白名单恢复（校验失败整体跳过，绝不恢复 WebDAV/backupPath/autoBackup/凭据）
+                destFiles.firstOrNull { it.name == SETTINGS_ENTRY }?.let { sf ->
+                    runCatching { settingRepository.importSettings(sf.readText()) }
+                        .onFailure {
+                            this@BackupRecoveryManagerImpl.logger()
+                                .w("startRecovery(), import settings skipped: ${it.message}")
+                        }
+                }
                 // 净自付（H3）：恢复是 CONFLICT_REPLACE 合并、恢复后无进程重启，
                 // 合并后 finalAmount 为「备份旧语义行 + 当前库新语义行」混合，须同步对全表重算覆盖
                 // F2：走 Repository 统一副作用（重算 + 置 finalAmountNetRecalcDone + bump recordDataVersion）
