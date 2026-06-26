@@ -26,7 +26,7 @@ import org.gradle.kotlin.dsl.invoke
  */
 @Suppress("UnstableApiUsage")
 internal fun configureGradleManagedDevices(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     val pixel4 = DeviceConfig("Pixel 4", 30, "aosp-atd")
     val pixel6 = DeviceConfig("Pixel 6", 31, "aosp")
@@ -35,7 +35,7 @@ internal fun configureGradleManagedDevices(
     val deviceConfigs = listOf(pixel4, pixel6, pixelC)
     val ciDeviceConfigs = listOf(pixel4, pixelC)
 
-    commonExtension.testOptions {
+    commonExtension.testOptions.apply {
         managedDevices {
             allDevices {
                 deviceConfigs.forEach { deviceConfig ->

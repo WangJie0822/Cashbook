@@ -167,10 +167,10 @@ com.google.accompanist:accompanist-drawablepainter:0.32.0
 com.google.accompanist:accompanist-permissions:0.36.0
 com.google.android.material:material:1.14.0
 com.google.code.findbugs:jsr305:3.0.2
-com.google.dagger:dagger-lint-aar:2.56.2
-com.google.dagger:dagger:2.56.2
-com.google.dagger:hilt-android:2.56.2
-com.google.dagger:hilt-core:2.56.2
+com.google.dagger:dagger-lint-aar:2.59.2
+com.google.dagger:dagger:2.59.2
+com.google.dagger:hilt-android:2.59.2
+com.google.dagger:hilt-core:2.59.2
 com.google.errorprone:error_prone_annotations:2.15.0
 com.google.guava:listenablefuture:1.0
 com.google.protobuf:protobuf-javalite:4.34.1
@@ -212,10 +212,10 @@ org.jetbrains.compose.ui:ui:1.7.0
 org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.9.22
 org.jetbrains.kotlin:kotlin-bom:1.8.22
 org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.22
-org.jetbrains.kotlin:kotlin-stdlib-common:2.2.0
+org.jetbrains.kotlin:kotlin-stdlib-common:2.3.20
 org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0
-org.jetbrains.kotlin:kotlin-stdlib:2.2.0
+org.jetbrains.kotlin:kotlin-stdlib:2.3.20
 org.jetbrains.kotlinx:atomicfu-jvm:0.23.2
 org.jetbrains.kotlinx:atomicfu:0.23.2
 org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2

@@ -19,8 +19,8 @@ import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.configureKotlinAndroid
 import cn.wj.android.cashbook.buildlogic.configurePrintApksTask
 import cn.wj.android.cashbook.buildlogic.disableUnnecessaryAndroidTests
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -38,13 +38,12 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(ProjectSetting.Plugin.PLUGIN_ANDROID_LIBRARY)
-                apply(ProjectSetting.Plugin.PLUGIN_KOTLIN_ANDROID)
                 apply(ProjectSetting.Plugin.PLUGIN_CASHBOOK_LINT)
             }
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = ProjectSetting.Config.TARGET_SDK
+                testOptions.targetSdk = ProjectSetting.Config.TARGET_SDK
                 defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 testOptions.animationsDisabled = true
                 configureGradleManagedDevices(this)

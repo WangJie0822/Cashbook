@@ -18,7 +18,7 @@ import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 import cn.wj.android.cashbook.buildlogic.configureGradleManagedDevices
 import cn.wj.android.cashbook.buildlogic.libs
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

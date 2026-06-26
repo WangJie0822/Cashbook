@@ -17,10 +17,8 @@
 
 import cn.wj.android.cashbook.buildlogic.CashbookBuildType
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
-import cn.wj.android.cashbook.buildlogic.FileSystemOperationsInjected
 import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
 import cn.wj.android.cashbook.buildlogic.configureOutputs
-import com.android.build.gradle.api.ApplicationVariant
 import java.io.FileWriter
 
 plugins {
@@ -86,8 +84,6 @@ android {
             } else {
                 signingConfigs.findByName("debug")
             }
-            // Release 版本自动构建使用最新基线配置
-            baselineProfile.automaticGenerationDuringBuild = true
         }
         getByName("debug") {
             isMinifyEnabled = false
@@ -130,14 +126,17 @@ android {
         baseline = file("lint-baseline.xml")
     }
 
-    configGenerateReleaseFile(applicationVariants)
+}
 
-    val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
+configGenerateReleaseFile()
+
+val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
+androidComponents {
     configureOutputs(
+        project = project,
         condition = { buildTypeName ->
             buildTypeName.contains("release", true)
         },
-        injected = project.objects.newInstance<FileSystemOperationsInjected>(),
         toPath = "${project.rootDir}${sep}outputs${sep}apk",
         include = "**/*.apk",
         renamer = { versionName ->
@@ -232,8 +231,10 @@ dependencies {
 }
 
 baselineProfile {
-    // 仅 Release 版本使用自动生成
-    automaticGenerationDuringBuild = false
+    // Release 版本自动生成基线配置。
+    // AGP9/baselineprofile 1.5.0-alpha 移除 per-buildType `baselineProfile.automaticGenerationDuringBuild`
+    // （main 原在 release 块设 true），改用顶层 consumer DSL；baseline profile 仅 release 消费，顶层 true 等价原 release-only。
+    automaticGenerationDuringBuild = true
     // 不区分多渠道，合并为一个基线配置
     mergeIntoMain = true
 }
@@ -245,10 +246,10 @@ dependencyGuard {
 }
 
 
-/** 配置 CI 构建生成 RELEASE.md */
-fun Project.configGenerateReleaseFile(applicationVariants: DomainObjectSet<ApplicationVariant>) {
-    applicationVariants.all {
-        mergeAssetsProvider.get().doFirst {
+/** 配置 CI 构建生成 RELEASE.md（仅 BUILD_TAG_NAME 设置时；不依赖变体，AGP9 移除变体 API 后改普通 task + preBuild.dependsOn） */
+fun Project.configGenerateReleaseFile() {
+    val generateReleaseFile = tasks.register("generateReleaseFile") {
+        doLast {
             val buildTagName = System.getenv("BUILD_TAG_NAME")
             if (!buildTagName.isNullOrBlank()) {
                 // CI 构建流程，生成 RELEASE.md
@@ -293,4 +294,5 @@ fun Project.configGenerateReleaseFile(applicationVariants: DomainObjectSet<Appli
             }
         }
     }
+    tasks.named("preBuild").configure { dependsOn(generateReleaseFile) }
 }

@@ -20,7 +20,6 @@ import com.android.build.api.dsl.ManagedVirtualDevice
 
 plugins {
     alias(conventionLibs.plugins.cashbook.android.test)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.androidx.baselineprofile)
 }
 

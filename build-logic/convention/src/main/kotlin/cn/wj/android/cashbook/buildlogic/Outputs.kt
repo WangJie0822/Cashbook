@@ -16,57 +16,60 @@
 
 package cn.wj.android.cashbook.buildlogic
 
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
-import org.gradle.api.file.FileSystemOperations
-import javax.inject.Inject
-
-interface FileSystemOperationsInjected {
-    @get:Inject
-    val fs: FileSystemOperations
-}
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
+import org.gradle.kotlin.dsl.register
 
 /**
- * 使用 [injected]，将满足 [condition] 条件的编译生成的**apk**，通过 [renamer] 重命名后，复制到 [toPath] 路径
- * - [condition] 参数 [String] 为 `buildTypeName`，返回参数 [Boolean] 为是否满足条件
- * - [injected] 为自定义接口 [FileSystemOperationsInjected]，通过 `project.objects.newInstance<FileSystemOperationsInjected>()` 获取
+ * 将满足 [condition]（参数 `buildTypeName`）的变体编译生成的 **apk**，通过 [renamer]（参数 `versionName`）重命名后复制到 [toPath]。
+ *
+ * AGP 9 移除 `applicationVariants` / `BaseAppModuleExtension`，改用 `androidComponents.onVariants` + `SingleArtifact.APK` + Copy task；
+ * Copy task `finalizedBy` 对应变体的 `assemble` 任务，复刻原 `assembleProvider.doLast` 的执行时机。
  *
  * - Sample:
  * ```
- * // 配置 APK 输出路径
  * val sep = org.jetbrains.kotlin.konan.file.File.Companion.separator
- * configureOutputs(
- *     condition = { buildTypeName ->
- *         buildTypeName.contains("release", true)
- *     },
- *     injected = project.objects.newInstance<FileSystemOperationsInjected>(),
- *     toPath = "${project.rootDir}${sep}outputs${sep}app",
- *     include = "*.apk",
- *     renamer = { versionName ->
- *         "Cashbook_${versionName}.apk"
- *     }
- * )
+ * androidComponents {
+ *     configureOutputs(
+ *         project = project,
+ *         condition = { buildTypeName ->
+ *             buildTypeName.contains("release", true)
+ *         },
+ *         toPath = "${project.rootDir}${sep}outputs${sep}apk",
+ *         include = "*.apk",
+ *         renamer = { versionName ->
+ *             "Cashbook_${versionName}.apk"
+ *         },
+ *     )
+ * }
  * ```
  */
-fun BaseAppModuleExtension.configureOutputs(
+fun ApplicationAndroidComponentsExtension.configureOutputs(
+    project: Project,
     condition: (String) -> Boolean,
-    injected: FileSystemOperationsInjected,
     toPath: String,
     include: String,
     renamer: (String) -> String,
 ) {
-    applicationVariants.all {
-        val buildTypeName = this@all.buildType.name
-        if (condition(buildTypeName)) {
-            val versionName = this.versionName
-            val fromPath = packageApplicationProvider.get().outputDirectory.asFile.get().toString()
-            assembleProvider.get().doLast {
-                println("> Task :build-logic:configureOutputs start copy apk from $fromPath to $toPath")
-                injected.fs.copy {
-                    from(fromPath)
-                    into(toPath)
-                    include(include)
-                    rename { renamer(versionName) }
-                }
+    onVariants { variant ->
+        val buildTypeName = variant.buildType ?: return@onVariants
+        if (!condition(buildTypeName)) return@onVariants
+        val apkDir = variant.artifacts.get(SingleArtifact.APK)
+        val versionNameProvider = variant.outputs.firstOrNull()?.versionName
+        val capName = variant.name.replaceFirstChar { it.uppercase() }
+        val copyTask = project.tasks.register<Copy>("copy${capName}ApkToOutputs") {
+            from(apkDir) {
+                include(include)
+            }
+            into(toPath)
+            rename { renamer(versionNameProvider?.orNull ?: "") }
+        }
+        // onVariants 回调时 assemble<Variant> 任务尚未创建，用 configureEach 懒式挂 finalizedBy（对未来创建的任务生效）
+        project.tasks.configureEach {
+            if (name == "assemble$capName") {
+                finalizedBy(copyTask)
             }
         }
     }

@@ -32,16 +32,16 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
  * - 统一版本号及 Java、Kotlin 等配置
  */
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         compileSdk = ProjectSetting.Config.COMPILE_SDK
 
-        defaultConfig {
+        defaultConfig.apply {
             minSdk = ProjectSetting.Config.MIN_SDK
         }
 
-        compileOptions {
+        compileOptions.apply {
             // Up to Java 11 APIs are available through desugaring
             // https://developer.android.com/studio/write/java11-minimal-support-table
             sourceCompatibility = ProjectSetting.Config.javaVersion

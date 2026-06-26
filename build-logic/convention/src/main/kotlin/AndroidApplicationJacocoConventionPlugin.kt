@@ -16,8 +16,8 @@
 
 import cn.wj.android.cashbook.buildlogic.ProjectSetting
 import cn.wj.android.cashbook.buildlogic.configureJacoco
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
@@ -27,7 +27,7 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply(ProjectSetting.Plugin.PLUGIN_JACOCO)
 
-            val androidExtension = extensions.getByType<BaseAppModuleExtension>()
+            val androidExtension = extensions.getByType<ApplicationExtension>()
 
             androidExtension.buildTypes.configureEach {
                 enableAndroidTestCoverage = true

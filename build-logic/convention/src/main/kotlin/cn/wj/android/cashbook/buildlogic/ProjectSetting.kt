@@ -41,7 +41,7 @@ object ProjectSetting {
         const val MIN_SDK = 24
 
         /** SDK 目标版本 */
-        const val TARGET_SDK = 35
+        const val TARGET_SDK = 36
 
         /** 大版本名 */
         private const val VERSION_NAME = "v1.2.0"
@@ -69,7 +69,7 @@ object ProjectSetting {
             }
 
         /** 源码 jdk 版本 */
-        val javaVersion = JavaVersion.VERSION_11
+        val javaVersion = JavaVersion.VERSION_17
 
         /** 从环境变量中获取版本名，若没有则根据当前时间生成 */
         private fun generateVersionName(): String {
