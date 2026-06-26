@@ -80,6 +80,12 @@
 - 供应链独立核验全干净（sha256 两源逐字节一致 / dependency-guard 全官方坐标 / alpha 仅构建期不入 APK / targetSdk36 edge-to-edge 已实现）。
 - **结论：0 未修复 Critical/High，交付就绪**。报告 `.full-review/05-final-report.md`（评审 scratch，不入项目 git）。
 
+## PR #491 CI 迭代（推 PR 跑真实 CI，本机未覆盖的 CI 路径）
+PR https://github.com/WangJie0822/Cashbook/pull/491（base main，20 commit=3 doc+17 升级）。CI 暴露 2 个本机遗漏（本机只跑 compileKotlin/testXxxUnitTest，未跑 CI 精确命令）：
+- **CI-1 `check -p build-logic` validatePlugins 失败**（`4c02dcc1`）：`enableStricterValidation` 要求每 Task 类型标缓存注解，`GenerateFlavorTask` 缺 → 加 `@DisableCachingByDefault`。本机 compileKotlin 不查、`check` 才查。
+- **CI-2 Robolectric API36 ⊥ JDK17**（`3fa6fad0`）：Robolectric 4.16.1 DefaultSdkProvider 字节码证 API36 requires Java21（API34/35=Java17），CI Java17 跑 Robolectric API36（targetSdk 默认）抛 UOE "Android SDK 36 requires Java 21 (have Java 17)"。androidTest **真机 instrumented 部分本就 ✓**（CI "Build...instrumentation tests" pass），仅 Robolectric coverage 步骤受影响。**用户拍板 CI JDK 17→21**（plan"JDK17 保持"假设被证伪；JDK21 仍满足"≥17"、AGP9/Gradle9 支持、Robolectric 跑实际 targetSdk36 与本机/基线一致）。4 处 setup-java 全 bump。
+- 本机已复现并验证两修复（`check -p build-logic` 绿 + `testOnlineDebug testOfflineDebug :lint:test` 绿）。
+
 ## 合入决策（待人工拍板）
 - `finishing-a-development-branch`：全绿 + 节点2 通过 → 由用户拍板 upgrade-agp9 合入 main。
 - 合入前建议：推 PR / 打 `v*_pre` tag 实跑一次真实 CI，覆盖本机未端到端验证的 CI 路径（GMD 基线生成+镜像源、proto 冷缓存、CI heap/parallel、签名链 build-tools 36）。
