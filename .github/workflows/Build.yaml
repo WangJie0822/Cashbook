@@ -68,7 +68,7 @@ jobs:
           ./gradlew dependencyGuardBaseline
 
       - name: Push new Dependency Guard baselines if available
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7
         if: steps.dependencyguard_baseline.outcome == 'success'
         with:
           file_pattern: '**/dependencies/*.txt'
@@ -95,7 +95,7 @@ jobs:
           ./gradlew recordRoborazziDevDebug
 
       - name: Push new screenshots if available
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7
         if: steps.screenshotsrecord.outcome == 'success'
         with:
           file_pattern: '*/*.png'
@@ -146,7 +146,7 @@ jobs:
 
     steps:
       - name: Delete unnecessary tools 🔧
-        uses: jlumbroso/free-disk-space@v1.3.1
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           android: false # Don't remove Android tools
           tool-cache: true # Remove image tool cache - rm -rf "$AGENT_TOOLSDIRECTORY"
@@ -182,7 +182,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Build projects and run instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
@@ -211,7 +211,7 @@ jobs:
       - name: Display local test coverage (only API 30)
         if: matrix.api-level == 30
         id: jacoco
-        uses: madrapps/jacoco-report@v1.8.0
+        uses: madrapps/jacoco-report@e51ce1f46f7f8b5331593f935e59cbaf44b84920 # v1.8.0
         with:
           title: Combined test coverage report
           min-coverage-overall: 40

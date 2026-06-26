@@ -5,8 +5,6 @@ pluginManagement {
     // 配置插件仓库
     repositories {
         maven { setUrl("https://repo1.maven.org/maven2") }
-        maven { setUrl("https://mvnrepository.com/repos/central") }
-        maven { setUrl("https://mvnrepository.com/repos/space-kotlin-dev") }
         maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }
         maven { setUrl("https://maven.aliyun.com/repository/public") }
         maven { setUrl("https://maven.aliyun.com/repository/google") }
@@ -22,8 +20,6 @@ dependencyResolutionManagement {
     // 配置三方依赖仓库
     repositories {
         maven { setUrl("https://repo1.maven.org/maven2") }
-        maven { setUrl("https://mvnrepository.com/repos/central") }
-        maven { setUrl("https://mvnrepository.com/repos/space-kotlin-dev") }
         maven { setUrl("https://maven.aliyun.com/repository/public") }
         maven { setUrl("https://maven.aliyun.com/repository/google") }
         maven { setUrl("https://jitpack.io") }
