@@ -46,9 +46,15 @@ import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_BACKUP
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.data.uitl.BACKUP_FORMAT_VERSION
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryManager
 import cn.wj.android.cashbook.core.data.uitl.BackupRecoveryState
+import cn.wj.android.cashbook.core.data.uitl.MANIFEST_ENTRY
 import cn.wj.android.cashbook.core.data.uitl.NetworkMonitor
+import cn.wj.android.cashbook.core.data.uitl.RECORD_IMAGES_ENTRY_PREFIX
+import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
+import cn.wj.android.cashbook.core.data.uitl.SETTINGS_ENTRY
+import cn.wj.android.cashbook.core.data.uitl.buildManifestJson
 import cn.wj.android.cashbook.core.database.CashbookDatabase
 import cn.wj.android.cashbook.core.database.migration.DatabaseMigrations
 import cn.wj.android.cashbook.core.database.util.DelegateSQLiteDatabase
@@ -70,6 +76,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URL
 import java.net.URLEncoder
+import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -88,6 +95,7 @@ class BackupRecoveryManagerImpl @Inject constructor(
     private val webDAVHandler: WebDAVHandler,
     private val database: CashbookDatabase,
     private val combineProtoDataSource: CombineProtoDataSource,
+    private val recordImageFileStorage: RecordImageFileStorage,
     @ApplicationContext private val context: Context,
     @Dispatcher(CashbookDispatchers.IO) private val ioCoroutineContext: CoroutineContext,
 ) : BackupRecoveryManager {
@@ -403,17 +411,39 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 }
             }
             databaseFile.copyTo(databaseCacheFile)
-            // 压缩备份文件
+            // 对备份副本 in-place VACUUM 压实（minSdk24 兼容；失败/ENOSPC 回退未 VACUUM 的 checkpointed 副本，不让备份失败）
+            runCatching {
+                context.openOrCreateDatabase(databaseCacheFile.absolutePath, Context.MODE_PRIVATE, null)
+                    .use { db ->
+                        db.execSQL("VACUUM")
+                        db.rawQuery("PRAGMA integrity_check", null).use { c ->
+                            if (c.moveToFirst()) {
+                                val ok = c.getString(0)
+                                if (!"ok".equals(ok, ignoreCase = true)) {
+                                    this@BackupRecoveryManagerImpl.logger()
+                                        .w("startBackup(), VACUUM integrity_check = <$ok>, keep copy")
+                                }
+                            }
+                        }
+                    }
+            }.onFailure {
+                this@BackupRecoveryManagerImpl.logger()
+                    .w("startBackup(), VACUUM failed, fallback to checkpointed copy: ${it.message}")
+            }
+            // 多 entry 打包：db(comment 仅此项，兼容旧 app 仅恢复 db 不崩) + record_images/* + settings.json + manifest.json
+            val settingsJson = settingRepository.exportSettings()
+            val manifestJson = buildManifestJson(BACKUP_FORMAT_VERSION, ApplicationInfo.versionName)
+            val imagesDir = recordImageFileStorage.baseDir()
             val zippedPath =
                 backupCacheDir.absolutePath + File.separator + BACKUP_FILE_NAME + dateFormat + BACKUP_FILE_EXT
             ZipOutputStream(FileOutputStream(zippedPath)).use { zos ->
-                BufferedInputStream(FileInputStream(databaseCacheFile)).use { bis ->
-                    val entry = ZipEntry(databaseCacheFile.name)
-                    entry.comment = ApplicationInfo.applicationInfo
-                    zos.putNextEntry(entry)
-                    zos.write(bis.readBytes())
-                    zos.closeEntry()
+                zos.setLevel(Deflater.BEST_COMPRESSION)
+                putZipFileEntry(zos, databaseCacheFile, databaseCacheFile.name, ApplicationInfo.applicationInfo)
+                imagesDir.listFiles()?.filter { it.isFile }?.forEach { img ->
+                    putZipFileEntry(zos, img, RECORD_IMAGES_ENTRY_PREFIX + img.name, comment = null)
                 }
+                putZipBytesEntry(zos, SETTINGS_ENTRY, settingsJson.toByteArray(), comment = null)
+                putZipBytesEntry(zos, MANIFEST_ENTRY, manifestJson.toByteArray(), comment = null)
             }
             // 将备份文件复制到备份路径
             val zippedFile = File(zippedPath)
@@ -511,6 +541,24 @@ class BackupRecoveryManagerImpl @Inject constructor(
         updateBackupState(state)
         this@BackupRecoveryManagerImpl.logger().i("startBackup(), result = <$result>")
         return state
+    }
+
+    /** 写一个文件 entry 到 zip；comment 仅 db entry 传非空（旧 app 据 comment 仅恢复 db、不崩） */
+    private fun putZipFileEntry(zos: ZipOutputStream, file: File, entryName: String, comment: String?) {
+        val entry = ZipEntry(entryName)
+        if (comment != null) entry.comment = comment
+        zos.putNextEntry(entry)
+        BufferedInputStream(FileInputStream(file)).use { zos.write(it.readBytes()) }
+        zos.closeEntry()
+    }
+
+    /** 写一段字节 entry 到 zip（settings.json / manifest.json） */
+    private fun putZipBytesEntry(zos: ZipOutputStream, entryName: String, bytes: ByteArray, comment: String?) {
+        val entry = ZipEntry(entryName)
+        if (comment != null) entry.comment = comment
+        zos.putNextEntry(entry)
+        zos.write(bytes)
+        zos.closeEntry()
     }
 
     /**
