@@ -103,7 +103,11 @@ class RecordRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
+        // 删前捕获图片相对路径（删后关联已清无法查）
+        val imagePaths = recordDao.queryImagesByRecordId(recordId).map { it.path }
         transactionDao.deleteRecordTransaction(recordId)
+        // DB 删成功后 best-effort 删托管图片文件（失败留孤儿，启动扫描兜底）
+        deleteManagedImageFiles(imagePaths, recordImageFileStorage)
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
     }
@@ -660,6 +664,14 @@ internal suspend fun runImageBackfill(
         storage.write(relativePath, image.bytes)
         recordDao.updateImagePathAndBytes(id, relativePath, ByteArray(0))
     }
+}
+
+/**
+ * best-effort 删除一组图片 path 中本应用托管的文件（非托管 path 不碰任何文件）。
+ * 抽为顶层 internal fun 便于单测。删失败留孤儿，由启动孤儿扫描兜底。
+ */
+internal fun deleteManagedImageFiles(imagePaths: List<String>, storage: RecordImageFileStorage) {
+    imagePaths.filter { storage.isManaged(it) }.forEach { storage.delete(it) }
 }
 
 /**
