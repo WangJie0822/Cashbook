@@ -145,13 +145,6 @@ androidComponents {
     )
 }
 
-// Release 版本自动构建使用最新基线配置
-// AGP9/baselineprofile 1.5.0-alpha：per-buildType 的 baselineProfile.automaticGenerationDuringBuild 已移除，
-// 改用顶层 consumer DSL（baseline profile 仅 release 消费，顶层设置等价原 release-only 行为）
-baselineProfile {
-    automaticGenerationDuringBuild = true
-}
-
 dependencies {
 
     // 功能
@@ -238,8 +231,10 @@ dependencies {
 }
 
 baselineProfile {
-    // 仅 Release 版本使用自动生成
-    automaticGenerationDuringBuild = false
+    // Release 版本自动生成基线配置。
+    // AGP9/baselineprofile 1.5.0-alpha 移除 per-buildType `baselineProfile.automaticGenerationDuringBuild`
+    // （main 原在 release 块设 true），改用顶层 consumer DSL；baseline profile 仅 release 消费，顶层 true 等价原 release-only。
+    automaticGenerationDuringBuild = true
     // 不区分多渠道，合并为一个基线配置
     mergeIntoMain = true
 }
