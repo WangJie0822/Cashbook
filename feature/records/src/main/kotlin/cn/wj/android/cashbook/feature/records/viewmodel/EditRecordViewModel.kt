@@ -59,6 +59,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -105,6 +106,11 @@ class EditRecordViewModel @Inject constructor(
     private val _defaultRecordData = _recordIdData.mapLatest {
         getDefaultRecordUseCase(it)
     }
+        .shareIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            replay = 1,
+        )
     private val _displayRecordData =
         combine(_mutableRecordData, _defaultRecordData) { mutable, default ->
             mutable ?: default
