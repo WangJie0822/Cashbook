@@ -89,10 +89,11 @@ internal fun Project.configureJacoco(
                 )
 
                 executionData.setFrom(
-                    project.fileTree("$buildDir/outputs/unit_test_code_coverage/${variant.name}UnitTest")
+                    // config-cache：project.fileTree 持有 project 引用不可序列化，改用配置阶段捕获的 objectFactory.fileTree（与上方 classDirectories 一致）
+                    myObjFactory.fileTree().setDir("$buildDir/outputs/unit_test_code_coverage/${variant.name}UnitTest")
                         .matching { include("**/*.exec") },
 
-                    project.fileTree("$buildDir/outputs/code_coverage/${variant.name}AndroidTest")
+                    myObjFactory.fileTree().setDir("$buildDir/outputs/code_coverage/${variant.name}AndroidTest")
                         .matching { include("**/*.ec") },
                 )
             }
