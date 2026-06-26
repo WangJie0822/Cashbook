@@ -114,4 +114,13 @@ interface SettingRepository {
 
     /** 更新月起始日（1-28） */
     suspend fun updateMonthStartDay(monthStartDay: Int)
+
+    /** 更新信用卡提醒开关 */
+    suspend fun updateCreditCardReminderEnable(enable: Boolean)
+
+    /** 更新待报销提醒开关 */
+    suspend fun updateReimbursementReminderEnable(enable: Boolean)
+
+    /** 更新上次提醒检查日期(epoch ms) */
+    suspend fun updateLastReminderCheckMs(ms: Long)
 }
