@@ -228,6 +228,10 @@ class CombineProtoDataSource @Inject constructor(
         recordSettings.updateData { it.copy { this.currentBookId = bookId } }
     }
 
+    @Deprecated(
+        "legacy：默认资产已改由 RecordDao.queryLastUsedAssetId 按账本派生（2026-06-26），" +
+            "lastAssetId 不再被任何业务读取，本写入无生产调用方，勿新增调用。",
+    )
     suspend fun updateLastAssetId(lastAssetId: Long) {
         recordSettings.updateData { it.copy { this.lastAssetId = lastAssetId } }
     }

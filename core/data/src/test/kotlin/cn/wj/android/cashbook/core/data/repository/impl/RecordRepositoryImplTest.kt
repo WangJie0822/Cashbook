@@ -543,6 +543,18 @@ class RecordRepositoryImplTest {
         assertThat(recordDao.queryLastUsedAssetId(1L)).isEqualTo(20L)
     }
 
+    @Test
+    fun given_latest_record_points_to_other_book_asset_when_queryLastUsedAssetId_then_skips_it() = runTest {
+        // 守护资产子查询内层 books_id 过滤（跨账本核心防线）：
+        // 账本1 的最近记录误指向账本2 的可见资产，应被排除、回退到本账本有效记录
+        recordDao.addAsset(createAsset(id = 10L, booksId = 1L))
+        recordDao.addAsset(createAsset(id = 20L, booksId = 2L)) // 属账本2、可见
+        recordDao.addRecord(createRecord(id = 1L, booksId = 1L, assetId = 10L))
+        recordDao.addRecord(createRecord(id = 2L, booksId = 1L, assetId = 20L)) // 账本1记录误指账本2资产
+
+        assertThat(recordDao.queryLastUsedAssetId(1L)).isEqualTo(10L)
+    }
+
     // ========== 辅助方法 ==========
 
     private fun createAsset(

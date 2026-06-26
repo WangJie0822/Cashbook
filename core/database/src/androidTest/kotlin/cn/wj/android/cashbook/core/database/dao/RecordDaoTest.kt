@@ -1267,5 +1267,18 @@ class RecordDaoTest {
         assertThat(recordDao.queryLastUsedAssetId(book)).isEqualTo(20L)
     }
 
+    @Test
+    fun queryLastUsedAssetId_skipsAssetFromAnotherBook() = runTest {
+        // 守护资产子查询内层 books_id 过滤：book1 最近记录误指 book2 的可见资产，应被排除
+        val book1 = createTestBook()
+        val book2 = createTestBook()
+        assetDao.insert(createAsset(id = 10L, booksId = book1, name = "卡A"))
+        assetDao.insert(createAsset(id = 20L, booksId = book2, name = "卡B")) // 属 book2、可见
+        insertRecord(createRecord(booksId = book1, assetId = 10L))
+        insertRecord(createRecord(booksId = book1, assetId = 20L)) // book1 记录误指 book2 资产
+
+        assertThat(recordDao.queryLastUsedAssetId(book1)).isEqualTo(10L)
+    }
+
     // endregion
 }
