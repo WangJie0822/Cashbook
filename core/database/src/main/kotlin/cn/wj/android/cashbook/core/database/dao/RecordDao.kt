@@ -471,6 +471,14 @@ interface RecordDao {
     )
     suspend fun queryImagesByRecordIds(recordIds: List<Long>): List<ImageWithRelatedTable>
 
+    /** 全表图片（backfill / 孤儿扫描引用集用） */
+    @Query("SELECT * FROM db_image_with_related")
+    suspend fun queryAllImages(): List<ImageWithRelatedTable>
+
+    /** backfill 逐行更新 path + 置空 bytes（不动其它列） */
+    @Query("UPDATE db_image_with_related SET image_path = :path, image_bytes = :bytes WHERE id = :id")
+    suspend fun updateImagePathAndBytes(id: Long, path: String, bytes: ByteArray)
+
     /** 批量查询关联关系：record_id 命中 [recordIds]（收入侧用），用于批量转换消除 N+1 */
     @Query("SELECT * FROM db_record_with_related WHERE record_id IN (:recordIds)")
     suspend fun queryRelatedByRecordIds(recordIds: List<Long>): List<RecordWithRelatedTable>

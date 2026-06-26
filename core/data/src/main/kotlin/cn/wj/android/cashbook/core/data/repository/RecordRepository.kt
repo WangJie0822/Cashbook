@@ -185,6 +185,9 @@ interface RecordRepository {
      */
     suspend fun queryImagesByRecordIds(ids: List<Long>): Map<Long, List<ImageModel>>
 
+    /** 存量图片 BLOB → 文件系统 backfill（逐行幂等，崩溃可重入；成功后置位迁移标志） */
+    suspend fun backfillImagesToFiles()
+
     /**
      * 批量查询「收入侧」关联关系：返回 recordId -> 关联记录 id 列表，
      * 等价于对每个 id 调用 [getRelatedIdListById] 后聚合，消除 N+1。

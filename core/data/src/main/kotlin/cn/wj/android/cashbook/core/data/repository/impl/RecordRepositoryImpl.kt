@@ -631,6 +631,35 @@ class RecordRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             recordDao.queryEarliestRecordTime(booksId)
         }
+
+    override suspend fun backfillImagesToFiles() = withContext(coroutineContext) {
+        runImageBackfill(recordDao, recordImageFileStorage)
+        // 成功后置位（封装在仓库，ViewModel 只读标志即可），下次启动幂等跳过；
+        // 参照 finalAmountNetRecalcDone 的 F2 统一副作用模式
+        combineProtoDataSource.updateImagesToFilesMigrated(true)
+    }
+}
+
+/**
+ * 存量图片 BLOB → 文件系统 backfill 核心（逐行幂等、崩溃可重入）。
+ * 抽为顶层 internal fun 便于单测（用 FakeRecordDao + FakeRecordImageFileStorage，无需构造整个 Repository）。
+ *
+ * - 无 id 行跳过（无法派生确定文件名）
+ * - bytes 为空行跳过（已迁移或无数据，幂等）
+ * - 文件名由行 id 确定性派生：崩溃后重跑按同名覆盖、不产孤儿
+ * - 逐行先写文件再更新该行 path + 置空 bytes（该行提交后 bytes 才释放）
+ */
+internal suspend fun runImageBackfill(
+    recordDao: RecordDao,
+    storage: RecordImageFileStorage,
+) {
+    recordDao.queryAllImages().forEach { image ->
+        val id = image.id ?: return@forEach
+        if (image.bytes.isEmpty()) return@forEach
+        val relativePath = storage.relativePathForId(id)
+        storage.write(relativePath, image.bytes)
+        recordDao.updateImagePathAndBytes(id, relativePath, ByteArray(0))
+    }
 }
 
 /**

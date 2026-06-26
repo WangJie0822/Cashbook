@@ -117,6 +117,14 @@ class FakeRecordRepository : RecordRepository {
         }
     }
 
+    /** [backfillImagesToFiles] 调用次数，供首屏 gate 测试断言 */
+    var backfillImagesToFilesCount = 0
+        private set
+
+    override suspend fun backfillImagesToFiles() {
+        backfillImagesToFilesCount++
+    }
+
     override suspend fun deleteRecord(recordId: Long) {
         lastDeletedRecordId = recordId
         records.removeAll { it.id == recordId }
