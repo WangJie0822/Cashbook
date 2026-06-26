@@ -42,6 +42,7 @@ import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.model.ImageViewModel
+import cn.wj.android.cashbook.feature.records.model.rememberRecordImageModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 
@@ -80,7 +81,7 @@ internal fun ImagePreviewDialog(
                 ) {
                     val placeholder = rememberAsyncImagePainter(list[index].bitmap)
                     AsyncImage(
-                        model = list[index].path,
+                        model = rememberRecordImageModel(list[index]),
                         placeholder = placeholder,
                         error = placeholder,
                         contentScale = ContentScale.Crop,

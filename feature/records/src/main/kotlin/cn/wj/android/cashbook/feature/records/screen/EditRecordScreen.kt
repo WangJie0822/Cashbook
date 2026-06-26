@@ -112,6 +112,7 @@ import cn.wj.android.cashbook.feature.records.enums.EditRecordBookmarkEnum
 import cn.wj.android.cashbook.feature.records.enums.EditRecordBottomSheetEnum
 import cn.wj.android.cashbook.feature.records.model.DateTimePickerModel
 import cn.wj.android.cashbook.feature.records.model.ImageViewModel
+import cn.wj.android.cashbook.feature.records.model.rememberRecordImageModel
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.ImagePreviewData
@@ -965,9 +966,9 @@ internal fun SelectImageSheetContent(
                             modifier = Modifier.padding(8.dp),
                         ) {
                             val (iv, delete) = createRefs()
-                            val placeholder = rememberAsyncImagePainter(model = item.path)
+                            val placeholder = rememberAsyncImagePainter(model = item.bitmap)
                             AsyncImage(
-                                model = item.bitmap,
+                                model = rememberRecordImageModel(item),
                                 placeholder = placeholder,
                                 error = placeholder,
                                 contentScale = ContentScale.Crop,
