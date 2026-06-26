@@ -56,9 +56,26 @@
 - **enableJetifier 保留**：运行时仍含 `com.android.support:support-annotations:27.1.0`（jetifier 替换中），按 Phase0 准则非空保留。
 - **本机 wrapper 分发下载**：`GRADLE_OPTS="-Dhttp.proxyHost=... -Dhttps.proxyHost=..."`（命令行 -D 不进 wrapper JVM）；代理 TLS 传输间歇不稳（CONNECT 200 但隧道内 reset），用重试循环暖缓存收敛。
 
+## T3.2 全链路验收门 完成（全 8 步通过，实测）
+- **① 全 flavor×buildType `:app:assemble`**：BUILD SUCCESSFUL 6m49s（1175 task，4g heap+--max-workers=1 串行）；`outputs/apk/Cashbook_*.apk` 重命名产物齐全（Outputs.kt AGP9 迁移工作）。
+- **② spotless + lint + lint module**：spotlessCheck 绿（无格式违规）；`:app:lintOnlineRelease/lintOfflineRelease/:lint:lint` 绿（84 warning+2 hint 无 error，Design detector Material3 ban 通过）；lint-gradle 从 google() 经代理拉。
+- **③ dependencyGuardBaseline + 人工 diff 审查**：`926019ec`；变更仅 com.google.dagger:*(Hilt 2.56.2→2.59.2)+org.jetbrains.kotlin:kotlin-stdlib*(2.2→2.3.20)，全官方坐标，无供应链异常。dependency-guard 0.5.0 兼容 Gradle9。
+- **④ verifyRoborazziDevDebug**：BUILD SUCCESSFUL，无 compare 图（无像素 diff）→ AGP9/Kotlin2.3 未致截图移位，无需重生基线。
+- **⑤ connectedDebugAndroidTest（Room 迁移）**：硬证 `<testsuite DatabaseTest tests=15 failures=0 errors=0>`，Medium_Phone(API30) 模拟器全过。
+- **⑥ baseline profile 生成（H7）**：GMD pixel6Api34 在本机 boot 挂死（0 CPU，env 问题非升级）；改手动启 bp_api34(API34) 连接设备生成 → 硬证 `BaselineProfileGenerator tests=1 failures=0` + profile 非空 **26852 行**（有效 ART 格式）→ baselineprofile 1.5.0-alpha06 端到端在 API34 工作。CI 用 GMD（已还原 useConnectedDevices=false）。
+- **⑦ apksigner verify**：release APK "Verifies" v2 scheme（本地 debug 签名回退，minSdk24 兼容；CI release keystore 签 v2/v3）。
+- **⑧ commit 基线**：dg `926019ec`；roborazzi 无变化。
+
+### T3.2 执行期发现/踩坑
+- **本机内存吃紧**：32GB 机 baseline 占用高（Studio+Edge ~25GB），`:app:assemble` 默认 `org.gradle.jvmargs=-Xmx6g`+`org.gradle.parallel=true` 并行 R8 撑到 97.9% → 临时降 heap 4g/3g + `--max-workers=1` 串行（验收后已还原 6g）。所有重 build 均 --max-workers=1。
+- **GMD pixel6Api34 boot 挂死**：AGP GMD 自带启动参数在本机 headless boot 挂死（0 CPU、无 adb 设备）；手动 `emulator -avd X -no-window -gpu swiftshader_indirect` 正常 boot（Medium_Phone/bp_api34 均 ~45s 起）→ 绕过 GMD 用手动连接设备。`collect<Flavor>BaselineProfile` 同时依赖 connected+managedDevices，managedDevices 留着会再触发 GMD 挂死。
+- **baseline profile 采集需 API 33+**：连接设备 API30 报 "Baseline Profile collection requires API 33+, or rooted device API 28+"（production build 不可 root）→ 建 bp_api34(API34) AVD。
+- **代理对 SDK 下载不稳**：sdkmanager 多 manifest 批量拉取撞代理 down 期反复 "IO exception while downloading manifest/Failed to find package"；改 `curl -C -` 续传直下 `x86_64-34_r14.zip`（1.56GB，4 次续传累积）+ 手动解压到 system-images + 补 `Pkg.Path` → sdkmanager --list_installed 识别。
+- **代理 TLS 传输间歇不稳**贯穿 Phase2/3：CONNECT 200 但隧道内 reset（~40-60% 丢包），所有下载用重试循环暖缓存收敛（Gradle 部分成功累积缓存）。
+
 ## 下一步
-- **T3.2 全链路验收门**：① 全 flavor×buildType `:app:assemble` ② spotless+lint+lint module ③ `dependencyGuardBaseline` 重生+人工 diff 审查 ④ `verifyRoborazziDevDebug`（dependency-guard 0.5.0 兼容此处验）⑤ android-cli 模拟器 `:core:database:connectedDebugAndroidTest`（Room 迁移）⑥ baseline profile 生成非空 ⑦ apksigner verify ⑧ commit 基线。
-- **T3.3**：节点2 `comprehensive-review:full-review` + `finishing-a-development-branch` 人工合入。
+- **T3.3**：节点2 `comprehensive-review:full-review`（全 diff 跨模块+构建+workflow）→ `finishing-a-development-branch` 人工合入。
+- 残留清理项：`KotlinAndroid.kt:80` `Project.provideDelegate` Gradle9.6 弃用 warning（warningsAsErrors 关，非阻塞）；baselineprofile 1.5.0-alpha06 待稳定版回退（技术债）。
 
 ## T1.6 API 36 行为审查（M8，基于官方 behavior-changes-16）
 targetSdk 35→36 = Android 16 行为变更生效。对 Cashbook 适用性：
