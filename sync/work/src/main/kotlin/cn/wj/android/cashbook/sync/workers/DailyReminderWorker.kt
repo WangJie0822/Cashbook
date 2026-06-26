@@ -40,13 +40,13 @@ import cn.wj.android.cashbook.sync.reminder.ReminderItem
 import cn.wj.android.cashbook.sync.reminder.computeReminders
 import cn.wj.android.cashbook.sync.reminder.reminderCheckDates
 import cn.wj.android.cashbook.sync.reminder.reminderDeepLinkIntent
+import cn.wj.android.cashbook.sync.reminder.reminderNotificationId
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -110,7 +110,7 @@ class DailyReminderWorker @AssistedInject constructor(
         }
 
         settingRepository.updateLastReminderCheckMs(
-            LocalDate.now(zone).atStartOfDay(zone).toInstant().toEpochMilli(),
+            Instant.ofEpochMilli(todayMs).atZone(zone).toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli(),
         )
         Result.success()
     }
@@ -118,24 +118,25 @@ class DailyReminderWorker @AssistedInject constructor(
     private fun notify(item: ReminderItem) {
         val nm = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             ?: return
+        val id = reminderNotificationId(ReminderNotificationBaseId, item)
         when (item) {
             is ReminderItem.CreditCardBilling -> sendNotification(
                 nm = nm,
-                id = ReminderNotificationBaseId + item.assetId.toInt() * 2,
+                id = id,
                 text = appContext.getString(R.string.reminder_credit_billing, item.assetName),
                 intent = reminderDeepLinkIntent(appContext, REMINDER_TARGET_ASSET, item.assetId),
             )
 
             is ReminderItem.CreditCardRepayment -> sendNotification(
                 nm = nm,
-                id = ReminderNotificationBaseId + item.assetId.toInt() * 2 + 1,
+                id = id,
                 text = appContext.getString(R.string.reminder_credit_repayment, item.assetName),
                 intent = reminderDeepLinkIntent(appContext, REMINDER_TARGET_ASSET, item.assetId),
             )
 
             is ReminderItem.Reimbursement -> sendNotification(
                 nm = nm,
-                id = ReminderNotificationBaseId,
+                id = id,
                 text = appContext.getString(R.string.reminder_reimbursement, item.count),
                 intent = reminderDeepLinkIntent(appContext, REMINDER_TARGET_REIMBURSEMENT, -1L),
             )

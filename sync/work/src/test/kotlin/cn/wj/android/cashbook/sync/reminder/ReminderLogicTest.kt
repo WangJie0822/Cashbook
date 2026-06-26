@@ -213,4 +213,27 @@ class ReminderLogicTest {
         val result = reminderCheckDates(ms(today), ms(today), zone)
         assertThat(result).isEmpty()
     }
+
+    // ========== reminderNotificationId 通知 id 派生 ==========
+
+    @Test
+    fun notificationId_billingAndRepayment_distinct() {
+        val billing = reminderNotificationId(20016, ReminderItem.CreditCardBilling(3L, "卡"))
+        val repayment = reminderNotificationId(20016, ReminderItem.CreditCardRepayment(3L, "卡"))
+        assertThat(billing).isEqualTo(20016 + 6)
+        assertThat(repayment).isEqualTo(20016 + 7)
+        assertThat(billing).isNotEqualTo(repayment)
+    }
+
+    @Test
+    fun notificationId_reimbursement_isBase() {
+        assertThat(reminderNotificationId(20016, ReminderItem.Reimbursement(5))).isEqualTo(20016)
+    }
+
+    @Test
+    fun notificationId_differentCards_distinct() {
+        val a = reminderNotificationId(20016, ReminderItem.CreditCardBilling(1L, "A"))
+        val b = reminderNotificationId(20016, ReminderItem.CreditCardBilling(2L, "B"))
+        assertThat(a).isNotEqualTo(b)
+    }
 }

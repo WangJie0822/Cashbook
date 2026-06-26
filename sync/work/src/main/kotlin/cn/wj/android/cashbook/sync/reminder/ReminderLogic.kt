@@ -88,3 +88,14 @@ internal fun reminderCheckDates(
     }
     return dates
 }
+
+/**
+ * 由提醒类型派生稳定的通知 id（同一卡每类事件唯一、待报销固定）。
+ * billing = [baseId] + assetId*2；repayment = +1；reimbursement = [baseId]。
+ * 同一提醒重发用同 id 替换而非堆叠。
+ */
+internal fun reminderNotificationId(baseId: Int, item: ReminderItem): Int = when (item) {
+    is ReminderItem.CreditCardBilling -> baseId + item.assetId.toInt() * 2
+    is ReminderItem.CreditCardRepayment -> baseId + item.assetId.toInt() * 2 + 1
+    is ReminderItem.Reimbursement -> baseId
+}
