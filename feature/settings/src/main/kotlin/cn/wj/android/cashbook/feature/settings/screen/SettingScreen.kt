@@ -115,6 +115,8 @@ internal fun SettingRoute(
         onImageQualitySelected = viewModel::onImageQualitySelected,
         onMonthStartDayClick = viewModel::onMonthStartDayClick,
         onMonthStartDaySelected = viewModel::onMonthStartDaySelected,
+        onCreditCardReminderEnableChanged = viewModel::onCreditCardReminderEnableChanged,
+        onReimbursementReminderEnableChanged = viewModel::onReimbursementReminderEnableChanged,
         onNeedSecurityVerificationWhenLaunchChanged = viewModel::onNeedSecurityVerificationWhenLaunchChanged,
         onEnableFingerprintVerificationChanged = viewModel::onEnableFingerprintVerificationChanged,
         onPasswordClick = viewModel::onPasswordClick,
@@ -182,6 +184,8 @@ internal fun SettingScreen(
     onImageQualitySelected: (ImageQualityEnum) -> Unit,
     onMonthStartDayClick: () -> Unit,
     onMonthStartDaySelected: (Int) -> Unit,
+    onCreditCardReminderEnableChanged: (Boolean) -> Unit,
+    onReimbursementReminderEnableChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -239,6 +243,8 @@ internal fun SettingScreen(
             onImageQualitySelected = onImageQualitySelected,
             onMonthStartDayClick = onMonthStartDayClick,
             onMonthStartDaySelected = onMonthStartDaySelected,
+            onCreditCardReminderEnableChanged = onCreditCardReminderEnableChanged,
+            onReimbursementReminderEnableChanged = onReimbursementReminderEnableChanged,
             onNeedSecurityVerificationWhenLaunchChanged = onNeedSecurityVerificationWhenLaunchChanged,
             onEnableFingerprintVerificationChanged = onEnableFingerprintVerificationChanged,
             onPasswordClick = onPasswordClick,
@@ -292,6 +298,8 @@ internal fun SettingContent(
     onImageQualitySelected: (ImageQualityEnum) -> Unit,
     onMonthStartDayClick: () -> Unit,
     onMonthStartDaySelected: (Int) -> Unit,
+    onCreditCardReminderEnableChanged: (Boolean) -> Unit,
+    onReimbursementReminderEnableChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -400,6 +408,31 @@ internal fun SettingContent(
                                 contentDescription = null,
                             )
                         }
+                    },
+                )
+                CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
+            }
+
+            item {
+                CbListItem(
+                    modifier = Modifier.padding(top = 16.dp),
+                    headlineContent = { Text(text = stringResource(id = R.string.credit_card_reminder)) },
+                    supportingContent = { Text(text = stringResource(id = R.string.credit_card_reminder_hint)) },
+                    trailingContent = {
+                        Switch(
+                            checked = uiState.creditCardReminderEnable,
+                            onCheckedChange = onCreditCardReminderEnableChanged,
+                        )
+                    },
+                )
+                CbListItem(
+                    headlineContent = { Text(text = stringResource(id = R.string.reimbursement_reminder)) },
+                    supportingContent = { Text(text = stringResource(id = R.string.reimbursement_reminder_hint)) },
+                    trailingContent = {
+                        Switch(
+                            checked = uiState.reimbursementReminderEnable,
+                            onCheckedChange = onReimbursementReminderEnableChanged,
+                        )
                     },
                 )
                 CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
@@ -1356,6 +1389,8 @@ private fun SettingScreenPreview() {
             onImageQualitySelected = { _ -> },
             onMonthStartDayClick = { },
             onMonthStartDaySelected = { _ -> },
+            onCreditCardReminderEnableChanged = { },
+            onReimbursementReminderEnableChanged = { },
             onVerifyConfirmClick = { _, _ -> },
             onClearConfirmClick = { _, _ -> },
             onFingerprintVerifySuccess = { },

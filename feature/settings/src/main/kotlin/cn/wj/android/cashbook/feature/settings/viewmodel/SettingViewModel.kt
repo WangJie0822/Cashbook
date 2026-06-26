@@ -79,6 +79,8 @@ class SettingViewModel @Inject constructor(
             darkMode = app.darkMode,
             dynamicColor = app.dynamicColor,
             monthStartDay = normalizeMonthStartDay(record.monthStartDay),
+            creditCardReminderEnable = app.creditCardReminderEnable,
+            reimbursementReminderEnable = app.reimbursementReminderEnable,
         )
     }
         .stateIn(
@@ -327,6 +329,18 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    fun onCreditCardReminderEnableChanged(enable: Boolean) {
+        viewModelScope.launch {
+            settingRepository.updateCreditCardReminderEnable(enable)
+        }
+    }
+
+    fun onReimbursementReminderEnableChanged(enable: Boolean) {
+        viewModelScope.launch {
+            settingRepository.updateReimbursementReminderEnable(enable)
+        }
+    }
+
     fun onVerificationModeSelected(verificationMode: VerificationModeEnum) {
         viewModelScope.launch {
             settingRepository.updateVerificationMode(verificationMode)
@@ -369,6 +383,8 @@ sealed class SettingUiState(
     open val darkMode: DarkModeEnum = DarkModeEnum.FOLLOW_SYSTEM,
     open val dynamicColor: Boolean = false,
     open val monthStartDay: Int = 1,
+    open val creditCardReminderEnable: Boolean = false,
+    open val reimbursementReminderEnable: Boolean = false,
 ) {
     data object Loading : SettingUiState()
 
@@ -382,5 +398,7 @@ sealed class SettingUiState(
         override val darkMode: DarkModeEnum,
         override val dynamicColor: Boolean,
         override val monthStartDay: Int,
+        override val creditCardReminderEnable: Boolean,
+        override val reimbursementReminderEnable: Boolean,
     ) : SettingUiState()
 }

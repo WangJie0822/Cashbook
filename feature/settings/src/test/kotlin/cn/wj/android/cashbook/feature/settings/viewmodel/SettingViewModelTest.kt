@@ -211,6 +211,38 @@ class SettingViewModelTest {
     }
 
     @Test
+    fun when_credit_card_reminder_changed_then_setting_updated() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher()) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.onCreditCardReminderEnableChanged(true)
+
+        val settings = settingRepository.appSettingsModel.first()
+        assertThat(settings.creditCardReminderEnable).isTrue()
+        val state = viewModel.uiState.value as SettingUiState.Success
+        assertThat(state.creditCardReminderEnable).isTrue()
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun when_reimbursement_reminder_changed_then_setting_updated() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher()) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.onReimbursementReminderEnableChanged(true)
+
+        val settings = settingRepository.appSettingsModel.first()
+        assertThat(settings.reimbursementReminderEnable).isTrue()
+        val state = viewModel.uiState.value as SettingUiState.Success
+        assertThat(state.reimbursementReminderEnable).isTrue()
+
+        collectJob.cancel()
+    }
+
+    @Test
     fun when_verification_mode_click_then_dialog_shown() {
         viewModel.onVerificationModeClick()
 
