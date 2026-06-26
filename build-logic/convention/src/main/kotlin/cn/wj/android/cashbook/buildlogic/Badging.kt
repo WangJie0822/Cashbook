@@ -60,7 +60,8 @@ abstract class GenerateBadgingTask : DefaultTask() {
 
     @TaskAction
     fun taskAction() {
-        println("> Task :${project.name}:GenerateBadgingTask")
+        // config-cache：@TaskAction(执行阶段)不可访问 Task.project，去掉 project.name
+        println("> Task :GenerateBadgingTask")
         execOperations.exec {
             commandLine(
                 aapt2Executable.get().asFile.absolutePath,

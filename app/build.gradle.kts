@@ -248,13 +248,16 @@ dependencyGuard {
 
 /** 配置 CI 构建生成 RELEASE.md（仅 BUILD_TAG_NAME 设置时；不依赖变体，AGP9 移除变体 API 后改普通 task + preBuild.dependsOn） */
 fun Project.configGenerateReleaseFile() {
+    // config-cache：执行阶段(doLast)不可访问 Task.project，配置阶段捕获所需值
+    val rootDirFile = rootDir
+    val projectName = name
     val generateReleaseFile = tasks.register("generateReleaseFile") {
         doLast {
             val buildTagName = System.getenv("BUILD_TAG_NAME")
             if (!buildTagName.isNullOrBlank()) {
                 // CI 构建流程，生成 RELEASE.md
-                File(rootDir, "CHANGELOG.md").readText().lines().let { list ->
-                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md")
+                File(rootDirFile, "CHANGELOG.md").readText().lines().let { list ->
+                    println("> Task :$projectName:beforeMergeAssets generate RELEASE.md")
                     val start = if (buildTagName.endsWith("_pre")) {
                         // 预发布版本，使用 [Unreleased] 作为发布说明
                         list.indexOf("## [Unreleased]")
@@ -280,8 +283,8 @@ fun Project.configGenerateReleaseFile() {
                         }
                         toString()
                     }
-                    println("> Task :${project.name}:beforeMergeAssets generate RELEASE.md content = <$content>")
-                    val releaseFile = File(rootDir, "RELEASE.md")
+                    println("> Task :$projectName:beforeMergeAssets generate RELEASE.md content = <$content>")
+                    val releaseFile = File(rootDirFile, "RELEASE.md")
                     if (releaseFile.exists()) {
                         releaseFile.delete()
                     }

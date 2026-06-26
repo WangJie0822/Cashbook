@@ -27,11 +27,14 @@ android {
 // 原实现挂在 libraryVariants.preBuild.doFirst（AGP 9 移除变体 API），改为普通 Copy task 并让 preBuild 依赖它。
 val copyLegalDocsToAssets by tasks.registering(Copy::class) {
     val intoDir = File(projectDir, "src/main/assets")
+    // config-cache：执行阶段(doFirst)不可访问 Task.project，配置阶段捕获所需值
+    val rootDirFile = rootDir
+    val projectName = project.name
     doFirst {
-        println("> Task :${project.name}:copyLegalDocsToAssets copy .md files from $rootDir into $intoDir")
-        delete(intoDir)
+        println("> Task :$projectName:copyLegalDocsToAssets copy .md files from $rootDirFile into $intoDir")
+        intoDir.deleteRecursively()
     }
-    from(rootDir) {
+    from(rootDirFile) {
         include("PRIVACY_POLICY.md", "CHANGELOG.md")
     }
     into(intoDir)
