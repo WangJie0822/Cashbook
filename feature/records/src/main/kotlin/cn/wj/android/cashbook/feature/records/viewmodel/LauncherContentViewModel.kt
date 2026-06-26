@@ -93,6 +93,19 @@ class LauncherContentViewModel @Inject constructor(
                             .e(e, "background netRecalc failed, will retry next launch")
                     }
                 }
+                if (!tempKeys.imagesToFilesMigrated) {
+                    // 图片 BLOB→文件 backfill 后台静默跑；逐行幂等、崩溃可重入，
+                    // backfillImagesToFiles 内部成功后置位 imagesToFilesMigrated。
+                    // try/catch：失败不连累已放行首屏，标志未置位则下次启动幂等重试。
+                    try {
+                        recordRepository.backfillImagesToFiles()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        this@LauncherContentViewModel.logger()
+                            .e(e, "background image backfill failed, will retry next launch")
+                    }
+                }
             }
         }
     }

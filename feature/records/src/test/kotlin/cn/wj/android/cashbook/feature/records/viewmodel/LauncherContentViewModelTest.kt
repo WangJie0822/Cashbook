@@ -110,6 +110,66 @@ class LauncherContentViewModelTest {
     }
 
     @Test
+    fun when_imagesToFiles_not_migrated_then_backfill_called() {
+        // 图片未迁移 → 首屏 gate 触发 backfillImagesToFiles 一次（净自付已重算以隔离）
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = true,
+                imagesToFilesMigrated = false,
+            ),
+        )
+        val freshRecordRepository = FakeRecordRepository()
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = freshRecordRepository,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+
+        LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = freshRecordRepository,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        assertThat(freshRecordRepository.backfillImagesToFilesCount).isEqualTo(1)
+    }
+
+    @Test
+    fun when_imagesToFiles_already_migrated_then_backfill_not_called() {
+        // 图片已迁移 → 首屏不再触发 backfill
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = true,
+                imagesToFilesMigrated = true,
+            ),
+        )
+        val freshRecordRepository = FakeRecordRepository()
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = freshRecordRepository,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+
+        LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = freshRecordRepository,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        assertThat(freshRecordRepository.backfillImagesToFilesCount).isEqualTo(0)
+    }
+
+    @Test
     fun when_net_recalc_running_then_uiState_already_success() = runTest {
         // M-D 区分力：净自付重算"进行中"时首屏应已放行为 Success（旧顺序此时为 Loading → 对旧实现 FAIL）
         settingRepository.setTempKeys(
