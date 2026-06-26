@@ -35,6 +35,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asSummaryModel
 import cn.wj.android.cashbook.core.data.repository.asTable
+import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
@@ -57,6 +58,7 @@ class RecordRepositoryImpl @Inject constructor(
     private val recordDao: RecordDao,
     private val transactionDao: TransactionDao,
     private val combineProtoDataSource: CombineProtoDataSource,
+    private val recordImageFileStorage: RecordImageFileStorage,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : RecordRepository {
 
@@ -87,12 +89,14 @@ class RecordRepositoryImpl @Inject constructor(
         relatedImageList: List<ImageModel>,
     ) = withContext(coroutineContext) {
         logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
+        // 新图：写文件 + path 相对化 + bytes 置空（消 DB BLOB 膨胀）；已托管/无 bytes 行原样透传
+        val persistedImages = persistNewImages(relatedImageList, recordImageFileStorage)
         transactionDao.updateRecordTransaction(
             record = record.asTable(),
             tagIdList = tagIdList,
             needRelated = needRelated,
             relatedRecordIdList = relatedRecordIdList,
-            relatedImageList = relatedImageList,
+            relatedImageList = persistedImages,
         )
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
@@ -627,4 +631,21 @@ class RecordRepositoryImpl @Inject constructor(
         withContext(coroutineContext) {
             recordDao.queryEarliestRecordTime(booksId)
         }
+}
+
+/**
+ * 落盘新图：对每张图，若有 bytes 且 path 尚未托管，则写文件系统 + path 改为相对值 + bytes 置空数组；
+ * 已托管或无 bytes 的图原样返回。抽为顶层 internal fun 便于单测（无需构造整个 Repository）。
+ */
+internal fun persistNewImages(
+    images: List<ImageModel>,
+    storage: RecordImageFileStorage,
+): List<ImageModel> = images.map { image ->
+    if (image.bytes.isNotEmpty() && !storage.isManaged(image.path)) {
+        val relativePath = storage.newRelativePath()
+        storage.write(relativePath, image.bytes)
+        image.copy(path = relativePath, bytes = ByteArray(0))
+    } else {
+        image
+    }
 }
