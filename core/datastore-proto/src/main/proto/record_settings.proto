@@ -7,7 +7,7 @@ option java_multiple_files = true;
 message RecordSettings {
   sint64 currentBookId = 1; // 当前使用的账本 id
   sint64 defaultTypeId = 2; // 默认类型 id
-  sint64 lastAssetId = 3; // 上一次使用资产 id
+  sint64 lastAssetId = 3; // [legacy] 上一次使用资产 id；自 2026-06-26 起不再被 getDefaultRecord 读取，默认资产改由 RecordDao.queryLastUsedAssetId 按账本派生。保留字段以兼容存量数据与 splitAppPreferences 迁移，勿复用字段号
   sint64 refundTypeId = 4; // 退款类型 id
   sint64 reimburseTypeId = 5; // 报销类型 id
   sint64 creditCardPaymentTypeId = 6; // 信用卡还款类型 id

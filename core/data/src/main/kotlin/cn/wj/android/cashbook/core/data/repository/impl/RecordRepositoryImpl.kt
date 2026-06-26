@@ -96,8 +96,6 @@ class RecordRepositoryImpl @Inject constructor(
         )
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
-        // 更新上次使用的默认数据
-        combineProtoDataSource.updateLastAssetId(record.assetId)
     }
 
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
@@ -376,7 +374,7 @@ class RecordRepositoryImpl @Inject constructor(
                 id = -1L,
                 booksId = appDataModel.currentBookId,
                 typeId = typeId,
-                assetId = appDataModel.lastAssetId,
+                assetId = recordDao.queryLastUsedAssetId(appDataModel.currentBookId) ?: -1L,
                 relatedAssetId = -1L,
                 amount = 0L,
                 finalAmount = 0L,
