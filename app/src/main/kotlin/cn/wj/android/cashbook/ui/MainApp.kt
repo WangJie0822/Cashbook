@@ -59,6 +59,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
+import cn.wj.android.cashbook.core.common.REMINDER_TARGET_ASSET
+import cn.wj.android.cashbook.core.common.REMINDER_TARGET_NONE
+import cn.wj.android.cashbook.core.common.REMINDER_TARGET_REIMBURSEMENT
 import cn.wj.android.cashbook.core.common.SHORTCUTS_TYPE_ADD
 import cn.wj.android.cashbook.core.common.SHORTCUTS_TYPE_ASSET
 import cn.wj.android.cashbook.core.common.TestTag
@@ -85,6 +88,7 @@ import cn.wj.android.cashbook.core.ui.LocalNavController
 import cn.wj.android.cashbook.core.ui.ProgressDialog
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.popBackStackSafety
+import cn.wj.android.cashbook.feature.assets.navigation.AssetInfo
 import cn.wj.android.cashbook.feature.assets.navigation.EditRecordSelectAssetBottomSheetContent
 import cn.wj.android.cashbook.feature.assets.navigation.MyAsset
 import cn.wj.android.cashbook.feature.assets.navigation.assetInfoScreen
@@ -106,6 +110,7 @@ import cn.wj.android.cashbook.feature.record.imports.navigation.recordImportScre
 import cn.wj.android.cashbook.feature.records.navigation.AssetInfoContent
 import cn.wj.android.cashbook.feature.records.navigation.EditRecord
 import cn.wj.android.cashbook.feature.records.navigation.LauncherContent
+import cn.wj.android.cashbook.feature.records.navigation.Reimbursement
 import cn.wj.android.cashbook.feature.records.navigation.analyticsScreen
 import cn.wj.android.cashbook.feature.records.navigation.calendarScreen
 import cn.wj.android.cashbook.feature.records.navigation.editRecordScreen
@@ -151,6 +156,8 @@ private val START_DESTINATION = SettingsLauncher
 @Composable
 fun MainApp(
     shortcutsType: Int,
+    reminderTarget: Int = REMINDER_TARGET_NONE,
+    reminderAssetId: Long = -1L,
     viewModel: MainAppViewModel = viewModel(),
 ) {
     // 监听生命周期
@@ -240,6 +247,29 @@ fun MainApp(
                                     // 当前已显示对应界面，不重复显示
                                     if (navController.currentDestination?.hasRoute<MyAsset>() != true) {
                                         navController.naviToMyAsset()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 提醒深链：受安全验证门控（needVerity 未通过不导航，防绕过密码/指纹门）
+                LaunchedEffect(reminderTarget, reminderAssetId, uiState) {
+                    (uiState as? MainAppUiState.Success)?.run {
+                        if (!needRequestProtocol && !needVerity) {
+                            when (reminderTarget) {
+                                REMINDER_TARGET_ASSET -> {
+                                    if (reminderAssetId > 0 &&
+                                        navController.currentDestination?.hasRoute<AssetInfo>() != true
+                                    ) {
+                                        navController.naviToAssetInfo(reminderAssetId)
+                                    }
+                                }
+
+                                REMINDER_TARGET_REIMBURSEMENT -> {
+                                    if (navController.currentDestination?.hasRoute<Reimbursement>() != true) {
+                                        navController.naviToReimbursement()
                                     }
                                 }
                             }

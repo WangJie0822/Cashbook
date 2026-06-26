@@ -26,12 +26,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import cn.wj.android.cashbook.core.common.EXTRA_REMINDER_ASSET_ID
+import cn.wj.android.cashbook.core.common.EXTRA_REMINDER_TARGET
+import cn.wj.android.cashbook.core.common.REMINDER_TARGET_NONE
 import cn.wj.android.cashbook.core.common.SHORTCUTS_TYPE
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
@@ -48,13 +52,22 @@ class MainActivity : AppCompatActivity() {
     /** 快捷入口打开类型 */
     private var shortcutsType by mutableIntStateOf(-1)
 
+    /** 提醒深链目标类型 */
+    private var reminderTarget by mutableIntStateOf(REMINDER_TARGET_NONE)
+
+    /** 提醒深链资产 id（信用卡详情用） */
+    private var reminderAssetId by mutableLongStateOf(-1L)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
         // 获取快捷方式类型
         shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
-        logger().i("onCreate(), shortcutsType = <$shortcutsType>")
+        // 获取提醒深链目标
+        reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE)
+        reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L)
+        logger().i("onCreate(), shortcutsType = <$shortcutsType>, reminderTarget = <$reminderTarget>")
 
         var uiState: ActivityUiState by mutableStateOf(ActivityUiState.Loading)
 
@@ -103,7 +116,11 @@ class MainActivity : AppCompatActivity() {
                 disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
             ) {
                 ProvideLocalState {
-                    MainApp(shortcutsType = shortcutsType)
+                    MainApp(
+                        shortcutsType = shortcutsType,
+                        reminderTarget = reminderTarget,
+                        reminderAssetId = reminderAssetId,
+                    )
                 }
             }
         }
@@ -112,7 +129,9 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
-        logger().i("onNewIntent(), shortcutsType = <$shortcutsType>")
+        reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE)
+        reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L)
+        logger().i("onNewIntent(), shortcutsType = <$shortcutsType>, reminderTarget = <$reminderTarget>")
     }
 }
 
