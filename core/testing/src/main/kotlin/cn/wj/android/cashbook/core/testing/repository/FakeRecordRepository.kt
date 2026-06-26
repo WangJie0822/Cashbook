@@ -125,6 +125,14 @@ class FakeRecordRepository : RecordRepository {
         backfillImagesToFilesCount++
     }
 
+    /** [cleanupOrphanImageFiles] 调用次数，供首屏 gate 测试断言 */
+    var cleanupOrphanImageFilesCount = 0
+        private set
+
+    override suspend fun cleanupOrphanImageFiles(graceWindowMs: Long) {
+        cleanupOrphanImageFilesCount++
+    }
+
     override suspend fun deleteRecord(recordId: Long) {
         lastDeletedRecordId = recordId
         records.removeAll { it.id == recordId }

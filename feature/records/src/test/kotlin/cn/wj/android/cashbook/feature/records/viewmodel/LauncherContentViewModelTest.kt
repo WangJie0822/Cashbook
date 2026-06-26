@@ -170,6 +170,36 @@ class LauncherContentViewModelTest {
     }
 
     @Test
+    fun launcher_always_runs_orphan_image_cleanup() {
+        // 孤儿扫描每次启动兜底：即便全迁移完成也会跑一次
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = true,
+                imagesToFilesMigrated = true,
+            ),
+        )
+        val freshRecordRepository = FakeRecordRepository()
+        val useCase = RecordModelTransToViewsUseCase(
+            recordRepository = freshRecordRepository,
+            typeRepository = FakeTypeRepository(),
+            assetRepository = FakeAssetRepository(),
+            tagRepository = FakeTagRepository(),
+            coroutineContext = dispatcherRule.testDispatcher,
+        )
+
+        LauncherContentViewModel(
+            booksRepository = booksRepository,
+            settingRepository = settingRepository,
+            recordRepository = freshRecordRepository,
+            recordModelTransToViewsUseCase = useCase,
+        )
+
+        assertThat(freshRecordRepository.cleanupOrphanImageFilesCount).isEqualTo(1)
+    }
+
+    @Test
     fun when_net_recalc_running_then_uiState_already_success() = runTest {
         // M-D 区分力：净自付重算"进行中"时首屏应已放行为 Success（旧顺序此时为 Loading → 对旧实现 FAIL）
         settingRepository.setTempKeys(

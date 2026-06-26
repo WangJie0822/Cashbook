@@ -58,6 +58,19 @@ internal fun deleteRecordImageFile(baseDir: File, relativePath: String): Boolean
 }
 
 /**
+ * 计算孤儿文件：不在引用集（按文件名）、是普通文件、lastModified 早于 now-grace 才算
+ * （grace window 保护刚写入但尚未被 DB 引用的新文件 / backfill 在途文件）。纯函数，便于单测。
+ */
+internal fun computeOrphanFiles(
+    referencedNames: Set<String>,
+    files: List<File>,
+    nowMs: Long,
+    graceWindowMs: Long,
+): List<File> = files.filter { f ->
+    f.isFile && f.name !in referencedNames && f.lastModified() < nowMs - graceWindowMs
+}
+
+/**
  * 记录图片文件存储入口（接口便于单测注入 fake）。
  *
  * 图片落 `filesDir/record_images/` 应用私有目录（minSdk 24 无需权限），

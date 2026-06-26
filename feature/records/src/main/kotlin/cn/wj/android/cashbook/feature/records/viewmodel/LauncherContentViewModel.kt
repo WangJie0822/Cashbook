@@ -107,6 +107,15 @@ class LauncherContentViewModel @Inject constructor(
                     }
                 }
             }
+            // 启动孤儿图片扫描（每次启动兜底：批量删账本/资产、编辑替换可能留孤儿文件）；
+            // grace window 保护刚写入/backfill 在途文件，未 backfill 行无 record_images 文件故不误删。
+            try {
+                recordRepository.cleanupOrphanImageFiles()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                this@LauncherContentViewModel.logger().e(e, "orphan image cleanup failed")
+            }
         }
     }
 

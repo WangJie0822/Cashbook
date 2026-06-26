@@ -36,6 +36,7 @@ import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asSummaryModel
 import cn.wj.android.cashbook.core.data.repository.asTable
 import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
+import cn.wj.android.cashbook.core.data.uitl.computeOrphanFiles
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
@@ -641,6 +642,20 @@ class RecordRepositoryImpl @Inject constructor(
         // 成功后置位（封装在仓库，ViewModel 只读标志即可），下次启动幂等跳过；
         // 参照 finalAmountNetRecalcDone 的 F2 统一副作用模式
         combineProtoDataSource.updateImagesToFilesMigrated(true)
+    }
+
+    override suspend fun cleanupOrphanImageFiles(graceWindowMs: Long) = withContext(coroutineContext) {
+        // DB 引用集（仅托管 path，取文件名）
+        val referenced = recordDao.queryAllImages()
+            .map { it.path }
+            .filter { recordImageFileStorage.isManaged(it) }
+            .map { it.substringAfterLast('/') }
+            .toSet()
+        val children = recordImageFileStorage.baseDir().listFiles()?.toList()
+        if (children != null) {
+            computeOrphanFiles(referenced, children, System.currentTimeMillis(), graceWindowMs)
+                .forEach { it.delete() }
+        }
     }
 }
 
