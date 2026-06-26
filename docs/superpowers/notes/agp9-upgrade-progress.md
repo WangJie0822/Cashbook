@@ -73,9 +73,17 @@
 - **代理对 SDK 下载不稳**：sdkmanager 多 manifest 批量拉取撞代理 down 期反复 "IO exception while downloading manifest/Failed to find package"；改 `curl -C -` 续传直下 `x86_64-34_r14.zip`（1.56GB，4 次续传累积）+ 手动解压到 system-images + 补 `Pkg.Path` → sdkmanager --list_installed 识别。
 - **代理 TLS 传输间歇不稳**贯穿 Phase2/3：CONNECT 200 但隧道内 reset（~40-60% 丢包），所有下载用重试循环暖缓存收敛（Gradle 部分成功累积缓存）。
 
-## 下一步
-- **T3.3**：节点2 `comprehensive-review:full-review`（全 diff 跨模块+构建+workflow）→ `finishing-a-development-branch` 人工合入。
-- 残留清理项：`KotlinAndroid.kt:80` `Project.provideDelegate` Gradle9.6 弃用 warning（warningsAsErrors 关，非阻塞）；baselineprofile 1.5.0-alpha06 待稳定版回退（技术债）。
+## T3.3 节点2 full-review 完成（Phase1-2，用户 checkpoint 收口）
+- 四维（code-quality/architecture/security/performance）独立评审全 diff，controller 对所有强断言 hands-on 核验。
+- **抓出并修复 1 个 High 回归（full-review 核心价值）**：`app/build.gradle.kts` 两个 `baselineProfile{}` 块矛盾——T2.3 移 per-buildType `automaticGenerationDuringBuild` 时新增顶层块(=true)，漏看既存顶层块(=false,mergeIntoMain=true)，last-write-wins → 净 false → release 基线 profile 自动生成被静默关闭（比 main 经 per-buildType=true 更糟）。字节码证 setter 无 merge=last-write-wins，controller 字节码+main 对比核验属实。**修复 commit `4a7b6caa`**（合并单块 =true+mergeIntoMain=true，`:app:help` 配置通过）。T3.2⑥ 用手动 collect 未走此 build 钩子故验收不可见——节点2 不可替代价值。
+- 其余非阻塞：Medium（Outputs configureEach / configuration-cache=false 提速机会 / CI GMD 生成路径+镜像源+heap 未端到端覆盖 / proto 冷缓存）+ Low/pre-existing（PLUGIN_KOTLIN_ANDROID 死常量 / GenerateFlavorTask 输入指纹 / F-2 CI action pin tag / F-3 mvnrepository.com 源 后两者 pre-existing 非本升级引入）。
+- 供应链独立核验全干净（sha256 两源逐字节一致 / dependency-guard 全官方坐标 / alpha 仅构建期不入 APK / targetSdk36 edge-to-edge 已实现）。
+- **结论：0 未修复 Critical/High，交付就绪**。报告 `.full-review/05-final-report.md`（评审 scratch，不入项目 git）。
+
+## 合入决策（待人工拍板）
+- `finishing-a-development-branch`：全绿 + 节点2 通过 → 由用户拍板 upgrade-agp9 合入 main。
+- 合入前建议：推 PR / 打 `v*_pre` tag 实跑一次真实 CI，覆盖本机未端到端验证的 CI 路径（GMD 基线生成+镜像源、proto 冷缓存、CI heap/parallel、签名链 build-tools 36）。
+- 独立 follow-up（pre-existing/技术债，非本升级 blocker）：CI action SHA pin（F-2 android-sign 优先）+ 移除 mvnrepository.com 源 + verification-metadata.xml（F-3）；configuration-cache 评估开启；baselineprofile 1.5.0-alpha06 待稳定版回退；`KotlinAndroid.kt:80` provideDelegate Gradle9.6 弃用 warning（warningsAsErrors 关，非阻塞）。
 
 ## T1.6 API 36 行为审查（M8，基于官方 behavior-changes-16）
 targetSdk 35→36 = Android 16 行为变更生效。对 Cashbook 适用性：
