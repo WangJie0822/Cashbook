@@ -25,6 +25,9 @@ import java.io.File
 class FakeRecordImageFileStorage : RecordImageFileStorage {
 
     val files = linkedMapOf<String, ByteArray>()
+
+    /** 测试用：write 命中这些相对路径时抛 IOException（模拟坏行/IO 失败） */
+    val failWritePaths = mutableSetOf<String>()
     private var counter = 0L
 
     override fun newRelativePath(): String = newRecordImageRelativePath("new${counter++}")
@@ -38,6 +41,7 @@ class FakeRecordImageFileStorage : RecordImageFileStorage {
     override fun exists(relativePath: String): Boolean = files.containsKey(relativePath)
 
     override fun write(relativePath: String, bytes: ByteArray) {
+        if (relativePath in failWritePaths) throw java.io.IOException("simulated write failure")
         files[relativePath] = bytes
     }
 

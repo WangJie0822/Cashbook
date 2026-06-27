@@ -44,6 +44,7 @@ import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -638,16 +639,16 @@ class RecordRepositoryImpl @Inject constructor(
         }
 
     override suspend fun backfillImagesToFiles() = withContext(coroutineContext) {
-        runImageBackfill(recordDao, recordImageFileStorage)
-        // 成功后置位（封装在仓库，ViewModel 只读标志即可），下次启动幂等跳过；
+        // 仅 clean pass（无坏行）才置位，否则下次启动重试剩余未迁移行（封装在仓库，ViewModel 只读标志即可）；
         // 参照 finalAmountNetRecalcDone 的 F2 统一副作用模式
-        combineProtoDataSource.updateImagesToFilesMigrated(true)
+        if (runImageBackfill(recordDao, recordImageFileStorage)) {
+            combineProtoDataSource.updateImagesToFilesMigrated(true)
+        }
     }
 
     override suspend fun cleanupOrphanImageFiles(graceWindowMs: Long) = withContext(coroutineContext) {
-        // DB 引用集（仅托管 path，取文件名）
-        val referenced = recordDao.queryAllImages()
-            .map { it.path }
+        // DB 引用集仅取 path 投影（不读 BLOB，避免一次性物化全表 BLOB 致 OOM）
+        val referenced = recordDao.queryAllImagePaths()
             .filter { recordImageFileStorage.isManaged(it) }
             .map { it.substringAfterLast('/') }
             .toSet()
@@ -671,14 +672,24 @@ class RecordRepositoryImpl @Inject constructor(
 internal suspend fun runImageBackfill(
     recordDao: RecordDao,
     storage: RecordImageFileStorage,
-) {
-    recordDao.queryAllImages().forEach { image ->
-        val id = image.id ?: return@forEach
-        if (image.bytes.isEmpty()) return@forEach
-        val relativePath = storage.relativePathForId(id)
-        storage.write(relativePath, image.bytes)
-        recordDao.updateImagePathAndBytes(id, relativePath, ByteArray(0))
+): Boolean {
+    var clean = true
+    // 流式逐 id：每次只取单图 bytes，峰值内存 O(单图) 而非 O(Σ全表 BLOB)，消 OOM
+    recordDao.queryUnmigratedImageIds().forEach { id ->
+        try {
+            val bytes = recordDao.queryImageBytesById(id) ?: return@forEach
+            if (bytes.isEmpty()) return@forEach
+            val relativePath = storage.relativePathForId(id)
+            storage.write(relativePath, bytes)
+            recordDao.updateImagePathAndBytes(id, relativePath, ByteArray(0))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            // 坏行（IO/损坏/超大）跳过、不阻塞其余行；本 pass 非 clean → 调用方不置 migrated 标志、下次启动重试
+            clean = false
+        }
     }
+    return clean
 }
 
 /**

@@ -471,9 +471,21 @@ interface RecordDao {
     )
     suspend fun queryImagesByRecordIds(recordIds: List<Long>): List<ImageWithRelatedTable>
 
-    /** 全表图片（backfill / 孤儿扫描引用集用） */
+    /** 全表图片（含 BLOB，仅测试断言/真机校验用；生产 backfill/孤儿扫描勿用，避免一次性物化全表 BLOB） */
     @Query("SELECT * FROM db_image_with_related")
     suspend fun queryAllImages(): List<ImageWithRelatedTable>
+
+    /** 全表图片相对路径（仅 path 投影，孤儿扫描引用集用，不读 BLOB 避免 OOM） */
+    @Query("SELECT image_path FROM db_image_with_related")
+    suspend fun queryAllImagePaths(): List<String>
+
+    /** 未迁移图片行 id（bytes 非空），backfill 流式逐行处理用，不一次性物化全表 BLOB */
+    @Query("SELECT id FROM db_image_with_related WHERE LENGTH(image_bytes) > 0")
+    suspend fun queryUnmigratedImageIds(): List<Long>
+
+    /** 按 id 取单行图片 bytes，backfill 逐行读，峰值内存 = O(单图) 而非 O(Σ全表) */
+    @Query("SELECT image_bytes FROM db_image_with_related WHERE id = :id")
+    suspend fun queryImageBytesById(id: Long): ByteArray?
 
     /** backfill 逐行更新 path + 置空 bytes（不动其它列） */
     @Query("UPDATE db_image_with_related SET image_path = :path, image_bytes = :bytes WHERE id = :id")

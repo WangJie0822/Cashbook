@@ -33,14 +33,36 @@ class RecordBackfillTest {
             images.add(ImageWithRelatedTable(id = 3L, recordId = 1L, path = "content://old/3", bytes = byteArrayOf(1, 2)))
         }
 
-        runImageBackfill(dao, storage)
+        val clean = runImageBackfill(dao, storage)
 
+        assertThat(clean).isTrue() // 无坏行
         // 文件按 id 确定性命名写入
         assertThat(storage.files["record_images/img_3.jpg"]).isEqualTo(byteArrayOf(1, 2))
         // 行已更新：path 相对化、bytes 置空
         val row = dao.queryAllImages().single()
         assertThat(row.path).isEqualTo("record_images/img_3.jpg")
         assertThat(row.bytes).isEmpty()
+    }
+
+    @Test
+    fun backfill_oneFailingRow_continuesOthers_returnsFalse() = runTest {
+        // 坏行（写失败）不阻塞其余行；返回 false → 调用方不置 migrated 标志、下次重试
+        val storage = FakeRecordImageFileStorage().apply { failWritePaths.add("record_images/img_2.jpg") }
+        val dao = FakeRecordDao().apply {
+            images.add(ImageWithRelatedTable(id = 1L, recordId = 1L, path = "content://1", bytes = byteArrayOf(1)))
+            images.add(ImageWithRelatedTable(id = 2L, recordId = 1L, path = "content://2", bytes = byteArrayOf(2)))
+            images.add(ImageWithRelatedTable(id = 3L, recordId = 1L, path = "content://3", bytes = byteArrayOf(3)))
+        }
+
+        val clean = runImageBackfill(dao, storage)
+
+        assertThat(clean).isFalse()
+        // id=1,3 迁移成功，id=2 跳过、不阻塞 id=3
+        assertThat(storage.files.keys).containsExactly("record_images/img_1.jpg", "record_images/img_3.jpg")
+        assertThat(dao.queryAllImages().first { it.id == 1L }.bytes).isEmpty()
+        assertThat(dao.queryAllImages().first { it.id == 3L }.bytes).isEmpty()
+        // 坏行保留 bytes（数据不丢，下次重试）
+        assertThat(dao.queryAllImages().first { it.id == 2L }.bytes).isEqualTo(byteArrayOf(2))
     }
 
     @Test

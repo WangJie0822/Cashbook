@@ -439,6 +439,14 @@ class FakeRecordDao : RecordDao {
 
     override suspend fun queryAllImages(): List<ImageWithRelatedTable> = images.toList()
 
+    override suspend fun queryAllImagePaths(): List<String> = images.map { it.path }
+
+    override suspend fun queryUnmigratedImageIds(): List<Long> =
+        images.filter { it.bytes.isNotEmpty() }.mapNotNull { it.id }
+
+    override suspend fun queryImageBytesById(id: Long): ByteArray? =
+        images.firstOrNull { it.id == id }?.bytes
+
     override suspend fun updateImagePathAndBytes(id: Long, path: String, bytes: ByteArray) {
         val idx = images.indexOfFirst { it.id == id }
         if (idx >= 0) images[idx] = images[idx].copy(path = path, bytes = bytes)
