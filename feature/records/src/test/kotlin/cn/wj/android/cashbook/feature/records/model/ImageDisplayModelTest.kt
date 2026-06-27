@@ -48,6 +48,19 @@ class ImageDisplayModelTest {
     }
 
     @Test
+    fun managedPrefixWithTraversal_fallsBackToBitmap() {
+        // 含 `..` 的伪托管 path（恶意恢复 DB）即使文件存在也不得用文件，回退 bitmap（CWE-22）
+        val file = File("/x/record_images/../../etc/x")
+        val model = imageCoilModel(
+            path = "record_images/../../etc/x",
+            file = file,
+            fileExists = true,
+            bitmapPresent = true,
+        )
+        assertThat(model).isEqualTo(ImageDisplaySource.FromBitmap)
+    }
+
+    @Test
     fun unmanagedPath_fallsBackToBitmap() {
         val file = File("/x/content")
         val model = imageCoilModel(

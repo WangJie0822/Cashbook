@@ -19,6 +19,7 @@ package cn.wj.android.cashbook.feature.records.model
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import cn.wj.android.cashbook.core.data.uitl.RECORD_IMAGES_DIR
 import cn.wj.android.cashbook.core.data.uitl.isManagedImagePath
 import java.io.File
 
@@ -53,8 +54,11 @@ internal fun imageCoilModel(
 internal fun rememberRecordImageModel(item: ImageViewModel): Any? {
     val context = LocalContext.current
     return remember(item.path, item.bitmap) {
+        val baseDir = File(context.filesDir, RECORD_IMAGES_DIR)
         val file = File(context.filesDir, item.path)
-        when (val source = imageCoilModel(item.path, file, file.exists(), item.bitmap != null)) {
+        // canonical containment：file 规范化路径须在 record_images 内（防 `..`/symlink 逃逸，CWE-22 读取侧防护）
+        val within = file.canonicalPath.startsWith(baseDir.canonicalPath + File.separator)
+        when (val source = imageCoilModel(item.path, file, within && file.exists(), item.bitmap != null)) {
             is ImageDisplaySource.FromFile -> source.file
             ImageDisplaySource.FromBitmap -> item.bitmap
             ImageDisplaySource.None -> null

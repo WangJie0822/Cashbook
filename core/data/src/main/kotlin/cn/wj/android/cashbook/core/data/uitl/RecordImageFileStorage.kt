@@ -31,8 +31,13 @@ internal fun recordImageRelativePath(id: Long): String = "$RECORD_IMAGES_DIR/img
 /** 由唯一 token 派生相对路径（新图未有 id 时用 uuid） */
 internal fun newRecordImageRelativePath(token: String): String = "$RECORD_IMAGES_DIR/img_$token.jpg"
 
-/** path 是否为本应用托管的相对图片路径（双轨读判据：true 才尝试文件、false 回退 bytes） */
-fun isManagedImagePath(path: String): Boolean = path.startsWith("$RECORD_IMAGES_DIR/")
+/**
+ * path 是否为本应用托管的相对图片路径（双轨读判据：true 才尝试文件、false 回退 bytes）。
+ * 拒绝含 `..` 的路径——恶意恢复 DB 的 `record_images/../../x` 不得逃逸 record_images（CWE-22，与写出侧
+ * isAllowedBackupEntry 的 `..` 拦截对称）。app 生成路径 `img_<id>.jpg`/`img_<uuid>.jpg` 无 `..`，不受影响。
+ */
+fun isManagedImagePath(path: String): Boolean =
+    path.startsWith("$RECORD_IMAGES_DIR/") && !path.contains("..")
 
 internal fun resolveRecordImage(baseDir: File, relativePath: String): File = File(baseDir, relativePath)
 

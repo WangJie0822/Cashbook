@@ -48,6 +48,14 @@ class RecordImageFileStorageTest {
     }
 
     @Test
+    fun isManagedImagePath_rejectsTraversal() {
+        // 恶意恢复 DB 的 path 含 `..` → 不得判为托管（CWE-22，防逃逸 record_images）
+        assertThat(isManagedImagePath("record_images/../../etc/passwd")).isFalse()
+        assertThat(isManagedImagePath("record_images/..")).isFalse()
+        assertThat(isManagedImagePath("record_images/a/../../../x")).isFalse()
+    }
+
+    @Test
     fun writeRecordImageAtomic_createsParentAndWritesBytes() {
         val base = tempFolder.root
         writeRecordImageAtomic(base, "record_images/img_7.jpg", byteArrayOf(1, 2, 3))
