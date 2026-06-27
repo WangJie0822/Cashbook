@@ -16,6 +16,9 @@
 
 package cn.wj.android.cashbook.sync.reminder
 
+import cn.wj.android.cashbook.core.common.REMINDER_TARGET_ASSET
+import cn.wj.android.cashbook.core.common.REMINDER_TARGET_REIMBURSEMENT
+import cn.wj.android.cashbook.sync.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -143,4 +146,16 @@ internal fun reminderRun(
     val newLastCheckMs = Instant.ofEpochMilli(todayMs).atZone(zone)
         .toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli()
     return ReminderRun(items, newLastCheckMs)
+}
+
+/** [ReminderItem] → [NotificationSpec] 文案/深链目标映射（纯函数）。 */
+internal fun ReminderItem.toNotificationSpec(): NotificationSpec = when (this) {
+    is ReminderItem.CreditCardBilling ->
+        NotificationSpec(R.string.reminder_credit_billing, listOf(assetName), REMINDER_TARGET_ASSET, assetId)
+
+    is ReminderItem.CreditCardRepayment ->
+        NotificationSpec(R.string.reminder_credit_repayment, listOf(assetName), REMINDER_TARGET_ASSET, assetId)
+
+    is ReminderItem.Reimbursement ->
+        NotificationSpec(R.string.reminder_reimbursement, listOf(count), REMINDER_TARGET_REIMBURSEMENT, -1L)
 }

@@ -16,6 +16,8 @@
 
 package cn.wj.android.cashbook.sync.reminder
 
+import androidx.annotation.StringRes
+
 /**
  * 一条待发送的提醒
  *
@@ -45,4 +47,19 @@ data class CreditCardReminderInfo(
     val name: String,
     val billingDate: String,
     val repaymentDate: String,
+)
+
+/**
+ * 一条通知的展示规格（从 [ReminderItem] 派生的值类型，便于纯函数测试）。
+ *
+ * @param textRes 文案字符串资源 id
+ * @param formatArgs 文案格式化参数（assetName 或 count）
+ * @param target 深链目标（REMINDER_TARGET_ASSET / REMINDER_TARGET_REIMBURSEMENT）
+ * @param assetId 深链资产 id（非资产类为 -1）
+ */
+data class NotificationSpec(
+    @StringRes val textRes: Int,
+    val formatArgs: List<Any>,
+    val target: Int,
+    val assetId: Long,
 )
