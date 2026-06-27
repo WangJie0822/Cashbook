@@ -34,6 +34,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -47,6 +48,7 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.navigation.LauncherDrawerActions
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherUiState
 import cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModel
+import kotlinx.coroutines.launch
 
 /**
  * 首页显示
@@ -133,9 +135,15 @@ internal fun LauncherScreen(
         }
     }
 
-    // 抽屉显示时，返回关闭抽屉
+    val scope = rememberCoroutineScope()
+    // 抽屉显示时，返回关闭抽屉。
+    // 手势/滑动打开抽屉时 shouldDisplayDrawerSheet 可能未同步为 true（仍 false），此时仅调
+    // onRequestDismissDrawerSheet() 会把 false 设成 false（无变化）→ LaunchedEffect(key 未变) 不重触发
+    // → drawerState.close() 从不执行、抽屉关不掉。故直接关 drawerState（覆盖所有打开路径），
+    // 同时回写 VM 意图源保持一致（菜单再次打开仍可用）。
     BackHandler(enabled = drawerState.isOpen) {
         onRequestDismissDrawerSheet()
+        scope.launch { drawerState.close() }
     }
 
     Box(
