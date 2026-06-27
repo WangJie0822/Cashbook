@@ -35,6 +35,7 @@ import cn.wj.android.cashbook.sync.initializers.ReminderNotificationBaseId
 import cn.wj.android.cashbook.sync.initializers.reminderNotificationBuilder
 import cn.wj.android.cashbook.sync.reminder.CreditCardReminderInfo
 import cn.wj.android.cashbook.sync.reminder.ReminderItem
+import cn.wj.android.cashbook.sync.reminder.reminderCheckDates
 import cn.wj.android.cashbook.sync.reminder.reminderDeepLinkIntent
 import cn.wj.android.cashbook.sync.reminder.reminderNotificationId
 import cn.wj.android.cashbook.sync.reminder.reminderRun
@@ -79,6 +80,10 @@ class DailyReminderWorker @AssistedInject constructor(
         }
         val zone = ZoneId.systemDefault()
         val todayMs = System.currentTimeMillis()
+        // 补发区间为空（当日已查过）时短路，避免无谓 repo 读取（与重构前行为一致）
+        if (reminderCheckDates(settings.lastReminderCheckMs, todayMs, zone).isEmpty()) {
+            return@withContext Result.success()
+        }
         val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
         val creditCards = if (settings.creditCardReminderEnable) {
             assetRepository.currentVisibleAssetListData.first()

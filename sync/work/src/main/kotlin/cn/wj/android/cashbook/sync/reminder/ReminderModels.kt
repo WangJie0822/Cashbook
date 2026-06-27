@@ -57,7 +57,7 @@ data class CreditCardReminderInfo(
  * @param target 深链目标（REMINDER_TARGET_ASSET / REMINDER_TARGET_REIMBURSEMENT）
  * @param assetId 深链资产 id（非资产类为 -1）
  */
-data class NotificationSpec(
+internal data class NotificationSpec(
     @StringRes val textRes: Int,
     val formatArgs: List<Any>,
     val target: Int,
