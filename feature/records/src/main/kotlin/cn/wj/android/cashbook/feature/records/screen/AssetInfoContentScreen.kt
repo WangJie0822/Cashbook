@@ -62,6 +62,7 @@ internal fun AssetInfoContentRoute(
     val recordList = viewModel.recordList.collectAsLazyPagingItems()
     val dateSelection by viewModel.dateSelection.collectAsStateWithLifecycle()
     val summary by viewModel.summary.collectAsStateWithLifecycle()
+    val monthStartDay by viewModel.monthStartDay.collectAsStateWithLifecycle()
 
     val currentMonth = (dateSelection as? DateSelectionEntity.ByMonth)?.yearMonth ?: YearMonth.now()
 
@@ -70,6 +71,7 @@ internal fun AssetInfoContentRoute(
         dateSelection = dateSelection,
         summary = summary,
         recordList = recordList,
+        byMonthCrossesNaturalMonth = monthStartDay != 1,
         showDatePopup = viewModel.showDatePopup,
         onDateClick = viewModel::displayDatePopup,
         onDismissDatePopup = viewModel::dismissDatePopup,
@@ -101,6 +103,7 @@ internal fun AssetInfoContentScreen(
     dateSelection: DateSelectionEntity,
     summary: AssetMonthSummaryModel,
     recordList: LazyPagingItems<LauncherListItem>,
+    byMonthCrossesNaturalMonth: Boolean = false,
     showDatePopup: Boolean = false,
     onDateClick: () -> Unit = {},
     onDismissDatePopup: () -> Unit = {},
@@ -149,7 +152,11 @@ internal fun AssetInfoContentScreen(
                 ) { index ->
                     when (val item = recordList[index]) {
                         is LauncherListItem.DayHeader -> {
-                            RecordDayHeader(item = item)
+                            RecordDayHeader(
+                                item = item,
+                                dateSelectionType = dateSelection.type,
+                                byMonthCrossesNaturalMonth = byMonthCrossesNaturalMonth,
+                            )
                         }
 
                         is LauncherListItem.Record -> {

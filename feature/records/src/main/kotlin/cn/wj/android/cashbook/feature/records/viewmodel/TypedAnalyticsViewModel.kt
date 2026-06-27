@@ -93,6 +93,10 @@ class TypedAnalyticsViewModel @Inject constructor(
         .map { normalizeMonthStartDay(it.monthStartDay) }
         .distinctUntilChanged()
 
+    /** 月起始日（归一化后）供 UI 计算日期头是否跨自然月 */
+    val monthStartDay: StateFlow<Int> = _monthStartDay
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), 1)
+
     /** 选择 + 月起始日 → (选择, [start,end) 毫秒区间)；列表与汇总同源，保证同口径（C1） */
     private val _selectionRange: kotlinx.coroutines.flow.Flow<Pair<DateSelectionEntity, Pair<Long, Long>>> =
         combine(_dateSelection, _monthStartDay) { selection, d -> selection to selection.toDateRange(d) }

@@ -39,10 +39,12 @@ import cn.wj.android.cashbook.core.design.component.CbIconButton
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
+import cn.wj.android.cashbook.core.model.enums.DateSelectionTypeEnum
 import cn.wj.android.cashbook.core.model.model.AssetMonthSummaryModel
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.component.DateSelectionPopup
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
+import cn.wj.android.cashbook.feature.records.viewmodel.recordDayHeaderDateText
 
 /**
  * 月份切换器 / 固定周期文字 + 收入/支出/结余 3 列汇总卡。
@@ -214,21 +216,42 @@ private fun SummaryColumn(
 }
 
 /**
- * 记录列表按日分组头（资产/分类/标签统计共用）
+ * 记录列表按日分组头（资产/分类/标签统计共用）。
+ * 日期文案按 [dateSelectionType] 自适应（与首页 DayHeaderItem 单一真源，见 [recordDayHeaderDateText]）。
  *
  * @param item 日期头数据
+ * @param dateSelectionType 当前周期类型
+ * @param byMonthCrossesNaturalMonth BY_MONTH 周期是否跨自然月（monthStartDay≠1）
  */
 @Composable
-internal fun RecordDayHeader(item: LauncherListItem.DayHeader) {
+internal fun RecordDayHeader(
+    item: LauncherListItem.DayHeader,
+    dateSelectionType: DateSelectionTypeEnum,
+    byMonthCrossesNaturalMonth: Boolean,
+) {
     val dayTypeSuffix = when (item.dayType) {
         0 -> stringResource(id = R.string.today_with_brackets)
         -1 -> stringResource(id = R.string.yesterday_with_brackets)
         -2 -> stringResource(id = R.string.before_yesterday_with_brackets)
         else -> ""
     }
+    val dateArray = item.dateStr.split("-")
+    val year = dateArray.getOrNull(0)?.toIntOrNull() ?: 0
+    val month = dateArray.getOrNull(1)?.toIntOrNull() ?: 0
+    val dateText = recordDayHeaderDateText(
+        type = dateSelectionType,
+        year = year,
+        month = month,
+        day = item.day,
+        dayTypeSuffix = dayTypeSuffix,
+        dayLabel = stringResource(id = R.string.day),
+        monthLabel = stringResource(id = R.string.month),
+        yearLabel = stringResource(id = R.string.year),
+        byMonthCrossesNaturalMonth = byMonthCrossesNaturalMonth,
+    )
     Column {
         Text(
-            text = "${item.day}${stringResource(id = R.string.day)}$dayTypeSuffix",
+            text = dateText,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier

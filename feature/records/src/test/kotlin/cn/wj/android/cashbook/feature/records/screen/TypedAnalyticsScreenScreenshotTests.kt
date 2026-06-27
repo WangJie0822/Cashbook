@@ -160,6 +160,32 @@ class TypedAnalyticsScreenScreenshotTests {
     }
 
     @Test
+    fun typedAnalyticsScreen_byMonthCrossing_multipleThemes() {
+        composeTestRule.captureMultiTheme(
+            name = "TypedAnalyticsScreen",
+            overrideFileName = "TypedAnalyticsScreen_byMonthCrossing",
+        ) {
+            val recordList = flowOf(PagingData.from(sampleItems))
+                .collectAsLazyPagingItems()
+            TypedAnalyticsScreen(
+                viewRecord = null,
+                onRequestShowRecordDetailsSheet = {},
+                onRequestDismissBottomSheet = {},
+                uiState = successUiState,
+                recordList = recordList,
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                summary = summary,
+                byMonthCrossesNaturalMonth = true,
+                onPreviousMonth = {},
+                onNextMonth = {},
+                onRequestNaviToEditRecord = {},
+                onRequestNaviToAssetInfo = {},
+                onRequestPopBackStack = {},
+            )
+        }
+    }
+
+    @Test
     fun typedAnalyticsScreen_transferHint_multipleThemes() {
         composeTestRule.captureMultiTheme(
             name = "TypedAnalyticsScreen",

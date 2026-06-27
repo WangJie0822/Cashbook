@@ -86,6 +86,10 @@ class AssetInfoContentViewModel @Inject constructor(
         .map { normalizeMonthStartDay(it.monthStartDay) }
         .distinctUntilChanged()
 
+    /** 月起始日（归一化后）供 UI 计算日期头是否跨自然月 */
+    val monthStartDay: StateFlow<Int> = _monthStartDay
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), 1)
+
     /** 记录列表数据（按资产 + 当前周期范围分页，并按日插入 [LauncherListItem.DayHeader] 分组） */
     val recordList = combine(_assetIdData, _dateSelection, _monthStartDay, recordDataVersion) { assetId, selection, d, _ ->
         assetId to selection.toDateRange(d)
