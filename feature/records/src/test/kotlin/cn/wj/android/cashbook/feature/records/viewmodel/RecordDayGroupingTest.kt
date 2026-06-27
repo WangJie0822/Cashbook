@@ -19,6 +19,7 @@ package cn.wj.android.cashbook.feature.records.viewmodel
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.dateFormat
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.enums.DateSelectionTypeEnum
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -92,6 +93,66 @@ class RecordDayGroupingTest {
 
         assertThat(header).isNotNull()
         assertThat(header!!.dateStr).isEqualTo(timeDay1.dateFormat(DATE_FORMAT_DATE))
+    }
+
+    @Test
+    fun dayHeaderText_byDay_showsDayOnly() {
+        val r = recordDayHeaderDateText(
+            type = DateSelectionTypeEnum.BY_DAY,
+            year = 2026, month = 6, day = 27, dayTypeSuffix = "(今天)",
+            dayLabel = "日", monthLabel = "月", yearLabel = "年", byMonthCrossesNaturalMonth = false,
+        )
+        assertThat(r).isEqualTo("27日(今天)")
+    }
+
+    @Test
+    fun dayHeaderText_byMonth_notCrossing_showsDayOnly() {
+        val r = recordDayHeaderDateText(
+            type = DateSelectionTypeEnum.BY_MONTH,
+            year = 2026, month = 6, day = 27, dayTypeSuffix = "",
+            dayLabel = "日", monthLabel = "月", yearLabel = "年", byMonthCrossesNaturalMonth = false,
+        )
+        assertThat(r).isEqualTo("27日")
+    }
+
+    @Test
+    fun dayHeaderText_byMonth_crossing_showsMonthDay() {
+        val r = recordDayHeaderDateText(
+            type = DateSelectionTypeEnum.BY_MONTH,
+            year = 2026, month = 6, day = 27, dayTypeSuffix = "",
+            dayLabel = "日", monthLabel = "月", yearLabel = "年", byMonthCrossesNaturalMonth = true,
+        )
+        assertThat(r).isEqualTo("6月27日")
+    }
+
+    @Test
+    fun dayHeaderText_byYear_showsMonthDay_withSuffix() {
+        val r = recordDayHeaderDateText(
+            type = DateSelectionTypeEnum.BY_YEAR,
+            year = 2026, month = 6, day = 27, dayTypeSuffix = "(今天)",
+            dayLabel = "日", monthLabel = "月", yearLabel = "年", byMonthCrossesNaturalMonth = false,
+        )
+        assertThat(r).isEqualTo("6月27日(今天)")
+    }
+
+    @Test
+    fun dayHeaderText_dateRange_showsYearMonthDay_noSuffix() {
+        val r = recordDayHeaderDateText(
+            type = DateSelectionTypeEnum.DATE_RANGE,
+            year = 2026, month = 6, day = 27, dayTypeSuffix = "(今天)",
+            dayLabel = "日", monthLabel = "月", yearLabel = "年", byMonthCrossesNaturalMonth = false,
+        )
+        assertThat(r).isEqualTo("2026年6月27日")
+    }
+
+    @Test
+    fun dayHeaderText_all_showsYearMonthDay_noSuffix() {
+        val r = recordDayHeaderDateText(
+            type = DateSelectionTypeEnum.ALL,
+            year = 2026, month = 6, day = 27, dayTypeSuffix = "(今天)",
+            dayLabel = "日", monthLabel = "月", yearLabel = "年", byMonthCrossesNaturalMonth = false,
+        )
+        assertThat(r).isEqualTo("2026年6月27日")
     }
 
     private fun record(id: Long, recordTime: Long): LauncherListItem.Record =

@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.feature.records.viewmodel
 
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.dateFormat
+import cn.wj.android.cashbook.core.model.enums.DateSelectionTypeEnum
 import java.util.Calendar
 
 /**
@@ -71,4 +72,44 @@ internal fun computeDayType(dateArray: List<String>): Int {
     } else {
         1
     }
+}
+
+/**
+ * 记录日期头文案（首页 [LauncherListItem.DayHeader] 渲染与分类/资产/标签统计页共用，单一真源）。
+ *
+ * 按周期类型决定是否带月/年上下文；BY_MONTH 在月起始日≠1（周期跨自然月）时也带月份。
+ * 纯函数：所有本地化字符串（[dayLabel]/[monthLabel]/[yearLabel]/[dayTypeSuffix]）由 @Composable
+ * 调用方解析后传入，故本函数不依赖 Compose、可纯 JVM 单测。
+ *
+ * 沿用首页既有口径：BY_YEAR 带 [dayTypeSuffix]，DATE_RANGE/ALL 不带（本次不统一）。
+ *
+ * @param dayTypeSuffix 已解析的「(今天)/(昨天)/(前天)」或空串
+ * @param byMonthCrossesNaturalMonth BY_MONTH 周期是否跨自然月（= 归一化后 monthStartDay≠1）
+ */
+internal fun recordDayHeaderDateText(
+    type: DateSelectionTypeEnum,
+    year: Int,
+    month: Int,
+    day: Int,
+    dayTypeSuffix: String,
+    dayLabel: String,
+    monthLabel: String,
+    yearLabel: String,
+    byMonthCrossesNaturalMonth: Boolean,
+): String = when (type) {
+    DateSelectionTypeEnum.BY_DAY ->
+        "$day$dayLabel$dayTypeSuffix"
+
+    DateSelectionTypeEnum.BY_MONTH ->
+        if (byMonthCrossesNaturalMonth) {
+            "$month$monthLabel$day$dayLabel$dayTypeSuffix"
+        } else {
+            "$day$dayLabel$dayTypeSuffix"
+        }
+
+    DateSelectionTypeEnum.BY_YEAR ->
+        "$month$monthLabel$day$dayLabel$dayTypeSuffix"
+
+    DateSelectionTypeEnum.DATE_RANGE, DateSelectionTypeEnum.ALL ->
+        "$year$yearLabel$month$monthLabel$day$dayLabel"
 }
