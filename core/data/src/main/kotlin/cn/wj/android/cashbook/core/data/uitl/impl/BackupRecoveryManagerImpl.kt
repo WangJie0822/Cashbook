@@ -72,8 +72,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileFilter
 import java.io.FileInputStream
@@ -547,12 +545,13 @@ class BackupRecoveryManagerImpl @Inject constructor(
         return state
     }
 
-    /** 写一个文件 entry 到 zip；comment 仅 db entry 传非空（旧 app 据 comment 仅恢复 db、不崩） */
+    /** 写一个文件 entry 到 zip；comment 仅 db entry 传非空（旧 app 据 comment 仅恢复 db、不崩）。
+     * 流式 copyTo（8KB 缓冲，O(1) 内存），避免大图/大库整文件读入堆。 */
     private fun putZipFileEntry(zos: ZipOutputStream, file: File, entryName: String, comment: String?) {
         val entry = ZipEntry(entryName)
         if (comment != null) entry.comment = comment
         zos.putNextEntry(entry)
-        BufferedInputStream(FileInputStream(file)).use { zos.write(it.readBytes()) }
+        FileInputStream(file).buffered().use { it.copyTo(zos) }
         zos.closeEntry()
     }
 
@@ -563,6 +562,38 @@ class BackupRecoveryManagerImpl @Inject constructor(
         zos.putNextEntry(entry)
         zos.write(bytes)
         zos.closeEntry()
+    }
+
+    /**
+     * 流式拷贝单个 zip entry 到 destFile，带单 entry 与累计总量上限（防 decompression bomb / OOM）。
+     * O(8KB) 内存；超限返回 null（调用方 fail-fast）；返回本 entry 写出字节数。
+     */
+    private fun copyZipEntryBounded(
+        zipFile: ZipFile,
+        entry: ZipEntry,
+        destFile: File,
+        alreadyWritten: Long,
+    ): Long? {
+        var entryWritten = 0L
+        zipFile.getInputStream(entry).use { input ->
+            FileOutputStream(destFile).use { output ->
+                val buf = ByteArray(8 * 1024)
+                while (true) {
+                    val n = input.read(buf)
+                    if (n < 0) break
+                    entryWritten += n
+                    if (entryWritten > MAX_RECOVERY_ENTRY_BYTES ||
+                        alreadyWritten + entryWritten > MAX_RECOVERY_TOTAL_BYTES
+                    ) {
+                        this@BackupRecoveryManagerImpl.logger()
+                            .e("startRecovery(), decompression size limit exceeded")
+                        return null
+                    }
+                    output.write(buf, 0, n)
+                }
+            }
+        }
+        return entryWritten
     }
 
     /**
@@ -687,12 +718,20 @@ class BackupRecoveryManagerImpl @Inject constructor(
             // 解压缩
             ZipFile(backupZippedCacheFile.absolutePath).use { zipFile ->
                 val entries = zipFile.entries()
+                var entryCount = 0
+                var totalWritten = 0L
                 while (entries.hasMoreElements()) {
                     val entry = entries.nextElement() as ZipEntry
                     val entryName = entry.name
                     // entry 白名单（替代旧 comment 判据）：仅 db/record_images/settings/manifest 允许写出
                     if (!isAllowedBackupEntry(entryName)) {
                         continue
+                    }
+                    // 防 decompression bomb：entry 数量上限
+                    if (++entryCount > MAX_RECOVERY_ENTRIES) {
+                        this@BackupRecoveryManagerImpl.logger()
+                            .e("startRecovery(), too many zip entries (> $MAX_RECOVERY_ENTRIES)")
+                        return@runCatching BackupRecoveryState.FAILED_FILE_FORMAT_ERROR
                     }
                     val destFile = File(cacheDir, entryName)
                     // Zip Slip 防护（保留）：含嵌套 record_images/*
@@ -708,11 +747,10 @@ class BackupRecoveryManagerImpl @Inject constructor(
                         destFile.delete()
                     }
                     destFile.createNewFile()
-                    BufferedInputStream(zipFile.getInputStream(entry)).use { bis ->
-                        BufferedOutputStream(FileOutputStream(destFile)).use { bos ->
-                            bos.write(bis.readBytes())
-                        }
-                    }
+                    // 流式拷贝 + 单 entry/总量上限（防 decompression bomb / OOM）：O(8KB) 内存，超限 fail-fast
+                    val written = copyZipEntryBounded(zipFile, entry, destFile, totalWritten)
+                        ?: return@runCatching BackupRecoveryState.FAILED_FILE_FORMAT_ERROR
+                    totalWritten += written
                     destFiles.add(destFile)
                 }
             }
@@ -763,10 +801,20 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 combineProtoDataSource.updateRefundTypeId(0L)
                 combineProtoDataSource.updateReimburseTypeId(0L)
                 combineProtoDataSource.updateCreditCardPaymentTypeId(0L)
-                // 图片合并恢复：解压出的 record_images/ 叠加到 filesDir/record_images/（合并语义、不清空现有目录）
+                // 重置图片迁移标志：恢复的旧 db-only 备份可能含 BLOB 图片行（CONFLICT_REPLACE 合并进库），
+                // 置 false 强制下次启动 backfill 重跑 → 把这些 BLOB materialize 为文件（已是文件态的行 bytes 空、
+                // backfill 的 queryUnmigratedImageIds 天然跳过，幂等）。镜像上面 type id 与下面 finalAmount 的恢复重置处理。
+                combineProtoDataSource.updateImagesToFilesMigrated(false)
+                // 图片合并恢复：解压出的 record_images/ 叠加到 filesDir/record_images/（合并语义、不清空现有目录）。
+                // guard：合并失败（ENOSPC 等）不连累后续 recalculateAllFinalAmount（finalAmount 一致性是关键步、必须跑）
                 val restoredImagesDir = File(cacheDir, RECORD_IMAGES_DIR)
                 if (restoredImagesDir.exists()) {
-                    restoredImagesDir.copyRecursively(recordImageFileStorage.baseDir(), overwrite = true)
+                    runCatching {
+                        restoredImagesDir.copyRecursively(recordImageFileStorage.baseDir(), overwrite = true)
+                    }.onFailure {
+                        this@BackupRecoveryManagerImpl.logger()
+                            .w("startRecovery(), image merge failed: ${it.message}")
+                    }
                 }
                 // settings 白名单恢复（校验失败整体跳过，绝不恢复 WebDAV/backupPath/autoBackup/凭据）
                 destFiles.firstOrNull { it.name == SETTINGS_ENTRY }?.let { sf ->
@@ -807,6 +855,11 @@ class BackupRecoveryManagerImpl @Inject constructor(
     }
 
     companion object {
+
+        /** 恢复解压防 decompression bomb 上限：最多 entry 数 / 单 entry 解压字节 / 总解压字节（生成合法备份远低于此） */
+        private const val MAX_RECOVERY_ENTRIES = 50_000
+        private const val MAX_RECOVERY_ENTRY_BYTES = 512L * 1024 * 1024
+        private const val MAX_RECOVERY_TOTAL_BYTES = 4L * 1024 * 1024 * 1024
 
         /** 恢复前安全快照子目录名 */
         private const val PRE_RESTORE_DIR_NAME = "pre-restore"
