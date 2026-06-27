@@ -106,6 +106,7 @@ import cn.wj.android.cashbook.feature.records.view.reimbursementDisplayStatus
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
+import cn.wj.android.cashbook.feature.records.viewmodel.recordDayHeaderDateText
 import coil.compose.AsyncImage
 import java.time.YearMonth
 
@@ -136,6 +137,7 @@ internal fun LauncherContentRoute(
     val dateSelection by viewModel.dateSelection.collectAsStateWithLifecycle()
     val dailySummaries by viewModel.dailySummaries.collectAsStateWithLifecycle()
     val pagingItems = viewModel.recordPagingData.collectAsLazyPagingItems()
+    val monthStartDay by viewModel.monthStartDay.collectAsStateWithLifecycle()
 
     LauncherContentScreen(
         shouldDisplayDeleteFailedBookmark = viewModel.shouldDisplayDeleteFailedBookmark,
@@ -157,6 +159,7 @@ internal fun LauncherContentRoute(
         uiState = uiState,
         pagingItems = pagingItems,
         dailySummaries = dailySummaries,
+        byMonthCrossesNaturalMonth = monthStartDay != 1,
         onRecordItemClick = viewModel::displayRecordDetailsSheet,
         onRequestDismissSheet = viewModel::dismissSheet,
         onShowSnackbar = onShowSnackbar,
@@ -188,6 +191,7 @@ internal fun LauncherContentScreen(
     uiState: LauncherContentUiState,
     pagingItems: LazyPagingItems<LauncherListItem>? = null,
     dailySummaries: Map<String, RecordDayEntity> = emptyMap(),
+    byMonthCrossesNaturalMonth: Boolean = false,
     onRecordItemClick: (RecordViewsEntity) -> Unit,
     onRequestDismissSheet: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> SnackbarResult,
@@ -288,6 +292,7 @@ internal fun LauncherContentScreen(
                             frontLayerContent = {
                                 FrontLayerContent(
                                     dateSelectionType = dateSelection.type,
+                                    byMonthCrossesNaturalMonth = byMonthCrossesNaturalMonth,
                                     onDateClick = onDateClick,
                                     pagingItems = pagingItems,
                                     dailySummaries = dailySummaries,
@@ -480,6 +485,7 @@ private fun BackLayerContent(
 @Composable
 private fun FrontLayerContent(
     dateSelectionType: DateSelectionTypeEnum,
+    byMonthCrossesNaturalMonth: Boolean,
     onDateClick: () -> Unit,
     pagingItems: LazyPagingItems<LauncherListItem>?,
     dailySummaries: Map<String, RecordDayEntity>,
@@ -530,6 +536,7 @@ private fun FrontLayerContent(
                                     day = item.day,
                                     dayType = item.dayType,
                                     dateSelectionType = dateSelectionType,
+                                    byMonthCrossesNaturalMonth = byMonthCrossesNaturalMonth,
                                     dayIncome = summary?.dayIncome ?: 0L,
                                     dayExpand = summary?.dayExpand ?: 0L,
                                 )
@@ -571,6 +578,7 @@ private fun DayHeaderItem(
     day: Int,
     dayType: Int,
     dateSelectionType: DateSelectionTypeEnum,
+    byMonthCrossesNaturalMonth: Boolean,
     dayIncome: Long,
     dayExpand: Long,
 ) {
@@ -583,14 +591,17 @@ private fun DayHeaderItem(
         -2 -> stringResource(id = R.string.before_yesterday_with_brackets)
         else -> ""
     }
-    val dateText = when (dateSelectionType) {
-        DateSelectionTypeEnum.BY_DAY, DateSelectionTypeEnum.BY_MONTH ->
-            "${day}${stringResource(id = R.string.day)}$dayTypeSuffix"
-        DateSelectionTypeEnum.BY_YEAR ->
-            "${month}${stringResource(id = R.string.month)}${day}${stringResource(id = R.string.day)}$dayTypeSuffix"
-        DateSelectionTypeEnum.DATE_RANGE, DateSelectionTypeEnum.ALL ->
-            "${year}${stringResource(id = R.string.year)}${month}${stringResource(id = R.string.month)}${day}${stringResource(id = R.string.day)}"
-    }
+    val dateText = recordDayHeaderDateText(
+        type = dateSelectionType,
+        year = year,
+        month = month,
+        day = day,
+        dayTypeSuffix = dayTypeSuffix,
+        dayLabel = stringResource(id = R.string.day),
+        monthLabel = stringResource(id = R.string.month),
+        yearLabel = stringResource(id = R.string.year),
+        byMonthCrossesNaturalMonth = byMonthCrossesNaturalMonth,
+    )
     Column {
         Row(
             modifier = Modifier

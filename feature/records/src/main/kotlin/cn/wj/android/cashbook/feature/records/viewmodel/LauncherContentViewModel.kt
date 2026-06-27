@@ -142,6 +142,10 @@ class LauncherContentViewModel @Inject constructor(
         .map { normalizeMonthStartDay(it.monthStartDay) }
         .distinctUntilChanged()
 
+    /** 月起始日（归一化后）供 UI 计算日期头是否跨自然月 */
+    val monthStartDay: StateFlow<Int> = _monthStartDay
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 1)
+
     init {
         // 初始化为可配置月周期的当前周期（D=1 等价 ByMonth(YearMonth.now())，无回归）。
         // 置于此处（_dateSelection 声明之后）：Unconfined 下构造时 init 立即执行，须保证 _dateSelection 已初始化。
