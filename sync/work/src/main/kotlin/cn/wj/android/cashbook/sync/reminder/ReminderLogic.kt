@@ -99,3 +99,48 @@ internal fun reminderNotificationId(baseId: Int, item: ReminderItem): Int = when
     is ReminderItem.CreditCardRepayment -> baseId + item.assetId.toInt() * 2 + 1
     is ReminderItem.Reimbursement -> baseId
 }
+
+/**
+ * 一次提醒检查的编排结果。
+ *
+ * @param items 待投递通知（按日期+顺序）
+ * @param newLastCheckMs 需持久化的 checkpoint（毫秒），null=不推进
+ */
+internal data class ReminderRun(
+    val items: List<ReminderItem>,
+    val newLastCheckMs: Long?,
+)
+
+/**
+ * 编排一次提醒检查（纯函数）：算补发区间 → 逐日 [computeReminders] 累积 → 决定 checkpoint。
+ *
+ * - 两开关全关 或 补发区间为空 → 空 items、不推进 checkpoint（newLastCheckMs=null）。
+ * - 否则累积区间内全部提醒，checkpoint 推进到 [todayMs] 当日 0 点（即便当日无提醒也推进）。
+ */
+internal fun reminderRun(
+    lastReminderCheckMs: Long,
+    todayMs: Long,
+    zone: ZoneId,
+    creditCardEnable: Boolean,
+    reimbursementEnable: Boolean,
+    creditCards: List<CreditCardReminderInfo>,
+    monthStartDay: Int,
+    reimbursableCount: Int,
+): ReminderRun {
+    if (!creditCardEnable && !reimbursementEnable) return ReminderRun(emptyList(), null)
+    val dates = reminderCheckDates(lastReminderCheckMs, todayMs, zone)
+    if (dates.isEmpty()) return ReminderRun(emptyList(), null)
+    val items = dates.flatMap { date ->
+        computeReminders(
+            date = date,
+            creditCardEnable = creditCardEnable,
+            reimbursementEnable = reimbursementEnable,
+            creditCards = creditCards,
+            monthStartDay = monthStartDay,
+            reimbursableCount = reimbursableCount,
+        )
+    }
+    val newLastCheckMs = Instant.ofEpochMilli(todayMs).atZone(zone)
+        .toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli()
+    return ReminderRun(items, newLastCheckMs)
+}
