@@ -20,6 +20,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.testing.util.captureMultiTheme
 import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
@@ -72,6 +73,13 @@ class RecordDetailsSheetScreenshotTests {
     /** 已手动标记已报销：可报销 + 未关联 + 已标记 → 显示「改回待报销」按钮 */
     private val markedRecord = pendingRecord.copy(reimbursed = true)
 
+    /** 含图片：relatedImage 非空（托管相对 path）→ 渲染关联图片区，守护 path 化后详情渲染不崩 */
+    private val withImageRecord = pendingRecord.copy(
+        relatedImage = listOf(
+            ImageModel(id = 1L, recordId = 1L, path = "record_images/img_demo.jpg", bytes = byteArrayOf()),
+        ),
+    )
+
     @Test
     fun recordDetailsSheet_pending_multipleThemes() {
         composeTestRule.captureMultiTheme(
@@ -97,6 +105,23 @@ class RecordDetailsSheetScreenshotTests {
         ) {
             RecordDetailsSheet(
                 recordData = markedRecord,
+                onRequestNaviToEditRecord = {},
+                onRequestNaviToAssetInfo = {},
+                onMarkReimbursed = {},
+                onRevertReimbursed = {},
+                onRequestDismissSheet = {},
+            )
+        }
+    }
+
+    @Test
+    fun recordDetailsSheet_withImage_multipleThemes() {
+        composeTestRule.captureMultiTheme(
+            name = "RecordDetailsSheet",
+            overrideFileName = "RecordDetailsSheet_withImage",
+        ) {
+            RecordDetailsSheet(
+                recordData = withImageRecord,
                 onRequestNaviToEditRecord = {},
                 onRequestNaviToAssetInfo = {},
                 onMarkReimbursed = {},
