@@ -24,8 +24,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
-import cn.wj.android.cashbook.core.common.REMINDER_TARGET_ASSET
-import cn.wj.android.cashbook.core.common.REMINDER_TARGET_REIMBURSEMENT
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.common.ext.logger
@@ -37,10 +35,10 @@ import cn.wj.android.cashbook.sync.initializers.ReminderNotificationBaseId
 import cn.wj.android.cashbook.sync.initializers.reminderNotificationBuilder
 import cn.wj.android.cashbook.sync.reminder.CreditCardReminderInfo
 import cn.wj.android.cashbook.sync.reminder.ReminderItem
-import cn.wj.android.cashbook.sync.reminder.computeReminders
-import cn.wj.android.cashbook.sync.reminder.reminderCheckDates
 import cn.wj.android.cashbook.sync.reminder.reminderDeepLinkIntent
 import cn.wj.android.cashbook.sync.reminder.reminderNotificationId
+import cn.wj.android.cashbook.sync.reminder.reminderRun
+import cn.wj.android.cashbook.sync.reminder.toNotificationSpec
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -55,10 +53,10 @@ import kotlin.coroutines.CoroutineContext
 private const val REMINDER_HOUR = 10
 
 /**
- * 每日提醒任务（薄壳）：取数据 → 调纯函数 [computeReminders] 判定 → 发系统通知。
+ * 每日提醒任务（薄壳）：取数据 → 调纯函数 [reminderRun] 编排判定 → 发系统通知。
  *
  * 始终注册（[cn.wj.android.cashbook.sync.workers.InitWorker] 中），两开关全关时直接 success 空转。
- * 补发：按 [reminderCheckDates] 计算逻辑日期区间逐日判定，缓解 Doze/OEM 漏触发。
+ * 补发由 [reminderRun] 内按逻辑日期区间逐日判定，缓解 Doze/OEM 漏触发。
  *
  * > [王杰](mailto:15555650921@163.com) 创建于 2026/6/26
  */
@@ -76,14 +74,11 @@ class DailyReminderWorker @AssistedInject constructor(
         this@DailyReminderWorker.logger().i("doWork(), reminder check")
         val settings = settingRepository.appSettingsModel.first()
         if (!settings.creditCardReminderEnable && !settings.reimbursementReminderEnable) {
-            // 两开关全关，空转
+            // 两开关全关，跳查 repo 空转
             return@withContext Result.success()
         }
         val zone = ZoneId.systemDefault()
         val todayMs = System.currentTimeMillis()
-        val dates = reminderCheckDates(settings.lastReminderCheckMs, todayMs, zone)
-        if (dates.isEmpty()) return@withContext Result.success()
-
         val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
         val creditCards = if (settings.creditCardReminderEnable) {
             assetRepository.currentVisibleAssetListData.first()
@@ -98,20 +93,18 @@ class DailyReminderWorker @AssistedInject constructor(
             0
         }
 
-        dates.forEach { date ->
-            computeReminders(
-                date = date,
-                creditCardEnable = settings.creditCardReminderEnable,
-                reimbursementEnable = settings.reimbursementReminderEnable,
-                creditCards = creditCards,
-                monthStartDay = monthStartDay,
-                reimbursableCount = reimbursableCount,
-            ).forEach { item -> notify(item) }
-        }
-
-        settingRepository.updateLastReminderCheckMs(
-            Instant.ofEpochMilli(todayMs).atZone(zone).toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli(),
+        val run = reminderRun(
+            lastReminderCheckMs = settings.lastReminderCheckMs,
+            todayMs = todayMs,
+            zone = zone,
+            creditCardEnable = settings.creditCardReminderEnable,
+            reimbursementEnable = settings.reimbursementReminderEnable,
+            creditCards = creditCards,
+            monthStartDay = monthStartDay,
+            reimbursableCount = reimbursableCount,
         )
+        run.items.forEach { notify(it) }
+        run.newLastCheckMs?.let { settingRepository.updateLastReminderCheckMs(it) }
         Result.success()
     }
 
@@ -119,28 +112,13 @@ class DailyReminderWorker @AssistedInject constructor(
         val nm = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             ?: return
         val id = reminderNotificationId(ReminderNotificationBaseId, item)
-        when (item) {
-            is ReminderItem.CreditCardBilling -> sendNotification(
-                nm = nm,
-                id = id,
-                text = appContext.getString(R.string.reminder_credit_billing, item.assetName),
-                intent = reminderDeepLinkIntent(appContext, REMINDER_TARGET_ASSET, item.assetId),
-            )
-
-            is ReminderItem.CreditCardRepayment -> sendNotification(
-                nm = nm,
-                id = id,
-                text = appContext.getString(R.string.reminder_credit_repayment, item.assetName),
-                intent = reminderDeepLinkIntent(appContext, REMINDER_TARGET_ASSET, item.assetId),
-            )
-
-            is ReminderItem.Reimbursement -> sendNotification(
-                nm = nm,
-                id = id,
-                text = appContext.getString(R.string.reminder_reimbursement, item.count),
-                intent = reminderDeepLinkIntent(appContext, REMINDER_TARGET_REIMBURSEMENT, -1L),
-            )
-        }
+        val spec = item.toNotificationSpec()
+        sendNotification(
+            nm = nm,
+            id = id,
+            text = appContext.getString(spec.textRes, *spec.formatArgs.toTypedArray()),
+            intent = reminderDeepLinkIntent(appContext, spec.target, spec.assetId),
+        )
     }
 
     private fun sendNotification(nm: NotificationManager, id: Int, text: String, intent: PendingIntent) {
