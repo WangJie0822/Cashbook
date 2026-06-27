@@ -79,6 +79,21 @@ const val SHORTCUTS_TYPE_ADD = 0
 /** 快捷方式类型 - 资产 */
 const val SHORTCUTS_TYPE_ASSET = 1
 
+/** 提醒深链目标类型 extra key */
+const val EXTRA_REMINDER_TARGET = "extra_reminder_target"
+
+/** 提醒深链资产 id extra key */
+const val EXTRA_REMINDER_ASSET_ID = "extra_reminder_asset_id"
+
+/** 提醒深链目标 - 无 */
+const val REMINDER_TARGET_NONE = 0
+
+/** 提醒深链目标 - 资产详情 */
+const val REMINDER_TARGET_ASSET = 1
+
+/** 提醒深链目标 - 待报销列表 */
+const val REMINDER_TARGET_REIMBURSEMENT = 2
+
 /** 固定类型 ID - 退款 */
 const val FIXED_TYPE_ID_REFUND = -2001L
 

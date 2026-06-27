@@ -16,6 +16,11 @@
 
 package cn.wj.android.cashbook.feature.settings.screen
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,9 +50,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.common.ApplicationInfo
@@ -103,6 +110,22 @@ internal fun SettingRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // 通知权限请求（Android 13+），首次开启提醒开关时拉起；拒绝不阻断，仅系统不展示通知
+    val context = LocalContext.current
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { /* 授权结果不阻断开关，通知由系统按授权状态展示 */ }
+    val requestNotificationPermission: () -> Unit = remember(context) {
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
     SettingScreen(
         supportFingerprint = supportFingerprint,
         uiState = uiState,
@@ -115,6 +138,14 @@ internal fun SettingRoute(
         onImageQualitySelected = viewModel::onImageQualitySelected,
         onMonthStartDayClick = viewModel::onMonthStartDayClick,
         onMonthStartDaySelected = viewModel::onMonthStartDaySelected,
+        onCreditCardReminderEnableChanged = { enable ->
+            if (enable) requestNotificationPermission()
+            viewModel.onCreditCardReminderEnableChanged(enable)
+        },
+        onReimbursementReminderEnableChanged = { enable ->
+            if (enable) requestNotificationPermission()
+            viewModel.onReimbursementReminderEnableChanged(enable)
+        },
         onNeedSecurityVerificationWhenLaunchChanged = viewModel::onNeedSecurityVerificationWhenLaunchChanged,
         onEnableFingerprintVerificationChanged = viewModel::onEnableFingerprintVerificationChanged,
         onPasswordClick = viewModel::onPasswordClick,
@@ -182,6 +213,8 @@ internal fun SettingScreen(
     onImageQualitySelected: (ImageQualityEnum) -> Unit,
     onMonthStartDayClick: () -> Unit,
     onMonthStartDaySelected: (Int) -> Unit,
+    onCreditCardReminderEnableChanged: (Boolean) -> Unit,
+    onReimbursementReminderEnableChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -239,6 +272,8 @@ internal fun SettingScreen(
             onImageQualitySelected = onImageQualitySelected,
             onMonthStartDayClick = onMonthStartDayClick,
             onMonthStartDaySelected = onMonthStartDaySelected,
+            onCreditCardReminderEnableChanged = onCreditCardReminderEnableChanged,
+            onReimbursementReminderEnableChanged = onReimbursementReminderEnableChanged,
             onNeedSecurityVerificationWhenLaunchChanged = onNeedSecurityVerificationWhenLaunchChanged,
             onEnableFingerprintVerificationChanged = onEnableFingerprintVerificationChanged,
             onPasswordClick = onPasswordClick,
@@ -292,6 +327,8 @@ internal fun SettingContent(
     onImageQualitySelected: (ImageQualityEnum) -> Unit,
     onMonthStartDayClick: () -> Unit,
     onMonthStartDaySelected: (Int) -> Unit,
+    onCreditCardReminderEnableChanged: (Boolean) -> Unit,
+    onReimbursementReminderEnableChanged: (Boolean) -> Unit,
     onNeedSecurityVerificationWhenLaunchChanged: (Boolean) -> Unit,
     onVerificationModeClick: () -> Unit,
     onEnableFingerprintVerificationChanged: (Boolean) -> Unit,
@@ -400,6 +437,31 @@ internal fun SettingContent(
                                 contentDescription = null,
                             )
                         }
+                    },
+                )
+                CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
+            }
+
+            item {
+                CbListItem(
+                    modifier = Modifier.padding(top = 16.dp),
+                    headlineContent = { Text(text = stringResource(id = R.string.credit_card_reminder)) },
+                    supportingContent = { Text(text = stringResource(id = R.string.credit_card_reminder_hint)) },
+                    trailingContent = {
+                        Switch(
+                            checked = uiState.creditCardReminderEnable,
+                            onCheckedChange = onCreditCardReminderEnableChanged,
+                        )
+                    },
+                )
+                CbListItem(
+                    headlineContent = { Text(text = stringResource(id = R.string.reimbursement_reminder)) },
+                    supportingContent = { Text(text = stringResource(id = R.string.reimbursement_reminder_hint)) },
+                    trailingContent = {
+                        Switch(
+                            checked = uiState.reimbursementReminderEnable,
+                            onCheckedChange = onReimbursementReminderEnableChanged,
+                        )
                     },
                 )
                 CbHorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
@@ -1356,6 +1418,8 @@ private fun SettingScreenPreview() {
             onImageQualitySelected = { _ -> },
             onMonthStartDayClick = { },
             onMonthStartDaySelected = { _ -> },
+            onCreditCardReminderEnableChanged = { },
+            onReimbursementReminderEnableChanged = { },
             onVerifyConfirmClick = { _, _ -> },
             onClearConfirmClick = { _, _ -> },
             onFingerprintVerifySuccess = { },

@@ -33,6 +33,7 @@ import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.enums.AutoBackupModeEnum
 import cn.wj.android.cashbook.sync.initializers.AutoBackupWorkName
+import cn.wj.android.cashbook.sync.initializers.ReminderWorkName
 import cn.wj.android.cashbook.sync.initializers.SyncWorkName
 import cn.wj.android.cashbook.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
@@ -109,6 +110,20 @@ class InitWorker @AssistedInject constructor(
                         cancelUniqueWork(AutoBackupWorkName)
                     }
                 }
+                // 提醒：始终注册周期任务（Worker 内读开关 gate），UPDATE 重算 initialDelay 对齐次日 10:00
+                enqueueUniquePeriodicWork(
+                    ReminderWorkName,
+                    ExistingPeriodicWorkPolicy.UPDATE,
+                    DailyReminderWorker.startUpPeriodicReminderWork(),
+                )
+                // 启动补查一次（消"启动时补发遗漏"）
+                enqueueUniqueWork(
+                    "${ReminderWorkName}_OneTime",
+                    ExistingWorkPolicy.REPLACE,
+                    OneTimeWorkRequestBuilder<DelegatingWorker>()
+                        .setInputData(DailyReminderWorker::class.delegatedData())
+                        .build(),
+                )
             }
         }
         Result.success()

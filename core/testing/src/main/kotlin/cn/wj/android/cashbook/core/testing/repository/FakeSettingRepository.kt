@@ -259,4 +259,16 @@ class FakeSettingRepository : SettingRepository {
     override suspend fun updateMonthStartDay(monthStartDay: Int) {
         _recordSettingsModel.value = _recordSettingsModel.value.copy(monthStartDay = monthStartDay)
     }
+
+    override suspend fun updateCreditCardReminderEnable(enable: Boolean) {
+        _appSettingsModel.value = _appSettingsModel.value.copy(creditCardReminderEnable = enable)
+    }
+
+    override suspend fun updateReimbursementReminderEnable(enable: Boolean) {
+        _appSettingsModel.value = _appSettingsModel.value.copy(reimbursementReminderEnable = enable)
+    }
+
+    override suspend fun updateLastReminderCheckMs(ms: Long) {
+        _appSettingsModel.value = _appSettingsModel.value.copy(lastReminderCheckMs = ms)
+    }
 }

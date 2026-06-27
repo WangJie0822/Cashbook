@@ -25,13 +25,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import cn.wj.android.cashbook.core.common.EXTRA_REMINDER_ASSET_ID
+import cn.wj.android.cashbook.core.common.EXTRA_REMINDER_TARGET
+import cn.wj.android.cashbook.core.common.REMINDER_TARGET_NONE
 import cn.wj.android.cashbook.core.common.SHORTCUTS_TYPE
 import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
@@ -45,16 +47,20 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
-    /** 快捷入口打开类型 */
-    private var shortcutsType by mutableIntStateOf(-1)
+    /** 待消费的深链意图（快捷方式 + 提醒通知统一） */
+    private var pendingDeepLink by mutableStateOf<PendingDeepLink>(PendingDeepLink.None)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // 获取快捷方式类型
-        shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
-        logger().i("onCreate(), shortcutsType = <$shortcutsType>")
+        // 解析深链意图（快捷方式 + 提醒通知）
+        pendingDeepLink = parsePendingDeepLink(
+            shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1),
+            reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE),
+            reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L),
+        )
+        logger().i("onCreate(), pendingDeepLink = <$pendingDeepLink>")
 
         var uiState: ActivityUiState by mutableStateOf(ActivityUiState.Loading)
 
@@ -103,7 +109,15 @@ class MainActivity : AppCompatActivity() {
                 disableDynamicTheming = shouldDisableDynamicTheming(uiState = uiState),
             ) {
                 ProvideLocalState {
-                    MainApp(shortcutsType = shortcutsType)
+                    MainApp(
+                        pendingDeepLink = pendingDeepLink,
+                        onConsumePendingDeepLink = {
+                            pendingDeepLink = PendingDeepLink.None
+                            intent.removeExtra(SHORTCUTS_TYPE)
+                            intent.removeExtra(EXTRA_REMINDER_TARGET)
+                            intent.removeExtra(EXTRA_REMINDER_ASSET_ID)
+                        },
+                    )
                 }
             }
         }
@@ -111,8 +125,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
-        logger().i("onNewIntent(), shortcutsType = <$shortcutsType>")
+        setIntent(intent)
+        pendingDeepLink = parsePendingDeepLink(
+            shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1),
+            reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE),
+            reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L),
+        )
+        logger().i("onNewIntent(), pendingDeepLink = <$pendingDeepLink>")
     }
 }
 

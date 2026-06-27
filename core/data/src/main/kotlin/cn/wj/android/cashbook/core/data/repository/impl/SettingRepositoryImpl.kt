@@ -254,6 +254,21 @@ class SettingRepositoryImpl @Inject constructor(
             combineProtoDataSource.updateMonthStartDay(monthStartDay)
         }
 
+    override suspend fun updateCreditCardReminderEnable(enable: Boolean) =
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateCreditCardReminderEnable(enable)
+        }
+
+    override suspend fun updateReimbursementReminderEnable(enable: Boolean) =
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateReimbursementReminderEnable(enable)
+        }
+
+    override suspend fun updateLastReminderCheckMs(ms: Long) =
+        withContext(coroutineContext) {
+            combineProtoDataSource.updateLastReminderCheckMs(ms)
+        }
+
     override suspend fun exportSettings(): String = withContext(coroutineContext) {
         val app = appSettingsModel.first()
         val record = recordSettingsModel.first()

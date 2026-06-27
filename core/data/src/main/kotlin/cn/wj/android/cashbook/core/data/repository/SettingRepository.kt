@@ -115,6 +115,15 @@ interface SettingRepository {
     /** 更新月起始日（1-28） */
     suspend fun updateMonthStartDay(monthStartDay: Int)
 
+    /** 更新信用卡提醒开关 */
+    suspend fun updateCreditCardReminderEnable(enable: Boolean)
+
+    /** 更新待报销提醒开关 */
+    suspend fun updateReimbursementReminderEnable(enable: Boolean)
+
+    /** 更新上次提醒检查日期(epoch ms) */
+    suspend fun updateLastReminderCheckMs(ms: Long)
+
     /** 导出设备无关偏好白名单为 JSON（排除凭据 / WebDAV / 设备绑定项），用于备份 */
     suspend fun exportSettings(): String
 

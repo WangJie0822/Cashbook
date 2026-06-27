@@ -30,4 +30,7 @@ message AppSettings {
   bool logcatInRelease = 23; // 在 Release 版本输出日志
   bool mobileNetworkBackupEnable = 24; // 是否允许使用数据流量备份
   int32 imageQuality = 25; // 图片质量
+  bool creditCardReminderEnable = 26; // 信用卡账单/还款提醒开关
+  bool reimbursementReminderEnable = 27; // 待报销提醒开关
+  sint64 lastReminderCheckMs = 28; // 上次提醒检查日期(epoch ms)，0=从未；补发用
 }

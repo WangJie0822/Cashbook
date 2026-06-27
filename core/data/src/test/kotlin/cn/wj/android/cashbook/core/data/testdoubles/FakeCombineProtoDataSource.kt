@@ -225,6 +225,18 @@ class FakeCombineProtoDataSource {
         _appSettings.update { it.copy(logcatInRelease = logcatInRelease) }
     }
 
+    suspend fun updateCreditCardReminderEnable(enable: Boolean) {
+        _appSettings.update { it.copy(creditCardReminderEnable = enable) }
+    }
+
+    suspend fun updateReimbursementReminderEnable(enable: Boolean) {
+        _appSettings.update { it.copy(reimbursementReminderEnable = enable) }
+    }
+
+    suspend fun updateLastReminderCheckMs(ms: Long) {
+        _appSettings.update { it.copy(lastReminderCheckMs = ms) }
+    }
+
     suspend fun updateLatestVersionData(
         latestVersionName: String,
         latestVersionInfo: String,
