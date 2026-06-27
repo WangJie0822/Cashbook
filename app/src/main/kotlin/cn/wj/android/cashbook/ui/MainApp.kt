@@ -59,11 +59,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import cn.wj.android.cashbook.core.common.PASSWORD_REGEX
-import cn.wj.android.cashbook.core.common.REMINDER_TARGET_ASSET
-import cn.wj.android.cashbook.core.common.REMINDER_TARGET_NONE
-import cn.wj.android.cashbook.core.common.REMINDER_TARGET_REIMBURSEMENT
-import cn.wj.android.cashbook.core.common.SHORTCUTS_TYPE_ADD
-import cn.wj.android.cashbook.core.common.SHORTCUTS_TYPE_ASSET
 import cn.wj.android.cashbook.core.common.TestTag
 import cn.wj.android.cashbook.core.common.tools.isMatch
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
@@ -155,9 +150,8 @@ private val START_DESTINATION = SettingsLauncher
 /** 应用入口 */
 @Composable
 fun MainApp(
-    shortcutsType: Int,
-    reminderTarget: Int = REMINDER_TARGET_NONE,
-    reminderAssetId: Long = -1L,
+    pendingDeepLink: PendingDeepLink,
+    onConsumePendingDeepLink: () -> Unit,
     viewModel: MainAppViewModel = viewModel(),
 ) {
     // 监听生命周期
@@ -230,48 +224,37 @@ fun MainApp(
 
                 val context = LocalContext.current
 
-                // 快捷入口变化、UI状态变化时触发
-                LaunchedEffect(shortcutsType, uiState) {
-                    // 显示正常UI，且已同意隐私协议、不需要认证时触发
+                // 深链消费（快捷方式 + 提醒统一）：受安全验证门控（needVerity 未通过不导航不消费，
+                // 验证通过后 uiState 重发再导航并消费 → 顺带修「安全门未过深链丢失」）
+                LaunchedEffect(pendingDeepLink, uiState) {
                     (uiState as? MainAppUiState.Success)?.run {
                         if (!needRequestProtocol && !needVerity) {
-                            when (shortcutsType) {
-                                SHORTCUTS_TYPE_ADD -> {
-                                    // 当前已显示对应界面，不重复显示
+                            when (val link = pendingDeepLink) {
+                                PendingDeepLink.None -> Unit
+                                PendingDeepLink.AddRecord ->
                                     if (navController.currentDestination?.hasRoute<EditRecord>() != true) {
                                         navController.naviToEditRecord()
                                     }
-                                }
 
-                                SHORTCUTS_TYPE_ASSET -> {
-                                    // 当前已显示对应界面，不重复显示
+                                PendingDeepLink.MyAsset ->
                                     if (navController.currentDestination?.hasRoute<MyAsset>() != true) {
                                         navController.naviToMyAsset()
                                     }
-                                }
-                            }
-                        }
-                    }
-                }
 
-                // 提醒深链：受安全验证门控（needVerity 未通过不导航，防绕过密码/指纹门）
-                LaunchedEffect(reminderTarget, reminderAssetId, uiState) {
-                    (uiState as? MainAppUiState.Success)?.run {
-                        if (!needRequestProtocol && !needVerity) {
-                            when (reminderTarget) {
-                                REMINDER_TARGET_ASSET -> {
-                                    if (reminderAssetId > 0 &&
+                                is PendingDeepLink.AssetInfo ->
+                                    if (link.assetId > 0 &&
                                         navController.currentDestination?.hasRoute<AssetInfo>() != true
                                     ) {
-                                        navController.naviToAssetInfo(reminderAssetId)
+                                        navController.naviToAssetInfo(link.assetId)
                                     }
-                                }
 
-                                REMINDER_TARGET_REIMBURSEMENT -> {
+                                PendingDeepLink.Reimbursement ->
                                     if (navController.currentDestination?.hasRoute<Reimbursement>() != true) {
                                         navController.naviToReimbursement()
                                     }
-                                }
+                            }
+                            if (pendingDeepLink != PendingDeepLink.None) {
+                                onConsumePendingDeepLink()
                             }
                         }
                     }

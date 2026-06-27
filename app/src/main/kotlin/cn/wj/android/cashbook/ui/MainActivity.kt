@@ -25,8 +25,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -49,25 +47,20 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
-    /** 快捷入口打开类型 */
-    private var shortcutsType by mutableIntStateOf(-1)
-
-    /** 提醒深链目标类型 */
-    private var reminderTarget by mutableIntStateOf(REMINDER_TARGET_NONE)
-
-    /** 提醒深链资产 id（信用卡详情用） */
-    private var reminderAssetId by mutableLongStateOf(-1L)
+    /** 待消费的深链意图（快捷方式 + 提醒通知统一） */
+    private var pendingDeepLink by mutableStateOf<PendingDeepLink>(PendingDeepLink.None)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // 获取快捷方式类型
-        shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
-        // 获取提醒深链目标
-        reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE)
-        reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L)
-        logger().i("onCreate(), shortcutsType = <$shortcutsType>, reminderTarget = <$reminderTarget>")
+        // 解析深链意图（快捷方式 + 提醒通知）
+        pendingDeepLink = parsePendingDeepLink(
+            shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1),
+            reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE),
+            reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L),
+        )
+        logger().i("onCreate(), pendingDeepLink = <$pendingDeepLink>")
 
         var uiState: ActivityUiState by mutableStateOf(ActivityUiState.Loading)
 
@@ -117,9 +110,13 @@ class MainActivity : AppCompatActivity() {
             ) {
                 ProvideLocalState {
                     MainApp(
-                        shortcutsType = shortcutsType,
-                        reminderTarget = reminderTarget,
-                        reminderAssetId = reminderAssetId,
+                        pendingDeepLink = pendingDeepLink,
+                        onConsumePendingDeepLink = {
+                            pendingDeepLink = PendingDeepLink.None
+                            intent.removeExtra(SHORTCUTS_TYPE)
+                            intent.removeExtra(EXTRA_REMINDER_TARGET)
+                            intent.removeExtra(EXTRA_REMINDER_ASSET_ID)
+                        },
                     )
                 }
             }
@@ -128,10 +125,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1)
-        reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE)
-        reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L)
-        logger().i("onNewIntent(), shortcutsType = <$shortcutsType>, reminderTarget = <$reminderTarget>")
+        setIntent(intent)
+        pendingDeepLink = parsePendingDeepLink(
+            shortcutsType = intent.getIntExtra(SHORTCUTS_TYPE, -1),
+            reminderTarget = intent.getIntExtra(EXTRA_REMINDER_TARGET, REMINDER_TARGET_NONE),
+            reminderAssetId = intent.getLongExtra(EXTRA_REMINDER_ASSET_ID, -1L),
+        )
+        logger().i("onNewIntent(), pendingDeepLink = <$pendingDeepLink>")
     }
 }
 
