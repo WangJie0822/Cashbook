@@ -745,6 +745,53 @@ class RecordDaoTest {
 
     // endregion
 
+    // region 21. queryAllImages / updateImagePathAndBytes（图片 backfill 真 SQL）
+
+    @Test
+    fun when_queryAllImages_then_returnsAllImageRowsAcrossRecords() = runTest {
+        testBookId = createTestBook()
+        val typeId = typeDao.insertType(createType())
+        val recordId1 = insertRecord(createRecord(typeId = typeId, remark = "r1"))
+        val recordId2 = insertRecord(createRecord(typeId = typeId, remark = "r2"))
+        transactionDao.insertRelatedImages(
+            listOf(
+                ImageWithRelatedTable(id = null, recordId = recordId1, path = "/a.jpg", bytes = byteArrayOf(1)),
+                ImageWithRelatedTable(id = null, recordId = recordId2, path = "/b.jpg", bytes = byteArrayOf(2)),
+            ),
+        )
+
+        val all = recordDao.queryAllImages()
+        assertThat(all).hasSize(2)
+        assertThat(all.map { it.path }).containsExactly("/a.jpg", "/b.jpg")
+    }
+
+    @Test
+    fun when_updateImagePathAndBytes_then_onlyTargetRowChanged() = runTest {
+        testBookId = createTestBook()
+        val typeId = typeDao.insertType(createType())
+        val recordId = insertRecord(createRecord(typeId = typeId, remark = "r"))
+        transactionDao.insertRelatedImages(
+            listOf(
+                ImageWithRelatedTable(id = null, recordId = recordId, path = "content://old/1", bytes = byteArrayOf(1, 2)),
+                ImageWithRelatedTable(id = null, recordId = recordId, path = "content://old/2", bytes = byteArrayOf(3, 4)),
+            ),
+        )
+        val rows = recordDao.queryAllImages().sortedBy { it.id }
+        val targetId = rows.first().id!!
+
+        recordDao.updateImagePathAndBytes(targetId, "record_images/img_$targetId.jpg", ByteArray(0))
+
+        val updated = recordDao.queryAllImages().first { it.id == targetId }
+        assertThat(updated.path).isEqualTo("record_images/img_$targetId.jpg")
+        assertThat(updated.bytes).isEmpty()
+        // 另一行不受影响（path/bytes 均保留）
+        val other = recordDao.queryAllImages().first { it.id != targetId }
+        assertThat(other.path).isEqualTo("content://old/2")
+        assertThat(other.bytes).isEqualTo(byteArrayOf(3, 4))
+    }
+
+    // endregion
+
     // region 20. getRecordCountByAssetIdAfterTime
 
     @Test
