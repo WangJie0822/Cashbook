@@ -119,6 +119,7 @@
     <string name="last_backup_time_with_colon">上次备份时间：</string>
     <string name="backup_hint">本地和 WebDAV 一起备份</string>
     <string name="backup_hint_offline">仅本地备份</string>
+    <string name="settings_backup_includes_preferences_hint">备份将包含应用偏好设置（深色模式、图片质量、月起始日等），不含账号、密码与 WebDAV 凭据</string>
     <string name="recovery">恢复</string>
     <string name="recovery_hint">优先从 WebDAV 恢复，长按从本地恢复</string>
     <string name="recovery_hint_offline">从本地恢复</string>

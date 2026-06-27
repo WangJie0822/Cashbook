@@ -684,6 +684,13 @@ internal fun BackupAndRecoveryScaffoldContent(
                 },
             ),
         )
+        // 设备无关偏好始终纳入备份（恢复侧严格校验+排除凭据）；只读说明，无交互开关
+        Text(
+            text = stringResource(id = R.string.settings_backup_includes_preferences_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = LocalContentColor.current.copy(0.5f),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
         Box {
             var expended by remember {
                 mutableStateOf(false)
