@@ -78,7 +78,10 @@ jobs:
       - name: Run all local screenshot tests (Roborazzi)
         id: screenshotsverify
         continue-on-error: true
-        run: ./gradlew verifyRoborazziDevDebug
+        # verifyRoborazziDevDebug 仅覆盖 app（唯一含 Dev flavor 的模块）；
+        # 追加 verifyRoborazziDebug 覆盖无 flavor 的 feature/core 模块（其变体为 Debug，无 *DevDebug 任务），
+        # 使 feature 模块截图基线同样由 CI 校验/录制。
+        run: ./gradlew verifyRoborazziDevDebug verifyRoborazziDebug
 
       - name: Prevent pushing new screenshots if this is a fork
         id: checkfork
@@ -92,7 +95,7 @@ jobs:
         id: screenshotsrecord
         if: steps.screenshotsverify.outcome == 'failure' && github.event_name == 'pull_request'
         run: |
-          ./gradlew recordRoborazziDevDebug
+          ./gradlew recordRoborazziDevDebug recordRoborazziDebug
 
       - name: Push new screenshots if available
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7
