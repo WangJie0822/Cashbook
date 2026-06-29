@@ -35,6 +35,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asSummaryModel
 import cn.wj.android.cashbook.core.data.repository.asTable
+import cn.wj.android.cashbook.core.data.uitl.DatabaseCompactor
 import cn.wj.android.cashbook.core.data.uitl.ORPHAN_SCAN_THROTTLE_MS
 import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
 import cn.wj.android.cashbook.core.data.uitl.computeOrphanFiles
@@ -63,6 +64,7 @@ class RecordRepositoryImpl @Inject constructor(
     private val transactionDao: TransactionDao,
     private val combineProtoDataSource: CombineProtoDataSource,
     private val recordImageFileStorage: RecordImageFileStorage,
+    private val databaseCompactor: DatabaseCompactor,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : RecordRepository {
 
@@ -662,6 +664,16 @@ class RecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun compactDatabaseIfNeeded() = withContext(coroutineContext) {
+        // C-robust：backfill 置空 BLOB 后一次性回收 live DB 空闲页；StatFs 预检 + 仅真成功置位、
+        // 失败（ENOSPC/锁）不置 dbVacuumDone → 下次启动重试（不与 imagesToFilesMigrated 耦合）
+        runDbCompactIfNeeded(
+            alreadyDone = combineProtoDataSource.tempKeysData.first().dbVacuumDone,
+            compactor = databaseCompactor,
+            onSuccess = { combineProtoDataSource.updateDbVacuumDone(true) },
+        )
+    }
+
     override suspend fun cleanupOrphanImageFiles(graceWindowMs: Long) = withContext(coroutineContext) {
         // 节流（gate 下沉 repo，ViewModel 仍无条件调用）：删资产/账本/编辑路径已各自删文件，
         // 孤儿扫描退为纯兜底（崩溃中途删/backfill 中断/恢复合并/外部损坏），7 天内已扫则跳过全目录 listFiles()
@@ -722,6 +734,24 @@ internal suspend fun runImageBackfill(
  */
 internal fun deleteManagedImageFiles(imagePaths: List<String>, storage: RecordImageFileStorage) {
     imagePaths.filter { storage.isManaged(it) }.forEach { storage.delete(it) }
+}
+
+/**
+ * C-robust live VACUUM 编排（抽为顶层 internal fun 便于单测，避免构造整个 Repository）。
+ *
+ * - 已完成（[alreadyDone]）→ 跳过（不重跑）
+ * - 可用空间 < DB 大小 → 跳过、不调 [onSuccess]（下次启动重试）
+ * - VACUUM 真成功 → 调 [onSuccess]（置位成功门）；失败 → 不置位（下次重试）
+ */
+internal suspend fun runDbCompactIfNeeded(
+    alreadyDone: Boolean,
+    compactor: DatabaseCompactor,
+    onSuccess: suspend () -> Unit,
+) {
+    if (alreadyDone) return
+    val size = compactor.databaseSizeBytes()
+    if (compactor.freeSpaceBytes() < size) return // 空间不足留待下次（StatFs 预检）
+    if (compactor.vacuum()) onSuccess()
 }
 
 /**

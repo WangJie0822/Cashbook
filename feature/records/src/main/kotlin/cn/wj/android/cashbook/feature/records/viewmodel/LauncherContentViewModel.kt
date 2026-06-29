@@ -106,6 +106,18 @@ class LauncherContentViewModel @Inject constructor(
                             .e(e, "background image backfill failed, will retry next launch")
                     }
                 }
+                if (tempKeys.imagesToFilesMigrated && !tempKeys.dbVacuumDone) {
+                    // C-robust：backfill 已完成后一次性 live DB VACUUM 回收空闲页（StatFs 预检 + 仅真成功置位、
+                    // 失败下次重试）。本次刚完成 backfill 的启动 tempKeys 快照仍为 false → 顺延下次启动跑，可接受。
+                    try {
+                        recordRepository.compactDatabaseIfNeeded()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        this@LauncherContentViewModel.logger()
+                            .e(e, "background db compact failed, will retry next launch")
+                    }
+                }
             }
             // 启动孤儿图片扫描（每次启动兜底：批量删账本/资产、编辑替换可能留孤儿文件）；
             // grace window 保护刚写入/backfill 在途文件，未 backfill 行无 record_images 文件故不误删。

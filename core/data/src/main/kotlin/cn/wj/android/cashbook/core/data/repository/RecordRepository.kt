@@ -191,6 +191,9 @@ interface RecordRepository {
     /** 清理 record_images 目录下不被 DB 引用的孤儿图片文件（grace window 保护新写文件） */
     suspend fun cleanupOrphanImageFiles(graceWindowMs: Long = 60_000L)
 
+    /** backfill 完成后一次性 live DB VACUUM 回收空闲页（C-robust：StatFs 预检 + 仅真成功置位、失败下次重试） */
+    suspend fun compactDatabaseIfNeeded()
+
     /**
      * 批量查询「收入侧」关联关系：返回 recordId -> 关联记录 id 列表，
      * 等价于对每个 id 调用 [getRelatedIdListById] 后聚合，消除 N+1。

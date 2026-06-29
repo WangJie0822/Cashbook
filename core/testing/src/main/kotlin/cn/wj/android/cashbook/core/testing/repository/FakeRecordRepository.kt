@@ -133,6 +133,14 @@ class FakeRecordRepository : RecordRepository {
         cleanupOrphanImageFilesCount++
     }
 
+    /** [compactDatabaseIfNeeded] 调用次数，供首屏 gate 测试断言 */
+    var compactDatabaseIfNeededCount = 0
+        private set
+
+    override suspend fun compactDatabaseIfNeeded() {
+        compactDatabaseIfNeededCount++
+    }
+
     override suspend fun deleteRecord(recordId: Long) {
         lastDeletedRecordId = recordId
         records.removeAll { it.id == recordId }
