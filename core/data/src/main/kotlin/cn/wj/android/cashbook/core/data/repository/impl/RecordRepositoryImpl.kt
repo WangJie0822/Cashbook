@@ -91,6 +91,11 @@ class RecordRepositoryImpl @Inject constructor(
         relatedImageList: List<ImageModel>,
     ) = withContext(coroutineContext) {
         logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
+        // 编辑前旧托管图路径（用于 diff 删被移除图，补齐编辑路径删文件对称）
+        val oldManagedPaths = recordDao.queryImagesByRecordId(record.id)
+            .map { it.path }
+            .filter { recordImageFileStorage.isManaged(it) }
+            .toSet()
         // 新图：写文件 + path 相对化 + bytes 置空（消 DB BLOB 膨胀）；已托管/无 bytes 行原样透传
         val persistedImages = persistNewImages(relatedImageList, recordImageFileStorage)
         transactionDao.updateRecordTransaction(
@@ -100,6 +105,11 @@ class RecordRepositoryImpl @Inject constructor(
             relatedRecordIdList = relatedRecordIdList,
             relatedImageList = persistedImages,
         )
+        // 保留集 = 持久化后仍引用的托管图（保留图 path 不变，diff 精确）；被移除 = 旧 − 保留 → 删文件
+        val keptPaths = persistedImages.map { it.path }
+            .filter { recordImageFileStorage.isManaged(it) }
+            .toSet()
+        deleteManagedImageFiles((oldManagedPaths - keptPaths).toList(), recordImageFileStorage)
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
     }
