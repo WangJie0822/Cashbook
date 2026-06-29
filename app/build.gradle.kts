@@ -18,6 +18,7 @@
 import cn.wj.android.cashbook.buildlogic.CashbookBuildType
 import cn.wj.android.cashbook.buildlogic.CashbookFlavor
 import cn.wj.android.cashbook.buildlogic.TEST_INSTRUMENTATION_RUNNER
+import cn.wj.android.cashbook.buildlogic.buildReleaseApkName
 import cn.wj.android.cashbook.buildlogic.configureOutputs
 import java.io.FileWriter
 
@@ -139,8 +140,8 @@ androidComponents {
         },
         toPath = "${project.rootDir}${sep}outputs${sep}apk",
         include = "**/*.apk",
-        renamer = { versionName ->
-            "Cashbook_${versionName}.apk"
+        renamer = { versionName, flavorName ->
+            buildReleaseApkName(versionName, flavorName)
         },
     )
 }

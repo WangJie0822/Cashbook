@@ -44,12 +44,17 @@ dependencies {
     compileOnly(libs.google.devtools.ksp.gradle.plugin)
     compileOnly(libs.squareup.javapoet)
     implementation(libs.google.truth)
+
+    testImplementation(libs.junit)
 }
 
 tasks {
     validatePlugins {
         enableStricterValidation = true
         failOnWarning = true
+    }
+    withType<Test>().configureEach {
+        useJUnit()
     }
 }
 
