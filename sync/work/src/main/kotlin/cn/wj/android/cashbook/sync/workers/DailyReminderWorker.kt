@@ -30,6 +30,8 @@ import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
+import cn.wj.android.cashbook.core.model.enums.ClassificationTypeEnum
+import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.sync.R
 import cn.wj.android.cashbook.sync.initializers.ReminderNotificationBaseId
 import cn.wj.android.cashbook.sync.initializers.reminderNotificationBuilder
@@ -52,6 +54,17 @@ import kotlin.coroutines.CoroutineContext
 
 /** 提醒触发时刻（本地时区，每日对齐到此小时） */
 private const val REMINDER_HOUR = 10
+
+/**
+ * N1 信用卡提醒取数过滤：仅【可见】信用卡大类（type==CREDIT_CARD_ACCOUNT，含银行品牌信用卡）。
+ *
+ * 判据与 EditAsset 显示账单/还款日字段的判据（type==CREDIT_CARD_ACCOUNT）一致，是旧判据
+ * classification.isCreditCard 的严格超集——额外纳入「信用卡→选具体银行」存为 BANK_CARD_* 的品牌信用卡。
+ * 隐藏信用卡（invisible）刻意不提醒，由上游 [AssetRepository.currentVisibleAssetListData] 已过滤。
+ */
+internal fun selectReminderCreditCards(assets: List<AssetModel>): List<CreditCardReminderInfo> =
+    assets.filter { it.type == ClassificationTypeEnum.CREDIT_CARD_ACCOUNT }
+        .map { CreditCardReminderInfo(it.id, it.name, it.billingDate, it.repaymentDate) }
 
 /**
  * 每日提醒任务（薄壳）：取数据 → 调纯函数 [reminderRun] 编排判定 → 发系统通知。
@@ -86,9 +99,7 @@ class DailyReminderWorker @AssistedInject constructor(
         }
         val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
         val creditCards = if (settings.creditCardReminderEnable) {
-            assetRepository.currentVisibleAssetListData.first()
-                .filter { it.classification.isCreditCard }
-                .map { CreditCardReminderInfo(it.id, it.name, it.billingDate, it.repaymentDate) }
+            selectReminderCreditCards(assetRepository.currentVisibleAssetListData.first())
         } else {
             emptyList()
         }
