@@ -139,7 +139,7 @@ class FakeSettingRepository : SettingRepository {
         _appSettingsModel.value = _appSettingsModel.value.copy(
             useGithub = backup.useGithub,
             autoCheckUpdate = backup.autoCheckUpdate,
-            ignoreUpdateVersion = backup.ignoreUpdateVersion,
+            // 不恢复 ignoreUpdateVersion（保留设备本地值），忠实复刻真实 importSettings 行为（节点1 reverse R2）
             mobileNetworkDownloadEnable = backup.mobileNetworkDownloadEnable,
             mobileNetworkBackupEnable = backup.mobileNetworkBackupEnable,
             darkMode = DarkModeEnum.ordinalOf(backup.darkMode),

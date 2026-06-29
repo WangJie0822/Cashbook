@@ -294,7 +294,8 @@ class SettingRepositoryImpl @Inject constructor(
         val backup = decodeSettingsBackup(json) ?: return
         updateUseGithub(backup.useGithub)
         updateAutoCheckUpdate(backup.autoCheckUpdate)
-        updateIgnoreUpdateVersion(backup.ignoreUpdateVersion)
+        // 不恢复 ignoreUpdateVersion：设备本地「跳过此更新版本」状态不随备份转移（节点1 reverse R2）。
+        // 字段仍保留于 SettingsBackup/codec（JSON 形状不变、旧 app 解析兼容），仅不 apply。
         updateMobileNetworkDownloadEnable(backup.mobileNetworkDownloadEnable)
         updateMobileNetworkBackupEnable(backup.mobileNetworkBackupEnable)
         updateDarkMode(DarkModeEnum.ordinalOf(backup.darkMode))
