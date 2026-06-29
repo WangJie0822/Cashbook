@@ -44,7 +44,7 @@ object ProjectSetting {
         const val TARGET_SDK = 36
 
         /** 大版本名 */
-        private const val VERSION_NAME = "v1.3.0"
+        private const val VERSION_NAME = "v1.3.1"
 
         private var versionCodeTemp = -1
 
