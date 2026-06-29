@@ -35,8 +35,10 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asSummaryModel
 import cn.wj.android.cashbook.core.data.repository.asTable
+import cn.wj.android.cashbook.core.data.uitl.ORPHAN_SCAN_THROTTLE_MS
 import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
 import cn.wj.android.cashbook.core.data.uitl.computeOrphanFiles
+import cn.wj.android.cashbook.core.data.uitl.shouldRunOrphanScan
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
@@ -661,6 +663,13 @@ class RecordRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cleanupOrphanImageFiles(graceWindowMs: Long) = withContext(coroutineContext) {
+        // 节流（gate 下沉 repo，ViewModel 仍无条件调用）：删资产/账本/编辑路径已各自删文件，
+        // 孤儿扫描退为纯兜底（崩溃中途删/backfill 中断/恢复合并/外部损坏），7 天内已扫则跳过全目录 listFiles()
+        val now = System.currentTimeMillis()
+        val lastScan = combineProtoDataSource.tempKeysData.first().lastOrphanScanMs
+        if (!shouldRunOrphanScan(lastScan, now, ORPHAN_SCAN_THROTTLE_MS)) {
+            return@withContext
+        }
         // DB 引用集仅取 path 投影（不读 BLOB，避免一次性物化全表 BLOB 致 OOM）
         val referenced = recordDao.queryAllImagePaths()
             .filter { recordImageFileStorage.isManaged(it) }
@@ -668,9 +677,10 @@ class RecordRepositoryImpl @Inject constructor(
             .toSet()
         val children = recordImageFileStorage.baseDir().listFiles()?.toList()
         if (children != null) {
-            computeOrphanFiles(referenced, children, System.currentTimeMillis(), graceWindowMs)
+            computeOrphanFiles(referenced, children, now, graceWindowMs)
                 .forEach { it.delete() }
         }
+        combineProtoDataSource.updateLastOrphanScanMs(now)
     }
 }
 

@@ -805,6 +805,9 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 // 置 false 强制下次启动 backfill 重跑 → 把这些 BLOB materialize 为文件（已是文件态的行 bytes 空、
                 // backfill 的 queryUnmigratedImageIds 天然跳过，幂等）。镜像上面 type id 与下面 finalAmount 的恢复重置处理。
                 combineProtoDataSource.updateImagesToFilesMigrated(false)
+                // 复位孤儿扫描时间戳：恢复合并会重新引入孤儿（备份含目录全部图片、merge 覆盖），
+                // 置 0 强制下次启动扫一次（否则被 7 天节流压制，恰在最该扫的时刻不扫，节点1 reverse R4）。
+                combineProtoDataSource.updateLastOrphanScanMs(0L)
                 // 图片合并恢复：解压出的 record_images/ 叠加到 filesDir/record_images/（合并语义、不清空现有目录）。
                 // guard：合并失败（ENOSPC 等）不连累后续 recalculateAllFinalAmount（finalAmount 一致性是关键步、必须跑）
                 val restoredImagesDir = File(cacheDir, RECORD_IMAGES_DIR)
