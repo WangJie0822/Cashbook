@@ -24,7 +24,9 @@ import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.asModel
 import cn.wj.android.cashbook.core.data.repository.asTable
+import cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorage
 import cn.wj.android.cashbook.core.database.dao.BooksDao
+import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.model.BooksModel
@@ -40,6 +42,8 @@ class BooksRepositoryImpl @Inject constructor(
     private val booksDao: BooksDao,
     private val transactionDao: TransactionDao,
     private val combineProtoDataSource: CombineProtoDataSource,
+    private val recordDao: RecordDao,
+    private val recordImageFileStorage: RecordImageFileStorage,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : BooksRepository {
 
@@ -68,7 +72,11 @@ class BooksRepositoryImpl @Inject constructor(
 
     override suspend fun deleteBook(id: Long): Boolean = withContext(coroutineContext) {
         val result = runCatching {
+            // 删前捕获图片相对路径（删后关联已清无法查），与单删/编辑对称
+            val imagePaths = recordDao.queryImagePathsByBookId(id)
             transactionDao.deleteBookTransaction(id)
+            // DB 删成功后 best-effort 删托管图片文件（复用同包 internal top-level fn，失败留孤儿启动扫描兜底）
+            deleteManagedImageFiles(imagePaths, recordImageFileStorage)
             true
         }.getOrElse { throwable ->
             this@BooksRepositoryImpl.logger().e(throwable, "deleteBook()")
