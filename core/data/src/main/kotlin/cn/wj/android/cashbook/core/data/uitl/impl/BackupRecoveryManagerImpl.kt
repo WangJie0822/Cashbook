@@ -569,21 +569,8 @@ class BackupRecoveryManagerImpl @Inject constructor(
         zos.closeEntry()
     }
 
-    /**
-     * 写一个 STORED（不压缩）文件 entry：JPEG 等已压缩内容 DEFLATE 几乎不省体积、白耗 CPU。
-     * STORED 需先手填 size + CRC32 → 两遍流式（先流读算 CRC/size，再流写），保持 O(1) 内存。
-     */
     private fun putZipStoredFileEntry(zos: ZipOutputStream, file: File, entryName: String) {
-        val (crc, size) = computeCrcAndSize(FileInputStream(file).buffered())
-        val entry = ZipEntry(entryName).apply {
-            method = ZipEntry.STORED
-            this.size = size
-            compressedSize = size
-            this.crc = crc
-        }
-        zos.putNextEntry(entry)
-        FileInputStream(file).buffered().use { it.copyTo(zos) }
-        zos.closeEntry()
+        writeStoredZipEntry(zos, file, entryName)
     }
 
     /** 写一段字节 entry 到 zip（settings.json / manifest.json） */
@@ -942,6 +929,24 @@ class BackupRecoveryManagerImpl @Inject constructor(
             }
         }
     }
+}
+
+/**
+ * 写一个 STORED（不压缩）文件 entry：JPEG 等已压缩内容 DEFLATE 几乎不省体积、白耗 CPU。
+ * STORED 需先手填 size + CRC32 → 两遍流式（先流读算 CRC/size，再流写），保持 O(1) 内存。
+ * 抽为顶层 internal fun 便于 zip round-trip 单测（无需构造整个 Manager）。
+ */
+internal fun writeStoredZipEntry(zos: ZipOutputStream, file: File, entryName: String) {
+    val (crc, size) = computeCrcAndSize(FileInputStream(file).buffered())
+    val entry = ZipEntry(entryName).apply {
+        method = ZipEntry.STORED
+        this.size = size
+        compressedSize = size
+        this.crc = crc
+    }
+    zos.putNextEntry(entry)
+    FileInputStream(file).buffered().use { it.copyTo(zos) }
+    zos.closeEntry()
 }
 
 /** 流式计算 (crc32, size)，O(1) 内存（STORED zip entry 必须先知 size+crc）。 */
