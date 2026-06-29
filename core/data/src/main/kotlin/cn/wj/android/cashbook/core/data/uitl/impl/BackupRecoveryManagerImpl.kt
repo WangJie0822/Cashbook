@@ -415,7 +415,8 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 }
             }
             databaseFile.copyTo(databaseCacheFile)
-            // 对备份副本 in-place VACUUM 压实（minSdk24 兼容；失败/ENOSPC 回退未 VACUUM 的 checkpointed 副本，不让备份失败）
+            // 对备份副本 in-place VACUUM 压实（minSdk24 兼容）。integrity_check 失败/VACUUM 失败 → gate 回退未 VACUUM 副本。
+            var integrityOk = true
             runCatching {
                 context.openOrCreateDatabase(databaseCacheFile.absolutePath, Context.MODE_PRIVATE, null)
                     .use { db ->
@@ -424,15 +425,25 @@ class BackupRecoveryManagerImpl @Inject constructor(
                             if (c.moveToFirst()) {
                                 val ok = c.getString(0)
                                 if (!"ok".equals(ok, ignoreCase = true)) {
+                                    integrityOk = false
                                     this@BackupRecoveryManagerImpl.logger()
-                                        .w("startBackup(), VACUUM integrity_check = <$ok>, keep copy")
+                                        .w("startBackup(), VACUUM integrity_check = <$ok>, will fallback")
                                 }
                             }
                         }
                     }
             }.onFailure {
+                integrityOk = false
                 this@BackupRecoveryManagerImpl.logger()
-                    .w("startBackup(), VACUUM failed, fallback to checkpointed copy: ${it.message}")
+                    .w("startBackup(), VACUUM failed, will fallback: ${it.message}")
+            }
+            if (!integrityOk) {
+                // gate 回退（句柄已随 .use{} 关闭再覆盖）：回退点晚于上面首次 checkpoint，期间 worker 写入可能落 -wal
+                // → 回退前重 checkpoint 再从 databaseFile 复制，避免回退副本丢最近记录（节点1 reverse/feasibility）
+                database.openHelper.writableDatabase.run {
+                    query("PRAGMA wal_checkpoint(TRUNCATE)").use { it.moveToFirst() }
+                }
+                databaseFile.copyTo(databaseCacheFile, overwrite = true)
             }
             // 多 entry 打包：db(comment 仅此项，兼容旧 app 仅恢复 db 不崩) + record_images/* + settings.json + manifest.json
             val settingsJson = settingRepository.exportSettings()
