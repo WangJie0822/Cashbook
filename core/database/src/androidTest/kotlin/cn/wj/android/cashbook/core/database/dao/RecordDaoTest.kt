@@ -839,6 +839,51 @@ class RecordDaoTest {
 
     // endregion
 
+    // region 21b. queryImagePathsByAssetId / queryImagePathsByBookId（删资产/账本删文件投影）
+
+    @Test
+    fun when_queryImagePathsByAssetId_then_returnsOnlyThatAssetImagesIncludingIntoAsset() = runTest {
+        testBookId = createTestBook()
+        val typeId = typeDao.insertType(createType())
+        val target = 100L
+        val rA = insertRecord(createRecord(typeId = typeId, assetId = target, remark = "a"))
+        val rT = insertRecord(createRecord(typeId = typeId, intoAssetId = target, remark = "t")) // 转账入账侧
+        val rB = insertRecord(createRecord(typeId = typeId, assetId = 200L, remark = "b"))
+        transactionDao.insertRelatedImages(
+            listOf(
+                ImageWithRelatedTable(id = null, recordId = rA, path = "record_images/a.jpg", bytes = byteArrayOf(1)),
+                ImageWithRelatedTable(id = null, recordId = rT, path = "record_images/t.jpg", bytes = byteArrayOf(2)),
+                ImageWithRelatedTable(id = null, recordId = rB, path = "record_images/b.jpg", bytes = byteArrayOf(3)),
+            ),
+        )
+
+        val paths = recordDao.queryImagePathsByAssetId(target)
+        assertThat(paths).containsExactly("record_images/a.jpg", "record_images/t.jpg") // 含 into_asset_id 侧
+        assertThat(paths).doesNotContain("record_images/b.jpg") // 他资产不返回（防过删）
+    }
+
+    @Test
+    fun when_queryImagePathsByBookId_then_returnsOnlyThatBookImages() = runTest {
+        val book1 = createTestBook()
+        val book2 = createTestBook()
+        testBookId = book1
+        val typeId = typeDao.insertType(createType())
+        val r1 = insertRecord(createRecord(typeId = typeId, booksId = book1, remark = "x"))
+        val r2 = insertRecord(createRecord(typeId = typeId, booksId = book2, remark = "y"))
+        transactionDao.insertRelatedImages(
+            listOf(
+                ImageWithRelatedTable(id = null, recordId = r1, path = "record_images/x.jpg", bytes = byteArrayOf(1)),
+                ImageWithRelatedTable(id = null, recordId = r2, path = "record_images/y.jpg", bytes = byteArrayOf(2)),
+            ),
+        )
+
+        val paths = recordDao.queryImagePathsByBookId(book1)
+        assertThat(paths).containsExactly("record_images/x.jpg")
+        assertThat(paths).doesNotContain("record_images/y.jpg") // 他账本不返回（防过删）
+    }
+
+    // endregion
+
     // region 20. getRecordCountByAssetIdAfterTime
 
     @Test
