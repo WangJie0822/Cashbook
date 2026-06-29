@@ -3,6 +3,9 @@
 # junit4
 junit = "4.13.2"
 
+# org.json（JVM 单测真实现，替换 android.jar stub；20180813 离线缓存有 metadata）
+orgJson = "20180813"
+
 # 代码覆盖率 [指南](https://www.jacoco.org/jacoco/)
 jacoco = "0.8.11"
 
@@ -154,6 +157,8 @@ didi-dokit = "3.7.11"
 [libraries]
 # junit
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+# org.json（JVM 单测真实现）
+org-json = { group = "org.json", name = "json", version.ref = "orgJson" }
 
 # kotlin [指南](https://kotlinlang.org/)
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
