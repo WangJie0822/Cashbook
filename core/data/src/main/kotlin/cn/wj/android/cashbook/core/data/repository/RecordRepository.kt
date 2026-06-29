@@ -188,7 +188,10 @@ interface RecordRepository {
     /** 存量图片 BLOB → 文件系统 backfill（逐行幂等，崩溃可重入；成功后置位迁移标志） */
     suspend fun backfillImagesToFiles()
 
-    /** 清理 record_images 目录下不被 DB 引用的孤儿图片文件（grace window 保护新写文件） */
+    /**
+     * 清理 record_images 目录下不被 DB 引用的孤儿图片文件（grace window 保护新写文件）。
+     * 内部按 7 天节流：距上次扫描未达窗口直接返回（删资产/账本/编辑路径已各自删文件，本扫描退为纯兜底）。
+     */
     suspend fun cleanupOrphanImageFiles(graceWindowMs: Long = 60_000L)
 
     /** backfill 完成后一次性 live DB VACUUM 回收空闲页（C-robust：StatFs 预检 + 仅真成功置位、失败下次重试） */

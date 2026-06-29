@@ -453,6 +453,9 @@ class FakeRecordDao : RecordDao {
         return images.filter { it.recordId in ids }.map { it.path }
     }
 
+    override suspend fun queryImagePathsByRecordId(recordId: Long): List<String> =
+        images.filter { it.recordId == recordId }.map { it.path }
+
     override suspend fun queryUnmigratedImageIds(): List<Long> =
         images.filter { it.bytes.isNotEmpty() }.mapNotNull { it.id }
 

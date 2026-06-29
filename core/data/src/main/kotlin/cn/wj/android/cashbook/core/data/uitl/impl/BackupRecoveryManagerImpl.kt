@@ -826,6 +826,9 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 // 复位孤儿扫描时间戳：恢复合并会重新引入孤儿（备份含目录全部图片、merge 覆盖），
                 // 置 0 强制下次启动扫一次（否则被 7 天节流压制，恰在最该扫的时刻不扫，节点1 reverse R4）。
                 combineProtoDataSource.updateLastOrphanScanMs(0L)
+                // 复位 live VACUUM 成功门：恢复重新引入 BLOB（CONFLICT_REPLACE）→ backfill 重跑置空 bytes
+                // → DB 产生大量空闲页，正是最该再压实一次的场景；置 false 允许下次启动重跑 VACUUM 回收（节点2 Code L2）。
+                combineProtoDataSource.updateDbVacuumDone(false)
                 // 图片合并恢复：解压出的 record_images/ 叠加到 filesDir/record_images/（合并语义、不清空现有目录）。
                 // guard：合并失败（ENOSPC 等）不连累后续 recalculateAllFinalAmount（finalAmount 一致性是关键步、必须跑）
                 val restoredImagesDir = File(cacheDir, RECORD_IMAGES_DIR)
@@ -935,6 +938,10 @@ class BackupRecoveryManagerImpl @Inject constructor(
  * 写一个 STORED（不压缩）文件 entry：JPEG 等已压缩内容 DEFLATE 几乎不省体积、白耗 CPU。
  * STORED 需先手填 size + CRC32 → 两遍流式（先流读算 CRC/size，再流写），保持 O(1) 内存。
  * 抽为顶层 internal fun 便于 zip round-trip 单测（无需构造整个 Manager）。
+ *
+ * 前置假设：[file] 在两遍读之间不可变（record_images 内容寻址、写后不改写，成立）；若两遍间变更，
+ * 写入字节数与声明 size 不符会致 closeEntry 抛 ZipException、备份显式失败（非静默坏备份）。
+ * 第 2 遍读大概率命中 OS page cache（紧跟第 1 遍）；海量图/极大图致页淘汰时退化为 2× 真磁盘读。
  */
 internal fun writeStoredZipEntry(zos: ZipOutputStream, file: File, entryName: String) {
     val (crc, size) = computeCrcAndSize(FileInputStream(file).buffered())

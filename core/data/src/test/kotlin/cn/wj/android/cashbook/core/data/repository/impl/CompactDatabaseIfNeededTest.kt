@@ -51,7 +51,8 @@ class CompactDatabaseIfNeededTest {
 
     @Test
     fun insufficientSpace_skips_noFlag() = runTest {
-        val compactor = FakeDatabaseCompactor(size = 1000, free = 500, vacuumResult = true)
+        // free 落在 1×~2× DB 之间：VACUUM 需 ~2×，应跳过（旧 1× 预检会误放行）
+        val compactor = FakeDatabaseCompactor(size = 1000, free = 1500, vacuumResult = true)
         var doneSet = false
         runDbCompactIfNeeded(alreadyDone = false, compactor = compactor) { doneSet = true }
         assertThat(compactor.vacuumCalls).isEqualTo(0) // 空间不足跳过、不置位（下次重试）

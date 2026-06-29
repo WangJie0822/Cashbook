@@ -503,6 +503,10 @@ interface RecordDao {
     )
     suspend fun queryImagePathsByBookId(bookId: Long): List<String>
 
+    /** 按记录取图片相对路径（仅 path 投影，不读 BLOB）；编辑记录 diff 删被移除图用 */
+    @Query("SELECT image_path FROM db_image_with_related WHERE record_id=:recordId")
+    suspend fun queryImagePathsByRecordId(recordId: Long): List<String>
+
     /** 未迁移图片行 id（bytes 非空），backfill 流式逐行处理用，不一次性物化全表 BLOB */
     @Query("SELECT id FROM db_image_with_related WHERE LENGTH(image_bytes) > 0")
     suspend fun queryUnmigratedImageIds(): List<Long>

@@ -95,9 +95,8 @@ class RecordRepositoryImpl @Inject constructor(
         relatedImageList: List<ImageModel>,
     ) = withContext(coroutineContext) {
         logger().i("updateRecord(record = <$record>, tagIdList = <$tagIdList>")
-        // 编辑前旧托管图路径（用于 diff 删被移除图，补齐编辑路径删文件对称）
-        val oldManagedPaths = recordDao.queryImagesByRecordId(record.id)
-            .map { it.path }
+        // 编辑前旧托管图路径（path 投影、不读 BLOB）：用于 diff 删被移除图，补齐编辑路径删文件对称
+        val oldManagedPaths = recordDao.queryImagePathsByRecordId(record.id)
             .filter { recordImageFileStorage.isManaged(it) }
             .toSet()
         // 新图：写文件 + path 相对化 + bytes 置空（消 DB BLOB 膨胀）；已托管/无 bytes 行原样透传
@@ -109,11 +108,11 @@ class RecordRepositoryImpl @Inject constructor(
             relatedRecordIdList = relatedRecordIdList,
             relatedImageList = persistedImages,
         )
-        // 保留集 = 持久化后仍引用的托管图（保留图 path 不变，diff 精确）；被移除 = 旧 − 保留 → 删文件
-        val keptPaths = persistedImages.map { it.path }
-            .filter { recordImageFileStorage.isManaged(it) }
-            .toSet()
-        deleteManagedImageFiles((oldManagedPaths - keptPaths).toList(), recordImageFileStorage)
+        // 被移除的托管图（旧托管 − 持久化后仍引用的托管，保留图 path 不变故 diff 精确）→ 删文件
+        deleteManagedImageFiles(
+            managedImagesToDelete(oldManagedPaths, persistedImages, recordImageFileStorage),
+            recordImageFileStorage,
+        )
         recordDataVersion.updateVersion()
         assetDataVersion.updateVersion()
     }
@@ -737,6 +736,19 @@ internal fun deleteManagedImageFiles(imagePaths: List<String>, storage: RecordIm
 }
 
 /**
+ * 编辑记录时计算被移除的托管图（旧托管 − 持久化后仍引用的托管）。抽顶层 internal fun 便于单测。
+ * 保留图经 [persistNewImages] 原样透传 path 不变，故集合差精确得「被移除图」。
+ */
+internal fun managedImagesToDelete(
+    oldManagedPaths: Set<String>,
+    persistedImages: List<ImageModel>,
+    storage: RecordImageFileStorage,
+): List<String> {
+    val kept = persistedImages.map { it.path }.filter { storage.isManaged(it) }.toSet()
+    return (oldManagedPaths - kept).toList()
+}
+
+/**
  * C-robust live VACUUM 编排（抽为顶层 internal fun 便于单测，避免构造整个 Repository）。
  *
  * - 已完成（[alreadyDone]）→ 跳过（不重跑）
@@ -750,7 +762,8 @@ internal suspend fun runDbCompactIfNeeded(
 ) {
     if (alreadyDone) return
     val size = compactor.databaseSizeBytes()
-    if (compactor.freeSpaceBytes() < size) return // 空间不足留待下次（StatFs 预检）
+    // VACUUM 重建整库副本，运行期峰值约需 ~2× DB 大小空闲；预检 2× 避免大库半程 ENOSPC 白耗整库 IO
+    if (compactor.freeSpaceBytes() < size * 2) return
     if (compactor.vacuum()) onSuccess()
 }
 
