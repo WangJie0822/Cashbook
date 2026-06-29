@@ -76,8 +76,10 @@ import java.io.File
 import java.io.FileFilter
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.net.URL
 import java.net.URLEncoder
+import java.util.zip.CRC32
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -442,7 +444,8 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 zos.setLevel(Deflater.BEST_COMPRESSION)
                 putZipFileEntry(zos, databaseCacheFile, databaseCacheFile.name, ApplicationInfo.applicationInfo)
                 imagesDir.listFiles()?.filter { it.isFile }?.forEach { img ->
-                    putZipFileEntry(zos, img, RECORD_IMAGES_ENTRY_PREFIX + img.name, comment = null)
+                    // 图片（JPEG 已压缩）用 STORED 不再 DEFLATE，省 CPU 几乎不增体积
+                    putZipStoredFileEntry(zos, img, RECORD_IMAGES_ENTRY_PREFIX + img.name)
                 }
                 putZipBytesEntry(zos, SETTINGS_ENTRY, settingsJson.toByteArray(), comment = null)
                 putZipBytesEntry(zos, MANIFEST_ENTRY, manifestJson.toByteArray(), comment = null)
@@ -550,6 +553,23 @@ class BackupRecoveryManagerImpl @Inject constructor(
     private fun putZipFileEntry(zos: ZipOutputStream, file: File, entryName: String, comment: String?) {
         val entry = ZipEntry(entryName)
         if (comment != null) entry.comment = comment
+        zos.putNextEntry(entry)
+        FileInputStream(file).buffered().use { it.copyTo(zos) }
+        zos.closeEntry()
+    }
+
+    /**
+     * 写一个 STORED（不压缩）文件 entry：JPEG 等已压缩内容 DEFLATE 几乎不省体积、白耗 CPU。
+     * STORED 需先手填 size + CRC32 → 两遍流式（先流读算 CRC/size，再流写），保持 O(1) 内存。
+     */
+    private fun putZipStoredFileEntry(zos: ZipOutputStream, file: File, entryName: String) {
+        val (crc, size) = computeCrcAndSize(FileInputStream(file).buffered())
+        val entry = ZipEntry(entryName).apply {
+            method = ZipEntry.STORED
+            this.size = size
+            compressedSize = size
+            this.crc = crc
+        }
         zos.putNextEntry(entry)
         FileInputStream(file).buffered().use { it.copyTo(zos) }
         zos.closeEntry()
@@ -911,4 +931,20 @@ class BackupRecoveryManagerImpl @Inject constructor(
             }
         }
     }
+}
+
+/** 流式计算 (crc32, size)，O(1) 内存（STORED zip entry 必须先知 size+crc）。 */
+internal fun computeCrcAndSize(input: InputStream): Pair<Long, Long> {
+    val crc = CRC32()
+    var size = 0L
+    val buf = ByteArray(8 * 1024)
+    input.use {
+        while (true) {
+            val n = it.read(buf)
+            if (n < 0) break
+            crc.update(buf, 0, n)
+            size += n
+        }
+    }
+    return crc.value to size
 }
