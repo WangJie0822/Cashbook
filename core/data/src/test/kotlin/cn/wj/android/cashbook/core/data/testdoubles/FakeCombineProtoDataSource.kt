@@ -295,6 +295,14 @@ class FakeCombineProtoDataSource {
         _tempKeys.update { it.copy(imagesToFilesMigrated = migrated) }
     }
 
+    suspend fun updateLastOrphanScanMs(ms: Long) {
+        _tempKeys.update { it.copy(lastOrphanScanMs = ms) }
+    }
+
+    suspend fun updateDbVacuumDone(done: Boolean) {
+        _tempKeys.update { it.copy(dbVacuumDone = done) }
+    }
+
     suspend fun needRelated(typeId: Long): Boolean {
         val settings = _recordSettings.value
         return typeId == settings.reimburseTypeId || typeId == settings.refundTypeId

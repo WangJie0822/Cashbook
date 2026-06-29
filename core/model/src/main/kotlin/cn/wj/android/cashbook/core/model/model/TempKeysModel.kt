@@ -30,4 +30,8 @@ data class TempKeysModel(
     val finalAmountNetRecalcDone: Boolean = false,
     /** 图片 BLOB→文件系统 backfill 是否已完成 */
     val imagesToFilesMigrated: Boolean = false,
+    /** 上次孤儿图片扫描时间戳（节流用，0=从未扫） */
+    val lastOrphanScanMs: Long = 0L,
+    /** backfill 后 live DB VACUUM 是否已成功（仅真成功才置位） */
+    val dbVacuumDone: Boolean = false,
 )

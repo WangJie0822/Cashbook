@@ -9,4 +9,6 @@ message TempKeys {
   bool preferenceSplit = 2; // app_preferences 是否已拆分
   bool finalAmountNetRecalcDone = 3; // finalAmount 净自付重算是否已执行（proto3 默认 false，首启触发一次）
   bool imagesToFilesMigrated = 4; // 图片 BLOB→文件系统 backfill 是否已完成（proto3 默认 false，首启触发一次）
+  int64 lastOrphanScanMs = 5; // 上次孤儿图片扫描时间戳（节流用，proto3 默认 0=从未扫，首启即扫一次）
+  bool dbVacuumDone = 6; // backfill 后 live DB VACUUM 是否已成功（仅真成功才置位，proto3 默认 false）
 }

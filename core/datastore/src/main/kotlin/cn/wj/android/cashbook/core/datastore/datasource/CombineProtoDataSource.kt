@@ -141,6 +141,8 @@ class CombineProtoDataSource @Inject constructor(
                 preferenceSplit = it.preferenceSplit,
                 finalAmountNetRecalcDone = it.finalAmountNetRecalcDone,
                 imagesToFilesMigrated = it.imagesToFilesMigrated,
+                lastOrphanScanMs = it.lastOrphanScanMs,
+                dbVacuumDone = it.dbVacuumDone,
             )
         }
 
@@ -205,6 +207,14 @@ class CombineProtoDataSource @Inject constructor(
 
     suspend fun updateImagesToFilesMigrated(migrated: Boolean) {
         tempKeys.updateData { it.copy { this.imagesToFilesMigrated = migrated } }
+    }
+
+    suspend fun updateLastOrphanScanMs(ms: Long) {
+        tempKeys.updateData { it.copy { this.lastOrphanScanMs = ms } }
+    }
+
+    suspend fun updateDbVacuumDone(done: Boolean) {
+        tempKeys.updateData { it.copy { this.dbVacuumDone = done } }
     }
 
     suspend fun updateKeywords(keywords: List<String>) {
