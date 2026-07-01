@@ -6,6 +6,9 @@ junit = "4.13.2"
 # org.json（JVM 单测真实现，替换 android.jar stub；20180813 离线缓存有 metadata）
 orgJson = "20180813"
 
+# javax.inject [版本查询](https://mvnrepository.com/artifact/javax.inject/javax.inject)
+javax-inject = "1"
+
 # 代码覆盖率 [指南](https://www.jacoco.org/jacoco/)
 jacoco = "0.8.11"
 
@@ -18,6 +21,9 @@ kotlin = "2.3.20"
 # [Github](https://github.com/Kotlin/kotlinx.coroutines)
 # [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx)
 kotlinx-coroutines = "1.10.2"
+# datetime [Github](https://github.com/Kotlin/kotlinx-datetime)
+# [版本查询](https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-datetime)
+kotlinx-datetime = "0.6.2"
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
 kotlinx-serialization-json = "1.8.1"
 
@@ -164,12 +170,18 @@ org-json = { group = "org.json", name = "json", version.ref = "orgJson" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 
+# javax.inject [版本查询](https://mvnrepository.com/artifact/javax.inject/javax.inject)
+javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javax-inject" }
+
 # Kotlinx
 # 协程 [指南](https://www.kotlincn.net/docs/reference/coroutines/coroutines-guide.html) [Github](https://github.com/Kotlin/kotlinx.coroutines)
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+# datetime [Github](https://github.com/Kotlin/kotlinx-datetime)
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 # Google 相关
 # Material [版本查询](https://www.wanandroid.com/maven_pom/index?k=com.google.android.material)
@@ -339,6 +351,8 @@ androidx-room = { id = "androidx.room", version.ref = "androidx-room" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 # json 序列化 [Github](https://github.com/Kotlin/kotlinx.serialization)
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+# Kotlin Multiplatform [指南](https://kotlinlang.org/docs/multiplatform.html)
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 # ksp
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "google-devtools-ksp" }
 # protobuf [Github](https://github.com/protocolbuffers/protobuf)
