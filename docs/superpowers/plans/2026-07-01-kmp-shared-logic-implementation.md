@@ -26,6 +26,31 @@
 
 ---
 
+## Phase 0 实证发现（2026-07-02·已通过硬门槛，勘误下游）
+
+Phase 0 实测已通过（config-cache stored+reused、PlatformTest 通过），H1 HIGH 风险解决。实证发现修正了 plan 原假设，下游 Phase 1-3 须按以下事实执行：
+
+1. **shared 模块 build 配置**（非 plan 原写的 `kotlin.multiplatform` + `androidTarget()`）：AGP 9 禁止 `com.android.library` + `kotlin.multiplatform` 联用，`androidTarget()` 报「requires Android Gradle Plugin」。实证正确配置：
+   ```kotlin
+   plugins {
+       alias(libs.plugins.kotlin.multiplatform)
+       alias(libs.plugins.android.kotlin.multiplatform.library)  // AGP9 KMP 库插件
+   }
+   kotlin {
+       androidLibrary {
+           namespace = "cn.wj.android.cashbook.shared"
+           compileSdk = 36
+           minSdk = 24
+           withHostTestBuilder {}  // 启用 JVM host 跑 commonTest
+       }
+       sourceSets { commonMain.dependencies { ... }; commonTest.dependencies { implementation(kotlin("test")) } }
+   }
+   ```
+2. **root `build.gradle.kts` 须加**：`alias(libs.plugins.kotlin.multiplatform) apply false` + `alias(libs.plugins.android.kotlin.multiplatform.library) apply false`（否则「plugin already on classpath with unknown version」冲突）。
+3. **版本目录须加**：`android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-gradle-plugin" }`（已在 Task 0.1/0.3 提交）。
+4. **shared 模块编译/测试 task 名**：`:shared:testAndroidHostTest`（跑 commonTest）；**非** plan 各处写的 `:shared:compileKotlinAndroid`——下游所有 `:shared:compile*` 验证命令替换为 `:shared:testAndroidHostTest` 或 `:shared:assemble`。
+5. **commonMain 不含 java.time**（JVM-only API）——凡迁入 commonMain 的文件（core:model / 工具函数）必须先做 java.time → kotlinx-datetime 替换（T1.3/T3.3 已含）。
+
 ## Phase 0：工具链验证（硬门槛·不通过则全方案降级）
 
 ### Task 0.1: 版本目录新增 KMP 依赖声明
