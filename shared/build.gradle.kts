@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             // api：DateSelectionEntity 公共字段暴露 kotlinx.datetime.LocalDate/YearMonth，消费方需传递可见
             api(libs.kotlinx.datetime)
+            // CashbookDispatchers 的 @Dispatcher 用 @Qualifier（JSR-330 纯注解，KMP 可用）；api 暴露给消费方（domain）的 Hilt 处理
+            api(libs.javax.inject)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
