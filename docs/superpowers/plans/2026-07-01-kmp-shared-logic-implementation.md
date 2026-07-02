@@ -528,7 +528,38 @@ git commit -m "[refactor|core:model|KMP][公共]Phase1 完成：core:model 清�
 
 ---
 
-## Phase 2：core:domain 剥离
+## Phase 2/3 执行顺序调整（2026-07-02·实证驱动·方案 A）
+
+**Phase 1 完成后经实证审计，原 Phase 2（core:domain 迁移）存在根本性架构 blocker，故调整为「先 Phase 3（core:common）后重评 Phase 2」（方案 A，用户 2026-07-02 确认）。**
+
+### Phase 2 blocker（实证，暂缓执行）
+
+1. `core:data` 是 Android library（`cashbook.android.library`+Hilt+Room+Paging），且已 `implementation(projects.shared)`（Phase 1 建立）→ 若 `shared` 反依赖 `core:data` 则**循环依赖**，Gradle 拒绝（`core/data/build.gradle.kts:16-19,47`）。
+2. `RecordRepository` 接口用 `androidx.paging.PagingData`（Android 类型），接口无法迁 commonMain（`RecordRepository.kt:19`）。
+3. **25/29 UseCase 直接 import `core.data.repository.*`**，无法迁 commonMain；剩 4 个「非 data」中 3 个又依赖 `core:common`（`Dispatcher`/`logger`/`toLocalDate`，本就 Phase 3 才迁），当前真正可干净迁的只有 1 个（`GetSelectableVisibleTagListUseCase`）。
+4. plan Task 2.3 的 Hilt 胶水写法 `@Provides fun provideX(x)=x` 错误（Hilt 不扫 commonMain，无法解析该参数），须手动构造 + 保留 `@Dispatcher` qualifier。
+
+→ Phase 2「29 UseCase 迁 commonMain」在当前架构下不成立。若将来推进 domain KMP 化，需先做**数据层抽象重构**（Repository 接口去 Android 化、PagingData 换 KMP paging）——属新 spec，**不在本 plan 范围**。
+
+### Phase 2/3 依赖倒置修正
+
+原 plan Phase 顺序 2→3 有隐藏依赖倒置：Phase 2 的 UseCase 依赖 Phase 3 core:common 的 `CashbookDispatchers`/`Dispatcher`/`logger`/`toLocalDate`。正确拓扑序为**先 common 后 domain**。
+
+### Phase 3 Task 3.2 实证修正（Number.kt 必须分裂）
+
+`Number.kt` 的 `toBigDecimalOrZero()`（×2，返回 `BigDecimal`）唯一非测试消费方是 `Migration6To7.kt`（历史 migration，12 处 BigDecimal 算术，不可变）→ 这 2 函数**保留 core:common**，不迁、不重写；纯部分（`toFloatOrZero`/`toDoubleOrZero`/`toIntOrZero`/`completeZero`）迁 commonMain。原 plan「Money.kt+Number.kt 纯 Long 重写整体迁入」修正为「Money 整体迁 + Number 分裂迁」。
+
+另：plan Task 3.2 给的 `toAmountCent` 纯 Long 重写方案（`parts[1].padEnd(2,'0').take(2)`）**直接截断第三位小数、不做 HALF_UP**（`"19.995"` 会错算 1999，期望 2000）→ 已按 `parseBudgetAmountCent` 手法重写为「第三位小数 ≥5 进 1 分 = BigDecimal HALF_UP 等价」，`it in '0'..'9'` 而非 `isDigit()`（避 Unicode 陷阱）。MoneyTest 的 19.995→2000 / 19.994→1999 守护。
+
+### Phase 3 通用约束：拆分文件必须换文件名（facade 冲突）
+
+**实证（T3.2）**：`core:common` 部分迁移时，若一个源文件被拆分（部分函数迁 shared、部分留 core:common），且两侧文件同名同包，Kotlin 会各自生成同 FQN 的顶层 facade 类（`XxxKt`），在**同时依赖两模块**的消费方（如 `core:database` 同时 `implementation(projects.core.common)` + `implementation(projects.shared)`）classpath 上互相遮蔽 → 对方文件的函数报 `Unresolved reference`（javap 实证：shared 与 core:common 各产 `core.common.ext.NumberKt`，方法集不同）。
+
+规则：**被拆分的文件，留在 core:common 的部分换文件名**（如 `Number.kt`→`BigDecimalExt.kt`，facade 变 `BigDecimalExtKt`）。函数包名不变、`import` 是函数级不涉 facade 名 → 消费方零改动。**整体迁走的文件**（core:common 侧删除、无残留同名 facade）不受此约束。T3.3/T3.4 处理 `Any.kt`（DecimalFormat/logger 部分留）等拆分文件时同样适用。
+
+---
+
+## Phase 2：core:domain 剥离（暂缓·见上方 blocker）
 
 ### Task 2.1: UseCase 审计与分类
 
