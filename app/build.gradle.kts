@@ -160,7 +160,7 @@ dependencies {
 
     // 架构
     implementation(projects.core.common)
-    implementation(projects.core.model)
+    implementation(projects.shared)
     implementation(projects.core.design)
     implementation(projects.core.ui)
     implementation(projects.core.data)

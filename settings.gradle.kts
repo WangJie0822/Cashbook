@@ -89,7 +89,6 @@ include(":core:testing")
 include(":core:design")
 
 include(":core:ui")
-include(":core:model")
 include(":shared")
 include(":core:common")
 

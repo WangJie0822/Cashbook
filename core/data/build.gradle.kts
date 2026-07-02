@@ -44,7 +44,7 @@ tasks.named("preBuild").configure { dependsOn(copyLegalDocsToAssets) }
 dependencies {
 
     implementation(projects.core.common)
-    implementation(projects.core.model)
+    implementation(projects.shared)
     implementation(projects.core.database)
     implementation(projects.core.datastore)
     implementation(projects.core.network)

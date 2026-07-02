@@ -17,7 +17,8 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.datetime)
+            // api：DateSelectionEntity 公共字段暴露 kotlinx.datetime.LocalDate/YearMonth，消费方需传递可见
+            api(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

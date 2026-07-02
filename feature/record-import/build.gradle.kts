@@ -26,7 +26,7 @@ android {
 dependencies {
 
     // 架构
-    implementation(projects.core.model)
+    implementation(projects.shared)
     implementation(projects.core.common)
     implementation(projects.core.data)
     implementation(projects.core.database)

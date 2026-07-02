@@ -26,7 +26,7 @@ android {
 
 dependencies {
 
-    implementation(projects.core.model)
+    implementation(projects.shared)
     implementation(projects.core.design)
 
     implementation(libs.androidx.core.ktx)

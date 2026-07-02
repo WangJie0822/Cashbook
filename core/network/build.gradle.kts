@@ -29,7 +29,7 @@ android {
 dependencies {
 
     implementation(projects.core.common)
-    implementation(projects.core.model)
+    implementation(projects.shared)
 
     // kotlin 协程
     implementation(libs.kotlinx.coroutines.android)

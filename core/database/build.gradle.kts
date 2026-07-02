@@ -47,7 +47,7 @@ dependencies {
     androidTestImplementation(projects.core.testing)
 
     implementation(projects.core.common)
-    implementation(projects.core.model)
+    implementation(projects.shared)
 
     implementation(libs.androidx.room.paging)
 }
