@@ -49,4 +49,23 @@ class BudgetAmountTest {
         assertNull(parseBudgetAmountCent("1E5"))
         assertNull(parseBudgetAmountCent("1e5"))
     }
+
+    /**
+     * ≥3 位小数的 HALF_UP 四舍五入边界（触发 fracPart.length > 2 分支）。
+     * ground-truth 与原 BigDecimal.setScale(2, HALF_UP) 逐例等价（0-4 舍 / 5-9 入，只看第 3 位小数）。
+     */
+    @Test fun round_halfUp_boundary() {
+        assertEquals(1L, parseBudgetAmountCent("0.005")) // 恰 .5 → 上入
+        assertNull(parseBudgetAmountCent("0.004")) // < .5 → 下舍到 0 → null
+        assertEquals(2L, parseBudgetAmountCent("0.015")) // .5 → 上入
+        assertEquals(2000L, parseBudgetAmountCent("19.995")) // 上入
+        assertEquals(1999L, parseBudgetAmountCent("19.994")) // 下舍
+        assertEquals(1000L, parseBudgetAmountCent("9.999")) // 小数进位入整数部分
+    }
+
+    /** 前导/末尾小数点边界（空整数部分 / 空小数部分路径）。 */
+    @Test fun leading_or_trailing_dot() {
+        assertEquals(50L, parseBudgetAmountCent(".5")) // 空整数部分
+        assertEquals(500L, parseBudgetAmountCent("5.")) // 空小数部分
+    }
 }
