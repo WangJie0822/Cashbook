@@ -56,9 +56,14 @@ import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.DateSelectionTypeEnum
 import cn.wj.android.cashbook.core.ui.R
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.number
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
 import java.util.Calendar
+import kotlin.time.Clock
 
 /**
  * 日期选择 Popup
@@ -96,31 +101,33 @@ fun DateSelectionPopup(
             mutableIntStateOf(types.indexOf(currentSelection.type))
         }
 
+        val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
+
         // 缓存各模式的选择状态
         var cachedDay by remember {
             mutableStateOf(
-                (currentSelection as? DateSelectionEntity.ByDay)?.date ?: LocalDate.now(),
+                (currentSelection as? DateSelectionEntity.ByDay)?.date ?: today,
             )
         }
         var cachedMonth by remember {
             mutableStateOf(
-                (currentSelection as? DateSelectionEntity.ByMonth)?.yearMonth ?: YearMonth.now(),
+                (currentSelection as? DateSelectionEntity.ByMonth)?.yearMonth ?: today.yearMonth,
             )
         }
         var cachedYear by remember {
             mutableIntStateOf(
-                (currentSelection as? DateSelectionEntity.ByYear)?.year ?: LocalDate.now().year,
+                (currentSelection as? DateSelectionEntity.ByYear)?.year ?: today.year,
             )
         }
         var cachedRangeFrom by remember {
             mutableStateOf(
                 (currentSelection as? DateSelectionEntity.DateRange)?.from
-                    ?: LocalDate.now().withDayOfMonth(1),
+                    ?: LocalDate(today.year, today.month, 1),
             )
         }
         var cachedRangeTo by remember {
             mutableStateOf(
-                (currentSelection as? DateSelectionEntity.DateRange)?.to ?: LocalDate.now(),
+                (currentSelection as? DateSelectionEntity.DateRange)?.to ?: today,
             )
         }
 
@@ -243,14 +250,14 @@ private fun DayPicker(
     val yearItems = remember(years) { years.map { "${it}年" } }
     val monthItems = remember { monthRange.map { "${it}月" } }
     val yearIndex = remember(date) { years.indexOf(date.year).coerceAtLeast(0) }
-    val monthIndex = remember(date) { date.monthValue - 1 }
+    val monthIndex = remember(date) { date.month.number - 1 }
 
     var selectedYear by remember(date) { mutableIntStateOf(date.year) }
-    var selectedMonth by remember(date) { mutableIntStateOf(date.monthValue) }
+    var selectedMonth by remember(date) { mutableIntStateOf(date.month.number) }
 
     val daysInMonth by remember(selectedYear, selectedMonth) {
         derivedStateOf {
-            YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
+            YearMonth(selectedYear, selectedMonth).numberOfDays
         }
     }
     val dayRange by remember(daysInMonth) {
@@ -258,7 +265,7 @@ private fun DayPicker(
     }
     val dayItems = remember(dayRange) { dayRange.map { "${it}日" } }
     val dayIndex = remember(date, daysInMonth) {
-        (date.dayOfMonth - 1).coerceIn(0, daysInMonth - 1)
+        (date.day - 1).coerceIn(0, daysInMonth - 1)
     }
 
     Row(
@@ -272,10 +279,10 @@ private fun DayPicker(
             selectedIndex = yearIndex,
             onItemSelected = { index ->
                 selectedYear = years[index]
-                val newDay = date.dayOfMonth.coerceAtMost(
-                    YearMonth.of(years[index], selectedMonth).lengthOfMonth(),
+                val newDay = date.day.coerceAtMost(
+                    YearMonth(years[index], selectedMonth).numberOfDays,
                 )
-                onDateChanged(LocalDate.of(years[index], selectedMonth, newDay))
+                onDateChanged(LocalDate(years[index], selectedMonth, newDay))
             },
             modifier = Modifier.weight(1f),
         )
@@ -284,10 +291,10 @@ private fun DayPicker(
             selectedIndex = monthIndex,
             onItemSelected = { index ->
                 selectedMonth = monthRange[index]
-                val newDay = date.dayOfMonth.coerceAtMost(
-                    YearMonth.of(selectedYear, monthRange[index]).lengthOfMonth(),
+                val newDay = date.day.coerceAtMost(
+                    YearMonth(selectedYear, monthRange[index]).numberOfDays,
                 )
-                onDateChanged(LocalDate.of(selectedYear, monthRange[index], newDay))
+                onDateChanged(LocalDate(selectedYear, monthRange[index], newDay))
             },
             modifier = Modifier.weight(1f),
         )
@@ -295,7 +302,7 @@ private fun DayPicker(
             items = dayItems,
             selectedIndex = dayIndex,
             onItemSelected = { index ->
-                onDateChanged(LocalDate.of(selectedYear, selectedMonth, dayRange[index]))
+                onDateChanged(LocalDate(selectedYear, selectedMonth, dayRange[index]))
             },
             modifier = Modifier.weight(1f),
         )
@@ -314,7 +321,7 @@ private fun MonthPicker(
     val yearItems = remember(years) { years.map { "${it}年" } }
     val monthItems = remember { monthRange.map { "${it}月" } }
     val yearIndex = remember(yearMonth) { years.indexOf(yearMonth.year).coerceAtLeast(0) }
-    val monthIndex = remember(yearMonth) { yearMonth.monthValue - 1 }
+    val monthIndex = remember(yearMonth) { yearMonth.month.number - 1 }
 
     Row(
         modifier = Modifier
@@ -326,7 +333,7 @@ private fun MonthPicker(
             items = yearItems,
             selectedIndex = yearIndex,
             onItemSelected = { index ->
-                onYearMonthChanged(YearMonth.of(years[index], yearMonth.monthValue))
+                onYearMonthChanged(YearMonth(years[index], yearMonth.month.number))
             },
             modifier = Modifier.weight(1f),
         )
@@ -334,7 +341,7 @@ private fun MonthPicker(
             items = monthItems,
             selectedIndex = monthIndex,
             onItemSelected = { index ->
-                onYearMonthChanged(YearMonth.of(yearMonth.year, monthRange[index]))
+                onYearMonthChanged(YearMonth(yearMonth.year, monthRange[index]))
             },
             modifier = Modifier.weight(1f),
         )
@@ -390,14 +397,14 @@ private fun DateRangePicker(
         // 起始日期行
         DateRangeRow(
             label = stringResource(R.string.date_selection_start_date),
-            dateText = "${from.year}-${from.monthValue.toString().padStart(2, '0')}-${from.dayOfMonth.toString().padStart(2, '0')}",
+            dateText = "${from.year}-${from.month.number.toString().padStart(2, '0')}-${from.day.toString().padStart(2, '0')}",
             onClick = { showFromPicker = true },
         )
         Spacer(modifier = Modifier.height(12.dp))
         // 结束日期行
         DateRangeRow(
             label = stringResource(R.string.date_selection_end_date),
-            dateText = "${to.year}-${to.monthValue.toString().padStart(2, '0')}-${to.dayOfMonth.toString().padStart(2, '0')}",
+            dateText = "${to.year}-${to.month.number.toString().padStart(2, '0')}-${to.day.toString().padStart(2, '0')}",
             onClick = { showToPicker = true },
         )
     }
@@ -409,7 +416,7 @@ private fun DateRangePicker(
             onDismiss = { showFromPicker = false },
             onConfirm = { newFrom ->
                 showFromPicker = false
-                val adjustedTo = if (newFrom.isAfter(to)) newFrom else to
+                val adjustedTo = if (newFrom > to) newFrom else to
                 onRangeChanged(newFrom, adjustedTo)
             },
         )
@@ -422,7 +429,7 @@ private fun DateRangePicker(
             onDismiss = { showToPicker = false },
             onConfirm = { newTo ->
                 showToPicker = false
-                val adjustedFrom = if (newTo.isBefore(from)) newTo else from
+                val adjustedFrom = if (newTo < from) newTo else from
                 onRangeChanged(adjustedFrom, newTo)
             },
         )
@@ -516,10 +523,10 @@ private fun DatePickerWheelDialog(
                 val yearIndex = remember(selectedDate) {
                     years.indexOf(selectedDate.year).coerceAtLeast(0)
                 }
-                val monthIndex = remember(selectedDate) { selectedDate.monthValue - 1 }
-                val daysInMonth by remember(selectedDate.year, selectedDate.monthValue) {
+                val monthIndex = remember(selectedDate) { selectedDate.month.number - 1 }
+                val daysInMonth by remember(selectedDate.year, selectedDate.month) {
                     derivedStateOf {
-                        YearMonth.of(selectedDate.year, selectedDate.monthValue).lengthOfMonth()
+                        YearMonth(selectedDate.year, selectedDate.month.number).numberOfDays
                     }
                 }
                 val dayRange by remember(daysInMonth) {
@@ -527,7 +534,7 @@ private fun DatePickerWheelDialog(
                 }
                 val dayItems = remember(dayRange) { dayRange.map { "${it}日" } }
                 val dayIndex = remember(selectedDate, daysInMonth) {
-                    (selectedDate.dayOfMonth - 1).coerceIn(0, daysInMonth - 1)
+                    (selectedDate.day - 1).coerceIn(0, daysInMonth - 1)
                 }
 
                 Row(
@@ -538,10 +545,10 @@ private fun DatePickerWheelDialog(
                         items = yearItems,
                         selectedIndex = yearIndex,
                         onItemSelected = { index ->
-                            val newDay = selectedDate.dayOfMonth.coerceAtMost(
-                                YearMonth.of(years[index], selectedDate.monthValue).lengthOfMonth(),
+                            val newDay = selectedDate.day.coerceAtMost(
+                                YearMonth(years[index], selectedDate.month.number).numberOfDays,
                             )
-                            selectedDate = LocalDate.of(years[index], selectedDate.monthValue, newDay)
+                            selectedDate = LocalDate(years[index], selectedDate.month.number, newDay)
                         },
                         modifier = Modifier.weight(1f),
                     )
@@ -550,10 +557,10 @@ private fun DatePickerWheelDialog(
                         selectedIndex = monthIndex,
                         onItemSelected = { index ->
                             val month = monthRange[index]
-                            val newDay = selectedDate.dayOfMonth.coerceAtMost(
-                                YearMonth.of(selectedDate.year, month).lengthOfMonth(),
+                            val newDay = selectedDate.day.coerceAtMost(
+                                YearMonth(selectedDate.year, month).numberOfDays,
                             )
-                            selectedDate = LocalDate.of(selectedDate.year, month, newDay)
+                            selectedDate = LocalDate(selectedDate.year, month, newDay)
                         },
                         modifier = Modifier.weight(1f),
                     )
@@ -561,9 +568,9 @@ private fun DatePickerWheelDialog(
                         items = dayItems,
                         selectedIndex = dayIndex,
                         onItemSelected = { index ->
-                            selectedDate = LocalDate.of(
+                            selectedDate = LocalDate(
                                 selectedDate.year,
-                                selectedDate.monthValue,
+                                selectedDate.month.number,
                                 dayRange[index],
                             )
                         },

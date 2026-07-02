@@ -30,9 +30,12 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.analyticsPieNetAmount
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Clock
 
 /**
  * 聚合「本周期预算进度」。
@@ -53,7 +56,7 @@ class GetBudgetProgressUseCase @Inject constructor(
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) {
 
-    suspend operator fun invoke(today: LocalDate = LocalDate.now()): BudgetProgressEntity =
+    suspend operator fun invoke(today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): BudgetProgressEntity =
         withContext(coroutineContext) {
             val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
             val booksId = booksRepository.currentBook.first().id

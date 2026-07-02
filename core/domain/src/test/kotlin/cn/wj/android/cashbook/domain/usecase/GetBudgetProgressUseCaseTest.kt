@@ -34,7 +34,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * [GetBudgetProgressUseCase] 端到端聚合测试。
@@ -52,7 +52,7 @@ class GetBudgetProgressUseCaseTest {
     private lateinit var budgetRepository: FakeBudgetRepository
     private lateinit var useCase: GetBudgetProgressUseCase
 
-    private val today = LocalDate.of(2024, 1, 15)
+    private val today = LocalDate(2024, 1, 15)
 
     @Before
     fun setup() {

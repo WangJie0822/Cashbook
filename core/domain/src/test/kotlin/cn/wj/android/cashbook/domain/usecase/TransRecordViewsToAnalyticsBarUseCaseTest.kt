@@ -30,8 +30,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 
 class TransRecordViewsToAnalyticsBarUseCaseTest {
 
@@ -63,7 +63,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
     @Test
     fun when_month_selected_then_generates_entries_for_each_day() = runTest {
         val result = useCase(
-            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 2)),
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 2)),
             recordViewsList = emptyList(),
         )
 
@@ -78,8 +78,8 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
     fun when_date_range_then_generates_entries_for_range() = runTest {
         val result = useCase(
             dateSelection = DateSelectionEntity.DateRange(
-                from = LocalDate.of(2024, 3, 1),
-                to = LocalDate.of(2024, 3, 5),
+                from = LocalDate(2024, 3, 1),
+                to = LocalDate(2024, 3, 5),
             ),
             recordViewsList = emptyList(),
         )
@@ -93,7 +93,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
     @Test
     fun when_by_day_then_generates_single_entry() = runTest {
         val result = useCase(
-            dateSelection = DateSelectionEntity.ByDay(LocalDate.of(2024, 3, 15)),
+            dateSelection = DateSelectionEntity.ByDay(LocalDate(2024, 3, 15)),
             recordViewsList = emptyList(),
         )
 
@@ -164,7 +164,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         )
 
         val result = useCase(
-            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
             recordViewsList = records,
         )
 
@@ -189,7 +189,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         )
 
         val result = useCase(
-            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
             recordViewsList = records,
         )
 
@@ -233,7 +233,7 @@ class TransRecordViewsToAnalyticsBarUseCaseTest {
         )
 
         val result = useCase(
-            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
             recordViewsList = records,
         )
 

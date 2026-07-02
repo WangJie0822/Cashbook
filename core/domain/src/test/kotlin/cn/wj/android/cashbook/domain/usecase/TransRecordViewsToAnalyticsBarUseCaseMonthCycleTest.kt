@@ -25,9 +25,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.ZoneId
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.datetime.YearMonth
 
 /**
  * [TransRecordViewsToAnalyticsBarUseCase] 可配置月周期建桶测试（C2）。
@@ -73,14 +73,14 @@ class TransRecordViewsToAnalyticsBarUseCaseMonthCycleTest {
     fun byMonth_d15_includesNextMonthRecordsInBuckets() = runTest {
         // 周期 [2024-01-15, 2024-02-15)，记录落在 2024-02-03（自然 1 月看不到，但属本周期）
         val record = expenditureRecord(ms(2024, 2, 3), 5000L)
-        val bars = useCase(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)), listOf(record), monthStartDay = 15)
+        val bars = useCase(DateSelectionEntity.ByMonth(YearMonth(2024, 1)), listOf(record), monthStartDay = 15)
         assertThat(bars.any { it.date == "2024-02-03" }).isTrue()
         assertThat(bars.sumOf { it.expenditure }).isEqualTo(5000L)
     }
 
     @Test
     fun byMonth_d1_isNaturalMonth() = runTest {
-        val bars = useCase(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)), emptyList(), monthStartDay = 1)
+        val bars = useCase(DateSelectionEntity.ByMonth(YearMonth(2024, 1)), emptyList(), monthStartDay = 1)
         assertThat(bars.first().date).isEqualTo("2024-01-01")
         assertThat(bars.last().date).isEqualTo("2024-01-31")
         assertThat(bars.size).isEqualTo(31)

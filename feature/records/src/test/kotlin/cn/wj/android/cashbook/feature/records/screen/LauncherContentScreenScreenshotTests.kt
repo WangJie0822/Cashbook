@@ -32,7 +32,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
-import java.time.YearMonth
+import kotlinx.datetime.YearMonth
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -61,7 +61,7 @@ class LauncherContentScreenScreenshotTests {
                 onRequestDismissBookmark = {},
                 viewRecord = null,
                 recordDetailSheetContent = {},
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                 showDatePopup = false,
                 onMenuClick = {},
                 onDateClick = {},
@@ -87,7 +87,7 @@ class LauncherContentScreenScreenshotTests {
                 onRequestDismissBookmark = {},
                 viewRecord = null,
                 recordDetailSheetContent = {},
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                 showDatePopup = false,
                 onMenuClick = {},
                 onDateClick = {},
@@ -114,7 +114,7 @@ class LauncherContentScreenScreenshotTests {
                     onRequestDismissBookmark = {},
                     viewRecord = null,
                     recordDetailSheetContent = {},
-                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                     showDatePopup = false,
                     onMenuClick = {},
                     onDateClick = {},
@@ -142,7 +142,7 @@ class LauncherContentScreenScreenshotTests {
                     onRequestDismissBookmark = {},
                     viewRecord = null,
                     recordDetailSheetContent = {},
-                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                     showDatePopup = false,
                     onMenuClick = {},
                     onDateClick = {},

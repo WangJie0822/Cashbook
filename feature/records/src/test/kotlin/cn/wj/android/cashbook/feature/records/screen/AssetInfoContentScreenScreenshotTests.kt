@@ -38,7 +38,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
-import java.time.YearMonth
+import kotlinx.datetime.YearMonth
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -114,7 +114,7 @@ class AssetInfoContentScreenScreenshotTests {
         balance = 4950_00L,
     )
 
-    private val sampleDateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1))
+    private val sampleDateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1))
 
     @Test
     fun assetInfoContentScreen_withRecords_multipleThemes() {

@@ -38,7 +38,13 @@ import cn.wj.android.cashbook.feature.records.view.RecordDayHeader
 import cn.wj.android.cashbook.feature.records.view.RecordMonthSummaryHeader
 import cn.wj.android.cashbook.feature.records.viewmodel.AssetInfoContentViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
-import java.time.YearMonth
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
+import kotlin.time.Clock
 
 /**
  * 资产信息界面记录列表
@@ -64,7 +70,8 @@ internal fun AssetInfoContentRoute(
     val summary by viewModel.summary.collectAsStateWithLifecycle()
     val monthStartDay by viewModel.monthStartDay.collectAsStateWithLifecycle()
 
-    val currentMonth = (dateSelection as? DateSelectionEntity.ByMonth)?.yearMonth ?: YearMonth.now()
+    val currentMonth = (dateSelection as? DateSelectionEntity.ByMonth)?.yearMonth
+        ?: Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth
 
     AssetInfoContentScreen(
         topContent = topContent,
@@ -76,8 +83,8 @@ internal fun AssetInfoContentRoute(
         onDateClick = viewModel::displayDatePopup,
         onDismissDatePopup = viewModel::dismissDatePopup,
         onDateSelected = viewModel::updateDateSelection,
-        onPreviousMonth = { viewModel.updateMonth(currentMonth.minusMonths(1)) },
-        onNextMonth = { viewModel.updateMonth(currentMonth.plusMonths(1)) },
+        onPreviousMonth = { viewModel.updateMonth(currentMonth.minus(1, DateTimeUnit.MONTH)) },
+        onNextMonth = { viewModel.updateMonth(currentMonth.plus(1, DateTimeUnit.MONTH)) },
         onRecordItemClick = onRecordItemClick,
     )
 }

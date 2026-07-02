@@ -38,8 +38,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
+import kotlin.time.Clock
 
 class LauncherContentViewModelTest {
 
@@ -433,14 +435,14 @@ class LauncherContentViewModelTest {
         val selection = viewModel.dateSelection.value
         assertThat(selection).isInstanceOf(DateSelectionEntity.ByMonth::class.java)
         val byMonth = selection as DateSelectionEntity.ByMonth
-        assertThat(byMonth.yearMonth).isEqualTo(YearMonth.now())
+        assertThat(byMonth.yearMonth).isEqualTo(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth)
     }
 
     @Test
     fun when_monthStartDay_configured_then_initial_period_uses_currentMonthPeriod() = runTest {
         // 选 d = 今天的 dayOfMonth+1（<=28），使当前周期落到上月，与未配置 D 的 ByMonth(now) 不同 → 有区分力
-        val today = LocalDate.now()
-        val d = if (today.dayOfMonth < 28) today.dayOfMonth + 1 else 1
+        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+        val d = if (today.day < 28) today.day + 1 else 1
         settingRepository.setRecordSettings(
             RecordSettingsModel(
                 currentBookId = 1L,

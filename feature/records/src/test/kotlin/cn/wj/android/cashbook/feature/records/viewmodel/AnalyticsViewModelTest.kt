@@ -40,7 +40,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.YearMonth
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
+import kotlin.time.Clock
 
 class AnalyticsViewModelTest {
 
@@ -114,7 +118,7 @@ class AnalyticsViewModelTest {
             ),
         )
         settingRepository.updateMonthStartDay(15)
-        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth(2024, 1)))
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -138,7 +142,7 @@ class AnalyticsViewModelTest {
         val selection = viewModel.dateSelection.value
         assertThat(selection).isInstanceOf(DateSelectionEntity.ByMonth::class.java)
         val byMonth = selection as DateSelectionEntity.ByMonth
-        assertThat(byMonth.yearMonth).isEqualTo(YearMonth.now())
+        assertThat(byMonth.yearMonth).isEqualTo(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth)
     }
 
     @Test
@@ -238,7 +242,7 @@ class AnalyticsViewModelTest {
         )
 
         // 切换到 2024-01 月份
-        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth(2024, 1)))
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -252,7 +256,7 @@ class AnalyticsViewModelTest {
 
     @Test
     fun when_dateSelection_is_byMonth_then_granularity_is_day() = runTest {
-        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth(2024, 1)))
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -288,7 +292,7 @@ class AnalyticsViewModelTest {
 
     @Test
     fun when_dateSelection_is_byMonth_then_titleText_shows_yearMonth() = runTest {
-        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 6)))
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth(2024, 6)))
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -359,7 +363,7 @@ class AnalyticsViewModelTest {
             ),
         )
 
-        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth(2024, 1)))
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -415,7 +419,7 @@ class AnalyticsViewModelTest {
         )
         // 对齐选择窗口到记录所在月（2024-01）：使测试在 Fake 忽略日期窗口与真实 DAO 按
         // queryByBooksIdBetweenDate 过滤两种语义下都成立，避免依赖 Fake 不过滤的假阳性
-        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth(2024, 1)))
 
         viewModel.showSheet(DefaultProgressDialogController(), typeId = 1L)
 
@@ -445,7 +449,7 @@ class AnalyticsViewModelTest {
             ),
         )
 
-        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)))
+        viewModel.updateDateSelection(DateSelectionEntity.ByMonth(YearMonth(2024, 1)))
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}

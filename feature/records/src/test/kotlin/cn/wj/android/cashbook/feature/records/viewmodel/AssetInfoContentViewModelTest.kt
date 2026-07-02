@@ -30,8 +30,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.ZoneId
+import kotlinx.datetime.YearMonth
 
 /**
  * [AssetInfoContentViewModel] 单元测试
@@ -62,11 +62,11 @@ class AssetInfoContentViewModelTest {
         // 调用月份切换与信用卡标记，验证不抛异常且 dateSelection 同步更新
         val viewModel = buildViewModel()
         viewModel.updateIsCreditCard(true)
-        viewModel.updateMonth(java.time.YearMonth.of(2024, 1))
+        viewModel.updateMonth(YearMonth(2024, 1))
         assertThat(viewModel.dateSelection.value)
             .isEqualTo(
                 cn.wj.android.cashbook.core.model.entity.DateSelectionEntity.ByMonth(
-                    java.time.YearMonth.of(2024, 1),
+                    YearMonth(2024, 1),
                 ),
             )
     }
@@ -82,7 +82,7 @@ class AssetInfoContentViewModelTest {
         )
         settingRepository.updateMonthStartDay(15)
         viewModel.updateAssetId(1L)
-        viewModel.updateMonth(YearMonth.of(2024, 1))
+        viewModel.updateMonth(YearMonth(2024, 1))
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.summary.collect {}

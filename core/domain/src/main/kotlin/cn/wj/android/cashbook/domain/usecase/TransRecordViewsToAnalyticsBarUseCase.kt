@@ -28,6 +28,10 @@ import cn.wj.android.cashbook.core.model.enums.AnalyticsBarGranularity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.number
+import kotlinx.datetime.onDay
+import kotlinx.datetime.plus
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -65,18 +69,18 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
             is DateSelectionEntity.ByDay -> {
                 granularity = AnalyticsBarGranularity.DAY
                 val date = dateSelection.date
-                dateList.add("${date.year}-${date.monthValue.completeZero()}-${date.dayOfMonth.completeZero()}")
+                dateList.add("${date.year}-${date.month.number.completeZero()}-${date.day.completeZero()}")
             }
 
             is DateSelectionEntity.ByMonth -> {
                 granularity = AnalyticsBarGranularity.DAY
                 val d = normalizeMonthStartDay(monthStartDay)
                 val ym = dateSelection.yearMonth
-                var date = ym.atDay(d)
-                val endExclusive = ym.plusMonths(1).atDay(d)
-                while (date.isBefore(endExclusive)) {
-                    dateList.add("${date.year}-${date.monthValue.completeZero()}-${date.dayOfMonth.completeZero()}")
-                    date = date.plusDays(1L)
+                var date = ym.onDay(d)
+                val endExclusive = ym.plus(1, DateTimeUnit.MONTH).onDay(d)
+                while (date < endExclusive) {
+                    dateList.add("${date.year}-${date.month.number.completeZero()}-${date.day.completeZero()}")
+                    date = date.plus(1, DateTimeUnit.DAY)
                 }
             }
 
@@ -85,10 +89,10 @@ class TransRecordViewsToAnalyticsBarUseCase @Inject constructor(
                 var date = dateSelection.from
                 val toDate = dateSelection.to
                 while (date != toDate) {
-                    dateList.add("${date.year}-${date.monthValue.completeZero()}-${date.dayOfMonth.completeZero()}")
-                    date = date.plusDays(1L)
+                    dateList.add("${date.year}-${date.month.number.completeZero()}-${date.day.completeZero()}")
+                    date = date.plus(1, DateTimeUnit.DAY)
                 }
-                dateList.add("${toDate.year}-${toDate.monthValue.completeZero()}-${toDate.dayOfMonth.completeZero()}")
+                dateList.add("${toDate.year}-${toDate.month.number.completeZero()}-${toDate.day.completeZero()}")
             }
         }
         dateList.forEach { date ->

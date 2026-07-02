@@ -82,6 +82,7 @@ import cn.wj.android.cashbook.feature.records.view.AnalyticsPieListItem
 import cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsUiState
 import cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.ShowSheetData
+import kotlinx.datetime.number
 
 /**
  * 数据分析界面
@@ -154,13 +155,13 @@ internal fun AnalyticsScreen(
                                 Column {
                                     Text(
                                         text = dateSelection.from.let {
-                                            "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}"
+                                            "${it.year}-${it.month.number.toString().padStart(2, '0')}-${it.day.toString().padStart(2, '0')}"
                                         },
                                         style = MaterialTheme.typography.labelMedium,
                                     )
                                     Text(
                                         text = dateSelection.to.let {
-                                            "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}"
+                                            "${it.year}-${it.month.number.toString().padStart(2, '0')}-${it.day.toString().padStart(2, '0')}"
                                         },
                                         style = MaterialTheme.typography.labelMedium,
                                     )

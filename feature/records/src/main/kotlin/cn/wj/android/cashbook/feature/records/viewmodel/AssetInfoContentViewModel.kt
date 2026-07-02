@@ -47,8 +47,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import java.time.YearMonth
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
 import javax.inject.Inject
+import kotlin.time.Clock
 
 /**
  * 资产信息页记录数据 ViewModel
@@ -73,7 +77,7 @@ class AssetInfoContentViewModel @Inject constructor(
 
     /** 当前月份选择，默认当前月 */
     private val _dateSelection = MutableStateFlow<DateSelectionEntity>(
-        DateSelectionEntity.ByMonth(YearMonth.now()),
+        DateSelectionEntity.ByMonth(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth),
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 

@@ -51,8 +51,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import java.time.YearMonth
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
 import javax.inject.Inject
+import kotlin.time.Clock
 
 /**
  * 指定类型 / 标签的分析数据 ViewModel：月份切换器 + 收支结余汇总 + 按日分组。
@@ -77,7 +81,7 @@ class TypedAnalyticsViewModel @Inject constructor(
     private val _typeIdData = MutableStateFlow(-1L)
     private val _includeChildTypes = MutableStateFlow(true)
     private val _dateSelection = MutableStateFlow<DateSelectionEntity>(
-        DateSelectionEntity.ByMonth(YearMonth.now()),
+        DateSelectionEntity.ByMonth(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth),
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
@@ -189,7 +193,7 @@ class TypedAnalyticsViewModel @Inject constructor(
         if (key != appliedDateKey) {
             appliedDateKey = key
             _dateSelection.tryEmit(
-                DateSelectionEntity.fromDisplayTextOrNull(date) ?: DateSelectionEntity.ByMonth(YearMonth.now()),
+                DateSelectionEntity.fromDisplayTextOrNull(date) ?: DateSelectionEntity.ByMonth(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth),
             )
         }
         logger().i("updateData(tagId=<$tagId>, typeId=<$typeId>, date=<$date>, includeChildTypes=<$includeChildTypes>)")

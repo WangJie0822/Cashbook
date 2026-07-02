@@ -38,7 +38,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
-import java.time.YearMonth
+import kotlinx.datetime.YearMonth
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -101,7 +101,7 @@ class TypedAnalyticsScreenScreenshotTests {
                 onRequestDismissBottomSheet = {},
                 uiState = TypedAnalyticsUiState.Loading,
                 recordList = recordList,
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                 summary = summary,
                 onPreviousMonth = {},
                 onNextMonth = {},
@@ -123,7 +123,7 @@ class TypedAnalyticsScreenScreenshotTests {
                 onRequestDismissBottomSheet = {},
                 uiState = successUiState,
                 recordList = recordList,
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                 summary = summary,
                 onPreviousMonth = {},
                 onNextMonth = {},
@@ -173,7 +173,7 @@ class TypedAnalyticsScreenScreenshotTests {
                 onRequestDismissBottomSheet = {},
                 uiState = successUiState,
                 recordList = recordList,
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                 summary = summary,
                 byMonthCrossesNaturalMonth = true,
                 onPreviousMonth = {},
@@ -199,7 +199,7 @@ class TypedAnalyticsScreenScreenshotTests {
                 onRequestDismissBottomSheet = {},
                 uiState = successUiState.copy(isTransferType = true),
                 recordList = recordList,
-                dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                 summary = AssetMonthSummaryModel(0L, 0L, 0L),
                 onPreviousMonth = {},
                 onNextMonth = {},
@@ -222,7 +222,7 @@ class TypedAnalyticsScreenScreenshotTests {
                     onRequestDismissBottomSheet = {},
                     uiState = successUiState,
                     recordList = recordList,
-                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                     summary = summary,
                     onPreviousMonth = {},
                     onNextMonth = {},
@@ -246,7 +246,7 @@ class TypedAnalyticsScreenScreenshotTests {
                     onRequestDismissBottomSheet = {},
                     uiState = TypedAnalyticsUiState.Loading,
                     recordList = recordList,
-                    dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+                    dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
                     summary = summary,
                     onPreviousMonth = {},
                     onNextMonth = {},

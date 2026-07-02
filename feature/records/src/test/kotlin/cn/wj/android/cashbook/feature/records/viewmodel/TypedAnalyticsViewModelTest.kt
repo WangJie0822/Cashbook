@@ -40,7 +40,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.YearMonth
+import kotlinx.datetime.YearMonth
 
 class TypedAnalyticsViewModelTest {
 
@@ -164,7 +164,7 @@ class TypedAnalyticsViewModelTest {
     fun when_updateData_with_yearMonth_then_dateSelection_is_byMonth() = runTest {
         viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
         assertThat(viewModel.dateSelection.value)
-            .isEqualTo(DateSelectionEntity.ByMonth(YearMonth.of(2024, 6)))
+            .isEqualTo(DateSelectionEntity.ByMonth(YearMonth(2024, 6)))
     }
 
     @Test
@@ -182,19 +182,19 @@ class TypedAnalyticsViewModelTest {
     @Test
     fun when_updateMonth_then_dateSelection_updates() = runTest {
         viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
-        viewModel.updateMonth(YearMonth.of(2024, 8))
+        viewModel.updateMonth(YearMonth(2024, 8))
         assertThat(viewModel.dateSelection.value)
-            .isEqualTo(DateSelectionEntity.ByMonth(YearMonth.of(2024, 8)))
+            .isEqualTo(DateSelectionEntity.ByMonth(YearMonth(2024, 8)))
     }
 
     @Test
     fun when_updateData_repeated_with_same_args_after_updateMonth_then_month_preserved() = runTest {
         // 模拟 Route 重组导致的重复 updateData（相同入口参数）：翻月结果不应被重置
         viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
-        viewModel.updateMonth(YearMonth.of(2024, 8))
+        viewModel.updateMonth(YearMonth(2024, 8))
         viewModel.updateData(tagId = -1L, typeId = 1L, date = "2024-06")
         assertThat(viewModel.dateSelection.value)
-            .isEqualTo(DateSelectionEntity.ByMonth(YearMonth.of(2024, 8)))
+            .isEqualTo(DateSelectionEntity.ByMonth(YearMonth(2024, 8)))
     }
 
     @Test

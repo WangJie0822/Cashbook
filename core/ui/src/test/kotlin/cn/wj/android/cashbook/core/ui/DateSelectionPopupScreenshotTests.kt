@@ -29,8 +29,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -47,7 +47,7 @@ class DateSelectionPopupScreenshotTests {
             DateSelectionPopup(
                 expanded = true,
                 onDismissRequest = {},
-                currentSelection = DateSelectionEntity.ByDay(LocalDate.of(2024, 6, 15)),
+                currentSelection = DateSelectionEntity.ByDay(LocalDate(2024, 6, 15)),
                 onDateSelected = {},
             )
         }
@@ -62,7 +62,7 @@ class DateSelectionPopupScreenshotTests {
             DateSelectionPopup(
                 expanded = true,
                 onDismissRequest = {},
-                currentSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 6)),
+                currentSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 6)),
                 onDateSelected = {},
             )
         }
@@ -93,8 +93,8 @@ class DateSelectionPopupScreenshotTests {
                 expanded = true,
                 onDismissRequest = {},
                 currentSelection = DateSelectionEntity.DateRange(
-                    from = LocalDate.of(2024, 1, 1),
-                    to = LocalDate.of(2024, 6, 30),
+                    from = LocalDate(2024, 1, 1),
+                    to = LocalDate(2024, 6, 30),
                 ),
                 onDateSelected = {},
             )

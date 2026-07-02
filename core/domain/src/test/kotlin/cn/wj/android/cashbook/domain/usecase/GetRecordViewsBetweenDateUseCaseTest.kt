@@ -30,7 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.YearMonth
+import kotlinx.datetime.YearMonth
 
 class GetRecordViewsBetweenDateUseCaseTest {
 
@@ -65,7 +65,7 @@ class GetRecordViewsBetweenDateUseCaseTest {
         recordRepository.addRecord(createRecordModel(id = 2L, typeId = 1L, amount = 20000L))
 
         val result = useCase(
-            dateSelection = DateSelectionEntity.ByMonth(YearMonth.of(2024, 1)),
+            dateSelection = DateSelectionEntity.ByMonth(YearMonth(2024, 1)),
         )
 
         assertThat(result).hasSize(2)

@@ -108,7 +108,11 @@ import cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModel
 import cn.wj.android.cashbook.feature.records.viewmodel.LauncherListItem
 import cn.wj.android.cashbook.feature.records.viewmodel.recordDayHeaderDateText
 import coil.compose.AsyncImage
-import java.time.YearMonth
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
+import kotlin.time.Clock
 
 /**
  * 首页内容
@@ -346,11 +350,11 @@ internal fun LauncherTopBar(
                     if (dateSelection is DateSelectionEntity.DateRange) {
                         Column {
                             Text(
-                                text = dateSelection.from.let { "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}" },
+                                text = dateSelection.from.let { "${it.year}-${it.month.number.toString().padStart(2, '0')}-${it.day.toString().padStart(2, '0')}" },
                                 style = MaterialTheme.typography.labelMedium,
                             )
                             Text(
-                                text = dateSelection.to.let { "${it.year}-${it.monthValue.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')}" },
+                                text = dateSelection.to.let { "${it.year}-${it.month.number.toString().padStart(2, '0')}-${it.day.toString().padStart(2, '0')}" },
                                 style = MaterialTheme.typography.labelMedium,
                             )
                         }
@@ -819,7 +823,7 @@ private fun LauncherContentScreenPreviewRevealed() {
             onRequestDismissBookmark = { },
             recordDetailSheetContent = { },
             viewRecord = null,
-            dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+            dateSelection = DateSelectionEntity.ByMonth(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth),
             showDatePopup = false,
             onMenuClick = { },
             onDateClick = { },
@@ -852,7 +856,7 @@ private fun LauncherContentScreenPreviewConcealed() {
             onRequestDismissBookmark = { },
             recordDetailSheetContent = { },
             viewRecord = null,
-            dateSelection = DateSelectionEntity.ByMonth(YearMonth.now()),
+            dateSelection = DateSelectionEntity.ByMonth(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth),
             showDatePopup = false,
             onMenuClick = { },
             onDateClick = { },

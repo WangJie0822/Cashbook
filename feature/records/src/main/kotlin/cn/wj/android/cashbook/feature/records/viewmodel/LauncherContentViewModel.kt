@@ -52,9 +52,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
 import javax.inject.Inject
+import kotlin.time.Clock
 
 @HiltViewModel
 class LauncherContentViewModel @Inject constructor(
@@ -89,7 +91,7 @@ class LauncherContentViewModel @Inject constructor(
 
     /** 当前日期选择 */
     private val _dateSelection = MutableStateFlow<DateSelectionEntity>(
-        DateSelectionEntity.ByMonth(YearMonth.now()),
+        DateSelectionEntity.ByMonth(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth),
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
@@ -107,7 +109,7 @@ class LauncherContentViewModel @Inject constructor(
         // 置于此处（_dateSelection 声明之后）：Unconfined 下构造时 init 立即执行，须保证 _dateSelection 已初始化。
         viewModelScope.launch {
             val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
-            _dateSelection.value = DateSelectionEntity.currentMonthPeriod(LocalDate.now(), monthStartDay)
+            _dateSelection.value = DateSelectionEntity.currentMonthPeriod(Clock.System.todayIn(TimeZone.currentSystemDefault()), monthStartDay)
         }
     }
 

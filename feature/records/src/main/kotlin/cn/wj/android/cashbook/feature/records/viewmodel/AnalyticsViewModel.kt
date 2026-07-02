@@ -48,9 +48,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.yearMonth
 import javax.inject.Inject
+import kotlin.time.Clock
 
 /**
  * 数据分析 ViewModel
@@ -87,7 +89,7 @@ class AnalyticsViewModel @Inject constructor(
 
     /** 当前日期选择 */
     private val _dateSelection = MutableStateFlow<DateSelectionEntity>(
-        DateSelectionEntity.ByMonth(YearMonth.now()),
+        DateSelectionEntity.ByMonth(Clock.System.todayIn(TimeZone.currentSystemDefault()).yearMonth),
     )
     val dateSelection: StateFlow<DateSelectionEntity> = _dateSelection
 
@@ -100,7 +102,7 @@ class AnalyticsViewModel @Inject constructor(
         // 初始化当前周期（D=1 等价 ByMonth(YearMonth.now())）。置于 _dateSelection 声明之后避免 init 早于属性初始化的 NPE。
         viewModelScope.launch {
             val monthStartDay = settingRepository.recordSettingsModel.first().monthStartDay
-            _dateSelection.value = DateSelectionEntity.currentMonthPeriod(LocalDate.now(), monthStartDay)
+            _dateSelection.value = DateSelectionEntity.currentMonthPeriod(Clock.System.todayIn(TimeZone.currentSystemDefault()), monthStartDay)
         }
     }
 
