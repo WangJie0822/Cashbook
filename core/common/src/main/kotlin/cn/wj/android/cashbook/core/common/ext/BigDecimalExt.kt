@@ -18,6 +18,19 @@ package cn.wj.android.cashbook.core.common.ext
 
 import java.math.BigDecimal
 
+/**
+ * 数字转换工具方法（BigDecimal 部分）。
+ *
+ * 纯 Kotlin 部分（`toFloatOrZero`/`toDoubleOrZero`/`toIntOrZero`/`completeZero`）已迁至 shared/commonMain
+ * 的 `Number.kt`。此处 BigDecimal 版本因唯一非测试消费方 `Migration6To7`（历史 migration）依赖 BigDecimal
+ * 算术、且 `java.math.BigDecimal` 不可迁 commonMain，保留在 core:common（Android 侧）。
+ *
+ * ⚠️ 文件名刻意为 `BigDecimalExt.kt`（而非 `Number.kt`）：Kotlin 顶层函数按文件名生成 facade 类，
+ * 若与 shared 的 `Number.kt`（同包 `core.common.ext`）同名，会都编译成 `NumberKt`，在同时依赖两模块的
+ * 消费方（如 `core:database`）classpath 上互相遮蔽、致对方函数 unresolved。改名后 facade 为 `BigDecimalExtKt`，
+ * 与 shared 的 `NumberKt` 不冲突；函数包名不变，消费方 `import ...ext.toBigDecimalOrZero` 零改动。
+ */
+
 /** 将 [String] 类型数字转换为 [BigDecimal]，为空或转换失败，返回值为 `0` 的 [BigDecimal] */
 fun String?.toBigDecimalOrZero(): BigDecimal {
     return this?.toBigDecimalOrNull() ?: "0".toBigDecimal()
@@ -26,28 +39,4 @@ fun String?.toBigDecimalOrZero(): BigDecimal {
 /** 将 [Number] 类型数字转换为 [BigDecimal]，为空或转换失败，返回值为 `0` 的 [BigDecimal] */
 fun Number?.toBigDecimalOrZero(): BigDecimal {
     return this?.toString().toBigDecimalOrZero()
-}
-
-/** 将 [String] 类型数字转换为 [Float]，为空或转换失败，返回值为 `0f` 的 [Float] */
-fun String?.toFloatOrZero(): Float {
-    return this?.toFloatOrNull() ?: 0f
-}
-
-/** 将 [String] 类型数字转换为 [Double]，为空或转换失败，返回值为 `0.0` 的 [Double] */
-fun String?.toDoubleOrZero(): Double {
-    return this?.toDoubleOrNull() ?: 0.0
-}
-
-/** 将 [String] 类型数字转换为 [Int]，为空或转换失败，返回值为 `0` 的 [Int] */
-fun String?.toIntOrZero(): Int {
-    return this?.toIntOrNull() ?: 0
-}
-
-/** 将 [Int] 类型的数字转换为 [String]，并在数字小于 10 时，在前补 0 */
-fun Int.completeZero(): String {
-    return if (this >= 10) {
-        this.toString()
-    } else {
-        "0$this"
-    }
 }

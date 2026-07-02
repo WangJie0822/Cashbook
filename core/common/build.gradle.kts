@@ -27,6 +27,9 @@ android {
 }
 
 dependencies {
+    // 纯工具（金额/字符串/符号/数字纯部分等）已迁 shared/commonMain，api 透传使消费方按原包名可见
+    api(projects.shared)
+
     implementation(libs.kotlinx.coroutines.android)
 
     api(libs.orhanobut.logger)
