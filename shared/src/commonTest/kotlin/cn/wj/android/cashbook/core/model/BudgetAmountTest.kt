@@ -43,4 +43,10 @@ class BudgetAmountTest {
     @Test fun reject_above_upper_bound() = assertNull(parseBudgetAmountCent("10000000"))
 
     @Test fun accept_upper_bound() = assertEquals(99999900L, parseBudgetAmountCent("999999"))
+
+    @Test fun reject_scientificNotation() {
+        // KMP commonMain 纯 Long 实现不支持科学计数法（有意比 JVM BigDecimal 更严格拒绝）
+        assertNull(parseBudgetAmountCent("1E5"))
+        assertNull(parseBudgetAmountCent("1e5"))
+    }
 }

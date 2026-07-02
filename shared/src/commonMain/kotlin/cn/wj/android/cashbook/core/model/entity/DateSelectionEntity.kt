@@ -54,7 +54,7 @@ sealed class DateSelectionEntity(val type: DateSelectionTypeEnum) {
     /**
      * 将日期选择转换为时间戳范围（毫秒），使用半开区间 [start, end)。
      *
-     * [monthStartDay] 仅影响 [ByMonth]：周期为 [yearMonth.atDay(D), yearMonth.plusMonths(1).atDay(D))；
+     * [monthStartDay] 仅影响 [ByMonth]：周期为 yearMonth.onDay(D) 到 yearMonth.plus(1, MONTH).onDay(D) 的半开区间；
      * D=1（默认）时与自然月一致。非法 D 经 [normalizeMonthStartDay] 归一化为 1。
      *
      * @return Pair<起始时间戳, 结束时间戳>
