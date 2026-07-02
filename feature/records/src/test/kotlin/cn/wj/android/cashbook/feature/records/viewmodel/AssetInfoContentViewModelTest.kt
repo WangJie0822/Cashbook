@@ -27,11 +27,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.YearMonth
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
 import java.time.ZoneId
-import kotlinx.datetime.YearMonth
 
 /**
  * [AssetInfoContentViewModel] 单元测试

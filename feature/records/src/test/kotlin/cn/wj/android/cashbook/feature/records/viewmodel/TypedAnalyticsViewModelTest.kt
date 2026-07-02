@@ -37,10 +37,10 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.YearMonth
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlinx.datetime.YearMonth
 
 class TypedAnalyticsViewModelTest {
 

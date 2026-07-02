@@ -28,6 +28,7 @@ import cn.wj.android.cashbook.core.testing.util.captureMultiDevice
 import cn.wj.android.cashbook.core.testing.util.captureMultiTheme
 import cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsUiState
 import dagger.hilt.android.testing.HiltTestApplication
+import kotlinx.datetime.YearMonth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,7 +36,6 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
-import kotlinx.datetime.YearMonth
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)

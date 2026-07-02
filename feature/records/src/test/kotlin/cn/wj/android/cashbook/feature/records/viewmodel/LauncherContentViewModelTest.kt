@@ -35,12 +35,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlinx.datetime.yearMonth
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import kotlin.time.Clock
 
 class LauncherContentViewModelTest {

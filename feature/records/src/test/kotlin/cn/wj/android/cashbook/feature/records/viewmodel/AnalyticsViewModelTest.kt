@@ -37,13 +37,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.todayIn
 import kotlinx.datetime.yearMonth
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import kotlin.time.Clock
 
 class AnalyticsViewModelTest {

@@ -23,11 +23,11 @@ import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.YearMonth
 import org.junit.Test
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlinx.datetime.YearMonth
 
 /**
  * [TransRecordViewsToAnalyticsBarUseCase] 可配置月周期建桶测试（C2）。
