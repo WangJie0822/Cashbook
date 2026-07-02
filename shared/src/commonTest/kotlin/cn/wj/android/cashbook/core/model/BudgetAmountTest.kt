@@ -68,4 +68,13 @@ class BudgetAmountTest {
         assertEquals(50L, parseBudgetAmountCent(".5")) // 空整数部分
         assertEquals(500L, parseBudgetAmountCent("5.")) // 空小数部分
     }
+
+    /**
+     * 仅接受 ASCII 0-9：Unicode 数字被拒（与原 toBigDecimalOrNull 的 ASCII-only 正则筛一致、KMP 平台无关）。
+     * 若数字判定误用 Char.isDigit()（Unicode-aware），"٣"/"３" 会被接受为 300，此测试即失败。
+     */
+    @Test fun reject_unicodeDigits() {
+        assertNull(parseBudgetAmountCent("٣")) // 阿拉伯数字 3（Arabic-Indic）
+        assertNull(parseBudgetAmountCent("３")) // 全角数字 3（Fullwidth）
+    }
 }

@@ -48,11 +48,13 @@ Cashbook 是一个 Android 记账应用，使用 Kotlin + Jetpack Compose 构建
 ./gradlew testOfflineDebugUnitTest
 
 # 运行单个模块的测试（⚠️ 模块类型决定测试任务名）
-# JVM 库（cashbook.jvm.library，如 core:model）用 :test，无 compileDebugKotlin/testDebugUnitTest（误用会报 task not found）
-./gradlew :core:model:test
+# JVM 库（cashbook.jvm.library，如 core:datastore-proto）用 :test，无 compileDebugKotlin/testDebugUnitTest（误用会报 task not found）
+./gradlew :core:datastore-proto:test
 # Android 库（cashbook.android.library，如 core:data/core:domain/feature:*）用 :testDebugUnitTest
 ./gradlew :core:data:testDebugUnitTest
 ./gradlew :feature:records:testDebugUnitTest
+# KMP 库（shared，AGP KMP androidLibrary）用 :shared:testAndroidHostTest（跑 commonTest，非 :test/:testDebugUnitTest）
+./gradlew :shared:testAndroidHostTest
 
 # 截图测试 (Roborazzi)——app 无截图测试；截图全在 feature/core 库模块（无 flavor，用 Debug 变体，非 OnlineDebug）
 ./gradlew verifyRoborazziDebug   # 校验全部截图模块（feature/core 库模块）
@@ -69,7 +71,7 @@ Cashbook 是一个 Android 记账应用，使用 Kotlin + Jetpack Compose 构建
 ### 分层结构
 
 ```
-app → feature/* → core/*
+app → feature/* → core/* → shared
 ```
 
 - **app**: 主入口，Hilt Application，导航设置，多渠道配置
@@ -86,11 +88,11 @@ app → feature/* → core/*
 | `core/datastore` | Proto DataStore 偏好存储 |
 | `core/datastore-proto` | Proto 定义 (JVM 库) |
 | `core/network` | Retrofit + OkHttp 网络层 |
-| `core/model` | 数据模型 (JVM 库，Compose 稳定性标注) |
 | `core/design` | 设计系统、主题、通用 Composable |
 | `core/ui` | 业务相关 UI 组件 |
 | `core/common` | 公共工具、常量、BuildConfig |
 | `core/testing` | 测试工具、自定义 TestRunner |
+| `shared` | KMP 共享模块（AGP KMP `androidLibrary`）：commonMain 承载纯 Kotlin 数据模型 model/entity/enums（原 `core/model` 迁入，包名 `cn.wj.android.cashbook.core.model.*` 不变，Compose 稳定性标注按包名保留）。测试用 `:shared:testAndroidHostTest`（跑 commonTest）。为内部 KMP 化承载层，供后续渐进剥离纯业务逻辑 |
 
 ### Convention Plugins (build-logic/)
 
@@ -114,7 +116,7 @@ app → feature/* → core/*
 - 外部输入（如导入账单的 `Double` 元值）必须通过 `Double.toCent()` 或 `String.toAmountCent()` 转换为分再存入数据库（工具方法在 `core/common/ext/Money.kt`）
 - 计算 `recordAmount` 应复用 `TransactionDao.calculateRecordAmount()` 方法，禁止自行用 `BigDecimal` / `Double` 重新实现
 - UI 显示时使用 `Long.toMoneyString()` / `Long.toMoneyFormat()` / `Long.toMoneyCNY()` 转回元
-- **金额计算两口径不可混用**（`core/model/.../model/RecordAmount.kt`）：`recordAmount(category, amount, charges, concessions)` 为 DAO/月度结余口径（INCOME=amount−charges；EXPENDITURE/**TRANSFER**=amount+charges−concessions，转账当支出）；`analyticsPieAmount(typeCategory, ...)` 为 Analytics 饼图口径（EXPENDITURE=amount+charges−concessions；INCOME/**TRANSFER**=amount−charges，转账当收入）。两函数签名完全相同、对 TRANSFER 处理相反，选错只会静默算错——`TransactionDao.calculateRecordAmount`/`GetAssetMonthSummaryUseCase` 用 `recordAmount`，两个 `TransRecordViewsToAnalyticsPie(Second)UseCase` 用 `analyticsPieNetAmount`
+- **金额计算两口径不可混用**（`shared/.../core/model/model/RecordAmount.kt`，包名不变）：`recordAmount(category, amount, charges, concessions)` 为 DAO/月度结余口径（INCOME=amount−charges；EXPENDITURE/**TRANSFER**=amount+charges−concessions，转账当支出）；`analyticsPieAmount(typeCategory, ...)` 为 Analytics 饼图口径（EXPENDITURE=amount+charges−concessions；INCOME/**TRANSFER**=amount−charges，转账当收入）。两函数签名完全相同、对 TRANSFER 处理相反，选错只会静默算错——`TransactionDao.calculateRecordAmount`/`GetAssetMonthSummaryUseCase` 用 `recordAmount`，两个 `TransRecordViewsToAnalyticsPie(Second)UseCase` 用 `analyticsPieNetAmount`
 - **`finalAmount` 为净自付语义（2026-06-08 重构，main `7114045e`）**：被报销/退款吸收的支出存「净自付额」= recordAmount − 被对冲额（**≥0**）；报销/退款款（吸收者）存「溢出额」= max(0, recordAmount − 对冲额)（**≥0**，通常 0）；未吸收记录 = recordAmount；转账 = concessions − charge。**全部非负，禁止重引入旧吸收模型**（被吸收支出=0 / 吸收者 = recordAmount−Σ被吸收 可负——会污染月度分项统计）。增删改由 `TransactionDao.recalculateFinalAmountForCluster`（= `discoverClusterIds` BFS 发现簇+`outEdges` 缓存 + `recalculateFinalAmountFromCluster` 吸收者 id 升序顺序贪心填充；2026-06-11 F-1 拆分以消 N+1/2x BFS，main `4c0dad0b`）维护；删账本/删资产走 `deleteRecordsBatch`（逐条 `deleteRecordCore` 余额回退+清关联+删、**无重算** + 删后对存活簇去重重算一次，消 O(N²)；单删 `deleteRecordTransaction` 委托之），全量重算走 `recalculateAllFinalAmount`（迁移 gate / 备份恢复复用，二者同算法同序保证增量=全量）。吸收边界：仅报销款(`-2002`)/退款款(`-2001`) INCOME 能吸收 EXPENDITURE（`TypeRepositoryImpl.needRelated`），关系表 `db_record_with_related` 单向二部图（`record_id`=吸收者收入、`related_record_id`=被吸收支出）。
 - **饼图第三口径 `analyticsPieNetAmount(typeCategory, finalAmount, amount, charges, concessions)`**（`RecordAmount.kt`，2026-06-08 新增）：EXPENDITURE/INCOME 用 `finalAmount`（净自付，被吸收支出按净额计入分类占比、报销款溢出不虚增收入），TRANSFER 仍委托 `analyticsPieAmount`（=amount−charges，守 #10b 金丝雀，TRANSFER 两口径不可统一）。两个 `TransRecordViewsToAnalyticsPie(Second)UseCase` 已切此口径；`analyticsPieAmount` 仍被其 TRANSFER 分支复用，非 dead code。
 - **删记录级联返回图 path 单一真源（M1，2026-07-08）**：`deleteRecordsBatch` 事务内删关联前 `chunk(900)` 收集实删记录托管图 `image_path` 并返回 `List<String>`，`deleteBookTransaction`/`deleteAssetRelatedData`/`deleteRecordTransaction` 透传（替代旧「删前独立 `queryImagePathsByAssetId`/`ByBookId` 查」双谓词模式，消谓词漂移）。**安全不变量：所有删图必经 `deleteManagedImageFiles` 的 `isManaged` 守卫（`startsWith("record_images/") && !contains("..")`），禁止把级联返回直接喂 `storage.delete`**——防恶意恢复 DB 注入 `record_images/..` 上跳序列逃逸沙箱（CWE-22）。新增删记录路径须沿用此模式、不得另写「删前独立取图查询」。编辑路径（`updateRecordTransaction`）例外：返回值**故意丢弃**，文件清理走 `RecordRepositoryImpl.updateRecord` 的 `managedImagesToDelete` 新旧图差集（删旧插新会重插保留图，若误删差集外会丢数据）。
@@ -165,7 +167,7 @@ app → feature/* → core/*
   > 违反此规则会触发 lint `Design` error，构建将中止。
 - **`CbTabRow`（或任何内容）放进 `CbTopAppBar` 的 `title` 槽时，modifier 必须用 `Modifier.fillMaxWidth()`，禁止 `fillMaxSize()`**：`fillMaxSize` 含 `fillMaxHeight`，在 Material3 `TopAppBar` title 槽下会使 TopAppBar 按 title 撑满全屏高度、`CbScaffold` body 区塌陷为 0 高 → 该屏内容（如分类网格）完全不渲染、tab 浮于屏幕垂直中部。曾致 Critical bug（记账/我的分类支出分类不渲染、无法记账，main `20a0e502` 修复，回归测试 `a0190d5e` 用 `assertIsDisplayed` 守护）。lint 不覆盖此 modifier 误用，靠本规则 + 回归测试防回归。**新增此类「topbar title 内 tab 行」优先用 `core/design` 的 `CbTabTopAppBar`（fillMaxWidth 已写死在封装内、不暴露 modifier，从 API 层杜绝误用；ARCH-1 引入），勿再手写 title 内 CbTabRow。**
 - **抽屉/导航回调聚合阈值**：当同一组相关点击/事件回调 **≥4 个** 且需跨 **≥3 层** Composable/navigation 透传时，聚合为单个 `XxxActions` data class 整体透传，避免逐参透传导致的签名漂移与参数爆炸；`dismiss`/导航后副作用在 `Route` 层用 `wrap` 包装（先执行回调再副作用）。**聚合类置于 `navigation` 包**（紧邻消费它的 `xxxScreen` navigation 函数）。被 public 跨模块 navigation 函数（如 `settingsLauncherScreen`）引用时**必须 public**，否则 `compileDebugKotlin` 报 `'public' function exposes its 'internal' parameter type`。实证：M1 抽屉 7 回调 4 层透传聚合为 `LauncherDrawerActions`（2026-06-22 main `49ac8c60`）。
-- `compose_compiler_config.conf` 声明了 `core/model` 中模型类的 Compose 稳定性
+- `compose_compiler_config.conf` 声明了 `shared` 模块（包名 `cn.wj.android.cashbook.core.model.*`）中模型类的 Compose 稳定性（按全限定包名匹配，迁移保留包名故配置无需改）
 - 测试使用自定义 TestRunner: `cn.wj.android.cashbook.core.testing.CashbookTestRunner`
 - 包名: `cn.wj.android.cashbook`
 

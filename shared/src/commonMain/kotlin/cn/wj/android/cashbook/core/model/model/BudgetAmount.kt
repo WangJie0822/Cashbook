@@ -28,6 +28,11 @@ private const val MAX_INT_PART_DIGITS = 16
  * 拒绝：非数字 / ≤0 / 超上界。纯 Long/字符串算术实现（KMP commonMain 无 java.math.BigDecimal）：
  * 整数部分位数提前限界避免 Long 溢出；小数部分四舍五入到分——只需看第 3 位小数（0-4 舍/5-9 入），
  * 因为舍入余数的量级完全由该位决定，与其后数字无关，等价于 BigDecimal HALF_UP。
+ *
+ * 数字判定仅接受 ASCII `0`..`9`：科学计数法（`1e3`）、下划线（`1_000`）、Unicode 数字（如阿拉伯数字 `٣`、
+ * 全角 `３`）均被拒（返回 null）。与原 `String.toBigDecimalOrNull()` 的 ASCII-only 正则筛保持一致，
+ * 且不依赖各 KMP 平台的 `Char.isDigit()` Unicode 表（`isDigit` 对 Unicode 数字返回 true，会引入平台分歧）。
+ * 整数位数按字符数计长（前导零计入），故 17+ 位前导零串即便去零后是合法小值也被拒。
  */
 fun parseBudgetAmountCent(input: String): Long? {
     val trimmed = input.trim()
@@ -56,8 +61,8 @@ fun parseBudgetAmountCent(input: String): Long? {
     }
 
     if (intPart.isEmpty() && fracPart.isEmpty()) return null
-    if (intPart.isNotEmpty() && !intPart.all { it.isDigit() }) return null
-    if (fracPart.isNotEmpty() && !fracPart.all { it.isDigit() }) return null
+    if (intPart.isNotEmpty() && !intPart.all { it in '0'..'9' }) return null
+    if (fracPart.isNotEmpty() && !fracPart.all { it in '0'..'9' }) return null
 
     // 整数位数过长必超上界，提前拒绝避免 *100 时 Long 溢出回绕
     if (intPart.length > MAX_INT_PART_DIGITS) return null

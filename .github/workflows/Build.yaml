@@ -80,7 +80,7 @@ jobs:
       # (spec: docs/superpowers/specs/2026-07-24-ci-screenshot-visual-diff-design.md).
       - name: Run local tests
         if: always()
-        run: ./gradlew testOnlineDebug testOfflineDebug testDebugUnitTest :core:model:test :lint:test -Proborazzi.test.verify=false
+        run: ./gradlew testOnlineDebug testOfflineDebug testDebugUnitTest :shared:testAndroidHostTest :lint:test -Proborazzi.test.verify=false
 
       - name: Build all build type and flavor permutations
         run: ./gradlew :app:assemble

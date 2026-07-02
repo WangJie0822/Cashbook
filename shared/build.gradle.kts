@@ -15,12 +15,13 @@
  */
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    // AGP 9 KMP 库插件：提供 androidLibrary target（AGP 9 禁止 com.android.library + kotlin.multiplatform 联用）
+    // AGP 9 KMP 库插件：提供 android target（AGP 9 禁止 com.android.library + kotlin.multiplatform 联用）
     alias(libs.plugins.android.kotlin.multiplatform.library)
 }
 
 kotlin {
-    androidLibrary {
+    // AGP 9.2.1 起用 android{}（旧 androidLibrary{} 已弃用 @Deprecated(ReplaceWith("android"))）
+    android {
         namespace = "cn.wj.android.cashbook.shared"
         compileSdk = 36
         minSdk = 24

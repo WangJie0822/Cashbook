@@ -90,6 +90,26 @@ class DateSelectionEntityMonthCycleTest {
         assertEquals(0L to Long.MAX_VALUE, DateSelectionEntity.All.toDateRange(15))
     }
 
+    /**
+     * 非 ByMonth 分支的**绝对**半开区间 [start, end)（此前仅重言式 toDateRange()==toDateRange(1)）。
+     * 守护迁移改写的 `date.plus(1, DAY)`（末尾+1日）与 `LocalDate(year+1,1,1)`（跨年+1年）。
+     */
+    @Test
+    fun toDateRange_absoluteBoundaries_nonByMonth() {
+        assertEquals(
+            ms(2024, 1, 15) to ms(2024, 1, 16), // ByDay: end = 次日 0 点（半开）
+            DateSelectionEntity.ByDay(LocalDate(2024, 1, 15)).toDateRange(),
+        )
+        assertEquals(
+            ms(2024, 1, 1) to ms(2025, 1, 1), // ByYear: end = 次年 1 月 1 日
+            DateSelectionEntity.ByYear(2024).toDateRange(),
+        )
+        assertEquals(
+            ms(2024, 1, 1) to ms(2024, 2, 1), // DateRange: end = to(1/31) + 1 日 = 2/1
+            DateSelectionEntity.DateRange(LocalDate(2024, 1, 1), LocalDate(2024, 1, 31)).toDateRange(),
+        )
+    }
+
     @Test
     fun currentMonthPeriod_dayGteD_usesThisMonth() {
         val p = DateSelectionEntity.currentMonthPeriod(LocalDate(2024, 3, 20), 15)
