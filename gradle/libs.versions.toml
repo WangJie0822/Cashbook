@@ -344,6 +344,8 @@ android-application = { id = "com.android.application", version.ref = "android-g
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 # Android 测试
 android-test = { id = "com.android.test", version.ref = "android-gradle-plugin" }
+# Android KMP 库（AGP9 KMP 专用库插件，替代 com.android.library + kotlin.multiplatform 联用）
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-gradle-plugin" }
 androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidx-baselineprofile" }
 # Room 数据库
 androidx-room = { id = "androidx.room", version.ref = "androidx-room" }
