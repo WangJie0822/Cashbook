@@ -24,14 +24,10 @@ import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordSettingsModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.model.TempKeysModel
-import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository
-import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
-import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
-import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.collect
@@ -60,23 +56,10 @@ class LauncherContentViewModelTest {
         booksRepository = FakeBooksRepository()
         settingRepository = FakeSettingRepository()
 
-        val typeRepository = FakeTypeRepository()
-        val assetRepository = FakeAssetRepository()
-        val tagRepository = FakeTagRepository()
-
-        val recordModelTransToViewsUseCase = RecordModelTransToViewsUseCase(
-            recordRepository = recordRepository,
-            typeRepository = typeRepository,
-            assetRepository = assetRepository,
-            tagRepository = tagRepository,
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
-
         viewModel = LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = recordRepository,
-            recordModelTransToViewsUseCase = recordModelTransToViewsUseCase,
         )
     }
 
@@ -91,19 +74,11 @@ class LauncherContentViewModelTest {
             ),
         )
         val freshRecordRepository = FakeRecordRepository()
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = freshRecordRepository,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
 
         LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = freshRecordRepository,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         assertThat(freshRecordRepository.recalculateAllFinalAmountCount).isEqualTo(1)
@@ -121,19 +96,11 @@ class LauncherContentViewModelTest {
             ),
         )
         val freshRecordRepository = FakeRecordRepository()
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = freshRecordRepository,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
 
         LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = freshRecordRepository,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         assertThat(freshRecordRepository.backfillImagesToFilesCount).isEqualTo(1)
@@ -151,19 +118,11 @@ class LauncherContentViewModelTest {
             ),
         )
         val freshRecordRepository = FakeRecordRepository()
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = freshRecordRepository,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
 
         LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = freshRecordRepository,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         assertThat(freshRecordRepository.backfillImagesToFilesCount).isEqualTo(0)
@@ -181,19 +140,11 @@ class LauncherContentViewModelTest {
             ),
         )
         val freshRecordRepository = FakeRecordRepository()
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = freshRecordRepository,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
 
         LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = freshRecordRepository,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         assertThat(freshRecordRepository.cleanupOrphanImageFilesCount).isEqualTo(1)
@@ -212,18 +163,10 @@ class LauncherContentViewModelTest {
         val repo = FakeRecordRepository()
         repo.recalcStartedSignal = CompletableDeferred()
         repo.recalcSuspendGate = CompletableDeferred() // 挂起重算，不放行
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = repo,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
         val vm = LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = repo,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
@@ -249,18 +192,10 @@ class LauncherContentViewModelTest {
         )
         val repo = FakeRecordRepository()
         repo.recalcThrowable = RuntimeException("simulated background recalc failure")
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = repo,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
         val vm = LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = repo,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
@@ -284,18 +219,10 @@ class LauncherContentViewModelTest {
         val repo = FakeRecordRepository()
         repo.migrateStartedSignal = CompletableDeferred()
         repo.migrateSuspendGate = CompletableDeferred() // 挂起 migrate
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = repo,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
         val vm = LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = repo,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
@@ -608,18 +535,10 @@ class LauncherContentViewModelTest {
                 monthStartDay = d,
             ),
         )
-        val useCase = RecordModelTransToViewsUseCase(
-            recordRepository = recordRepository,
-            typeRepository = FakeTypeRepository(),
-            assetRepository = FakeAssetRepository(),
-            tagRepository = FakeTagRepository(),
-            coroutineContext = dispatcherRule.testDispatcher,
-        )
         val vm = LauncherContentViewModel(
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = recordRepository,
-            recordModelTransToViewsUseCase = useCase,
         )
 
         // init 应将当前周期初始化为 currentMonthPeriod(now, d)（D=d 走周期，而非裸 ByMonth(now)）

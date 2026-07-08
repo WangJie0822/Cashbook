@@ -40,7 +40,6 @@ import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
-import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -63,7 +62,6 @@ class LauncherContentViewModel @Inject constructor(
     booksRepository: BooksRepository,
     settingRepository: SettingRepository,
     private val recordRepository: RecordRepository,
-    private val recordModelTransToViewsUseCase: RecordModelTransToViewsUseCase,
 ) : ViewModel() {
 
     /** 标记 - 数据迁移是否已完成 */
@@ -183,15 +181,14 @@ class LauncherContentViewModel @Inject constructor(
             initialValue = emptyMap(),
         )
 
-    /** 分页记录数据 */
+    /** 分页记录数据（RecordViewsModel 已在 DAO 层 @Relation 批量物化，此处仅 asEntity 纯转换，无逐条 N+1） */
     val recordPagingData: Flow<PagingData<LauncherListItem>> =
         combine(_dateSelection, _monthStartDay) { selection, d -> selection.toDateRange(d) }
             .flatMapLatest { (startDate, endDate) ->
                 recordRepository.getRecordPagingData(startDate, endDate)
                     .map { pagingData ->
-                        pagingData.map { recordModel ->
-                            val views = recordModelTransToViewsUseCase(recordModel).asEntity()
-                            LauncherListItem.Record(views) as LauncherListItem
+                        pagingData.map { viewsModel ->
+                            LauncherListItem.Record(viewsModel.asEntity()) as LauncherListItem
                         }
                     }
                     .map { pagingData ->
