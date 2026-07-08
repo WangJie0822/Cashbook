@@ -30,12 +30,18 @@ import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 
 /**
  * 把 @Relation 分页视图 [LauncherRecordViewRelation] 组装为 [RecordViewsModel]，
- * 与单条 RecordModelTransToViewsUseCase.invoke 逐字段等价。
+ * 对健康数据（库内存在的类型 + 平账合成类型）与单条 RecordModelTransToViewsUseCase.invoke 逐字段等价。
  * 所有关联已由 Room @Relation 批量物化，此处仅内存组装（零查询）。
  *
- * - type/asset 一对一取 firstOrNull；平账（types 空）按 typeId 映射合成类型；
+ * - type/asset 一对一取 firstOrNull；平账（types 空且 typeId 为 -1101/-1102）按 typeId 映射合成类型；
  * - relatedRecord 按 typeCategory 选向：INCOME 用 relatedAsRecordId，其余用 relatedAsRelatedId（复刻单条版）；
+ * - relatedTags 去重：复刻单条版 `id IN (子查询)` / 批量版 `.distinct()` 的去重语义
+ *   （db_tag_with_record 无 (record_id,tag_id) 唯一约束，重复关联行经 @Relation JOIN 会物化重复 TagTable）；
  * - relatedAmount/relatedNature 复用 [sumRelatedAmount]/[computeRelatedNature]。
+ *
+ * 边界差异（非「逐字段等价」）：孤立正 typeId（记录引用 db_type 中已不存在的类型；正常删类型走
+ * TransactionDao.migrateTypeRecords 先改派记录、不产生孤儿，仅历史/导入数据可能出现）本函数走合成支出
+ * 兜底，单条版经 getNoNullRecordTypeById 走「首个真实支出类型」兜底——二者不等价。
  */
 internal fun LauncherRecordViewRelation.toRecordViewsModel(): RecordViewsModel {
     val typeTable = types.firstOrNull()
@@ -67,7 +73,7 @@ internal fun LauncherRecordViewRelation.toRecordViewsModel(): RecordViewsModel {
         concessions = record.concessions,
         remark = record.remark,
         reimbursable = record.reimbursable == SWITCH_INT_ON,
-        relatedTags = tags.map { it.asModel() },
+        relatedTags = tags.map { it.asModel() }.distinct(),
         relatedImage = images.map { it.asModel() },
         relatedRecord = relatedRecords,
         relatedAmount = sumRelatedAmount(type.typeCategory, relatedRecords),

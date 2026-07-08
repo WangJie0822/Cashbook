@@ -17,8 +17,10 @@
 package cn.wj.android.cashbook.core.data.repository.impl
 
 import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
+import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.relation.LauncherRecordViewRelation
 import cn.wj.android.cashbook.core.database.table.AssetTable
+import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.database.table.TagTable
 import cn.wj.android.cashbook.core.database.table.TypeTable
@@ -40,8 +42,14 @@ class RecordViewsRelationMapperTest {
     )
 
     private fun typeTable(id: Long, category: Int) = TypeTable(
-        id = id, parentId = -1L, name = "餐饮", iconName = "ic", typeLevel = 0,
-        typeCategory = category, protected = 0, sort = 0,
+        id = id,
+        parentId = -1L,
+        name = "餐饮",
+        iconName = "ic",
+        typeLevel = 0,
+        typeCategory = category,
+        protected = 0,
+        sort = 0,
     )
 
     private fun assetTable(id: Long) = AssetTable(
@@ -77,8 +85,12 @@ class RecordViewsRelationMapperTest {
         val pojo = LauncherRecordViewRelation(
             record = recordTable(id = 2L, typeId = RECORD_TYPE_BALANCE_EXPENDITURE.id),
             types = emptyList(),
-            assets = emptyList(), intoAssets = emptyList(), images = emptyList(), tags = emptyList(),
-            relatedAsRecordId = emptyList(), relatedAsRelatedId = emptyList(),
+            assets = emptyList(),
+            intoAssets = emptyList(),
+            images = emptyList(),
+            tags = emptyList(),
+            relatedAsRecordId = emptyList(),
+            relatedAsRelatedId = emptyList(),
         )
         val m = pojo.toRecordViewsModel()
         assertThat(m.type.id).isEqualTo(RECORD_TYPE_BALANCE_EXPENDITURE.id)
@@ -90,7 +102,10 @@ class RecordViewsRelationMapperTest {
         val pojo = LauncherRecordViewRelation(
             record = recordTable(id = 4L, typeId = 5L),
             types = listOf(typeTable(5L, RecordTypeCategoryEnum.EXPENDITURE.ordinal)),
-            assets = emptyList(), intoAssets = emptyList(), images = emptyList(), tags = emptyList(),
+            assets = emptyList(),
+            intoAssets = emptyList(),
+            images = emptyList(),
+            tags = emptyList(),
             relatedAsRecordId = listOf(recordTable(id = 99L, typeId = 5L)), // 不应被选
             relatedAsRelatedId = listOf(recordTable(id = 7L, typeId = FIXED_TYPE_ID_REIMBURSE, amount = 1000L)),
         )
@@ -98,5 +113,69 @@ class RecordViewsRelationMapperTest {
         assertThat(m.relatedRecord.map { it.id }).containsExactly(7L)
         assertThat(m.relatedNature).isEqualTo(RecordRelatedNatureEnum.REIMBURSED)
         assertThat(m.relatedAmount).isEqualTo(1000L) // recordAmount(INCOME)=amount-charges=1000
+    }
+
+    @Test
+    fun income_picks_relatedAsRecordId_side() {
+        val pojo = LauncherRecordViewRelation(
+            record = recordTable(id = 2L, typeId = 8L),
+            types = listOf(typeTable(8L, RecordTypeCategoryEnum.INCOME.ordinal)),
+            assets = emptyList(),
+            intoAssets = emptyList(),
+            images = emptyList(),
+            tags = emptyList(),
+            relatedAsRecordId = listOf(recordTable(id = 5L, typeId = 1L)), // 收入侧应选此
+            relatedAsRelatedId = listOf(recordTable(id = 9L, typeId = 1L)), // 不应被选
+        )
+        val m = pojo.toRecordViewsModel()
+        assertThat(m.type.typeCategory).isEqualTo(RecordTypeCategoryEnum.INCOME)
+        assertThat(m.relatedRecord.map { it.id }).containsExactly(5L)
+    }
+
+    @Test
+    fun duplicate_tag_relation_rows_deduped() {
+        // db_tag_with_record 无 (record_id,tag_id) 唯一约束，重复关联行经 @Relation JOIN 物化重复 TagTable；
+        // 须与单条版 id IN 子查询 / 批量版 .distinct() 一致去重
+        val tag = TagTable(id = 3L, name = "旅行", booksId = 1L, invisible = 0)
+        val pojo = LauncherRecordViewRelation(
+            record = recordTable(id = 1L, typeId = 5L),
+            types = listOf(typeTable(5L, RecordTypeCategoryEnum.EXPENDITURE.ordinal)),
+            assets = emptyList(),
+            intoAssets = emptyList(),
+            images = emptyList(),
+            tags = listOf(tag, tag),
+            relatedAsRecordId = emptyList(),
+            relatedAsRelatedId = emptyList(),
+        )
+        val m = pojo.toRecordViewsModel()
+        assertThat(m.relatedTags.map { it.id }).containsExactly(3L)
+    }
+
+    @Test
+    fun maps_asset_relatedAsset_image_reimbursable_charges_fields() {
+        val record = RecordTable(
+            id = 1L, typeId = 5L, assetId = 10L, intoAssetId = 20L, booksId = 1L,
+            amount = 1000L, finalAmount = 800L, concessions = 50L, charge = 30L,
+            remark = "备注", reimbursable = SWITCH_INT_ON, recordTime = 100L, reimbursed = SWITCH_INT_ON,
+        )
+        val pojo = LauncherRecordViewRelation(
+            record = record,
+            types = listOf(typeTable(5L, RecordTypeCategoryEnum.EXPENDITURE.ordinal)),
+            assets = listOf(assetTable(10L)),
+            intoAssets = listOf(assetTable(20L)),
+            images = listOf(ImageWithRelatedTable(id = 1L, recordId = 1L, path = "/img.jpg", bytes = byteArrayOf(1))),
+            tags = emptyList(),
+            relatedAsRecordId = emptyList(),
+            relatedAsRelatedId = emptyList(),
+        )
+        val m = pojo.toRecordViewsModel()
+        assertThat(m.asset?.id).isEqualTo(10L)
+        assertThat(m.relatedAsset?.id).isEqualTo(20L)
+        assertThat(m.charges).isEqualTo(30L)
+        assertThat(m.concessions).isEqualTo(50L)
+        assertThat(m.finalAmount).isEqualTo(800L)
+        assertThat(m.reimbursable).isTrue()
+        assertThat(m.reimbursed).isTrue()
+        assertThat(m.relatedImage).hasSize(1)
     }
 }
