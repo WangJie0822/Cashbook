@@ -573,14 +573,14 @@ interface TransactionDao {
 
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun deleteRecordTransaction(recordId: Long?) {
+    suspend fun deleteRecordTransaction(recordId: Long?): List<String> {
         if (null == recordId) {
-            return
+            return emptyList()
         }
         // 获取记录信息
         val record =
             queryRecordById(recordId) ?: throw DataTransactionException("Record id not found")
-        deleteRecordTransaction(record)
+        return deleteRecordTransaction(record)
     }
 
     /**
@@ -644,9 +644,8 @@ interface TransactionDao {
      */
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun deleteRecordTransaction(record: RecordTable) {
+    suspend fun deleteRecordTransaction(record: RecordTable): List<String> =
         deleteRecordsBatch(listOf(record))
-    }
 
     @Query(
         value = """
@@ -710,6 +709,10 @@ interface TransactionDao {
     @Query("DELETE FROM db_image_with_related WHERE record_id IN (:ids)")
     suspend fun deleteImageRelationsByRecordIds(ids: List<Long>)
 
+    /** 一组记录的图片相对路径（仅 image_path 投影、不物化 BLOB）；deleteRecordsBatch 删前收集删文件用（M1 单一真源） */
+    @Query("SELECT image_path FROM db_image_with_related WHERE record_id IN (:ids)")
+    suspend fun queryImagePathsByRecordIds(ids: List<Long>): List<String>
+
     /** 批量删除一组记录的关联记录关系（双向 IN-OR，等价逐条 clearRelatedRecordById） */
     @Query("DELETE FROM db_record_with_related WHERE record_id IN (:ids) OR related_record_id IN (:ids)")
     suspend fun deleteRecordRelationsByRecordIds(ids: List<Long>)
@@ -725,8 +728,8 @@ interface TransactionDao {
      */
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun deleteRecordsBatch(records: List<RecordTable>) {
-        if (records.isEmpty()) return
+    suspend fun deleteRecordsBatch(records: List<RecordTable>): List<String> {
+        if (records.isEmpty()) return emptyList()
         val deletedIds = records.mapNotNull { it.id }.toSet()
         // L7：survivors 必须删前捕获（删后关联已清无法查）
         val affectedSurvivors = LinkedHashSet<Long>()
@@ -746,6 +749,8 @@ interface TransactionDao {
         }
         // L8：三类关联删 + 删记录遍历同一完整 deletedIds 全集
         val idList = deletedIds.toList()
+        // M1 单一真源：删关联前捕获实删记录的托管图 path（关联删后无法查）；chunk 防 SQLite 变量上限（节点1 F4）
+        val imagePaths = idList.chunked(DELETE_IN_CHUNK_SIZE).flatMap { queryImagePathsByRecordIds(it) }
         idList.chunked(DELETE_IN_CHUNK_SIZE).forEach { chunk ->
             deleteTagRelationsByRecordIds(chunk)
             deleteImageRelationsByRecordIds(chunk)
@@ -764,6 +769,7 @@ interface TransactionDao {
             visited += clusterIds
             recalculateFinalAmountFromCluster(clusterIds, outEdges)
         }
+        return imagePaths
     }
 
     /**
@@ -772,8 +778,9 @@ interface TransactionDao {
      */
     @Throws(DataTransactionException::class)
     @Transaction
-    suspend fun deleteBookTransaction(bookId: Long) {
-        deleteRecordsBatch(queryRecordListByBookId(bookId))
+    suspend fun deleteBookTransaction(bookId: Long): List<String> {
+        // 首步 deleteRecordsBatch 返回该账本全部记录的托管图 path（M1）；图仅挂 record，删标签/资产/账本/预算不产图孤儿
+        val imagePaths = deleteRecordsBatch(queryRecordListByBookId(bookId))
         // 删除该账本下的所有标签
         deleteTagsByBookId(bookId)
         // 删除该账本下的所有资产
@@ -782,6 +789,7 @@ interface TransactionDao {
         deleteBookById(bookId)
         // 删除该账本下的所有预算
         deleteBudgetsByBookId(bookId)
+        return imagePaths
     }
 
     @Query("DELETE FROM db_budget WHERE books_id = :bookId")
@@ -826,7 +834,6 @@ interface TransactionDao {
      * 逐条删记录正确回退对方资产余额（转账场景），删后统一对存活簇重算（去 O(N²)）。
      */
     @Transaction
-    suspend fun deleteAssetRelatedData(assetId: Long) {
+    suspend fun deleteAssetRelatedData(assetId: Long): List<String> =
         deleteRecordsBatch(queryRecordsByAssetId(assetId))
-    }
 }

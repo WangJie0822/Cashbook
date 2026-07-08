@@ -552,6 +552,60 @@ class TransactionDaoLogicTest {
         assertThat(dao.imageWithRecords).isEmpty()
     }
 
+    // ========== M1 删除返回实删记录托管图 path（单一真源）测试 ==========
+
+    @Test
+    fun deleteRecordsBatch_returns_managed_image_paths_of_deleted_records() = runTest {
+        setupTypesForAbsorption()
+        val r1 = createRecordTable(id = 1L)
+        val r2 = createRecordTable(id = 2L)
+        dao.records.add(r1)
+        dao.records.add(r2)
+        dao.imageWithRecords.add(
+            ImageWithRelatedTable(id = 1L, recordId = 1L, path = "record_images/a.jpg", bytes = byteArrayOf()),
+        )
+        dao.imageWithRecords.add(
+            ImageWithRelatedTable(id = 2L, recordId = 2L, path = "record_images/b.jpg", bytes = byteArrayOf()),
+        )
+
+        val paths = dao.deleteRecordsBatch(listOf(r1, r2))
+
+        assertThat(paths).containsExactly("record_images/a.jpg", "record_images/b.jpg")
+    }
+
+    @Test
+    fun deleteRecordsBatch_no_images_returns_empty() = runTest {
+        setupTypesForAbsorption()
+        val r1 = createRecordTable(id = 1L)
+        dao.records.add(r1)
+
+        assertThat(dao.deleteRecordsBatch(listOf(r1))).isEmpty()
+    }
+
+    @Test
+    fun deleteAssetRelatedData_returns_that_asset_images_incl_intoAsset_excl_others() = runTest {
+        // M1 单一真源等价旧 queryImagePathsByAssetId：谓词 asset_id OR into_asset_id（含转账入账侧）；他资产图不返回（F7）
+        setupTypesForAbsorption()
+        val assetId = 10L
+        dao.records.add(createRecordTable(id = 1L, assetId = assetId))
+        dao.records.add(createRecordTable(id = 2L, assetId = 30L, intoAssetId = assetId))
+        dao.records.add(createRecordTable(id = 3L, assetId = 30L, intoAssetId = 40L))
+        dao.imageWithRecords.add(
+            ImageWithRelatedTable(id = 1L, recordId = 1L, path = "record_images/a.jpg", bytes = byteArrayOf()),
+        )
+        dao.imageWithRecords.add(
+            ImageWithRelatedTable(id = 2L, recordId = 2L, path = "record_images/into.jpg", bytes = byteArrayOf()),
+        )
+        dao.imageWithRecords.add(
+            ImageWithRelatedTable(id = 3L, recordId = 3L, path = "record_images/other.jpg", bytes = byteArrayOf()),
+        )
+
+        val paths = dao.deleteAssetRelatedData(assetId)
+
+        assertThat(paths).containsExactly("record_images/a.jpg", "record_images/into.jpg")
+        assertThat(paths).doesNotContain("record_images/other.jpg")
+    }
+
     // ========== batchImportRecordsTransaction 测试 ==========
 
     @Test

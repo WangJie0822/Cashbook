@@ -240,6 +240,9 @@ class FakeTransactionDao : TransactionDao {
         imageWithRecords.removeAll { it.recordId in ids }
     }
 
+    override suspend fun queryImagePathsByRecordIds(ids: List<Long>): List<String> =
+        imageWithRecords.filter { it.recordId in ids }.map { it.path }
+
     override suspend fun deleteRecordRelationsByRecordIds(ids: List<Long>) {
         relatedRecords.removeAll { it.recordId in ids || it.relatedRecordId in ids }
     }
