@@ -26,6 +26,7 @@ import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository {
@@ -127,8 +128,8 @@ interface RecordRepository {
 
     fun queryRecordByYearMonth(year: String, month: String): Flow<List<RecordModel>>
 
-    /** 获取分页记录数据 */
-    fun getRecordPagingData(startDate: Long, endDate: Long): Flow<PagingData<RecordModel>>
+    /** 获取分页记录数据（@Relation 视图，已在 DAO 层批量物化 type/asset/tags/images/双向 relatedRecord，消 N+1） */
+    fun getRecordPagingData(startDate: Long, endDate: Long): Flow<PagingData<RecordViewsModel>>
 
     /** 获取轻量记录汇总数据（响应式，数据变更时重新发射） */
     fun queryRecordViewSummariesFlow(startDate: Long, endDate: Long): Flow<List<RecordViewSummaryModel>>

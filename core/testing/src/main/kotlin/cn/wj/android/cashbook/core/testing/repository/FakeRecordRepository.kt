@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -283,11 +284,14 @@ class FakeRecordRepository : RecordRepository {
         return MutableStateFlow(records.toList())
     }
 
+    /** 首页分页视图桩（测试按需 recordViews.add(...) 注入；接口现返回 @Relation 视图 RecordViewsModel） */
+    val recordViews = mutableListOf<RecordViewsModel>()
+
     override fun getRecordPagingData(
         startDate: Long,
         endDate: Long,
-    ): Flow<PagingData<RecordModel>> {
-        return flowOf(PagingData.from(records.toList()))
+    ): Flow<PagingData<RecordViewsModel>> {
+        return flowOf(PagingData.from(recordViews.toList()))
     }
 
     private val _summaryData = MutableStateFlow<List<RecordViewSummaryModel>>(emptyList())
