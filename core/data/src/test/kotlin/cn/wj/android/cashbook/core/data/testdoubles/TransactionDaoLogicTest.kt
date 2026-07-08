@@ -606,6 +606,26 @@ class TransactionDaoLogicTest {
         assertThat(paths).doesNotContain("record_images/other.jpg")
     }
 
+    @Test
+    fun deleteRecordTransaction_byId_returns_managed_image_path_of_deleted_record() = runTest {
+        // 单删（最高频路径）：RecordRepositoryImpl.deleteRecord 生产实走 deleteRecordTransaction(recordId: Long?) 重载
+        setupTypesForAbsorption()
+        dao.records.add(createRecordTable(id = 1L))
+        dao.imageWithRecords.add(
+            ImageWithRelatedTable(id = 1L, recordId = 1L, path = "record_images/single.jpg", bytes = byteArrayOf()),
+        )
+
+        val paths = dao.deleteRecordTransaction(1L)
+
+        assertThat(paths).containsExactly("record_images/single.jpg")
+        assertThat(dao.queryRecordById(1L)).isNull()
+    }
+
+    @Test
+    fun deleteRecordTransaction_nullId_returns_empty() = runTest {
+        assertThat(dao.deleteRecordTransaction(null)).isEmpty()
+    }
+
     // ========== batchImportRecordsTransaction 测试 ==========
 
     @Test

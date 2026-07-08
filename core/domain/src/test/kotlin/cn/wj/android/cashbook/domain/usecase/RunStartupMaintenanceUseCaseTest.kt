@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * [RunStartupMaintenanceUseCase] 编排测试：验证 gate 放行时机与各维护步骤按 tempKeys 标志触发/跳过。
@@ -127,5 +128,68 @@ class RunStartupMaintenanceUseCaseTest {
         assertThat(recordRepository.backfillImagesToFilesCount).isEqualTo(0)
         assertThat(recordRepository.compactDatabaseIfNeededCount).isEqualTo(0)
         assertThat(recordRepository.cleanupOrphanImageFilesCount).isEqualTo(1)
+    }
+
+    @Test
+    fun netRecalc_fails_but_subsequent_steps_still_run() = runTest {
+        // runCatchingMaintenance「失败隔离」契约：某步 Throwable 被吞、不连累后续步骤
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = false,
+                imagesToFilesMigrated = false,
+                dbVacuumDone = false,
+            ),
+        )
+        recordRepository.recalcThrowable = RuntimeException("boom")
+
+        useCase { } // 不得抛（Throwable 被 runCatchingMaintenance 吞掉）
+
+        // netRecalc 失败被吞后 backfill + orphanScan 仍执行
+        assertThat(recordRepository.recalculateAllFinalAmountCount).isEqualTo(1)
+        assertThat(recordRepository.backfillImagesToFilesCount).isEqualTo(1)
+        assertThat(recordRepository.cleanupOrphanImageFilesCount).isEqualTo(1)
+    }
+
+    @Test
+    fun cancellation_in_maintenance_step_propagates_and_halts() = runTest {
+        // CancellationException 必须先于 Throwable rethrow（不吞协程取消）：逃逸中断编排
+        settingRepository.setTempKeys(
+            TempKeysModel(
+                db9To10DataMigrated = true,
+                preferenceSplit = true,
+                finalAmountNetRecalcDone = false,
+            ),
+        )
+        recordRepository.recalcThrowable = CancellationException("cancelled")
+
+        try {
+            useCase { }
+            throw AssertionError("expected CancellationException to propagate")
+        } catch (e: CancellationException) {
+            // 期望：CancellationException 被 rethrow（不吞协程取消）
+        }
+        // 取消逃逸中断编排，后续 orphanScan 未到达
+        assertThat(recordRepository.cleanupOrphanImageFilesCount).isEqualTo(0)
+    }
+
+    @Test
+    fun migrate_failure_escapes_and_gate_not_released() = runTest {
+        // migrateAfter9To10 故意不包 try/catch：异常逃逸触发全局 handler，标志未置位下次幂等重试
+        settingRepository.setTempKeys(
+            TempKeysModel(db9To10DataMigrated = false, preferenceSplit = false),
+        )
+        recordRepository.migrateThrowable = RuntimeException("migration boom")
+        var ready = false
+
+        try {
+            useCase { ready = true }
+            throw AssertionError("expected migrate exception to escape (不包 try/catch)")
+        } catch (e: RuntimeException) {
+            // 期望：迁移异常逃逸到调用方
+        }
+        assertThat(ready).isFalse() // 迁移失败不放行首屏 gate
+        assertThat(recordRepository.cleanupOrphanImageFilesCount).isEqualTo(0) // 逃逸中断编排，orphanScan 未到达
     }
 }
