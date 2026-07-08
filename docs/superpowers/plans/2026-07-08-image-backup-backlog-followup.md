@@ -547,6 +547,8 @@ git commit -m "[feat|core:database|删除图片单一真源][公共]M1 deleteRec
 **Interfaces:**
 - Consumes: Task 4 的 `deleteRecordsBatch/deleteAssetRelatedData/deleteBookTransaction/deleteRecordTransaction` 返回 `List<String>`
 
+> **执行勘误（2026-07-08，controller hands-on）**：Step 1 原设计的集成测试 `deleteRecordsWithAsset_deletes_managed_image_files_via_cascade_return`（构造真实 Impl 验 storage.delete 被调）**架构上写不了**——`RecordRepositoryImplTest.kt:38` 明确不实例化 `RecordRepositoryImpl`（依赖 `CombineProtoDataSource` 是 final class 不可 mock），`BooksRepositoryImplTest` 同。改造正确性改由**三层守护**：① 编译类型匹配（级联返回 `List<String>` 喂 `deleteManagedImageFiles(List<String>)`）② Task 4 级联返回正确性（`TransactionDaoLogicTest` JVM + `TransactionDaoTest` androidTest）③ `RecordImageOrphanTest` 的 `deleteManagedImageFiles` 过滤（**补 F5 traversal 负用例**）。3 行简单编排抽 top-level fun 收益低（YAGNI 不抽）。另：单删实际删前查用的是 `queryImagesByRecordId(recordId).map { it.path }`（读 BLOB，非 plan 所写的 `queryImagePathsByRecordId`），改级联返回顺带消除该 BLOB 读；`BooksRepositoryImpl` 的 `recordDao` 注入唯一用途是 `queryImagePathsByBookId`，改造后一并移除。
+
 - [ ] **Step 1: 写失败/守护测试**（core:data JVM，参照现有 `RecordRepositoryImpl`/`BooksRepositoryImpl` 测试；断言删资产/删账本/单删后被删记录的托管图文件已删 + F5 恶意 path 不删）
 
 在删资产测试（`RecordRepositoryImplTest` 或对应文件）补：
