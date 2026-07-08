@@ -475,18 +475,6 @@ class FakeRecordDao : RecordDao {
 
     override suspend fun queryAllImagePaths(): List<String> = images.map { it.path }
 
-    // 忠实复刻真实 SQL：先按谓词筛 record id 集（含 into_asset_id 转账入账侧），再投影命中记录的图片 path
-    override suspend fun queryImagePathsByAssetId(assetId: Long): List<String> {
-        val ids = records.filter { it.assetId == assetId || it.intoAssetId == assetId }
-            .mapNotNull { it.id }.toSet()
-        return images.filter { it.recordId in ids }.map { it.path }
-    }
-
-    override suspend fun queryImagePathsByBookId(bookId: Long): List<String> {
-        val ids = records.filter { it.booksId == bookId }.mapNotNull { it.id }.toSet()
-        return images.filter { it.recordId in ids }.map { it.path }
-    }
-
     override suspend fun queryImagePathsByRecordId(recordId: Long): List<String> =
         images.filter { it.recordId == recordId }.map { it.path }
 

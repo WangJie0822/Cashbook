@@ -119,9 +119,8 @@ class RecordRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
-        // 删前捕获图片相对路径（删后关联已清无法查）
-        val imagePaths = recordDao.queryImagesByRecordId(recordId).map { it.path }
-        transactionDao.deleteRecordTransaction(recordId)
+        // 事务内删除并回传实删记录的托管图 path（单一真源；消除删前单独查 BLOB 的 queryImagesByRecordId）
+        val imagePaths = transactionDao.deleteRecordTransaction(recordId)
         // DB 删成功后 best-effort 删托管图片文件（失败留孤儿，启动扫描兜底）
         deleteManagedImageFiles(imagePaths, recordImageFileStorage)
         recordDataVersion.updateVersion()
@@ -512,10 +511,8 @@ class RecordRepositoryImpl @Inject constructor(
 
     override suspend fun deleteRecordsWithAsset(assetId: Long): Unit =
         withContext(coroutineContext) {
-            // 删前捕获图片相对路径（删后关联已清无法查），与单删/编辑对称
-            val imagePaths = recordDao.queryImagePathsByAssetId(assetId)
-            // 事务化删除：标签关联、记录关联、图片关联、记录
-            transactionDao.deleteAssetRelatedData(assetId)
+            // 事务化删除并回传实删记录的托管图 path（单一真源；消除删前单独查 queryImagePathsByAssetId 的谓词漂移）
+            val imagePaths = transactionDao.deleteAssetRelatedData(assetId)
             // DB 删成功后 best-effort 删托管图片文件（失败留孤儿，启动扫描兜底）
             deleteManagedImageFiles(imagePaths, recordImageFileStorage)
             recordDataVersion.updateVersion()

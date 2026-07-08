@@ -501,30 +501,6 @@ interface RecordDao {
     @Query("SELECT image_path FROM db_image_with_related")
     suspend fun queryAllImagePaths(): List<String>
 
-    /**
-     * 按资产取图片相对路径（仅 path 投影）。谓词逐字镜像 [TransactionDao.queryRecordsByAssetId]
-     * （= deleteAssetRelatedData 实删集，含 into_asset_id 转账入账侧），删资产时删图片文件用。
-     */
-    @Query(
-        """
-        SELECT image_path FROM db_image_with_related
-        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-    """,
-    )
-    suspend fun queryImagePathsByAssetId(assetId: Long): List<String>
-
-    /**
-     * 按账本取图片相对路径（仅 path 投影）。谓词镜像 [TransactionDao.queryRecordListByBookId]
-     * （= deleteBookTransaction 实删集），删账本时删图片文件用。
-     */
-    @Query(
-        """
-        SELECT image_path FROM db_image_with_related
-        WHERE record_id IN (SELECT id FROM db_record WHERE books_id=:bookId)
-    """,
-    )
-    suspend fun queryImagePathsByBookId(bookId: Long): List<String>
-
     /** 按记录取图片相对路径（仅 path 投影，不读 BLOB）；编辑记录 diff 删被移除图用 */
     @Query("SELECT image_path FROM db_image_with_related WHERE record_id=:recordId")
     suspend fun queryImagePathsByRecordId(recordId: Long): List<String>

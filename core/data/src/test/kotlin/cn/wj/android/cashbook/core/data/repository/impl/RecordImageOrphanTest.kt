@@ -50,6 +50,21 @@ class RecordImageOrphanTest {
         assertThat(storage.files).containsKey("record_images/keep.jpg")
     }
 
+    @Test
+    fun deleteManagedImageFiles_traversalPathInCascadeReturn_notDeleted() {
+        // F5：删资产/删账本/单删的级联返回若含被恶意恢复 DB 注入的 record_images/../evil
+        // （startsWith record_images/ 为真但含 ..）→ isManaged=false → 不删，防逃逸 record_images 目录（CWE-22）
+        val storage = FakeRecordImageFileStorage().apply {
+            files["record_images/legit.jpg"] = byteArrayOf(1)
+            files["record_images/../evil.jpg"] = byteArrayOf(2) // 模拟越界文件（Fake 仅按 key 存）
+        }
+
+        deleteManagedImageFiles(listOf("record_images/legit.jpg", "record_images/../evil.jpg"), storage)
+
+        assertThat(storage.files).doesNotContainKey("record_images/legit.jpg") // 合法托管 → 删
+        assertThat(storage.files).containsKey("record_images/../evil.jpg") // 含 .. → isManaged=false → 不删
+    }
+
     // region managedImagesToDelete（编辑路径 diff：旧托管 − 持久化后仍引用的托管）
 
     @Test
