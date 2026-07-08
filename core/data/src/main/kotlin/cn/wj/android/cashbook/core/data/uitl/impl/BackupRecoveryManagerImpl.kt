@@ -719,15 +719,7 @@ class BackupRecoveryManagerImpl @Inject constructor(
                     }
                 }
             } else {
-                val localFile = File(localPath)
-                backupZippedCacheFile = File(cacheDir, localFile.name)
-                if (localFile.absolutePath != backupZippedCacheFile.absolutePath) {
-                    // 非相同文件，需要复制
-                    if (!backupZippedCacheFile.exists()) {
-                        backupZippedCacheFile.createNewFile()
-                    }
-                    localFile.copyTo(backupZippedCacheFile)
-                }
+                backupZippedCacheFile = stageLocalBackupToCache(File(localPath), cacheDir)
             }
 
             this@BackupRecoveryManagerImpl.logger()
@@ -970,4 +962,28 @@ internal fun computeCrcAndSize(input: InputStream): Pair<Long, Long> {
         }
     }
     return crc.value to size
+}
+
+/**
+ * 把本地文件路径的备份 zip 暂存进恢复缓存目录 [cacheDir]，返回缓存中的 zip 文件。
+ *
+ * 抽为顶层 internal fun 便于单测（无需构造整个 Manager / Android Context）。
+ *
+ * 此分支（startRecovery 中非 content:// 的 else）在两条恢复流被执行：
+ * - WebDAV 恢复：getWebFile 已把备份下到 [cacheDir] 内同名文件，[localFile] 与 dest 绝对路径相同
+ *   → 命中「源即目标」跳过复制（不触发下述缺陷）；
+ * - 本地原始文件路径恢复：getLocalBackupList 在 SAF 返回非 content:// URI（uri.path 回退，现代
+ *   scoped storage 罕见但个别 OEM/遗留实现可能）时产出 cacheDir 外的原始路径 → 需真正复制。
+ *
+ * 修复历史缺陷：旧实现先 `createNewFile()` 建空目标、再 `File.copyTo()`（默认 `overwrite = false`），
+ * 因目标已被 createNewFile 建出而必抛 [kotlin.io.FileAlreadyExistsException] —— 仅在上述「需真正复制」
+ * 的本地原始路径子情形触发（WebDAV 走 same-file skip 故从未暴露，非无条件失败）。这里用
+ * `copyTo(overwrite = true)` 一步完成，目标存在与否都正确覆盖。
+ */
+internal fun stageLocalBackupToCache(localFile: File, cacheDir: File): File {
+    val dest = File(cacheDir, localFile.name)
+    if (localFile.absolutePath != dest.absolutePath) {
+        localFile.copyTo(dest, overwrite = true)
+    }
+    return dest
 }
