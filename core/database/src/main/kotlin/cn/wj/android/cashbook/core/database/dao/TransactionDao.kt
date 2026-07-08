@@ -375,7 +375,9 @@ interface TransactionDao {
         relatedRecordIdList: List<Long>,
         relatedImageList: List<ImageModel>,
     ) {
-        // 删除旧数据
+        // 删除旧数据（编辑=删旧插新）；deleteRecordTransaction 返回的托管图 path 在此**故意丢弃**——
+        // 编辑保留图会被同 path 重新插入，文件级清理走 RecordRepositoryImpl.updateRecord 的新旧图差集
+        // (managedImagesToDelete)，切勿在此调 deleteManagedImageFiles（会误删正被保留的图 → 数据丢失）
         deleteRecordTransaction(record.id)
         // 插入新数据
         insertRecordTransaction(
@@ -571,6 +573,10 @@ interface TransactionDao {
         return insertedIds
     }
 
+    /**
+     * 按 id 单删记录（recordId 为 null 时空操作返回空）。委托 [deleteRecordTransaction] 的 RecordTable 重载。
+     * @return 同 [deleteRecordsBatch]：实删记录的托管候选图相对路径（未 isManaged 过滤，须经 deleteManagedImageFiles 守卫）。
+     */
     @Throws(DataTransactionException::class)
     @Transaction
     suspend fun deleteRecordTransaction(recordId: Long?): List<String> {
@@ -641,6 +647,7 @@ interface TransactionDao {
     /**
      * 删除已有记录（单删，UI 路径）。委托 [deleteRecordsBatch]（单元素列表）——
      * 复用同一套「捕获 survivors → 余额回退 → 批量删关联/记录 → 存活簇去重重算」逻辑，避免重复（DRY）。
+     * @return 同 [deleteRecordsBatch]：实删记录的托管候选图相对路径（未 isManaged 过滤，须经 deleteManagedImageFiles 守卫）。
      */
     @Throws(DataTransactionException::class)
     @Transaction
@@ -725,6 +732,9 @@ interface TransactionDao {
      * 批量删除一组记录：删前捕获 survivors → 逐条余额回退 → 批量删关联/记录（byIds IN + chunk）→
      * L3 行数校验 → 删后对「存活簇」只重算一次。消除逐条 per-record DB 往返（A2，P-M1）。
      * 存活引用为备份恢复/导入异常的安全网（正常数据 survivors 为空）。
+     * @return 实删记录的托管候选图相对路径（**未经 isManaged 过滤**，为删图单一真源）。调用方必须经
+     *   `deleteManagedImageFiles(paths, storage)` 的 isManaged 守卫后才可删文件，**禁止直接喂 storage.delete**
+     *   ——防恶意备份注入 `record_images` 上跳序列逃逸沙箱（CWE-22 containment）。
      */
     @Throws(DataTransactionException::class)
     @Transaction
@@ -747,17 +757,17 @@ interface TransactionDao {
             if (record.id == null) continue
             revertRecordBalanceOnly(record)
         }
-        // L8：三类关联删 + 删记录遍历同一完整 deletedIds 全集
-        val idList = deletedIds.toList()
-        // M1 单一真源：删关联前捕获实删记录的托管图 path（关联删后无法查）；chunk 防 SQLite 变量上限（节点1 F4）
-        val imagePaths = idList.chunked(DELETE_IN_CHUNK_SIZE).flatMap { queryImagePathsByRecordIds(it) }
-        idList.chunked(DELETE_IN_CHUNK_SIZE).forEach { chunk ->
+        // L8：三类关联删 + 删记录遍历同一完整 deletedIds 全集；分区抽一次复用（防 SQLite 变量上限，节点1 F4）
+        val chunks = deletedIds.toList().chunked(DELETE_IN_CHUNK_SIZE)
+        // M1 单一真源：删关联前捕获实删记录的托管图 path（关联删后无法查）
+        val imagePaths = chunks.flatMap { queryImagePathsByRecordIds(it) }
+        chunks.forEach { chunk ->
             deleteTagRelationsByRecordIds(chunk)
             deleteImageRelationsByRecordIds(chunk)
             deleteRecordRelationsByRecordIds(chunk)
         }
         // 批量删记录 + L3 行数校验（去重 size）
-        val deleted = idList.chunked(DELETE_IN_CHUNK_SIZE).sumOf { deleteRecordsByIds(it) }
+        val deleted = chunks.sumOf { deleteRecordsByIds(it) }
         if (deleted < deletedIds.size) {
             throw DataTransactionException("Record delete failed!")
         }
@@ -775,6 +785,7 @@ interface TransactionDao {
     /**
      * 事务化删除账本及其所有关联数据。
      * 逐条删记录正确回退资产余额（含跨账本转账对方资产），删后统一对存活簇重算（去 O(N²)）。
+     * @return 首步 [deleteRecordsBatch] 回传的该账本全部记录托管候选图 path（未 isManaged 过滤，须经 deleteManagedImageFiles 守卫）。
      */
     @Throws(DataTransactionException::class)
     @Transaction
@@ -832,6 +843,7 @@ interface TransactionDao {
     /**
      * 事务化删除资产关联的所有数据（不删资产行本身，守 AUDIT-2 契约：目标资产存活+余额回退）。
      * 逐条删记录正确回退对方资产余额（转账场景），删后统一对存活簇重算（去 O(N²)）。
+     * @return 委托 [deleteRecordsBatch] 回传的该资产全部记录托管候选图 path（未 isManaged 过滤，须经 deleteManagedImageFiles 守卫）。
      */
     @Transaction
     suspend fun deleteAssetRelatedData(assetId: Long): List<String> =

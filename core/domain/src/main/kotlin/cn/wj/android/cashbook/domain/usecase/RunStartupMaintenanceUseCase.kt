@@ -33,6 +33,10 @@ import kotlin.coroutines.cancellation.CancellationException
  *   标志未置位下次幂等重试）再放行；
  * - 已迁移：立即放行，后台按 tempKeys 标志跑净自付重算 / 图片 backfill / DB 压实。
  * - 孤儿扫描每次启动兜底（批量删账本/资产、编辑替换可能留孤儿文件）。
+ *
+ * **故意不注入 `@Dispatcher(IO) coroutineContext`（有别于本模块其他 UseCase 模板）**：5 个 repo 维护方法各自
+ * `withContext(IO)` 自切 IO，[onFirstScreenReady] 首屏 gate 回调须留在调用方 context（`viewModelScope.launch`
+ * = Main）；若整体包 `withContext(IO)` 会把 gate 回调挪到 IO 线程。勿"补全模板"加 withContext（破坏 gate 时机）。
  */
 class RunStartupMaintenanceUseCase @Inject constructor(
     private val recordRepository: RecordRepository,
