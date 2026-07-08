@@ -28,6 +28,7 @@ import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
+import cn.wj.android.cashbook.domain.usecase.RunStartupMaintenanceUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.collect
@@ -60,94 +61,8 @@ class LauncherContentViewModelTest {
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = recordRepository,
+            runStartupMaintenance = RunStartupMaintenanceUseCase(recordRepository, settingRepository),
         )
-    }
-
-    @Test
-    fun when_db9To10_done_but_net_recalc_not_done_then_recalculateAllFinalAmount_called() {
-        // 老用户 gate：db9To10 已迁移、净自付未重算 → 触发 recalculateAllFinalAmount 一次
-        settingRepository.setTempKeys(
-            TempKeysModel(
-                db9To10DataMigrated = true,
-                preferenceSplit = true,
-                finalAmountNetRecalcDone = false,
-            ),
-        )
-        val freshRecordRepository = FakeRecordRepository()
-
-        LauncherContentViewModel(
-            booksRepository = booksRepository,
-            settingRepository = settingRepository,
-            recordRepository = freshRecordRepository,
-        )
-
-        assertThat(freshRecordRepository.recalculateAllFinalAmountCount).isEqualTo(1)
-    }
-
-    @Test
-    fun when_imagesToFiles_not_migrated_then_backfill_called() {
-        // 图片未迁移 → 首屏 gate 触发 backfillImagesToFiles 一次（净自付已重算以隔离）
-        settingRepository.setTempKeys(
-            TempKeysModel(
-                db9To10DataMigrated = true,
-                preferenceSplit = true,
-                finalAmountNetRecalcDone = true,
-                imagesToFilesMigrated = false,
-            ),
-        )
-        val freshRecordRepository = FakeRecordRepository()
-
-        LauncherContentViewModel(
-            booksRepository = booksRepository,
-            settingRepository = settingRepository,
-            recordRepository = freshRecordRepository,
-        )
-
-        assertThat(freshRecordRepository.backfillImagesToFilesCount).isEqualTo(1)
-    }
-
-    @Test
-    fun when_imagesToFiles_already_migrated_then_backfill_not_called() {
-        // 图片已迁移 → 首屏不再触发 backfill
-        settingRepository.setTempKeys(
-            TempKeysModel(
-                db9To10DataMigrated = true,
-                preferenceSplit = true,
-                finalAmountNetRecalcDone = true,
-                imagesToFilesMigrated = true,
-            ),
-        )
-        val freshRecordRepository = FakeRecordRepository()
-
-        LauncherContentViewModel(
-            booksRepository = booksRepository,
-            settingRepository = settingRepository,
-            recordRepository = freshRecordRepository,
-        )
-
-        assertThat(freshRecordRepository.backfillImagesToFilesCount).isEqualTo(0)
-    }
-
-    @Test
-    fun launcher_always_runs_orphan_image_cleanup() {
-        // 孤儿扫描每次启动兜底：即便全迁移完成也会跑一次
-        settingRepository.setTempKeys(
-            TempKeysModel(
-                db9To10DataMigrated = true,
-                preferenceSplit = true,
-                finalAmountNetRecalcDone = true,
-                imagesToFilesMigrated = true,
-            ),
-        )
-        val freshRecordRepository = FakeRecordRepository()
-
-        LauncherContentViewModel(
-            booksRepository = booksRepository,
-            settingRepository = settingRepository,
-            recordRepository = freshRecordRepository,
-        )
-
-        assertThat(freshRecordRepository.cleanupOrphanImageFilesCount).isEqualTo(1)
     }
 
     @Test
@@ -167,6 +82,7 @@ class LauncherContentViewModelTest {
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = repo,
+            runStartupMaintenance = RunStartupMaintenanceUseCase(repo, settingRepository),
         )
 
         val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
@@ -196,6 +112,7 @@ class LauncherContentViewModelTest {
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = repo,
+            runStartupMaintenance = RunStartupMaintenanceUseCase(repo, settingRepository),
         )
 
         val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
@@ -223,6 +140,7 @@ class LauncherContentViewModelTest {
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = repo,
+            runStartupMaintenance = RunStartupMaintenanceUseCase(repo, settingRepository),
         )
 
         val collectJob = launch(UnconfinedTestDispatcher()) { vm.uiState.collect() }
@@ -539,6 +457,7 @@ class LauncherContentViewModelTest {
             booksRepository = booksRepository,
             settingRepository = settingRepository,
             recordRepository = recordRepository,
+            runStartupMaintenance = RunStartupMaintenanceUseCase(recordRepository, settingRepository),
         )
 
         // init 应将当前周期初始化为 currentMonthPeriod(now, d)（D=d 走周期，而非裸 ByMonth(now)）

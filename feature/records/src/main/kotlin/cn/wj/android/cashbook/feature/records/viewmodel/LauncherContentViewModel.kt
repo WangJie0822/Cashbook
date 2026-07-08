@@ -26,7 +26,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
-import cn.wj.android.cashbook.core.common.ext.logger
 import cn.wj.android.cashbook.core.common.ext.toMoneyString
 import cn.wj.android.cashbook.core.common.tools.DATE_FORMAT_DATE
 import cn.wj.android.cashbook.core.common.tools.dateFormat
@@ -40,8 +39,8 @@ import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.transfer.asEntity
+import cn.wj.android.cashbook.domain.usecase.RunStartupMaintenanceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -62,70 +61,17 @@ class LauncherContentViewModel @Inject constructor(
     booksRepository: BooksRepository,
     settingRepository: SettingRepository,
     private val recordRepository: RecordRepository,
+    private val runStartupMaintenance: RunStartupMaintenanceUseCase,
 ) : ViewModel() {
 
     /** 标记 - 数据迁移是否已完成 */
     private val _migrationCompleted = MutableStateFlow(false)
 
     init {
+        // 启动维护编排（迁移/净自付重算/图片 backfill/DB 压实/孤儿扫描）收编至 RunStartupMaintenanceUseCase（M2）；
+        // onFirstScreenReady 在正确时机（db9To10 迁移后 / 已迁移立即）回调放行首屏，gate 语义与原 init 逐行等价。
         viewModelScope.launch {
-            val tempKeys = settingRepository.tempKeysModel.first()
-            if (!tempKeys.db9To10DataMigrated) {
-                // final_amount 全为 Migration9To10 DEFAULT 0，首屏会显全 0 → 必须 gate（先迁移后置位，不可调换）
-                recordRepository.migrateAfter9To10()
-                _migrationCompleted.value = true
-            } else {
-                // 已迁移：立即放行首屏（finalAmount 为旧吸收模型值——被吸收支出=0/吸收者可负，首屏短暂显旧值）
-                _migrationCompleted.value = true
-                if (!tempKeys.finalAmountNetRecalcDone) {
-                    // 老用户净自付重算后台静默跑；完成后 recalculateAllFinalAmount 内部 bump recordDataVersion，
-                    // 汇总流（订阅 version）+ 列表（Room PagingSource 对 db_record UPDATE 自动 invalidate）刷新到净自付值。
-                    // try/catch（M-1 节点2）：后台重算失败不连累已放行首屏——异常逃逸会触发全局
-                    // UncaughtExceptionHandler 的 finishAllActivity()；finalAmountNetRecalcDone 未置位，下次启动幂等重试。
-                    try {
-                        recordRepository.recalculateAllFinalAmount()
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Throwable) {
-                        this@LauncherContentViewModel.logger()
-                            .e(e, "background netRecalc failed, will retry next launch")
-                    }
-                }
-                if (!tempKeys.imagesToFilesMigrated) {
-                    // 图片 BLOB→文件 backfill 后台静默跑；逐行幂等、崩溃可重入，
-                    // backfillImagesToFiles 内部成功后置位 imagesToFilesMigrated。
-                    // try/catch：失败不连累已放行首屏，标志未置位则下次启动幂等重试。
-                    try {
-                        recordRepository.backfillImagesToFiles()
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Throwable) {
-                        this@LauncherContentViewModel.logger()
-                            .e(e, "background image backfill failed, will retry next launch")
-                    }
-                }
-                if (tempKeys.imagesToFilesMigrated && !tempKeys.dbVacuumDone) {
-                    // C-robust：backfill 已完成后一次性 live DB VACUUM 回收空闲页（StatFs 预检 + 仅真成功置位、
-                    // 失败下次重试）。本次刚完成 backfill 的启动 tempKeys 快照仍为 false → 顺延下次启动跑，可接受。
-                    try {
-                        recordRepository.compactDatabaseIfNeeded()
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Throwable) {
-                        this@LauncherContentViewModel.logger()
-                            .e(e, "background db compact failed, will retry next launch")
-                    }
-                }
-            }
-            // 启动孤儿图片扫描（每次启动兜底：批量删账本/资产、编辑替换可能留孤儿文件）；
-            // grace window 保护刚写入/backfill 在途文件，未 backfill 行无 record_images 文件故不误删。
-            try {
-                recordRepository.cleanupOrphanImageFiles()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
-                this@LauncherContentViewModel.logger().e(e, "orphan image cleanup failed")
-            }
+            runStartupMaintenance { _migrationCompleted.value = true }
         }
     }
 
