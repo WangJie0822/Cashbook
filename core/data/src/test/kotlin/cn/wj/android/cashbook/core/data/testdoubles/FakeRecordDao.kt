@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.dao.RecordDao
 import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
+import cn.wj.android.cashbook.core.database.relation.LauncherRecordViewRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
@@ -400,6 +401,39 @@ class FakeRecordDao : RecordDao {
             }
 
             override fun getRefreshKey(state: PagingState<Int, RecordTable>): Int? = null
+        }
+    }
+
+    override fun pagingLauncherRecordViews(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): PagingSource<Int, LauncherRecordViewRelation> {
+        // 仅记录层过滤/排序正确，type/asset/tags/images/双向 relatedRecord 等 @Relation 关联置空——
+        // 其批量物化语义由 core:database androidTest（RecordDaoRelationTest，Task 7）真库验证，非此处假阳性覆盖。
+        return object : PagingSource<Int, LauncherRecordViewRelation>() {
+            override suspend fun load(
+                params: LoadParams<Int>,
+            ): LoadResult<Int, LauncherRecordViewRelation> {
+                val data = records.filter {
+                    it.booksId == booksId && it.recordTime >= startDate && it.recordTime < endDate
+                }.sortedByDescending { it.recordTime }.map { record ->
+                    LauncherRecordViewRelation(
+                        record = record,
+                        types = emptyList(),
+                        assets = emptyList(),
+                        intoAssets = emptyList(),
+                        images = emptyList(),
+                        tags = emptyList(),
+                        relatedAsRecordId = emptyList(),
+                        relatedAsRelatedId = emptyList(),
+                    )
+                }
+                return LoadResult.Page(data = data, prevKey = null, nextKey = null)
+            }
+
+            override fun getRefreshKey(state: PagingState<Int, LauncherRecordViewRelation>): Int? =
+                null
         }
     }
 
