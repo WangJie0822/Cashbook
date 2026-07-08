@@ -22,6 +22,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.InputStream
 
 /**
  * [stageInputStreamToCache] 单测：守护 content:// 恢复分支「暂存 zip 进缓存」的流式化（#2 backlog）。
@@ -40,46 +41,55 @@ class StageInputStreamToCacheTest {
     @Test
     fun stream_copiedIntoCache_bytesIdentical() {
         val cacheDir = tempFolder.newFolder("cache")
+        val input = TrackingInputStream(ByteArrayInputStream(backupBytes))
 
-        val staged = stageInputStreamToCache(
-            ByteArrayInputStream(backupBytes),
-            cacheDir,
-            "Cashbook_Backup_File_x.zip",
-        )
+        val staged = stageInputStreamToCache(input, cacheDir, "Cashbook_Backup_File_x.zip")
 
         assertThat(staged.absolutePath)
             .isEqualTo(File(cacheDir, "Cashbook_Backup_File_x.zip").absolutePath)
         assertThat(staged.exists()).isTrue()
         assertThat(staged.readBytes()).isEqualTo(backupBytes)
+        assertThat(input.closed).isTrue() // 成功路径关流（copyTo 后 use 关闭）
     }
 
     @Test
     fun destAlreadyExists_overwritten() {
         val cacheDir = tempFolder.newFolder("cache")
         File(cacheDir, "Cashbook_Backup_File_x.zip").writeBytes("stale-leftover".toByteArray())
+        val input = TrackingInputStream(ByteArrayInputStream(backupBytes))
 
-        val staged = stageInputStreamToCache(
-            ByteArrayInputStream(backupBytes),
-            cacheDir,
-            "Cashbook_Backup_File_x.zip",
-        )
+        val staged = stageInputStreamToCache(input, cacheDir, "Cashbook_Backup_File_x.zip")
 
         assertThat(staged.readBytes()).isEqualTo(backupBytes)
+        assertThat(input.closed).isTrue()
     }
 
     @Test
-    fun nameWithPathTraversal_rejected() {
+    fun nameWithPathTraversal_rejected_stillClosesStream() {
+        // M-1 回归：require 拒绝路径穿越时，caller 已打开的 input 流仍须关闭（防 content-resolver fd 泄漏）。
+        // 修复前 require 先于 input.use 抛异常、流从不关闭 → closed=false 此断言失败；body 包进 input.use 后转绿。
         val cacheDir = tempFolder.newFolder("cache")
+        val input = TrackingInputStream(ByteArrayInputStream(backupBytes))
 
         try {
-            stageInputStreamToCache(
-                ByteArrayInputStream(backupBytes),
-                cacheDir,
-                "../escape.zip",
-            )
+            stageInputStreamToCache(input, cacheDir, "../escape.zip")
             throw AssertionError("expected IllegalArgumentException for path traversal name")
         } catch (e: IllegalArgumentException) {
             // 期望：越出 cacheDir 被 isWithinDir 拒绝
+        }
+        assertThat(input.closed).isTrue() // 拒绝路径也须关流（M-1）
+    }
+
+    /** 记录 close() 是否被调用的 InputStream 装饰器（守护 M-1：任何退出路径都须关流）。 */
+    private class TrackingInputStream(private val delegate: InputStream) : InputStream() {
+        var closed = false
+            private set
+
+        override fun read(): Int = delegate.read()
+        override fun read(b: ByteArray, off: Int, len: Int): Int = delegate.read(b, off, len)
+        override fun close() {
+            closed = true
+            delegate.close()
         }
     }
 }

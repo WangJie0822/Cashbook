@@ -994,10 +994,13 @@ internal fun stageLocalBackupToCache(localFile: File, cacheDir: File): File {
  * [name] 来自 DocumentFile.name（provider 可控、SAF 不保证无 `/`/`..`），用 [isWithinDir] canonical
  * 校验拒绝路径穿越（本地文件分支因 File.name 剥离分隔符天然安全，此处补齐 content:// 分支的对称性）。
  */
-internal fun stageInputStreamToCache(input: InputStream, cacheDir: File, name: String): File {
-    val dest = File(cacheDir, name)
-    require(isWithinDir(dest, cacheDir)) { "staged file escapes cache dir: $name" }
-    dest.parentFile?.mkdirs()
-    input.use { inS -> FileOutputStream(dest).use { inS.copyTo(it) } }
-    return dest
-}
+internal fun stageInputStreamToCache(input: InputStream, cacheDir: File, name: String): File =
+    // input 由 caller 传入时已打开（openInputStream），整个 body 包进 input.use：
+    // 保证 require 拒绝路径穿越 / canonicalPath 抛 IOException 等任何早退路径也关闭流（防 content-resolver fd 泄漏）
+    input.use { inS ->
+        val dest = File(cacheDir, name)
+        require(isWithinDir(dest, cacheDir)) { "staged file escapes cache dir: $name" }
+        dest.parentFile?.mkdirs()
+        FileOutputStream(dest).use { inS.copyTo(it) }
+        dest
+    }
