@@ -65,7 +65,7 @@
 
 ```
 core:database  → LauncherRecordViewRelation（@Relation POJO） + RecordDao.@Transaction @Query（Room 生成 LimitOffsetPagingSource）
-core:model     → RecordViewsModel 组装纯函数（含 sumRelatedAmount/computeRelatedNature/平账特判，从 core:domain 提取共用）
+core:data      → sumRelatedAmount/computeRelatedNature 纯函数（勘误：原设想 core:model，因其零依赖 jvm library 无法访问 core:common 的 FIXED_TYPE_ID_*，改放 core:data；见 plan Task 1），供 mapper 与 transBatch 共用
 core:data      → RecordRepositoryImpl.getRecordPagingData 内部 map POJO→RecordViewsModel，暴露 Flow<PagingData<RecordViewsModel>>
 feature:records→ LauncherContentViewModel 去掉逐元素 transToViews，改 map { asEntity } + insertSeparators
 ```
