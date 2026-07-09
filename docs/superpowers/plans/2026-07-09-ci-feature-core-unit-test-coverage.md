@@ -57,9 +57,13 @@ Expected: 默认下 SUCCESSFUL（证明失败纯由时区/locale） → 归入 T
 
 在本会话记录：`<模块>::<测试类>::<方法>` 逐条 + 失败断言摘要。此清单为 Task 2 输入。若清单为空 → 跳过 Task 2，直接 Task 3。
 
+> **执行结果（2026-07-09）**：本机 UTC/en（init script `systemProperty user.timezone=UTC / language=en / country=US`，比 `TZ` 环境变量在 Windows 更可靠）全库预筛 `BUILD SUCCESSFUL`，17 个 `testDebugUnitTest` + `:core:model:test` 全过 → **脆弱清单为空（时区/locale 脆弱测试 = 0）**。既有测试均已 zone/locale-robust。**Task 2 空转跳过。**
+>
+> **预筛副产物 → 方案级勘误**：预筛暴露 Gradle 9 `Test.failOnNoDiscoveredTests` 默认 `true`——CI 加无前缀 `testDebugUnitTest`（覆盖所有库模块）会命中 `core:testing`（测试基础设施模块，`api(libs.junit)`+Hilt testing 使 test 源集非 NO-SOURCE 但自身 0 `@Test`）判 FAILED。已实证**仅 `core:testing` 一个模块**触发（其余库模块要么有 `@Test` 要么 NO-SOURCE）。处理并入 Task 3 Step 0（`core:testing/build.gradle.kts` 就地 `failOnNoDiscoveredTests=false`）。
+
 ---
 
-## Task 2: 修脆弱测试为 zone/locale-robust（数据驱动，输入=Task 1 清单）
+## Task 2: 修脆弱测试为 zone/locale-robust（数据驱动，输入=Task 1 清单）—— **脆弱=0，整个 Task 跳过**
 
 **Files:**
 - Modify: Task 1 清单列出的测试文件（`<module>/src/test/.../XxxTest.kt`），逐个修
@@ -106,14 +110,33 @@ git -C D:/wt/Cashbook/ci-coverage-fix commit -m "[test|<模块>|时区健壮性]
 
 ---
 
-## Task 3: Build.yaml 加库模块单测到 CI（组件 1）
+## Task 3: 库模块单测上 CI（组件 1）+ core:testing failOnNoDiscoveredTests 勘误
+
+> **勘误（Task 1 预筛发现）**：原 plan 只含 Build.yaml 一处改动。实测 Gradle 9 `failOnNoDiscoveredTests` 默认 `true` 使 `core:testing`（0 测试的基础设施模块）被无前缀 `testDebugUnitTest` 命中判 FAILED，故本 Task 扩展为**两处**：Step 0 关闭 `core:testing` 检查（前置，否则 Step 1 上 CI 后必红）+ Step 1 改 Build.yaml。
 
 **Files:**
+- Modify: `core/testing/build.gradle.kts`（末尾加 `tasks.withType<Test>` 关闭 `failOnNoDiscoveredTests`）
 - Modify: `.github/workflows/Build.yaml`（`Run local tests` step，现 `:106-108`）
 
 **Interfaces:**
 - Consumes: Task 2 完成（脆弱测试已修，CI 首跑不会红）
 - Produces: CI Local job 执行 feature/core `testDebugUnitTest` + `:core:model:test`
+
+- [ ] **Step 0: core:testing 关闭 failOnNoDiscoveredTests（勘误，前置于 Build.yaml）**
+
+在 `core/testing/build.gradle.kts` 末尾（`dependencies {}` 块后）加：
+```kotlin
+// core:testing 是测试基础设施模块（对下游提供 Fake/测试工具），自身不含单元测试。
+// Gradle 9 起 Test.failOnNoDiscoveredTests 默认 true：本模块 test 源集因 junit/Hilt testing 依赖
+// 非 NO-SOURCE，但无任何 @Test → testDebugUnitTest 会判 FAILED。CI 聚合的 testDebugUnitTest
+// （无前缀，覆盖所有库模块）会命中本模块，故就地关闭该检查（仅本模块，不影响其他模块的空测试报警）。
+tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+    failOnNoDiscoveredTests = false
+}
+```
+验证（**不加** init script，默认 `failOnNoDiscoveredTests=true` 环境下模块级关闭是否生效）：
+Run: `D:/wt/Cashbook/ci-coverage-fix/gradlew -p D:/wt/Cashbook/ci-coverage-fix :core:testing:testDebugUnitTest --no-daemon --offline --console=plain 2>&1 | grep -E '^BUILD (SUCCESSFUL|FAILED)'`
+Expected: BUILD SUCCESSFUL（对照未关闭时为 `> Task :core:testing:testDebugUnitTest FAILED`）。**已验证通过（2026-07-09，1 executed SUCCESSFUL）。**
 
 - [ ] **Step 1: 改 Build.yaml**
 
@@ -138,9 +161,13 @@ Expected: BUILD SUCCESSFUL。
 Run: `git -C D:/wt/Cashbook/ci-coverage-fix status --short | grep -c 'src/test/screenshots'`
 Expected: `0`（`-Proborazzi.test.verify=false` 使截图模块不做 capture/verify，无基线覆写）。
 
-- [ ] **Step 3: commit**
+- [ ] **Step 3: commit（两笔原子化：core:testing 配置 + Build.yaml CI 命令）**
 
 ```bash
+# 第一笔：core:testing failOnNoDiscoveredTests（Gradle 9 兼容前置）
+git -C D:/wt/Cashbook/ci-coverage-fix add core/testing/build.gradle.kts
+git -C D:/wt/Cashbook/ci-coverage-fix commit -m "[build|core:testing|Gradle9兼容][公共]关闭 failOnNoDiscoveredTests——core:testing 是无单测的测试基础设施模块（junit/Hilt testing 依赖使 test 源集非 NO-SOURCE 但 0 @Test），CI 聚合 testDebugUnitTest 会命中判 FAILED"
+# 第二笔：Build.yaml CI 覆盖
 git -C D:/wt/Cashbook/ci-coverage-fix add .github/workflows/Build.yaml
 git -C D:/wt/Cashbook/ci-coverage-fix commit -m "[ci|build|CI覆盖feature-core单测][公共]Run local tests 加 testDebugUnitTest :core:model:test -Proborazzi.test.verify=false，让 CI 跑库模块 JVM 单测（此前 app-flavor task 只覆盖 app，feature/core UnitTest 执行=0）"
 ```
