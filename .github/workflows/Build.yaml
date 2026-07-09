@@ -105,7 +105,7 @@ jobs:
       # Run local tests after screenshot tests to avoid wrong UP-TO-DATE. TODO: Ignore screenshots.
       - name: Run local tests
         if: always()
-        run: ./gradlew testOnlineDebug testOfflineDebug :lint:test
+        run: ./gradlew testOnlineDebug testOfflineDebug testDebugUnitTest :core:model:test :lint:test -Proborazzi.test.verify=false
 
       - name: Build all build type and flavor permutations
         run: ./gradlew :app:assemble
