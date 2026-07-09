@@ -53,3 +53,11 @@ dependencies {
 
     debugApi(libs.androidx.compose.ui.test.manifest)
 }
+
+// core:testing 是测试基础设施模块（对下游提供 Fake/测试工具），自身不含单元测试。
+// Gradle 9 起 Test.failOnNoDiscoveredTests 默认 true：本模块 test 源集因 junit/Hilt testing 依赖
+// 非 NO-SOURCE，但无任何 @Test → testDebugUnitTest 会判 FAILED。CI 聚合的 testDebugUnitTest
+// （无前缀，覆盖所有库模块）会命中本模块，故就地关闭该检查（仅本模块，不影响其他模块的空测试报警）。
+tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+    failOnNoDiscoveredTests = false
+}
