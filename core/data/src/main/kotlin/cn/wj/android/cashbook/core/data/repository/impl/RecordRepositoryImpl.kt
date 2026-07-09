@@ -47,6 +47,7 @@ import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -118,9 +119,8 @@ class RecordRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
-        // 删前捕获图片相对路径（删后关联已清无法查）
-        val imagePaths = recordDao.queryImagesByRecordId(recordId).map { it.path }
-        transactionDao.deleteRecordTransaction(recordId)
+        // 事务内删除并回传实删记录的托管图 path（单一真源；消除删前单独查 BLOB 的 queryImagesByRecordId）
+        val imagePaths = transactionDao.deleteRecordTransaction(recordId)
         // DB 删成功后 best-effort 删托管图片文件（失败留孤儿，启动扫描兜底）
         deleteManagedImageFiles(imagePaths, recordImageFileStorage)
         recordDataVersion.updateVersion()
@@ -354,22 +354,23 @@ class RecordRepositoryImpl @Inject constructor(
     override fun getRecordPagingData(
         startDate: Long,
         endDate: Long,
-    ): Flow<PagingData<RecordModel>> {
-        // 刷新依赖 Room PagingSource 对 db_record 写自动 invalidate，故不显式订阅 recordDataVersion
-        // （区别于 queryRecordViewSummariesFlow 手动 combine version）；勿加 version，否则每次增删改重建 Pager 回顶。
+    ): Flow<PagingData<RecordViewsModel>> {
+        // 用 @Transaction+@Relation 分页：Room 生成 LimitOffsetPagingSource，对全部关联表（db_record/db_type/
+        // db_asset/db_image_with_related/db_tag_with_record/db_record_with_related）自动 invalidate（保位、不回顶），
+        // 关联在 DAO 层批量 IN 物化、消 N+1。勿改回手动 combine recordDataVersion，否则每次增删改重建 Pager 回顶。
         return combineProtoDataSource.recordSettingsData
             .flatMapLatest { settings ->
                 Pager(
                     config = PagingConfig(pageSize = 20),
                     pagingSourceFactory = {
-                        recordDao.pagingQueryByBooksIdBetweenDate(
+                        recordDao.pagingLauncherRecordViews(
                             booksId = settings.currentBookId,
                             startDate = startDate,
                             endDate = endDate,
                         )
                     },
                 ).flow.map { pagingData ->
-                    pagingData.map { it.asModel() }
+                    pagingData.map { it.toRecordViewsModel() }
                 }
             }
     }
@@ -510,10 +511,8 @@ class RecordRepositoryImpl @Inject constructor(
 
     override suspend fun deleteRecordsWithAsset(assetId: Long): Unit =
         withContext(coroutineContext) {
-            // 删前捕获图片相对路径（删后关联已清无法查），与单删/编辑对称
-            val imagePaths = recordDao.queryImagePathsByAssetId(assetId)
-            // 事务化删除：标签关联、记录关联、图片关联、记录
-            transactionDao.deleteAssetRelatedData(assetId)
+            // 事务化删除并回传实删记录的托管图 path（单一真源；消除删前单独查 queryImagePathsByAssetId 的谓词漂移）
+            val imagePaths = transactionDao.deleteAssetRelatedData(assetId)
             // DB 删成功后 best-effort 删托管图片文件（失败留孤儿，启动扫描兜底）
             deleteManagedImageFiles(imagePaths, recordImageFileStorage)
             recordDataVersion.updateVersion()

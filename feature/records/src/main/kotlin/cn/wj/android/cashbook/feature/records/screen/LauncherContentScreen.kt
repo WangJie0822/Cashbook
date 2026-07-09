@@ -527,6 +527,13 @@ private fun FrontLayerContent(
                                 null -> "placeholder_$index"
                             }
                         },
+                        contentType = { index ->
+                            when (items.peek(index)) {
+                                is LauncherListItem.DayHeader -> "day_header"
+                                is LauncherListItem.Record -> "record"
+                                null -> "placeholder"
+                            }
+                        },
                     ) { index ->
                         when (val item = items[index]) {
                             is LauncherListItem.DayHeader -> {

@@ -19,10 +19,12 @@ package cn.wj.android.cashbook.core.database.dao
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import cn.wj.android.cashbook.core.common.SWITCH_INT_OFF
 import cn.wj.android.cashbook.core.common.SWITCH_INT_ON
 import cn.wj.android.cashbook.core.database.relation.ExportRecordRelation
+import cn.wj.android.cashbook.core.database.relation.LauncherRecordViewRelation
 import cn.wj.android.cashbook.core.database.relation.RecordViewsRelation
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -87,6 +89,26 @@ interface RecordDao {
         startDate: Long,
         endDate: Long,
     ): PagingSource<Int, RecordTable>
+
+    /**
+     * 首页分页：一次 @Transaction + @Relation 物化 type/asset/tags/images/双向 relatedRecord，消 N+1。
+     * Room 生成 LimitOffsetPagingSource（保位 + 自动 invalidate 全部 @Relation 表）。
+     */
+    @Transaction
+    @Query(
+        value = """
+            SELECT * FROM db_record
+            WHERE record_time>=:startDate
+            AND record_time<:endDate
+            AND books_id=:booksId
+            ORDER BY record_time DESC
+        """,
+    )
+    fun pagingLauncherRecordViews(
+        booksId: Long,
+        startDate: Long,
+        endDate: Long,
+    ): PagingSource<Int, LauncherRecordViewRelation>
 
     /** 查询日期范围内的轻量记录视图（含类型分类），用于计算收支汇总 */
     @Query(
@@ -478,30 +500,6 @@ interface RecordDao {
     /** 全表图片相对路径（仅 path 投影，孤儿扫描引用集用，不读 BLOB 避免 OOM） */
     @Query("SELECT image_path FROM db_image_with_related")
     suspend fun queryAllImagePaths(): List<String>
-
-    /**
-     * 按资产取图片相对路径（仅 path 投影）。谓词逐字镜像 [TransactionDao.queryRecordsByAssetId]
-     * （= deleteAssetRelatedData 实删集，含 into_asset_id 转账入账侧），删资产时删图片文件用。
-     */
-    @Query(
-        """
-        SELECT image_path FROM db_image_with_related
-        WHERE record_id IN (SELECT id FROM db_record WHERE asset_id=:assetId OR into_asset_id=:assetId)
-    """,
-    )
-    suspend fun queryImagePathsByAssetId(assetId: Long): List<String>
-
-    /**
-     * 按账本取图片相对路径（仅 path 投影）。谓词镜像 [TransactionDao.queryRecordListByBookId]
-     * （= deleteBookTransaction 实删集），删账本时删图片文件用。
-     */
-    @Query(
-        """
-        SELECT image_path FROM db_image_with_related
-        WHERE record_id IN (SELECT id FROM db_record WHERE books_id=:bookId)
-    """,
-    )
-    suspend fun queryImagePathsByBookId(bookId: Long): List<String>
 
     /** 按记录取图片相对路径（仅 path 投影，不读 BLOB）；编辑记录 diff 删被移除图用 */
     @Query("SELECT image_path FROM db_image_with_related WHERE record_id=:recordId")

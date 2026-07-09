@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -121,24 +122,36 @@ class FakeRecordRepository : RecordRepository {
     var backfillImagesToFilesCount = 0
         private set
 
+    /** 非 null 时 [backfillImagesToFiles] 在 count++ 后抛此异常（测试后台维护失败隔离路径） */
+    var backfillThrowable: Throwable? = null
+
     override suspend fun backfillImagesToFiles() {
         backfillImagesToFilesCount++
+        backfillThrowable?.let { throw it }
     }
 
     /** [cleanupOrphanImageFiles] 调用次数，供首屏 gate 测试断言 */
     var cleanupOrphanImageFilesCount = 0
         private set
 
+    /** 非 null 时 [cleanupOrphanImageFiles] 在 count++ 后抛此异常 */
+    var orphanThrowable: Throwable? = null
+
     override suspend fun cleanupOrphanImageFiles(graceWindowMs: Long) {
         cleanupOrphanImageFilesCount++
+        orphanThrowable?.let { throw it }
     }
 
     /** [compactDatabaseIfNeeded] 调用次数，供首屏 gate 测试断言 */
     var compactDatabaseIfNeededCount = 0
         private set
 
+    /** 非 null 时 [compactDatabaseIfNeeded] 在 count++ 后抛此异常 */
+    var compactThrowable: Throwable? = null
+
     override suspend fun compactDatabaseIfNeeded() {
         compactDatabaseIfNeededCount++
+        compactThrowable?.let { throw it }
     }
 
     override suspend fun deleteRecord(recordId: Long) {
@@ -283,11 +296,14 @@ class FakeRecordRepository : RecordRepository {
         return MutableStateFlow(records.toList())
     }
 
+    /** 首页分页视图桩（测试按需 recordViews.add(...) 注入；接口现返回 @Relation 视图 RecordViewsModel） */
+    val recordViews = mutableListOf<RecordViewsModel>()
+
     override fun getRecordPagingData(
         startDate: Long,
         endDate: Long,
-    ): Flow<PagingData<RecordModel>> {
-        return flowOf(PagingData.from(records.toList()))
+    ): Flow<PagingData<RecordViewsModel>> {
+        return flowOf(PagingData.from(recordViews.toList()))
     }
 
     private val _summaryData = MutableStateFlow<List<RecordViewSummaryModel>>(emptyList())
@@ -405,10 +421,14 @@ class FakeRecordRepository : RecordRepository {
     /** [migrateAfter9To10] 进入信号：入口 complete，供测试确认协程已停在挂起点 */
     var migrateStartedSignal: CompletableDeferred<Unit>? = null
 
+    /** 非 null 时 [migrateAfter9To10] 在 count++ + gate 放行后抛此异常（测试迁移失败逃逸全局 handler 路径） */
+    var migrateThrowable: Throwable? = null
+
     override suspend fun migrateAfter9To10() {
         migrateAfter9To10Count++
         migrateStartedSignal?.complete(Unit)
         migrateSuspendGate?.await()
+        migrateThrowable?.let { throw it }
     }
 
     /** 净自付重算调用次数（供 gate 触发测试断言） */

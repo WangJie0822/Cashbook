@@ -896,6 +896,100 @@ class TransactionDaoTest {
         assertThat(transactionDao.queryRecordsByAssetId(2L)).hasSize(1)
     }
 
+    @Test
+    fun when_deleteAssetRelatedData_then_returnsImagePaths_intoAssetIncluded_otherAssetExcluded() = runTest {
+        // M1：删资产返回实删记录的托管图 path，含 into_asset 转账入账侧、不含他资产图（isolation 负断言，承接旧 queryImagePathsByAssetId 覆盖）
+        insertBook()
+        val expTypeId = insertType(createExpenditureType())
+        val transferTypeId = insertType(createTransferType())
+        insertAsset(createNormalAsset(id = 1L, name = "资产A", balance = 100000L))
+        insertAsset(createNormalAsset(id = 2L, name = "资产B", balance = 100000L))
+        insertAsset(createNormalAsset(id = 3L, name = "资产C", balance = 100000L))
+
+        // 记录1：资产A 支出，带图 a.jpg
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = expTypeId, assetId = 1L, amount = 5000L),
+            tagIdList = emptyList(),
+            needRelated = false,
+            relatedRecordIdList = emptyList(),
+            relatedImageList = listOf(ImageModel(id = 0L, recordId = 0L, path = "record_images/a.jpg", bytes = byteArrayOf(1))),
+        )
+        // 记录2：资产C → 资产A 转账（into_asset=1），带图 b.jpg —— 删资产A 须一并返回（into_asset 侧命中 queryRecordsByAssetId）
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = transferTypeId, assetId = 3L, intoAssetId = 1L, amount = 2000L),
+            tagIdList = emptyList(),
+            needRelated = false,
+            relatedRecordIdList = emptyList(),
+            relatedImageList = listOf(ImageModel(id = 0L, recordId = 0L, path = "record_images/b.jpg", bytes = byteArrayOf(2))),
+        )
+        // 记录3：资产B 支出，带图 c.jpg —— 他资产，删资产A 不应返回
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = expTypeId, assetId = 2L, amount = 3000L),
+            tagIdList = emptyList(),
+            needRelated = false,
+            relatedRecordIdList = emptyList(),
+            relatedImageList = listOf(ImageModel(id = 0L, recordId = 0L, path = "record_images/c.jpg", bytes = byteArrayOf(3))),
+        )
+
+        val paths = transactionDao.deleteAssetRelatedData(1L)
+
+        assertThat(paths).containsExactly("record_images/a.jpg", "record_images/b.jpg")
+        assertThat(paths).doesNotContain("record_images/c.jpg")
+    }
+
+    @Test
+    fun when_deleteBookTransaction_then_returnsAllBookRecordImagePaths() = runTest {
+        // M1：删账本返回账本下全部实删记录的托管图 path（承接旧 queryImagePathsByBookId 覆盖）
+        val bookId = insertBook(name = "待删账本")
+        val typeId = insertType(createExpenditureType())
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = typeId, booksId = bookId, amount = 5000L),
+            tagIdList = emptyList(),
+            needRelated = false,
+            relatedRecordIdList = emptyList(),
+            relatedImageList = listOf(ImageModel(id = 0L, recordId = 0L, path = "record_images/x.jpg", bytes = byteArrayOf(1))),
+        )
+        transactionDao.insertRecordTransaction(
+            record = createRecord(typeId = typeId, booksId = bookId, amount = 3000L),
+            tagIdList = emptyList(),
+            needRelated = false,
+            relatedRecordIdList = emptyList(),
+            relatedImageList = listOf(ImageModel(id = 0L, recordId = 0L, path = "record_images/y.jpg", bytes = byteArrayOf(2))),
+        )
+
+        val paths = transactionDao.deleteBookTransaction(bookId)
+
+        assertThat(paths).containsExactly("record_images/x.jpg", "record_images/y.jpg")
+    }
+
+    @Test
+    fun when_deleteRecordsBatch_overChunkSize_then_noSqlVariableError_returnsAllPaths() = runTest {
+        // M1 F4：>900 条带图记录，chunk+flatMap 收集须不抛 SQLite "too many SQL variables" 且返回全部 path
+        val bookId = insertBook(name = "大批量账本")
+        val typeId = insertType(createExpenditureType())
+        val count = 1000
+        val images = mutableListOf<ImageWithRelatedTable>()
+        repeat(count) { i ->
+            val recordId = transactionDao.insertRecord(
+                createRecord(typeId = typeId, booksId = bookId, amount = 100L),
+            )
+            images.add(
+                ImageWithRelatedTable(
+                    id = null,
+                    recordId = recordId,
+                    path = "record_images/bulk_$i.jpg",
+                    bytes = byteArrayOf(0),
+                ),
+            )
+        }
+        transactionDao.insertRelatedImages(images)
+
+        val paths = transactionDao.deleteBookTransaction(bookId)
+
+        assertThat(paths).hasSize(count)
+        assertThat(transactionDao.queryRecordListByBookId(bookId)).isEmpty()
+    }
+
     // endregion
 
     // region 7. migrateTypeRecords 测试

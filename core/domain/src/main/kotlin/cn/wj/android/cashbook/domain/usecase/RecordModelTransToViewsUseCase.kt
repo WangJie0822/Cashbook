@@ -16,15 +16,14 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
-import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REFUND
-import cn.wj.android.cashbook.core.common.FIXED_TYPE_ID_REIMBURSE
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
 import cn.wj.android.cashbook.core.data.repository.TypeRepository
-import cn.wj.android.cashbook.core.model.enums.RecordRelatedNatureEnum
+import cn.wj.android.cashbook.core.data.repository.computeRelatedNature
+import cn.wj.android.cashbook.core.data.repository.sumRelatedAmount
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.AssetModel
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
@@ -32,7 +31,6 @@ import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
-import cn.wj.android.cashbook.core.model.model.recordAmount
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -182,47 +180,4 @@ class RecordModelTransToViewsUseCase @Inject constructor(
                 )
             }
         }
-
-    /**
-     * 计算关联金额，单条与批量共用同一口径，保证两者逐字段等价。
-     * 关联 category 由主 category 取反推断（零额外查询）：
-     * - 主支出：关联收入，recordAmount(INCOME)=amount−charges
-     * - 主收入：关联支出，recordAmount(EXPENDITURE)=amount+charges−concessions
-     * - 其它（TRANSFER 等）：不累加
-     */
-    private fun sumRelatedAmount(
-        typeCategory: RecordTypeCategoryEnum,
-        relatedRecord: List<RecordModel>,
-    ): Long {
-        val relatedCategory = when (typeCategory) {
-            RecordTypeCategoryEnum.EXPENDITURE -> RecordTypeCategoryEnum.INCOME
-            RecordTypeCategoryEnum.INCOME -> RecordTypeCategoryEnum.EXPENDITURE
-            else -> return 0L
-        }
-        return relatedRecord.sumOf { record ->
-            recordAmount(relatedCategory, record.amount, record.charges, record.concessions)
-        }
-    }
-
-    /**
-     * 计算被吸收支出的关联性质（在已物化 relatedRecord 上判定，零额外查询）。
-     * 仅 EXPENDITURE 主记录有性质；relatedRecord 为吸收它的收入（报销/退款款）。
-     * 标准链路下关联收入 typeId 经 migrateSpecialTypes 为固定负 ID（REIMBURSE/REFUND）；
-     * 若出现其它 typeId（未迁移/历史导入等），归 MIXED 兜底。
-     */
-    private fun computeRelatedNature(
-        typeCategory: RecordTypeCategoryEnum,
-        relatedRecord: List<RecordModel>,
-    ): RecordRelatedNatureEnum {
-        if (typeCategory != RecordTypeCategoryEnum.EXPENDITURE || relatedRecord.isEmpty()) {
-            return RecordRelatedNatureEnum.NONE
-        }
-        val allReimburse = relatedRecord.all { it.typeId == FIXED_TYPE_ID_REIMBURSE }
-        val allRefund = relatedRecord.all { it.typeId == FIXED_TYPE_ID_REFUND }
-        return when {
-            allReimburse -> RecordRelatedNatureEnum.REIMBURSED
-            allRefund -> RecordRelatedNatureEnum.REFUNDED
-            else -> RecordRelatedNatureEnum.MIXED
-        }
-    }
 }
