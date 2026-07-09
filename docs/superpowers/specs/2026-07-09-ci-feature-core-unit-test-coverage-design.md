@@ -120,6 +120,7 @@ Cashbook 只在 app 配 Product Flavor（Online/Offline/Canary/Dev），feature/
 4. **M2 独立 job**：截图 verify/record 拆到独立 job（与单测、APK 构建解耦），评估 60min timeout。
 5. **M3 独立录基线 PR**：先用独立「CI 录 Linux 基线」PR 一次性重录 676 张并单独评审合入，再翻开常态 verify，避免淹没功能 PR。
 6. **L1 收窄 pathspec**：`file_pattern` → `*/src/test/screenshots/*.png`。
+7. **L-E 破 UP-TO-DATE 缓存**（节点2 架构评审补）：截图 verify 若在后续 step 以 `-Proborazzi.test.verify=true` 再跑同一 `:feature:*:testDebugUnitTest`，Gradle 会因该 task 已在 `Run local tests`（`verify=false`）执行而判 UP-TO-DATE、**跳过 verify**（`Build.yaml:105` 现有注释「Run local tests after screenshot tests to avoid wrong UP-TO-DATE」正是此类坑）。故截图 verify 须 `--rerun-tasks` 或拆独立 job/checkout 破缓存，不可与本轮的 `verify=false` 单测跑同一 task 图。
 
 ## 验证（完整链路）
 
