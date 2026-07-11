@@ -74,7 +74,6 @@ import java.io.File
 import java.io.FileFilter
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.URL
@@ -231,16 +230,19 @@ class BackupRecoveryManagerImpl @Inject constructor(
         cacheDir.deleteAllFiles()
         cacheDir.mkdirs()
         val backupCacheFile = File(cacheDir, fileName)
+        // 与 stageInputStreamToCache（content:// 恢复分支）canonical 加固对称，防未来 fileName 源变更。
+        // 校验前移到 get 之前：万一 fileName 源改为可含分隔符（如 Content-Disposition），逃逸路径在
+        // 下载写盘前即被拒，不会先落至多 MAX_DOWNLOAD_BYTES 再抛（当前 url.split("/").last()
+        // + startsWith/endsWith 已挡 "../"，此处 defense-in-depth）。
+        require(isWithinDir(backupCacheFile, cacheDir)) { "web file escapes cache dir: $fileName" }
 
         withCredentials {
             // 流式下载消 response.body.bytes() 堆物化；失败契约：返 false ⇒ dest 无残留（handler 已清）
             // + 映射到 "" 哨兵（getWebFile 现约定："" = 下载失败/格式不符，路径 = 缓存中的完整备份）。
-            if (!get(url, backupCacheFile, MAX_RECOVERY_TOTAL_BYTES)) {
+            // 压缩包下载 cap 用 MAX_DOWNLOAD_BYTES（落盘压缩字节界），与 MAX_RECOVERY_TOTAL_BYTES（解压总量界）解耦。
+            if (!get(url, backupCacheFile, MAX_DOWNLOAD_BYTES)) {
                 return@withCredentials ""
             }
-            // 与 stageInputStreamToCache（content:// 恢复分支）canonical 加固对称，防未来 fileName 源变更
-            // （当前 url.split("/").last() + startsWith/endsWith 已挡 "../"，此处 defense-in-depth）。
-            require(isWithinDir(backupCacheFile, cacheDir)) { "web file escapes cache dir: $fileName" }
             backupCacheFile.path
         }
     }
@@ -491,10 +493,12 @@ class BackupRecoveryManagerImpl @Inject constructor(
                     // 流式 copy 消 readBytes() 堆物化（备份 zip 含图片可达数十 MB）；
                     // writeFileToStream 内嵌套双 use 保证 outputStream 关闭（SAF 常在 close 时才 finalize）。
                     writeFileToStream(zippedFile, outputStream)
-                } catch (e: IOException) {
-                    // 写入中途失败：删半截目标文件（与 openOutputStream==null 分支对称）
+                } catch (t: Throwable) {
+                    // 写入中途任何失败（IOException / SAF provider RuntimeException / OOM 等）都删半截目标文件，
+                    // 避免半截 zip 被 getLocalBackupList 列为恢复候选（与 openOutputStream==null 分支对称）。
+                    // 此处同步块、writeFileToStream 无 suspend 点，catch Throwable 不涉 CancellationException 顺序。
                     backupFile.delete()
-                    throw e
+                    throw t
                 }
                 // 写入成功后再删除旧备份
                 if (keepLatest) {
@@ -886,6 +890,13 @@ class BackupRecoveryManagerImpl @Inject constructor(
         private const val MAX_RECOVERY_ENTRIES = 50_000
         private const val MAX_RECOVERY_ENTRY_BYTES = 512L * 1024 * 1024
         private const val MAX_RECOVERY_TOTAL_BYTES = 4L * 1024 * 1024 * 1024
+
+        /**
+         * WebDAV 下载压缩备份包的落盘上限，界定 copyToCapped 写入缓存目录的**压缩字节数**，
+         * 与 MAX_RECOVERY_TOTAL_BYTES（**解压后总量**上限）语义解耦。合法备份 zip 远小于此；
+         * 恶意/异常服务器最坏撑至此值即 fail-fast，减小低端设备下载阶段的磁盘压力。
+         */
+        private const val MAX_DOWNLOAD_BYTES = 512L * 1024 * 1024
 
         /** 恢复前安全快照子目录名 */
         private const val PRE_RESTORE_DIR_NAME = "pre-restore"

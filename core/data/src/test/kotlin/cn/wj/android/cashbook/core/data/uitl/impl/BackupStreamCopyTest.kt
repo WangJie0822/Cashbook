@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package cn.wj.android.cashbook.core.data.uitl
+package cn.wj.android.cashbook.core.data.uitl.impl
 
-import cn.wj.android.cashbook.core.data.uitl.impl.writeFileToStream
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.io.ByteArrayOutputStream
@@ -28,6 +27,9 @@ import java.io.OutputStream
  * 导出侧流式 copy 单测，守护：
  * - 大文件流式 copy 内容一致（不整流物化）
  * - 输出流由 writeFileToStream 关闭（copyTo 不 flush/close 目标流，需嵌套双 use）
+ *
+ * 与被测 writeFileToStream（BackupRecoveryManagerImpl.kt 顶层 internal fun）同包，
+ * 与镜像测试 StageInputStreamToCacheTest / StageLocalBackupToCacheTest / StoredZipEntryTest 一致。
  */
 class BackupStreamCopyTest {
 

@@ -178,6 +178,28 @@ class OkHttpWebDAVHandlerTest {
         }
     }
 
+    @Test
+    fun copyToCapped_at_exact_cap_does_not_throw() {
+        // 恰好等于 cap 不抛：copyToCapped 用 total > maxBytes 判断（cap 含界）。
+        // 守护未来退化为 >= 会静默拒绝合法的 at-cap 下载。
+        val input = ByteArrayInputStream(ByteArray(500) { 1 })
+        val out = ByteArrayOutputStream()
+        val copied = input.copyToCapped(out, maxBytes = 500)
+        assertThat(copied).isEqualTo(500L)
+        assertThat(out.size()).isEqualTo(500)
+    }
+
+    @Test
+    fun copyToCapped_exceeds_cap_partial_output_within_cap() {
+        // 输入 > 8KB buffer 且 cap 落在块边界之间：超限时已落盘部分 <= cap（部分写契约，超限块不落盘）。
+        val input = ByteArrayInputStream(ByteArray(20_000))
+        val out = ByteArrayOutputStream()
+        assertThrows(IOException::class.java) {
+            input.copyToCapped(out, maxBytes = 10_000)
+        }
+        assertThat(out.size().toLong()).isAtMost(10_000L)
+    }
+
     // ---------------- get (GET) 流式下载到 dest ----------------
 
     @Test
