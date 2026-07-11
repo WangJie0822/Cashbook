@@ -51,6 +51,11 @@ interface WebDAVHandler {
         propsList: List<String> = emptyList(),
     ): List<BackupModel>
 
+    /**
+     * 流式下载 [url] 到 [dest] 文件；成功返回 true。
+     * 失败契约：非 2xx / 网络异常 / 累计写入超过 [maxBytes] 上限 → 返回 false 且 dest 无残留（实现负责清）。
+     * [maxBytes] 由调用方按语义传入（如 core:data 的 MAX_RECOVERY_TOTAL_BYTES），core:network 不定义业务上限。
+     */
     @WorkerThread
-    suspend fun get(url: String): ByteArray?
+    suspend fun get(url: String, dest: File, maxBytes: Long): Boolean
 }

@@ -23,10 +23,13 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 
 /**
  * OkHttpWebDAVHandler 单元测试
@@ -34,7 +37,7 @@ import java.io.File
  * 使用 MockWebServer 验证备份/恢复 WebDAV 网络底座：
  * - exists(HEAD) / put(PUT) 对 2xx/非 2xx/空 url 的布尔映射
  * - list(PROPFIND) 对 207 XML 的解析（剔目录与非 .zip，仅留 .zip 备份）
- * - get(GET) 对 200/404/空 url 的字节流映射
+ * - get(GET) 流式下载到 dest 文件 + 大小上限 + 失败清理
  */
 class OkHttpWebDAVHandlerTest {
 
@@ -155,27 +158,69 @@ class OkHttpWebDAVHandlerTest {
             )
     }
 
-    // ---------------- get (GET) ----------------
+    // ---------------- copyToCapped ----------------
 
     @Test
-    fun when_get_blank_url_then_null() = runTest {
-        assertThat(handler.get("")).isNull()
+    fun copyToCapped_within_cap_copies_all_bytes() {
+        val input = ByteArrayInputStream(ByteArray(500) { 1 })
+        val out = ByteArrayOutputStream()
+        val copied = input.copyToCapped(out, maxBytes = 1000)
+        assertThat(copied).isEqualTo(500L)
+        assertThat(out.size()).isEqualTo(500)
     }
 
     @Test
-    fun when_get_success_response_then_bytes() = runTest {
+    fun copyToCapped_exceeds_cap_throws() {
+        val input = ByteArrayInputStream(ByteArray(2000))
+        val out = ByteArrayOutputStream()
+        assertThrows(IOException::class.java) {
+            input.copyToCapped(out, maxBytes = 1000)
+        }
+    }
+
+    // ---------------- get (GET) 流式下载到 dest ----------------
+
+    @Test
+    fun when_get_blank_url_then_false_and_no_request() = runTest {
+        val dest = File.createTempFile("dltest", ".zip").also { it.delete() }
+        assertThat(handler.get("", dest, maxBytes = 1024)).isFalse()
+        assertThat(mockWebServer.requestCount).isEqualTo(0)
+        assertThat(dest.exists()).isFalse()
+    }
+
+    @Test
+    fun when_get_success_then_writes_dest_and_true() = runTest {
         val body = "backup-binary-content"
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(body))
+        val dest = File.createTempFile("dltest", ".zip")
 
-        val result = handler.get(url())
+        val ok = handler.get(url(), dest, maxBytes = 1_000_000)
 
-        assertThat(result).isNotNull()
-        assertThat(String(result!!)).isEqualTo(body)
+        assertThat(ok).isTrue()
+        assertThat(dest.readText()).isEqualTo(body)
+        dest.delete()
     }
 
     @Test
-    fun when_get_error_response_then_null() = runTest {
+    fun when_get_error_response_then_false_and_dest_deleted() = runTest {
         mockWebServer.enqueue(MockResponse().setResponseCode(404))
-        assertThat(handler.get(url())).isNull()
+        val dest = File.createTempFile("dltest", ".zip")
+
+        val ok = handler.get(url(), dest, maxBytes = 1_000_000)
+
+        assertThat(ok).isFalse()
+        assertThat(dest.exists()).isFalse()
+    }
+
+    @Test
+    fun when_get_exceeds_cap_then_false_and_dest_deleted() = runTest {
+        val body = "x".repeat(10_000)
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(body))
+        val dest = File.createTempFile("dltest", ".zip")
+
+        val ok = handler.get(url(), dest, maxBytes = 100)
+
+        assertThat(ok).isFalse()
+        assertThat(dest.exists()).isFalse()
     }
 }

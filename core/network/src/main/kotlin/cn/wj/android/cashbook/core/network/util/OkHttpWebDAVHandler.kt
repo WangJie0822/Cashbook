@@ -32,7 +32,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.intellij.lang.annotations.Language
 import org.jsoup.Jsoup
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -214,11 +216,11 @@ class OkHttpWebDAVHandler @Inject constructor(
     }
 
     @WorkerThread
-    override suspend fun get(url: String): ByteArray? = withContext(ioCoroutineContext) {
+    override suspend fun get(url: String, dest: File, maxBytes: Long): Boolean = withContext(ioCoroutineContext) {
         if (url.isBlank()) {
-            return@withContext null
+            return@withContext false
         }
-        runCatching {
+        val ok = runCatching {
             callFactory.newCall(
                 Request.Builder()
                     .url(url)
@@ -226,13 +228,21 @@ class OkHttpWebDAVHandler @Inject constructor(
                     .build(),
             ).execute().use { response ->
                 logger().i("get(url = <$url>), response = <${response.code}>")
-                if (!response.isSuccessful) return@withContext null
-                response.body?.bytes()
+                if (!response.isSuccessful) return@use false // 非 2xx 不写 dest
+                val body = response.body ?: return@use false
+                body.byteStream().use { input -> // 嵌套双 use：input+output 都关闭
+                    dest.outputStream().use { output ->
+                        input.copyToCapped(output, maxBytes) // 流式 + 大小上限
+                    }
+                }
+                true
             }
         }.getOrElse { throwable ->
             logger().e(throwable, "get(url = <$url>)")
-            null
+            false
         }
+        if (!ok) dest.delete() // 失败清半截 dest（含空 url 早退）
+        ok
     }
 
     companion object {
@@ -251,4 +261,23 @@ class OkHttpWebDAVHandler @Inject constructor(
                 </a:prop>
             </a:propfind>"""
     }
+}
+
+/**
+ * 流式把 receiver 输入流内容写入 [out]，8KB 缓冲、O(1) 堆内存；
+ * 累计写入超过 [maxBytes] 立即抛 IOException（防不可信来源的磁盘耗尽 DoS）。返回已 copy 字节数。
+ *
+ * 抽为顶层 internal fun 便于单测。调用方负责各自 use 输入/输出流。
+ */
+internal fun InputStream.copyToCapped(out: OutputStream, maxBytes: Long): Long {
+    val buffer = ByteArray(8 * 1024)
+    var total = 0L
+    while (true) {
+        val read = read(buffer)
+        if (read < 0) break
+        total += read
+        if (total > maxBytes) throw IOException("download exceeds cap: $maxBytes bytes")
+        out.write(buffer, 0, read)
+    }
+    return total
 }

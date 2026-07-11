@@ -226,16 +226,21 @@ class BackupRecoveryManagerImpl @Inject constructor(
             // 不满足格式
             return@withContext ""
         }
-        // 创建本地缓存文件
+        // 准备本地缓存目录（实际文件由 WebDAVHandler.get 流式写入，不再 createNewFile 预建 + writeBytes 全量物化）
         val cacheDir = File(context.cacheDir, BACKUP_CACHE_FILE_NAME)
         cacheDir.deleteAllFiles()
         cacheDir.mkdirs()
         val backupCacheFile = File(cacheDir, fileName)
-        backupCacheFile.createNewFile()
 
         withCredentials {
-            val bytes = get(url) ?: return@withCredentials ""
-            backupCacheFile.writeBytes(bytes)
+            // 流式下载消 response.body.bytes() 堆物化；失败契约：返 false ⇒ dest 无残留（handler 已清）
+            // + 映射到 "" 哨兵（getWebFile 现约定："" = 下载失败/格式不符，路径 = 缓存中的完整备份）。
+            if (!get(url, backupCacheFile, MAX_RECOVERY_TOTAL_BYTES)) {
+                return@withCredentials ""
+            }
+            // 与 stageInputStreamToCache（content:// 恢复分支）canonical 加固对称，防未来 fileName 源变更
+            // （当前 url.split("/").last() + startsWith/endsWith 已挡 "../"，此处 defense-in-depth）。
+            require(isWithinDir(backupCacheFile, cacheDir)) { "web file escapes cache dir: $fileName" }
             backupCacheFile.path
         }
     }
