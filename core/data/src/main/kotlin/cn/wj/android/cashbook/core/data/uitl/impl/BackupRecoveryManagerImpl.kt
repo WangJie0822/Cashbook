@@ -76,7 +76,9 @@ import java.io.File
 import java.io.FileFilter
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import java.net.URL
 import java.net.URLEncoder
 import java.util.zip.CRC32
@@ -481,8 +483,14 @@ class BackupRecoveryManagerImpl @Inject constructor(
                     backupFile.delete()
                     return@runCatching BackupRecoveryState.FAILED_BACKUP_PATH_UNAUTHORIZED
                 }
-                outputStream.use {
-                    it.write(zippedFile.readBytes())
+                try {
+                    // 流式 copy 消 readBytes() 堆物化（备份 zip 含图片可达数十 MB）；
+                    // writeFileToStream 内嵌套双 use 保证 outputStream 关闭（SAF 常在 close 时才 finalize）。
+                    writeFileToStream(zippedFile, outputStream)
+                } catch (e: IOException) {
+                    // 写入中途失败：删半截目标文件（与 openOutputStream==null 分支对称）
+                    backupFile.delete()
+                    throw e
                 }
                 // 写入成功后再删除旧备份
                 if (keepLatest) {
@@ -1004,3 +1012,20 @@ internal fun stageInputStreamToCache(input: InputStream, cacheDir: File, name: S
         FileOutputStream(dest).use { inS.copyTo(it) }
         dest
     }
+
+/**
+ * 流式把 [src] 文件内容写入 [out]，8KB 缓冲、O(1) 堆内存。
+ *
+ * 负责关闭 [out] 与内部 input 流——嵌套双 use：
+ * - `kotlin.io.copyTo` 不 flush/close 目标流（stdlib 契约）；SAF `openOutputStream` 常在 close 时才 finalize
+ *   content-provider 端字节，漏关会致目标文件末段丢失/截断。
+ * - 与 [stageInputStreamToCache] 对称——同为「消 readBytes() 堆物化」的流式落盘范式，方向相反
+ *   （前者读 InputStream 写文件，本 fun 读文件写 OutputStream）。
+ *
+ * 抽为顶层 internal fun 便于单测（无需构造整个 Manager / Android Context）。
+ */
+internal fun writeFileToStream(src: File, out: OutputStream) {
+    out.use { output ->
+        src.inputStream().buffered().use { it.copyTo(output) }
+    }
+}
