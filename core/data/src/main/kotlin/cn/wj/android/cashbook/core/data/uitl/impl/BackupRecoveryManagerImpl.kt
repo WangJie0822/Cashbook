@@ -19,9 +19,7 @@ package cn.wj.android.cashbook.core.data.uitl.impl
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.core.content.ContextCompat
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import cn.wj.android.cashbook.core.common.ApplicationInfo
@@ -142,20 +140,21 @@ class BackupRecoveryManagerImpl @Inject constructor(
         connectedDataVersion.updateVersion()
     }
 
-    private suspend fun upload(backupFileUri: Uri): Boolean = withContext(ioCoroutineContext) {
+    /**
+     * 上传本地备份 zip 到 WebDAV。改走 [put] 的 File 重载消 [put] InputStream 重载内的
+     * readBytes() 堆物化（备份含图片可达数十 MB）；file.asRequestBody() 天然：
+     * - 流式（okio 从文件流读，O(1) 堆）
+     * - repeatable（OkHttp retry/redirect 重发 body 时重开文件，非耗尽的一次性流）
+     * - 有 Content-Length（避 chunked，坚果云等 WebDAV 服务端对 chunked PUT 兼容不一）
+     *
+     * [localZip] 由 [startBackup] 传入的本地缓存文件，其内容与 SAF 目标一致（SAF 目标本就是 zippedFile 写出）；
+     * upload 时 backupCacheDir.deleteAllFiles() 尚未执行（存活至 startBackup 末尾），可安全复用。
+     */
+    private suspend fun upload(localZip: File): Boolean = withContext(ioCoroutineContext) {
         this@BackupRecoveryManagerImpl.logger()
-            .i("upload(backupFileUri = <$backupFileUri>)")
+            .i("upload(localZip = <${localZip.name}>)")
         withCredentials { root ->
-            if (backupFileUri.scheme == "content") {
-                val backupFileName = DocumentFile.fromSingleUri(context, backupFileUri)?.name
-                    ?: throw RuntimeException("get file name failed")
-                context.contentResolver.openInputStream(backupFileUri)!!.use { bis ->
-                    put(root + backupFileName, bis, "application/octet-stream")
-                }
-            } else {
-                val backupFile = backupFileUri.toFile()
-                put(root + backupFile.name, backupFile, "application/octet-stream")
-            }
+            put(root + localZip.name, localZip, "application/octet-stream")
         }
     }
 
@@ -532,7 +531,9 @@ class BackupRecoveryManagerImpl @Inject constructor(
                 runCatching {
                     this@BackupRecoveryManagerImpl.logger()
                         .i("startBackup(), upload to WebDAV")
-                    if (upload(backupFileUri)) {
+                    // 传本地缓存 zip 走 put(file)——避免从 SAF openInputStream 读回同一份内容再整流物化；
+                    // zippedFile 与 backupFileUri 目标内容一致（SAF 目标本就是 zippedFile 由 writeFileToStream 写出）。
+                    if (upload(zippedFile)) {
                         BackupRecoveryState.SUCCESS_BACKUP
                     } else {
                         BackupRecoveryState.FAILED_BACKUP_WEBDAV

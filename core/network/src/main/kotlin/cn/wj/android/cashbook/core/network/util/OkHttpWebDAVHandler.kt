@@ -101,6 +101,15 @@ class OkHttpWebDAVHandler @Inject constructor(
         }
     }
 
+    /**
+     * InputStream 上传保留：当前无生产调用方（备份上传已改走 [put] 的 File 重载，asRequestBody 天然
+     * 流式 + repeatable + 有 Content-Length）。若未来重新启用 InputStream 上传，须先解决：
+     * - LoggerInterceptor（network interceptor + debug LEVEL_BODY）无 isOneShot 守卫，会消耗流；
+     * - 当前实现 dataStream.readBytes() 全量入堆——若改流式包 InputStream 需自定义 RequestBody
+     *   并显式 override contentLength()（否则退化 chunked，坚果云等 WebDAV 服务端可能拒 411/400）
+     *   与 isOneShot() = true（防 OkHttp retry/redirect 重发耗尽流）。
+     * 详见 docs/superpowers/specs/2026-07-10-backup-streaming-design.md 节点1四维评审。
+     */
     @WorkerThread
     override fun put(url: String, dataStream: InputStream, contentType: String): Boolean {
         if (url.isBlank()) {

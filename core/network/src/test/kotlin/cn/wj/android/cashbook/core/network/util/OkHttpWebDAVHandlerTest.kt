@@ -26,6 +26,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayInputStream
+import java.io.File
 
 /**
  * OkHttpWebDAVHandler 单元测试
@@ -99,6 +100,27 @@ class OkHttpWebDAVHandlerTest {
         assertThat(
             handler.put(url(), ByteArrayInputStream("data".toByteArray()), "application/zip"),
         ).isFalse()
+    }
+
+    /**
+     * 回归护栏：备份上传由 upload 走 [put] 的 File 重载（asRequestBody 天然流式 + repeatable +
+     * 带 Content-Length），非 chunked。守护 Task 2 上传流式化的前提；若哪天 File 重载被误改为流式包 InputStream
+     * 致 Content-Length 消失、退化 chunked，此测试立刻红。
+     */
+    @Test
+    fun when_put_file_then_request_has_content_length_not_chunked() = runTest {
+        val file = File.createTempFile("backup", ".zip")
+        file.writeBytes("zip-binary-body".toByteArray())
+        mockWebServer.enqueue(MockResponse().setResponseCode(201))
+
+        val ok = handler.put(url(), file, "application/octet-stream")
+
+        assertThat(ok).isTrue()
+        val recorded = mockWebServer.takeRequest()
+        assertThat(recorded.getHeader("Content-Length")).isNotNull()
+        assertThat(recorded.getHeader("Transfer-Encoding")).isNull()
+        assertThat(recorded.body.readUtf8()).isEqualTo("zip-binary-body")
+        file.delete()
     }
 
     // ---------------- list (PROPFIND) ----------------
