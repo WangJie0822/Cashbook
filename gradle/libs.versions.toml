@@ -61,7 +61,7 @@ android-desugarJdkLibs = "2.1.5"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
 android-gradle-plugin = "9.2.1"
-android-tools = "32.2.1"
+android-tools = "32.3.0"
 # baselineprofile/benchmark：稳定版 1.4.1 不兼容 AGP9（"Module :app is not a supported android module"），
 # AGP9 兼容仅 1.5.0-alphaXX；构建期 dev 工具非运行时代码，pin alpha（待 1.5.0 稳定回退，技术债）
 androidx-baselineprofile = "1.5.0-alpha06"
