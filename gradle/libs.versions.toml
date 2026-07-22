@@ -64,7 +64,7 @@ android-gradle-plugin = "9.3.0"
 android-tools = "32.3.0"
 # baselineprofile/benchmark：稳定版 1.4.1 不兼容 AGP9（"Module :app is not a supported android module"），
 # AGP9 兼容仅 1.5.0-alphaXX；构建期 dev 工具非运行时代码，pin alpha（待 1.5.0 稳定回退，技术债）
-androidx-baselineprofile = "1.5.0-alpha06"
+androidx-baselineprofile = "1.5.0-alpha07"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
 android-lint = "32.3.0"
