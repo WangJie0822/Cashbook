@@ -171,6 +171,8 @@ app → feature/* → core/*
 
 ## 规范（强制）
 - 所有修改新增功能必须确认是否新增对应测试，功能开发必须在测试通过才算完成
+- **本地跑任何单测需本机可探测 JDK 21**：convention 插件为全部 Test 任务显式 `javaLauncher`=Java 21 toolchain（`ProjectSetting.Config.TEST_JVM_VERSION`，Robolectric 模拟 SDK 36 要求 Java 21 运行时；不显式声明时 CI 上 fork JVM 曾漂移到 17 致 25 个截图测试类沙箱崩溃）。项目未配 foojay resolver 不会自动下载 JDK——本机 JAVA_HOME=21 或标准路径装有 JDK 21 即可；只装 JDK 17 的环境跑测试会报 `Cannot find a Java installation ... languageVersion=21`。未来升 `javaVersion` 时须核对 `TEST_JVM_VERSION` ≥ 编译版本
+- **依赖仓库 CI/本地二元化**：`settings.gradle.kts` 按 `CI` 环境变量切换 repo 顺序——CI（海外 runner）官方源优先、aliyun 殿后兜底（aliyun 海外访问间歇 502/404，且部分同步镜像有 pom 缺 jar 时 Gradle 锁定不回落官方源，曾致 main 红与多 dependabot PR 假失败）；本地 aliyun 优先加速。**aliyun 不可移除**：jcenter 遗产构件（如 dokitx 传递依赖 `com.android.volley:volley:1.1.1`）仅 aliyun 有、官方源 404（实测）。本地撞 aliyun 缺构件时可临时 `CI=true ./gradlew <task>` 切官方源优先自证是否镜像问题
 - 修改 Composable 或 ViewModel 的签名（参数增删）时，必须同步更新该模块 `src/test` 下对应的截图测试（`*ScreenshotTests`）与 `*ViewModelTest` 的构造/调用——模块测试源集整体编译，任一测试文件签名不匹配会导致整个模块 `testDebugUnitTest` 编译失败（既往多次踩坑：feature:settings 的 BackupAndRecoveryScreen/ViewModel 签名漂移、feature:records/assets 截图测试）
 - 测试替身（`core/testing` 的 `FakeXxxRepository` / `core/data` test 的 `FakeXxxDao`）的方法必须**忠实复刻真实 DAO/SQL 的匹配语义**，禁止用 `emptyList()` 桩或宽松 `contains` 替代真实条件——否则该路径成"假阳性覆盖"（测试绿但真实代码不这样执行，回归抓不到）。既往踩坑：`queryByTimeAndAmount`（元/分单位错配桩使去重永不命中）、`queryByWechatTransactionId`（`emptyList` 桩使 EXACT 路径从未覆盖 + 裸 `contains` 偏离真实 `remark LIKE '%[微信单号:<id>]%'` 方括号定界），均在评审时才暴露
 - 注：`core/data` 的 test 源集**不依赖 `core:testing`**（仅 junit+truth），各测试文件自带 `private fun createXxx` 构造数据；`core/domain`/`feature` 的 test 才用 `core:testing` 的 `FakeXxxRepository`/`createXxxModel`

@@ -71,6 +71,15 @@ object ProjectSetting {
         /** 源码 jdk 版本 */
         val javaVersion = JavaVersion.VERSION_17
 
+        /**
+         * Test 任务 fork JVM 版本
+         *
+         * Robolectric 模拟 Android SDK 36 要求 Java 21 运行时；不显式声明时 fork JVM 跟随环境
+         * 隐式选择（CI 上曾被解析为 Java 17 致沙箱创建失败 `Android SDK 36 requires Java 21`），
+         * 故统一显式固定为 21（编译产物仍为 [javaVersion] 目标，两者不冲突）
+         */
+        const val TEST_JVM_VERSION = 21
+
         /** 从环境变量中获取版本名，若没有则根据当前时间生成 */
         private fun generateVersionName(): String {
             val buildTagName = System.getenv("BUILD_TAG_NAME") ?: ""
