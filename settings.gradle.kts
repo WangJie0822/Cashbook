@@ -3,11 +3,17 @@
 pluginManagement {
     includeBuild("build-logic")
     // 配置插件仓库
+    // CI（GitHub Actions 海外 runner）访问 aliyun 镜像不稳定（间歇 502/404，且镜像部分同步时
+    // Gradle 会锁定在缺 jar 的镜像上不回落官方源），故 CI 环境跳过 aliyun 直连官方源；
+    // 本地开发保持 aliyun 优先加速
+    val isCi = System.getenv("CI").toBoolean()
     repositories {
         maven { setUrl("https://repo1.maven.org/maven2") }
-        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }
-        maven { setUrl("https://maven.aliyun.com/repository/public") }
-        maven { setUrl("https://maven.aliyun.com/repository/google") }
+        if (!isCi) {
+            maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }
+            maven { setUrl("https://maven.aliyun.com/repository/public") }
+            maven { setUrl("https://maven.aliyun.com/repository/google") }
+        }
         gradlePluginPortal()
         google()
         mavenCentral()
@@ -18,10 +24,14 @@ dependencyResolutionManagement {
     // 配置只能在当前文件配置三方依赖仓库，否则编译异常退出
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     // 配置三方依赖仓库
+    // CI 环境跳过 aliyun 直连官方源，理由同 pluginManagement
+    val isCi = System.getenv("CI").toBoolean()
     repositories {
         maven { setUrl("https://repo1.maven.org/maven2") }
-        maven { setUrl("https://maven.aliyun.com/repository/public") }
-        maven { setUrl("https://maven.aliyun.com/repository/google") }
+        if (!isCi) {
+            maven { setUrl("https://maven.aliyun.com/repository/public") }
+            maven { setUrl("https://maven.aliyun.com/repository/google") }
+        }
         maven { setUrl("https://jitpack.io") }
         google()
         mavenCentral()
