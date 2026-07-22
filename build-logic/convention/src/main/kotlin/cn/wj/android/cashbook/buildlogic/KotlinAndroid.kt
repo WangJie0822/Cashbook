@@ -19,9 +19,14 @@ package cn.wj.android.cashbook.buildlogic
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -55,6 +60,8 @@ internal fun Project.configureKotlinAndroid(
             add("coreLibraryDesugaring", libs.findLibrary("android-desugarJdkLibs").get())
         }
     }
+
+    configureTestJavaLauncher()
 }
 
 /**
@@ -69,6 +76,27 @@ fun Project.configureKotlinJvm() {
     }
 
     configureKotlin<KotlinJvmProjectExtension>()
+
+    configureTestJavaLauncher()
+}
+
+/**
+ * 为 Test 任务显式指定 fork JVM 版本为 [ProjectSetting.Config.TEST_JVM_VERSION]
+ *
+ * 不显式声明时 Test fork JVM 跟随环境隐式选择，CI 上曾被解析为 Java 17，触发 Robolectric
+ * `Android SDK 36 requires Java 21 (have Java 17)` 沙箱创建失败；显式固定后不再受环境影响
+ */
+internal fun Project.configureTestJavaLauncher() {
+    val javaToolchains = extensions.getByType<JavaToolchainService>()
+    tasks.withType<Test>().configureEach {
+        javaLauncher.set(
+            javaToolchains.launcherFor {
+                languageVersion.set(
+                    JavaLanguageVersion.of(ProjectSetting.Config.TEST_JVM_VERSION),
+                )
+            },
+        )
+    }
 }
 
 /**
