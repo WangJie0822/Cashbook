@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **执行勘误（2026-07-23，随 spec 修订 R1）**：Task 1 实测发现 `--rerun-tasks` 不带 `--continue` 时 FAIL 集是截断值（feature/types 未调度），固化命令补 `--continue`；Task 2（L1）因当前态无 IDENTICAL-yet-FAIL 标本而关闭；Task 3 归因产出「机制 D 漂移 + 机制 P 跨类渲染历史依赖」（qualifier 假设被零 DIMENSION_DIFF 证伪）；Task 5 修复候选 A-D 均未启用（roundtrip 闭环绿证明无须改代码）；Task 6 dynamic 定性并入全量漂移报告一体拍板；终态处置 = 全量重录 531 张基线（用户批准，`51e76163`）。完整证据链见 `docs/testing/reports/2026-07-23-screenshot-suite-pollution-investigation.md`。
+
 **Goal:** 修复本机全量 `verifyRoborazziDebug` 的套件级污染（golden 加载失败型 + 渲染型假 FAIL），并定性 `_dynamic` 噪声，使全量 verify 恢复「FAIL 即真回归」的可信语义。
 
 **Architecture:** 调查驱动（spec 方案 A′）：Phase 0 同源命令固化 FAIL 清单（前置门）→ Phase 1 两线机制归因（L1 golden 加载失败型 / L2 渲染型）→ Phase 2 按证据就地定向修复 → Phase 3 `_dynamic` 定性后用户拍板 → Phase 4 验收（基线零改动 + 连续 2 次全量绿）与文档同步。修复候选代码在本 plan 内给全，但**每个候选都有启用条件（Phase 1 证据）**，无证据不得应用。

@@ -113,6 +113,8 @@ Cashbook 只在 app 配 Product Flavor（Online/Offline/Canary/Dev），feature/
 
 ## 截图 verify 独立 spec 前置条件（供后续参考，本轮不实现）
 
+> **状态回填（2026-07-23）**：本机全量 verify 已可信绿——「套件污染」经归因实为依赖漂移+跨类渲染历史效应，531/676 张基线已重录（`51e76163`），见 `docs/testing/reports/2026-07-23-screenshot-suite-pollution-investigation.md` 与 `2026-07-23-screenshot-suite-pollution-fix-design.md` 修订 R1。**对本节的新增约束**：基线绑定「完整模块套件轨迹」（同 JVM 前序渲染内容影响后续渲染），故 CI verify 必须整套件跑、基线须由同轨迹 record 产出，H1 容差与 M3 独立录基线 PR 的设计须计入跨机渲染差异与轨迹绑定双重因素。下列 H1/H2/M1/M2/M3/L1/L-E 仍待 CI spec 处理。
+
 后续若要让 CI verify feature/core 截图，必须先解决：
 1. **H1 像素容差**：`ScreenshotHelper.kt:47 changeThreshold` 从 0f 提到小容差（如 0.01），吸收跨渲染 antialiasing；或截图校验降级为周期性重录。
 2. **H2 push-to-main 无自愈**：verify/record/auto-commit 全套限定 `event==pull_request`，push-to-main 跳过截图校验或 `-Proborazzi.test.verify=false`。
