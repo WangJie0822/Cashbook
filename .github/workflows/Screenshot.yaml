@@ -35,10 +35,13 @@ jobs:
 
   screenshot_diff:
     name: "Screenshot visual diff (informational, never blocks)"
+    # label 打/摘只影响 freshness 的豁免判定，无谓重跑 12min 双 record
+    if: ${{ github.event.action != 'labeled' && github.event.action != 'unlabeled' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
     # Phase 0 实测（PR #513 run 30073389140）：单次全量 record ≈6min（含编译），双 record 约 12min
+    # 「never blocks」指比对结果永不 fail；record/编译失败仍会红（基础设施错误应可见）
     timeout-minutes: 30
     steps:
       - name: Checkout

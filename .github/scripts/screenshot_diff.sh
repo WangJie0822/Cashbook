@@ -5,14 +5,18 @@
 # changed 帧新旧对拷贝到 out_dir（__base.png/__head.png 后缀）。恒 exit 0（C' 永不 fail）。
 # 用法: screenshot_diff.sh <base_dir> <head_dir> <out_dir>
 set -euo pipefail
+# 统一 find/sort/comm/cmp 的 locale 语义（GNU comm --check-order 对排序 locale 敏感，
+# 勿依赖 runner 环境 LANG 恰为 C.UTF-8 的巧合）
+export LC_ALL=C
 
 BASE_DIR="$1"
 HEAD_DIR="$2"
 OUT_DIR="$3"
 mkdir -p "$OUT_DIR"
 WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
 
-list_shots() { (cd "$1" && find . -path '*/src/test/screenshots/*' -name '*.png' | LC_ALL=C sort); }
+list_shots() { (cd "$1" && find . -path '*/src/test/screenshots/*' -name '*.png' | sort); }
 
 list_shots "$BASE_DIR" > "$WORK/base.list"
 list_shots "$HEAD_DIR" > "$WORK/head.list"
@@ -48,7 +52,8 @@ SUMMARY="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
       echo ""
       echo "<details><summary>$kind ($n)</summary>"
       echo ""
-      sed 's/^\.\///; s/^/- /' "$WORK/$kind.list" | head -300
+      # head 在前作生产端（sed|head 在 set -o pipefail 下清单超管道缓冲时 SIGPIPE 击穿恒 exit 0）
+      head -300 "$WORK/$kind.list" | sed 's/^\.\///; s/^/- /'
       if [ "$n" -gt 300 ]; then echo "- ...(truncated, $n total)"; fi
       echo ""
       echo "</details>"
