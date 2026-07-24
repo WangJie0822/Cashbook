@@ -133,7 +133,7 @@ internal fun MyTagsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(top = 9.dp, start = 16.dp, end = 16.dp),
+                .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         ) {
             // 编辑标签弹窗
             if (dialogState is DialogState.Shown<*>) {
