@@ -75,34 +75,9 @@ jobs:
           disable_globbing: true
           commit_message: "🤖 Updates baselines for Dependency Guard"
 
-      - name: Run all local screenshot tests (Roborazzi)
-        id: screenshotsverify
-        continue-on-error: true
-        run: ./gradlew verifyRoborazziDevDebug
-
-      - name: Prevent pushing new screenshots if this is a fork
-        id: checkfork
-        continue-on-error: false
-        if: steps.screenshotsverify.outcome == 'failure' && github.event.pull_request.head.repo.full_name != github.repository
-        run: |
-          echo "::error::Screenshot tests failed, please create a PR in your fork first." && exit 1
-
-      # Runs if previous job failed
-      - name: Generate new screenshots if verification failed and it's a PR
-        id: screenshotsrecord
-        if: steps.screenshotsverify.outcome == 'failure' && github.event_name == 'pull_request'
-        run: |
-          ./gradlew recordRoborazziDevDebug
-
-      - name: Push new screenshots if available
-        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
-        if: steps.screenshotsrecord.outcome == 'success'
-        with:
-          file_pattern: '*/*.png'
-          disable_globbing: true
-          commit_message: "🤖 Updates screenshots"
-
-      # Run local tests after screenshot tests to avoid wrong UP-TO-DATE. TODO: Ignore screenshots.
+      # Screenshot guardrails live in Screenshot.yaml (freshness lint + visual diff report).
+      # The former app-flavor verify/record/auto-commit chain was a no-op for library modules and was removed
+      # (spec: docs/superpowers/specs/2026-07-24-ci-screenshot-visual-diff-design.md).
       - name: Run local tests
         if: always()
         run: ./gradlew testOnlineDebug testOfflineDebug testDebugUnitTest :core:model:test :lint:test -Proborazzi.test.verify=false

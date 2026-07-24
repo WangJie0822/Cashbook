@@ -1,0 +1,98 @@
+name: Screenshot
+
+on:
+  pull_request:
+    # labeled/unlabeled：打/摘 screenshot-freshness-skip 后无需空 push 即可重判
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: screenshot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshot_freshness:
+    name: "Screenshot baseline freshness (blocking, label-skippable)"
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'screenshot-freshness-skip') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check screenshot baseline freshness
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          MB="$(git merge-base "$BASE_SHA" "$HEAD_SHA")"
+          echo "merge-base: $MB"
+          set -o pipefail
+          bash .github/scripts/screenshot_freshness.sh "$MB" "$HEAD_SHA" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  screenshot_diff:
+    name: "Screenshot visual diff (informational, never blocks)"
+    # label 打/摘只影响 freshness 的豁免判定，无谓重跑 12min 双 record
+    if: ${{ github.event.action != 'labeled' && github.event.action != 'unlabeled' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Phase 0 实测（PR #513 run 30073389140）：单次全量 record ≈6min（含编译），双 record 约 12min
+    # 「never blocks」指比对结果永不 fail；record/编译失败仍会红（基础设施错误应可见）
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          validate-wrappers: true
+          gradle-home-cache-cleanup: true
+
+      - name: Record at merge-base
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          MB="$(git merge-base "$BASE_SHA" "$HEAD_SHA")"
+          echo "merge-base: $MB"
+          git checkout --detach "$MB"
+          ./gradlew recordRoborazziDebug --rerun-tasks
+          mkdir -p "$RUNNER_TEMP/base-shots"
+          tar cf - $(git ls-files '*/src/test/screenshots/*.png' | sed 's|/src/test/screenshots/.*||' | sort -u | sed 's|$|/src/test/screenshots|') | (cd "$RUNNER_TEMP/base-shots" && tar xf -)
+          git checkout -- .
+          git clean -fd -- '*/src/test/screenshots/'
+
+      - name: Record at PR HEAD
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git checkout --detach "$HEAD_SHA"
+          ./gradlew recordRoborazziDebug --rerun-tasks
+
+      - name: Compare and summarize
+        id: diff
+        run: bash .github/scripts/screenshot_diff.sh "$RUNNER_TEMP/base-shots" . "$RUNNER_TEMP/diff-out"
+
+      - name: Upload changed pairs
+        if: steps.diff.outputs.changed_count != '0'
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshot-diff
+          path: ${{ runner.temp }}/diff-out
+          retention-days: 14
