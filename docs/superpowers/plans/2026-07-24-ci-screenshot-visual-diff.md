@@ -539,6 +539,8 @@ git rm .github/workflows/Phase0ScreenshotDeterminism.yaml
 git commit -m "[ci|截图verify][公共]删Phase0临时gating workflow(判读已回填spec)"
 ```
 
+> **执行勘误（2026-07-24）**：① Step 2 CLAUDE.md 同步**改在本地 main 执行**（不进 PR）——目标条款是超长单行，本地 main 未推送 docs commit（`73c2e4ca` 等）已改过同一行的 dynamic 噪声部分，PR 侧再改同一行必然在后续 rebase 时冲突；移到本地 main 改则零冲突。② Task 4/5 合并执行：C' job 上线 commit 与 TEMP 变异 commit 同轮推送（一轮 CI 同时实测 freshness 红 + C' changed 报告），revert 轮同时实测 freshness 绿 + C' 全零——比 plan 原序省 2 轮 CI。③ Phase0 的 `on.pull_request.paths` 过滤是 PR 级（非单次 push 增量），后续每次 push 都会重触发 Phase0 重跑，均已手动 `gh run cancel`（首轮结果已抄录，重跑无价值）。
+
 - [ ] **Step 2: CLAUDE.md 条款同步**
 
 在「Roborazzi 截图基线由本地 record 维护，CI 当前不 verify/不 record feature/core 截图」条款中，将「**但截图 verify 仍未上 CI**，待独立 spec 加固后引入」段更新为实际落地态（按 Phase 0 结果二选一，保持一行内）：
