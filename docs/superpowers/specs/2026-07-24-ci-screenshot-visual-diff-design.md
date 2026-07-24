@@ -105,6 +105,10 @@ PR diff 触碰 <module>/src/main/**（*.kt / res/**）
 - **gating 通过**：ubuntu 同 runner `recordRoborazziDebug --rerun-tasks` ×2，`changed_pairs=0`（Compare step success、failure-evidence 上传 step skipped）——ubuntu 渲染确定性成立，C' 上线。
 - 时长实测：Record round 1 = **6m00s**（含全量编译）、round 2 = **5m28s**（增量），整 job 12m01s（2-core ubuntu-latest）——C' 双 record job `timeout-minutes: 30` 充足（原 90 保守值下调）。
 
+## 8.2 实施后 backlog（节点 2 architect F6，2026-07-24）
+
+- 日后若将 `screenshot_freshness` 配为分支保护 required check：label 豁免走的是 **job 级 `if`**，命中时 job 呈 `skipped`——部分 required-check 配置把 skipped 当「未通过」反向阻塞。届时须改为 job 内 early-success step（检测 label 后 `exit 0`）而非 job 级 `if` 跳过。当前 `required_status_checks=null` 不受影响。
+
 ## 9. 开放决策点（writing-plans 前需确认）
 
 - L 的 `src/main/**` 触发面是否排除 `res/values/**`（纯字符串/尺寸资源改动通常影响渲染，倾向**不排除**——字符串变更本就该重录）；
