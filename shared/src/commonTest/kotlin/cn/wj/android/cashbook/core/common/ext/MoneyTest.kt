@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.core.common.ext
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -195,6 +196,121 @@ class MoneyTest {
     @Test
     fun when_small_decimal_string_toAmountCent_then_returns_correct_cents() {
         assertEquals(1L, "0.01".toAmountCent())
+    }
+
+    // ---- 重写契约用例（纯 Long 状态机相对旧 BigDecimal 实现的行为约定，逐条固化防回退）----
+
+    @Test
+    fun when_plus_prefixed_string_toAmountCent_then_returns_cents() {
+        assertEquals(1999L, "+19.99".toAmountCent())
+    }
+
+    @Test
+    fun when_sign_only_string_toAmountCent_then_returns_0() {
+        assertEquals(0L, "-".toAmountCent())
+        assertEquals(0L, "+".toAmountCent())
+    }
+
+    @Test
+    fun when_multiple_dots_string_toAmountCent_then_returns_0() {
+        assertEquals(0L, "1.2.3".toAmountCent())
+    }
+
+    @Test
+    fun when_dot_only_string_toAmountCent_then_returns_0() {
+        assertEquals(0L, ".".toAmountCent())
+    }
+
+    @Test
+    fun when_non_numeric_fraction_toAmountCent_then_returns_0() {
+        assertEquals(0L, "1.a".toAmountCent())
+    }
+
+    @Test
+    fun when_leading_dot_string_toAmountCent_then_returns_cents() {
+        assertEquals(50L, ".5".toAmountCent())
+    }
+
+    @Test
+    fun when_surrounding_whitespace_toAmountCent_then_trimmed_and_parsed() {
+        // 契约：首尾空白 trim 后接受（旧 BigDecimal 实现拒绝，此为有意放宽）
+        assertEquals(1999L, " 19.99 ".toAmountCent())
+    }
+
+    @Test
+    fun when_negative_half_up_toAmountCent_then_rounds_away_from_zero() {
+        // 负数 HALF_UP 远离零：-19.995 -> -2000（与 BigDecimal HALF_UP 方向一致）
+        assertEquals(-2000L, "-19.995".toAmountCent())
+    }
+
+    @Test
+    fun when_scientific_notation_toAmountCent_then_returns_0() {
+        // 契约：拒绝科学计数法（旧 BigDecimal 实现接受 "1e3"=1000 元，此为有意收紧）
+        assertEquals(0L, "1e3".toAmountCent())
+        assertEquals(0L, "1E3".toAmountCent())
+    }
+
+    @Test
+    fun when_huge_exponent_toAmountCent_then_returns_0_without_blowup() {
+        // 回归守卫：旧 BigDecimal 实现对 "1e10000000" 需物化千万位精度（秒级 CPU，CWE-1333 放大面），
+        // 新实现 O(n) 拒绝；若回退为 BigDecimal 委托该 DoS 会复活
+        assertEquals(0L, "1e10000000".toAmountCent())
+    }
+
+    @Test
+    fun when_unicode_digits_toAmountCent_then_returns_0() {
+        // 契约：仅 ASCII 0-9；全角数字（U+FF11 U+FF10 = "１０"）拒绝，防各 KMP 平台 isDigit 分歧
+        val fullWidthTen = buildString {
+            append('１')
+            append('０')
+        }
+        assertEquals(0L, fullWidthTen.toAmountCent())
+    }
+
+    @Test
+    fun when_int_part_over_16_digits_toAmountCent_then_returns_0() {
+        // 契约：有效整数位 >16 拒绝，防 *100 Long 溢出（17 位有效数字）
+        assertEquals(0L, "99999999999999999".toAmountCent())
+    }
+
+    @Test
+    fun when_20_digits_toAmountCent_then_returns_0_not_garbage() {
+        // 回归守卫：旧 BigDecimal.longValue() 对 20 位数字静默截断出垃圾值 1864712049423024028，
+        // 新实现拒绝返回 0；若回退该截断 bug 会复活
+        assertEquals(0L, "99999999999999999999".toAmountCent())
+    }
+
+    @Test
+    fun when_leading_zeros_within_effective_digits_toAmountCent_then_parsed() {
+        // 限长按有效数字计（前导零剥除后判长）：22 字符但有效整数位仅 2 位，合法
+        assertEquals(1999L, "0000000000000000019.99".toAmountCent())
+    }
+
+    // ========== toAmountCentOrNull() ==========
+
+    @Test
+    fun when_valid_string_toAmountCentOrNull_then_returns_cents() {
+        assertEquals(1999L, "19.99".toAmountCentOrNull())
+    }
+
+    @Test
+    fun when_invalid_string_toAmountCentOrNull_then_returns_null() {
+        // null 语义供调用方区分「非法输入」与「0 元」——搜索路径以此回落 -1L 哨兵而非按 0 元误匹配
+        assertNull("".toAmountCentOrNull())
+        assertNull("abc".toAmountCentOrNull())
+        assertNull("1e3".toAmountCentOrNull())
+        assertNull("-".toAmountCentOrNull())
+        val fullWidthTen = buildString {
+            append('１')
+            append('０')
+        }
+        assertNull(fullWidthTen.toAmountCentOrNull())
+    }
+
+    @Test
+    fun when_zero_string_toAmountCentOrNull_then_returns_0_not_null() {
+        // "0" 是合法输入，返回 0L 而非 null——与非法输入可区分
+        assertEquals(0L, "0".toAmountCentOrNull())
     }
 
     // ========== toCent() ==========

@@ -47,58 +47,19 @@ fun Long.toMoneyFormat(): String {
 fun Long.toMoneyCNY(): String = toMoneyString().withCNY()
 
 /**
- * 用户输入的金额字符串(元) -> Long(分): "19.99" -> 1999L；非法输入返回 0L。
+ * 用户输入的金额字符串(元) -> Long(分)，非法输入返回 null: "19.99" -> 1999L，"1e3"/"abc" -> null。
  *
- * 纯 Long/字符串算术实现（KMP commonMain 无 java.math.BigDecimal）：小数四舍五入到分只需看第 3 位小数
- * （0-4 舍 / 5-9 入），舍入余数量级完全由该位决定、与其后数字无关，等价于原 BigDecimal `HALF_UP`。
- * 数字判定仅接受 ASCII `0`..`9`：科学计数法（`1e3`）、下划线、Unicode 数字均视为非法（返回 0L），
- * 与 [parseBudgetAmountCent][cn.wj.android.cashbook.core.model.model.parseBudgetAmountCent] 的 ASCII-only
- * 约定一致，且不依赖各平台 `Char.isDigit()` 的 Unicode 表（会引入平台分歧）。整数位数超 16 位视为非法，
- * 避免 `*100` 时 Long 溢出回绕。
+ * null 语义供调用方区分「非法输入」与「合法的 0 元」——搜索金额匹配以此回落哨兵而非按 0 元误匹配；
+ * 写库路径可据此拒绝并提示而非静默存 0。文法契约与实现见 [parseDecimalCentOrNull]（金额解析单一真源，
+ * 与 [parseBudgetAmountCent][cn.wj.android.cashbook.core.model.model.parseBudgetAmountCent] 同源）。
  */
-fun String.toAmountCent(): Long {
-    val trimmed = this.trim()
-    if (trimmed.isEmpty()) return 0L
+fun String.toAmountCentOrNull(): Long? = parseDecimalCentOrNull(this)
 
-    var body = trimmed
-    var negative = false
-    if (body.startsWith("+")) {
-        body = body.substring(1)
-    } else if (body.startsWith("-")) {
-        negative = true
-        body = body.substring(1)
-    }
-    if (body.isEmpty()) return 0L
-
-    val dotIndex = body.indexOf('.')
-    val intPart: String
-    val fracPart: String
-    if (dotIndex < 0) {
-        intPart = body
-        fracPart = ""
-    } else {
-        if (body.indexOf('.', dotIndex + 1) >= 0) return 0L
-        intPart = body.substring(0, dotIndex)
-        fracPart = body.substring(dotIndex + 1)
-    }
-
-    if (intPart.isEmpty() && fracPart.isEmpty()) return 0L
-    if (intPart.isNotEmpty() && !intPart.all { it in '0'..'9' }) return 0L
-    if (fracPart.isNotEmpty() && !fracPart.all { it in '0'..'9' }) return 0L
-    if (intPart.length > 16) return 0L
-
-    val intValue = if (intPart.isEmpty()) 0L else intPart.toLong()
-    var cent = intValue * 100
-    if (fracPart.isNotEmpty()) {
-        cent += if (fracPart.length <= 2) {
-            fracPart.padEnd(2, '0').toLong()
-        } else {
-            val keep = fracPart.substring(0, 2).toLong()
-            if (fracPart[2] >= '5') keep + 1 else keep
-        }
-    }
-    return if (negative) -cent else cent
-}
+/**
+ * 用户输入的金额字符串(元) -> Long(分): "19.99" -> 1999L；非法输入返回 0L（兼容旧语义的薄委托，
+ * 调用方需感知非法输入时用 [toAmountCentOrNull]）。文法契约见 [parseDecimalCentOrNull]。
+ */
+fun String.toAmountCent(): Long = toAmountCentOrNull() ?: 0L
 
 /** Double(元，兼容旧数据) -> Long(分): 19.99 -> 1999L */
 fun Double.toCent(): Long = (this * 100).roundToLong()

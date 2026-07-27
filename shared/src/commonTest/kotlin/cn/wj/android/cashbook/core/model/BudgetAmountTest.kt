@@ -70,11 +70,17 @@ class BudgetAmountTest {
     }
 
     /**
-     * 仅接受 ASCII 0-9：Unicode 数字被拒（与原 toBigDecimalOrNull 的 ASCII-only 正则筛一致、KMP 平台无关）。
+     * 仅接受 ASCII 0-9：Unicode 数字被拒（收紧于原 toBigDecimalOrNull——后者实测接受 Unicode 十进制数字；
+     * 收紧是为不依赖各 KMP 平台 Char.isDigit() 的 Unicode 表、保证平台一致）。
      * 若数字判定误用 Char.isDigit()（Unicode-aware），"٣"/"３" 会被接受为 300，此测试即失败。
      */
     @Test fun reject_unicodeDigits() {
         assertNull(parseBudgetAmountCent("٣")) // 阿拉伯数字 3（Arabic-Indic）
         assertNull(parseBudgetAmountCent("３")) // 全角数字 3（Fullwidth）
+    }
+
+    /** 限长按有效数字计：前导零剥除后判长，22 字符但有效整数位 2 位的合法小额不被误拒。 */
+    @Test fun accept_leading_zeros_within_effective_digits() {
+        assertEquals(1999L, parseBudgetAmountCent("0000000000000000019.99"))
     }
 }
