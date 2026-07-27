@@ -998,3 +998,18 @@ kmp 从 `aca27481`（07-02 main）rebase 到 main `031b4005`（新 HEAD `93a42cf
 2. **shared compileSdk 36→37**：shared 不走 cashbook convention 插件、compileSdk 硬编码，main 升 SDK 37（`ProjectSetting.Config.COMPILE_SDK` 单点改）未带动它——rebase 语义漂移点，手动对齐并加同步注释。
 3. **M5 闭环**：`./gradlew :app:dependencyGuardBaseline` 本地重生成，3 个 Release runtime classpath baseline 各 +2 行（`kotlinx-datetime`/`kotlinx-datetime-jvm` 0.7.1，shared `api` 暴露所致），纯新增无删除。
 
+### 节点 2 full-review（2026-07-27，Phase 3 diff 全维评审）与收口修复
+
+评审对象 `a0fc3369^..kmp -- ':!docs'`（26 文件 +849/−173）。**勘误（M-1/F-4）**：`a0fc3369^`（=`c926ba7c`，docs commit）夹带了 T3.2 的「删除半边」（Money/String/Symbol/MoneyTest/StringTest 5 文件删除），该 commit 树不可编译且使评审 diff 看不到迁移前对照——**T3.2 真实对照基线是 `c926ba7c^`**（即 `d0da2409`，rebase 前 hash），后续回溯/评审须以此为准；今后搬迁「删旧+加新」必须同 commit（git 呈 R 且逐 commit 可编译）。
+
+Phase 1-2 结果（去重合并）：0 Critical / 2 High / 7 Medium。checkpoint 用户拍板「先修复再继续」，收口修复（一次变更合并 H-1+H-2+S-1 解析层+M-2+L-1/2/3/6/7/8）：
+- **单一真源**：新建 `shared/.../ext/DecimalParse.kt` `internal parseDecimalCentOrNull`（含 L-1 前导零剥除后判长修正），`toAmountCent`=`toAmountCentOrNull() ?: 0L` 薄委托、新增 `toAmountCentOrNull(): Long?`、`parseBudgetAmountCent` 委托后仅追加业务界——消 40 行双解析器重复（M-2）
+- **H-1 修复**：`RecordRepositoryImpl:303`+`FakeRecordRepository:273` 由 `if (toBigDecimalOrNull()!=null) toAmountCent() else -1L`（文法分裂，科学计数法/全角数字静默按 0 元误匹配）改 `toAmountCentOrNull() ?: -1L`
+- **H-2 修复**：MoneyTest 42→59（+17：8 边界+科学计数法/Unicode/17 位三契约+`1e10000000` DoS 回归守卫+20 位截断回归守卫+负数 HALF_UP 方向+trim 放宽契约+OrNull null 语义 3 条），BudgetAmountTest 13→14（前导零有效位判长）；**变异验证**：限长 16→18 精确杀死 `when_int_part_over_16_digits`（红）、还原复绿
+- **顺手项**：L-3/F-7 两处 KDoc「与原 toBigDecimalOrNull ASCII-only 一致」论据修正为「收紧于原实现」（jshell 实证旧实现接受 Unicode 数字/科学计数法）；L-6 coroutines implementation→api（ApplicationCoroutineScope public 超类型暴露）；L-7 core:design 补显式 `implementation(projects.shared)`；L-8 删零消费死代码 `ext/Flow.kt`（tryEmitNoRepeat 全仓仅定义处）
+- 安全/性能维净态势**正向**：重写消除 pre-existing BigDecimal 科学计数法 DoS 放大面（`"1e10000000"` 旧实现 ~2s 千万位物化）与 20 位截断垃圾值 bug（均已加回归守卫）；41 例对抗语料+30 万随机模糊对真实编译类零异常；kotlinx-datetime OSV 无 CVE（带 log4j 阳性对照自证）
+
+**遗留 backlog（不阻塞，多数属 main 侧或结构性）**：
+- main 侧（kmp 不修避免无关漂移）：S-2 `WechatBillParser:279` 对 `Infinity`/超量级输入缺 `isFinite()` 界（Double.toCent 饱和 Long.MAX_VALUE 入库污染聚合，pre-existing）；S-1 写路径静默 0 元的 UI 反馈（EditAsset/EditRecord 对 null 拒绝+提示，涉 feature 层）；`PATTERN_SIGN_MONEY` 整数位无上限；Time.kt 4 个零消费函数
+- kmp 结构性（后续 Task 评估）：M-3 `cashbook.kmp.library` convention 插件（Test fork JVM/jacoco/jvmTarget 契约缺失）；M-4 javax.inject 纯 JVM 构件下沉 androidMain；M-5 Intent.kt/TestTag.kt Android 语义常量下沉（commonMain 准入判据=语义中立非编译通过）；L-5 api 透传重新导出 core.model 面（拆 shared-common/shared-model 评估）；F-11 `Long.MIN_VALUE.toMoneyString()` 差 1 分+弱断言（存量）
+
