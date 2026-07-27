@@ -118,4 +118,19 @@ class GetSearchRecordViewsUseCaseTest {
 
         assertThat(result).hasSize(1)
     }
+
+    @Test
+    fun when_search_grammar_split_keyword_then_not_match_zero_amount_record() = runTest {
+        // H-1 回归守卫：科学计数法/全角数字 keyword 在旧的分裂守卫（toBigDecimalOrNull 放行 + toAmountCent
+        // 返 0L）下会按 0 元误匹配本记录；现行 toAmountCentOrNull()==null -> -1L 哨兵不参与金额匹配。
+        // 把守卫行 revert 回 if (toBigDecimalOrNull()!=null) toAmountCent() else -1L 本测试即红。
+        recordRepository.addRecord(createRecordModel(id = 1L, typeId = 1L, amount = 0L, finalAmount = 0L, remark = "记账"))
+
+        assertThat(useCase("1e3", 0, 10)).isEmpty()
+        val fullWidthTen = buildString {
+            append('１')
+            append('０')
+        }
+        assertThat(useCase(fullWidthTen, 0, 10)).isEmpty()
+    }
 }

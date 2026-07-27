@@ -274,6 +274,19 @@ class MoneyTest {
     }
 
     @Test
+    fun when_int_part_exactly_16_digits_toAmountCent_then_accepted() {
+        // 恰界接受：16 位有效整数位合法（*100 = 999999999999999900 < Long.MAX 无溢出），
+        // 与 17 位拒绝用例成对，防限长被误收紧
+        assertEquals(999_999_999_999_999_900L, "9999999999999999".toAmountCent())
+    }
+
+    @Test
+    fun when_trailing_dot_string_toAmountCent_then_returns_cents() {
+        // 与 .5（空整数部分）成对：5.（空小数部分）合法
+        assertEquals(500L, "5.".toAmountCent())
+    }
+
+    @Test
     fun when_20_digits_toAmountCent_then_returns_0_not_garbage() {
         // 回归守卫：旧 BigDecimal.longValue() 对 20 位数字静默截断出垃圾值 1864712049423024028，
         // 新实现拒绝返回 0；若回退该截断 bug 会复活
