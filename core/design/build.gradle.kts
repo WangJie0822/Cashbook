@@ -35,6 +35,7 @@ dependencies {
     lintPublish(projects.lint)
 
     implementation(projects.core.common)
+    implementation(projects.shared)
 
     debugApi(libs.androidx.compose.ui.tooling)
     api(libs.androidx.compose.ui.tooling.preview)

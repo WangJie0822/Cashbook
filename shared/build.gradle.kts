@@ -32,7 +32,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlinx.coroutines.core)
+            // api：ApplicationCoroutineScope 公共超类型暴露 CoroutineScope，消费方需传递可见
+            api(libs.kotlinx.coroutines.core)
             // api：DateSelectionEntity 公共字段暴露 kotlinx.datetime.LocalDate/YearMonth，消费方需传递可见
             api(libs.kotlinx.datetime)
             // CashbookDispatchers 的 @Dispatcher 用 @Qualifier（JSR-330 纯注解，KMP 可用）；api 暴露给消费方（domain）的 Hilt 处理
