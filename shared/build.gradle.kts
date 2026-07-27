@@ -26,6 +26,10 @@ kotlin {
         // shared 不走 cashbook convention 插件，compileSdk 须与 ProjectSetting.Config.COMPILE_SDK 手动同步
         compileSdk = 37
         minSdk = 24
+        // 与 ProjectSetting.Config.javaVersion(=17) 手动同步：不钉则产物字节码随构建 JDK 漂移（实测未钉时 major 65=Java 21）
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
         // 启用 JVM host 单元测试（使 commonTest 在本机 JVM 上运行，无需设备）
         withHostTestBuilder {}
     }

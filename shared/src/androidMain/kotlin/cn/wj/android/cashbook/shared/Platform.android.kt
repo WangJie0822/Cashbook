@@ -17,4 +17,4 @@
 package cn.wj.android.cashbook.shared
 
 /** Android 平台实现——Phase 0 PoC。 */
-actual fun platformName(): String = "Android"
+internal actual fun platformName(): String = "Android"

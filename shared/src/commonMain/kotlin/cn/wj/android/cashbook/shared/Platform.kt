@@ -17,4 +17,4 @@
 package cn.wj.android.cashbook.shared
 
 /** 平台名称——KMP expect/actual 机制验证用（Phase 0 PoC）。 */
-expect fun platformName(): String
+internal expect fun platformName(): String
