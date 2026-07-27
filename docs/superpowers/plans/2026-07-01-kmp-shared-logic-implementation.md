@@ -970,3 +970,31 @@ Phase 0 (T0.1→T0.2→T0.3→T0.4) ──gate passed──→ Phase 1 (T1.1→T
 - Phase 1/2/3 串行依赖（2 依赖 1 的 shared 模块存在，3 依赖 2 同理）
 - 每 Task 内步骤串行，每步骤是独立可提交单元
 
+---
+
+## 执行终局记录（2026-07-27）
+
+### 分支定位变更
+
+kmp 为**长期独立分支**（用户拍板）：不合入 main、不 push origin、不开 PR。原 T3.4/收尾中「push/PR 决策」「M5 留 PR 自愈」路径失效，M5 改为本地 `dependencyGuardBaseline` 手动闭环（见下）。
+
+### rebase 消化漂移
+
+kmp 从 `aca27481`（07-02 main）rebase 到 main `031b4005`（新 HEAD `93a42cf6`，领先 20/落后 0）。唯一冲突 `Build.yaml` CI 行，合并为 `testDebugUnitTest :shared:testAndroidHostTest ...`（main 侧 PR #507 引入聚合，`:core:model:test` 已随模块删除移除）。rebase 后全量验证绿：库模块聚合单测 + `:shared:testAndroidHostTest` + app Online 单测 0 FAILED、spotlessCheck、全量 `verifyRoborazziDebug` 676 基线 0 FAIL（kotlinx-datetime 渲染零漂移）。踩坑：`com.android.kotlin.multiplatform.library` 插件版本跟随 AGP，main 升 AGP 9.3.0 后该插件构件离线缓存缺失，须带代理暖缓存一次。
+
+### T3.3（日期工具）关闭 —— 不迁定性
+
+2026-07-27 审计实证后用户拍板**不迁**：
+- `Time.kt` 真实消费方 17 文件全部为 Android 库模块（core/data、core/domain、feature/books、record-import、records、settings、sync/work），`LunarUtils.kt` 唯一消费方 `core/design/CalendarView.kt`——均不可能进 commonMain
+- shared 不依赖 core:common（方向相反），shared 内零日期工具需求；Phase 2 暂缓后 commonMain 无新消费者 → 迁移收益 = 0
+- 成本/风险：11 函数 SimpleDateFormat→kotlinx-datetime 重写、无测试守护须先补特性测试、备份文件名（`DATE_FORMAT_BACKUP`）/微信导入/提醒调度等真实链路行为差异风险
+- Android 侧 java.time 生态与 shared 的 kotlinx-datetime 生态边界清晰共存（全量编译测试绿），维持现状即正确分层
+- 将来 Phase 2 重启且 commonMain 出现真实日期工具需求时再评估迁移（YAGNI）
+- 顺带发现 `Time.kt` 4 个零消费函数（`parseDate`/`paresDate`/`toLongTime`/`toYearMonthString`）——属 main 侧既有死代码（与 KMP 无关），**不在 kmp 分支清理**（避免加大与 main 的无关 diff），记 main 侧 backlog
+
+### T3.5 收尾内容
+
+1. **shared 死依赖清理**：删 `implementation(libs.kotlinx.serialization.json)`（shared 全量零 import 实证；serialization 在 app/core:network 等经各自依赖真实使用不受影响）。**修正 07-02 记录**：`kotlinx.coroutines.core` **不是死依赖**——T3.4 迁入的 `ApplicationCoroutineScope.kt`（CoroutineScope/Dispatchers/SupervisorJob）与 `ext/Flow.kt`（MutableSharedFlow/first）真实使用，保留。
+2. **shared compileSdk 36→37**：shared 不走 cashbook convention 插件、compileSdk 硬编码，main 升 SDK 37（`ProjectSetting.Config.COMPILE_SDK` 单点改）未带动它——rebase 语义漂移点，手动对齐并加同步注释。
+3. **M5 闭环**：`./gradlew :app:dependencyGuardBaseline` 本地重生成，3 个 Release runtime classpath baseline 各 +2 行（`kotlinx-datetime`/`kotlinx-datetime-jvm` 0.7.1，shared `api` 暴露所致），纯新增无删除。
+
