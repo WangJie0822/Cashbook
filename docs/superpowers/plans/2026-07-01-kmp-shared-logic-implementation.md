@@ -1006,7 +1006,7 @@ Phase 1-2 结果（去重合并）：0 Critical / 2 High / 7 Medium。checkpoint
 - **单一真源**：新建 `shared/.../ext/DecimalParse.kt` `internal parseDecimalCentOrNull`（含 L-1 前导零剥除后判长修正），`toAmountCent`=`toAmountCentOrNull() ?: 0L` 薄委托、新增 `toAmountCentOrNull(): Long?`、`parseBudgetAmountCent` 委托后仅追加业务界——消 40 行双解析器重复（M-2）
 - **H-1 修复**：`RecordRepositoryImpl:303`+`FakeRecordRepository:273` 由 `if (toBigDecimalOrNull()!=null) toAmountCent() else -1L`（文法分裂，科学计数法/全角数字静默按 0 元误匹配）改 `toAmountCentOrNull() ?: -1L`
 - **H-2 修复**：MoneyTest 42→59（+17：8 边界+科学计数法/Unicode/17 位三契约+`1e10000000` DoS 回归守卫+20 位截断回归守卫+负数 HALF_UP 方向+trim 放宽契约+OrNull null 语义 3 条），BudgetAmountTest 13→14（前导零有效位判长）；**变异验证**：限长 16→18 精确杀死 `when_int_part_over_16_digits`（红）、还原复绿
-- **顺手项**：L-3/F-7 两处 KDoc「与原 toBigDecimalOrNull ASCII-only 一致」论据修正为「收紧于原实现」（jshell 实证旧实现接受 Unicode 数字/科学计数法）；L-6 coroutines implementation→api（ApplicationCoroutineScope public 超类型暴露）；L-7 core:design 补显式 `implementation(projects.shared)`；L-8 删零消费死代码 `ext/Flow.kt`（tryEmitNoRepeat 全仓仅定义处）
+- **顺手项**：L-3/F-7 两处 KDoc「与原 toBigDecimalOrNull ASCII-only 一致」论据修正为「收紧于原实现」（jshell 实证旧实现接受 Unicode 数字/科学计数法）；L-6 coroutines implementation→api（ApplicationCoroutineScope public 超类型暴露）；L-7 core:design 补显式 `implementation(projects.shared)`；L-8 删零消费死代码 `ext/Flow.kt`（tryEmitNoRepeat 全仓仅定义处；删后上文「coroutines 真实使用」论据仅剩 ApplicationCoroutineScope，仍成立）
 - 安全/性能维净态势**正向**：重写消除 pre-existing BigDecimal 科学计数法 DoS 放大面（`"1e10000000"` 旧实现 ~2s 千万位物化）与 20 位截断垃圾值 bug（均已加回归守卫）；41 例对抗语料+30 万随机模糊对真实编译类零异常；kotlinx-datetime OSV 无 CVE（带 log4j 阳性对照自证）
 
 **遗留 backlog（不阻塞，多数属 main 侧或结构性）**：

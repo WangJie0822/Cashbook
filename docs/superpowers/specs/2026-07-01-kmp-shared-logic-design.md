@@ -4,6 +4,7 @@
 > 状态：design · 节点1四维评审已完成（4 HIGH / 6 MEDIUM / 2 LOW 已纳入修订）
 > 范围：仅 Android 单平台内部重构，不新增 iOS/Desktop 编译目标
 > **【未验证】KMP plugin + AGP 9.2.1 + config-cache 兼容性——Phase 0 先决验证**
+> **执行偏差（2026-07-27）**：T3.3 日期工具**不迁**（YAGNI，17 消费文件全 Android 模块）、`kotlinx-serialization-json` 未落 commonMain（死依赖已删）——本 spec 中「日期工具→shared」「serialization 依赖」相关表述以 plan『执行终局记录』为准
 
 ## 背景
 

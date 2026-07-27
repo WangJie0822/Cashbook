@@ -92,7 +92,7 @@ app → feature/* → core/* → shared
 | `core/ui` | 业务相关 UI 组件 |
 | `core/common` | 公共工具、常量、BuildConfig |
 | `core/testing` | 测试工具、自定义 TestRunner |
-| `shared` | KMP 共享模块（AGP KMP `androidLibrary`）：commonMain 承载纯 Kotlin 数据模型 model/entity/enums（原 `core/model` 迁入，包名 `cn.wj.android.cashbook.core.model.*` 不变，Compose 稳定性标注按包名保留）。测试用 `:shared:testAndroidHostTest`（跑 commonTest）。为内部 KMP 化承载层，供后续渐进剥离纯业务逻辑 |
+| `shared` | KMP 共享模块（AGP KMP `androidLibrary`）：commonMain 承载纯 Kotlin 数据模型 model/entity/enums（原 `core/model` 迁入，包名 `cn.wj.android.cashbook.core.model.*` 不变，Compose 稳定性标注按包名保留）+ 原 `core:common` 纯工具（金额 Money/DecimalParse、String/Number、Constants/Info/Intent/Patterns/TestTag/MimeType/ApplicationCoroutineScope/CashbookDispatchers，包名 `core.common.*` 同样保留、core:common `api(projects.shared)` 透传）。测试用 `:shared:testAndroidHostTest`（跑 commonTest）。为内部 KMP 化承载层，供后续渐进剥离纯业务逻辑 |
 
 ### Convention Plugins (build-logic/)
 
@@ -113,7 +113,7 @@ app → feature/* → core/* → shared
 
 - 数据库及全链路金额统一使用 **`Long` 类型，单位：分**（1 元 = 100）
 - `RecordTable.amount`、`finalAmount`、`concessions`、`charge` 以及 `AssetTable.balance` 均为 `Long`
-- 外部输入（如导入账单的 `Double` 元值）必须通过 `Double.toCent()` 或 `String.toAmountCent()` 转换为分再存入数据库（工具方法在 `core/common/ext/Money.kt`）
+- 外部输入（如导入账单的 `Double` 元值）必须通过 `Double.toCent()` 或 `String.toAmountCent()` 转换为分再存入数据库（工具方法在 `shared/.../core/common/ext/Money.kt`，包名不变；解析单一真源 `parseDecimalCentOrNull` 同目录 `DecimalParse.kt`）。需区分「非法输入」与「合法 0 元」时（搜索金额守卫哨兵、写库拒绝提示）用 `String.toAmountCentOrNull()`，**禁止**再写 `toBigDecimalOrNull()` 守卫 + `toAmountCent()` 的分裂文法（两套数字文法对科学计数法/全角数字判定不一致，曾致搜索按 0 元误匹配）
 - 计算 `recordAmount` 应复用 `TransactionDao.calculateRecordAmount()` 方法，禁止自行用 `BigDecimal` / `Double` 重新实现
 - UI 显示时使用 `Long.toMoneyString()` / `Long.toMoneyFormat()` / `Long.toMoneyCNY()` 转回元
 - **金额计算两口径不可混用**（`shared/.../core/model/model/RecordAmount.kt`，包名不变）：`recordAmount(category, amount, charges, concessions)` 为 DAO/月度结余口径（INCOME=amount−charges；EXPENDITURE/**TRANSFER**=amount+charges−concessions，转账当支出）；`analyticsPieAmount(typeCategory, ...)` 为 Analytics 饼图口径（EXPENDITURE=amount+charges−concessions；INCOME/**TRANSFER**=amount−charges，转账当收入）。两函数签名完全相同、对 TRANSFER 处理相反，选错只会静默算错——`TransactionDao.calculateRecordAmount`/`GetAssetMonthSummaryUseCase` 用 `recordAmount`，两个 `TransRecordViewsToAnalyticsPie(Second)UseCase` 用 `analyticsPieNetAmount`

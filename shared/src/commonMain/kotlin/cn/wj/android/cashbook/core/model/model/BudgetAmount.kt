@@ -18,7 +18,7 @@ package cn.wj.android.cashbook.core.model.model
 
 import cn.wj.android.cashbook.core.common.ext.parseDecimalCentOrNull
 
-/** 预算限额上界：999 万元（分） */
+/** 预算限额上界：999,999 元（分） */
 const val BUDGET_AMOUNT_MAX_CENT = 999999_00L
 
 /**

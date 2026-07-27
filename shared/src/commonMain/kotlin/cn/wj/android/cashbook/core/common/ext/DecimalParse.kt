@@ -16,7 +16,10 @@
 
 package cn.wj.android.cashbook.core.common.ext
 
-/** 整数部分有效位数上界（前导零剥除后计长）：超过必致 `*100` 时 Long 溢出，提前拒绝。 */
+/**
+ * 整数部分有效位数上界（前导零剥除后计长）。16 位内保证 `*100` 加分值不溢出
+ * （9999999999999999*100+99 ≈ 1e18 < Long.MAX ≈ 9.22e18）；17 位起较大值即溢出回绕，保守拒绝。
+ */
 internal const val MAX_AMOUNT_INT_PART_DIGITS = 16
 
 /**
