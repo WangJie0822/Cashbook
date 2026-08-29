@@ -75,7 +75,7 @@ android-lint = "32.3.1"
 androidx-appcompat = "1.7.1"
 # 约束性布局 [指南](https://developer.android.google.cn/jetpack/androidx/releases/constraintlayout)
 # [版本查询](https://mvnrepository.com/artifact/androidx.constraintlayout)
-androidx-constraintlayout-compose = "1.1.1"
+androidx-constraintlayout-compose = "1.1.2"
 # 列表拖动排序 [版本查询](https://mvnrepository.com/artifact/sh.calvin.reorderable/reorderable)
 calvin-reorderable = "3.1.0"
 # multidex 分包 [指南](https://developer.android.google.cn/jetpack/androidx/releases/multidex)
