@@ -101,7 +101,7 @@ androidx-lifecycle = "2.11.0"
 androidx-room = "2.7.1"
 # Paging 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/paging)
 # [版本查询](https://mvnrepository.com/artifact/androidx.paging)
-androidx-paging = "3.5.0"
+androidx-paging = "3.5.1"
 # Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
 androidx-navigation = "2.9.8"
