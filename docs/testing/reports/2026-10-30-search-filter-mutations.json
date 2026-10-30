@@ -1,0 +1,425 @@
+{
+  "schema": 1,
+  "date": "2026-10-30",
+  "mutations": 16,
+  "runs": [
+    {
+      "evidence_directory": ".superpowers/sdd/2026-10-30-search-filter/mutations-v2",
+      "status": "PASS",
+      "baseline_counts": {
+        "room": 14,
+        "state": 22,
+        "ui": 11,
+        "model": 8
+      },
+      "restored_counts": {
+        "room": 14,
+        "state": 22,
+        "ui": 11,
+        "model": 8
+      },
+      "source_untouched": true,
+      "mutation_tree_restored": true,
+      "mutations": [
+        {
+          "id": "book_and_to_or",
+          "group": "room",
+          "expected_guard": "combinedTypesCategoriesAndTags_doNotBypassBookOrOtherDimensions",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.combinedTypesCategoriesAndTags_doNotBypassBookOrOtherDimensions"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 159,
+            "statement": "assertThat(records(request).map { it.id }).containsExactly(2L, 1L).inOrder()"
+          },
+          "guard_cause": "unexpected (3): 5, 4, 3\n---\nexpected      : [2, 1]\nbut was       : [5, 4, 3, 2, 1]",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.syntheticBalance_countedButNotSummed",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.typeOnlyWrite_refreshesLiveSummary",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.deletedSelections_neverBecomeUnrestricted",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.deletedWholeGroup_doesNotMatchDanglingChildren",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.outsideRangeReimbursement_updatesHistoricNet",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.typeOnlyWrite_invalidatesLivePaging",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.wholeGroup_newChildAndMovedChild_followCurrentTree",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.deletedSelectedTag_neverBecomesUnrestricted",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.combinedTypesCategoriesAndTags_doNotBypassBookOrOtherDimensions",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.tagsAny_deduplicatesAndScopesBook",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.dateRange_includesStartAndExcludesEnd"
+          ],
+          "saved_reports": [
+            "book_and_to_or/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "tag_outer_join_duplicates",
+          "group": "room",
+          "expected_guard": "tagsAny_deduplicatesAndScopesBook",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.tagsAny_deduplicatesAndScopesBook"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 88,
+            "statement": "assertThat(records(request).map { it.id }).containsExactly(2L, 1L).inOrder()"
+          },
+          "guard_cause": "unexpected (1): 1\n---\nexpected      : [2, 1]\nbut was       : [2, 1, 1]",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.aggregate_coversAllPagesAndSameTimestampIsStable",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.tagsAny_deduplicatesAndScopesBook"
+          ],
+          "saved_reports": [
+            "tag_outer_join_duplicates/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "date_end_inclusive",
+          "group": "room",
+          "expected_guard": "dateRange_includesStartAndExcludesEnd",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.dateRange_includesStartAndExcludesEnd"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 99,
+            "statement": "assertThat(records(request).map { it.id }).containsExactly(3L, 2L).inOrder()"
+          },
+          "guard_cause": "unexpected (1): 4\n---\nexpected      : [3, 2]\nbut was       : [4, 3, 2]",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.dateRange_includesStartAndExcludesEnd"
+          ],
+          "saved_reports": [
+            "date_end_inclusive/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "dynamic_children_disconnected",
+          "group": "room",
+          "expected_guard": "wholeGroup_newChildAndMovedChild_followCurrentTree",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.wholeGroup_newChildAndMovedChild_followCurrentTree"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 108,
+            "statement": "assertThat(records(request).map { it.id }).containsExactly(2L)"
+          },
+          "guard_cause": "missing (1): 2\n---\nexpected   : [2]\nbut was    : []",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.typeOnlyWrite_refreshesLiveSummary",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.deletedWholeGroup_doesNotMatchDanglingChildren",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.typeOnlyWrite_invalidatesLivePaging",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.wholeGroup_newChildAndMovedChild_followCurrentTree",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.combinedTypesCategoriesAndTags_doNotBypassBookOrOtherDimensions",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.wholeGroup_handlesMoreThanNineHundredChildren"
+          ],
+          "saved_reports": [
+            "dynamic_children_disconnected/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "exclusion_reversed",
+          "group": "room",
+          "expected_guard": "wholeGroup_newChildAndMovedChild_followCurrentTree",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.wholeGroup_newChildAndMovedChild_followCurrentTree"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 108,
+            "statement": "assertThat(records(request).map { it.id }).containsExactly(2L)"
+          },
+          "guard_cause": "value of: iterable.onlyElement()\nexpected: 2\nbut was : 1",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.wholeGroup_newChildAndMovedChild_followCurrentTree",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.combinedTypesCategoriesAndTags_doNotBypassBookOrOtherDimensions"
+          ],
+          "saved_reports": [
+            "exclusion_reversed/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "summary_limited_to_first_page",
+          "group": "room",
+          "expected_guard": "aggregate_coversAllPagesAndSameTimestampIsStable",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.aggregate_coversAllPagesAndSameTimestampIsStable"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 190,
+            "statement": "assertThat(repository.observeSummary(request).first()).isEqualTo(RecordFilterSummary(61L, 0L, 6100L))"
+          },
+          "guard_cause": "expected: RecordFilterSummary(totalCount=61, income=0, expenditure=6100)\nbut was : RecordFilterSummary(totalCount=20, income=0, expenditure=2000)",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.aggregate_coversAllPagesAndSameTimestampIsStable",
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.wholeGroup_handlesMoreThanNineHundredChildren"
+          ],
+          "saved_reports": [
+            "summary_limited_to_first_page/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "sql_transfer_counts_principal",
+          "group": "room",
+          "expected_guard": "transfer_onlyFeeMinusConcessionsContributes",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.transfer_onlyFeeMinusConcessionsContributes"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 183,
+            "statement": "assertThat(repository.observeSummary(request).first()).isEqualTo(RecordFilterSummary(2L, 0L, 100L))"
+          },
+          "guard_cause": "expected: RecordFilterSummary(totalCount=2, income=0, expenditure=100)\nbut was : RecordFilterSummary(totalCount=2, income=0, expenditure=1000000)",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.transfer_onlyFeeMinusConcessionsContributes"
+          ],
+          "saved_reports": [
+            "sql_transfer_counts_principal/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "keyword_uses_filter_source",
+          "group": "state",
+          "expected_guard": "keyword_ignoresPreviouslyAppliedFilter",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.keyword_ignoresPreviouslyAppliedFilter"
+          ],
+          "assertion_evidence": "explicit_exception_type",
+          "guard_cause": "value of    : iterable.size()\nexpected    : 1\nbut was     : 2\niterable was: [RecordFilterRequest(bookId=1, fromInclusive=0, toExclusive=9223372036854775807, typeCategories=[], categories=CategoryFilterSelection(exactTypeIds=[], wholeGroupIds=[], excludedTypeIds=[]), tagIds=[41]), RecordFilterRequest(bookId=1, fromInclusive=0, toExclusive=9223372036854775807, typeCategories=[], categories=CategoryFilterSelection(exactTypeIds=[], wholeGroupIds=[], excludedTypeIds=[]), tagIds=[41])]",
+          "failed_cases": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.keyword_ignoresPreviouslyAppliedFilter"
+          ],
+          "saved_reports": [
+            "keyword_uses_filter_source/reports/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.xml"
+          ]
+        },
+        {
+          "id": "catalogue_subscription_once",
+          "group": "state",
+          "expected_guard": "independentTypeVersion_refreshesTreeAndQuery",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.independentTypeVersion_refreshesTreeAndQuery"
+          ],
+          "assertion_evidence": "explicit_exception_type",
+          "guard_cause": "expected: 40\nbut was : 10",
+          "failed_cases": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.independentTypeVersion_refreshesTreeAndQuery"
+          ],
+          "saved_reports": [
+            "catalogue_subscription_once/reports/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.xml"
+          ]
+        },
+        {
+          "id": "retry_epoch_guard_deleted",
+          "group": "state",
+          "expected_guard": "retry_oldFailureCannotReplaceNewSuccessForSameCriteria",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.retry_oldFailureCannotReplaceNewSuccessForSameCriteria"
+          ],
+          "assertion_evidence": "explicit_exception_type",
+          "guard_cause": "expected instance of: cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState.Ready\nbut was instance of : cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState.Failed\nwith value          : Failed(context=SearchQueryContext(criteriaRevision=2, bookId=1, mode=Filter, request=RecordFilterRequest(bookId=1, fromInclusive=0, toExclusive=9223372036854775807, typeCategories=[], categories=CategoryFilterSelection(exactTypeIds=[], wholeGroupIds=[], excludedTypeIds=[]), tagIds=[41]), keyword=), message=query_failed)",
+          "failed_cases": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.retry_oldFailureCannotReplaceNewSuccessForSameCriteria"
+          ],
+          "saved_reports": [
+            "retry_epoch_guard_deleted/reports/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.xml"
+          ]
+        },
+        {
+          "id": "query_started_before_context_publication",
+          "group": "state",
+          "expected_guard": "resetThenApply_unrestrictedIsExplicit",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.resetThenApply_unrestrictedIsExplicit"
+          ],
+          "assertion_evidence": "explicit_exception_type",
+          "guard_cause": "expected instance of: cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState.Ready\nbut was instance of : cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState.Loading\nwith value          : Loading(context=SearchQueryContext(criteriaRevision=2, bookId=1, mode=Filter, request=RecordFilterRequest(bookId=1, fromInclusive=0, toExclusive=9223372036854775807, typeCategories=[], categories=CategoryFilterSelection(exactTypeIds=[], wholeGroupIds=[], excludedTypeIds=[]), tagIds=[]), keyword=))",
+          "failed_cases": [
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.reset_changesOnlyDraftUntilExplicitApply",
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.cancelDraft_doesNotChangeResults",
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.hiddenTags_remainSelectableAndApplied",
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.resetThenApply_unrestrictedIsExplicit",
+            "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.clearKeyword_restoresFilter"
+          ],
+          "saved_reports": [
+            "query_started_before_context_publication/reports/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.xml"
+          ]
+        },
+        {
+          "id": "annotation_rollback_to_original_row",
+          "group": "ui",
+          "expected_guard": "transferAndRelatedIncome_keepMainAmountsAndExplainContributions",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.transferAndRelatedIncome_keepMainAmountsAndExplainContributions"
+          ],
+          "assertion_evidence": "explicit_exception_type",
+          "guard_cause": "java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains '统计计入：支出 ¥2.00' (ignoreCase: false) is not displayed!",
+          "failed_cases": [
+            "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.transferAndRelatedIncome_keepMainAmountsAndExplainContributions"
+          ],
+          "saved_reports": [
+            "annotation_rollback_to_original_row/reports/TEST-cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.xml"
+          ]
+        },
+        {
+          "id": "model_rollback_to_legacy_transfer_amount",
+          "group": "model",
+          "expected_guard": "transfer_excludesPrincipalAndShowsFeeContribution",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.model.model.RecordFilterSummaryTest.transfer_excludesPrincipalAndShowsFeeContribution"
+          ],
+          "assertion_evidence": "explicit_exception_type",
+          "guard_cause": "value of: recordFilterContribution(...)\nexpected: RecordFilterContribution(income=0, expenditure=200)\nbut was : RecordFilterContribution(income=0, expenditure=500200)",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.model.model.RecordFilterSummaryTest.transfer_concessionsCanProduceNegativeExpenditure",
+            "cn.wj.android.cashbook.core.model.model.RecordFilterSummaryTest.transfer_excludesPrincipalAndShowsFeeContribution"
+          ],
+          "saved_reports": [
+            "model_rollback_to_legacy_transfer_amount/reports/TEST-cn.wj.android.cashbook.core.model.model.RecordFilterSummaryTest.xml"
+          ]
+        }
+      ],
+      "target_hashes": {
+        "core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterSqlBuilder.kt": "e65accc25647e9a723b3280cf89794bfd40450a35d3bedf99630f15330d1cc5b",
+        "core/model/src/main/kotlin/cn/wj/android/cashbook/core/model/model/RecordFilterSummary.kt": "501b32e21c7ebcf7dac619072b48e11b52a50fe2974dbde3ee06ee1c8b353d4e",
+        "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterRecordItem.kt": "1053322a4ac951c8addfac88fb5b6afc0e4dfb7afa684ecd1a103b4861b6ce06",
+        "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchViewModel.kt": "df6e6863731c80e410079a207260b29210258ca36a807809062369e7d346a63e"
+      }
+    },
+    {
+      "evidence_directory": ".superpowers/sdd/2026-10-30-search-filter/mutations-net-income-v2",
+      "status": "PASS",
+      "baseline_counts": {
+        "room": 14,
+        "ui": 11
+      },
+      "restored_counts": {
+        "room": 14,
+        "ui": 11
+      },
+      "source_untouched": true,
+      "mutation_tree_restored": true,
+      "mutations": [
+        {
+          "id": "sql_expenditure_rollback_to_gross",
+          "group": "room",
+          "expected_guard": "outsideRangeReimbursement_updatesHistoricNet",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.outsideRangeReimbursement_updatesHistoricNet"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 211,
+            "statement": "assertThat(repository.observeSummary(request).first()).isEqualTo(RecordFilterSummary(1L, 0L, 20000L))"
+          },
+          "guard_cause": "expected: RecordFilterSummary(totalCount=1, income=0, expenditure=20000)\nbut was : RecordFilterSummary(totalCount=1, income=0, expenditure=100000)",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.outsideRangeReimbursement_updatesHistoricNet"
+          ],
+          "saved_reports": [
+            "sql_expenditure_rollback_to_gross/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "sql_income_rollback_to_gross",
+          "group": "room",
+          "expected_guard": "outsideRangeReimbursement_updatesHistoricNet",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.outsideRangeReimbursement_updatesHistoricNet"
+          ],
+          "assertion_evidence": {
+            "kind": "android_truth_source_verified",
+            "path": "core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryRoomTest.kt",
+            "line": 214,
+            "statement": "assertThat(repository.observeSummary(incomeMonth).first()).isEqualTo(RecordFilterSummary(1L, 0L, 0L))"
+          },
+          "guard_cause": "expected: RecordFilterSummary(totalCount=1, income=0, expenditure=0)\nbut was : RecordFilterSummary(totalCount=1, income=80000, expenditure=0)",
+          "failed_cases": [
+            "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest.outsideRangeReimbursement_updatesHistoricNet"
+          ],
+          "saved_reports": [
+            "sql_income_rollback_to_gross/reports/TEST-Cashbook_Filter_20261030_b53cc90(AVD) - 11-_core_data-.xml"
+          ]
+        },
+        {
+          "id": "income_annotation_disconnected",
+          "group": "ui",
+          "expected_guard": "transferAndRelatedIncome_keepMainAmountsAndExplainContributions",
+          "verdict": "KILLED",
+          "returncode": 1,
+          "matched_assertion_guards": [
+            "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.transferAndRelatedIncome_keepMainAmountsAndExplainContributions"
+          ],
+          "assertion_evidence": "explicit_exception_type",
+          "guard_cause": "java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains '统计计入：收入 ¥0.00' (ignoreCase: false) is not displayed!",
+          "failed_cases": [
+            "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.transferAndRelatedIncome_keepMainAmountsAndExplainContributions"
+          ],
+          "saved_reports": [
+            "income_annotation_disconnected/reports/TEST-cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.xml"
+          ]
+        }
+      ],
+      "target_hashes": {
+        "core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterSqlBuilder.kt": "e65accc25647e9a723b3280cf89794bfd40450a35d3bedf99630f15330d1cc5b",
+        "core/model/src/main/kotlin/cn/wj/android/cashbook/core/model/model/RecordFilterSummary.kt": "501b32e21c7ebcf7dac619072b48e11b52a50fe2974dbde3ee06ee1c8b353d4e",
+        "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterRecordItem.kt": "1053322a4ac951c8addfac88fb5b6afc0e4dfb7afa684ecd1a103b4861b6ce06",
+        "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchViewModel.kt": "df6e6863731c80e410079a207260b29210258ca36a807809062369e7d346a63e"
+      }
+    }
+  ],
+  "preserved_failed_attempts": [
+    {
+      "directory": "mutations",
+      "reason": "Android Truth assertion type omitted from XML; initial classifier rejected it; not counted as PASS"
+    },
+    {
+      "directory": "mutations-net-income",
+      "reason": "Unresolved 20-second timeout in typeOnlyWrite_invalidatesLivePaging during baseline; no mutations executed"
+    }
+  ],
+  "limitations": [
+    "An instrumented baseline timeout remains unexplained; later passes do not prove it fixed.",
+    "Mutation tool executed on Windows with Python 3.14; Mac/Linux process branches were not executed."
+  ]
+}
