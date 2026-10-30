@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.BudgetDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
+import cn.wj.android.cashbook.core.database.dao.RecordFilterDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
@@ -68,6 +69,9 @@ abstract class CashbookDatabase : RoomDatabase() {
 
     /** 获取记录数据库操作接口 */
     abstract fun recordDao(): RecordDao
+
+    /** 组合筛选与全量汇总查询 */
+    abstract fun recordFilterDao(): RecordFilterDao
 
     /** 获取账本数据库操作接口 */
     abstract fun booksDao(): BooksDao

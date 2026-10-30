@@ -19,6 +19,7 @@ package cn.wj.android.cashbook.core.data.di
 import cn.wj.android.cashbook.core.data.repository.AssetRepository
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.BudgetRepository
+import cn.wj.android.cashbook.core.data.repository.RecordFilterRepository
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.data.repository.SettingRepository
 import cn.wj.android.cashbook.core.data.repository.TagRepository
@@ -26,6 +27,7 @@ import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.data.repository.impl.AssetRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.BooksRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.BudgetRepositoryImpl
+import cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.RecordRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.SettingRepositoryImpl
 import cn.wj.android.cashbook.core.data.repository.impl.TagRepositoryImpl
@@ -96,6 +98,10 @@ interface DataModule {
     fun bindRecordRepository(
         repository: RecordRepositoryImpl,
     ): RecordRepository
+
+    @Binds
+    @Singleton
+    fun bindRecordFilterRepository(repository: RecordFilterRepositoryImpl): RecordFilterRepository
 
     @Binds
     @Singleton

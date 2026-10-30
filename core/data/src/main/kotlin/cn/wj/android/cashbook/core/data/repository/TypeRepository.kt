@@ -32,6 +32,9 @@ import kotlinx.coroutines.flow.Flow
  */
 interface TypeRepository {
 
+    /** 包含一级和二级分类的完整目录，供筛选树响应独立分类变动。 */
+    val allTypeListData: Flow<List<RecordTypeModel>>
+
     val firstExpenditureTypeListData: Flow<List<RecordTypeModel>>
 
     val firstIncomeTypeListData: Flow<List<RecordTypeModel>>
