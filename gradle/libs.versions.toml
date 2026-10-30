@@ -60,11 +60,11 @@ dropbox-dependency-guard = "0.5.0"
 android-desugarJdkLibs = "2.1.5"
 # Android Gradle 插件 [版本对照](https://developer.android.google.cn/studio/releases/gradle-plugin)
 # [版本查询](https://mvnrepository.com/artifact/com.android.application)
-android-gradle-plugin = "9.3.0"
+android-gradle-plugin = "9.3.2"
 android-tools = "32.3.1"
 # baselineprofile/benchmark：稳定版 1.4.1 不兼容 AGP9（"Module :app is not a supported android module"），
 # AGP9 兼容仅 1.5.0-alphaXX；构建期 dev 工具非运行时代码，pin alpha（待 1.5.0 稳定回退，技术债）
-androidx-baselineprofile = "1.5.0-alpha07"
+androidx-baselineprofile = "1.5.0-rc01"
 # Android lint [指南](https://developer.android.google.cn/studio/write/lint)
 # [版本查询](https://mvnrepository.com/artifact/com.android.lint)
 android-lint = "32.3.1"
@@ -72,10 +72,10 @@ android-lint = "32.3.1"
 # Androidx
 # appcompat [指南](https://developer.android.google.cn/jetpack/androidx/releases/appcompat)
 # [版本查询](https://mvnrepository.com/artifact/androidx.appcompat)
-androidx-appcompat = "1.7.1"
+androidx-appcompat = "1.8.0"
 # 约束性布局 [指南](https://developer.android.google.cn/jetpack/androidx/releases/constraintlayout)
 # [版本查询](https://mvnrepository.com/artifact/androidx.constraintlayout)
-androidx-constraintlayout-compose = "1.1.1"
+androidx-constraintlayout-compose = "1.1.2"
 # 列表拖动排序 [版本查询](https://mvnrepository.com/artifact/sh.calvin.reorderable/reorderable)
 calvin-reorderable = "3.1.0"
 # multidex 分包 [指南](https://developer.android.google.cn/jetpack/androidx/releases/multidex)
@@ -101,7 +101,7 @@ androidx-lifecycle = "2.11.0"
 androidx-room = "2.7.1"
 # Paging 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/paging)
 # [版本查询](https://mvnrepository.com/artifact/androidx.paging)
-androidx-paging = "3.5.0"
+androidx-paging = "3.5.1"
 # Navigation 相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/navigation)
 # [版本查询](https://mvnrepository.com/artifact/androidx.navigation)
 androidx-navigation = "2.9.8"
@@ -117,7 +117,7 @@ androidx-annotation = "1.9.1"
 # DocumentFile [指南](https://developer.android.google.cn/jetpack/androidx/releases/documentfile)
 # [版本查询](https://mvnrepository.com/artifact/androidx.documentfile)
 androidx-documentfile = "1.1.0"
-androidx-benchmark-macro = "1.5.0-alpha07"
+androidx-benchmark-macro = "1.5.0-rc01"
 # exif
 androidx-exifinterface = "1.4.2"
 # 测试相关 [指南](https://developer.android.google.cn/jetpack/androidx/releases/test)
