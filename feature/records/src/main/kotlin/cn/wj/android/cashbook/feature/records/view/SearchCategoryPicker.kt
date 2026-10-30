@@ -65,6 +65,7 @@ import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.model.CategorySelectionKind
 import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import cn.wj.android.cashbook.feature.records.model.SearchFilterState
+import cn.wj.android.cashbook.feature.records.R as FilterR
 
 @Composable
 fun SearchCategoryPicker(state: SearchFilterState, onEvent: (SearchFilterEvent) -> Unit, modifier: Modifier = Modifier) {
@@ -99,12 +100,12 @@ fun SearchCategoryPicker(state: SearchFilterState, onEvent: (SearchFilterEvent) 
                     if (compact) {
                         Column(Modifier.weight(1f)) { typeTabs() }
                     } else {
-                        Text(stringResource(R.string.search_filter_choose_categories), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
+                        Text(stringResource(FilterR.string.search_filter_choose_categories), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
                     }
-                    CbTextButton(onClick = { onEvent(SearchFilterEvent.ConfirmCategories) }) { Text(stringResource(R.string.search_filter_done)) }
+                    CbTextButton(onClick = { onEvent(SearchFilterEvent.ConfirmCategories) }) { Text(stringResource(FilterR.string.search_filter_done)) }
                 }
                 if (!compact) typeTabs()
-                SearchFilterTextField(state.categorySearchQuery, { onEvent(SearchFilterEvent.ChangeCategorySearch(it)) }, stringResource(R.string.search_filter_search_categories), Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = if (compact) 0.dp else 12.dp).testTag("category_search"))
+                SearchFilterTextField(state.categorySearchQuery, { onEvent(SearchFilterEvent.ChangeCategorySearch(it)) }, stringResource(FilterR.string.search_filter_search_categories), Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = if (compact) 0.dp else 12.dp).testTag("category_search"))
                 Row(Modifier.weight(1f).fillMaxWidth()) {
                     LazyColumn(Modifier.weight(0.30f).testTag("category_parents")) {
                         items(parents, key = { it.id }) { item ->
@@ -127,14 +128,14 @@ fun SearchCategoryPicker(state: SearchFilterState, onEvent: (SearchFilterEvent) 
                             val toggle = if (grouped && !partial) ToggleableState.On else if (grouped || partial) ToggleableState.Indeterminate else ToggleableState.Off
                             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).triStateToggleable(toggle, role = Role.Checkbox, onClick = { onEvent(SearchFilterEvent.ToggleCategoryGroup(parent.id, !grouped)) }).testTag("category_group_${parent.id}"), verticalAlignment = Alignment.CenterVertically) {
                                 TriStateCheckbox(toggle, onClick = null)
-                                Text(stringResource(R.string.search_filter_whole_group, parent.name), style = MaterialTheme.typography.labelLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                Text(stringResource(FilterR.string.search_filter_whole_group, parent.name), style = MaterialTheme.typography.labelLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             }
                         }
-                        if (visible.isEmpty()) Text(stringResource(R.string.search_filter_no_categories), Modifier.padding(12.dp))
+                        if (visible.isEmpty()) Text(stringResource(FilterR.string.search_filter_no_categories), Modifier.padding(12.dp))
                         LazyVerticalGrid(columns = GridCells.Adaptive(112.dp), modifier = Modifier.weight(1f).testTag("category_items"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             items(visible, key = { it.id }) { type ->
                                 FilterCheckRow(
-                                    if (type.typeLevel == TypeLevelEnum.FIRST) stringResource(R.string.search_filter_parent_only, type.name) else if (search.isNotEmpty()) parentNames[type.parentId]?.let { "$it / ${type.name}" } ?: type.name else type.name,
+                                    if (type.typeLevel == TypeLevelEnum.FIRST) stringResource(FilterR.string.search_filter_parent_only, type.name) else if (search.isNotEmpty()) parentNames[type.parentId]?.let { "$it / ${type.name}" } ?: type.name else type.name,
                                     !selection.isUnrestricted && selection.matches(type.id, type.parentId),
                                     { onEvent(SearchFilterEvent.ToggleCategoryItem(type.id, selection.isUnrestricted || !selection.matches(type.id, type.parentId))) },
                                     Modifier.testTag("category_item_${type.id}"),
@@ -144,25 +145,25 @@ fun SearchCategoryPicker(state: SearchFilterState, onEvent: (SearchFilterEvent) 
                     }
                 }
                 CbHorizontalDivider()
-                if (!compact) Text(stringResource(R.string.search_filter_selected), Modifier.padding(start = 16.dp, top = 12.dp), style = MaterialTheme.typography.labelLarge)
+                if (!compact) Text(stringResource(FilterR.string.search_filter_selected), Modifier.padding(start = 16.dp, top = 12.dp), style = MaterialTheme.typography.labelLarge)
                 LazyRow(Modifier.fillMaxWidth().heightIn(min = 48.dp, max = if (compact) 64.dp else 112.dp).testTag("category_selected"), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    if (selection.isUnrestricted) item { Text(stringResource(R.string.search_filter_all_categories), Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium) }
+                    if (selection.isUnrestricted) item { Text(stringResource(FilterR.string.search_filter_all_categories), Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium) }
                     val selected = selection.wholeGroupIds.map { CategorySelectionKind.GROUP to it } + selection.exactTypeIds.map { CategorySelectionKind.EXACT to it } + selection.excludedTypeIds.map { CategorySelectionKind.EXCLUDED to it }
                     items(selected, key = { "${it.first}_${it.second}" }) { (kind, id) ->
                         val type = state.catalog.find { it.id == id }
-                        val name = type?.let { selected -> state.catalog.find { it.id == selected.parentId }?.let { "${it.name} / ${selected.name}" } ?: selected.name } ?: stringResource(R.string.search_filter_unavailable, id)
+                        val name = type?.let { selected -> state.catalog.find { it.id == selected.parentId }?.let { "${it.name} / ${selected.name}" } ?: selected.name } ?: stringResource(FilterR.string.search_filter_unavailable, id)
                         val label = when (kind) {
                             CategorySelectionKind.GROUP -> {
                                 val excludedCount = state.catalog.count { (it.id == id || it.parentId == id) && it.id in selection.excludedTypeIds }
-                                if (excludedCount == 0) stringResource(R.string.search_filter_group_summary, name) else stringResource(R.string.search_filter_group_except, name, excludedCount)
+                                if (excludedCount == 0) stringResource(FilterR.string.search_filter_group_summary, name) else stringResource(FilterR.string.search_filter_group_except, name, excludedCount)
                             }
-                            CategorySelectionKind.EXCLUDED -> stringResource(R.string.search_filter_excluded_summary, name)
+                            CategorySelectionKind.EXCLUDED -> stringResource(FilterR.string.search_filter_excluded_summary, name)
                             else -> name
                         }
                         Row(Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(label, Modifier.widthIn(max = 220.dp), maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall)
                             CbIconButton(onClick = { onEvent(SearchFilterEvent.RemoveCategory(id, kind)) }, modifier = Modifier.testTag("category_remove_${kind.name.lowercase()}_$id")) {
-                                Icon(CbIcons.Cancel, stringResource(R.string.search_filter_remove, name))
+                                Icon(CbIcons.Cancel, stringResource(FilterR.string.search_filter_remove, name))
                             }
                         }
                     }

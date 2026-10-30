@@ -95,6 +95,7 @@ import cn.wj.android.cashbook.feature.records.view.categorySelectionSummary
 import cn.wj.android.cashbook.feature.records.view.filterMessageText
 import cn.wj.android.cashbook.feature.records.view.filterTypeLabel
 import cn.wj.android.cashbook.feature.records.viewmodel.SearchViewModel
+import cn.wj.android.cashbook.feature.records.R as FilterR
 
 @Composable
 internal fun SearchRoute(
@@ -170,7 +171,7 @@ internal fun SearchScreen(
     val context = filterState.queryContext
     val filtering = filterState.mode == SearchMode.Filter
     val keywordMode = filterState.mode == SearchMode.Keyword
-    val clearKeywordHint = stringResource(R.string.search_filter_clear_keyword_first)
+    val clearKeywordHint = stringResource(FilterR.string.search_filter_clear_keyword_first)
     val readySummary = (summaryState as? SearchFilterSummaryState.Ready)?.takeIf { it.context == context }
     val summaryFailed = (summaryState as? SearchFilterSummaryState.Failed)?.context == context
     val failed = filterState.recordQueryFailure == context || recordList.loadState.refresh is LoadState.Error || (filtering && summaryFailed) || filterState.message == SearchFilterMessage.METADATA_FAILED
@@ -197,7 +198,7 @@ internal fun SearchScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     if (filterState.queryDraft.isNotEmpty() || filterState.submittedKeyword.isNotEmpty()) CbIconButton(onClick = { onFilterEvent(SearchFilterEvent.ClearSubmittedKeyword); expanded = false; focus.clearFocus() }, modifier = Modifier.testTag("search_clear")) { Icon(CbIcons.Cancel, stringResource(R.string.cd_clear)) }
                                     CbTextButton(enabled = filterState.metadataReady && !keywordMode, onClick = { expanded = false; focus.clearFocus(); onFilterEvent(SearchFilterEvent.OpenDrawer) }, modifier = Modifier.testTag("search_filter_button").semantics { if (keywordMode) stateDescription = clearKeywordHint }) {
-                                        Text(stringResource(R.string.search_filter))
+                                        Text(stringResource(FilterR.string.search_filter))
                                         if (filtering) Box(Modifier.padding(start = 4.dp).size(6.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
                                     }
                                 }
@@ -228,8 +229,8 @@ internal fun SearchScreen(
                         }
                         if (failed) {
                             Column(Modifier.fillMaxWidth().padding(24.dp).testTag("search_query_error"), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(stringResource(if (filterState.message == SearchFilterMessage.METADATA_FAILED) R.string.search_filter_metadata_failed else R.string.search_filter_failed))
-                                CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }, modifier = Modifier.testTag("search_retry")) { Text(stringResource(R.string.search_filter_retry)) }
+                                Text(stringResource(if (filterState.message == SearchFilterMessage.METADATA_FAILED) FilterR.string.search_filter_metadata_failed else FilterR.string.search_filter_failed))
+                                CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }, modifier = Modifier.testTag("search_retry")) { Text(stringResource(FilterR.string.search_filter_retry)) }
                             }
                         } else {
                             Row(Modifier.fillMaxWidth().padding(24.dp).testTag("search_query_loading"), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
@@ -250,21 +251,21 @@ internal fun SearchScreen(
                         }
                         if (filterState.mode == SearchMode.Keyword && filterState.appliedFilter != null) {
                             item(key = "filter_paused") {
-                                Text(stringResource(R.string.search_filter_keyword_independent), Modifier.padding(16.dp), style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(FilterR.string.search_filter_keyword_independent), Modifier.padding(16.dp), style = MaterialTheme.typography.bodySmall)
                             }
                         }
                         if (filterState.message == SearchFilterMessage.METADATA_FAILED || filterState.message == SearchFilterMessage.RESTORE_FAILED) {
                             item(key = "metadata_error") {
                                 Column(Modifier.padding(16.dp)) {
                                     Text(filterMessageText(filterState.message), color = MaterialTheme.colorScheme.error)
-                                    CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }) { Text(stringResource(R.string.search_filter_retry)) }
+                                    CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }) { Text(stringResource(FilterR.string.search_filter_retry)) }
                                 }
                             }
                         }
                         if (filtering && readySummary != null) item(key = "filter_summary") { SearchFilterSummary(readySummary.summary, Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
                         if (recordList.itemCount == 0) {
                             item(key = "empty") {
-                                Empty(hintText = stringResource(if (filtering) R.string.search_filter_empty else if (filterState.mode == SearchMode.Initial) R.string.search_filter_initial_hint else R.string.record_search_no_data_hint), modifier = Modifier.fillMaxWidth())
+                                Empty(hintText = stringResource(if (filtering) FilterR.string.search_filter_empty else if (filterState.mode == SearchMode.Initial) FilterR.string.search_filter_initial_hint else R.string.record_search_no_data_hint), modifier = Modifier.fillMaxWidth())
                             }
                         } else {
                             items(recordList.itemCount, key = { recordList.peek(it)?.id ?: "placeholder_$it" }) { index ->
@@ -277,7 +278,7 @@ internal fun SearchScreen(
                                 }
                             }
                             if (recordList.loadState.append is LoadState.Error) {
-                                item(key = "append_error") { CbTextButton(onClick = recordList::retry) { Text(stringResource(R.string.search_filter_retry)) } }
+                                item(key = "append_error") { CbTextButton(onClick = recordList::retry) { Text(stringResource(FilterR.string.search_filter_retry)) } }
                             } else if (recordList.loadState.append is LoadState.Loading) {
                                 item(key = "append_loading") { CbCircularProgressIndicator(Modifier.padding(16.dp)) }
                             } else if (recordList.loadState.append.endOfPaginationReached) item(key = "footer") { Footer(stringResource(R.string.footer_hint_default)) }
@@ -300,12 +301,12 @@ internal fun SearchScreen(
 private fun filterConditionsText(filter: RecordFilter, state: SearchFilterState): String {
     val types = filter.typeCategories.map { filterTypeLabel(it) }
     val category = categorySelectionSummary(filter.categories, state)
-    val tags = filter.tagIds.take(2).map { id -> state.tags.find { it.id == id }?.name ?: stringResource(R.string.search_filter_unavailable, id) }
+    val tags = filter.tagIds.take(2).map { id -> state.tags.find { it.id == id }?.name ?: stringResource(FilterR.string.search_filter_unavailable, id) }
     return listOf(
         state.bookName,
         filter.dateSelection.getDisplayText(),
-        types.joinToString("、").ifEmpty { stringResource(R.string.search_filter_any_type) },
+        types.joinToString("、").ifEmpty { stringResource(FilterR.string.search_filter_any_type) },
         category,
-        if (tags.isEmpty()) stringResource(R.string.search_filter_any_tag) else tags.joinToString("、") + if (filter.tagIds.size > 2) " +${filter.tagIds.size - 2}" else "",
+        if (tags.isEmpty()) stringResource(FilterR.string.search_filter_any_tag) else tags.joinToString("、") + if (filter.tagIds.size > 2) " +${filter.tagIds.size - 2}" else "",
     ).joinToString(" · ")
 }

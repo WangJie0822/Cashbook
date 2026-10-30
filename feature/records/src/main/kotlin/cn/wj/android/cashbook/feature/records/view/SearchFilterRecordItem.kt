@@ -33,8 +33,8 @@ import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.recordFilterContribution
 import cn.wj.android.cashbook.core.model.model.shouldShowFilterContribution
-import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.screen.RecordListItem
+import cn.wj.android.cashbook.feature.records.R as FilterR
 
 @Composable
 fun SearchFilterRecordItem(record: RecordViewsEntity, onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -43,11 +43,11 @@ fun SearchFilterRecordItem(record: RecordViewsEntity, onClick: () -> Unit, modif
         if (shouldShowFilterContribution(record)) {
             val contribution = recordFilterContribution(record)
             val explanation = if (record.typeId == -1101L || record.typeId == -1102L) {
-                stringResource(R.string.search_filter_balance_excluded)
+                stringResource(FilterR.string.search_filter_balance_excluded)
             } else if (record.typeCategory == RecordTypeCategoryEnum.INCOME) {
-                stringResource(R.string.search_filter_contribution_income, contribution.income.toMoneyCNY())
+                stringResource(FilterR.string.search_filter_contribution_income, contribution.income.toMoneyCNY())
             } else {
-                stringResource(R.string.search_filter_contribution_expenditure, contribution.expenditure.toMoneyCNY())
+                stringResource(FilterR.string.search_filter_contribution_expenditure, contribution.expenditure.toMoneyCNY())
             }
             Text(explanation, Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp).testTag("filter_contribution_${record.id}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

@@ -33,20 +33,20 @@ import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.common.ext.toMoneyCNY
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
-import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.core.ui.expand.typeColor
+import cn.wj.android.cashbook.feature.records.R as FilterR
 
 @Composable
 fun SearchFilterSummary(summary: RecordFilterSummary, modifier: Modifier = Modifier) {
     Surface(modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainer) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(stringResource(R.string.search_filter_total, summary.totalCount), Modifier.testTag("filter_summary_count"), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(FilterR.string.search_filter_total, summary.totalCount), Modifier.testTag("filter_summary_count"), style = MaterialTheme.typography.titleMedium)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                SummaryValue(stringResource(R.string.search_filter_income), summary.income, RecordTypeCategoryEnum.INCOME.typeColor, Modifier.weight(1f).testTag("filter_summary_income"))
-                SummaryValue(stringResource(R.string.search_filter_expenditure), summary.expenditure, RecordTypeCategoryEnum.EXPENDITURE.typeColor, Modifier.weight(1f).testTag("filter_summary_expenditure"))
-                SummaryValue(stringResource(R.string.search_filter_balance), summary.balance, MaterialTheme.colorScheme.primary, Modifier.weight(1f).testTag("filter_summary_balance"))
+                SummaryValue(stringResource(FilterR.string.search_filter_income), summary.income, RecordTypeCategoryEnum.INCOME.typeColor, Modifier.weight(1f).testTag("filter_summary_income"))
+                SummaryValue(stringResource(FilterR.string.search_filter_expenditure), summary.expenditure, RecordTypeCategoryEnum.EXPENDITURE.typeColor, Modifier.weight(1f).testTag("filter_summary_expenditure"))
+                SummaryValue(stringResource(FilterR.string.search_filter_balance), summary.balance, MaterialTheme.colorScheme.primary, Modifier.weight(1f).testTag("filter_summary_balance"))
             }
-            Text(stringResource(R.string.search_filter_net_rule), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(FilterR.string.search_filter_net_rule), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
