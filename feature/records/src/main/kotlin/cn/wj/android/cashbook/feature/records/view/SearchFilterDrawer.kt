@@ -57,7 +57,9 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
+import cn.wj.android.cashbook.core.model.model.RecordFilter
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import cn.wj.android.cashbook.feature.records.model.SearchFilterMessage
@@ -138,6 +140,7 @@ fun SearchFilterDrawer(state: SearchFilterState, onEvent: (SearchFilterEvent) ->
                         }
                     }
                     item {
+                        SearchFilterConstraintNotice(draft, state, Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
                         FilterSectionTitle(stringResource(R.string.search_filter_tags))
                         CbTextButton(onClick = { draft.tagIds.forEach { onEvent(SearchFilterEvent.ToggleTag(it)) } }, modifier = Modifier.testTag("filter_all_tags")) {
                             Text(stringResource(R.string.search_filter_any_tag))
@@ -225,4 +228,16 @@ internal fun SearchFilterDateRangeDialog(date: DateSelectionEntity, monthStartDa
     }, dismissButton = { CbTextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }) {
         DateRangePicker(state = picker, modifier = Modifier.heightIn(max = 520.dp).testTag("filter_date_picker"), title = { Text(stringResource(R.string.search_filter_range), Modifier.padding(16.dp)) })
     }
+}
+
+@Composable
+internal fun SearchFilterConstraintNotice(filter: RecordFilter, state: SearchFilterState, modifier: Modifier = Modifier) {
+    if (!state.metadataReady) return
+    val catalog = state.catalog.associateBy { it.id }
+    val categories = filter.categories
+    val unavailable = (categories.exactTypeIds + categories.excludedTypeIds).any { it !in catalog } ||
+        categories.wholeGroupIds.any { id -> catalog[id]?.let { it.parentId != -1L || it.typeLevel != TypeLevelEnum.FIRST } ?: true } ||
+        (filter.tagIds - state.tags.map { it.id }.toSet()).isNotEmpty()
+    val conflict = filter.typeCategories.isNotEmpty() && (categories.exactTypeIds + categories.wholeGroupIds).any { id -> catalog[id]?.let { it.typeCategory !in filter.typeCategories } == true }
+    if (unavailable || conflict) Text(stringResource(if (unavailable) R.string.search_filter_unavailable_hint else R.string.search_filter_conflicting_categories), modifier.testTag("filter_constraint_notice"), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
 }

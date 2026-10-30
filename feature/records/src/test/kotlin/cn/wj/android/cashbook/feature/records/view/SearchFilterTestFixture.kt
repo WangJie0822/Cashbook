@@ -40,11 +40,11 @@ import kotlinx.coroutines.cancel
 internal class SearchFilterTestFixture {
     val records = FakeRecordRepository()
     val types = FakeTypeRepository().apply {
-        addType(createRecordTypeModel(id = 10L, name = "餐饮"))
-        addType(createRecordTypeModel(id = 11L, parentId = 10L, name = "午餐", typeLevel = TypeLevelEnum.SECOND))
-        addType(createRecordTypeModel(id = 12L, parentId = 10L, name = "咖啡", typeLevel = TypeLevelEnum.SECOND))
-        addType(createRecordTypeModel(id = 20L, name = "工资", typeCategory = RecordTypeCategoryEnum.INCOME))
-        addType(createRecordTypeModel(id = 30L, name = "转账", typeCategory = RecordTypeCategoryEnum.TRANSFER))
+        addType(createRecordTypeModel(id = 10L, name = "餐饮", iconName = "vector_type_three_meals_24"))
+        addType(createRecordTypeModel(id = 11L, parentId = 10L, name = "午餐", typeLevel = TypeLevelEnum.SECOND, iconName = "vector_type_three_meals_24"))
+        addType(createRecordTypeModel(id = 12L, parentId = 10L, name = "咖啡", typeLevel = TypeLevelEnum.SECOND, iconName = "vector_type_three_meals_24"))
+        addType(createRecordTypeModel(id = 20L, name = "工资", typeCategory = RecordTypeCategoryEnum.INCOME, iconName = "vector_type_three_meals_24"))
+        addType(createRecordTypeModel(id = 30L, name = "转账", typeCategory = RecordTypeCategoryEnum.TRANSFER, iconName = "vector_type_three_meals_24"))
     }
     val tags = FakeTagRepository().apply {
         addTag(createTagModel(id = 41L, name = "旅行"))

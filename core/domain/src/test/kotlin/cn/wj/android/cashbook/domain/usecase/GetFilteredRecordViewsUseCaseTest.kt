@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import androidx.paging.LoadState
 import androidx.paging.PagingDataEvent
 import androidx.paging.PagingDataPresenter
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
@@ -62,5 +63,6 @@ class GetFilteredRecordViewsUseCaseTest {
         assertThat(items.single().finalAmount).isEqualTo(20000L)
         assertThat(items.single().amount).isEqualTo(100000L)
         assertThat(repository.recordRequests.last()).isEqualTo(request)
+        assertThat(presenter.loadStateFlow.value?.refresh).isInstanceOf(LoadState.NotLoading::class.java)
     }
 }

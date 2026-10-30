@@ -74,10 +74,11 @@ fun SearchCategoryPicker(state: SearchFilterState, onEvent: (SearchFilterEvent) 
     val browseType = state.categoryBrowseType.takeIf { it in types } ?: types.first()
     val catalog = state.catalog.filter { it.typeCategory == browseType }
     val parents = catalog.filter { it.parentId == -1L && it.typeLevel == TypeLevelEnum.FIRST }.sortedWith(compareBy({ it.sort }, { it.id }))
+    val parentNames = parents.associate { it.id to it.name }
     val parent = parents.find { it.id == state.categoryBrowseParentId } ?: parents.firstOrNull()
     val search = state.categorySearchQuery.trim()
     val visible = if (search.isNotEmpty()) {
-        catalog.filter { type -> type.name.contains(search, ignoreCase = true) || parents.find { it.id == type.parentId }?.name?.contains(search, ignoreCase = true) == true }
+        catalog.filter { type -> type.name.contains(search, ignoreCase = true) || parentNames[type.parentId]?.contains(search, ignoreCase = true) == true }
             .sortedWith(compareBy({ it.sort }, { it.id }))
     } else {
         catalog.filter { it.id == parent?.id || it.parentId == parent?.id }.sortedWith(compareBy({ it.typeLevel.ordinal }, { it.sort }, { it.id }))
@@ -126,14 +127,14 @@ fun SearchCategoryPicker(state: SearchFilterState, onEvent: (SearchFilterEvent) 
                             val toggle = if (grouped && !partial) ToggleableState.On else if (grouped || partial) ToggleableState.Indeterminate else ToggleableState.Off
                             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).triStateToggleable(toggle, role = Role.Checkbox, onClick = { onEvent(SearchFilterEvent.ToggleCategoryGroup(parent.id, !grouped)) }).testTag("category_group_${parent.id}"), verticalAlignment = Alignment.CenterVertically) {
                                 TriStateCheckbox(toggle, onClick = null)
-                                Text(stringResource(R.string.search_filter_whole_group, parent.name), style = MaterialTheme.typography.labelLarge)
+                                Text(stringResource(R.string.search_filter_whole_group, parent.name), style = MaterialTheme.typography.labelLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             }
                         }
                         if (visible.isEmpty()) Text(stringResource(R.string.search_filter_no_categories), Modifier.padding(12.dp))
                         LazyVerticalGrid(columns = GridCells.Adaptive(112.dp), modifier = Modifier.weight(1f).testTag("category_items"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             items(visible, key = { it.id }) { type ->
                                 FilterCheckRow(
-                                    if (type.typeLevel == TypeLevelEnum.FIRST) stringResource(R.string.search_filter_parent_only, type.name) else type.name,
+                                    if (type.typeLevel == TypeLevelEnum.FIRST) stringResource(R.string.search_filter_parent_only, type.name) else if (search.isNotEmpty()) parentNames[type.parentId]?.let { "$it / ${type.name}" } ?: type.name else type.name,
                                     !selection.isUnrestricted && selection.matches(type.id, type.parentId),
                                     { onEvent(SearchFilterEvent.ToggleCategoryItem(type.id, selection.isUnrestricted || !selection.matches(type.id, type.parentId))) },
                                     Modifier.testTag("category_item_${type.id}"),
@@ -149,7 +150,7 @@ fun SearchCategoryPicker(state: SearchFilterState, onEvent: (SearchFilterEvent) 
                     val selected = selection.wholeGroupIds.map { CategorySelectionKind.GROUP to it } + selection.exactTypeIds.map { CategorySelectionKind.EXACT to it } + selection.excludedTypeIds.map { CategorySelectionKind.EXCLUDED to it }
                     items(selected, key = { "${it.first}_${it.second}" }) { (kind, id) ->
                         val type = state.catalog.find { it.id == id }
-                        val name = type?.name ?: stringResource(R.string.search_filter_unavailable, id)
+                        val name = type?.let { selected -> state.catalog.find { it.id == selected.parentId }?.let { "${it.name} / ${selected.name}" } ?: selected.name } ?: stringResource(R.string.search_filter_unavailable, id)
                         val label = when (kind) {
                             CategorySelectionKind.GROUP -> {
                                 val excludedCount = state.catalog.count { (it.id == id || it.parentId == id) && it.id in selection.excludedTypeIds }

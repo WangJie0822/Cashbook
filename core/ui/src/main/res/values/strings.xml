@@ -66,5 +66,16 @@
     <string name="search_filter_metadata_failed">筛选选项加载失败，请重试</string>
     <string name="search_filter_restore_failed">上次条件无法恢复，请重新筛选</string>
     <string name="search_filter_unavailable_hint">部分选项已不可用，仍保留筛选约束</string>
+    <string name="search_filter_conflicting_categories">部分分类不在当前收支类型内，仍保留原筛选条件</string>
     <string name="search_filter_retry">重试</string>
+    <string name="search_filter_total">%1$d 笔</string>
+    <string name="search_filter_balance">结余</string>
+    <string name="search_filter_net_rule">净额口径；转账仅计手续费与优惠；平账不计收支</string>
+    <string name="search_filter_balance_excluded">统计计入：平账不计收支</string>
+    <string name="search_filter_contribution_income">统计计入：收入 %1$s</string>
+    <string name="search_filter_contribution_expenditure">统计计入：支出 %1$s</string>
+    <string name="search_filter_keyword_independent">关键字搜索期间，筛选暂不生效</string>
+    <string name="search_filter_empty">没有符合条件的账单，请调整筛选</string>
+    <string name="search_filter_initial_hint">输入关键字，或通过筛选统计当前账本</string>
+    <string name="search_filter_no_conditions">当前账本全部账单</string>
 </resources>

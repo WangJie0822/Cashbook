@@ -30,6 +30,8 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
+import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltTestApplication
@@ -120,5 +122,18 @@ class SearchCategoryPickerTest {
         val height = compose.onNodeWithTag("category_item_11").fetchSemanticsNode().boundsInRoot.height
         assertThat(height).isAtLeast(with(compose.density) { 48.dp.toPx() })
         compose.onNodeWithTag("category_item_11").performClick().assertIsOn()
+    }
+
+    @Test fun sameNamedSearchResults_showParentPathAndSelectTheIntendedId() {
+        show()
+        compose.runOnIdle {
+            fixture.types.addType(createRecordTypeModel(id = 40L, name = "差旅"))
+            fixture.types.addType(createRecordTypeModel(id = 42L, parentId = 40L, name = "午餐", typeLevel = TypeLevelEnum.SECOND))
+        }
+        compose.onNodeWithTag("category_search").performTextInput("午餐")
+        compose.onNodeWithText("餐饮 / 午餐").assertIsDisplayed()
+        compose.onNodeWithText("差旅 / 午餐").assertIsDisplayed()
+        compose.onNodeWithTag("category_item_42").performClick()
+        compose.runOnIdle { assertThat(fixture.vm.filterState.value.categoryDraft!!.exactTypeIds).containsExactly(42L) }
     }
 }

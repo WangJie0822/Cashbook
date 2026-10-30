@@ -16,6 +16,8 @@
 
 package cn.wj.android.cashbook.core.testing.repository
 
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -65,7 +67,7 @@ class FakeRecordFilterRepository(
     override fun validate(request: RecordFilterRequest) = validationOverride ?: validator.validate(request)
     override fun observeRecords(request: RecordFilterRequest): Flow<PagingData<RecordViewsModel>> {
         recordRequests += request
-        return recordsProvider?.invoke(request) ?: matching(request).map { PagingData.from(it) }
+        return recordsProvider?.invoke(request) ?: matching(request).map { PagingData.from(it, sourceLoadStates = LoadStates(LoadState.NotLoading(false), LoadState.NotLoading(true), LoadState.NotLoading(true))) }
     }
     override fun observeSummary(request: RecordFilterRequest): Flow<RecordFilterSummary> {
         summaryRequests += request
