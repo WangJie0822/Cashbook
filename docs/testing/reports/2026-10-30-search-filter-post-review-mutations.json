@@ -1,0 +1,137 @@
+{
+  "runtime_source_commit": "5685f7dbefe0c58e0f23f115edebc546d0a9abe3",
+  "status": "PASS",
+  "baseline": {
+    "ui": {
+      "returncode": 0,
+      "tests": 13,
+      "all_passed": true
+    },
+    "state": {
+      "returncode": 0,
+      "tests": 23,
+      "all_passed": true
+    }
+  },
+  "mutations": [
+    {
+      "id": "keyword_filter_button_reenabled",
+      "expected_guard": "keyword_disablesFilterEntryAndExplainsHowToRestoreIt",
+      "verdict": "KILLED",
+      "returncode": 1,
+      "matched_assertion_guards": [
+        "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.keyword_disablesFilterEntryAndExplainsHowToRestoreIt"
+      ],
+      "all_failed_cases": [
+        "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.keyword_disablesFilterEntryAndExplainsHowToRestoreIt"
+      ],
+      "failure_type": "java.lang.AssertionError",
+      "failure_message": "java.lang.AssertionError: Failed to assert the following: (is not enabled)\nSemantics of the node:\nNode #230 at (l=1047.0, t=48.0, r=1221.0, b=168.0)px, Tag: 'search_filter_button'\nFocused = 'false'\nRole = 'Button'\nShape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'\nStateDescription = '清空关键字后筛选'\nText = '[筛选]'\nActions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]\nMergeDescendants = 'true'\nHas 2 siblings\nSelector used: (TestTag = 'search_filter_button')\n",
+      "saved_reports": [
+        "keyword_filter_button_reenabled/reports/TEST-cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.xml"
+      ]
+    },
+    {
+      "id": "keyword_filter_hint_removed",
+      "expected_guard": "keyword_disablesFilterEntryAndExplainsHowToRestoreIt",
+      "verdict": "KILLED",
+      "returncode": 1,
+      "matched_assertion_guards": [
+        "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.keyword_disablesFilterEntryAndExplainsHowToRestoreIt"
+      ],
+      "all_failed_cases": [
+        "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.keyword_disablesFilterEntryAndExplainsHowToRestoreIt"
+      ],
+      "failure_type": "java.lang.AssertionError",
+      "failure_message": "java.lang.AssertionError: Failed to assert the following: (StateDescription = '清空关键字后筛选')\nSemantics of the node:\nNode #230 at (l=1047.0, t=48.0, r=1221.0, b=168.0)px, Tag: 'search_filter_button'\nRole = 'Button'\nShape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'\nText = '[筛选]'\n[Disabled]\nActions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]\nMergeDescendants = 'true'\nHas 2 siblings\nSelector used: (TestTag = 'search_filter_button')\n",
+      "saved_reports": [
+        "keyword_filter_hint_removed/reports/TEST-cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.xml"
+      ]
+    },
+    {
+      "id": "keyword_drawer_guard_removed",
+      "expected_guard": "keyword_blocksDrawerButDraftAndClearKeepFilteringAvailable",
+      "verdict": "KILLED",
+      "returncode": 1,
+      "matched_assertion_guards": [
+        "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.keyword_blocksDrawerButDraftAndClearKeepFilteringAvailable"
+      ],
+      "all_failed_cases": [
+        "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.keyword_blocksDrawerButDraftAndClearKeepFilteringAvailable"
+      ],
+      "failure_type": "com.google.common.truth.AssertionErrorWithFacts",
+      "failure_message": "com.google.common.truth.AssertionErrorWithFacts: expected: null\nbut was : RecordFilter(dateSelection=All, typeCategories=[], categories=CategoryFilterSelection(exactTypeIds=[], wholeGroupIds=[], excludedTypeIds=[]), tagIds=[41])",
+      "saved_reports": [
+        "keyword_drawer_guard_removed/reports/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.xml"
+      ]
+    },
+    {
+      "id": "restored_scroll_uses_revision_counter",
+      "expected_guard": "newViewModel_delayedBookRestoresAppliedCriteriaAndScroll",
+      "verdict": "KILLED",
+      "returncode": 1,
+      "matched_assertion_guards": [
+        "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.newViewModel_delayedBookRestoresAppliedCriteriaAndScroll"
+      ],
+      "all_failed_cases": [
+        "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.restoredScroll_usesActualCriteriaInsteadOfRestartedRevisionCounter",
+        "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.newViewModel_delayedBookRestoresAppliedCriteriaAndScroll"
+      ],
+      "failure_type": "java.lang.AssertionError",
+      "failure_message": "java.lang.AssertionError: Assert failed: The component with TestTag = 'search_record_50' is not displayed!",
+      "saved_reports": [
+        "restored_scroll_uses_revision_counter/reports/TEST-cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.xml"
+      ]
+    }
+  ],
+  "restored_baseline": {
+    "ui": {
+      "returncode": 0,
+      "tests": 13,
+      "all_passed": true
+    },
+    "state": {
+      "returncode": 0,
+      "tests": 23,
+      "all_passed": true
+    }
+  },
+  "source_hashes_before": {
+    "core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterSqlBuilder.kt": "e65accc25647e9a723b3280cf89794bfd40450a35d3bedf99630f15330d1cc5b",
+    "core/model/src/main/kotlin/cn/wj/android/cashbook/core/model/model/RecordFilterSummary.kt": "501b32e21c7ebcf7dac619072b48e11b52a50fe2974dbde3ee06ee1c8b353d4e",
+    "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/screen/SearchScreen.kt": "f12930eb1db9410bef41b9fac285caf4d9dcb98406a07d239f5d72871b7f5580",
+    "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterRecordItem.kt": "b824e958bd47be1a6fd5d5ccf94c69b9c10895887c234efe56fbe7deb5849eff",
+    "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchViewModel.kt": "c4ee4f1f06d0d756e0e048aa2e2234690f2cd78dd23e85fc0f679fbee8580a7d"
+  },
+  "source_hashes_after": {
+    "core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterSqlBuilder.kt": "e65accc25647e9a723b3280cf89794bfd40450a35d3bedf99630f15330d1cc5b",
+    "core/model/src/main/kotlin/cn/wj/android/cashbook/core/model/model/RecordFilterSummary.kt": "501b32e21c7ebcf7dac619072b48e11b52a50fe2974dbde3ee06ee1c8b353d4e",
+    "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/screen/SearchScreen.kt": "f12930eb1db9410bef41b9fac285caf4d9dcb98406a07d239f5d72871b7f5580",
+    "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterRecordItem.kt": "b824e958bd47be1a6fd5d5ccf94c69b9c10895887c234efe56fbe7deb5849eff",
+    "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchViewModel.kt": "c4ee4f1f06d0d756e0e048aa2e2234690f2cd78dd23e85fc0f679fbee8580a7d"
+  },
+  "source_untouched": true,
+  "mutation_tree_restored": true,
+  "runner_sha256": "b1b5b3a82372d1cd8d0aaf9ed8b07079f6bf62a0d71c51b1e11baca2c25abc0c",
+  "raw_evidence_directory": ".superpowers/sdd/2026-10-30-search-filter/post-review-mutations",
+  "native_replay": {
+    "runtime_commit": "5685f7dbefe0c58e0f23f115edebc546d0a9abe3",
+    "device": "emulator-5582",
+    "avd": "Cashbook_Filter_20261030_b53cc90",
+    "application_id": "cn.wj.android.cashbook",
+    "apk_sha256": "37b8cf66cb8be3801ad7be577de917a0d759c215613461bb0f087ee9e1c94098",
+    "checks": [
+      "keyword_button_parent_disabled",
+      "disabled_tap_keeps_drawer_closed",
+      "clear_reenables_filter",
+      "clear_restores_explicit_applied_filter"
+    ],
+    "status": "PASS",
+    "scope": "Final APK synthetic empty book; initial two-record finance replay is separately preserved",
+    "keyboard_note": "Used Back during keyword flow; no assertion of automatic keyboard collapse"
+  },
+  "apk_build_context": {
+    "git_head": "48d7d65a2b898c31871c5ac2dd1d90d154ea07cc",
+    "note": "APK built before resource-move commit from its staged product sources; those sources equal runtime_source_commit. Build metadata was evaluated before that commit."
+  }
+}
