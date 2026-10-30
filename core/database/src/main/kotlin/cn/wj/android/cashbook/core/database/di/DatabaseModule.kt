@@ -25,6 +25,7 @@ import cn.wj.android.cashbook.core.database.dao.AssetDao
 import cn.wj.android.cashbook.core.database.dao.BooksDao
 import cn.wj.android.cashbook.core.database.dao.BudgetDao
 import cn.wj.android.cashbook.core.database.dao.RecordDao
+import cn.wj.android.cashbook.core.database.dao.RecordFilterDao
 import cn.wj.android.cashbook.core.database.dao.TagDao
 import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.database.dao.TypeDao
@@ -82,6 +83,10 @@ object DatabaseModule {
     fun providesRecordDao(
         database: CashbookDatabase,
     ): RecordDao = database.recordDao()
+
+    @Provides
+    @Singleton
+    fun providesRecordFilterDao(database: CashbookDatabase): RecordFilterDao = database.recordFilterDao()
 
     @Provides
     @Singleton
