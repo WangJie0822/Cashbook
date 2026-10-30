@@ -160,8 +160,8 @@ androidx.viewpager:viewpager:1.0.0
 androidx.window:window-core-android:1.5.0
 androidx.window:window-core:1.5.0
 androidx.window:window:1.5.0
-androidx.work:work-runtime-ktx:2.10.1
-androidx.work:work-runtime:2.10.1
+androidx.work:work-runtime-ktx:2.12.0
+androidx.work:work-runtime:2.12.0
 com.atlassian.commonmark:commonmark:0.13.0
 com.google.accompanist:accompanist-drawablepainter:0.32.0
 com.google.accompanist:accompanist-permissions:0.36.0
