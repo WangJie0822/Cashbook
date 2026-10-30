@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class FakeTypeRepository : TypeRepository {
 
     private val types = mutableListOf<RecordTypeModel>()
+    private val _allTypeListData = MutableStateFlow<List<RecordTypeModel>>(emptyList())
+    override val allTypeListData: Flow<List<RecordTypeModel>> = _allTypeListData
 
     private val _firstExpenditureTypeListData = MutableStateFlow<List<RecordTypeModel>>(emptyList())
     private val _firstIncomeTypeListData = MutableStateFlow<List<RecordTypeModel>>(emptyList())
@@ -44,6 +46,7 @@ class FakeTypeRepository : TypeRepository {
     }
 
     private fun updateFlows() {
+        _allTypeListData.value = types.toList()
         _firstExpenditureTypeListData.value = types.filter {
             it.typeCategory == RecordTypeCategoryEnum.EXPENDITURE && it.typeLevel == TypeLevelEnum.FIRST
         }.sortedBy { it.sort }

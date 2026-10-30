@@ -30,6 +30,7 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.database)
+    implementation(libs.androidx.room.runtime)
     implementation(projects.core.design)
 
     api(libs.junit)
