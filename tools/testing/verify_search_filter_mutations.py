@@ -40,6 +40,7 @@ from dataclasses import asdict, dataclass
 
 SQL = "core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterSqlBuilder.kt"
 VM = "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchViewModel.kt"
+SCREEN = "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/screen/SearchScreen.kt"
 ROW = "feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterRecordItem.kt"
 MODEL = "core/model/src/main/kotlin/cn/wj/android/cashbook/core/model/model/RecordFilterSummary.kt"
 ROOM_CLASS = "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest"
@@ -100,6 +101,14 @@ MUTATIONS = (
         Edit(SQL, "THEN r.final_amount ELSE 0 END", "THEN r.amount - r.charge ELSE 0 END"),)),
     Mutation("income_annotation_disconnected", "ui", "transferAndRelatedIncome_keepMainAmountsAndExplainContributions", (
         Edit(ROW, "if (shouldShowFilterContribution(record))", "if (shouldShowFilterContribution(record) && record.typeCategory != RecordTypeCategoryEnum.INCOME)"),)),
+    Mutation("keyword_filter_button_reenabled", "ui", "keyword_disablesFilterEntryAndExplainsHowToRestoreIt", (
+        Edit(SCREEN, "enabled = filterState.metadataReady && !keywordMode", "enabled = filterState.metadataReady"),)),
+    Mutation("keyword_filter_hint_removed", "ui", "keyword_disablesFilterEntryAndExplainsHowToRestoreIt", (
+        Edit(SCREEN, "if (keywordMode) stateDescription = clearKeywordHint", "if (false) stateDescription = clearKeywordHint"),)),
+    Mutation("keyword_drawer_guard_removed", "state", "keyword_blocksDrawerButDraftAndClearKeepFilteringAvailable", (
+        Edit(VM, "state.metadataReady && state.mode != SearchMode.Keyword", "state.metadataReady"),)),
+    Mutation("restored_scroll_uses_revision_counter", "ui", "newViewModel_delayedBookRestoresAppliedCriteriaAndScroll", (
+        Edit(SCREEN, "filterState.queryContext.copy(criteriaRevision = 0L).toString()", "filterState.queryContext.toString()"),)),
 )
 
 GROUPS = {

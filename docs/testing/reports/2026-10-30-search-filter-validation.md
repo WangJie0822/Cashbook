@@ -2,7 +2,24 @@
 
 日期：2026-10-30。范围：当前账本的日期、收支类型、分类、标签多选筛选与全量净额汇总；关键字搜索独立。实现契约见 [设计](../../superpowers/specs/2026-10-29-search-filter-design.md)，任务见 [计划](../../superpowers/plans/2026-10-30-search-filter.md)。
 
-## 构建与回归
+## 评审收尾后的最终验证
+
+完整多维评审和两项 Medium 的定向修复见 [收尾评审记录](2026-10-30-search-filter-review.md)。以下均取得实际退出 0；原始日志仍保留在本地 `.superpowers/sdd/2026-10-30-search-filter/`，不把读取日志成功当作构建成功。
+
+| 验证 | 实际结果 | 本地日志或跟踪清单 |
+| --- | --- | --- |
+| 完整单测 | 1504 tests，0 failures/errors/skips；732/732 tasks executed | `post-review-final-full-tests.log`；[逐套件及显式源码清单](2026-10-30-search-filter-tests.json) |
+| Dev APK、全局格式、三渠道 Release lint、lint 模块 | 合并命令成功；1332 tasks，114 executed、10 from cache、1208 up-to-date | `post-review-final-build-checks.log`；完整命令见收尾记录 |
+| 全部截图 | 9 个模块的测试任务实际执行；713 张跟踪基准图；19 executed、465 up-to-date | `post-review-final-screenshots.log` |
+| 新守卫变异 | 4/4 KILLED；UI13/State23 的绿基线及还原基线通过；两个工作区的 5 个目标源文件字节核对通过 | [收尾变异及原生回放清单](2026-10-30-search-filter-post-review-mutations.json) |
+| 最终 APK 回放 | 原生按钮父节点禁用、禁用后点击不打开、清空后入口启用且恢复已应用条件，共 4 项断言通过 | `post-review-native-assertions.json`、原始 XML/JSON 与两张 PNG |
+| 截图新鲜度 | 原范围实际 `MISS core/ui`/exit1；资源归入功能模块后实际 `OK`/exit0 | `post-review-freshness-red.log`、`post-review-freshness-green.log` |
+
+首轮 16 项与收尾 4 项分别保留各自实际源版本、基线和断言证据，不声称 20 项都在同一源版本重跑。新增 3 个用例覆盖 Keyword 入口状态、可访问说明及新 VM/延迟账本元数据的滚动恢复；最后一项正常实现通过，回退到 revision 条件键时具名断言失败，没有据未复现候选修改恢复实现。
+
+本次按用户明确选择**不执行 Vault 归档**。仅保留本地分支和项目验收产物，没有合入、推送、创建 PR、贴豁免标签或修改 CI。
+
+## 首轮构建与回归（评审前）
 
 Windows、JDK 21.0.11、Gradle 9.6.1，使用项目 wrapper。下列日志均含真实 `BUILD SUCCESSFUL`；构建与全套单测强制重跑。其余命令保留缓存计数，不把缓存任务写为实际执行。
 
@@ -15,7 +32,7 @@ Windows、JDK 21.0.11、Gradle 9.6.1，使用项目 wrapper。下列日志均含
 | 全部截图 | `./gradlew verifyRoborazziDebug --console=plain` | 18 executed，466 up-to-date；9 个截图模块的测试任务实际执行 | `task-6-all-screenshots.log` |
 | 真实 Room | `./gradlew :core:data:connectedDebugAndroidTest --rerun -Pandroid.testInstrumentationRunnerArguments.class=cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryRoomTest --console=plain` | 实际退出 0；14 tests，0 failures/errors/skips | `task-6-room-final.log`；补充收入断言后的重跑见 `task-6-room-income-final.log`（同时执行 `:core:data:spotlessKotlinCheck --init-script gradle/init.gradle.kts --no-configuration-cache`） |
 
-完整单测的 **207 份报告、214 个显式测试源码路径**及逐套件计数保存在 [测试清单](2026-10-30-search-filter-tests.json)。该清单定义本次统计集合；不以数量替代行为覆盖。截图 reference 共 713 张，以 `git ls-files '*src/test/screenshots/*.png'` 枚举；未将其它模块的图片变化混入本次基线。
+当前最终单测的 **207 份报告、214 个显式测试源码路径**及逐套件计数保存在 [测试清单](2026-10-30-search-filter-tests.json)；首轮为 1501 条，收尾新增 3 条至 1504。清单定义统计集合，不以数量替代行为覆盖。截图 reference 共 713 张，以 `git ls-files '*src/test/screenshots/*.png'` 枚举；未将其它模块的图片变化混入本次基线。
 
 前五项的旧 PowerShell 外层会话未取得最终退出码，结论依据是已保存的 Gradle 终态行、实际任务记录及 XML，不补称观察到外层退出 0。后续命令使用无 profile shell，Room 已取得最终退出码。
 
@@ -32,7 +49,7 @@ Windows、JDK 21.0.11、Gradle 9.6.1，使用项目 wrapper。下列日志均含
 | `feature/records/.../viewmodel/SearchFilterStateTest.kt` | 关键字独立、草稿取消、目录更新、过期请求/同条件重试、状态恢复、删除条件不放宽 |
 | `feature/records/.../view/SearchFilterDrawerTest.kt` | 真实日期控件、隐藏标签、重置/取消/参数错误 |
 | `feature/records/.../view/SearchCategoryPickerTest.kt` | 分类多选/搜索/路径、短横屏布局、跨类型浏览与分类草稿 |
-| `feature/records/.../screen/SearchFilterScreenTest.kt` | 11 个真实 SearchRoute/Compose 用例：模式切换、金额附注、错误重试、NavHost 返回与重新进入、滚动恢复、迟到旧上下文、条件不可用提示 |
+| `feature/records/.../screen/SearchFilterScreenTest.kt` | 13 个真实 SearchRoute/Compose 用例：模式切换、金额附注、错误重试、NavHost 返回与重新进入、新 VM/延迟账本元数据的滚动恢复、Keyword 禁用入口与说明、迟到旧上下文、条件不可用提示 |
 
 省略段的完整源码路径在测试清单；Room 全名见上方复跑命令。现有关键字查询用例随完整单测执行。数据库 schema/version 未变；`TypeRepository.allTypeListData` 的真实与 Fake 实现均随 app 构建和完整套件检查。
 
@@ -70,4 +87,4 @@ Windows、JDK 21.0.11、Gradle 9.6.1，使用项目 wrapper。下列日志均含
 
 恢复原测试后的补充运行已在 `mutations-net-income-v2/` 结束并通过。**原超时根因仍未定位**，作为最终评审及交付的已知限制保留，不把后来通过改写为全程无失败。
 
-本记录冻结时，最终 full-review 尚未开始；后续固定范围、原始报告和状态分别保存在 `.full-review/00-scope.md`、`.full-review/raw/`、`.full-review/state.json`。尚未合入主分支、推送或创建 PR。知识文档登记 pending-docs 不代表已归档到知识库。
+上述首轮记录冻结时 full-review 尚未开始；其后五阶段整批评审已完成，固定范围、原始报告和状态保存在本地 `.full-review/00-scope.md`、`.full-review/raw/`、`.full-review/state.json`。评审后的修复仅由控制器定向验证，结果见本文开头和收尾记录；没有把旧范围评审冒充新版本结论。pending-docs 不代表归档，本次依用户选择未执行 Vault 归档。

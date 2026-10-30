@@ -11,7 +11,7 @@
     "--console=plain"
   ],
   "totals": {
-    "tests": 1501,
+    "tests": 1504,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -1623,7 +1623,7 @@
       "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.xml",
       "task": ":feature:records:testDebugUnitTest",
       "name": "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest",
-      "tests": 11,
+      "tests": 13,
       "failures": 0,
       "errors": 0,
       "skipped": 0
@@ -1785,7 +1785,7 @@
       "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.xml",
       "task": ":feature:records:testDebugUnitTest",
       "name": "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest",
-      "tests": 22,
+      "tests": 23,
       "failures": 0,
       "errors": 0,
       "skipped": 0
@@ -2096,5 +2096,32 @@
     "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/reminder/SelectReminderCreditCardsTest.kt",
     "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/workers/AutoBackupWorkerTest.kt",
     "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/workers/ReminderScheduleTest.kt"
+  ],
+  "log_sha256": "4e876c44b86bc4021b7e05131573bd90a557e64bbc63aff4c40fa66039f12886",
+  "executed_tasks": [
+    ":app:testOfflineDebugUnitTest",
+    ":app:testOnlineDebugUnitTest",
+    ":core:common:testDebugUnitTest",
+    ":core:data:testDebugUnitTest",
+    ":core:datastore:testDebugUnitTest",
+    ":core:design:testDebugUnitTest",
+    ":core:domain:testDebugUnitTest",
+    ":core:model:test",
+    ":core:network:testDebugUnitTest",
+    ":core:testing:testDebugUnitTest",
+    ":core:ui:testDebugUnitTest",
+    ":feature:assets:testDebugUnitTest",
+    ":feature:books:testDebugUnitTest",
+    ":feature:budget:testDebugUnitTest",
+    ":feature:record-import:testDebugUnitTest",
+    ":feature:records:testDebugUnitTest",
+    ":feature:settings:testDebugUnitTest",
+    ":feature:tags:testDebugUnitTest",
+    ":feature:types:testDebugUnitTest",
+    ":lint:test",
+    ":sync:work:testDebugUnitTest"
+  ],
+  "executed_tasks_without_junit_reports": [
+    ":core:testing:testDebugUnitTest"
   ]
 }
