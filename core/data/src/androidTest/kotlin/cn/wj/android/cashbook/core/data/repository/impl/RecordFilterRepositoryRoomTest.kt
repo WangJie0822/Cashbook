@@ -210,6 +210,11 @@ class RecordFilterRepositoryRoomTest {
         val request = RecordFilter(dateSelection = DateSelectionEntity.DateRange(LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31))).toRequest(1L, 1)
         assertThat(repository.observeSummary(request).first()).isEqualTo(RecordFilterSummary(1L, 0L, 20000L))
         assertThat(records(request).single().finalAmount).isEqualTo(20000L)
+        val incomeMonth = RecordFilter(dateSelection = DateSelectionEntity.DateRange(LocalDate.of(2026, 11, 1), LocalDate.of(2026, 11, 30))).toRequest(1L, 1)
+        assertThat(repository.observeSummary(incomeMonth).first()).isEqualTo(RecordFilterSummary(1L, 0L, 0L))
+        val reimbursement = records(incomeMonth).single()
+        assertThat(reimbursement.amount).isEqualTo(80000L)
+        assertThat(reimbursement.finalAmount).isEqualTo(0L)
     }
 
     @Test
