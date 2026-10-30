@@ -16,13 +16,18 @@
 
 package cn.wj.android.cashbook.feature.records.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
+import cn.wj.android.cashbook.core.testing.repository.FakeBooksRepository
+import cn.wj.android.cashbook.core.testing.repository.FakeRecordFilterRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordRepository
+import cn.wj.android.cashbook.core.testing.repository.FakeSettingRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTagRepository
 import cn.wj.android.cashbook.core.testing.repository.FakeTypeRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
+import cn.wj.android.cashbook.domain.usecase.GetFilteredRecordViewsUseCase
 import cn.wj.android.cashbook.domain.usecase.GetSearchRecordViewsUseCase
 import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import com.google.common.truth.Truth.assertThat
@@ -62,6 +67,13 @@ class SearchViewModelTest {
         viewModel = SearchViewModel(
             recordRepository = recordRepository,
             getSearchRecordViewsUseCase = getSearchRecordViewsUseCase,
+            getFilteredRecordViewsUseCase = GetFilteredRecordViewsUseCase(FakeRecordFilterRepository()),
+            recordFilterRepository = FakeRecordFilterRepository(),
+            typeRepository = typeRepository,
+            tagRepository = tagRepository,
+            booksRepository = FakeBooksRepository(),
+            settingRepository = FakeSettingRepository(),
+            savedStateHandle = SavedStateHandle(),
         )
     }
 

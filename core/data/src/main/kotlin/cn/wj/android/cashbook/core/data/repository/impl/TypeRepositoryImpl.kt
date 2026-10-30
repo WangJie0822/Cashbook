@@ -35,6 +35,8 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -52,6 +54,10 @@ class TypeRepositoryImpl @Inject constructor(
     private val combineProtoDataSource: CombineProtoDataSource,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : TypeRepository {
+
+    override val allTypeListData: Flow<List<RecordTypeModel>> = typeDao.queryAll().map { rows ->
+        rows.map { it.asModel(it.id == FIXED_TYPE_ID_REFUND || it.id == FIXED_TYPE_ID_REIMBURSE) }
+    }.flowOn(coroutineContext)
 
     override val firstExpenditureTypeListData: Flow<List<RecordTypeModel>> =
         typeDataVersion.mapLatest {

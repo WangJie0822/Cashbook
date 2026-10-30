@@ -60,4 +60,8 @@ dependencies {
     // 真实 org.json：本地 JVM 单测中 android.jar 的 org.json 是抛 "not mocked" 的 stub，
     // 测试经 SettingsBackupCodec / BackupManifest 用到 org.json 时需真实实现（运行时/androidTest 用系统内置）
     testImplementation(libs.org.json)
+
+    androidTestImplementation(projects.core.testing)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.room.testing)
 }
