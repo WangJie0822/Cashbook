@@ -113,6 +113,29 @@ class SearchFilterStateTest {
     }
 
     @Test
+    fun keyword_blocksDrawerButDraftAndClearKeepFilteringAvailable() = runTest {
+        activate()
+        applyTag(41L)
+        val applied = f.vm.filterState.value.appliedFilter
+        f.vm.onFilterEvent(SearchFilterEvent.UpdateQueryDraft("午餐"))
+        f.vm.onFilterEvent(SearchFilterEvent.OpenDrawer)
+        assertThat(f.vm.filterState.value.drawerDraft).isEqualTo(applied)
+        f.vm.onFilterEvent(SearchFilterEvent.CancelDrawer)
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        val requests = f.filters.recordRequests.size
+        f.vm.onFilterEvent(SearchFilterEvent.OpenDrawer)
+        assertThat(f.vm.filterState.value.drawerDraft).isNull()
+        assertThat(f.vm.filterState.value.mode).isEqualTo(SearchMode.Keyword)
+        assertThat(f.filters.recordRequests).hasSize(requests)
+        f.vm.onFilterEvent(SearchFilterEvent.ClearSubmittedKeyword)
+        runCurrent()
+        f.vm.onFilterEvent(SearchFilterEvent.OpenDrawer)
+        assertThat(f.vm.filterState.value.drawerDraft).isEqualTo(applied)
+        assertThat(f.vm.filterState.value.mode).isEqualTo(SearchMode.Filter)
+    }
+
+    @Test
     fun keyword_ignoresPreviouslyAppliedFilter() = runTest {
         activate()
         applyTag(41L)

@@ -18,8 +18,10 @@ package cn.wj.android.cashbook.feature.records.view
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
+import cn.wj.android.cashbook.core.model.model.BooksModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createTagModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
@@ -36,8 +38,12 @@ import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import cn.wj.android.cashbook.feature.records.viewmodel.SearchViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 
-internal class SearchFilterTestFixture {
+internal class SearchFilterTestFixture(
+    savedStateHandle: SavedStateHandle = SavedStateHandle(),
+    delayedCurrentBook: Flow<BooksModel>? = null,
+) {
     val records = FakeRecordRepository()
     val types = FakeTypeRepository().apply {
         addType(createRecordTypeModel(id = 10L, name = "餐饮", iconName = "vector_type_three_meals_24"))
@@ -52,9 +58,12 @@ internal class SearchFilterTestFixture {
     }
     val settings = FakeSettingRepository()
     val books = FakeBooksRepository()
+    private val bookSource = delayedCurrentBook?.let { delayed ->
+        object : BooksRepository by books { override val currentBook = delayed }
+    } ?: books
     val filters = FakeRecordFilterRepository(types.allTypeListData, tags.tagListData)
     private val mapper = RecordModelTransToViewsUseCase(records, types, FakeAssetRepository(), tags, Dispatchers.Unconfined)
-    val vm = SearchViewModel(records, GetSearchRecordViewsUseCase(records, mapper, Dispatchers.Unconfined), GetFilteredRecordViewsUseCase(filters), filters, types, tags, books, settings, SavedStateHandle())
+    val vm = SearchViewModel(records, GetSearchRecordViewsUseCase(records, mapper, Dispatchers.Unconfined), GetFilteredRecordViewsUseCase(filters), filters, types, tags, bookSource, settings, savedStateHandle)
     val events = mutableListOf<SearchFilterEvent>()
     fun event(event: SearchFilterEvent) { events += event; vm.onFilterEvent(event) }
     fun close() { vm.viewModelScope.cancel() }

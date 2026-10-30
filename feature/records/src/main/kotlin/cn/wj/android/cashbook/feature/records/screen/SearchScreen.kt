@@ -62,6 +62,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -167,6 +169,8 @@ internal fun SearchScreen(
     BackHandler(enabled = expanded && filterState.drawerDraft == null) { expanded = false }
     val context = filterState.queryContext
     val filtering = filterState.mode == SearchMode.Filter
+    val keywordMode = filterState.mode == SearchMode.Keyword
+    val clearKeywordHint = stringResource(R.string.search_filter_clear_keyword_first)
     val readySummary = (summaryState as? SearchFilterSummaryState.Ready)?.takeIf { it.context == context }
     val summaryFailed = (summaryState as? SearchFilterSummaryState.Failed)?.context == context
     val failed = filterState.recordQueryFailure == context || recordList.loadState.refresh is LoadState.Error || (filtering && summaryFailed) || filterState.message == SearchFilterMessage.METADATA_FAILED
@@ -192,7 +196,7 @@ internal fun SearchScreen(
                             trailingIcon = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     if (filterState.queryDraft.isNotEmpty() || filterState.submittedKeyword.isNotEmpty()) CbIconButton(onClick = { onFilterEvent(SearchFilterEvent.ClearSubmittedKeyword); expanded = false; focus.clearFocus() }, modifier = Modifier.testTag("search_clear")) { Icon(CbIcons.Cancel, stringResource(R.string.cd_clear)) }
-                                    CbTextButton(enabled = filterState.metadataReady, onClick = { expanded = false; focus.clearFocus(); onFilterEvent(SearchFilterEvent.OpenDrawer) }, modifier = Modifier.testTag("search_filter_button")) {
+                                    CbTextButton(enabled = filterState.metadataReady && !keywordMode, onClick = { expanded = false; focus.clearFocus(); onFilterEvent(SearchFilterEvent.OpenDrawer) }, modifier = Modifier.testTag("search_filter_button").semantics { if (keywordMode) stateDescription = clearKeywordHint }) {
                                         Text(stringResource(R.string.search_filter))
                                         if (filtering) Box(Modifier.padding(start = 4.dp).size(6.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
                                     }

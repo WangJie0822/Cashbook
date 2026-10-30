@@ -25,7 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -37,6 +42,7 @@ import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,6 +62,7 @@ import cn.wj.android.cashbook.core.model.model.RecordFilter
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
 import cn.wj.android.cashbook.core.model.model.toRequest
 import cn.wj.android.cashbook.core.model.transfer.asEntity
+import cn.wj.android.cashbook.core.testing.data.createBooksModel
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createRecordViewsModel
@@ -69,6 +76,7 @@ import cn.wj.android.cashbook.feature.records.view.SearchFilterTestFixture
 import cn.wj.android.cashbook.feature.records.viewmodel.SearchViewModel
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltTestApplication
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -167,6 +175,22 @@ class SearchFilterScreenTest {
         compose.onNodeWithTag("search_record_4").assertDoesNotExist()
     }
 
+    @Test fun keyword_disablesFilterEntryAndExplainsHowToRestoreIt() {
+        show()
+        applyTravel()
+        compose.onNodeWithTag("search_query").performTextInput("关键词")
+        compose.onNodeWithTag("search_filter_button").assertIsEnabled()
+        compose.onNodeWithTag("search_query").performImeAction()
+        waitFor("search_record_4")
+        compose.onNodeWithTag("search_filter_button").assertIsNotEnabled()
+        compose.onNodeWithTag("search_filter_button").assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "清空关键字后筛选"))
+        compose.runOnIdle { assertThat(fixture.vm.filterState.value.drawerDraft).isNull() }
+        compose.onNodeWithTag("search_clear").performClick()
+        waitFor("filter_summary_count")
+        compose.onNodeWithTag("search_filter_button").assertIsEnabled().performClick()
+        compose.runOnIdle { assertThat(fixture.vm.filterState.value.drawerDraft!!.tagIds).containsExactly(41L) }
+    }
+
     @Test fun summaryFailure_showsRetryAndNeverZeroStatistics() {
         show { it.filters.summaryProvider = { flow { error("synthetic failure") } } }
         applyTravel("search_query_error")
@@ -259,6 +283,43 @@ class SearchFilterScreenTest {
             assertThat(fixture.filters.recordRequests).isEmpty()
         }
         compose.onNodeWithTag("filter_summary_count").assertDoesNotExist()
+    }
+
+    @Test fun newViewModel_delayedBookRestoresAppliedCriteriaAndScroll() {
+        val handle = SavedStateHandle()
+        val rows = (80L downTo 1L).map {
+            createRecordViewsModel(id = it, type = createRecordTypeModel(id = 11L, iconName = "vector_type_three_meals_24"), amount = 100L, finalAmount = 100L, relatedTags = listOf(createTagModel(id = 41L)))
+        }
+        compose.runOnUiThread { fixture = SearchFilterTestFixture(handle).apply { filters.setRecords(rows) } }
+        val restoration = StateRestorationTester(compose)
+        restoration.setContent {
+            CompositionLocalProvider(LocalDefaultEmptyImagePainter provides ColorPainter(Color.Gray)) { CashbookTheme { SearchRoute({}, {}, {}, viewModel = fixture.vm) } }
+        }
+        applyTravel()
+        compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tag_42").performScrollTo().performClick()
+        compose.onNodeWithText("完成").performClick()
+        waitFor("filter_summary_count")
+        compose.onNodeWithTag("search_results").performScrollToNode(hasTestTag("search_record_50"))
+        compose.onNodeWithTag("search_record_50").assertIsDisplayed()
+        val previousRevision = fixture.vm.filterState.value.queryContext.criteriaRevision
+        val delayedBook = MutableSharedFlow<cn.wj.android.cashbook.core.model.model.BooksModel>(replay = 1)
+        compose.runOnIdle {
+            val restoredHandle = SavedStateHandle(handle.keys().associateWith { handle.get<Any?>(it) })
+            fixture.close()
+            fixture = SearchFilterTestFixture(restoredHandle, delayedBook).apply { filters.setRecords(rows) }
+            assertThat(fixture.vm.filterState.value.metadataReady).isFalse()
+        }
+        restoration.emulateSavedInstanceStateRestore()
+        compose.onNodeWithTag("search_query_loading").assertIsDisplayed()
+        compose.runOnIdle { runBlocking { delayedBook.emit(createBooksModel()) } }
+        waitFor("search_results")
+        compose.onNodeWithTag("search_record_50").assertIsDisplayed()
+        compose.runOnIdle {
+            assertThat(fixture.vm.filterState.value.appliedFilter!!.tagIds).containsExactly(41L, 42L)
+            assertThat(fixture.vm.filterState.value.queryContext.criteriaRevision).isLessThan(previousRevision)
+            assertThat(fixture.filters.recordRequests.last().bookId).isEqualTo(1L)
+        }
     }
 
     @Test fun restoredScroll_usesActualCriteriaInsteadOfRestartedRevisionCounter() {

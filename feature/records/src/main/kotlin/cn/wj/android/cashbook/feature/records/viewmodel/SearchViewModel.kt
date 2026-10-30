@@ -193,7 +193,7 @@ class SearchViewModel @Inject constructor(
         val draft = state.drawerDraft
         val selection = state.categoryDraft
         val next = when (event) {
-            SearchFilterEvent.OpenDrawer -> if (state.metadataReady) state.copy(drawerDraft = state.appliedFilter ?: RecordFilter(), categoryDraft = null, message = null, removedTypeIds = emptySet()) else state
+            SearchFilterEvent.OpenDrawer -> if (state.metadataReady && state.mode != SearchMode.Keyword) state.copy(drawerDraft = state.appliedFilter ?: RecordFilter(), categoryDraft = null, message = null, removedTypeIds = emptySet()) else state
             SearchFilterEvent.CancelDrawer -> state.copy(drawerDraft = null, categoryDraft = null, message = null, removedTypeIds = emptySet())
             SearchFilterEvent.ResetDrawer -> if (draft != null) state.copy(drawerDraft = RecordFilter(), categoryDraft = null, message = null, removedTypeIds = emptySet()) else state
             SearchFilterEvent.ApplyDrawer -> {
