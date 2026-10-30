@@ -1,0 +1,2100 @@
+{
+  "command": [
+    "./gradlew",
+    "testOnlineDebug",
+    "testOfflineDebug",
+    "testDebugUnitTest",
+    ":core:model:test",
+    ":lint:test",
+    "-Proborazzi.test.verify=false",
+    "--rerun-tasks",
+    "--console=plain"
+  ],
+  "totals": {
+    "tests": 1501,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "reports": [
+    {
+      "path": "core/common/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.common.ext.MoneyTest.xml",
+      "task": ":core:common:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.common.ext.MoneyTest",
+      "tests": 42,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/common/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.common.ext.NumberTest.xml",
+      "task": ":core:common:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.common.ext.NumberTest",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/common/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.common.ext.StringTest.xml",
+      "task": ":core:common:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.common.ext.StringTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/datastore/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSourceTest.xml",
+      "task": ":core:datastore:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSourceTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.BudgetAmountTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.BudgetAmountTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.BudgetProgressTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.BudgetProgressTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.entity.DateSelectionEntityMonthCycleTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.entity.DateSelectionEntityMonthCycleTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.entity.DateSelectionEntityTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.entity.DateSelectionEntityTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.model.AnalyticsPieAmountTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.model.AnalyticsPieAmountTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.model.RecordAmountTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.model.RecordAmountTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.model.RecordFilterSummaryTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.model.RecordFilterSummaryTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.model.RecordFilterTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.model.RecordFilterTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/model/build/test-results/test/TEST-cn.wj.android.cashbook.core.model.transfer.ModelTransferReimbursedTest.xml",
+      "task": ":core:model:test",
+      "name": "cn.wj.android.cashbook.core.model.transfer.ModelTransferReimbursedTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "lint/build/test-results/test/TEST-cn.wj.android.cashbook.lint.DesignDetectorTest.xml",
+      "task": ":lint:test",
+      "name": "cn.wj.android.cashbook.lint.DesignDetectorTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "lint/build/test-results/test/TEST-cn.wj.android.cashbook.lint.TestMethodNameDetectorTest.xml",
+      "task": ":lint:test",
+      "name": "cn.wj.android.cashbook.lint.TestMethodNameDetectorTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "sync/work/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.sync.reminder.NotificationSpecTest.xml",
+      "task": ":sync:work:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.sync.reminder.NotificationSpecTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "sync/work/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.sync.reminder.ReminderLogicTest.xml",
+      "task": ":sync:work:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.sync.reminder.ReminderLogicTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "sync/work/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.sync.reminder.ReminderRunTest.xml",
+      "task": ":sync:work:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.sync.reminder.ReminderRunTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "sync/work/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.sync.reminder.SelectReminderCreditCardsTest.xml",
+      "task": ":sync:work:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.sync.reminder.SelectReminderCreditCardsTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "sync/work/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.sync.workers.AutoBackupWorkerTest.xml",
+      "task": ":sync:work:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.sync.workers.AutoBackupWorkerTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "sync/work/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.sync.workers.ReminderScheduleTest.xml",
+      "task": ":sync:work:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.sync.workers.ReminderScheduleTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.helper.BillCategoryMatcherTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.helper.BillCategoryMatcherTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.helper.BillPaymentMatcherTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.helper.BillPaymentMatcherTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.helper.DailyAccountExporterTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.helper.DailyAccountExporterTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.helper.WechatBillParserTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.helper.WechatBillParserTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.RecordSettingsModelMonthStartDayTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.RecordSettingsModelMonthStartDayTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.AssetRepositoryImplTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.AssetRepositoryImplTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.BooksRepositoryImplTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.BooksRepositoryImplTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.CompactDatabaseIfNeededTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.CompactDatabaseIfNeededTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.PersistNewImagesTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.PersistNewImagesTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.RecordBackfillTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.RecordBackfillTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.RecordFilterSqlBuilderTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.RecordFilterSqlBuilderTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.RecordImageOrphanTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.RecordImageOrphanTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.RecordRepositoryImplTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.RecordRepositoryImplTest",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.RecordViewsRelationMapperTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.RecordViewsRelationMapperTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.SettingRepositoryImplTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.SettingRepositoryImplTest",
+      "tests": 55,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.TagRepositoryImplTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.TagRepositoryImplTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.impl.TypeRepositoryImplTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.impl.TypeRepositoryImplTest",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.MappingTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.MappingTest",
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.RecordViewsCalcTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.RecordViewsCalcTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.repository.SettingsBackupCodecTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.repository.SettingsBackupCodecTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.testdoubles.SpecialTypeMigrationTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.testdoubles.SpecialTypeMigrationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.testdoubles.TransactionDaoLogicTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.testdoubles.TransactionDaoLogicTest",
+      "tests": 47,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.BackupEntryPolicyTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.BackupEntryPolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.BackupManifestTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.BackupManifestTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.impl.BackupRecoveryManagerSchemeTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.impl.BackupRecoveryManagerSchemeTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.impl.BackupStreamCopyTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.impl.BackupStreamCopyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.impl.BackupZipRoundTripTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.impl.BackupZipRoundTripTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.impl.StageInputStreamToCacheTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.impl.StageInputStreamToCacheTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.impl.StageLocalBackupToCacheTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.impl.StageLocalBackupToCacheTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.impl.StoredZipEntryTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.impl.StoredZipEntryTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.OrphanScanThrottleTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.OrphanScanThrottleTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorageTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.RecordImageFileStorageTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/data/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.data.uitl.RecordOrphanScanTest.xml",
+      "task": ":core:data:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.data.uitl.RecordOrphanScanTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/network/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.network.datasource.NetworkDataSourceTest.xml",
+      "task": ":core:network:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.network.datasource.NetworkDataSourceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/network/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.network.entity.GitReleaseEntitySerializationTest.xml",
+      "task": ":core:network:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.network.entity.GitReleaseEntitySerializationTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/network/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.network.okhttp.LoggerInterceptorTest.xml",
+      "task": ":core:network:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.network.okhttp.LoggerInterceptorTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/network/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.network.util.OkHttpWebDAVHandlerTest.xml",
+      "task": ":core:network:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.network.util.OkHttpWebDAVHandlerTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/ui/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.ui.DateSelectionPopupScreenshotTests.xml",
+      "task": ":core:ui:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.ui.DateSelectionPopupScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/ui/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.ui.DialogStateTest.xml",
+      "task": ":core:ui:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.ui.DialogStateTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/ui/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.ui.SelectDateDialogScreenshotTests.xml",
+      "task": ":core:ui:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.ui.SelectDateDialogScreenshotTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/ui/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.ui.TypeIconScreenshotTests.xml",
+      "task": ":core:ui:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.ui.TypeIconScreenshotTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.AlertDialogScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.AlertDialogScreenshotTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.BackgroundScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.BackgroundScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.CalculatorScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.CalculatorScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.CalendarViewScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.CalendarViewScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.CardScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.CardScreenshotTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.CbTabTopAppBarScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.CbTabTopAppBarScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.DateRangePickerScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.DateRangePickerScreenshotTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.DividerScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.DividerScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.EmptyScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.EmptyScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.FloatingActionButtonScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.FloatingActionButtonScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.FooterScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.FooterScreenshotTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.IconButtonScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.IconButtonScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.LineChartScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.LineChartScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.ListItemScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.ListItemScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.LoadingScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.LoadingScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.ModalBottomSheetScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.ModalBottomSheetScreenshotTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.PieChartScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.PieChartScreenshotTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.ScaffoldScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.ScaffoldScreenshotTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.TabRowScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.TabRowScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.TextButtonScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.TextButtonScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.TextFieldScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.TextFieldScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.theme.HapticTest.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.theme.HapticTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.theme.MotionTest.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.theme.MotionTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.theme.ShapeTest.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.theme.ShapeTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.TopAppBarScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.TopAppBarScreenshotTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.util.CalculatorUtilsTest.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.util.CalculatorUtilsTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.VerticalGridScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.VerticalGridScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/design/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.core.design.WheelPickerScreenshotTests.xml",
+      "task": ":core:design:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.core.design.WheelPickerScreenshotTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.AssetRecordBetweenDateRepositoryTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.AssetRecordBetweenDateRepositoryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.DeleteRecordUseCaseTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.ExportRecordUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.ExportRecordUseCaseTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetAssetListUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetAssetListUseCaseTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetAssetMonthSummaryUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetAssetMonthSummaryUseCaseTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetAssetRecordViewsUseCaseTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetBudgetProgressUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetBudgetProgressUseCaseTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsMapUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsMapUseCaseTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetCurrentMonthRecordViewsUseCaseTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetDefaultAssetUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetDefaultAssetUseCaseTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetDefaultRecordUseCaseTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetDefaultRelatedRecordListUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetDefaultRelatedRecordListUseCaseTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetFilteredRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetFilteredRecordViewsUseCaseTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetRecordTypeListUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetRecordTypeListUseCaseTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetRecordViewsBetweenDateUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetRecordViewsBetweenDateUseCaseTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetRecordViewsUseCaseTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetReimbursableUnrelatedRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetReimbursableUnrelatedRecordViewsUseCaseTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetRelatedRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetRelatedRecordViewsUseCaseTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetSearchRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetSearchRecordViewsUseCaseTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetSelectableBooksListUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetSelectableBooksListUseCaseTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetSelectableVisibleTagListUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetSelectableVisibleTagListUseCaseTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetTagRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetTagRecordViewsUseCaseTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetTypedMonthSummaryUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetTypedMonthSummaryUseCaseTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.GetTypeRecordViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.GetTypeRecordViewsUseCaseTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCaseTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.RunStartupMaintenanceUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.RunStartupMaintenanceUseCaseTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.SaveAssetUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.SaveAssetUseCaseTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.SaveRecordUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.SaveRecordUseCaseTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCaseMonthCycleTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCaseMonthCycleTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsBarUseCaseTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieSecondUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieSecondUseCaseTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.TransRecordViewsToAnalyticsPieUseCaseTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.TypeFirstSortRepositoryTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.TypeFirstSortRepositoryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core/domain/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.domain.usecase.UpdateRecordReimbursedUseCaseTest.xml",
+      "task": ":core:domain:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.domain.usecase.UpdateRecordReimbursedUseCaseTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/books/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.books.screen.EditBookScreenScreenshotTests.xml",
+      "task": ":feature:books:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.books.screen.EditBookScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/books/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.books.screen.MyBooksScreenScreenshotTests.xml",
+      "task": ":feature:books:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.books.screen.MyBooksScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/books/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.books.viewmodel.EditBookViewModelTest.xml",
+      "task": ":feature:books:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.books.viewmodel.EditBookViewModelTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/books/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.books.viewmodel.MyBooksViewModelTest.xml",
+      "task": ":feature:books:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.books.viewmodel.MyBooksViewModelTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-c-PQCDMKTUVR7L8.wj.android.cashbook.feature.assets.screen.EditRecordSelectAssetBottomSheetScreenScreenshotTests.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.screen.EditRecordSelectAssetBottomSheetScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.screen.AssetInfoScreenScreenshotTests.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.screen.AssetInfoScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.screen.EditAssetScreenScreenshotTests.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.screen.EditAssetScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.screen.InvisibleAssetScreenScreenshotTests.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.screen.InvisibleAssetScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.screen.MyAssetScreenScreenshotTests.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.screen.MyAssetScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModelTest.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.viewmodel.AssetInfoViewModelTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetViewModelTest.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.viewmodel.EditAssetViewModelTest",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.viewmodel.EditRecordSelectAssetBottomSheetViewModelTest.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.viewmodel.EditRecordSelectAssetBottomSheetViewModelTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.viewmodel.InvisibleAssetViewModelTest.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.viewmodel.InvisibleAssetViewModelTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/assets/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetViewModelTest.xml",
+      "task": ":feature:assets:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.assets.viewmodel.MyAssetViewModelTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/budget/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.budget.BudgetScreenScreenshotTests.xml",
+      "task": ":feature:budget:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.budget.BudgetScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/budget/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.budget.viewmodel.BudgetViewModelTest.xml",
+      "task": ":feature:budget:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.budget.viewmodel.BudgetViewModelTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOnlineDebugUnitTest/TEST-cn.wj.android.cashbook.ExampleUnitTest.xml",
+      "task": ":app:testOnlineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ExampleUnitTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOnlineDebugUnitTest/TEST-cn.wj.android.cashbook.ui.ActivityUiStateTest.xml",
+      "task": ":app:testOnlineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ui.ActivityUiStateTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOnlineDebugUnitTest/TEST-cn.wj.android.cashbook.ui.MainViewModelTest.xml",
+      "task": ":app:testOnlineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ui.MainViewModelTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOnlineDebugUnitTest/TEST-cn.wj.android.cashbook.ui.PendingDeepLinkTest.xml",
+      "task": ":app:testOnlineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ui.PendingDeepLinkTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/record-import/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.record.imports.viewmodel.RecordImportFlowTest.xml",
+      "task": ":feature:record-import:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.record.imports.viewmodel.RecordImportFlowTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/record-import/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.record.imports.viewmodel.RecordImportViewModelTest.xml",
+      "task": ":feature:record-import:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.record.imports.viewmodel.RecordImportViewModelTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/tags/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.tags.screen.EditRecordSelectTagBottomSheetScreenScreenshotTests.xml",
+      "task": ":feature:tags:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.tags.screen.EditRecordSelectTagBottomSheetScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/tags/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.tags.screen.MyTagsScreenScreenshotTests.xml",
+      "task": ":feature:tags:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.tags.screen.MyTagsScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/tags/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.tags.viewmodel.DeleteTagDialogViewModelTest.xml",
+      "task": ":feature:tags:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.tags.viewmodel.DeleteTagDialogViewModelTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/tags/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModelTest.xml",
+      "task": ":feature:tags:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.tags.viewmodel.EditRecordSelectTagBottomSheetViewModelTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/tags/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.tags.viewmodel.EditTagDialogViewModelTest.xml",
+      "task": ":feature:tags:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.tags.viewmodel.EditTagDialogViewModelTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/tags/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.tags.viewmodel.MyTagsViewModelTest.xml",
+      "task": ":feature:tags:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.tags.viewmodel.MyTagsViewModelTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.screen.AboutUsScreenScreenshotTests.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.screen.AboutUsScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.screen.BackupAndRecoveryScreenScreenshotTests.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.screen.BackupAndRecoveryScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.screen.LauncherScreenBackHandlerTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.screen.LauncherScreenBackHandlerTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.screen.LauncherScreenScreenshotTests.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.screen.LauncherScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.screen.MarkdownScreenScreenshotTests.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.screen.MarkdownScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.screen.SettingScreenScreenshotTests.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.screen.SettingScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsViewModelTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.viewmodel.AboutUsViewModelTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryDomainValidationTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryDomainValidationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewModelTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.viewmodel.BackupAndRecoveryViewModelTest",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModelTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.viewmodel.LauncherViewModelTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.viewmodel.MainAppViewModelTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.viewmodel.MainAppViewModelTest",
+      "tests": 37,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.viewmodel.MarkdownViewModelTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.viewmodel.MarkdownViewModelTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/settings/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.settings.viewmodel.SettingViewModelTest.xml",
+      "task": ":feature:settings:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.settings.viewmodel.SettingViewModelTest",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOfflineDebugUnitTest/TEST-cn.wj.android.cashbook.ExampleUnitTest.xml",
+      "task": ":app:testOfflineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ExampleUnitTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOfflineDebugUnitTest/TEST-cn.wj.android.cashbook.ui.ActivityUiStateTest.xml",
+      "task": ":app:testOfflineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ui.ActivityUiStateTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOfflineDebugUnitTest/TEST-cn.wj.android.cashbook.ui.MainViewModelTest.xml",
+      "task": ":app:testOfflineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ui.MainViewModelTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "app/build/test-results/testOfflineDebugUnitTest/TEST-cn.wj.android.cashbook.ui.PendingDeepLinkTest.xml",
+      "task": ":app:testOfflineDebugUnitTest",
+      "name": "cn.wj.android.cashbook.ui.PendingDeepLinkTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.model.ImageDisplayModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.model.ImageDisplayModelTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.AnalyticsScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.AnalyticsScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.AssetInfoContentScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.AssetInfoContentScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.CalendarScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.CalendarScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.EditRecordScreenRenderRegressionTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.EditRecordScreenRenderRegressionTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.EditRecordScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.EditRecordScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.LauncherContentScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.LauncherContentScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.ReimbursementScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.ReimbursementScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.SearchFilterScreenTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.SearchScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.SearchScreenScreenshotTests",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.SelectRelatedRecordScreenScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.screen.TypedAnalyticsScreenScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.screen.TypedAnalyticsScreenScreenshotTests",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.view.RecordDetailsSheetScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.view.RecordDetailsSheetScreenshotTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.view.ReimbursementDisplayStatusTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.view.ReimbursementDisplayStatusTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.view.SearchCategoryPickerTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.view.SearchCategoryPickerTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.view.SearchFilterDrawerScreenshotTests.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.view.SearchFilterDrawerScreenshotTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.view.SearchFilterDrawerTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.view.SearchFilterDrawerTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.AnalyticsViewModelTest",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.AssetInfoContentViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.AssetInfoContentViewModelTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.CalendarViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.CalendarViewModelTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.ConfirmDeleteRecordDialogViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.ConfirmDeleteRecordDialogViewModelTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.EditRecordViewModelTest",
+      "tests": 51,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.LauncherContentViewModelTest",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.RecordDayGroupingTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.RecordDayGroupingTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.RecordDetailsSheetViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.RecordDetailsSheetViewModelTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.ReimbursementViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.ReimbursementViewModelTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.SearchFilterStateTest",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SearchViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.SearchViewModelTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.SelectRelatedRecordViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.SelectRelatedRecordViewModelTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/records/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsViewModelTest.xml",
+      "task": ":feature:records:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.records.viewmodel.TypedAnalyticsViewModelTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/types/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.types.screen.EditRecordTypeListScreenScreenshotTests.xml",
+      "task": ":feature:types:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.types.screen.EditRecordTypeListScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/types/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.types.screen.MyCategoriesScreenProtectedMenuTest.xml",
+      "task": ":feature:types:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.types.screen.MyCategoriesScreenProtectedMenuTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/types/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.types.screen.MyCategoriesScreenRenderRegressionTest.xml",
+      "task": ":feature:types:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.types.screen.MyCategoriesScreenRenderRegressionTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/types/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.types.screen.MyCategoriesScreenScreenshotTests.xml",
+      "task": ":feature:types:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.types.screen.MyCategoriesScreenScreenshotTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/types/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.types.viewmodel.EditRecordTypeListViewModelTest.xml",
+      "task": ":feature:types:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.types.viewmodel.EditRecordTypeListViewModelTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/types/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesViewModelTest.xml",
+      "task": ":feature:types:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.types.viewmodel.MyCategoriesViewModelTest",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "feature/types/build/test-results/testDebugUnitTest/TEST-cn.wj.android.cashbook.feature.types.viewmodel.TypeIconGroupListViewModelTest.xml",
+      "task": ":feature:types:testDebugUnitTest",
+      "name": "cn.wj.android.cashbook.feature.types.viewmodel.TypeIconGroupListViewModelTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "test_source_files": [
+    "app/src/test/kotlin/cn/wj/android/cashbook/ExampleUnitTest.kt",
+    "app/src/test/kotlin/cn/wj/android/cashbook/ui/ActivityUiStateTest.kt",
+    "app/src/test/kotlin/cn/wj/android/cashbook/ui/MainViewModelTest.kt",
+    "app/src/test/kotlin/cn/wj/android/cashbook/ui/PendingDeepLinkTest.kt",
+    "build-logic/convention/src/test/kotlin/cn/wj/android/cashbook/buildlogic/OutputsTest.kt",
+    "core/common/src/test/kotlin/cn/wj/android/cashbook/core/common/ext/MoneyTest.kt",
+    "core/common/src/test/kotlin/cn/wj/android/cashbook/core/common/ext/NumberTest.kt",
+    "core/common/src/test/kotlin/cn/wj/android/cashbook/core/common/ext/StringTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/RecordSettingsModelMonthStartDayTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/helper/BillCategoryMatcherTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/helper/BillPaymentMatcherTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/helper/DailyAccountExporterTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/helper/WechatBillParserTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/MappingTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/RecordViewsCalcTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/SettingsBackupCodecTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/AssetRepositoryImplTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/BooksRepositoryImplTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/CompactDatabaseIfNeededTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/PersistNewImagesTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordBackfillTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterRepositoryTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordFilterSqlBuilderTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordImageOrphanTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordRepositoryImplTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordViewsRelationMapperTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/SettingRepositoryImplTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/TagRepositoryImplTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/repository/impl/TypeRepositoryImplTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeAssetDao.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeBooksDao.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeCombineProtoDataSource.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeRecordDao.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeRemoteDataSource.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeTagDao.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeTransactionDao.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeTypeDao.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/SpecialTypeMigrationTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/TransactionDaoLogicTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/BackupEntryPolicyTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/BackupManifestTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/FakeRecordImageFileStorage.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/OrphanScanThrottleTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/RecordImageFileStorageTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/RecordOrphanScanTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/impl/BackupRecoveryManagerSchemeTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/impl/BackupStreamCopyTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/impl/BackupZipRoundTripTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/impl/StageInputStreamToCacheTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/impl/StageLocalBackupToCacheTest.kt",
+    "core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/uitl/impl/StoredZipEntryTest.kt",
+    "core/datastore/src/test/kotlin/cn/wj/android/cashbook/core/datastore/datasource/CombineProtoDataSourceTest.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/AlertDialogScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/BackgroundScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/CalculatorScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/CalendarViewScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/CardScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/CbTabTopAppBarScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/DateRangePickerScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/DividerScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/EmptyScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/FloatingActionButtonScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/FooterScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/IconButtonScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/LineChartScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/ListItemScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/LoadingScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/ModalBottomSheetScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/PieChartScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/ScaffoldScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/TabRowScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/TextButtonScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/TextFieldScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/TopAppBarScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/VerticalGridScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/WheelPickerScreenshotTests.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/theme/HapticTest.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/theme/MotionTest.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/theme/ShapeTest.kt",
+    "core/design/src/test/kotlin/cn/wj/android/cashbook/core/design/util/CalculatorUtilsTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/AssetRecordBetweenDateRepositoryTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/DeleteRecordUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/ExportRecordUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetAssetListUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetAssetMonthSummaryUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetAssetRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetBudgetProgressUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetCurrentMonthRecordViewsMapUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetCurrentMonthRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetDefaultAssetUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetDefaultRecordUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetDefaultRelatedRecordListUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetFilteredRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetRecordTypeListUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetRecordViewsBetweenDateUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetReimbursableUnrelatedRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetRelatedRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetSearchRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetSelectableBooksListUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetSelectableVisibleTagListUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetTagRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetTypeRecordViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/GetTypedMonthSummaryUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/RecordModelTransToViewsUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/RunStartupMaintenanceUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/SaveAssetUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/SaveRecordUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/TransRecordViewsToAnalyticsBarUseCaseMonthCycleTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/TransRecordViewsToAnalyticsBarUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/TransRecordViewsToAnalyticsPieSecondUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/TransRecordViewsToAnalyticsPieUseCaseTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/TypeFirstSortRepositoryTest.kt",
+    "core/domain/src/test/kotlin/cn/wj/android/cashbook/domain/usecase/UpdateRecordReimbursedUseCaseTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/BudgetAmountTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/BudgetProgressTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/entity/DateSelectionEntityMonthCycleTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/entity/DateSelectionEntityTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/model/AnalyticsPieAmountTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/model/RecordAmountTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/model/RecordFilterSummaryTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/model/RecordFilterTest.kt",
+    "core/model/src/test/kotlin/cn/wj/android/cashbook/core/model/transfer/ModelTransferReimbursedTest.kt",
+    "core/network/src/test/kotlin/cn/wj/android/cashbook/core/network/datasource/NetworkDataSourceTest.kt",
+    "core/network/src/test/kotlin/cn/wj/android/cashbook/core/network/entity/GitReleaseEntitySerializationTest.kt",
+    "core/network/src/test/kotlin/cn/wj/android/cashbook/core/network/okhttp/LoggerInterceptorTest.kt",
+    "core/network/src/test/kotlin/cn/wj/android/cashbook/core/network/util/OkHttpWebDAVHandlerTest.kt",
+    "core/ui/src/test/kotlin/cn/wj/android/cashbook/core/ui/DateSelectionPopupScreenshotTests.kt",
+    "core/ui/src/test/kotlin/cn/wj/android/cashbook/core/ui/DialogStateTest.kt",
+    "core/ui/src/test/kotlin/cn/wj/android/cashbook/core/ui/SelectDateDialogScreenshotTests.kt",
+    "core/ui/src/test/kotlin/cn/wj/android/cashbook/core/ui/TypeIconScreenshotTests.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/screen/AssetInfoScreenScreenshotTests.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/screen/EditAssetScreenScreenshotTests.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/screen/EditRecordSelectAssetBottomSheetScreenScreenshotTests.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/screen/InvisibleAssetScreenScreenshotTests.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/screen/MyAssetScreenScreenshotTests.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/viewmodel/AssetInfoViewModelTest.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/viewmodel/EditAssetViewModelTest.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/viewmodel/EditRecordSelectAssetBottomSheetViewModelTest.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/viewmodel/InvisibleAssetViewModelTest.kt",
+    "feature/assets/src/test/kotlin/cn/wj/android/cashbook/feature/assets/viewmodel/MyAssetViewModelTest.kt",
+    "feature/books/src/test/kotlin/cn/wj/android/cashbook/feature/books/screen/EditBookScreenScreenshotTests.kt",
+    "feature/books/src/test/kotlin/cn/wj/android/cashbook/feature/books/screen/MyBooksScreenScreenshotTests.kt",
+    "feature/books/src/test/kotlin/cn/wj/android/cashbook/feature/books/viewmodel/EditBookViewModelTest.kt",
+    "feature/books/src/test/kotlin/cn/wj/android/cashbook/feature/books/viewmodel/MyBooksViewModelTest.kt",
+    "feature/budget/src/test/kotlin/cn/wj/android/cashbook/feature/budget/BudgetScreenScreenshotTests.kt",
+    "feature/budget/src/test/kotlin/cn/wj/android/cashbook/feature/budget/viewmodel/BudgetViewModelTest.kt",
+    "feature/record-import/src/test/kotlin/cn/wj/android/cashbook/feature/record/imports/viewmodel/RecordImportFlowTest.kt",
+    "feature/record-import/src/test/kotlin/cn/wj/android/cashbook/feature/record/imports/viewmodel/RecordImportViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/model/ImageDisplayModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/AnalyticsScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/AssetInfoContentScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/CalendarScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/EditRecordScreenRenderRegressionTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/EditRecordScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/LauncherContentScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/ReimbursementScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/SearchFilterScreenTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/SearchScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/SelectRelatedRecordScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/screen/TypedAnalyticsScreenScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/view/RecordDetailsSheetScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/view/ReimbursementDisplayStatusTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/view/SearchCategoryPickerTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterDrawerScreenshotTests.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterDrawerTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/view/SearchFilterTestFixture.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/AnalyticsViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/AssetInfoContentViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/CalendarViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/ConfirmDeleteRecordDialogViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/EditRecordViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/LauncherContentViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/RecordDayGroupingTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/RecordDetailsSheetViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/ReimbursementViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchFilterStateTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SelectRelatedRecordViewModelTest.kt",
+    "feature/records/src/test/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/TypedAnalyticsViewModelTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/screen/AboutUsScreenScreenshotTests.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/screen/BackupAndRecoveryScreenScreenshotTests.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/screen/LauncherScreenBackHandlerTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/screen/LauncherScreenScreenshotTests.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/screen/MarkdownScreenScreenshotTests.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/screen/SettingScreenScreenshotTests.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/viewmodel/AboutUsViewModelTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/viewmodel/BackupAndRecoveryDomainValidationTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/viewmodel/BackupAndRecoveryViewModelTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/viewmodel/LauncherViewModelTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/viewmodel/MainAppViewModelTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/viewmodel/MarkdownViewModelTest.kt",
+    "feature/settings/src/test/kotlin/cn/wj/android/cashbook/feature/settings/viewmodel/SettingViewModelTest.kt",
+    "feature/tags/src/test/kotlin/cn/wj/android/cashbook/feature/tags/screen/EditRecordSelectTagBottomSheetScreenScreenshotTests.kt",
+    "feature/tags/src/test/kotlin/cn/wj/android/cashbook/feature/tags/screen/MyTagsScreenScreenshotTests.kt",
+    "feature/tags/src/test/kotlin/cn/wj/android/cashbook/feature/tags/viewmodel/DeleteTagDialogViewModelTest.kt",
+    "feature/tags/src/test/kotlin/cn/wj/android/cashbook/feature/tags/viewmodel/EditRecordSelectTagBottomSheetViewModelTest.kt",
+    "feature/tags/src/test/kotlin/cn/wj/android/cashbook/feature/tags/viewmodel/EditTagDialogViewModelTest.kt",
+    "feature/tags/src/test/kotlin/cn/wj/android/cashbook/feature/tags/viewmodel/MyTagsViewModelTest.kt",
+    "feature/types/src/test/kotlin/cn/wj/android/cashbook/feature/types/screen/EditRecordTypeListScreenScreenshotTests.kt",
+    "feature/types/src/test/kotlin/cn/wj/android/cashbook/feature/types/screen/MyCategoriesScreenProtectedMenuTest.kt",
+    "feature/types/src/test/kotlin/cn/wj/android/cashbook/feature/types/screen/MyCategoriesScreenRenderRegressionTest.kt",
+    "feature/types/src/test/kotlin/cn/wj/android/cashbook/feature/types/screen/MyCategoriesScreenScreenshotTests.kt",
+    "feature/types/src/test/kotlin/cn/wj/android/cashbook/feature/types/viewmodel/EditRecordTypeListViewModelTest.kt",
+    "feature/types/src/test/kotlin/cn/wj/android/cashbook/feature/types/viewmodel/MyCategoriesViewModelTest.kt",
+    "feature/types/src/test/kotlin/cn/wj/android/cashbook/feature/types/viewmodel/TypeIconGroupListViewModelTest.kt",
+    "lint/src/test/kotlin/cn/wj/android/cashbook/lint/DesignDetectorTest.kt",
+    "lint/src/test/kotlin/cn/wj/android/cashbook/lint/TestMethodNameDetectorTest.kt",
+    "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/reminder/NotificationSpecTest.kt",
+    "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/reminder/ReminderLogicTest.kt",
+    "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/reminder/ReminderRunTest.kt",
+    "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/reminder/SelectReminderCreditCardsTest.kt",
+    "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/workers/AutoBackupWorkerTest.kt",
+    "sync/work/src/test/kotlin/cn/wj/android/cashbook/sync/workers/ReminderScheduleTest.kt"
+  ]
+}
