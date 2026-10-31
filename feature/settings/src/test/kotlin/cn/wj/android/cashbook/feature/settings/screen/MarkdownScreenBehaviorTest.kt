@@ -19,6 +19,7 @@ package cn.wj.android.cashbook.feature.settings.screen
 import android.content.ActivityNotFoundException
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.view.View
@@ -37,11 +38,16 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.feature.settings.view.MarkdownContent
 import cn.wj.android.cashbook.feature.settings.view.openMarkdownLink
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
+import com.github.takahirom.roborazzi.RoborazziOptions
+import com.github.takahirom.roborazzi.RoborazziTaskType
+import com.github.takahirom.roborazzi.captureRoboImage
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import dagger.hilt.android.testing.HiltTestApplication
@@ -60,6 +66,7 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import java.io.File
 
 /**
  * 从真实页面的原生文本与点击副作用守护链接接线，避免仅测试未被页面使用的打开函数。
@@ -179,6 +186,45 @@ class MarkdownScreenBehaviorTest {
             assertThat((updated.parent as ScrollView).scrollY).isEqualTo(position)
         }
         composeTestRule.onNodeWithText("重组后的标题").assertIsDisplayed()
+    }
+
+    @Test
+    @OptIn(ExperimentalRoborazziApi::class)
+    fun scrolledMarkdown_keepsAllTitleBarPixelsUnchanged() {
+        val title = "标题边界"
+        val markdown = (1..160).joinToString("\n\n") { "段落 $it：滚动正文不能覆盖标题和返回按钮。" }
+        composeTestRule.setContent {
+            CashbookTheme {
+                MarkdownScreen(title = title, markdownData = markdown, onBackClick = {})
+            }
+        }
+        val titleBottom = kotlin.math.ceil(composeTestRule.onNodeWithText(title).fetchSemanticsNode().boundsInRoot.bottom).toInt()
+        val rootTop = kotlin.math.round(composeTestRule.onRoot().fetchSemanticsNode().boundsInWindow.top).toInt()
+        val headerHeight = composeTestRule.runOnIdle {
+            val location = IntArray(2)
+            (markdownText("段落 160").parent as ScrollView).getLocationInWindow(location)
+            location[1] - rootTop
+        }
+        assertThat(headerHeight).isAtLeast(titleBottom)
+        fun headerPixels(name: String): IntArray {
+            val file = File("build/tmp/markdown-viewport/$name.png")
+            file.parentFile!!.mkdirs()
+            composeTestRule.onRoot().captureRoboImage(
+                file.absolutePath,
+                roborazziOptions = RoborazziOptions(taskType = RoborazziTaskType.Record, recordOptions = RoborazziOptions.RecordOptions(resizeScale = 1.0)),
+            )
+            val bitmap = checkNotNull(BitmapFactory.decodeFile(file.absolutePath))
+            return IntArray(bitmap.width * headerHeight).also { bitmap.getPixels(it, 0, bitmap.width, 0, 0, bitmap.width, headerHeight) }
+        }
+        val expected = headerPixels("before")
+        composeTestRule.runOnIdle {
+            val scroll = markdownText("段落 160").parent as ScrollView
+            scroll.scrollTo(0, 500)
+            assertThat(scroll.scrollY).isEqualTo(500)
+        }
+        val after = headerPixels("after")
+        val changed = expected.indices.count { index -> expected[index] != after[index] }
+        assertWithMessage("长文滚动后标题区不得被原生正文绘制覆盖").that(changed).isEqualTo(0)
     }
 
     @Test

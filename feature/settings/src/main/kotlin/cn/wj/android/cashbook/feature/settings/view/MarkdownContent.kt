@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.feature.settings.view
 
 import android.util.TypedValue
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,7 +89,9 @@ internal fun MarkdownContent(
             factory = { viewContext ->
                 ScrollView(viewContext).apply {
                     isFillViewport = true
-                    clipToPadding = false
+                    // AndroidView 不自动裁剪原生内容，滚动绘制必须限制在正文视口内。
+                    outlineProvider = ViewOutlineProvider.BOUNDS
+                    clipToOutline = true
                     addView(
                         TextView(viewContext),
                         ViewGroup.LayoutParams(
