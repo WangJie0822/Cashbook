@@ -435,4 +435,21 @@ class SearchFilterScreenTest {
         compose.onNodeWithTag("search_query_loading").assertIsDisplayed()
         compose.onNodeWithTag("filter_summary_count").assertDoesNotExist()
     }
+
+    @Test fun restoredIntentWithoutMetadataNeverShowsAQueriedEmptyList() {
+        val state = SearchFilterState(mode = SearchMode.Filter, appliedFilter = RecordFilter())
+        val pages = flowOf(PagingData.from(emptyList<RecordViewsEntity>(), sourceLoadStates = LoadStates(LoadState.NotLoading(false), LoadState.NotLoading(true), LoadState.NotLoading(true))))
+        compose.setContent {
+            CompositionLocalProvider(LocalDefaultEmptyImagePainter provides ColorPainter(Color.Gray), LocalDefaultLoadingHint provides "数据加载中") {
+                CashbookTheme {
+                    val records = pages.collectAsLazyPagingItems()
+                    SearchScreen(null, {}, {}, emptyList(), {}, records, {}, {}, {}, {}, state, SearchFilterSummaryState.Hidden, {})
+                }
+            }
+        }
+        compose.waitForIdle()
+        compose.mainClock.advanceTimeBy(1000L)
+        compose.onNodeWithTag("search_query_loading").assertIsDisplayed()
+        compose.onNodeWithTag("search_statistics_loading").assertDoesNotExist()
+    }
 }

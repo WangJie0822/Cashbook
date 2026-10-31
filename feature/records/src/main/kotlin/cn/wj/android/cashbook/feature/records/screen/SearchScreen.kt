@@ -183,7 +183,7 @@ internal fun SearchScreen(
     val failed = filterState.recordQueryFailure == context || recordList.loadState.refresh is LoadState.Error || filterState.message == SearchFilterMessage.METADATA_FAILED
     val pending = filterState.mode != SearchMode.Initial && !failed &&
         (
-            recordContext != context || recordList.loadState.refresh is LoadState.Loading ||
+            context.mode == SearchMode.Initial || recordContext != context || recordList.loadState.refresh is LoadState.Loading ||
                 (readySummary != null && readySummary.summary.totalCount > 0L && recordList.itemCount == 0)
             )
 
