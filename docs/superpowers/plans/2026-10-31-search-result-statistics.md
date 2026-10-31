@@ -44,34 +44,34 @@
 - `core/testing/.../repository/FakeRecordFilterRepository.kt`：实现新统计契约，保留 summaryProvider 的旧错误/迟到测试接线；新增 keywordRequests 与 keywordStatisticsProvider。SQL 正确性由真实 Room 测试承担。
 - `feature/records/.../model/SearchFilterState.kt`：Ready 保留 context/summary 构造兼容，新增 categories 默认空列表。
 - `feature/records/.../viewmodel/SearchViewModel.kt`：两种查询模式均启动统计；关键词分页携带不可变 RecordKeywordQuery。
-- `feature/records/.../view/SearchResultDistribution.kt`（新增）：纯 UI 分布组件，消费 RecordSearchStatistics；展开/折叠及稳定组键选中由组件管理。
+- `feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/view/SearchResultDistribution.kt`（新增）：SearchDistributionState/rememberSearchDistributionState管理可保存纯UI状态；LazyListScope.searchResultDistribution将首卡和展开余项接入主列表，消费RecordSearchStatistics，点击不修改查询。
 - SearchScreen、search_filter_strings.xml、现有 SearchFilterScreenTest/SearchScreenScreenshotTests：接入两种模式统计、独立统计加载/错误、关键词贡献说明与新截图。
 
 ## Task 1：查询与原子统计链路
 
 **Produces:** 上述模型、两种 observeStatistics Flow、固定关键词分页、Ready.categories。UI 不参与任务1。
 
-- [ ] 在现有 SearchFilterStateTest 写关键词汇总真实旧行为红灯，断言 Keyword 模式 summary 为 Ready；先运行目标用例并保留断言失败 XML。
-- [ ] 模型测试：+5/−3 同组=+2；−3 独占 magnitude=3；同组相抵为零；同名不同 ID；Long.MIN abs、绝对值和/结余溢出明确抛出异常。
-- [ ] 聚合 SQL 以有效父级 CASE 分组；组行总计兼顾平账及未知类型，不展开关系。转账差值用 typeof 检测整数溢出，坏差值贡献暂置0且标 invalidAmounts；仓库收到标志明确失败，不能把它当0。SQL SUM 自身溢出和 Kotlin addExact/subtractExact 均进入统计失败。
-- [ ] 真实 Room 测试放 `core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordSearchStatisticsRoomTest.kt`：对照旧 DAO，构造超过20条匹配、两个账本、重复标签、父子混记、跨类型同名、失效父级、零/负贡献、无匹配；记录及分类修改后统计失效；验证同一发射内汇总与分布守恒。
-- [ ] 增加/适配 data 的 SQL/仓库测试以及全部 RecordFilterDao fake；不能删去已有筛选预算/非法条件用例。
-- [ ] 关键词 query 由已有数值转换构造一次；分页传入同一个 query；初始不查询，关键词不带 appliedFilter。
-- [ ] 适配 FakeRecordRepository 的新重载与明确账本，保留旧入口兼容；FakeFilter 的真实类型/组关系计算与测试输入一致，不用全量空桩冒充统计。
-- [ ] VM 测试：Keyword/Filter 都 Ready；恢复筛选、切账本、关键词空白/初始、加载/失败/重试、旧响应迟到、编辑与分类改名刷新；旧断言只在确属本需求改变时更新，保留互斥/历史语义。
-- [ ] 执行 `./gradlew :core:model:test :core:data:testDebugUnitTest :core:domain:testDebugUnitTest :feature:records:testDebugUnitTest -Proborazzi.test.verify=false --console=plain`，检查真实 XML；仪器测试用 `:core:data:connectedDebugAndroidTest` 目标新类。
-- [ ] 无助手在写入时才提交精确文件清单，中文原子提交。任务1是后续接口前提，钉定 SHA 后派一名 reviewer；可测 finding 最多一轮定向复核，文案自行订正留账。
+- [x] 在现有 SearchFilterStateTest 写关键词汇总真实旧行为红灯，断言 Keyword 模式 summary 为 Ready；先运行目标用例并保留断言失败 XML。
+- [x] 模型测试：+5/−3 同组=+2；−3 独占 magnitude=3；同组相抵为零；同名不同 ID；Long.MIN abs、绝对值和/结余溢出明确抛出异常。
+- [x] 聚合 SQL 以有效父级 CASE 分组；组行总计兼顾平账及未知类型，不展开关系。转账差值用 typeof 检测整数溢出，坏差值贡献暂置0且标 invalidAmounts；仓库收到标志明确失败，不能把它当0。SQL SUM 自身溢出和 Kotlin addExact/subtractExact 均进入统计失败。
+- [x] 真实 Room 测试放 `core/data/src/androidTest/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordSearchStatisticsRoomTest.kt`：对照旧 DAO，构造超过20条匹配、两个账本、重复标签、父子混记、跨类型同名、失效父级、零/负贡献、无匹配；记录及分类修改后统计失效；验证同一发射内汇总与分布守恒。
+- [x] 增加/适配 data 的 SQL/仓库测试以及全部 RecordFilterDao fake；不能删去已有筛选预算/非法条件用例。
+- [x] 关键词 query 由已有数值转换构造一次；分页传入同一个 query；初始不查询，关键词不带 appliedFilter。
+- [x] 适配 FakeRecordRepository 的新重载与明确账本，保留旧入口兼容；FakeFilter 的真实类型/组关系计算与测试输入一致，不用全量空桩冒充统计。
+- [x] VM 测试：Keyword/Filter 都 Ready；恢复筛选、切账本、关键词空白/初始、加载/失败/重试、旧响应迟到、编辑与分类改名刷新；旧断言只在确属本需求改变时更新，保留互斥/历史语义。
+- [x] 执行 `./gradlew :core:model:test :core:data:testDebugUnitTest :core:domain:testDebugUnitTest :feature:records:testDebugUnitTest -Proborazzi.test.verify=false --console=plain`，检查真实 XML；仪器测试用 `:core:data:connectedDebugAndroidTest` 目标新类。
+- [x] 无助手在写入时才提交精确文件清单，中文原子提交。任务1是后续接口前提，钉定 SHA 后派一名 reviewer；可测 finding 最多一轮定向复核，文案自行订正留账。
 
 ## Task 2：搜索页图表与状态
 
 **Consumes:** Task1 的统计结果与 Ready.categories。
 
-- [ ] 先写 UI 行为断言：关键词统计可见；统计错误而列表仍在；正负/零/无匹配；图例超过5行可展开；折叠不改变查询；点图例选中/取消；小比例仍列出。
-- [ ] 新组件复用 CbPieChart，sliceSpaceDegrees=0、showLeaderLines=false；扇区为全部非零组，图例含零组。默认展开、默认前5，圆心用占比基数或选中组有符号金额；比例为0显示0%，极小非零显示小于显示精度。
-- [ ] 搜索页从整体 failed/pending 拆出统计状态，保留分页错误路径；仅统计失败不隐藏列表，统计加载不混入旧查询数据。两种模式均用贡献解释，不改共享 RecordListItem 默认值。
-- [ ] 新文案放现有 search_filter_strings.xml；沿用设计系统与主题，长中文、手机/平板/折叠屏布局可读且整页滚动。
-- [ ] 补 screenshot 用例；只录本次受影响的 records 截图，核对 Git 改动与可见图片，再验证完整截图基线。
-- [ ] 本地测试通过后原子提交本任务。此任务不含逐字产品实现代码，也不作为后续产品任务设计前提，不额外派 task review。
+- [x] 先写 UI 行为断言：关键词统计可见；统计错误而列表仍在；正负/零/无匹配；图例超过5行可展开；折叠不改变查询；点图例选中/取消；小比例仍列出。
+- [x] 新组件复用 CbPieChart，sliceSpaceDegrees=0、showLeaderLines=false；扇区为全部非零组，图例含零组。默认展开、默认前5，圆心用占比基数或选中组有符号金额；比例为0显示0%，极小非零显示小于显示精度。
+- [x] 搜索页从整体 failed/pending 拆出统计状态，保留分页错误路径；仅统计失败不隐藏列表，统计加载不混入旧查询数据。两种模式均用贡献解释，不改共享 RecordListItem 默认值。
+- [x] 新文案放现有 search_filter_strings.xml；沿用设计系统与主题，长中文、手机/平板/折叠屏布局可读且整页滚动。
+- [x] 补 screenshot 用例；只录本次受影响的 records 截图，核对 Git 改动与可见图片，再验证完整截图基线。
+- [x] 本地测试通过后原子提交本任务。此任务不含逐字产品实现代码，也不作为后续产品任务设计前提，不额外派 task review。
 
 ## Task 3：组合验收与交付
 
