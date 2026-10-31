@@ -19,18 +19,17 @@ package cn.wj.android.cashbook.feature.settings.screen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cn.wj.android.cashbook.core.design.component.CashbookGradientBackground
@@ -40,7 +39,8 @@ import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.settings.viewmodel.MarkdownViewModel
-import io.noties.markwon.Markwon
+import cn.wj.android.cashbook.feature.settings.view.MarkdownContent
+import kotlinx.coroutines.launch
 
 /**
  * Markdown 显示界面
@@ -86,9 +86,13 @@ internal fun MarkdownScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val linkFailureMessage = stringResource(cn.wj.android.cashbook.feature.settings.R.string.markdown_link_open_failed)
     CashbookGradientBackground {
         CbScaffold(
             modifier = modifier,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 CbTopAppBar(title = { Text(text = title) }, onBackClick = onBackClick)
             },
@@ -104,13 +108,11 @@ internal fun MarkdownScreen(
                         modifier = Modifier.align(Alignment.TopCenter),
                     )
                 } else {
-                    Text(
-                        text = buildAnnotatedString {
-                            append(Markwon.create(LocalContext.current).toMarkdown(markdownData))
+                    MarkdownContent(
+                        markdownData = markdownData,
+                        onLinkFailure = {
+                            scope.launch { snackbarHostState.showSnackbar(linkFailureMessage) }
                         },
-                        modifier = Modifier
-                            .verticalScroll(state = rememberScrollState())
-                            .padding(16.dp),
                     )
                 }
             }
