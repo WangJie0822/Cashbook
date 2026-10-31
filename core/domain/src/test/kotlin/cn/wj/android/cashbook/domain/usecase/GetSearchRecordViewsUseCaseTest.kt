@@ -59,6 +59,18 @@ class GetSearchRecordViewsUseCaseTest {
     }
 
     @Test
+    fun createQuery_preservesRawKeywordAndHalfUpMoneyConversion() = runTest {
+        assertThat(useCase.createQuery(2L, "123.456")).isEqualTo(RecordKeywordQuery(2L, "123.456", 12346L))
+        assertThat(useCase.createQuery(2L, "-0.01")).isEqualTo(RecordKeywordQuery(2L, "-0.01", -1L))
+    }
+
+    @Test
+    fun createQuery_doesNotTrimOrTreatTextAsZeroMoney() = runTest {
+        assertThat(useCase.createQuery(2L, " 123 ")).isEqualTo(RecordKeywordQuery(2L, " 123 ", -1L))
+        assertThat(useCase.createQuery(2L, "午餐")).isEqualTo(RecordKeywordQuery(2L, "午餐", -1L))
+    }
+
+    @Test
     fun frozenQuery_keepsBookAndNumericParameterAcrossPages() = runTest {
         recordRepository.addRecord(createRecordModel(id = 1L, booksId = 1L, typeId = 1L, amount = 100L, remark = "alpha"))
         recordRepository.addRecord(createRecordModel(id = 2L, booksId = 2L, typeId = 1L, amount = 100L, remark = "alpha"))

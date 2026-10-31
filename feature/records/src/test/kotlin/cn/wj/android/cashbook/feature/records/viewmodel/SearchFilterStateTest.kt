@@ -218,6 +218,22 @@ class SearchFilterStateTest {
     }
 
     @Test
+    fun keyword_conversionFailureIsReportedInsteadOfEscapingTheUiEvent() = runTest {
+        activate()
+        for (keyword in listOf("1e2147483647", "1e-2147483647")) {
+            f.vm.onKeywordChange(keyword)
+            runCurrent()
+            assertThat(f.vm.filterSummary.value).isInstanceOf(SearchFilterSummaryState.Failed::class.java)
+            assertThat(f.vm.filterState.value.recordQueryFailure).isEqualTo(f.vm.filterState.value.queryContext)
+        }
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(ready().context.keyword).isEqualTo("午餐")
+        assertThat(f.vm.filterState.value.recordQueryFailure).isNull()
+        assertThat(f.vm.filterState.value.message).isNull()
+    }
+
+    @Test
     fun keyword_typeVersionRefreshesThePagedRecordName() = runTest {
         f.records.addRecord(createRecordModel(id = 1L, booksId = 1L, typeId = 11L, remark = "午餐"))
         val presenter = object : PagingDataPresenter<RecordViewsEntity>(kotlinx.coroutines.Dispatchers.Main) {

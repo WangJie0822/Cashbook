@@ -30,7 +30,6 @@ import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.core.common.ext.logger
-import cn.wj.android.cashbook.core.common.ext.toAmountCent
 import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
 import cn.wj.android.cashbook.core.common.model.tagDataVersion
@@ -65,6 +64,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -73,7 +73,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -141,7 +143,12 @@ class SearchViewModel @Inject constructor(
         val key = SearchQueryContext(old.criteriaRevision, candidate.bookId ?: -1L, activeMode, request, candidate.submittedKeyword.takeIf { activeMode == SearchMode.Keyword }.orEmpty())
         val changed = key != old
         val context = key.copy(criteriaRevision = old.criteriaRevision + if (changed) 1 else 0)
-        _filterState.value = candidate.copy(mode = mode, queryContext = context, recordQueryFailure = if (changed || retry) null else candidate.recordQueryFailure)
+        _filterState.value = candidate.copy(
+            mode = mode,
+            queryContext = context,
+            recordQueryFailure = if (changed || retry) null else candidate.recordQueryFailure,
+            message = candidate.message.takeUnless { (changed || retry) && it == SearchFilterMessage.QUERY_FAILED },
+        )
         SearchFilterStateCodec.write(savedStateHandle, _filterState.value)
         if (changed || retry) startQuery(context)
     }
@@ -154,11 +161,11 @@ class SearchViewModel @Inject constructor(
         fun isCurrent() = epoch == attempt && context == filterState.value.queryContext
         _filterSummary.value = if (context.mode != SearchMode.Initial) SearchFilterSummaryState.Loading(context) else SearchFilterSummaryState.Hidden
         val request = context.request
-        val keywordQuery = RecordKeywordQuery(
-            context.bookId,
-            context.keyword,
-            if (context.keyword.toBigDecimalOrNull() != null) context.keyword.toAmountCent() else -1L,
-        )
+        val keywordQuery = if (context.mode == SearchMode.Keyword) {
+            scope.async { getSearchRecordViewsUseCase.createQuery(context.bookId, context.keyword) }
+        } else {
+            null
+        }
         val validation = if (context.mode == SearchMode.Filter && request != null) recordFilterRepository.validate(request) else RecordFilterValidation.Valid
         val pages = when {
             validation != RecordFilterValidation.Valid || (context.mode == SearchMode.Filter && request == null) -> {
@@ -167,10 +174,15 @@ class SearchViewModel @Inject constructor(
                 flowOf(PagingData.empty())
             }
             context.mode == SearchMode.Filter -> getFilteredRecordViewsUseCase(request!!)
-            context.mode == SearchMode.Keyword -> combine(recordDataVersion, typeDataVersion, tagDataVersion, assetDataVersion) { _, _, _, _ -> Unit }.flatMapLatest {
-                Pager(PagingConfig(pageSize = DEFAULT_PAGE_SIZE, initialLoadSize = DEFAULT_PAGE_SIZE)) {
-                    SearchRecordPagingSource(keywordQuery, getSearchRecordViewsUseCase)
-                }.flow
+            context.mode == SearchMode.Keyword -> flow {
+                val query = keywordQuery!!.await()
+                emitAll(
+                    combine(recordDataVersion, typeDataVersion, tagDataVersion, assetDataVersion) { _, _, _, _ -> Unit }.flatMapLatest {
+                        Pager(PagingConfig(pageSize = DEFAULT_PAGE_SIZE, initialLoadSize = DEFAULT_PAGE_SIZE)) {
+                            SearchRecordPagingSource(query, getSearchRecordViewsUseCase)
+                        }.flow
+                    },
+                )
             }
             else -> flowOf(PagingData.empty())
         }.catch { error ->
@@ -183,7 +195,7 @@ class SearchViewModel @Inject constructor(
             scope.launch {
                 try {
                     val statistics = if (context.mode == SearchMode.Keyword) {
-                        recordFilterRepository.observeKeywordStatistics(keywordQuery)
+                        recordFilterRepository.observeKeywordStatistics(keywordQuery!!.await())
                     } else {
                         recordFilterRepository.observeStatistics(request!!)
                     }

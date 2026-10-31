@@ -18,6 +18,7 @@ package cn.wj.android.cashbook.domain.usecase
 
 import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
+import cn.wj.android.cashbook.core.common.ext.toAmountCent
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
@@ -36,6 +37,11 @@ class GetSearchRecordViewsUseCase @Inject constructor(
     private val recordModelTransToViewsUseCase: RecordModelTransToViewsUseCase,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) {
+
+    /** 保留既有金额转换，在 IO 上构造一次供分页与统计共同使用。 */
+    suspend fun createQuery(bookId: Long, keyword: String): RecordKeywordQuery = withContext(coroutineContext) {
+        RecordKeywordQuery(bookId, keyword, if (keyword.toBigDecimalOrNull() != null) keyword.toAmountCent() else -1L)
+    }
 
     suspend operator fun invoke(
         query: RecordKeywordQuery,

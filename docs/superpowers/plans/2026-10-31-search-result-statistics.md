@@ -40,7 +40,7 @@
 - `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordSearchStatisticsSqlBuilder.kt`（新增）：`build(fromWhere: String, args: List<Any>): SupportSQLiteQuery`、`keyword(query: RecordKeywordQuery): SupportSQLiteQuery`。
 - 同目录 `RecordFilterSqlBuilder.kt`：RecordFilterQueries 新增 statistics 查询，从同一 fromWhere/args 构建，预算纳入新查询。
 - `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/RecordFilterRepository.kt` 与 impl：新增 `observeStatistics(RecordFilterRequest)`、`observeKeywordStatistics(RecordKeywordQuery)`，均返回 Flow<RecordSearchStatistics>；原 observeSummary 保留兼容。
-- RecordRepository 接口、真实实现与 FakeRecordRepository：保留旧三参数入口，新增 `queryPagingRecordListByKeyword(query: RecordKeywordQuery, page: Int, pageSize: Int)` 重载；GetSearchRecordViewsUseCase 同样新增 query 重载，调用真实旧 DAO。
+- RecordRepository 接口、真实实现与 FakeRecordRepository：保留旧三参数入口，新增 `queryPagingRecordListByKeyword(query: RecordKeywordQuery, page: Int, pageSize: Int)` 重载；GetSearchRecordViewsUseCase 同样新增 query 重载，调用真实旧 DAO，并提供 `suspend createQuery(bookId: Long, keyword: String): RecordKeywordQuery` 在已注入 IO 上转换。VM 用同一 Deferred 供分页/统计 await，转换失败进入各自错误边界，不逃逸 UI 事件。
 - `core/testing/.../repository/FakeRecordFilterRepository.kt`：实现新统计契约，保留 summaryProvider 的旧错误/迟到测试接线；新增 keywordRequests 与 keywordStatisticsProvider。SQL 正确性由真实 Room 测试承担。
 - `feature/records/.../model/SearchFilterState.kt`：Ready 保留 context/summary 构造兼容，新增 categories 默认空列表。
 - `feature/records/.../viewmodel/SearchViewModel.kt`：两种查询模式均启动统计；关键词分页携带不可变 RecordKeywordQuery。
