@@ -90,11 +90,12 @@ internal fun rememberSearchDistributionState(key: String, categories: List<Recor
 
 /** 展开余项直接进入搜索页的主 LazyColumn，避免嵌套滚动或一次构造全部图例。 */
 internal fun LazyListScope.searchResultDistribution(statistics: RecordSearchStatistics, state: SearchDistributionState) {
-    item(key = "distribution") { SearchResultDistribution(statistics, state, Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
+    val colorOrder = distributionColorOrder(statistics.categories)
+    item(key = "distribution") { SearchResultDistribution(statistics, state, colorOrder, Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
     if (state.expanded && state.allLegends) {
         items(statistics.categories.drop(5), key = { "distribution_more_${it.distributionKey}" }) { category ->
             Surface(Modifier.padding(horizontal = 16.dp).fillMaxWidth(), color = MaterialTheme.colorScheme.surfaceContainer) {
-                SearchDistributionLegend(category, statistics.magnitude, state)
+                SearchDistributionLegend(category, statistics.magnitude, state, colorOrder.getValue(category.distributionKey))
             }
         }
         item(key = "distribution_end") {
@@ -107,12 +108,12 @@ internal fun LazyListScope.searchResultDistribution(statistics: RecordSearchStat
 
 /** 搜索结果的全量分类净额；展示交互不改变任何查询条件。 */
 @Composable
-internal fun SearchResultDistribution(statistics: RecordSearchStatistics, state: SearchDistributionState, modifier: Modifier = Modifier) {
+internal fun SearchResultDistribution(statistics: RecordSearchStatistics, state: SearchDistributionState, colorOrder: Map<String, Int>, modifier: Modifier = Modifier) {
     with(state) {
         val categories = statistics.categories
         val selected = categories.find { it.distributionKey == selectedKey }
         val palette = rememberCbPieChartPalette()
-        fun colorIndex(category: RecordCategoryNet) = Math.floorMod(category.typeId.hashCode() * 31 + category.typeCategory.code, palette.pieColors.size)
+        fun colorIndex(category: RecordCategoryNet) = Math.floorMod(colorOrder.getValue(category.distributionKey), palette.pieColors.size)
         val chartCategories = categories.filter { it.amount != 0L }
         val chartSelected = chartCategories.find { it.distributionKey == selectedKey }
         val chartDescription = stringResource(SearchR.string.search_distribution_chart_count, chartCategories.size) +
@@ -162,7 +163,7 @@ internal fun SearchResultDistribution(statistics: RecordSearchStatistics, state:
                     }
                     val legends: @Composable () -> Unit = {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            categories.take(5).forEach { category -> SearchDistributionLegend(category, statistics.magnitude, state) }
+                            categories.take(5).forEach { category -> SearchDistributionLegend(category, statistics.magnitude, state, colorOrder.getValue(category.distributionKey)) }
                             if (categories.size > 5) {
                                 CbTextButton(onClick = { allLegends = !allLegends }, modifier = Modifier.testTag("distribution_expand")) {
                                     Text(if (allLegends) stringResource(SearchR.string.search_distribution_collapse) else stringResource(SearchR.string.search_distribution_all, categories.size))
@@ -188,10 +189,10 @@ internal fun SearchResultDistribution(statistics: RecordSearchStatistics, state:
 }
 
 @Composable
-private fun SearchDistributionLegend(category: RecordCategoryNet, magnitude: Long, state: SearchDistributionState) {
+private fun SearchDistributionLegend(category: RecordCategoryNet, magnitude: Long, state: SearchDistributionState, colorSlot: Int) {
     val chosen = category.distributionKey == state.selectedKey
     val palette = rememberCbPieChartPalette()
-    val colorIndex = Math.floorMod(category.typeId.hashCode() * 31 + category.typeCategory.code, palette.pieColors.size)
+    val colorIndex = Math.floorMod(colorSlot, palette.pieColors.size)
     Row(
         Modifier.fillMaxWidth().testTag("distribution_group_${category.typeCategory.code}_${category.typeId}")
             .clip(MaterialTheme.shapes.small)
@@ -211,6 +212,10 @@ private fun SearchDistributionLegend(category: RecordCategoryNet, magnitude: Lon
 }
 
 private val RecordCategoryNet.distributionKey: String get() = "${typeCategory.code}:$typeId"
+
+internal fun distributionColorOrder(categories: List<RecordCategoryNet>): Map<String, Int> =
+    categories.sortedWith(compareBy<RecordCategoryNet> { it.amount == 0L }.thenBy { it.typeCategory.code }.thenBy { it.typeId })
+        .mapIndexed { index, category -> category.distributionKey to index }.toMap()
 
 /** 净额已通过模型绝对值/基数校验；极小非零比例不写成 0%。 */
 internal fun distributionPercent(amount: Long, magnitude: Long, locale: Locale = Locale.getDefault()): String {

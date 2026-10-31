@@ -16,11 +16,23 @@
 
 package cn.wj.android.cashbook.feature.records.view
 
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
+import cn.wj.android.cashbook.core.model.model.RecordCategoryNet
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.util.Locale
 
 class SearchDistributionPercentTest {
+    @Test fun sparseNonzeroIdsDoNotCollideOrGiveTheirSlotsToZeroGroups() {
+        val categories = (1L..17L).map { id -> RecordCategoryNet(id, RecordTypeCategoryEnum.EXPENDITURE, "分类$id", if (id in listOf(1L, 9L, 17L)) 100L else 0L) }
+        val slots = distributionColorOrder(categories)
+        // 已知不同的旧槽位作为阳性对照，随后验证三个稀疏非零ID。
+        assertThat(slots["0:2"]).isNotEqualTo(slots["0:3"])
+        assertThat(listOf(1L, 9L, 17L).map { slots.getValue("0:$it") % 8 }.toSet()).hasSize(3)
+        assertThat(listOf(1L, 9L, 17L).map { slots.getValue("0:$it") }).containsExactly(0, 1, 2)
+        assertThat(distributionColorOrder(categories.reversed())).isEqualTo(slots)
+    }
+
     @Test fun negativeNetUsesItsMagnitudeAndZeroRemainsZero() {
         assertThat(distributionPercent(-300, 800, Locale.US)).isEqualTo("37.50%")
         assertThat(distributionPercent(0, 800, Locale.US)).isEqualTo("0%")
