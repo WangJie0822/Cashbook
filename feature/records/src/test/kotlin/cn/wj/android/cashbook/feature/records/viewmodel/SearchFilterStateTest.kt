@@ -31,6 +31,7 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
 import cn.wj.android.cashbook.core.model.model.RecordCategoryNet
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
+import cn.wj.android.cashbook.core.model.model.RecordFilter
 import cn.wj.android.cashbook.core.model.model.RecordSearchStatistics
 import cn.wj.android.cashbook.core.testing.data.createBooksModel
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
@@ -52,6 +53,7 @@ import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import cn.wj.android.cashbook.feature.records.model.SearchFilterMessage
 import cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState
 import cn.wj.android.cashbook.feature.records.model.SearchMode
+import cn.wj.android.cashbook.feature.records.model.SearchFilterState
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -118,7 +120,153 @@ class SearchFilterStateTest {
     }
 
     @Test
-    fun keyword_blocksDrawerButDraftAndClearKeepFilteringAvailable() = runTest {
+    fun keyword_withAppliedTags_statisticsUseIntersection() = runTest {
+        val daily = createTagModel(id = 41L)
+        val other = createTagModel(id = 42L, invisible = true)
+        f.filters.setRecords(
+            listOf(
+                createRecordViewsModel(id = 101L, booksId = 1L, type = f.child, remark = "午餐", amount = 2600L, finalAmount = 2600L, relatedTags = listOf(daily)),
+                createRecordViewsModel(id = 102L, booksId = 1L, type = f.child, remark = "午餐", amount = 4500L, finalAmount = 4500L, relatedTags = listOf(other)),
+                createRecordViewsModel(id = 103L, booksId = 1L, type = f.child, remark = "晚餐", amount = 3800L, finalAmount = 3800L, relatedTags = listOf(daily)),
+                createRecordViewsModel(id = 104L, booksId = 2L, type = f.child, remark = "午餐", amount = 9900L, finalAmount = 9900L, relatedTags = listOf(daily)),
+            ),
+        )
+        activate()
+        applyTag(41L)
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(ready().summary).isEqualTo(RecordFilterSummary(1L, 0L, 2600L))
+        assertThat(ready().categories.single().amount).isEqualTo(2600L)
+        assertThat(ready().context.request!!.tagIds).containsExactly(41L)
+        assertThat(ready().context.bookId).isEqualTo(1L)
+        val presenter = presenter()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { f.vm.recordListData.collectLatest { presenter.collectFrom(it) } }
+        runCurrent()
+        assertThat(presenter.snapshot().items.map { it.id }).containsExactly(101L)
+    }
+
+    @Test
+    fun keywordFirst_applyAndResetFiltersKeepTheSubmittedKeyword() = runTest {
+        f.filters.setRecords(
+            listOf(
+                createRecordViewsModel(id = 101L, type = f.child, remark = "午餐", finalAmount = 2600L, relatedTags = listOf(createTagModel(id = 41L))),
+                createRecordViewsModel(id = 102L, type = f.child, remark = "午餐", finalAmount = 4500L),
+                createRecordViewsModel(id = 103L, type = f.child, remark = "晚餐", finalAmount = 3800L, relatedTags = listOf(createTagModel(id = 41L))),
+            ),
+        )
+        activate()
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(ready().summary.totalCount).isEqualTo(2L)
+        applyTag(41L)
+        runCurrent()
+        assertThat(ready().summary).isEqualTo(RecordFilterSummary(1L, 0L, 2600L))
+        f.vm.onFilterEvent(SearchFilterEvent.OpenDrawer)
+        f.vm.onFilterEvent(SearchFilterEvent.ResetDrawer)
+        assertThat(ready().summary.totalCount).isEqualTo(1L)
+        f.vm.onFilterEvent(SearchFilterEvent.ApplyDrawer)
+        runCurrent()
+        assertThat(ready().context.keyword).isEqualTo("午餐")
+        assertThat(ready().summary).isEqualTo(RecordFilterSummary(2L, 0L, 7100L))
+        f.vm.onFilterEvent(SearchFilterEvent.ClearSubmittedKeyword)
+        runCurrent()
+        assertThat(ready().context.mode).isEqualTo(SearchMode.Filter)
+        assertThat(ready().summary.totalCount).isEqualTo(3L)
+    }
+
+    @Test
+    fun combinedSavedState_restoresBothConditionsAndActualRecordIds() = runTest {
+        val handle = SavedStateHandle()
+        SearchFilterStateCodec.write(handle, SearchFilterState(queryDraft = "未提交", submittedKeyword = "Test", appliedFilter = RecordFilter(tagIds = setOf(41L))))
+        f.close()
+        f = Fixture(handle)
+        activate()
+        val presenter = presenter()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { f.vm.recordListData.collectLatest { presenter.collectFrom(it) } }
+        runCurrent()
+        assertThat(ready().context.request!!.tagIds).containsExactly(41L)
+        assertThat(ready().context.keyword).isEqualTo("Test")
+        assertThat(f.vm.filterState.value.queryDraft).isEqualTo("未提交")
+        assertThat(presenter.snapshot().items.map { it.id }).containsExactly(1L)
+        assertThat(ready().summary).isEqualTo(RecordFilterSummary(1L, 0L, 100L))
+    }
+
+    @Test
+    fun combinedInvalidBudget_isRejectedBeforeExtremeNumberConversionAndCanRecover() = runTest {
+        activate()
+        applyTag(41L)
+        f.filters.validationOverride = RecordFilterValidation.TooManyParameters(901, 900)
+        f.vm.onKeywordChange("1e2147483647")
+        runCurrent()
+        assertThat((f.vm.filterSummary.value as SearchFilterSummaryState.Failed).message).isEqualTo("invalid_filter")
+        assertThat(f.filters.combinedStatisticsRequests).isEmpty()
+        assertThat(f.vm.filterState.value.appliedFilter!!.tagIds).containsExactly(41L)
+        f.filters.validationOverride = null
+        f.vm.onKeywordChange("Test")
+        runCurrent()
+        assertThat(ready().summary.totalCount).isEqualTo(1L)
+    }
+
+    @Test
+    @OptIn(kotlinx.coroutines.InternalCoroutinesApi::class)
+    fun combined_nonCooperativeOldStatisticsAndPagesCannotReplaceAnotherBook() = runTest {
+        val old = CompletableDeferred<Unit>()
+        f.filters.combinedStatisticsProvider = { _, query ->
+            object : kotlinx.coroutines.flow.Flow<RecordSearchStatistics> {
+                override suspend fun collect(collector: kotlinx.coroutines.flow.FlowCollector<RecordSearchStatistics>) {
+                    withContext(NonCancellable) {
+                        if (query.bookId == 1L) old.await()
+                        collector.emit(RecordSearchStatistics(RecordFilterSummary(1L, 0L, query.bookId * 100L), emptyList()))
+                    }
+                }
+            }
+        }
+        f.filters.combinedRecordsProvider = { _, query ->
+            flow { withContext(NonCancellable) { if (query.bookId == 1L) old.await() }; emit(PagingData.from(listOf(createRecordViewsModel(id = query.bookId, type = f.child)))) }
+        }
+        try {
+            activate()
+            applyTag(41L)
+            val presenter = presenter()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { f.vm.recordListData.collectLatest { presenter.collectFrom(it) } }
+            f.vm.onKeywordChange("Test")
+            runCurrent()
+            f.books.setCurrentBook(createBooksModel(id = 2L))
+            runCurrent()
+            assertThat(ready().context.bookId).isEqualTo(2L)
+            assertThat(ready().summary.expenditure).isEqualTo(200L)
+            assertThat(presenter.snapshot().items.map { it.id }).containsExactly(2L)
+            old.complete(Unit)
+            runCurrent()
+            assertThat(ready().context.bookId).isEqualTo(2L)
+            assertThat(presenter.snapshot().items.map { it.id }).containsExactly(2L)
+        } finally { old.complete(Unit) }
+    }
+
+    @Test
+    fun combined_statisticsFailureCanRetryWhileKeepingAValidList() = runTest {
+        var attempts = 0
+        f.filters.combinedStatisticsProvider = { _, _ ->
+            if (attempts++ == 0) flow { error("combined statistics failure") } else flowOf(RecordSearchStatistics(RecordFilterSummary(1L, 0L, 100L), emptyList()))
+        }
+        activate()
+        applyTag(41L)
+        val presenter = presenter()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { f.vm.recordListData.collectLatest { presenter.collectFrom(it) } }
+        f.vm.onKeywordChange("Test")
+        runCurrent()
+        assertThat(f.vm.filterSummary.value).isInstanceOf(SearchFilterSummaryState.Failed::class.java)
+        assertThat(f.vm.filterState.value.recordQueryFailure).isNull()
+        assertThat(presenter.snapshot().items.map { it.id }).containsExactly(1L)
+        f.vm.onFilterEvent(SearchFilterEvent.Retry)
+        runCurrent()
+        assertThat(ready().context.keyword).isEqualTo("Test")
+        assertThat(ready().context.request!!.tagIds).containsExactly(41L)
+        assertThat(ready().summary.totalCount).isEqualTo(1L)
+    }
+
+    @Test
+    fun keyword_allowsDrawerAndClearKeepsAppliedFilter() = runTest {
         activate()
         applyTag(41L)
         val applied = f.vm.filterState.value.appliedFilter
@@ -130,7 +278,7 @@ class SearchFilterStateTest {
         runCurrent()
         val requests = f.filters.recordRequests.size
         f.vm.onFilterEvent(SearchFilterEvent.OpenDrawer)
-        assertThat(f.vm.filterState.value.drawerDraft).isNull()
+        assertThat(f.vm.filterState.value.drawerDraft).isEqualTo(applied)
         assertThat(f.vm.filterState.value.mode).isEqualTo(SearchMode.Keyword)
         assertThat(f.filters.recordRequests).hasSize(requests)
         f.vm.onFilterEvent(SearchFilterEvent.ClearSubmittedKeyword)
@@ -149,7 +297,7 @@ class SearchFilterStateTest {
     }
 
     @Test
-    fun keyword_ignoresPreviouslyAppliedFilter() = runTest {
+    fun keyword_preservesRawTextAndPreviouslyAppliedFilter() = runTest {
         activate()
         applyTag(41L)
         val requests = f.filters.recordRequests.size
@@ -159,15 +307,17 @@ class SearchFilterStateTest {
         assertThat(f.vm.filterState.value.submittedKeyword).isEqualTo("  午餐  ")
         assertThat(f.filters.recordRequests).hasSize(requests)
         assertThat(ready().context.keyword).isEqualTo("  午餐  ")
-        assertThat(ready().context.request).isNull()
-        assertThat(f.filters.keywordRequests.last().keyword).isEqualTo("  午餐  ")
+        assertThat(ready().context.request!!.tagIds).containsExactly(41L)
+        assertThat(f.filters.combinedStatisticsRequests.last().second.keyword).isEqualTo("  午餐  ")
+        assertThat(f.filters.keywordRequests).isEmpty()
     }
 
     @Test
-    fun keyword_statisticsAreFullAndIndependentOfThePausedFilter() = runTest {
+    fun keyword_statisticsCoverAllMatchesInTheAppliedFilterAndCurrentBook() = runTest {
+        val hidden = createTagModel(id = 42L, invisible = true)
         f.filters.setRecords(
-            (1L..35L).map { createRecordViewsModel(id = it, type = f.child, remark = "午餐", amount = 100L, finalAmount = 100L) } +
-                createRecordViewsModel(id = 100L, booksId = 2L, type = f.child, remark = "午餐", amount = 999L, finalAmount = 999L),
+            (1L..61L).map { createRecordViewsModel(id = it, type = f.child, remark = "午餐", amount = 100L, finalAmount = 100L, relatedTags = if (it <= 35L) listOf(hidden) else emptyList()) } +
+                createRecordViewsModel(id = 100L, booksId = 2L, type = f.child, remark = "午餐", amount = 999L, finalAmount = 999L, relatedTags = listOf(hidden)),
         )
         activate()
         applyTag(42L)
@@ -175,7 +325,7 @@ class SearchFilterStateTest {
         runCurrent()
         assertThat(ready().summary).isEqualTo(RecordFilterSummary(35L, 0L, 3500L))
         assertThat(ready().categories.single().amount).isEqualTo(3500L)
-        assertThat(f.filters.keywordRequests.last().bookId).isEqualTo(1L)
+        assertThat(f.filters.combinedStatisticsRequests.last().second.bookId).isEqualTo(1L)
         f.books.setCurrentBook(createBooksModel(id = 2L))
         runCurrent()
         assertThat(ready().summary).isEqualTo(RecordFilterSummary(1L, 0L, 999L))
@@ -591,6 +741,10 @@ class SearchFilterStateTest {
         return f.vm.filterSummary.value as SearchFilterSummaryState.Ready
     }
 
+    private fun presenter() = object : PagingDataPresenter<RecordViewsEntity>(dispatcherRule.testDispatcher) {
+        override suspend fun presentPagingDataEvent(event: PagingDataEvent<RecordViewsEntity>) = Unit
+    }
+
     private inner class Fixture(handle: SavedStateHandle = SavedStateHandle()) {
         val records = FakeRecordRepository()
         val types = FakeTypeRepository()
@@ -613,7 +767,7 @@ class SearchFilterStateTest {
         val filters = FakeRecordFilterRepository(types.allTypeListData, tags.tagListData).apply {
             setRecords(
                 listOf(
-                    createRecordViewsModel(id = 1L, type = child, amount = 100L, finalAmount = 100L, relatedTags = listOf(createTagModel(id = 41L))),
+                    createRecordViewsModel(id = 1L, type = child, remark = "Test", amount = 100L, finalAmount = 100L, relatedTags = listOf(createTagModel(id = 41L))),
                     createRecordViewsModel(id = 2L, type = income, amount = 200L, finalAmount = 200L, relatedTags = listOf(createTagModel(id = 42L, invisible = true))),
                     createRecordViewsModel(id = 3L, booksId = 2L, type = child, amount = 300L, finalAmount = 300L, relatedTags = listOf(createTagModel(id = 41L))),
                 ),

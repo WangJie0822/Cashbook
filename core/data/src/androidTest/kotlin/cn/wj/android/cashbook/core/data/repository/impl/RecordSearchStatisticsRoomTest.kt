@@ -16,6 +16,9 @@
 
 package cn.wj.android.cashbook.core.data.repository.impl
 
+import androidx.paging.LoadState
+import androidx.paging.PagingDataEvent
+import androidx.paging.PagingDataPresenter
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -31,11 +34,16 @@ import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
 import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.model.RecordSearchStatistics
+import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -240,10 +248,218 @@ class RecordSearchStatisticsRoomTest {
         }
     }
 
+    @Test fun combinedPagingAndStatistics_matchOldDaoIntersectionAcrossAllPages() = runTest {
+        database.tagDao().insert(TagTable(1, "偶数", -1, 0))
+        database.tagDao().insert(TagTable(2, "三的倍数", -1, 1))
+        for (id in 1L..61L) {
+            database.typeDao().insertType(type(10000 + id))
+            put(id, type = 10000 + id, amount = id, remark = "组合匹配")
+            val tags = buildList {
+                if (id % 2 == 0L) add(1L)
+                if (id % 3 == 0L) add(2L)
+            }
+            attachTags(id, tags)
+        }
+        put(62, book = 2, amount = 99999, remark = "组合匹配")
+        attachTags(62, listOf(1, 2))
+        put(63, amount = 99999, remark = "组合匹配") // 有关键词、无选中标签。
+        put(64, amount = 99999, remark = "其他内容") // 有标签、无关键词。
+        attachTags(64, listOf(1))
+        val filter = request().copy(tagIds = setOf(1, 2))
+        val keyword = RecordKeywordQuery(1, "组合匹配", -1)
+        val oldKeywordIds = oldKeywordIds(keyword)
+        val oldFilterIds = records(filter).map { it.id }.toSet()
+        assertThat(oldKeywordIds).hasSize(62)
+        assertThat(oldFilterIds).hasSize(41)
+        val expectedIds = listOf(
+            2L, 3L, 4L, 6L, 8L, 9L, 10L, 12L, 14L, 15L,
+            16L, 18L, 20L, 21L, 22L, 24L, 26L, 27L, 28L, 30L,
+            32L, 33L, 34L, 36L, 38L, 39L, 40L, 42L, 44L, 45L,
+            46L, 48L, 50L, 51L, 52L, 54L, 56L, 57L, 58L, 60L,
+        )
+        val combined = records(filter, keyword)
+        assertThat(combined.map { it.id }).containsExactlyElementsIn(oldKeywordIds intersect oldFilterIds)
+        assertThat(combined.map { it.id }).containsExactlyElementsIn(expectedIds.reversed()).inOrder()
+        assertThat(combined).hasSize(40)
+        val stats = withTimeout(20000) { repository.observeStatistics(filter, keyword).first() }
+        assertThat(stats.summary).isEqualTo(RecordFilterSummary(40, 0, 1230))
+        // 每笔有独立一级分类：列表漏页不能靠分类合并或相同总额掩盖。
+        assertThat(stats.categories.map { it.typeId - 10000 }).containsExactlyElementsIn(expectedIds)
+        assertThat(stats.categories.associate { it.typeId - 10000 to it.amount })
+            .containsExactlyEntriesIn(expectedIds.associateWith { it })
+        assertThat(stats.magnitude).isEqualTo(1230)
+    }
+
+    @Test fun combinedPredicates_keepParentExclusionsNetAmountsTagsAndDateBoundaries() = runTest {
+        database.tagDao().insert(TagTable(1, "公开", -1, 0))
+        database.tagDao().insert(TagTable(2, "隐藏", -1, 1))
+        put(100, type = 11, amount = 99999, remark = "组合", time = 1000) // 起点之前。
+        put(1, type = 11, amount = 100, finalAmount = 80, remark = "组合") // 起点包含。
+        put(2, type = 12, amount = 99999, remark = "组合") // 显式排除的子类。
+        put(3, type = 20, amount = 300, finalAmount = 250, remark = "组合")
+        put(4, type = 31, amount = 500000, charge = 100, concessions = 400, remark = "组合")
+        put(5, type = 32, amount = 500000, charge = 50, concessions = 250, remark = "组合")
+        put(6, type = 11, amount = 99999, remark = "组合") // 终点不包含。
+        put(7, type = 11, amount = 99999, book = 2, remark = "组合", time = 1002)
+        put(8, type = 11, amount = 99999, remark = "其他内容", time = 1002)
+        put(9, type = 11, amount = 99999, remark = "组合", time = 1002) // 无标签。
+        put(10, type = 40, amount = 99999, remark = "组合", time = 1002) // 不在分类集合。
+        for (id in listOf(100L, 1L, 2L, 3L, 5L, 6L, 7L, 8L, 10L)) attachTags(id, listOf(1, 2))
+        attachTags(4, listOf(2))
+        val filter = request().copy(
+            fromInclusive = 1001,
+            toExclusive = 1006,
+            typeCategories = setOf(
+                RecordTypeCategoryEnum.EXPENDITURE,
+                RecordTypeCategoryEnum.INCOME,
+                RecordTypeCategoryEnum.TRANSFER,
+            ),
+            categories = CategoryFilterSelection(
+                wholeGroupIds = setOf(10, 30),
+                exactTypeIds = setOf(20),
+                excludedTypeIds = setOf(12),
+            ),
+            tagIds = setOf(1, 2),
+        )
+        val keyword = RecordKeywordQuery(1, "组合", -1)
+        val combinedIds = records(filter, keyword).map { it.id }
+        assertThat(combinedIds).containsExactly(5L, 4L, 3L, 1L).inOrder()
+        assertThat(combinedIds).containsExactlyElementsIn(oldKeywordIds(keyword) intersect records(filter).map { it.id }.toSet())
+        val stats = withTimeout(20000) { repository.observeStatistics(filter, keyword).first() }
+        assertThat(stats.summary).isEqualTo(RecordFilterSummary(4, 250, -420))
+        assertThat(stats.categories.associate { it.typeId to it.amount }).containsExactly(10L, 80L, 20L, 250L, 30L, -500L)
+        assertThat(stats.magnitude).isEqualTo(830)
+        val incomeOnly = filter.copy(typeCategories = setOf(RecordTypeCategoryEnum.INCOME))
+        assertThat(records(incomeOnly, keyword).map { it.id }).containsExactly(3L)
+        assertThat(withTimeout(20000) { repository.observeStatistics(incomeOnly, keyword).first() }.summary)
+            .isEqualTo(RecordFilterSummary(1, 250, 0))
+        assertThat(records(filter.copy(fromInclusive = 1002), keyword).map { it.id })
+            .containsExactly(5L, 4L, 3L).inOrder()
+        assertThat(records(filter.copy(toExclusive = 1005), keyword).map { it.id })
+            .containsExactly(4L, 3L, 1L).inOrder()
+    }
+
+    @Test fun combinedLiveTagDeletionAndRecordInsertion_refreshPagingAndStatistics() = runTest {
+        val deletedTag = TagTable(1, "待删除", -1, 0)
+        database.tagDao().insert(deletedTag)
+        database.tagDao().insert(TagTable(2, "隐藏但仍有效", -1, 1))
+        put(1, amount = 100, remark = "组合")
+        attachTags(1, listOf(1))
+        put(3, amount = 99999, remark = "其他内容")
+        attachTags(3, listOf(2))
+        val filter = request().copy(tagIds = setOf(1, 2))
+        val keyword = RecordKeywordQuery(1, "组合", -1)
+        withContext(Dispatchers.Default) {
+            withTimeout(20000) {
+                withContext(Dispatchers.Main) {
+                    val initial = CompletableDeferred<RecordSearchStatistics>()
+                    val deleted = CompletableDeferred<RecordSearchStatistics>()
+                    val inserted = CompletableDeferred<RecordSearchStatistics>()
+                    val presenter = presenter()
+                    val pagingJob = launch {
+                        repository.observeRecords(filter, keyword).collectLatest { presenter.collectFrom(it) }
+                    }
+                    val statisticsJob = launch {
+                        repository.observeStatistics(filter, keyword).collect { stats ->
+                            assertThat(stats.categories.sumOf { it.amount }).isEqualTo(stats.summary.expenditure)
+                            if (!initial.isCompleted) initial.complete(stats)
+                            if (stats.summary.totalCount == 0L) deleted.complete(stats)
+                            if (stats.summary == RecordFilterSummary(1, 0, 200)) inserted.complete(stats)
+                        }
+                    }
+                    try {
+                        settled(presenter)
+                        assertThat(presenter.snapshot().items.map { it.id }).containsExactly(1L)
+                        assertThat(initial.await().summary).isEqualTo(RecordFilterSummary(1, 0, 100))
+                        val removedPage = async(start = CoroutineStart.UNDISPATCHED) {
+                            presenter.onPagesUpdatedFlow.first { presenter.snapshot().items.isEmpty() }
+                        }
+                        database.tagDao().delete(deletedTag)
+                        removedPage.await()
+                        settled(presenter)
+                        assertThat(presenter.snapshot().items).isEmpty()
+                        assertThat(deleted.await().summary).isEqualTo(RecordFilterSummary(0, 0, 0))
+                        val insertedPage = async(start = CoroutineStart.UNDISPATCHED) {
+                            presenter.onPagesUpdatedFlow.first { presenter.snapshot().items.map { it.id } == listOf(2L) }
+                        }
+                        put(2, amount = 200, remark = "组合")
+                        attachTags(2, listOf(2))
+                        insertedPage.await()
+                        settled(presenter)
+                        assertThat(presenter.snapshot().items.map { it.id }).containsExactly(2L)
+                        val refreshed = inserted.await()
+                        assertThat(refreshed.summary).isEqualTo(RecordFilterSummary(1, 0, 200))
+                        assertThat(refreshed.categories.associate { it.typeId to it.amount }).containsExactly(10L, 200L)
+                    } finally {
+                        pagingJob.cancelAndJoin()
+                        statisticsJob.cancelAndJoin()
+                    }
+                }
+            }
+        }
+    }
+
+    /** 分页读取旧 DAO，避免把只读首屏的集合当作完整关键词集合。 */
+    private suspend fun oldKeywordIds(query: RecordKeywordQuery): Set<Long> = withTimeout(20000) {
+        val ids = mutableSetOf<Long>()
+        var offset = 0
+        while (true) {
+            check(offset < 2000) { "Old keyword DAO did not finish within 100 pages" }
+            val page = database.recordDao().queryRecordByKeyword(query.bookId, query.keyword, query.amountCent, offset, 20)
+            ids += page.map { it.id!! }
+            if (page.size < 20) break
+            offset += 20
+        }
+        ids
+    }
+
+    private fun presenter() = object : PagingDataPresenter<RecordViewsModel>(Dispatchers.Main) {
+        override suspend fun presentPagingDataEvent(event: PagingDataEvent<RecordViewsModel>) = Unit
+    }
+
+    private suspend fun settled(presenter: PagingDataPresenter<RecordViewsModel>) {
+        val states = presenter.loadStateFlow.filterNotNull().first {
+            it.refresh !is LoadState.Loading && it.append !is LoadState.Loading
+        }
+        listOf(states.refresh, states.append).filterIsInstance<LoadState.Error>().firstOrNull()?.let { throw it.error }
+    }
+
+    /** 沿用真实 Room 测试的公共 Paging 展示器；事件等待和最大页数同时有界。 */
+    private suspend fun records(request: RecordFilterRequest, keyword: RecordKeywordQuery? = null): List<RecordViewsModel> =
+        withContext(Dispatchers.Default) {
+            withTimeout(20000) {
+                withContext(Dispatchers.Main) {
+                    val presenter = presenter()
+                    val job = launch {
+                        val paging = if (keyword == null) repository.observeRecords(request) else repository.observeRecords(request, keyword)
+                        paging.collectLatest { presenter.collectFrom(it) }
+                    }
+                    try {
+                        settled(presenter)
+                        var loads = 0
+                        while ((presenter.loadStateFlow.value?.append as? LoadState.NotLoading)?.endOfPaginationReached != true) {
+                            check(++loads <= 100) { "Paging did not finish within 100 page events" }
+                            val update = async(start = CoroutineStart.UNDISPATCHED) { presenter.onPagesUpdatedFlow.first() }
+                            presenter[presenter.size - 1]
+                            update.await()
+                            settled(presenter)
+                        }
+                        presenter.snapshot().items
+                    } finally {
+                        job.cancelAndJoin()
+                    }
+                }
+            }
+        }
+
+    private suspend fun attachTags(recordId: Long, tagIds: List<Long>) {
+        database.transactionDao().insertRelatedTags(tagIds.map { TagWithRecordTable(null, recordId, it) })
+    }
+
     private fun request() = RecordFilterRequest(1, 0, 100000, emptySet(), CategoryFilterSelection(), emptySet())
     private fun type(id: Long, parent: Long = -1, category: Int = 0) =
         TypeTable(id, parent, "同名", "vector_type_three_meals_24", if (parent == -1L) 0 else 1, category, 0, 0)
-    private suspend fun put(id: Long, type: Long = 11, amount: Long = 100, finalAmount: Long = amount, charge: Long = 0, concessions: Long = 0, book: Long = 1, remark: String = "匹配") {
-        database.transactionDao().insertRecord(RecordTable(id, type, NO_ASSET_ID, NO_ASSET_ID, book, amount, finalAmount, concessions, charge, remark, 0, 1000 + id))
+    private suspend fun put(id: Long, type: Long = 11, amount: Long = 100, finalAmount: Long = amount, charge: Long = 0, concessions: Long = 0, book: Long = 1, remark: String = "匹配", time: Long = 1000 + id) {
+        database.transactionDao().insertRecord(RecordTable(id, type, NO_ASSET_ID, NO_ASSET_ID, book, amount, finalAmount, concessions, charge, remark, 0, time))
     }
 }

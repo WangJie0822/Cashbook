@@ -37,6 +37,7 @@ data class SearchQueryContext(
     val mode: SearchMode = SearchMode.Initial,
     val request: RecordFilterRequest? = null,
     val keyword: String = "",
+    val filterApplied: Boolean = request != null,
 )
 
 /** 每套条件持有独立分页缓存，切换时不重放上一条件的页面。 */

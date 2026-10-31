@@ -109,7 +109,7 @@ class SearchFilterScreenTest {
             val travel = listOf(createTagModel(id = 41L, name = "旅行"))
             fixture.filters.setRecords(
                 listOf(
-                    createRecordViewsModel(id = 1L, type = expense, amount = 100L, finalAmount = 100L, relatedTags = travel),
+                    createRecordViewsModel(id = 1L, type = expense, amount = 100L, finalAmount = 100L, remark = "关键词", relatedTags = travel),
                     createRecordViewsModel(id = 2L, type = income, amount = 80000L, finalAmount = 0L, relatedRecord = listOf(createRecordModel(id = 101L)), relatedTags = travel),
                     createRecordViewsModel(id = 3L, type = transfer, amount = 500000L, finalAmount = -200L, charges = 200L, relatedTags = travel),
                     createRecordViewsModel(id = 4L, type = expense, amount = 300L, finalAmount = 300L, remark = "关键词", relatedTags = listOf(createTagModel(id = 42L))),
@@ -160,16 +160,18 @@ class SearchFilterScreenTest {
         compose.onNodeWithTag("filter_summary_expenditure").assertIsDisplayed()
     }
 
-    @Test fun submittedKeyword_ignoresFiltersAndClearRestoresThem() {
+    @Test fun submittedKeyword_intersectsFiltersAndClearRestoresTheirFullResults() {
         show()
         applyTravel()
         compose.onNodeWithTag("search_query").performTextInput("关键词")
         compose.onNodeWithTag("search_query").performImeAction()
-        waitFor("search_record_4")
-        compose.onNodeWithTag("search_record_4").assertIsDisplayed()
+        waitFor("search_record_1")
+        compose.onNodeWithTag("search_record_1").assertIsDisplayed()
+        compose.onNodeWithTag("search_record_4").assertDoesNotExist()
+        compose.onNodeWithTag("filter_conditions").assertIsDisplayed()
         compose.onNodeWithTag("filter_summary_count").assertIsDisplayed()
         compose.onNodeWithText("1 笔").assertIsDisplayed()
-        compose.onNodeWithTag("filter_contribution_4").assertDoesNotExist()
+        compose.onNodeWithTag("filter_contribution_1").assertDoesNotExist()
         compose.runOnIdle { assertThat(fixture.vm.filterState.value.mode).isEqualTo(SearchMode.Keyword) }
         compose.onNodeWithTag("search_clear").performClick()
         waitFor("filter_summary_count")
@@ -177,16 +179,16 @@ class SearchFilterScreenTest {
         compose.onNodeWithTag("search_record_4").assertDoesNotExist()
     }
 
-    @Test fun keyword_disablesFilterEntryAndExplainsHowToRestoreIt() {
+    @Test fun keyword_keepsFilterEntryEnabledAndOpensItsAppliedDraft() {
         show()
         applyTravel()
         compose.onNodeWithTag("search_query").performTextInput("关键词")
         compose.onNodeWithTag("search_filter_button").assertIsEnabled()
         compose.onNodeWithTag("search_query").performImeAction()
-        waitFor("search_record_4")
-        compose.onNodeWithTag("search_filter_button").assertIsNotEnabled()
-        compose.onNodeWithTag("search_filter_button").assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "清空关键字后筛选"))
-        compose.runOnIdle { assertThat(fixture.vm.filterState.value.drawerDraft).isNull() }
+        waitFor("filter_conditions")
+        compose.onNodeWithTag("search_filter_button").assertIsEnabled().performClick()
+        compose.runOnIdle { assertThat(fixture.vm.filterState.value.drawerDraft!!.tagIds).containsExactly(41L) }
+        compose.onNodeWithTag("filter_drawer_close").performClick()
         compose.onNodeWithTag("search_clear").performClick()
         waitFor("filter_summary_count")
         compose.onNodeWithTag("search_filter_button").assertIsEnabled().performClick()
