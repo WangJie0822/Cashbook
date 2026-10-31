@@ -26,9 +26,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecordFilterRepository {
     fun validate(request: RecordFilterRequest): RecordFilterValidation
+    fun validate(request: RecordFilterRequest, hasKeyword: Boolean): RecordFilterValidation
     fun observeRecords(request: RecordFilterRequest): Flow<PagingData<RecordViewsModel>>
+    fun observeRecords(request: RecordFilterRequest, keyword: RecordKeywordQuery): Flow<PagingData<RecordViewsModel>>
     fun observeSummary(request: RecordFilterRequest): Flow<RecordFilterSummary>
     fun observeStatistics(request: RecordFilterRequest): Flow<RecordSearchStatistics>
+    fun observeStatistics(request: RecordFilterRequest, keyword: RecordKeywordQuery): Flow<RecordSearchStatistics>
     fun observeKeywordStatistics(query: RecordKeywordQuery): Flow<RecordSearchStatistics>
 }
 

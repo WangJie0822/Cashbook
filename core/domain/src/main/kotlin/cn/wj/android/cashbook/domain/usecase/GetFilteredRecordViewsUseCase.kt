@@ -19,10 +19,12 @@ package cn.wj.android.cashbook.domain.usecase
 import androidx.paging.map
 import cn.wj.android.cashbook.core.data.repository.RecordFilterRepository
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetFilteredRecordViewsUseCase @Inject constructor(private val repository: RecordFilterRepository) {
     operator fun invoke(request: RecordFilterRequest) = repository.observeRecords(request).map { page -> page.map { it.asEntity() } }
+    operator fun invoke(request: RecordFilterRequest, keyword: RecordKeywordQuery) = repository.observeRecords(request, keyword).map { page -> page.map { it.asEntity() } }
 }

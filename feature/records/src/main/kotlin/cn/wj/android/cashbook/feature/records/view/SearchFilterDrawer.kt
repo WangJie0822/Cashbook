@@ -17,7 +17,13 @@
 package cn.wj.android.cashbook.feature.records.view
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -27,7 +33,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePickerDialog
@@ -40,15 +45,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.component.CbHorizontalDivider
@@ -70,107 +80,159 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import cn.wj.android.cashbook.feature.records.R as FilterR
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SearchFilterDrawer(state: SearchFilterState, onEvent: (SearchFilterEvent) -> Unit, modifier: Modifier = Modifier) {
-    val draft = state.drawerDraft ?: return
-    val validDate = runCatching { draft.dateSelection.toDateRange(state.monthStartDay).let { it.first < it.second } }.getOrDefault(false)
-    BackHandler { onEvent(if (state.categoryDraft != null) SearchFilterEvent.CancelCategories else SearchFilterEvent.CancelDrawer) }
-    Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-        if (state.categoryDraft != null) {
-            SearchCategoryPicker(state, onEvent)
-        } else {
-            var showDatePicker by rememberSaveable { mutableStateOf(false) }
-            if (showDatePicker) {
-                SearchFilterDateRangeDialog(draft.dateSelection, state.monthStartDay, { showDatePicker = false }) {
-                    onEvent(SearchFilterEvent.UpdateDate(it)); showDatePicker = false
-                }
+    SearchFilterDrawerContent(state, onEvent, modifier, active = state.drawerDraft != null)
+}
+
+private enum class FilterPage { Root, Categories, Tags }
+private data class FilterPageSnapshot(val page: FilterPage, val state: SearchFilterState)
+
+@Composable
+internal fun SearchFilterDrawerContent(state: SearchFilterState, onEvent: (SearchFilterEvent) -> Unit, modifier: Modifier, active: Boolean) {
+    if (state.drawerDraft == null) return
+    val page = when {
+        state.categoryDraft != null -> FilterPage.Categories
+        state.tagDraft != null -> FilterPage.Tags
+        else -> FilterPage.Root
+    }
+    val holder = rememberSaveableStateHolder()
+    val focus = LocalFocusManager.current
+    LaunchedEffect(page, active) { focus.clearFocus() }
+    BackHandler(enabled = active) {
+        // 连续操作时重组尚未完成；由 ViewModel 读取当下的草稿层级决定返回目标。
+        onEvent(SearchFilterEvent.Back)
+    }
+    AnimatedContent(
+        targetState = FilterPageSnapshot(page, state),
+        contentKey = { it.page },
+        modifier = modifier.fillMaxSize().clipToBounds(),
+        transitionSpec = {
+            if (targetState.page == FilterPage.Root) {
+                (slideInHorizontally(tween(280)) { -it / 4 } togetherWith slideOutHorizontally(tween(280)) { it }).using(null)
+            } else {
+                (slideInHorizontally(tween(280)) { it } togetherWith slideOutHorizontally(tween(280)) { -it / 4 }).using(null)
             }
-            Column {
-                Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(FilterR.string.search_filter), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f).padding(start = 8.dp))
-                    CbIconButton(onClick = { onEvent(SearchFilterEvent.CancelDrawer) }, modifier = Modifier.testTag("filter_drawer_close")) {
-                        Icon(CbIcons.Close, contentDescription = stringResource(R.string.cancel))
-                    }
-                }
-                LazyColumn(Modifier.weight(1f).testTag("filter_options"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    item {
-                        Text(stringResource(FilterR.string.search_filter_scope, state.bookName), Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.bodyMedium)
-                        Text(stringResource(FilterR.string.search_filter_rule), Modifier.padding(horizontal = 16.dp, vertical = 4.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    item {
-                        FilterSectionTitle(stringResource(FilterR.string.search_filter_time))
-                        FlowRow(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            val today = LocalDate.now()
-                            val month = DateSelectionEntity.currentMonthPeriod(today, state.monthStartDay)
-                            listOf(
-                                FilterR.string.search_filter_all_time to DateSelectionEntity.All,
-                                FilterR.string.search_filter_this_month to month,
-                                FilterR.string.search_filter_last_month to DateSelectionEntity.ByMonth(month.yearMonth.minusMonths(1)),
-                                FilterR.string.search_filter_this_year to DateSelectionEntity.ByYear(today.year),
-                            ).forEach { (label, date) ->
-                                FilterChip(selected = draft.dateSelection == date, onClick = { onEvent(SearchFilterEvent.UpdateDate(date)) }, label = { Text(stringResource(label)) })
-                            }
-                        }
-                        CbTextButton(onClick = { showDatePicker = true }, modifier = Modifier.padding(horizontal = 8.dp).testTag("filter_date_range")) {
-                            Text(if (draft.dateSelection is DateSelectionEntity.DateRange) draft.dateSelection.getDisplayText() else stringResource(FilterR.string.search_filter_range))
-                        }
-                    }
-                    item {
-                        FilterSectionTitle(stringResource(FilterR.string.search_filter_types))
-                        FlowRow(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(selected = draft.typeCategories.isEmpty(), onClick = { onEvent(SearchFilterEvent.UpdateTypes(emptySet())) }, label = { Text(stringResource(FilterR.string.search_filter_any_type)) })
-                            RecordTypeCategoryEnum.entries.forEach { type ->
-                                FilterChip(
-                                    selected = type in draft.typeCategories,
-                                    onClick = { onEvent(SearchFilterEvent.UpdateTypes(if (type in draft.typeCategories) draft.typeCategories - type else draft.typeCategories + type)) },
-                                    label = { Text(filterTypeLabel(type)) },
-                                    modifier = Modifier.testTag("filter_type_${type.name}"),
-                                )
-                            }
-                        }
-                        if (state.removedTypeIds.isNotEmpty()) Text(stringResource(FilterR.string.search_filter_pruned, state.removedTypeIds.size), Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-                    }
-                    item {
-                        FilterSectionTitle(stringResource(FilterR.string.search_filter_categories))
-                        CbTextButton(onClick = { onEvent(SearchFilterEvent.OpenCategories) }, modifier = Modifier.fillMaxWidth().testTag("filter_categories")) {
-                            Column(Modifier.fillMaxWidth()) {
-                                Text(stringResource(FilterR.string.search_filter_choose_categories))
-                                Text(categorySelectionSummary(draft.categories, state), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-                    }
-                    item {
-                        SearchFilterConstraintNotice(draft, state, Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
-                        FilterSectionTitle(stringResource(FilterR.string.search_filter_tags))
-                        CbTextButton(onClick = { draft.tagIds.forEach { onEvent(SearchFilterEvent.ToggleTag(it)) } }, modifier = Modifier.testTag("filter_all_tags")) {
-                            Text(stringResource(FilterR.string.search_filter_any_tag))
-                        }
-                    }
-                    if (state.tags.isEmpty()) item { Text(stringResource(FilterR.string.search_filter_no_tags), Modifier.padding(horizontal = 16.dp)) }
-                    items(state.tags, key = { "tag_${it.id}" }) { tag ->
-                        FilterCheckRow(
-                            text = if (tag.invisible) stringResource(FilterR.string.search_filter_hidden_tag, tag.name) else tag.name,
-                            checked = tag.id in draft.tagIds,
-                            onClick = { onEvent(SearchFilterEvent.ToggleTag(tag.id)) },
-                            modifier = Modifier.testTag("filter_tag_${tag.id}"),
-                        )
-                    }
-                    items((draft.tagIds - state.tags.map { it.id }.toSet()).toList(), key = { "missing_$it" }) { id ->
-                        FilterCheckRow(stringResource(FilterR.string.search_filter_unavailable, id), true, { onEvent(SearchFilterEvent.ToggleTag(id)) }, Modifier.testTag("filter_tag_$id"))
-                    }
-                }
-                (if (!validDate) SearchFilterMessage.INVALID_DATE else state.message)?.takeUnless { it == SearchFilterMessage.INCOMPATIBLE_CATEGORIES_REMOVED }?.let {
-                    Text(filterMessageText(it), Modifier.padding(horizontal = 16.dp, vertical = 8.dp), color = MaterialTheme.colorScheme.error)
-                }
-                CbHorizontalDivider()
-                Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    CbTextButton(onClick = { onEvent(SearchFilterEvent.ResetDrawer) }) { Text(stringResource(FilterR.string.search_filter_reset)) }
-                    CbTextButton(enabled = validDate, onClick = { onEvent(SearchFilterEvent.ApplyDrawer) }) { Text(stringResource(FilterR.string.search_filter_done)) }
+        },
+        label = "filter_secondary_page",
+    ) { snapshot ->
+        val current = active && snapshot.page == page
+        val event: (SearchFilterEvent) -> Unit = { if (current) onEvent(it) }
+        // 退出页使用冻结快照绘制，但不再暴露可操作语义或向当前草稿派事件。
+        Box(Modifier.fillMaxSize().testTag("filter_page_${snapshot.page}").then(if (current) Modifier else Modifier.clearAndSetSemantics {})) {
+            holder.SaveableStateProvider(snapshot.page) {
+                when (snapshot.page) {
+                    FilterPage.Root -> SearchFilterRoot(snapshot.state, event)
+                    FilterPage.Categories -> SearchCategoryPicker(snapshot.state, event)
+                    FilterPage.Tags -> SearchTagPicker(snapshot.state, event)
                 }
             }
         }
     }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SearchFilterRoot(state: SearchFilterState, onEvent: (SearchFilterEvent) -> Unit) {
+    val draft = state.drawerDraft ?: return
+    val validDate = runCatching { draft.dateSelection.toDateRange(state.monthStartDay).let { it.first < it.second } }.getOrDefault(false)
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+        var showDatePicker by rememberSaveable { mutableStateOf(false) }
+        if (showDatePicker) {
+            SearchFilterDateRangeDialog(draft.dateSelection, state.monthStartDay, { showDatePicker = false }) {
+                onEvent(SearchFilterEvent.UpdateDate(it)); showDatePicker = false
+            }
+        }
+        Column {
+            Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(FilterR.string.search_filter), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f).padding(start = 8.dp))
+                CbIconButton(onClick = { onEvent(SearchFilterEvent.CancelDrawer) }, modifier = Modifier.testTag("filter_drawer_close")) {
+                    Icon(CbIcons.Close, contentDescription = stringResource(R.string.cancel))
+                }
+            }
+            LazyColumn(Modifier.weight(1f).testTag("filter_options"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                item {
+                    Text(stringResource(FilterR.string.search_filter_scope, state.bookName), Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(FilterR.string.search_filter_rule), Modifier.padding(horizontal = 16.dp, vertical = 4.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                item {
+                    FilterSectionTitle(stringResource(FilterR.string.search_filter_time))
+                    FlowRow(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        val today = LocalDate.now()
+                        val month = DateSelectionEntity.currentMonthPeriod(today, state.monthStartDay)
+                        listOf(
+                            FilterR.string.search_filter_all_time to DateSelectionEntity.All,
+                            FilterR.string.search_filter_this_month to month,
+                            FilterR.string.search_filter_last_month to DateSelectionEntity.ByMonth(month.yearMonth.minusMonths(1)),
+                            FilterR.string.search_filter_this_year to DateSelectionEntity.ByYear(today.year),
+                        ).forEach { (label, date) ->
+                            FilterChip(selected = draft.dateSelection == date, onClick = { onEvent(SearchFilterEvent.UpdateDate(date)) }, label = { Text(stringResource(label)) })
+                        }
+                    }
+                    CbTextButton(onClick = { showDatePicker = true }, modifier = Modifier.padding(horizontal = 8.dp).testTag("filter_date_range")) {
+                        Text(if (draft.dateSelection is DateSelectionEntity.DateRange) draft.dateSelection.getDisplayText() else stringResource(FilterR.string.search_filter_range))
+                    }
+                }
+                item {
+                    FilterSectionTitle(stringResource(FilterR.string.search_filter_types))
+                    FlowRow(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(selected = draft.typeCategories.isEmpty(), onClick = { onEvent(SearchFilterEvent.UpdateTypes(emptySet())) }, label = { Text(stringResource(FilterR.string.search_filter_any_type)) })
+                        RecordTypeCategoryEnum.entries.forEach { type ->
+                            FilterChip(
+                                selected = type in draft.typeCategories,
+                                onClick = { onEvent(SearchFilterEvent.UpdateTypes(if (type in draft.typeCategories) draft.typeCategories - type else draft.typeCategories + type)) },
+                                label = { Text(filterTypeLabel(type)) },
+                                modifier = Modifier.testTag("filter_type_${type.name}"),
+                            )
+                        }
+                    }
+                    if (state.removedTypeIds.isNotEmpty()) Text(stringResource(FilterR.string.search_filter_pruned, state.removedTypeIds.size), Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                }
+                item {
+                    FilterSectionTitle(stringResource(FilterR.string.search_filter_categories))
+                    CbTextButton(onClick = { onEvent(SearchFilterEvent.OpenCategories) }, modifier = Modifier.fillMaxWidth().testTag("filter_categories")) {
+                        Column(Modifier.fillMaxWidth()) {
+                            Text(stringResource(FilterR.string.search_filter_choose_categories))
+                            Text(categorySelectionSummary(draft.categories, state), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+                item {
+                    SearchFilterConstraintNotice(draft, state, Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+                    FilterSectionTitle(stringResource(FilterR.string.search_filter_tags))
+                    CbTextButton(onClick = { onEvent(SearchFilterEvent.OpenTags) }, modifier = Modifier.fillMaxWidth().testTag("filter_tags")) {
+                        Column(Modifier.fillMaxWidth()) {
+                            Text(stringResource(FilterR.string.search_filter_choose_tags))
+                            Text(tagSelectionSummary(draft.tagIds, state), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
+            (if (!validDate) SearchFilterMessage.INVALID_DATE else state.message)?.takeUnless { it == SearchFilterMessage.INCOMPATIBLE_CATEGORIES_REMOVED }?.let {
+                Text(filterMessageText(it), Modifier.padding(horizontal = 16.dp, vertical = 8.dp), color = MaterialTheme.colorScheme.error)
+            }
+            CbHorizontalDivider()
+            Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                CbTextButton(onClick = { onEvent(SearchFilterEvent.ResetDrawer) }) { Text(stringResource(FilterR.string.search_filter_reset)) }
+                CbTextButton(enabled = validDate, onClick = { onEvent(SearchFilterEvent.ApplyDrawer) }) { Text(stringResource(FilterR.string.search_filter_done)) }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun tagSelectionSummary(ids: Set<Long>, state: SearchFilterState): String {
+    if (ids.isEmpty()) return stringResource(FilterR.string.search_filter_any_tag)
+    val tags = state.tags.associateBy { it.id }
+    val names = ids.take(2).map { id ->
+        val tag = tags[id]
+        when {
+            tag == null -> stringResource(FilterR.string.search_filter_unavailable, id)
+            tag.invisible -> stringResource(FilterR.string.search_filter_hidden_tag, tag.name)
+            else -> tag.name
+        }
+    }
+    return stringResource(FilterR.string.search_filter_category_count, ids.size) + "：" + names.joinToString("、") + if (ids.size > 2) " +${ids.size - 2}" else ""
 }
 
 @Composable

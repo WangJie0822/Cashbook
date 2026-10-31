@@ -45,13 +45,22 @@ class RecordFilterRepositoryImpl @Inject constructor(
     private val dao: RecordFilterDao,
     @param:Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) : RecordFilterRepository {
-    override fun validate(request: RecordFilterRequest): RecordFilterValidation {
+    override fun validate(request: RecordFilterRequest): RecordFilterValidation = validate(request, false)
+
+    override fun validate(request: RecordFilterRequest, hasKeyword: Boolean): RecordFilterValidation {
         if (request.fromInclusive >= request.toExclusive) return RecordFilterValidation.InvalidRange
-        return budgetValidation(RecordFilterSqlBuilder.build(request).requiredBindCount)
+        val base = RecordFilterSqlBuilder.build(request).requiredBindCount
+        return budgetValidation(Math.addExact(base, if (hasKeyword) RecordFilterSqlBuilder.KEYWORD_BIND_COUNT else 0))
     }
 
-    override fun observeRecords(request: RecordFilterRequest): Flow<PagingData<RecordViewsModel>> = flow {
-        val query = checkedQueries(request).records
+    override fun observeRecords(request: RecordFilterRequest): Flow<PagingData<RecordViewsModel>> = records(request, null)
+
+    override fun observeRecords(request: RecordFilterRequest, keyword: RecordKeywordQuery): Flow<PagingData<RecordViewsModel>> = records(request, keyword)
+
+    override fun observeStatistics(request: RecordFilterRequest, keyword: RecordKeywordQuery): Flow<RecordSearchStatistics> = statistics(request, keyword)
+
+    private fun records(request: RecordFilterRequest, keyword: RecordKeywordQuery?): Flow<PagingData<RecordViewsModel>> = flow {
+        val query = checkedQueries(request, keyword).records
         emitAll(
             Pager(PagingConfig(pageSize = 20, initialLoadSize = 20), pagingSourceFactory = { dao.pagingRecords(query) })
                 .flow.map { paging -> paging.map { it.toRecordViewsModel() } },
@@ -63,17 +72,19 @@ class RecordFilterRepositoryImpl @Inject constructor(
         emitAll(dao.observeSummary(query).map { RecordFilterSummary(it.totalCount, it.income, it.expenditure) })
     }.flowOn(coroutineContext)
 
-    override fun observeStatistics(request: RecordFilterRequest): Flow<RecordSearchStatistics> = flow {
-        emitAll(dao.observeStatistics(checkedQueries(request).statistics).map { it.toStatistics() })
+    override fun observeStatistics(request: RecordFilterRequest): Flow<RecordSearchStatistics> = statistics(request, null)
+
+    private fun statistics(request: RecordFilterRequest, keyword: RecordKeywordQuery?): Flow<RecordSearchStatistics> = flow {
+        emitAll(dao.observeStatistics(checkedQueries(request, keyword).statistics).map { it.toStatistics() })
     }.flowOn(coroutineContext)
 
     override fun observeKeywordStatistics(query: RecordKeywordQuery): Flow<RecordSearchStatistics> = flow {
         emitAll(dao.observeStatistics(RecordSearchStatisticsSqlBuilder.keyword(query)).map { it.toStatistics() })
     }.flowOn(coroutineContext)
 
-    private fun checkedQueries(request: RecordFilterRequest): RecordFilterQueries {
+    private fun checkedQueries(request: RecordFilterRequest, keyword: RecordKeywordQuery? = null): RecordFilterQueries {
         require(request.fromInclusive < request.toExclusive) { "Invalid record filter range" }
-        val queries = RecordFilterSqlBuilder.build(request)
+        val queries = RecordFilterSqlBuilder.build(request, keyword)
         require(budgetValidation(queries.requiredBindCount) == RecordFilterValidation.Valid) {
             "Record filter bind budget exceeded (${queries.requiredBindCount}/$SQL_IN_CHUNK_SIZE)"
         }

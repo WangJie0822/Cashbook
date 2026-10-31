@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_INCOME
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 
 internal data class RecordFilterQueries(
     val records: SupportSQLiteQuery,
@@ -32,7 +33,11 @@ internal data class RecordFilterQueries(
 )
 
 internal object RecordFilterSqlBuilder {
-    fun build(request: RecordFilterRequest): RecordFilterQueries {
+    /** 预检不做金额解析；行为测试同时核对本数值与实际绑定数量。 */
+    const val KEYWORD_BIND_COUNT = 4
+
+    fun build(request: RecordFilterRequest, keyword: RecordKeywordQuery? = null): RecordFilterQueries {
+        require(keyword == null || keyword.bookId == request.bookId) { "Keyword and filter book must match" }
         val args = mutableListOf<Any>(request.bookId, request.fromInclusive, request.toExclusive)
         val predicates = mutableListOf("r.books_id = ?", "r.record_time >= ?", "r.record_time < ?")
 
@@ -71,6 +76,11 @@ internal object RecordFilterSqlBuilder {
             // EXISTS 保证一笔多标签账单只出现一次，JOIN 标签表使已删除标签不再命中。
             predicates += "EXISTS (SELECT 1 FROM db_tag_with_record tr INNER JOIN db_tag tg ON tg.id = tr.tag_id WHERE tr.record_id = r.id AND tg.id IN (${placeholders(ids.size)}))"
             args.addAll(ids)
+        }
+
+        if (keyword != null && keyword.keyword.isNotBlank()) {
+            predicates += "(r.remark LIKE '%' || ? || '%' OR (? != -1 AND (r.amount = ? OR r.final_amount = ?)))"
+            args.addAll(listOf(keyword.keyword, keyword.amountCent, keyword.amountCent, keyword.amountCent))
         }
 
         val fromWhere = "FROM db_record r LEFT JOIN db_type t ON t.id = r.type_id WHERE " + predicates.joinToString(" AND ")

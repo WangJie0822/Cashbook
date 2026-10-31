@@ -17,16 +17,22 @@
 package cn.wj.android.cashbook.feature.records.view
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.unit.dp
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
@@ -53,23 +59,109 @@ class SearchFilterDrawerTest {
 
     @After fun close() { if (::fixture.isInitialized) compose.runOnIdle { fixture.close() } }
 
-    private fun show() {
+    private fun show(modifier: Modifier = Modifier) {
         compose.runOnUiThread { fixture = SearchFilterTestFixture(); fixture.event(SearchFilterEvent.OpenDrawer) }
-        compose.setContent { CashbookTheme { val state by fixture.vm.filterState.collectAsState(); SearchFilterDrawer(state, fixture::event) } }
+        compose.setContent { CashbookTheme { val state by fixture.vm.filterState.collectAsState(); SearchFilterDrawer(state, fixture::event, modifier) } }
+    }
+
+    @Test fun secondaryPages_animateForwardAndReverseWithFrozenOutgoingContent() {
+        show()
+        val width = compose.onNodeWithTag("filter_page_Root").fetchSemanticsNode().boundsInRoot.width
+        compose.mainClock.autoAdvance = false
+        try {
+            compose.onNodeWithTag("filter_categories").performScrollTo().performClick()
+            compose.mainClock.advanceTimeBy(80L)
+            val entering = compose.onNodeWithTag("filter_page_Categories").fetchSemanticsNode().boundsInRoot
+            assertThat(entering.left).isGreaterThan(0f)
+            assertThat(entering.left).isLessThan(width)
+            // 退出页仍有布局和冻结内容，且不再暴露旧按钮。
+            val leaving = compose.onNodeWithTag("filter_page_Root", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+            assertThat(leaving.width).isGreaterThan(0f)
+            compose.onNodeWithTag("filter_drawer_close").assertDoesNotExist()
+            compose.mainClock.advanceTimeBy(320L)
+            compose.onNodeWithTag("category_back").performClick()
+            compose.mainClock.advanceTimeBy(80L)
+            assertThat(compose.onNodeWithTag("filter_page_Root").fetchSemanticsNode().boundsInRoot.right).isLessThan(width)
+            assertThat(compose.onNodeWithTag("filter_page_Categories", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.left).isGreaterThan(0f)
+            compose.onNodeWithTag("category_back").assertDoesNotExist()
+            compose.mainClock.advanceTimeBy(320L)
+            compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+            compose.mainClock.advanceTimeBy(320L)
+            compose.onNodeWithTag("filter_tag_41").performClick()
+            compose.onNodeWithTag("tag_done").performClick()
+            compose.mainClock.advanceTimeBy(80L)
+            assertThat(compose.onNodeWithTag("filter_page_Tags", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.left).isGreaterThan(0f)
+            compose.runOnIdle {
+                assertThat(fixture.vm.filterState.value.drawerDraft!!.tagIds).containsExactly(41L)
+                assertThat(fixture.vm.filterState.value.appliedFilter).isNull()
+            }
+            compose.mainClock.advanceTimeBy(320L)
+            compose.onNodeWithTag("filter_page_Tags", useUnmergedTree = true).assertDoesNotExist()
+        } finally { compose.mainClock.autoAdvance = true }
+    }
+
+    @Test fun parentScroll_survivesChildRoundTripAndRapidPageChanges() {
+        show(Modifier.requiredHeight(480.dp))
+        compose.onNodeWithTag("filter_options").performScrollToNode(hasTestTag("filter_tags"))
+        val before = compose.onNodeWithTag("filter_options").fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].value()
+        assertThat(before).isGreaterThan(0f)
+        compose.onNodeWithTag("filter_tags").performClick()
+        compose.onNodeWithTag("tag_back").performClick()
+        val after = compose.onNodeWithTag("filter_options").fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].value()
+        assertThat(after).isEqualTo(before)
+        compose.mainClock.autoAdvance = false
+        try {
+            compose.onNodeWithTag("filter_tags").performClick()
+            compose.mainClock.advanceTimeBy(32L)
+            compose.runOnIdle { fixture.event(SearchFilterEvent.CancelTags) }
+            compose.mainClock.advanceTimeBy(32L)
+            compose.runOnIdle { fixture.event(SearchFilterEvent.OpenCategories) }
+            compose.mainClock.advanceTimeBy(32L)
+            compose.runOnIdle { fixture.event(SearchFilterEvent.CancelCategories) }
+            compose.mainClock.advanceTimeBy(400L)
+            compose.onNodeWithTag("tag_done").assertDoesNotExist()
+            compose.onNodeWithTag("category_back").assertDoesNotExist()
+            compose.onNodeWithTag("filter_tags").assertIsDisplayed()
+            compose.runOnIdle { assertThat(fixture.vm.filterState.value.appliedFilter).isNull() }
+        } finally { compose.mainClock.autoAdvance = true }
+    }
+
+    @Test fun tagsOpenASecondaryPickerAndHideHiddenCandidatesByDefault() {
+        show()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        compose.onNodeWithTag("filter_tag_41").assertIsDisplayed()
+        compose.onNodeWithTag("filter_tag_42").assertDoesNotExist()
+        compose.onNodeWithTag("tag_show_hidden").performClick()
+        compose.onNodeWithTag("filter_tag_42").performClick().assertIsOn()
+        compose.onNodeWithTag("tag_show_hidden").performClick()
+        compose.onNodeWithTag("filter_tag_42").assertDoesNotExist()
+        compose.onNodeWithTag("tag_selected_42").assertIsDisplayed()
+        compose.onNodeWithTag("tag_done").performClick()
+        compose.runOnIdle {
+            assertThat(fixture.vm.filterState.value.drawerDraft!!.tagIds).containsExactly(42L)
+            assertThat(fixture.vm.filterState.value.appliedFilter).isNull()
+        }
+        compose.onNodeWithText("完成").performClick()
+        compose.runOnIdle { assertThat(fixture.vm.filterState.value.appliedFilter!!.tagIds).containsExactly(42L) }
     }
 
     @Test fun hiddenTag_isMarkedSelectableAndAppliedOnlyOnDone() {
         show()
-        compose.onNodeWithTag("filter_tag_42").performScrollTo().performClick().assertIsOn()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        compose.onNodeWithTag("tag_show_hidden").performClick()
         compose.onNodeWithText("旧项目（已隐藏）").assertIsDisplayed()
+        compose.onNodeWithTag("filter_tag_42").performScrollTo().performClick().assertIsOn()
         compose.runOnIdle { assertThat(fixture.vm.filterState.value.appliedFilter).isNull() }
+        compose.onNodeWithTag("tag_done").performClick()
         compose.onNodeWithText("完成").performClick()
         compose.runOnIdle { assertThat(fixture.vm.filterState.value.appliedFilter!!.tagIds).containsExactly(42L) }
     }
 
     @Test fun reset_changesDraftAndDismissCancelsWholeDrawer() {
         show()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
         compose.onNodeWithTag("filter_tag_41").performScrollTo().performClick()
+        compose.onNodeWithTag("tag_done").performClick()
         compose.onNodeWithText("重置").performClick()
         compose.runOnIdle { assertThat(fixture.vm.filterState.value.drawerDraft!!.tagIds).isEmpty() }
         compose.onNodeWithTag("filter_drawer_close").performClick()

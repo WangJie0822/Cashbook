@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.core.database.relation.RecordSearchStatisticsRelat
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,39 @@ import org.junit.Test
 import kotlin.test.assertFailsWith
 
 class RecordFilterRepositoryTest {
+
+    @Test
+    fun combinedBudget_precheckReservesAllFourKeywordBindingsWithoutIO() {
+        val dao = FakeFilterDao()
+        val repo = RecordFilterRepositoryImpl(dao, Dispatchers.Unconfined)
+        val lastValid = request().copy(tagIds = (1L..885L).toSet())
+        val firstInvalid = request().copy(tagIds = (1L..886L).toSet())
+        assertThat(repo.validate(lastValid, true)).isEqualTo(RecordFilterValidation.Valid)
+        assertThat(repo.validate(firstInvalid, false)).isEqualTo(RecordFilterValidation.Valid)
+        assertThat(repo.validate(firstInvalid, true)).isEqualTo(RecordFilterValidation.TooManyParameters(901, 900))
+        assertThat(dao.calls).isEqualTo(0)
+    }
+
+    @Test
+    fun combinedExecution_rechecksBudgetBeforeAnyStatisticsOrPagingIO() = runTest {
+        val dao = FakeFilterDao()
+        val repo = RecordFilterRepositoryImpl(dao, Dispatchers.Unconfined)
+        val filter = request().copy(tagIds = (1L..886L).toSet())
+        val query = RecordKeywordQuery(2L, "午餐", -1L)
+        assertFailsWith<IllegalArgumentException> { repo.observeStatistics(filter, query).first() }
+        assertFailsWith<IllegalArgumentException> { repo.observeRecords(filter, query).first() }
+        assertThat(dao.calls).isEqualTo(0)
+    }
+
+    @Test
+    fun combinedExecution_rejectsCrossBookQueryWithoutIO() = runTest {
+        val dao = FakeFilterDao()
+        val repo = RecordFilterRepositoryImpl(dao, Dispatchers.Unconfined)
+        val query = RecordKeywordQuery(7L, "午餐", -1L)
+        assertFailsWith<IllegalArgumentException> { repo.observeStatistics(request(), query).first() }
+        assertFailsWith<IllegalArgumentException> { repo.observeRecords(request(), query).first() }
+        assertThat(dao.calls).isEqualTo(0)
+    }
 
     @Test
     fun validRequest_doesNotQueryDuringValidation() {

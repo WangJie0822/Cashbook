@@ -17,6 +17,7 @@
 package cn.wj.android.cashbook.feature.records.view
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.Text
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
@@ -74,4 +75,17 @@ class SearchFilterDrawerScreenshotTests {
     @Test fun categoryPicker_manyCategories_multipleDevices() { compose.captureMultiDevice("SearchCategoryPicker_many") { CashbookTheme { SearchCategoryPicker(state.copy(categoryDraft = selection), {}) } } }
 
     @Test fun selectedDrawer_multipleDevices() { compose.captureMultiDevice("SearchFilterDrawer_selected") { CashbookTheme { SearchFilterDrawer(state, {}) } } }
+
+    private val tagState = state.copy(
+        tagDraft = setOf(42L, 999L),
+        tags = state.tags + (1L..100L).map { createTagModel(id = 1000L + it, name = "旅行与朋友聚会的长标签名称 $it") },
+    )
+
+    @Test fun tagPicker_selectedHiddenAndMissing_multipleThemes() { compose.captureMultiTheme("SearchTagPicker_selected") { SearchTagPicker(tagState, {}) } }
+
+    @Test fun tagPicker_selectedHiddenAndMissing_multipleDevices() { compose.captureMultiDevice("SearchTagPicker_selected") { CashbookTheme { SearchTagPicker(tagState, {}) } } }
+
+    @Test fun tagPicker_hiddenCandidates_multipleThemes() { compose.captureMultiTheme("SearchTagPicker_hidden") { SearchTagPicker(tagState.copy(showHiddenTags = true), {}) } }
+
+    @Test fun rightSidebar_multipleDevices() { compose.captureMultiDevice("SearchFilterSidebar_right") { CashbookTheme { SearchFilterSidebar(state, {}) { Text("搜索结果") } } } }
 }

@@ -89,4 +89,50 @@ class MarkdownScreenScreenshotTests {
             }
         }
     }
+
+    @Test
+    fun markdownScreen_formattedLinks_multipleThemes() {
+        composeTestRule.captureMultiTheme(
+            name = "MarkdownScreen",
+            overrideFileName = "MarkdownScreen_formattedLinks",
+        ) {
+            MarkdownScreen(
+                title = "隐私政策",
+                markdownData = formattedMarkdown,
+                onBackClick = {},
+            )
+        }
+    }
+
+    @Test
+    fun markdownScreen_formattedLinks_multipleDevices() {
+        composeTestRule.captureMultiDevice(screenshotName = "MarkdownScreen_formattedLinks") {
+            CashbookTheme {
+                MarkdownScreen(
+                    title = "隐私政策",
+                    markdownData = formattedMarkdown,
+                    onBackClick = {},
+                )
+            }
+        }
+    }
+
+    private val formattedMarkdown = """
+        # 使用说明
+
+        这里保留 **重要内容**、*强调说明* 与 [查看完整隐私说明](https://example.org/privacy?q=app#details)。
+
+        ## 数据与权限
+
+        - 账单保存在你的账本中
+        - 链接由系统选择的应用打开
+
+        > 请在外部页面核对网址。
+
+        行内代码：`amount = 100`
+
+        ```
+        收入 - 支出 = 结余
+        ```
+    """.trimIndent()
 }

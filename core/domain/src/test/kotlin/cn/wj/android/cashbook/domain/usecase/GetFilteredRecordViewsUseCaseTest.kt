@@ -22,9 +22,11 @@ import androidx.paging.PagingDataPresenter
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
 import cn.wj.android.cashbook.core.model.model.RecordFilter
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.model.toRequest
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createRecordViewsModel
+import cn.wj.android.cashbook.core.testing.data.createTagModel
 import cn.wj.android.cashbook.core.testing.repository.FakeRecordFilterRepository
 import cn.wj.android.cashbook.core.testing.util.TestDispatcherRule
 import com.google.common.truth.Truth.assertThat
@@ -64,5 +66,37 @@ class GetFilteredRecordViewsUseCaseTest {
         assertThat(items.single().amount).isEqualTo(100000L)
         assertThat(repository.recordRequests.last()).isEqualTo(request)
         assertThat(presenter.loadStateFlow.value?.refresh).isInstanceOf(LoadState.NotLoading::class.java)
+    }
+
+    @Test
+    fun combinedQueryMapsOnlyTheIntersectionAndPreservesAmounts() = runTest {
+        val type = createRecordTypeModel(id = 11L)
+        val tag = createTagModel(id = 41L)
+        val repository = FakeRecordFilterRepository(flowOf(listOf(type)), flowOf(listOf(tag))).apply {
+            setRecords(
+                listOf(
+                    createRecordViewsModel(id = 7L, type = type, remark = "午餐", amount = 100000L, finalAmount = 20000L, relatedTags = listOf(tag)),
+                    createRecordViewsModel(id = 8L, type = type, remark = "午餐", amount = 20000L),
+                    createRecordViewsModel(id = 9L, type = type, remark = "晚餐", relatedTags = listOf(tag)),
+                    createRecordViewsModel(id = 10L, booksId = 2L, type = type, remark = "午餐", relatedTags = listOf(tag)),
+                ),
+            )
+        }
+        val request = RecordFilter(tagIds = setOf(41L)).toRequest(1L, 1)
+        val query = RecordKeywordQuery(1L, "午餐", -1L)
+        val result = CompletableDeferred<List<RecordViewsEntity>>()
+        val presenter = object : PagingDataPresenter<RecordViewsEntity>(dispatcherRule.testDispatcher) {
+            override suspend fun presentPagingDataEvent(event: PagingDataEvent<RecordViewsEntity>) = Unit
+        }
+        presenter.addOnPagesUpdatedListener { result.complete(presenter.snapshot().items) }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            GetFilteredRecordViewsUseCase(repository)(request, query).collectLatest { presenter.collectFrom(it) }
+        }
+        val item = result.await().single()
+        assertThat(item.id).isEqualTo(7L)
+        assertThat(item.amount).isEqualTo(100000L)
+        assertThat(item.finalAmount).isEqualTo(20000L)
+        assertThat(repository.combinedRecordRequests).containsExactly(request to query)
+        assertThat(repository.recordRequests).isEmpty()
     }
 }

@@ -37,6 +37,7 @@ data class SearchQueryContext(
     val mode: SearchMode = SearchMode.Initial,
     val request: RecordFilterRequest? = null,
     val keyword: String = "",
+    val filterApplied: Boolean = request != null,
 )
 
 /** 每套条件持有独立分页缓存，切换时不重放上一条件的页面。 */
@@ -57,6 +58,9 @@ data class SearchFilterState(
     val appliedFilter: RecordFilter? = null,
     val drawerDraft: RecordFilter? = null,
     val categoryDraft: CategoryFilterSelection? = null,
+    val tagDraft: Set<Long>? = null,
+    val tagSearchQuery: String = "",
+    val showHiddenTags: Boolean = false,
     val catalog: List<RecordTypeModel> = emptyList(),
     val tags: List<TagModel> = emptyList(),
     val categoryBrowseType: RecordTypeCategoryEnum = RecordTypeCategoryEnum.EXPENDITURE,

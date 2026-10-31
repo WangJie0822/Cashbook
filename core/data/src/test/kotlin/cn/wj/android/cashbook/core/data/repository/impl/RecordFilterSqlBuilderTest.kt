@@ -21,10 +21,45 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import kotlin.test.assertFailsWith
 
 class RecordFilterSqlBuilderTest {
+
+    @Test
+    fun combinedKeyword_isBoundInsideTheSameFilterPredicate() {
+        val query = RecordKeywordQuery(2L, "午餐%'_", -1L)
+        val filter = request().copy(tagIds = setOf(42L, 41L))
+        val queries = RecordFilterSqlBuilder.build(filter, query)
+        val values = bindings(queries.records)
+        assertThat(values).containsExactly(2L, 1000L, 2000L, 41L, 42L, "午餐%'_", -1L, -1L, -1L).inOrder()
+        assertThat(queries.records.sql).doesNotContain(query.keyword)
+        assertThat(queries.records.sql).contains("AND (r.remark LIKE '%' || ? || '%' OR (? != -1 AND (r.amount = ? OR r.final_amount = ?)))")
+        val fromWhere = queries.records.sql.substringAfter("SELECT r.* ").substringBefore(" ORDER BY ")
+        assertThat(queries.summary.sql).endsWith(fromWhere)
+        assertThat(queries.statistics.sql).contains(fromWhere)
+        assertThat(bindings(queries.statistics).takeLast(values.size)).isEqualTo(values)
+        assertThat(queries.requiredBindCount).isEqualTo(17)
+    }
+
+    @Test
+    fun combinedBlankKeyword_keepsTheFilterQueryUnchanged() {
+        val plain = RecordFilterSqlBuilder.build(request())
+        val blank = RecordFilterSqlBuilder.build(request(), RecordKeywordQuery(2L, " \t ", -1L))
+        assertThat(blank.records.sql).isEqualTo(plain.records.sql)
+        assertThat(bindings(blank.records)).isEqualTo(bindings(plain.records))
+        assertThat(blank.requiredBindCount).isEqualTo(plain.requiredBindCount)
+    }
+
+    @Test
+    fun combinedKeyword_cannotCarryAnotherBook() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            RecordFilterSqlBuilder.build(request(), RecordKeywordQuery(8L, "午餐", -1L))
+        }
+        assertThat(error.message).contains("book")
+    }
 
     @Test
     fun recordQuery_bindsBookAndBothDateEndpoints() {

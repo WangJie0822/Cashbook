@@ -57,10 +57,14 @@ class FakeRecordFilterRepository(
     val recordRequests = mutableListOf<RecordFilterRequest>()
     val summaryRequests = mutableListOf<RecordFilterRequest>()
     val keywordRequests = mutableListOf<RecordKeywordQuery>()
+    val combinedRecordRequests = mutableListOf<Pair<RecordFilterRequest, RecordKeywordQuery>>()
+    val combinedStatisticsRequests = mutableListOf<Pair<RecordFilterRequest, RecordKeywordQuery>>()
     var validationOverride: RecordFilterValidation? = null
     var summaryProvider: ((RecordFilterRequest) -> Flow<RecordFilterSummary>)? = null
     var keywordStatisticsProvider: ((RecordKeywordQuery) -> Flow<RecordSearchStatistics>)? = null
     var recordsProvider: ((RecordFilterRequest) -> Flow<PagingData<RecordViewsModel>>)? = null
+    var combinedRecordsProvider: ((RecordFilterRequest, RecordKeywordQuery) -> Flow<PagingData<RecordViewsModel>>)? = null
+    var combinedStatisticsProvider: ((RecordFilterRequest, RecordKeywordQuery) -> Flow<RecordSearchStatistics>)? = null
 
     private val validator = RecordFilterRepositoryImpl(
         object : RecordFilterDao {
@@ -73,9 +77,18 @@ class FakeRecordFilterRepository(
 
     fun setRecords(value: List<RecordViewsModel>) { records.value = value.toList() }
     override fun validate(request: RecordFilterRequest) = validationOverride ?: validator.validate(request)
+    override fun validate(request: RecordFilterRequest, hasKeyword: Boolean) = validationOverride ?: validator.validate(request, hasKeyword)
     override fun observeRecords(request: RecordFilterRequest): Flow<PagingData<RecordViewsModel>> {
         recordRequests += request
         return recordsProvider?.invoke(request) ?: matching(request).map { PagingData.from(it, sourceLoadStates = LoadStates(LoadState.NotLoading(false), LoadState.NotLoading(true), LoadState.NotLoading(true))) }
+    }
+
+    override fun observeRecords(request: RecordFilterRequest, keyword: RecordKeywordQuery): Flow<PagingData<RecordViewsModel>> {
+        require(request.bookId == keyword.bookId) { "Keyword and filter book must match" }
+        combinedRecordRequests += request to keyword
+        return combinedRecordsProvider?.invoke(request, keyword) ?: matching(request).map { rows ->
+            PagingData.from(rows.filter { keyword.keyword.isBlank() || matchesKeyword(it, keyword) }, sourceLoadStates = LoadStates(LoadState.NotLoading(false), LoadState.NotLoading(true), LoadState.NotLoading(true)))
+        }
     }
     override fun observeSummary(request: RecordFilterRequest): Flow<RecordFilterSummary> {
         summaryRequests += request
@@ -95,16 +108,22 @@ class FakeRecordFilterRepository(
         keywordRequests += query
         return keywordStatisticsProvider?.invoke(query) ?: combine(records, catalog) { rows, types ->
             statistics(
-                rows.filter {
-                    it.booksId == query.bookId && (
-                        sqliteLikeContains(it.remark, query.keyword) ||
-                            (query.amountCent != -1L && (it.amount == query.amountCent || it.finalAmount == query.amountCent))
-                        )
-                },
+                rows.filter { matchesKeyword(it, query) },
                 types,
             )
         }
     }
+
+    override fun observeStatistics(request: RecordFilterRequest, keyword: RecordKeywordQuery): Flow<RecordSearchStatistics> {
+        require(request.bookId == keyword.bookId) { "Keyword and filter book must match" }
+        combinedStatisticsRequests += request to keyword
+        return combinedStatisticsProvider?.invoke(request, keyword) ?: combine(matching(request, normalizeTypes = false), catalog) { rows, types ->
+            statistics(rows.filter { keyword.keyword.isBlank() || matchesKeyword(it, keyword) }, types)
+        }
+    }
+
+    private fun matchesKeyword(row: RecordViewsModel, query: RecordKeywordQuery): Boolean = row.booksId == query.bookId &&
+        (sqliteLikeContains(row.remark, query.keyword) || (query.amountCent != -1L && (row.amount == query.amountCent || row.finalAmount == query.amountCent)))
 
     private fun statistics(rows: List<RecordViewsModel>, types: List<RecordTypeModel>): RecordSearchStatistics {
         val byId = types.associateBy { it.id }

@@ -221,10 +221,11 @@ class MyCategoriesViewModel @Inject constructor(
 
     fun requestEditType(id: Long, parentId: Long) {
         viewModelScope.launch {
+            val type = typeRepository.getRecordTypeById(id)
             dialogState = DialogState.Shown(
                 MyCategoriesDialogData.EditType(
-                    type = typeRepository.getRecordTypeById(id),
-                    parentType = typeRepository.getRecordTypeById(parentId),
+                    type = type,
+                    parentType = typeRepository.getRecordTypeById(type?.parentId ?: parentId),
                 ),
             )
         }
@@ -255,8 +256,6 @@ class MyCategoriesViewModel @Inject constructor(
                         needRelated = false,
                     )
                     ).copy(
-                    id = id,
-                    parentId = parentId,
                     name = name,
                     iconName = iconName,
                 )

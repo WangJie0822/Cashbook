@@ -35,6 +35,11 @@
     <string name="search_filter_all_categories">不限分类</string>
     <string name="search_filter_category_count">已选 %1$d 项</string>
     <string name="search_filter_tags">标签</string>
+    <string name="search_filter_choose_tags">选择标签</string>
+    <string name="search_filter_search_tags">搜索标签名称</string>
+    <string name="search_filter_show_hidden_tags">显示隐藏标签</string>
+    <string name="search_filter_selected_tags">已选标签</string>
+    <string name="search_filter_clear_tags">清空选择</string>
     <string name="search_filter_any_tag">不限标签</string>
     <string name="search_filter_hidden_tag">%1$s（已隐藏）</string>
     <string name="search_filter_unavailable">不可用（%1$d）</string>
@@ -65,8 +70,6 @@
     <string name="search_filter_balance_excluded">统计计入：平账不计收支</string>
     <string name="search_filter_contribution_income">统计计入：收入 %1$s</string>
     <string name="search_filter_contribution_expenditure">统计计入：支出 %1$s</string>
-    <string name="search_filter_keyword_independent">关键字搜索期间，筛选暂不生效</string>
-    <string name="search_filter_clear_keyword_first">清空关键字后筛选</string>
     <string name="search_filter_empty">没有符合条件的账单，请调整筛选</string>
     <string name="search_filter_initial_hint">输入关键字，或通过筛选统计当前账本</string>
     <string name="search_filter_no_conditions">当前账本全部账单</string>

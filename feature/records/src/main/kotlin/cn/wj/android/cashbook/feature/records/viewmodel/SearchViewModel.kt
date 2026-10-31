@@ -138,9 +138,10 @@ class SearchViewModel @Inject constructor(
     private fun updateState(candidate: SearchFilterState, retry: Boolean = false) {
         val mode = if (candidate.submittedKeyword.isNotBlank()) SearchMode.Keyword else if (candidate.appliedFilter != null) SearchMode.Filter else SearchMode.Initial
         val activeMode = if (candidate.bookId != null && candidate.settingsLoaded) mode else SearchMode.Initial
-        val request = if (activeMode == SearchMode.Filter) runCatching { candidate.appliedFilter!!.toRequest(candidate.bookId!!, candidate.monthStartDay) }.getOrNull() else null
+        val filterApplied = activeMode != SearchMode.Initial && candidate.appliedFilter != null
+        val request = if (filterApplied) runCatching { candidate.appliedFilter!!.toRequest(candidate.bookId!!, candidate.monthStartDay) }.getOrNull() else null
         val old = filterState.value.queryContext
-        val key = SearchQueryContext(old.criteriaRevision, candidate.bookId ?: -1L, activeMode, request, candidate.submittedKeyword.takeIf { activeMode == SearchMode.Keyword }.orEmpty())
+        val key = SearchQueryContext(old.criteriaRevision, candidate.bookId ?: -1L, activeMode, request, candidate.submittedKeyword.takeIf { activeMode == SearchMode.Keyword }.orEmpty(), filterApplied)
         val changed = key != old
         val context = key.copy(criteriaRevision = old.criteriaRevision + if (changed) 1 else 0)
         _filterState.value = candidate.copy(
@@ -161,19 +162,26 @@ class SearchViewModel @Inject constructor(
         fun isCurrent() = epoch == attempt && context == filterState.value.queryContext
         _filterSummary.value = if (context.mode != SearchMode.Initial) SearchFilterSummaryState.Loading(context) else SearchFilterSummaryState.Hidden
         val request = context.request
-        val keywordQuery = if (context.mode == SearchMode.Keyword) {
+        val validation = when {
+            context.filterApplied && request == null -> RecordFilterValidation.InvalidRange
+            request != null -> recordFilterRepository.validate(request, context.mode == SearchMode.Keyword)
+            else -> RecordFilterValidation.Valid
+        }
+        val keywordQuery = if (context.mode == SearchMode.Keyword && validation == RecordFilterValidation.Valid) {
             scope.async { getSearchRecordViewsUseCase.createQuery(context.bookId, context.keyword) }
         } else {
             null
         }
-        val validation = if (context.mode == SearchMode.Filter && request != null) recordFilterRepository.validate(request) else RecordFilterValidation.Valid
         val pages = when {
-            validation != RecordFilterValidation.Valid || (context.mode == SearchMode.Filter && request == null) -> {
+            validation != RecordFilterValidation.Valid -> {
                 _filterSummary.value = SearchFilterSummaryState.Failed(context, "invalid_filter")
                 _filterState.value = filterState.value.copy(recordQueryFailure = context)
                 flowOf(PagingData.empty())
             }
             context.mode == SearchMode.Filter -> getFilteredRecordViewsUseCase(request!!)
+            context.mode == SearchMode.Keyword && request != null -> flow {
+                emitAll(getFilteredRecordViewsUseCase(request, keywordQuery!!.await()))
+            }
             context.mode == SearchMode.Keyword -> flow {
                 val query = keywordQuery!!.await()
                 emitAll(
@@ -191,11 +199,12 @@ class SearchViewModel @Inject constructor(
             emit(PagingData.empty())
         }.cachedIn(scope)
         _recordSources.value = SearchRecordsSource(context, pages)
-        if (context.mode != SearchMode.Initial && validation == RecordFilterValidation.Valid && (context.mode != SearchMode.Filter || request != null)) {
+        if (context.mode != SearchMode.Initial && validation == RecordFilterValidation.Valid) {
             scope.launch {
                 try {
                     val statistics = if (context.mode == SearchMode.Keyword) {
-                        recordFilterRepository.observeKeywordStatistics(keywordQuery!!.await())
+                        val query = keywordQuery!!.await()
+                        if (request != null) recordFilterRepository.observeStatistics(request, query) else recordFilterRepository.observeKeywordStatistics(query)
                     } else {
                         recordFilterRepository.observeStatistics(request!!)
                     }
@@ -220,22 +229,28 @@ class SearchViewModel @Inject constructor(
         val state = filterState.value
         val draft = state.drawerDraft
         val selection = state.categoryDraft
+        val atRoot = state.categoryDraft == null && state.tagDraft == null
         val next = when (event) {
-            SearchFilterEvent.OpenDrawer -> if (state.metadataReady && state.mode != SearchMode.Keyword) state.copy(drawerDraft = state.appliedFilter ?: RecordFilter(), categoryDraft = null, message = null, removedTypeIds = emptySet()) else state
-            SearchFilterEvent.CancelDrawer -> state.copy(drawerDraft = null, categoryDraft = null, message = null, removedTypeIds = emptySet())
-            SearchFilterEvent.ResetDrawer -> if (draft != null) state.copy(drawerDraft = RecordFilter(), categoryDraft = null, message = null, removedTypeIds = emptySet()) else state
+            SearchFilterEvent.Back -> when {
+                state.categoryDraft != null -> state.copy(categoryDraft = null)
+                state.tagDraft != null -> state.copy(tagDraft = null)
+                else -> state.copy(drawerDraft = null, message = null, removedTypeIds = emptySet())
+            }
+            SearchFilterEvent.OpenDrawer -> if (state.metadataReady) state.copy(drawerDraft = state.appliedFilter ?: RecordFilter(), categoryDraft = null, tagDraft = null, message = null, removedTypeIds = emptySet()) else state
+            SearchFilterEvent.CancelDrawer -> state.copy(drawerDraft = null, categoryDraft = null, tagDraft = null, message = null, removedTypeIds = emptySet())
+            SearchFilterEvent.ResetDrawer -> if (draft != null && atRoot) state.copy(drawerDraft = RecordFilter(), categoryDraft = null, tagDraft = null, message = null, removedTypeIds = emptySet()) else state
             SearchFilterEvent.ApplyDrawer -> {
-                if (draft == null || !state.metadataReady) return
+                if (draft == null || !state.metadataReady || !atRoot) return
                 val request = runCatching { draft.toRequest(state.bookId!!, state.monthStartDay) }.getOrNull()
-                val validation = request?.let(recordFilterRepository::validate) ?: RecordFilterValidation.InvalidRange
+                val validation = request?.let { recordFilterRepository.validate(it, state.submittedKeyword.isNotBlank()) } ?: RecordFilterValidation.InvalidRange
                 if (validation != RecordFilterValidation.Valid) {
                     updateState(state.copy(message = if (validation == RecordFilterValidation.InvalidRange) SearchFilterMessage.INVALID_DATE else SearchFilterMessage.TOO_MANY_CONDITIONS))
                     return
                 }
-                state.copy(appliedFilter = draft, drawerDraft = null, categoryDraft = null, message = null)
+                state.copy(appliedFilter = draft, drawerDraft = null, categoryDraft = null, tagDraft = null, message = null)
             }
-            is SearchFilterEvent.UpdateDate -> if (draft != null) state.copy(drawerDraft = draft.copy(dateSelection = event.date), message = null) else state
-            is SearchFilterEvent.UpdateTypes -> if (draft != null) {
+            is SearchFilterEvent.UpdateDate -> if (draft != null && atRoot) state.copy(drawerDraft = draft.copy(dateSelection = event.date), message = null) else state
+            is SearchFilterEvent.UpdateTypes -> if (draft != null && atRoot) {
                 val updated = changeFilterTypes(draft, event.types, state.catalog)
                 state.copy(
                     drawerDraft = updated.filter,
@@ -245,11 +260,22 @@ class SearchViewModel @Inject constructor(
             } else {
                 state
             }
-            is SearchFilterEvent.ToggleTag -> if (draft != null) state.copy(drawerDraft = draft.copy(tagIds = if (event.id in draft.tagIds) draft.tagIds - event.id else draft.tagIds + event.id)) else state
-            SearchFilterEvent.OpenCategories -> if (draft != null) {
+            is SearchFilterEvent.ToggleTag -> if (draft != null && atRoot) state.copy(drawerDraft = draft.copy(tagIds = if (event.id in draft.tagIds) draft.tagIds - event.id else draft.tagIds + event.id)) else state
+            SearchFilterEvent.OpenTags -> if (draft != null && atRoot) state.copy(tagDraft = draft.tagIds.toSet(), tagSearchQuery = "", showHiddenTags = false, categoryDraft = null) else state
+            SearchFilterEvent.CancelTags -> state.copy(tagDraft = null)
+            SearchFilterEvent.ConfirmTags -> if (draft != null && state.tagDraft != null) state.copy(drawerDraft = draft.copy(tagIds = state.tagDraft.toSet()), tagDraft = null) else state
+            is SearchFilterEvent.ToggleTagDraft -> if (draft != null && state.tagDraft != null && (event.id in state.tagDraft || state.tags.any { it.id == event.id })) {
+                state.copy(tagDraft = if (event.id in state.tagDraft) state.tagDraft - event.id else state.tagDraft + event.id)
+            } else {
+                state
+            }
+            SearchFilterEvent.ClearTagSelection -> if (state.tagDraft != null) state.copy(tagDraft = emptySet()) else state
+            is SearchFilterEvent.ChangeTagSearch -> if (state.tagDraft != null) state.copy(tagSearchQuery = event.keyword) else state
+            is SearchFilterEvent.ShowHiddenTags -> if (state.tagDraft != null) state.copy(showHiddenTags = event.show) else state
+            SearchFilterEvent.OpenCategories -> if (draft != null && atRoot) {
                 val allowed = draft.typeCategories
                 val browse = state.categoryBrowseType.takeIf { allowed.isEmpty() || it in allowed } ?: allowed.first()
-                state.copy(categoryDraft = draft.categories, categoryBrowseType = browse, categoryBrowseParentId = null, categorySearchQuery = "")
+                state.copy(categoryDraft = draft.categories, tagDraft = null, categoryBrowseType = browse, categoryBrowseParentId = null, categorySearchQuery = "")
             } else {
                 state
             }
