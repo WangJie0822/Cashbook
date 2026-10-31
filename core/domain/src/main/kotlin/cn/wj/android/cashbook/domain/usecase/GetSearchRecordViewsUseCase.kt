@@ -20,6 +20,7 @@ import cn.wj.android.cashbook.core.common.annotation.CashbookDispatchers
 import cn.wj.android.cashbook.core.common.annotation.Dispatcher
 import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.transfer.asEntity
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -35,6 +36,18 @@ class GetSearchRecordViewsUseCase @Inject constructor(
     private val recordModelTransToViewsUseCase: RecordModelTransToViewsUseCase,
     @Dispatcher(CashbookDispatchers.IO) private val coroutineContext: CoroutineContext,
 ) {
+
+    suspend operator fun invoke(
+        query: RecordKeywordQuery,
+        pageNum: Int,
+        pageSize: Int,
+    ): List<RecordViewsEntity> = withContext(coroutineContext) {
+        if (query.keyword.isBlank()) return@withContext emptyList()
+        recordModelTransToViewsUseCase(
+            recordRepository.queryPagingRecordListByKeyword(query, pageNum, pageSize)
+                .sortedByDescending { it.recordTime },
+        ).map { it.asEntity() }
+    }
 
     suspend operator fun invoke(
         keyword: String,

@@ -23,6 +23,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordFilterValidation
 import cn.wj.android.cashbook.core.database.dao.RecordFilterDao
 import cn.wj.android.cashbook.core.database.relation.LauncherRecordViewRelation
 import cn.wj.android.cashbook.core.database.relation.RecordFilterSummaryRelation
+import cn.wj.android.cashbook.core.database.relation.RecordSearchStatisticsRelation
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
@@ -98,6 +99,7 @@ class RecordFilterRepositoryTest {
     /** 守卫失败时也只返回有限桩结果，不会意外打开真实数据库或网络。 */
     private class FakeFilterDao : RecordFilterDao {
         var calls = 0
+        override fun observeStatistics(query: SupportSQLiteQuery): Flow<List<RecordSearchStatisticsRelation>> { calls++; return flowOf(emptyList()) }
         override fun observeSummary(query: SupportSQLiteQuery): Flow<RecordFilterSummaryRelation> {
             calls++
             return flowOf(RecordFilterSummaryRelation(3L, 800L, 500L))

@@ -20,6 +20,7 @@ import androidx.paging.PagingData
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
+import cn.wj.android.cashbook.core.model.model.RecordCategoryNet
 import cn.wj.android.cashbook.core.model.model.RecordFilter
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
@@ -78,6 +79,6 @@ data class SearchFilterState(
 sealed interface SearchFilterSummaryState {
     data object Hidden : SearchFilterSummaryState
     data class Loading(val context: SearchQueryContext) : SearchFilterSummaryState
-    data class Ready(val context: SearchQueryContext, val summary: RecordFilterSummary) : SearchFilterSummaryState
+    data class Ready(val context: SearchQueryContext, val summary: RecordFilterSummary, val categories: List<RecordCategoryNet> = emptyList()) : SearchFilterSummaryState
     data class Failed(val context: SearchQueryContext, val message: String) : SearchFilterSummaryState
 }

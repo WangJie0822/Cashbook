@@ -27,6 +27,7 @@ import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
 internal data class RecordFilterQueries(
     val records: SupportSQLiteQuery,
     val summary: SupportSQLiteQuery,
+    val statistics: SupportSQLiteQuery,
     val requiredBindCount: Int,
 )
 
@@ -89,7 +90,8 @@ internal object RecordFilterSqlBuilder {
             "SELECT COUNT(*) AS totalCount, COALESCE(SUM($income), 0) AS income, COALESCE(SUM($expenditure), 0) AS expenditure $fromWhere",
             summaryArgs.toTypedArray(),
         )
-        return RecordFilterQueries(records, summary, maxOf(records.argCount + 2, summary.argCount))
+        val statistics = RecordSearchStatisticsSqlBuilder.build(fromWhere, args)
+        return RecordFilterQueries(records, summary, statistics, maxOf(records.argCount + 2, summary.argCount, statistics.argCount))
     }
 
     private fun placeholders(size: Int): String = List(size) { "?" }.joinToString(",")

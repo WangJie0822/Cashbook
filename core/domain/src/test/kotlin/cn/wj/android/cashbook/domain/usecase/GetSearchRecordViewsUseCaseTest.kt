@@ -16,6 +16,7 @@
 
 package cn.wj.android.cashbook.domain.usecase
 
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.repository.FakeAssetRepository
@@ -55,6 +56,28 @@ class GetSearchRecordViewsUseCaseTest {
             recordModelTransToViewsUseCase = transUseCase,
             coroutineContext = UnconfinedTestDispatcher(),
         )
+    }
+
+    @Test
+    fun frozenQuery_keepsBookAndNumericParameterAcrossPages() = runTest {
+        recordRepository.addRecord(createRecordModel(id = 1L, booksId = 1L, typeId = 1L, amount = 100L, remark = "alpha"))
+        recordRepository.addRecord(createRecordModel(id = 2L, booksId = 2L, typeId = 1L, amount = 100L, remark = "alpha"))
+        recordRepository.addRecord(createRecordModel(id = 3L, booksId = 1L, typeId = 1L, amount = 100L, remark = "alpha"))
+        val query = RecordKeywordQuery(1L, "does not match", 100L)
+        val ids = (useCase(query, 0, 1) + useCase(query, 1, 1)).map { it.id }
+        assertThat(ids).containsExactly(1L, 3L)
+    }
+
+    @Test
+    fun frozenQuery_preservesLikeWildcardsAsciiAndNullTermination() = runTest {
+        val remarks = listOf("AbC", "Ä", "午餐", "abc\u0000def", "abc", "xxab")
+        remarks.forEachIndexed { i, remark -> recordRepository.addRecord(createRecordModel(id = i + 1L, booksId = 1L, typeId = 1L, remark = remark)) }
+        suspend fun ids(keyword: String) = useCase(RecordKeywordQuery(1L, keyword, -1L), 0, 20).map { it.id }
+        assertThat(ids("a_c")).containsExactly(1L, 4L, 5L)
+        assertThat(ids("ä")).isEmpty()
+        assertThat(ids("餐")).containsExactly(3L)
+        assertThat(ids("def")).isEmpty()
+        assertThat(ids("ab\u0000x")).containsExactly(6L)
     }
 
     @Test

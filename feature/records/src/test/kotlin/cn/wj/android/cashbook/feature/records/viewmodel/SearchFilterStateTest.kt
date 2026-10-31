@@ -21,14 +21,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.PagingDataEvent
 import androidx.paging.PagingDataPresenter
+import cn.wj.android.cashbook.core.common.model.typeDataVersion
+import cn.wj.android.cashbook.core.common.model.updateVersion
 import cn.wj.android.cashbook.core.data.repository.RecordFilterValidation
 import cn.wj.android.cashbook.core.model.entity.DateSelectionEntity
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
+import cn.wj.android.cashbook.core.model.model.RecordCategoryNet
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
+import cn.wj.android.cashbook.core.model.model.RecordSearchStatistics
 import cn.wj.android.cashbook.core.testing.data.createBooksModel
+import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createRecordViewsModel
 import cn.wj.android.cashbook.core.testing.data.createTagModel
@@ -136,6 +141,14 @@ class SearchFilterStateTest {
     }
 
     @Test
+    fun keyword_exposesSummaryRatherThanHidingStatistics() = runTest {
+        activate()
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(f.vm.filterSummary.value).isInstanceOf(SearchFilterSummaryState.Ready::class.java)
+    }
+
+    @Test
     fun keyword_ignoresPreviouslyAppliedFilter() = runTest {
         activate()
         applyTag(41L)
@@ -145,7 +158,137 @@ class SearchFilterStateTest {
         assertThat(f.vm.filterState.value.mode).isEqualTo(SearchMode.Keyword)
         assertThat(f.vm.filterState.value.submittedKeyword).isEqualTo("  午餐  ")
         assertThat(f.filters.recordRequests).hasSize(requests)
-        assertThat(f.vm.filterSummary.value).isEqualTo(SearchFilterSummaryState.Hidden)
+        assertThat(ready().context.keyword).isEqualTo("  午餐  ")
+        assertThat(ready().context.request).isNull()
+        assertThat(f.filters.keywordRequests.last().keyword).isEqualTo("  午餐  ")
+    }
+
+    @Test
+    fun keyword_statisticsAreFullAndIndependentOfThePausedFilter() = runTest {
+        f.filters.setRecords(
+            (1L..35L).map { createRecordViewsModel(id = it, type = f.child, remark = "午餐", amount = 100L, finalAmount = 100L) } +
+                createRecordViewsModel(id = 100L, booksId = 2L, type = f.child, remark = "午餐", amount = 999L, finalAmount = 999L),
+        )
+        activate()
+        applyTag(42L)
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(ready().summary).isEqualTo(RecordFilterSummary(35L, 0L, 3500L))
+        assertThat(ready().categories.single().amount).isEqualTo(3500L)
+        assertThat(f.filters.keywordRequests.last().bookId).isEqualTo(1L)
+        f.books.setCurrentBook(createBooksModel(id = 2L))
+        runCurrent()
+        assertThat(ready().summary).isEqualTo(RecordFilterSummary(1L, 0L, 999L))
+        assertThat(ready().context.bookId).isEqualTo(2L)
+    }
+
+    @Test
+    @OptIn(kotlinx.coroutines.InternalCoroutinesApi::class)
+    fun keyword_nonCooperativeOldSuccessCannotReplaceAnotherBook() = runTest {
+        val old = CompletableDeferred<Unit>()
+        f.filters.keywordStatisticsProvider = { query ->
+            if (query.bookId == 1L) {
+                object : kotlinx.coroutines.flow.Flow<RecordSearchStatistics> {
+                    override suspend fun collect(collector: kotlinx.coroutines.flow.FlowCollector<RecordSearchStatistics>) {
+                        withContext(NonCancellable) {
+                            old.await()
+                            collector.emit(RecordSearchStatistics(RecordFilterSummary(1L, 0L, 100L), emptyList()))
+                        }
+                    }
+                }
+            } else {
+                flowOf(RecordSearchStatistics(RecordFilterSummary(2L, 0L, 900L), emptyList()))
+            }
+        }
+        try {
+            activate()
+            f.vm.onKeywordChange("午餐")
+            runCurrent()
+            f.books.setCurrentBook(createBooksModel(id = 2L))
+            runCurrent()
+            assertThat(ready().context.bookId).isEqualTo(2L)
+            assertThat(ready().summary.expenditure).isEqualTo(900L)
+            old.complete(Unit)
+            runCurrent()
+            assertThat(ready().context.bookId).isEqualTo(2L)
+            assertThat(ready().summary.expenditure).isEqualTo(900L)
+        } finally {
+            old.complete(Unit)
+        }
+    }
+
+    @Test
+    fun keyword_typeVersionRefreshesThePagedRecordName() = runTest {
+        f.records.addRecord(createRecordModel(id = 1L, booksId = 1L, typeId = 11L, remark = "午餐"))
+        val presenter = object : PagingDataPresenter<RecordViewsEntity>(kotlinx.coroutines.Dispatchers.Main) {
+            override suspend fun presentPagingDataEvent(event: PagingDataEvent<RecordViewsEntity>) = Unit
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { f.vm.recordListData.collectLatest { presenter.collectFrom(it) } }
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(presenter.snapshot().items.single().typeName).isEqualTo(f.child.name)
+        f.types.update(f.child.copy(name = "改名后的分类"))
+        typeDataVersion.updateVersion()
+        runCurrent()
+        assertThat(presenter.snapshot().items.single().typeName).isEqualTo("改名后的分类")
+    }
+
+    @Test
+    fun keyword_recordAndCategoryMetadataChangesRefreshStatistics() = runTest {
+        f.filters.setRecords(listOf(createRecordViewsModel(id = 1L, type = f.child, remark = "午餐", finalAmount = 100L)))
+        activate()
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(ready().categories.single().typeId).isEqualTo(10L)
+        f.types.update(createRecordTypeModel(id = 10L, name = "新餐饮"))
+        runCurrent()
+        assertThat(ready().categories.single().typeName).isEqualTo("新餐饮")
+        f.filters.setRecords(listOf(createRecordViewsModel(id = 1L, type = f.child, remark = "午餐", finalAmount = 200L)))
+        runCurrent()
+        assertThat(ready().summary.expenditure).isEqualTo(200L)
+        assertThat(ready().categories.single().amount).isEqualTo(200L)
+    }
+
+    @Test
+    fun keyword_statisticsFailureCanRetryWithoutChangingTheKeyword() = runTest {
+        var attempts = 0
+        f.filters.keywordStatisticsProvider = {
+            if (attempts++ == 0) flow { error("statistics failed") } else flowOf(RecordSearchStatistics(RecordFilterSummary(1L, 0L, 200L), emptyList()))
+        }
+        activate()
+        f.vm.onKeywordChange("午餐")
+        runCurrent()
+        assertThat(f.vm.filterSummary.value).isInstanceOf(SearchFilterSummaryState.Failed::class.java)
+        assertThat(f.vm.filterState.value.recordQueryFailure).isNull()
+        f.vm.onFilterEvent(SearchFilterEvent.Retry)
+        runCurrent()
+        assertThat(ready().context.keyword).isEqualTo("午餐")
+        assertThat(ready().summary.expenditure).isEqualTo(200L)
+    }
+
+    @Test
+    fun keyword_oldStatisticsFailureCannotReplaceRetriedSuccess() = runTest {
+        val old = CompletableDeferred<Unit>()
+        var attempts = 0
+        f.filters.keywordStatisticsProvider = {
+            if (attempts++ == 0) {
+                flow { withContext(NonCancellable) { old.await(); error("old failure") } }
+            } else {
+                flowOf(RecordSearchStatistics(RecordFilterSummary(1L, 0L, 200L), listOf(RecordCategoryNet(10L, RecordTypeCategoryEnum.EXPENDITURE, "餐饮", 200L))))
+            }
+        }
+        try {
+            activate()
+            f.vm.onKeywordChange("午餐")
+            f.vm.onFilterEvent(SearchFilterEvent.Retry)
+            runCurrent()
+            assertThat(ready().categories.single().amount).isEqualTo(200L)
+            old.complete(Unit)
+            runCurrent()
+            assertThat(ready().summary.expenditure).isEqualTo(200L)
+        } finally {
+            old.complete(Unit)
+        }
     }
 
     @Test

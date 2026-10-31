@@ -30,7 +30,11 @@ import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import cn.wj.android.cashbook.core.common.DEFAULT_PAGE_SIZE
 import cn.wj.android.cashbook.core.common.ext.logger
+import cn.wj.android.cashbook.core.common.ext.toAmountCent
+import cn.wj.android.cashbook.core.common.model.assetDataVersion
 import cn.wj.android.cashbook.core.common.model.recordDataVersion
+import cn.wj.android.cashbook.core.common.model.tagDataVersion
+import cn.wj.android.cashbook.core.common.model.typeDataVersion
 import cn.wj.android.cashbook.core.data.repository.BooksRepository
 import cn.wj.android.cashbook.core.data.repository.RecordFilterRepository
 import cn.wj.android.cashbook.core.data.repository.RecordFilterValidation
@@ -41,6 +45,7 @@ import cn.wj.android.cashbook.core.data.repository.TypeRepository
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.entity.normalizeMonthStartDay
 import cn.wj.android.cashbook.core.model.model.RecordFilter
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.model.changeFilterTypes
 import cn.wj.android.cashbook.core.model.model.selectCategoryGroup
 import cn.wj.android.cashbook.core.model.model.selectCategoryItem
@@ -67,6 +72,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -146,8 +152,13 @@ class SearchViewModel @Inject constructor(
         val scope = CoroutineScope(viewModelScope.coroutineContext + SupervisorJob(viewModelScope.coroutineContext[Job]))
         queryScope = scope
         fun isCurrent() = epoch == attempt && context == filterState.value.queryContext
-        _filterSummary.value = if (context.mode == SearchMode.Filter) SearchFilterSummaryState.Loading(context) else SearchFilterSummaryState.Hidden
+        _filterSummary.value = if (context.mode != SearchMode.Initial) SearchFilterSummaryState.Loading(context) else SearchFilterSummaryState.Hidden
         val request = context.request
+        val keywordQuery = RecordKeywordQuery(
+            context.bookId,
+            context.keyword,
+            if (context.keyword.toBigDecimalOrNull() != null) context.keyword.toAmountCent() else -1L,
+        )
         val validation = if (context.mode == SearchMode.Filter && request != null) recordFilterRepository.validate(request) else RecordFilterValidation.Valid
         val pages = when {
             validation != RecordFilterValidation.Valid || (context.mode == SearchMode.Filter && request == null) -> {
@@ -156,9 +167,9 @@ class SearchViewModel @Inject constructor(
                 flowOf(PagingData.empty())
             }
             context.mode == SearchMode.Filter -> getFilteredRecordViewsUseCase(request!!)
-            context.mode == SearchMode.Keyword -> recordDataVersion.flatMapLatest {
+            context.mode == SearchMode.Keyword -> combine(recordDataVersion, typeDataVersion, tagDataVersion, assetDataVersion) { _, _, _, _ -> Unit }.flatMapLatest {
                 Pager(PagingConfig(pageSize = DEFAULT_PAGE_SIZE, initialLoadSize = DEFAULT_PAGE_SIZE)) {
-                    SearchRecordPagingSource(context.keyword, getSearchRecordViewsUseCase)
+                    SearchRecordPagingSource(keywordQuery, getSearchRecordViewsUseCase)
                 }.flow
             }
             else -> flowOf(PagingData.empty())
@@ -168,11 +179,16 @@ class SearchViewModel @Inject constructor(
             emit(PagingData.empty())
         }.cachedIn(scope)
         _recordSources.value = SearchRecordsSource(context, pages)
-        if (context.mode == SearchMode.Filter && request != null && validation == RecordFilterValidation.Valid) {
+        if (context.mode != SearchMode.Initial && validation == RecordFilterValidation.Valid && (context.mode != SearchMode.Filter || request != null)) {
             scope.launch {
                 try {
-                    recordFilterRepository.observeSummary(request).collect { summary ->
-                        if (isCurrent()) _filterSummary.value = SearchFilterSummaryState.Ready(context, summary)
+                    val statistics = if (context.mode == SearchMode.Keyword) {
+                        recordFilterRepository.observeKeywordStatistics(keywordQuery)
+                    } else {
+                        recordFilterRepository.observeStatistics(request!!)
+                    }
+                    statistics.collect { value ->
+                        if (isCurrent()) _filterSummary.value = SearchFilterSummaryState.Ready(context, value.summary, value.categories)
                     }
                 } catch (error: Throwable) {
                     if (error is CancellationException) throw error
@@ -264,14 +280,14 @@ class SearchViewModel @Inject constructor(
 }
 
 private class SearchRecordPagingSource(
-    private val keyword: String,
+    private val query: RecordKeywordQuery,
     private val getSearchRecordViewsUseCase: GetSearchRecordViewsUseCase,
 ) : PagingSource<Int, RecordViewsEntity>() {
     override fun getRefreshKey(state: PagingState<Int, RecordViewsEntity>): Int? = null
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RecordViewsEntity> {
         return try {
             val page = params.key ?: 0
-            val items = getSearchRecordViewsUseCase(keyword, page, params.loadSize)
+            val items = getSearchRecordViewsUseCase(query, page, params.loadSize)
             LoadResult.Page(items, if (page > 0) page - 1 else null, if (items.isNotEmpty()) page + 1 else null)
         } catch (error: Throwable) {
             if (error is CancellationException) throw error

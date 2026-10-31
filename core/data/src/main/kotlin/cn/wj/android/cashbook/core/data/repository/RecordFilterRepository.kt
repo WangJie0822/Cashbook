@@ -19,6 +19,8 @@ package cn.wj.android.cashbook.core.data.repository
 import androidx.paging.PagingData
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
+import cn.wj.android.cashbook.core.model.model.RecordSearchStatistics
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import kotlinx.coroutines.flow.Flow
 
@@ -26,6 +28,8 @@ interface RecordFilterRepository {
     fun validate(request: RecordFilterRequest): RecordFilterValidation
     fun observeRecords(request: RecordFilterRequest): Flow<PagingData<RecordViewsModel>>
     fun observeSummary(request: RecordFilterRequest): Flow<RecordFilterSummary>
+    fun observeStatistics(request: RecordFilterRequest): Flow<RecordSearchStatistics>
+    fun observeKeywordStatistics(query: RecordKeywordQuery): Flow<RecordSearchStatistics>
 }
 
 sealed interface RecordFilterValidation {
