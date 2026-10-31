@@ -46,7 +46,7 @@
 ### #7 N+1 其余 caller 批量化(改 7 个非 Paging UseCase)
 
 复用 `transBatch`(逐字段等价已验证):
-- **排序型 4 个**(`GetAssetRecordViewsUseCase.kt:51-52`、`GetSearchRecordViewsUseCase.kt:48-50`、`GetTagRecordViewsUseCase.kt:48-50`、`GetTypeRecordViewsUseCase.kt:65-67`):`list.sortedByDescending{it.recordTime}` → `recordModelTransToViewsUseCase(sorted)` → `.map{it.asEntity()}`
+- **排序型 4 个**(`GetAssetRecordViewsUseCase.kt:51-52`、`GetSearchRecordViewsUseCase.kt`（`GetSearchRecordViewsUseCase#invoke(String, Int, Int)`）、`GetTagRecordViewsUseCase.kt:48-50`、`GetTypeRecordViewsUseCase.kt:65-67`):`list.sortedByDescending{it.recordTime}` → `recordModelTransToViewsUseCase(sorted)` → `.map{it.asEntity()}`
 - **Flow 型** `GetCurrentMonthRecordViewsUseCase.kt:38-39`:`mapLatest{ recordModelTransToViewsUseCase(it).map{e->e.asEntity()} }`
 - **filter 型** `GetRelatedRecordViewsUseCase.kt:63-66`:`records.filter{queryRelatedRecordCountById(it.id)<=0}` → `recordModelTransToViewsUseCase(filtered)` → `.map{it.asEntity()}`(filter 内 `queryRelatedRecordCountById` 逐条查询是另一处 N+1,**范围外不动**)
 

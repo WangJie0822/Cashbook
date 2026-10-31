@@ -57,6 +57,7 @@ import cn.wj.android.cashbook.core.design.component.CbTextButton
 import cn.wj.android.cashbook.core.design.component.LocalDefaultEmptyImagePainter
 import cn.wj.android.cashbook.core.design.component.LocalDefaultLoadingHint
 import cn.wj.android.cashbook.core.design.theme.CashbookTheme
+import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.model.RecordFilter
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
@@ -111,7 +112,7 @@ class SearchFilterScreenTest {
                     createRecordViewsModel(id = 1L, type = expense, amount = 100L, finalAmount = 100L, relatedTags = travel),
                     createRecordViewsModel(id = 2L, type = income, amount = 80000L, finalAmount = 0L, relatedRecord = listOf(createRecordModel(id = 101L)), relatedTags = travel),
                     createRecordViewsModel(id = 3L, type = transfer, amount = 500000L, finalAmount = -200L, charges = 200L, relatedTags = travel),
-                    createRecordViewsModel(id = 4L, type = expense, amount = 300L, finalAmount = 300L, relatedTags = listOf(createTagModel(id = 42L))),
+                    createRecordViewsModel(id = 4L, type = expense, amount = 300L, finalAmount = 300L, remark = "关键词", relatedTags = listOf(createTagModel(id = 42L))),
                 ),
             )
             fixture.records.addRecord(createRecordModel(id = 4L, typeId = 11L, amount = 300L, finalAmount = 300L, remark = "关键词"))
@@ -166,7 +167,8 @@ class SearchFilterScreenTest {
         compose.onNodeWithTag("search_query").performImeAction()
         waitFor("search_record_4")
         compose.onNodeWithTag("search_record_4").assertIsDisplayed()
-        compose.onNodeWithTag("filter_summary_count").assertDoesNotExist()
+        compose.onNodeWithTag("filter_summary_count").assertIsDisplayed()
+        compose.onNodeWithText("1 笔").assertIsDisplayed()
         compose.onNodeWithTag("filter_contribution_4").assertDoesNotExist()
         compose.runOnIdle { assertThat(fixture.vm.filterState.value.mode).isEqualTo(SearchMode.Keyword) }
         compose.onNodeWithTag("search_clear").performClick()
@@ -193,13 +195,41 @@ class SearchFilterScreenTest {
 
     @Test fun summaryFailure_showsRetryAndNeverZeroStatistics() {
         show { it.filters.summaryProvider = { flow { error("synthetic failure") } } }
-        applyTravel("search_query_error")
-        compose.onNodeWithTag("search_query_error").assertIsDisplayed()
+        applyTravel("search_statistics_error")
+        compose.onNodeWithTag("search_statistics_error").assertIsDisplayed()
+        compose.onNodeWithTag("search_query_error").assertDoesNotExist()
+        compose.onNodeWithTag("search_record_1").assertIsDisplayed()
         compose.onNodeWithTag("filter_summary_count").assertDoesNotExist()
-        compose.runOnIdle { fixture.filters.summaryProvider = { flowOf(RecordFilterSummary(3L, 0L, 300L)) } }
-        compose.onNodeWithTag("search_retry").performClick()
+        compose.runOnIdle { fixture.filters.summaryProvider = null }
+        compose.onNodeWithTag("search_statistics_retry").performClick()
         waitFor("filter_summary_count")
         compose.onNodeWithText("3 笔").assertIsDisplayed()
+        compose.onNodeWithTag("distribution_chart").assertIsDisplayed()
+    }
+
+    @Test fun statisticsLoadingDoesNotHideAlreadyLoadedRecords() {
+        show { it.filters.summaryProvider = { flow { kotlinx.coroutines.awaitCancellation() } } }
+        applyTravel("search_statistics_loading")
+        compose.onNodeWithTag("search_statistics_loading").assertIsDisplayed()
+        compose.onNodeWithTag("search_record_1").assertIsDisplayed()
+        compose.onNodeWithTag("filter_summary_count").assertDoesNotExist()
+    }
+
+    @Test fun distributionInteractionsDoNotChangeTheQueryOrItsRecords() {
+        show()
+        applyTravel()
+        val context = fixture.vm.filterState.value.queryContext
+        val requests = fixture.filters.recordRequests.size
+        compose.onNodeWithTag("distribution_toggle").performClick()
+        compose.onNodeWithTag("distribution_chart").assertDoesNotExist()
+        compose.onNodeWithTag("distribution_toggle").performClick()
+        compose.onNodeWithTag("distribution_group_2_30").performClick()
+        compose.runOnIdle {
+            assertThat(fixture.vm.filterState.value.queryContext).isEqualTo(context)
+            assertThat(fixture.filters.recordRequests).hasSize(requests)
+            assertThat(fixture.vm.filterState.value.appliedFilter!!.tagIds).containsExactly(41L)
+        }
+        compose.onNodeWithTag("search_record_3").assertIsDisplayed()
     }
 
     @Test fun recordsFailure_canRetryWithoutShowingZeroSummary() {
@@ -389,5 +419,37 @@ class SearchFilterScreenTest {
         compose.onNodeWithTag("search_query_loading").assertIsDisplayed()
         compose.onNodeWithTag("search_record_99").assertDoesNotExist()
         compose.onNodeWithTag("filter_summary_count").assertDoesNotExist()
+    }
+
+    @Test fun positiveStatisticsDoNotPretendAnEmptyPageIsTheFinalEmptyResult() {
+        val filter = RecordFilter()
+        val context = SearchQueryContext(1, 1, SearchMode.Filter, filter.toRequest(1, 1))
+        val state = SearchFilterState(mode = SearchMode.Filter, appliedFilter = filter, queryContext = context)
+        val pages = flowOf(PagingData.from(emptyList<RecordViewsEntity>(), sourceLoadStates = LoadStates(LoadState.NotLoading(false), LoadState.NotLoading(true), LoadState.NotLoading(true))))
+        compose.setContent {
+            CashbookTheme {
+                val records = pages.collectAsLazyPagingItems()
+                SearchScreen(null, {}, {}, emptyList(), {}, records, {}, {}, {}, {}, state, SearchFilterSummaryState.Ready(context, RecordFilterSummary(1, 0, 100)), {})
+            }
+        }
+        compose.onNodeWithTag("search_query_loading").assertIsDisplayed()
+        compose.onNodeWithTag("filter_summary_count").assertDoesNotExist()
+    }
+
+    @Test fun restoredIntentWithoutMetadataNeverShowsAQueriedEmptyList() {
+        val state = SearchFilterState(mode = SearchMode.Filter, appliedFilter = RecordFilter())
+        val pages = flowOf(PagingData.from(emptyList<RecordViewsEntity>(), sourceLoadStates = LoadStates(LoadState.NotLoading(false), LoadState.NotLoading(true), LoadState.NotLoading(true))))
+        compose.setContent {
+            CompositionLocalProvider(LocalDefaultEmptyImagePainter provides ColorPainter(Color.Gray), LocalDefaultLoadingHint provides "数据加载中") {
+                CashbookTheme {
+                    val records = pages.collectAsLazyPagingItems()
+                    SearchScreen(null, {}, {}, emptyList(), {}, records, {}, {}, {}, {}, state, SearchFilterSummaryState.Hidden, {})
+                }
+            }
+        }
+        compose.waitForIdle()
+        compose.mainClock.advanceTimeBy(1000L)
+        compose.onNodeWithTag("search_query_loading").assertIsDisplayed()
+        compose.onNodeWithTag("search_statistics_loading").assertDoesNotExist()
     }
 }

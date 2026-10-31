@@ -45,6 +45,7 @@ import cn.wj.android.cashbook.core.database.dao.TransactionDao
 import cn.wj.android.cashbook.core.datastore.datasource.CombineProtoDataSource
 import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
@@ -310,6 +311,20 @@ class RecordRepositoryImpl @Inject constructor(
         ).map {
             it.asModel()
         }
+    }
+
+    override suspend fun queryPagingRecordListByKeyword(
+        query: RecordKeywordQuery,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel> = withContext(coroutineContext) {
+        recordDao.queryRecordByKeyword(
+            booksId = query.bookId,
+            keyword = query.keyword,
+            amountCent = query.amountCent,
+            pageNum = page * pageSize,
+            pageSize = pageSize,
+        ).map { it.asModel() }
     }
 
     override fun queryRecordByYearMonth(

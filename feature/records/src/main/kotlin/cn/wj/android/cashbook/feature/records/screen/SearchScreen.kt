@@ -54,6 +54,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,6 +81,7 @@ import cn.wj.android.cashbook.core.design.icon.CbIcons
 import cn.wj.android.cashbook.core.design.theme.rememberHapticOnClick
 import cn.wj.android.cashbook.core.model.entity.RecordViewsEntity
 import cn.wj.android.cashbook.core.model.model.RecordFilter
+import cn.wj.android.cashbook.core.model.model.RecordSearchStatistics
 import cn.wj.android.cashbook.core.ui.R
 import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import cn.wj.android.cashbook.feature.records.model.SearchFilterMessage
@@ -94,6 +96,8 @@ import cn.wj.android.cashbook.feature.records.view.SearchFilterSummary
 import cn.wj.android.cashbook.feature.records.view.categorySelectionSummary
 import cn.wj.android.cashbook.feature.records.view.filterMessageText
 import cn.wj.android.cashbook.feature.records.view.filterTypeLabel
+import cn.wj.android.cashbook.feature.records.view.rememberSearchDistributionState
+import cn.wj.android.cashbook.feature.records.view.searchResultDistribution
 import cn.wj.android.cashbook.feature.records.viewmodel.SearchViewModel
 import cn.wj.android.cashbook.feature.records.R as FilterR
 
@@ -173,12 +177,14 @@ internal fun SearchScreen(
     val keywordMode = filterState.mode == SearchMode.Keyword
     val clearKeywordHint = stringResource(FilterR.string.search_filter_clear_keyword_first)
     val readySummary = (summaryState as? SearchFilterSummaryState.Ready)?.takeIf { it.context == context }
+    val readyStatistics = remember(readySummary) { readySummary?.let { RecordSearchStatistics(it.summary, it.categories) } }
+    val distributionState = rememberSearchDistributionState(criteriaKey, readySummary?.categories)
     val summaryFailed = (summaryState as? SearchFilterSummaryState.Failed)?.context == context
-    val failed = filterState.recordQueryFailure == context || recordList.loadState.refresh is LoadState.Error || (filtering && summaryFailed) || filterState.message == SearchFilterMessage.METADATA_FAILED
+    val failed = filterState.recordQueryFailure == context || recordList.loadState.refresh is LoadState.Error || filterState.message == SearchFilterMessage.METADATA_FAILED
     val pending = filterState.mode != SearchMode.Initial && !failed &&
         (
-            recordContext != context || recordList.loadState.refresh is LoadState.Loading ||
-                (filtering && (readySummary == null || (readySummary.summary.totalCount > 0L && recordList.itemCount == 0)))
+            context.mode == SearchMode.Initial || recordContext != context || recordList.loadState.refresh is LoadState.Loading ||
+                (readySummary != null && readySummary.summary.totalCount > 0L && recordList.itemCount == 0)
             )
 
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
@@ -262,7 +268,26 @@ internal fun SearchScreen(
                                 }
                             }
                         }
-                        if (filtering && readySummary != null) item(key = "filter_summary") { SearchFilterSummary(readySummary.summary, Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
+                        if (filterState.mode != SearchMode.Initial) {
+                            if (readySummary != null) {
+                                item(key = "filter_summary") { SearchFilterSummary(readySummary.summary, Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
+                                searchResultDistribution(readyStatistics!!, distributionState)
+                            } else if (summaryFailed) {
+                                item(key = "statistics_error") {
+                                    Column(Modifier.padding(16.dp).testTag("search_statistics_error")) {
+                                        Text(stringResource(FilterR.string.search_statistics_failed), color = MaterialTheme.colorScheme.error)
+                                        CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }, modifier = Modifier.testTag("search_statistics_retry")) { Text(stringResource(FilterR.string.search_filter_retry)) }
+                                    }
+                                }
+                            } else {
+                                item(key = "statistics_loading") {
+                                    Row(Modifier.padding(16.dp).testTag("search_statistics_loading"), verticalAlignment = Alignment.CenterVertically) {
+                                        CbCircularProgressIndicator(Modifier.size(20.dp))
+                                        Text(stringResource(R.string.data_in_loading), Modifier.padding(start = 12.dp))
+                                    }
+                                }
+                            }
+                        }
                         if (recordList.itemCount == 0) {
                             item(key = "empty") {
                                 Empty(hintText = stringResource(if (filtering) FilterR.string.search_filter_empty else if (filterState.mode == SearchMode.Initial) FilterR.string.search_filter_initial_hint else R.string.record_search_no_data_hint), modifier = Modifier.fillMaxWidth())
@@ -270,7 +295,7 @@ internal fun SearchScreen(
                         } else {
                             items(recordList.itemCount, key = { recordList.peek(it)?.id ?: "placeholder_$it" }) { index ->
                                 recordList[index]?.let { record ->
-                                    if (filtering) {
+                                    if (filtering || keywordMode) {
                                         SearchFilterRecordItem(record, { onRequestShowRecordDetailSheet(record) }, Modifier.testTag("search_record_${record.id}"))
                                     } else {
                                         RecordListItem(record, modifier = Modifier.testTag("search_record_${record.id}").clickable(onClick = rememberHapticOnClick { onRequestShowRecordDetailSheet(record) }))

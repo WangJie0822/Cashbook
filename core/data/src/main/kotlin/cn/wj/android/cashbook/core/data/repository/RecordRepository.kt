@@ -24,6 +24,7 @@ import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
@@ -120,6 +121,13 @@ interface RecordRepository {
 
     suspend fun queryPagingRecordListByKeyword(
         keyword: String,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel>
+
+    /** 搜索页固定查询所属账本，避免翻页期间读取到新账本。 */
+    suspend fun queryPagingRecordListByKeyword(
+        query: RecordKeywordQuery,
         page: Int,
         pageSize: Int,
     ): List<RecordModel>

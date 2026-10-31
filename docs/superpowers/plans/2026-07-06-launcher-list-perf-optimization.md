@@ -547,7 +547,7 @@ git commit -m "[feat|core:data|首页分页][公共]新增 @Relation POJO→Reco
 
 **Files:**
 - Modify: `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/RecordRepository.kt:130-131`（接口返回类型）
-- Modify: `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordRepositoryImpl.kt:354-375`
+- Modify: `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordRepositoryImpl.kt`（`RecordRepositoryImpl#getRecordPagingData(Long, Long)`）
 - Modify: `core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeRecordDao.kt`（补新方法）
 - Modify: `core/testing/src/main/kotlin/cn/wj/android/cashbook/core/testing/repository/FakeRecordRepository.kt:286-291`
 
@@ -568,7 +568,7 @@ git commit -m "[feat|core:data|首页分页][公共]新增 @Relation POJO→Reco
 
 - [ ] **Step 2: 改 `RecordRepositoryImpl.getRecordPagingData`**
 
-替换 `:354-375` 实现体：
+替换 `RecordRepositoryImpl.kt` 的 `RecordRepositoryImpl#getRecordPagingData(Long, Long)` 实现体：
 ```kotlin
     override fun getRecordPagingData(
         startDate: Long,

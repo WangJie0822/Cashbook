@@ -22,6 +22,7 @@ import cn.wj.android.cashbook.core.data.repository.RecordRepository
 import cn.wj.android.cashbook.core.database.table.RecordTable
 import cn.wj.android.cashbook.core.model.model.ExportRecordModel
 import cn.wj.android.cashbook.core.model.model.ImageModel
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
 import cn.wj.android.cashbook.core.model.model.RecordModel
 import cn.wj.android.cashbook.core.model.model.RecordViewSummaryModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
@@ -277,6 +278,17 @@ class FakeRecordRepository : RecordRepository {
         }
             .drop(page * pageSize)
             .take(pageSize)
+    }
+
+    override suspend fun queryPagingRecordListByKeyword(
+        query: RecordKeywordQuery,
+        page: Int,
+        pageSize: Int,
+    ): List<RecordModel> {
+        return records.filter {
+            it.booksId == query.bookId &&
+                (sqliteLikeContains(it.remark, query.keyword) || (query.amountCent != -1L && (it.amount == query.amountCent || it.finalAmount == query.amountCent)))
+        }.sortedByDescending { it.recordTime }.drop(page * pageSize).take(pageSize)
     }
 
     override suspend fun queryRecordListBetweenDate(

@@ -23,6 +23,7 @@ import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import cn.wj.android.cashbook.core.database.relation.LauncherRecordViewRelation
 import cn.wj.android.cashbook.core.database.relation.RecordFilterSummaryRelation
+import cn.wj.android.cashbook.core.database.relation.RecordSearchStatisticsRelation
 import cn.wj.android.cashbook.core.database.table.AssetTable
 import cn.wj.android.cashbook.core.database.table.ImageWithRelatedTable
 import cn.wj.android.cashbook.core.database.table.RecordTable
@@ -46,4 +47,8 @@ interface RecordFilterDao {
 
     @RawQuery(observedEntities = [RecordTable::class, TypeTable::class, TagTable::class, TagWithRecordTable::class])
     fun observeSummary(query: SupportSQLiteQuery): Flow<RecordFilterSummaryRelation>
+
+    @Transaction
+    @RawQuery(observedEntities = [RecordTable::class, TypeTable::class, TagTable::class, TagWithRecordTable::class])
+    fun observeStatistics(query: SupportSQLiteQuery): Flow<List<RecordSearchStatisticsRelation>>
 }

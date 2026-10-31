@@ -70,4 +70,15 @@
     <string name="search_filter_empty">没有符合条件的账单，请调整筛选</string>
     <string name="search_filter_initial_hint">输入关键字，或通过筛选统计当前账本</string>
     <string name="search_filter_no_conditions">当前账本全部账单</string>
+    <string name="search_statistics_failed">收支统计加载失败，请重试</string>
+    <string name="search_distribution_title">分类净额分布</string>
+    <string name="search_distribution_base">占比基数</string>
+    <string name="search_distribution_collapse">收起</string>
+    <string name="search_distribution_open">展开</string>
+    <string name="search_distribution_all">展开全部（%1$d）</string>
+    <string name="search_distribution_no_matches">暂无匹配账单</string>
+    <string name="search_distribution_zero">暂无可绘制的净收支</string>
+    <string name="search_distribution_rule">占比按各分类净额的绝对值计算，金额保留正负；平账不计入。</string>
+    <string name="search_distribution_chart_count">包含 %1$d 个非零分类</string>
+    <string name="search_distribution_chart_selected">；已选中%1$s</string>
 </resources>

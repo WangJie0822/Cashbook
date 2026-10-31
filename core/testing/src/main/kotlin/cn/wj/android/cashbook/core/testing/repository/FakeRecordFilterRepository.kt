@@ -27,10 +27,15 @@ import cn.wj.android.cashbook.core.data.repository.impl.RecordFilterRepositoryIm
 import cn.wj.android.cashbook.core.database.dao.RecordFilterDao
 import cn.wj.android.cashbook.core.database.relation.LauncherRecordViewRelation
 import cn.wj.android.cashbook.core.database.relation.RecordFilterSummaryRelation
+import cn.wj.android.cashbook.core.database.relation.RecordSearchStatisticsRelation
+import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.RECORD_TYPE_BALANCE_EXPENDITURE
+import cn.wj.android.cashbook.core.model.model.RecordCategoryNet
 import cn.wj.android.cashbook.core.model.model.RecordFilterRequest
 import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
+import cn.wj.android.cashbook.core.model.model.RecordKeywordQuery
+import cn.wj.android.cashbook.core.model.model.RecordSearchStatistics
 import cn.wj.android.cashbook.core.model.model.RecordTypeModel
 import cn.wj.android.cashbook.core.model.model.RecordViewsModel
 import cn.wj.android.cashbook.core.model.model.TagModel
@@ -51,14 +56,17 @@ class FakeRecordFilterRepository(
     private val records = MutableStateFlow<List<RecordViewsModel>>(emptyList())
     val recordRequests = mutableListOf<RecordFilterRequest>()
     val summaryRequests = mutableListOf<RecordFilterRequest>()
+    val keywordRequests = mutableListOf<RecordKeywordQuery>()
     var validationOverride: RecordFilterValidation? = null
     var summaryProvider: ((RecordFilterRequest) -> Flow<RecordFilterSummary>)? = null
+    var keywordStatisticsProvider: ((RecordKeywordQuery) -> Flow<RecordSearchStatistics>)? = null
     var recordsProvider: ((RecordFilterRequest) -> Flow<PagingData<RecordViewsModel>>)? = null
 
     private val validator = RecordFilterRepositoryImpl(
         object : RecordFilterDao {
             override fun pagingRecords(query: SupportSQLiteQuery): PagingSource<Int, LauncherRecordViewRelation> = error("No database IO in fake validation")
             override fun observeSummary(query: SupportSQLiteQuery): Flow<RecordFilterSummaryRelation> = error("No database IO in fake validation")
+            override fun observeStatistics(query: SupportSQLiteQuery): Flow<List<RecordSearchStatisticsRelation>> = error("No database IO in fake validation")
         },
         Dispatchers.Unconfined,
     )
@@ -77,7 +85,56 @@ class FakeRecordFilterRepository(
         }
     }
 
-    private fun matching(request: RecordFilterRequest) = combine(records, catalog, tags) { rows, types, allTags ->
+    override fun observeStatistics(request: RecordFilterRequest): Flow<RecordSearchStatistics> {
+        if (summaryProvider != null) return observeSummary(request).map { RecordSearchStatistics(it, emptyList()) }
+        summaryRequests += request
+        return combine(matching(request, normalizeTypes = false), catalog) { rows, types -> statistics(rows, types) }
+    }
+
+    override fun observeKeywordStatistics(query: RecordKeywordQuery): Flow<RecordSearchStatistics> {
+        keywordRequests += query
+        return keywordStatisticsProvider?.invoke(query) ?: combine(records, catalog) { rows, types ->
+            statistics(
+                rows.filter {
+                    it.booksId == query.bookId && (
+                        sqliteLikeContains(it.remark, query.keyword) ||
+                            (query.amountCent != -1L && (it.amount == query.amountCent || it.finalAmount == query.amountCent))
+                        )
+                },
+                types,
+            )
+        }
+    }
+
+    private fun statistics(rows: List<RecordViewsModel>, types: List<RecordTypeModel>): RecordSearchStatistics {
+        val byId = types.associateBy { it.id }
+        val groups = mutableMapOf<Pair<RecordTypeCategoryEnum, Long>, RecordCategoryNet>()
+        var income = 0L
+        var expenditure = 0L
+        rows.forEach { row ->
+            if (row.isBalanceRecord) return@forEach
+            val type = byId[row.type.id] ?: return@forEach
+            val amount = when (type.typeCategory) {
+                RecordTypeCategoryEnum.TRANSFER -> Math.subtractExact(row.charges, row.concessions)
+                else -> row.finalAmount
+            }
+            if (type.typeCategory == RecordTypeCategoryEnum.INCOME) {
+                income = Math.addExact(income, amount)
+            } else {
+                expenditure = Math.addExact(expenditure, amount)
+            }
+            val group = byId[type.parentId]?.takeIf {
+                type.typeLevel == TypeLevelEnum.SECOND && it.parentId == -1L && it.typeLevel == TypeLevelEnum.FIRST && it.typeCategory == type.typeCategory
+            } ?: type
+            val key = type.typeCategory to group.id
+            groups[key] = RecordCategoryNet(group.id, type.typeCategory, group.name, Math.addExact(groups[key]?.amount ?: 0L, amount))
+        }
+        val categories = groups.values.toList()
+        val result = RecordSearchStatistics(RecordFilterSummary(rows.size.toLong(), income, expenditure), categories)
+        return result.copy(categories = categories.sortedWith(compareByDescending<RecordCategoryNet> { kotlin.math.abs(it.amount) }.thenBy { it.typeId }.thenBy { it.typeCategory.code }))
+    }
+
+    private fun matching(request: RecordFilterRequest, normalizeTypes: Boolean = true) = combine(records, catalog, tags) { rows, types, allTags ->
         val byId = types.associateBy { it.id }
         val groups = request.categories.wholeGroupIds.filter { byId[it]?.let { t -> t.parentId == -1L && t.typeLevel == TypeLevelEnum.FIRST } == true }.toSet()
         val existingTags = allTags.map { it.id }.toSet()
@@ -93,7 +150,7 @@ class FakeRecordFilterRepository(
                         )
                     ) &&
                 (request.tagIds.isEmpty() || row.relatedTags.any { it.id in request.tagIds && it.id in existingTags })
-        }.distinctBy { it.id }.map { it.copy(type = byId[it.type.id] ?: it.type.takeIf { type -> type.id == -1101L || type.id == -1102L } ?: RECORD_TYPE_BALANCE_EXPENDITURE) }
+        }.distinctBy { it.id }.map { if (normalizeTypes) it.copy(type = byId[it.type.id] ?: it.type.takeIf { type -> type.id == -1101L || type.id == -1102L } ?: RECORD_TYPE_BALANCE_EXPENDITURE) else it }
             .sortedWith(compareByDescending<RecordViewsModel> { it.recordTime }.thenByDescending { it.id })
     }
 }
