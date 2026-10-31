@@ -16,15 +16,15 @@
 
 package cn.wj.android.cashbook.feature.settings.screen
 
-import android.content.Intent
 import android.content.ActivityNotFoundException
 import android.content.ContextWrapper
+import android.content.Intent
 import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.ScrollView
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
@@ -195,6 +195,7 @@ class MarkdownScreenBehaviorTest {
             assertThat(view.text.toString()).doesNotContain("旧链接")
             clickLink(view, "新链接")
             val chooser = shadowOf(composeTestRule.activity).nextStartedActivity
+
             @Suppress("DEPRECATION")
             val target = chooser.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
             assertThat(target!!.dataString).isEqualTo("https://example.org/new#next")

@@ -38,8 +38,8 @@ import cn.wj.android.cashbook.core.design.component.CbTopAppBar
 import cn.wj.android.cashbook.core.design.component.Empty
 import cn.wj.android.cashbook.core.model.enums.MarkdownTypeEnum
 import cn.wj.android.cashbook.core.ui.R
-import cn.wj.android.cashbook.feature.settings.viewmodel.MarkdownViewModel
 import cn.wj.android.cashbook.feature.settings.view.MarkdownContent
+import cn.wj.android.cashbook.feature.settings.viewmodel.MarkdownViewModel
 import kotlinx.coroutines.launch
 
 /**
