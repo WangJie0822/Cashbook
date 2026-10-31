@@ -149,6 +149,30 @@ class SearchFilterScreenTest {
         assertThat(bounds.left).isGreaterThan(root.left)
     }
 
+    @Test fun gestureWhileTyping_preservesDraftAndRevealsAppliedResultsWithoutSubmittingIt() {
+        show()
+        compose.onNodeWithTag("search_query").performTextInput("未提交草稿")
+        compose.onRoot().performTouchInput {
+            swipe(Offset(width - 2f, height * 0.6f), Offset(width * 0.2f, height * 0.6f), 500L)
+        }
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        compose.onNodeWithTag("filter_tag_41").performClick()
+        compose.onNodeWithTag("tag_done").performClick()
+        compose.onNodeWithText("完成").performClick()
+        compose.waitUntil(10_000L) {
+            (fixture.vm.filterSummary.value as? SearchFilterSummaryState.Ready)?.summary?.totalCount == 3L
+        }
+        compose.onNodeWithTag("filter_summary_count").assertIsDisplayed()
+        compose.onNodeWithTag("search_results").performScrollToNode(hasTestTag("search_record_1"))
+        compose.onNodeWithTag("search_record_1").assertIsDisplayed()
+        compose.runOnIdle {
+            assertThat(fixture.vm.filterState.value.queryDraft).isEqualTo("未提交草稿")
+            assertThat(fixture.vm.filterState.value.submittedKeyword).isEmpty()
+            assertThat(fixture.filters.keywordRequests).isEmpty()
+            assertThat(fixture.filters.combinedStatisticsRequests).isEmpty()
+        }
+    }
+
     @Test fun sidebarBack_returnsFromChildThenDiscardsParentAndReopensAtRoot() {
         show()
         compose.onNodeWithTag("search_filter_button").performClick()

@@ -154,6 +154,12 @@ internal fun SearchScreen(
 
     var expanded by rememberSaveable { mutableStateOf(false) }
     val focus = LocalFocusManager.current
+    LaunchedEffect(filterState.drawerDraft != null) {
+        if (filterState.drawerDraft != null) {
+            expanded = false
+            focus.clearFocus()
+        }
+    }
     val listState = rememberLazyListState()
     // 重建 ViewModel 时 revision 从头计数；保存实际条件键才能保住配置变化后的滚动位置。
     val criteriaKey = filterState.queryContext.copy(criteriaRevision = 0L).toString()
