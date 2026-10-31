@@ -107,18 +107,23 @@ class SearchScreenScreenshotTests {
     @Composable
     private fun FilterContent(kind: String) {
         val filter = RecordFilter(tagIds = setOf(41L))
-        val keyword = kind == "keyword"
+        val keyword = kind == "keyword" || kind == "combined"
         val mode = if (keyword) SearchMode.Keyword else SearchMode.Filter
-        val context = SearchQueryContext(1L, 1L, mode, if (keyword) null else filter.toRequest(1L, 1), if (keyword) "午餐" else "")
-        val rows = if (kind == "ready") filterRecords else if (keyword) keywordRecords else emptyList()
+        val context = SearchQueryContext(1L, 1L, mode, if (kind == "keyword") null else filter.toRequest(1L, 1), if (keyword) "午餐" else "")
+        val rows = when {
+            kind == "combined" -> keywordRecords.map { it.copy(relatedTags = listOf(createTagModel(id = 41L, name = "旅行"))) }
+            kind == "ready" -> filterRecords
+            keyword -> keywordRecords
+            else -> emptyList()
+        }
         val source = remember(kind) { flowOf(PagingData.from(rows, sourceLoadStates = loaded)) }
         val records = source.collectAsLazyPagingItems()
-        val state = SearchFilterState(mode = mode, queryDraft = if (keyword) "午餐" else "", submittedKeyword = if (keyword) "午餐" else "", appliedFilter = if (keyword) null else filter, bookId = 1L, bookName = "日常账本", settingsLoaded = true, catalogLoaded = true, tagsLoaded = true, tags = listOf(createTagModel(id = 41L, name = "旅行")), queryContext = context)
+        val state = SearchFilterState(mode = mode, queryDraft = if (keyword) "午餐" else "", submittedKeyword = if (keyword) "午餐" else "", appliedFilter = if (kind == "keyword") null else filter, bookId = 1L, bookName = "日常账本", settingsLoaded = true, catalogLoaded = true, tagsLoaded = true, tags = listOf(createTagModel(id = 41L, name = "旅行")), queryContext = context)
         val summary = when (kind) {
             "error" -> SearchFilterSummaryState.Failed(context, "query_failed")
             "loading" -> SearchFilterSummaryState.Loading(context)
             "empty" -> SearchFilterSummaryState.Ready(context, RecordFilterSummary(0L, 0L, 0L))
-            "keyword" -> SearchFilterSummaryState.Ready(
+            "keyword", "combined" -> SearchFilterSummaryState.Ready(
                 context,
                 RecordFilterSummary(3, 2000, 4950),
                 listOf(
@@ -147,6 +152,10 @@ class SearchScreenScreenshotTests {
     @Test fun searchScreen_keywordSummary_multipleThemes() { composeTestRule.captureMultiTheme("SearchKeywordStatistics") { FilterContent("keyword") } }
 
     @Test fun searchScreen_keywordSummary_multipleDevices() { composeTestRule.captureMultiDevice("SearchKeywordStatistics") { CashbookTheme { FilterContent("keyword") } } }
+
+    @Test fun searchScreen_combinedSummary_multipleThemes() { composeTestRule.captureMultiTheme("SearchCombinedStatistics") { FilterContent("combined") } }
+
+    @Test fun searchScreen_combinedSummary_multipleDevices() { composeTestRule.captureMultiDevice("SearchCombinedStatistics") { CashbookTheme { FilterContent("combined") } } }
 
     @Test fun searchScreen_filterEmpty_multipleThemes() { composeTestRule.captureMultiTheme("SearchFilterEmpty") { FilterContent("empty") } }
 
