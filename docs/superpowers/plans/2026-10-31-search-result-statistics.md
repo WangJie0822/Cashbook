@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- 分支 codex/search-result-statistics，worktree D:/wt/search-result-statistics/Cashbook；base 为远端 main 的内容，不夹带分类修复。
+- 分支 `codex/search-result-statistics`，独立 worktree；base 为远端 main 的内容，不夹带分类修复。
 - 当前会话执行；仅本地提交、不推送、不发布、不归档 Vault/Memory。
 - 金额 Long 分；先分类有符号求和后 abs；占比基数 sum(abs(分类净额))，不等于结余。转账只有 charge−concessions；平账计笔数不计金额。
 - 父级有效须存在、为一级且同收支类型；否则以自身分组；同名不同 ID 不合并。
@@ -41,9 +41,9 @@
 - 同目录 `RecordFilterSqlBuilder.kt`：RecordFilterQueries 新增 statistics 查询，从同一 fromWhere/args 构建，预算纳入新查询。
 - `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/RecordFilterRepository.kt` 与 impl：新增 `observeStatistics(RecordFilterRequest)`、`observeKeywordStatistics(RecordKeywordQuery)`，均返回 Flow<RecordSearchStatistics>；原 observeSummary 保留兼容。
 - RecordRepository 接口、真实实现与 FakeRecordRepository：保留旧三参数入口，新增 `queryPagingRecordListByKeyword(query: RecordKeywordQuery, page: Int, pageSize: Int)` 重载；GetSearchRecordViewsUseCase 同样新增 query 重载，调用真实旧 DAO，并提供 `suspend createQuery(bookId: Long, keyword: String): RecordKeywordQuery` 在已注入 IO 上转换。VM 用同一 Deferred 供分页/统计 await，转换失败进入各自错误边界，不逃逸 UI 事件。
-- `core/testing/.../repository/FakeRecordFilterRepository.kt`：实现新统计契约，保留 summaryProvider 的旧错误/迟到测试接线；新增 keywordRequests 与 keywordStatisticsProvider。SQL 正确性由真实 Room 测试承担。
-- `feature/records/.../model/SearchFilterState.kt`：Ready 保留 context/summary 构造兼容，新增 categories 默认空列表。
-- `feature/records/.../viewmodel/SearchViewModel.kt`：两种查询模式均启动统计；关键词分页携带不可变 RecordKeywordQuery。
+- `core/testing/src/main/kotlin/cn/wj/android/cashbook/core/testing/repository/FakeRecordFilterRepository.kt`：实现新统计契约，保留 summaryProvider 的旧错误/迟到测试接线；新增 keywordRequests 与 keywordStatisticsProvider。SQL 正确性由真实 Room 测试承担。
+- `feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/model/SearchFilterState.kt`：Ready 保留 context/summary 构造兼容，新增 categories 默认空列表。
+- `feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/viewmodel/SearchViewModel.kt`：两种查询模式均启动统计；关键词分页携带不可变 RecordKeywordQuery。
 - `feature/records/src/main/kotlin/cn/wj/android/cashbook/feature/records/view/SearchResultDistribution.kt`（新增）：SearchDistributionState/rememberSearchDistributionState管理可保存纯UI状态；LazyListScope.searchResultDistribution将首卡和展开余项接入主列表，消费RecordSearchStatistics，点击不修改查询。
 - SearchScreen、search_filter_strings.xml、现有 SearchFilterScreenTest/SearchScreenScreenshotTests：接入两种模式统计、独立统计加载/错误、关键词贡献说明与新截图。
 
@@ -75,10 +75,10 @@
 
 ## Task 3：组合验收与交付
 
-- [ ] 枚举本次 unit/androidTest 用例；全套执行 `./gradlew testOnlineDebug testOfflineDebug testDebugUnitTest :core:model:test :lint:test -Proborazzi.test.verify=false --rerun-tasks --console=plain`，逐 XML 复算总数。
-- [ ] 构建 DevDebug、Spotless、Dependency Guard、Online/Offline/Dev Release Lint、自定义 Lint；执行 `verifyRoborazziDebug`，不重录无关模块。
-- [ ] 变异独立副本：关键词统计接线回退、丢关键词账本、错用转账本金/截负值、先逐笔abs、只取第一页、漏标签去重/小分类、迟到结果覆盖、统计错误隐藏列表。每轮硬超时、基线先绿；记录具名失败和原因，变异源不碰实施树。
-- [ ] 专用模拟器与合成数据，从真实搜索提交/筛选入口验证汇总、图例、折叠/选中、编辑后刷新；截图和账单数据留证；不操作用户账本。
+- [x] 枚举本次 unit/androidTest 用例；全套执行 `./gradlew testOnlineDebug testOfflineDebug testDebugUnitTest :core:model:test :lint:test -Proborazzi.test.verify=false --rerun-tasks --console=plain`，逐 XML 复算总数。
+- [x] 构建 DevDebug、Spotless、Dependency Guard、Online/Offline/Dev Release Lint、自定义 Lint；执行 `verifyRoborazziDebug`，不重录无关模块。
+- [x] 变异独立副本：关键词统计接线回退、丢关键词账本、错用转账本金/截负值、先逐笔abs、只取第一页、漏标签去重/小分类、迟到结果覆盖、统计错误隐藏列表。每轮硬超时、基线先绿；记录具名失败和原因，变异源不碰实施树。
+- [x] 专用模拟器与合成数据，从真实搜索提交/筛选入口验证汇总、图例、折叠/选中、编辑后刷新；截图和账单数据留证；不操作用户账本。
 - [ ] 全部开发结束后固定两个 SHA 做一次 full-review，完整保留发现及执行事件；按本机 AGENTS.md 的检查点处理阶段推进，不伪造批准。
 - [ ] 文档按实际运行写完成态，复核影响范围；仅本地提交、保留 worktree，交付逐项报告构建、守卫、变异、提交、知识归档（本次不归档）。
 

@@ -133,11 +133,11 @@ class RunStartupMaintenanceUseCase @Inject constructor(
    - 删资产 `RecordRepositoryImpl.kt:513-522`：删 `queryImagePathsByAssetId` 前置查询，改 `val imagePaths = transactionDao.deleteAssetRelatedData(assetId)`，再 `deleteManagedImageFiles(imagePaths, recordImageFileStorage)`。
    - 删账本 `BooksRepositoryImpl.kt:76`：删 `queryImagePathsByBookId`，改用 `deleteBookTransaction(id)` 返回值经 `deleteManagedImageFiles` 删文件。
    - 单删 `RecordRepositoryImpl.kt:121-128`：删 `queryImagesByRecordId(recordId).map{path}`，改用 `deleteRecordTransaction(recordId)` 返回值经 `deleteManagedImageFiles`。
-5. 清理孤儿：`queryImagePathsByAssetId`（`RecordDao.kt:514`）/`queryImagePathsByBookId`（`:526`）生产调用方仅上述两处，删除后成孤儿 → 删 DAO 声明 + `FakeRecordDao:479/485` override + androidTest `RecordDaoTest:845/866` 两用例（其守护职责由新的按 record id 路径 + `deleteRecordsBatch` androidTest 承接）。`queryImagePathsByRecordId`（`:530`）**保留**（编辑路径 `updateRecord:100` 仍用）。
+5. 清理孤儿：`queryImagePathsByAssetId`（`RecordDao.kt:514`）/`queryImagePathsByBookId`（`:526`）生产调用方仅上述两处，删除后成孤儿 → 删 DAO 声明 + `FakeRecordDao:479/485` override + androidTest `RecordDaoTest:845/866` 两用例（其守护职责由新的按 record id 路径 + `deleteRecordsBatch` androidTest 承接）。`queryImagePathsByRecordId`（`:530`）**保留**（`RecordRepositoryImpl.kt` 的编辑方法 `RecordRepositoryImpl#updateRecord()` 仍调用 `queryImagePathsByRecordId(record.id)`）。
 
 ### 决策点 2（已定）：编辑路径不纳入 M1
 
-理由：编辑 `updateRecord`（`RecordRepositoryImpl.kt:100-116`）走 `queryImagePathsByRecordId` + `managedImagesToDelete(oldManagedPaths, persistedImages, ...)` **diff** 新旧图片集、只删被移除的、保留记录本身，与「删整条记录」语义不同；强纳入会把两种不同语义混进 `deleteRecordsBatch` 的级联返回，制造新耦合。
+理由：`RecordRepositoryImpl.kt` 的 `RecordRepositoryImpl#updateRecord()` 走 `queryImagePathsByRecordId` + `managedImagesToDelete(oldManagedPaths, persistedImages, ...)` **diff** 新旧图片集、只删被移除的、保留记录本身，与「删整条记录」语义不同；强纳入会把两种不同语义混进 `deleteRecordsBatch` 的级联返回，制造新耦合。
 
 ### 影响面与回归风险
 

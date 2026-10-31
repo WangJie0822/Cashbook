@@ -537,7 +537,7 @@ git commit -m "[feat|core:database|删除图片单一真源][公共]M1 deleteRec
 ### Task 5: M1 调用方切换 + 孤儿 DAO 清理（core:data + core:database）
 
 **Files:**
-- Modify: `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordRepositoryImpl.kt`（删资产 `:513-522`、单删 `:121-128`）
+- Modify: `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/RecordRepositoryImpl.kt`（删资产 `RecordRepositoryImpl#deleteRecordsWithAsset(Long)`、单删 `RecordRepositoryImpl#deleteRecord(Long)`）
 - Modify: `core/data/src/main/kotlin/cn/wj/android/cashbook/core/data/repository/impl/BooksRepositoryImpl.kt`（删账本 `:76`）
 - Modify: `core/database/src/main/kotlin/cn/wj/android/cashbook/core/database/dao/RecordDao.kt`（删 `queryImagePathsByAssetId:514`/`ByBookId:526`）
 - Modify: `core/data/src/test/kotlin/cn/wj/android/cashbook/core/data/testdoubles/FakeRecordDao.kt`（删两孤儿 override `:479/:485`）
@@ -570,7 +570,7 @@ fun cascade_return_with_traversal_path_not_deleted() = runTest {
 
 - [ ] **Step 2: 实现调用方切换**（安全不变量：级联返回必经 `deleteManagedImageFiles`，禁直接 `storage.delete`）
 
-删资产 `RecordRepositoryImpl.kt:513-522`：
+删资产 `RecordRepositoryImpl.kt`（`RecordRepositoryImpl#deleteRecordsWithAsset(Long)`）：
 ```kotlin
 override suspend fun deleteRecordsWithAsset(assetId: Long): Unit =
     withContext(coroutineContext) {
@@ -579,7 +579,7 @@ override suspend fun deleteRecordsWithAsset(assetId: Long): Unit =
         recordDataVersion.updateVersion()
     }
 ```
-单删 `RecordRepositoryImpl.kt:121-128`：
+单删 `RecordRepositoryImpl.kt`（`RecordRepositoryImpl#deleteRecord(Long)`）：
 ```kotlin
 override suspend fun deleteRecord(recordId: Long) = withContext(coroutineContext) {
     val imagePaths = transactionDao.deleteRecordTransaction(recordId)

@@ -301,7 +301,7 @@ git commit -m "refactor(core/domain): 两个 Pie UseCase 复用 analyticsPieAmou
 
 **Files(均 Modify):**
 - `core/domain/.../usecase/GetAssetRecordViewsUseCase.kt:51-52`
-- `core/domain/.../usecase/GetSearchRecordViewsUseCase.kt:48-50`
+- `core/domain/src/main/kotlin/cn/wj/android/cashbook/domain/usecase/GetSearchRecordViewsUseCase.kt`（`GetSearchRecordViewsUseCase#invoke(String, Int, Int)`）
 - `core/domain/.../usecase/GetTagRecordViewsUseCase.kt:48-50`
 - `core/domain/.../usecase/GetTypeRecordViewsUseCase.kt:65-67`
 - Test: 各对应 `*UseCaseTest`(查既有,补"批量==单条逐元素"断言)
