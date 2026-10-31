@@ -404,7 +404,8 @@ class MyCategoriesViewModelTest {
             ),
         )
 
-        viewModel.requestEditType(id = 10L, parentId = 1L)
+        // 我的分类真实编辑入口只传分类 ID，父 ID 为 -1。
+        viewModel.requestEditType(id = 10L, parentId = -1L)
 
         assertThat(viewModel.dialogState).isInstanceOf(DialogState.Shown::class.java)
         val data = (viewModel.dialogState as DialogState.Shown<*>).data
@@ -475,10 +476,82 @@ class MyCategoriesViewModelTest {
         // 保存一个不存在的新类型（id=-1L 表示新建）
         viewModel.saveRecordType(id = -1L, parentId = -1L, name = "新分类", iconName = "new_icon")
 
+        val created = typeRepository.getRecordTypeById(-1L)!!
+        assertThat(created.parentId).isEqualTo(-1L)
+        assertThat(created.typeLevel).isEqualTo(TypeLevelEnum.FIRST)
+        assertThat(created.typeCategory).isEqualTo(RecordTypeCategoryEnum.EXPENDITURE)
+
         // 弹窗应关闭
         assertThat(viewModel.dialogState).isEqualTo(DialogState.Dismiss)
 
         collectJob.cancel()
+    }
+
+    @Test
+    fun when_edit_from_route_then_save_preserves_hierarchy_and_metadata() = runTest {
+        for (category in RecordTypeCategoryEnum.entries) {
+            for (level in TypeLevelEnum.entries) {
+                for (name in listOf("原名", "改名")) {
+                    setup()
+                    val parent = createRecordTypeModel(id = 1L, name = "父类", typeCategory = category)
+                    val original = createRecordTypeModel(
+                        id = 10L,
+                        parentId = if (level == TypeLevelEnum.FIRST) -1L else 1L,
+                        name = "原名",
+                        typeLevel = level,
+                        typeCategory = category,
+                        sort = 417,
+                        protected = true,
+                        needRelated = true,
+                    )
+                    typeRepository.addType(parent)
+                    typeRepository.addType(original)
+                    viewModel.requestEditType(original.id, -1L)
+                    val edit = (viewModel.dialogState as DialogState.Shown<*>).data as MyCategoriesDialogData.EditType
+                    // 切换页签不应改变正在编辑分类的收支类型；保存参数与 Sheet 一致。
+                    viewModel.selectTypeCategory(RecordTypeCategoryEnum.entries.first { it != category })
+                    viewModel.saveRecordType(edit.type!!.id, edit.parentType?.id ?: -1L, name, "new_icon")
+                    assertThat(typeRepository.getRecordTypeById(10L))
+                        .isEqualTo(original.copy(name = name, iconName = "new_icon"))
+                    assertThat(typeRepository.countByName("原名")).isEqualTo(if (name == "原名") 1 else 0)
+                    assertThat(typeRepository.countByName(name)).isEqualTo(1)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun when_hierarchy_changes_after_opening_editor_then_save_keeps_current_hierarchy() = runTest {
+        for (parentId in listOf(2L, -1L)) {
+            setup()
+            val original = createRecordTypeModel(id = 10L, parentId = 1L, name = "原名", typeLevel = TypeLevelEnum.SECOND)
+            typeRepository.addType(createRecordTypeModel(id = 1L, name = "原父类"))
+            typeRepository.addType(createRecordTypeModel(id = 2L, name = "新父类"))
+            typeRepository.addType(original)
+            viewModel.requestEditType(original.id, -1L)
+            val edit = (viewModel.dialogState as DialogState.Shown<*>).data as MyCategoriesDialogData.EditType
+            val level = if (parentId == -1L) TypeLevelEnum.FIRST else TypeLevelEnum.SECOND
+            if (parentId == -1L) viewModel.changeSecondTypeToFirst(10L) else viewModel.changeTypeToSecond(10L, 2L)
+            viewModel.saveRecordType(edit.type!!.id, edit.parentType?.id ?: -1L, "改名", "new_icon")
+            assertThat(typeRepository.getRecordTypeById(10L))
+                .isEqualTo(original.copy(parentId = parentId, typeLevel = level, name = "改名", iconName = "new_icon"))
+        }
+    }
+
+    @Test
+    fun when_create_second_type_then_parent_level_and_category_are_persisted() = runTest {
+        for (category in RecordTypeCategoryEnum.entries) {
+            setup()
+            typeRepository.addType(createRecordTypeModel(id = 1L, name = "父类", typeCategory = category))
+            viewModel.selectTypeCategory(category)
+            viewModel.requestEditType(-1L, 1L)
+            val edit = (viewModel.dialogState as DialogState.Shown<*>).data as MyCategoriesDialogData.EditType
+            viewModel.saveRecordType(-1L, edit.parentType?.id ?: -1L, "新子类", "new_icon")
+            val created = typeRepository.getRecordTypeById(-1L)!!
+            assertThat(created.parentId).isEqualTo(1L)
+            assertThat(created.typeLevel).isEqualTo(TypeLevelEnum.SECOND)
+            assertThat(created.typeCategory).isEqualTo(category)
+        }
     }
 
     @Test
