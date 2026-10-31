@@ -30,8 +30,8 @@ import cn.wj.android.cashbook.core.model.enums.RecordTypeCategoryEnum
 import cn.wj.android.cashbook.core.model.enums.TypeLevelEnum
 import cn.wj.android.cashbook.core.model.model.CategoryFilterSelection
 import cn.wj.android.cashbook.core.model.model.RecordCategoryNet
-import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
 import cn.wj.android.cashbook.core.model.model.RecordFilter
+import cn.wj.android.cashbook.core.model.model.RecordFilterSummary
 import cn.wj.android.cashbook.core.model.model.RecordSearchStatistics
 import cn.wj.android.cashbook.core.testing.data.createBooksModel
 import cn.wj.android.cashbook.core.testing.data.createRecordModel
@@ -51,9 +51,9 @@ import cn.wj.android.cashbook.domain.usecase.GetSearchRecordViewsUseCase
 import cn.wj.android.cashbook.domain.usecase.RecordModelTransToViewsUseCase
 import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import cn.wj.android.cashbook.feature.records.model.SearchFilterMessage
+import cn.wj.android.cashbook.feature.records.model.SearchFilterState
 import cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState
 import cn.wj.android.cashbook.feature.records.model.SearchMode
-import cn.wj.android.cashbook.feature.records.model.SearchFilterState
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -580,6 +580,26 @@ class SearchFilterStateTest {
         f.vm.onFilterEvent(SearchFilterEvent.ConfirmCategories)
         assertThat(f.vm.filterState.value.drawerDraft!!.categories.wholeGroupIds).containsExactly(10L)
         assertThat(f.vm.filterState.value.appliedFilter).isNull()
+    }
+
+    @Test
+    fun staleParentActions_cannotApplyResetOrReplaceAnOpenChild() = runTest {
+        activate()
+        f.vm.onFilterEvent(SearchFilterEvent.OpenDrawer)
+        f.vm.onFilterEvent(SearchFilterEvent.OpenTags)
+        f.vm.onFilterEvent(SearchFilterEvent.ToggleTagDraft(41L))
+        f.vm.onFilterEvent(SearchFilterEvent.ApplyDrawer)
+        assertThat(f.vm.filterState.value.appliedFilter).isNull()
+        f.vm.onFilterEvent(SearchFilterEvent.ResetDrawer)
+        f.vm.onFilterEvent(SearchFilterEvent.OpenCategories)
+        assertThat(f.vm.filterState.value.tagDraft).containsExactly(41L)
+        f.vm.onFilterEvent(SearchFilterEvent.CancelTags)
+        f.vm.onFilterEvent(SearchFilterEvent.OpenCategories)
+        f.vm.onFilterEvent(SearchFilterEvent.ToggleCategoryItem(11L, true))
+        f.vm.onFilterEvent(SearchFilterEvent.ApplyDrawer)
+        assertThat(f.vm.filterState.value.appliedFilter).isNull()
+        f.vm.onFilterEvent(SearchFilterEvent.ResetDrawer)
+        assertThat(f.vm.filterState.value.categoryDraft!!.exactTypeIds).containsExactly(11L)
     }
 
     @Test

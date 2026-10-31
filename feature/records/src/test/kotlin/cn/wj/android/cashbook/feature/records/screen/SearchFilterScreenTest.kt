@@ -22,26 +22,27 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -68,6 +69,7 @@ import cn.wj.android.cashbook.core.testing.data.createRecordModel
 import cn.wj.android.cashbook.core.testing.data.createRecordTypeModel
 import cn.wj.android.cashbook.core.testing.data.createRecordViewsModel
 import cn.wj.android.cashbook.core.testing.data.createTagModel
+import cn.wj.android.cashbook.feature.records.model.SearchFilterEvent
 import cn.wj.android.cashbook.feature.records.model.SearchFilterState
 import cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState
 import cn.wj.android.cashbook.feature.records.model.SearchMode
@@ -127,15 +129,80 @@ class SearchFilterScreenTest {
 
     private fun applyTravel(awaitTag: String = "filter_summary_count") {
         compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
         compose.onNodeWithTag("filter_tag_41").performScrollTo().performClick()
+        compose.onNodeWithTag("tag_done").performClick()
         compose.onNodeWithText("完成").performClick()
         waitFor(awaitTag)
+    }
+
+    @Test fun rightEdgeSwipe_opensTheActualFilterSidebarAndPreservesTextDirection() {
+        show()
+        compose.onRoot().performTouchInput {
+            swipe(Offset(width - 2f, height * 0.6f), Offset(width * 0.2f, height * 0.6f), 500L)
+        }
+        compose.runOnIdle { assertThat(fixture.vm.filterState.value.drawerDraft).isNotNull() }
+        compose.onNodeWithTag("filter_drawer_close").assertIsDisplayed()
+        val bounds = compose.onNodeWithTag("filter_sidebar").fetchSemanticsNode().boundsInRoot
+        val root = compose.onRoot().fetchSemanticsNode().boundsInRoot
+        assertThat(bounds.right).isEqualTo(root.right)
+        assertThat(bounds.left).isGreaterThan(root.left)
+    }
+
+    @Test fun sidebarBack_returnsFromChildThenDiscardsParentAndReopensAtRoot() {
+        show()
+        compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        compose.onNodeWithTag("filter_tag_41").performClick()
+        compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
+        compose.waitForIdle()
+        compose.runOnIdle {
+            assertThat(fixture.vm.filterState.value.tagDraft).isNull()
+            assertThat(fixture.vm.filterState.value.drawerDraft!!.tagIds).isEmpty()
+        }
+        compose.onNodeWithTag("filter_tags").performClick()
+        compose.onNodeWithTag("filter_tag_41").performClick()
+        compose.onNodeWithTag("tag_done").performClick()
+        compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
+        compose.waitForIdle()
+        compose.runOnIdle {
+            assertThat(fixture.vm.filterState.value.drawerDraft).isNull()
+            assertThat(fixture.vm.filterState.value.appliedFilter).isNull()
+        }
+        compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        // 从子页直接关整层，下一次打开不能闪回旧子页。
+        compose.onRoot().performTouchInput { click(Offset(4f, height * 0.5f)) }
+        compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_categories").assertIsDisplayed()
+        compose.onNodeWithTag("tag_done").assertDoesNotExist()
+    }
+
+    @Test fun horizontalSelectedTagsGesture_doesNotCloseTheSidebar() {
+        show { f -> (43L..64L).forEach { f.tags.addTag(createTagModel(id = it, name = "横向已选标签$it")) } }
+        compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        compose.runOnIdle { (43L..64L).forEach { fixture.vm.onFilterEvent(SearchFilterEvent.ToggleTagDraft(it)) } }
+        compose.onNodeWithTag("tag_selected").performTouchInput {
+            swipe(Offset(width * 0.85f, height * 0.5f), Offset(width * 0.15f, height * 0.5f), 400L)
+        }
+        compose.onNodeWithTag("tag_selected").performTouchInput {
+            swipe(Offset(width * 0.15f, height * 0.5f), Offset(width * 0.85f, height * 0.5f), 400L)
+        }
+        compose.onNodeWithTag("tag_done").assertIsDisplayed()
+        compose.runOnIdle {
+            assertThat(fixture.vm.filterState.value.drawerDraft).isNotNull()
+            assertThat(fixture.vm.filterState.value.tagDraft).hasSize(22)
+            assertThat(fixture.vm.filterState.value.appliedFilter).isNull()
+        }
     }
 
     @Test fun realSearchEntry_appliesTagAndCategoryIntersectionToListAndSummary() {
         show()
         compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
         compose.onNodeWithTag("filter_tag_41").performScrollTo().performClick()
+        compose.onNodeWithTag("tag_done").performClick()
         compose.onNodeWithTag("filter_categories").performScrollTo().performClick()
         compose.onNodeWithTag("category_group_10").performClick()
         compose.onNodeWithText("完成").performClick()
@@ -248,8 +315,9 @@ class SearchFilterScreenTest {
     @Test fun drawerScrim_cancelsDraftInsteadOfApplyingIt() {
         show()
         compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
         compose.onNodeWithTag("filter_tag_41").performScrollTo().performClick()
-        compose.onNodeWithTag("filter_scrim").performClick()
+        compose.onRoot().performTouchInput { click(Offset(4f, height * 0.5f)) }
         compose.runOnIdle {
             assertThat(fixture.vm.filterState.value.drawerDraft).isNull()
             assertThat(fixture.vm.filterState.value.appliedFilter).isNull()
@@ -302,7 +370,9 @@ class SearchFilterScreenTest {
         compose.onNodeWithTag("search_record_50").assertIsDisplayed()
         compose.runOnIdle { assertThat(fixture.vm.filterState.value.appliedFilter!!.tagIds).containsExactly(41L) }
         compose.onNodeWithTag("search_filter_button").performClick()
-        compose.onNodeWithTag("filter_all_tags").performScrollTo().performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        compose.onNodeWithTag("tag_clear").performClick()
+        compose.onNodeWithTag("tag_done").performClick()
         compose.onNodeWithText("完成").performClick()
         waitFor("filter_summary_count")
         compose.onNodeWithTag("filter_summary_count").assertIsDisplayed()
@@ -329,7 +399,10 @@ class SearchFilterScreenTest {
         }
         applyTravel()
         compose.onNodeWithTag("search_filter_button").performClick()
+        compose.onNodeWithTag("filter_tags").performScrollTo().performClick()
+        compose.onNodeWithTag("tag_show_hidden").performClick()
         compose.onNodeWithTag("filter_tag_42").performScrollTo().performClick()
+        compose.onNodeWithTag("tag_done").performClick()
         compose.onNodeWithText("完成").performClick()
         waitFor("filter_summary_count")
         compose.onNodeWithTag("search_results").performScrollToNode(hasTestTag("search_record_50"))

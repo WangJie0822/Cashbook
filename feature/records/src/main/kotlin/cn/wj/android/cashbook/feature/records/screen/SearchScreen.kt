@@ -21,21 +21,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -59,7 +52,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -88,8 +80,8 @@ import cn.wj.android.cashbook.feature.records.model.SearchFilterSummaryState
 import cn.wj.android.cashbook.feature.records.model.SearchMode
 import cn.wj.android.cashbook.feature.records.model.SearchQueryContext
 import cn.wj.android.cashbook.feature.records.view.SearchFilterConstraintNotice
-import cn.wj.android.cashbook.feature.records.view.SearchFilterDrawer
 import cn.wj.android.cashbook.feature.records.view.SearchFilterRecordItem
+import cn.wj.android.cashbook.feature.records.view.SearchFilterSidebar
 import cn.wj.android.cashbook.feature.records.view.SearchFilterSummary
 import cn.wj.android.cashbook.feature.records.view.categorySelectionSummary
 import cn.wj.android.cashbook.feature.records.view.filterMessageText
@@ -185,129 +177,124 @@ internal fun SearchScreen(
             )
 
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-        Box {
-            Column(Modifier.fillMaxSize()) {
-                SearchBar(
-                    inputField = {
-                        SearchBarDefaults.InputField(
-                            modifier = Modifier.fillMaxWidth().testTag("search_query"),
-                            query = filterState.queryDraft,
-                            onQueryChange = { onFilterEvent(if (it.isEmpty()) SearchFilterEvent.ClearSubmittedKeyword else SearchFilterEvent.UpdateQueryDraft(it)) },
-                            onSearch = { onKeywordChange(it); expanded = false; focus.clearFocus() },
-                            expanded = expanded, onExpandedChange = { expanded = it },
-                            placeholder = { Text(stringResource(R.string.record_search_hint)) },
-                            leadingIcon = { CbIconButton(onClick = { if (expanded) expanded = false else onRequestPopBackStack() }, modifier = Modifier.testTag("search_back")) { Icon(CbIcons.ArrowBack, stringResource(R.string.cd_navigate_back)) } },
-                            trailingIcon = {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    if (filterState.queryDraft.isNotEmpty() || filterState.submittedKeyword.isNotEmpty()) CbIconButton(onClick = { onFilterEvent(SearchFilterEvent.ClearSubmittedKeyword); expanded = false; focus.clearFocus() }, modifier = Modifier.testTag("search_clear")) { Icon(CbIcons.Cancel, stringResource(R.string.cd_clear)) }
-                                    CbTextButton(enabled = filterState.metadataReady, onClick = { expanded = false; focus.clearFocus(); onFilterEvent(SearchFilterEvent.OpenDrawer) }, modifier = Modifier.testTag("search_filter_button")) {
-                                        Text(stringResource(FilterR.string.search_filter))
-                                        if (filtering) Box(Modifier.padding(start = 4.dp).size(6.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
+        SearchFilterSidebar(filterState, onFilterEvent) {
+            Box {
+                Column(Modifier.fillMaxSize()) {
+                    SearchBar(
+                        inputField = {
+                            SearchBarDefaults.InputField(
+                                modifier = Modifier.fillMaxWidth().testTag("search_query"),
+                                query = filterState.queryDraft,
+                                onQueryChange = { onFilterEvent(if (it.isEmpty()) SearchFilterEvent.ClearSubmittedKeyword else SearchFilterEvent.UpdateQueryDraft(it)) },
+                                onSearch = { onKeywordChange(it); expanded = false; focus.clearFocus() },
+                                expanded = expanded, onExpandedChange = { expanded = it },
+                                placeholder = { Text(stringResource(R.string.record_search_hint)) },
+                                leadingIcon = { CbIconButton(onClick = { if (expanded) expanded = false else onRequestPopBackStack() }, modifier = Modifier.testTag("search_back")) { Icon(CbIcons.ArrowBack, stringResource(R.string.cd_navigate_back)) } },
+                                trailingIcon = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        if (filterState.queryDraft.isNotEmpty() || filterState.submittedKeyword.isNotEmpty()) CbIconButton(onClick = { onFilterEvent(SearchFilterEvent.ClearSubmittedKeyword); expanded = false; focus.clearFocus() }, modifier = Modifier.testTag("search_clear")) { Icon(CbIcons.Cancel, stringResource(R.string.cd_clear)) }
+                                        CbTextButton(enabled = filterState.metadataReady, onClick = { expanded = false; focus.clearFocus(); onFilterEvent(SearchFilterEvent.OpenDrawer) }, modifier = Modifier.testTag("search_filter_button")) {
+                                            Text(stringResource(FilterR.string.search_filter))
+                                            if (filtering) Box(Modifier.padding(start = 4.dp).size(6.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
+                                        }
                                     }
-                                }
-                            },
-                        )
-                    },
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                ) {
-                    if (searchHistoryList.isEmpty()) {
-                        Empty(stringResource(R.string.record_search_no_history), modifier = Modifier.align(Alignment.CenterHorizontally))
-                    } else {
-                        CbTextButton(onClick = onRequestClearSearchHistory) { Text(stringResource(R.string.clear)) }
-                        FlowRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            searchHistoryList.forEach { keyword -> ElevatedSuggestionChip(onClick = { onFilterEvent(SearchFilterEvent.UpdateQueryDraft(keyword)) }, label = { Text(keyword) }) }
-                        }
-                    }
-                }
-                // 加载期间不测量一个更短的临时列表，避免恢复的滚动索引被自动夹到零。
-                if (pending || failed) {
-                    Column(Modifier.weight(1f).fillMaxWidth()) {
-                        if (filtering) {
-                            Column(Modifier.padding(16.dp)) {
-                                Text(filterConditionsText(filterState.appliedFilter!!, filterState), style = MaterialTheme.typography.bodySmall)
-                                SearchFilterConstraintNotice(filterState.appliedFilter, filterState)
-                            }
-                        }
-                        if (failed) {
-                            Column(Modifier.fillMaxWidth().padding(24.dp).testTag("search_query_error"), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(stringResource(if (filterState.message == SearchFilterMessage.METADATA_FAILED) FilterR.string.search_filter_metadata_failed else FilterR.string.search_filter_failed))
-                                CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }, modifier = Modifier.testTag("search_retry")) { Text(stringResource(FilterR.string.search_filter_retry)) }
-                            }
+                                },
+                            )
+                        },
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                    ) {
+                        if (searchHistoryList.isEmpty()) {
+                            Empty(stringResource(R.string.record_search_no_history), modifier = Modifier.align(Alignment.CenterHorizontally))
                         } else {
-                            Row(Modifier.fillMaxWidth().padding(24.dp).testTag("search_query_loading"), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                                CbCircularProgressIndicator(Modifier.size(24.dp))
-                                Text(stringResource(R.string.data_in_loading), Modifier.padding(start = 12.dp))
+                            CbTextButton(onClick = onRequestClearSearchHistory) { Text(stringResource(R.string.clear)) }
+                            FlowRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                searchHistoryList.forEach { keyword -> ElevatedSuggestionChip(onClick = { onFilterEvent(SearchFilterEvent.UpdateQueryDraft(keyword)) }, label = { Text(keyword) }) }
                             }
                         }
                     }
-                } else {
-                    LazyColumn(state = listState, modifier = Modifier.weight(1f).fillMaxWidth().testTag("search_results")) {
-                        if (filtering) {
-                            item(key = "filter_conditions") {
+                    // 加载期间不测量一个更短的临时列表，避免恢复的滚动索引被自动夹到零。
+                    if (pending || failed) {
+                        Column(Modifier.weight(1f).fillMaxWidth()) {
+                            if (filtering) {
                                 Column(Modifier.padding(16.dp)) {
-                                    Text(filterConditionsText(filterState.appliedFilter!!, filterState), Modifier.testTag("filter_conditions"), style = MaterialTheme.typography.bodySmall)
+                                    Text(filterConditionsText(filterState.appliedFilter!!, filterState), style = MaterialTheme.typography.bodySmall)
                                     SearchFilterConstraintNotice(filterState.appliedFilter, filterState)
                                 }
                             }
-                        }
-                        if (filterState.message == SearchFilterMessage.METADATA_FAILED || filterState.message == SearchFilterMessage.RESTORE_FAILED) {
-                            item(key = "metadata_error") {
-                                Column(Modifier.padding(16.dp)) {
-                                    Text(filterMessageText(filterState.message), color = MaterialTheme.colorScheme.error)
-                                    CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }) { Text(stringResource(FilterR.string.search_filter_retry)) }
-                                }
-                            }
-                        }
-                        if (filterState.mode != SearchMode.Initial) {
-                            if (readySummary != null) {
-                                item(key = "filter_summary") { SearchFilterSummary(readySummary.summary, Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
-                                searchResultDistribution(readyStatistics!!, distributionState)
-                            } else if (summaryFailed) {
-                                item(key = "statistics_error") {
-                                    Column(Modifier.padding(16.dp).testTag("search_statistics_error")) {
-                                        Text(stringResource(FilterR.string.search_statistics_failed), color = MaterialTheme.colorScheme.error)
-                                        CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }, modifier = Modifier.testTag("search_statistics_retry")) { Text(stringResource(FilterR.string.search_filter_retry)) }
-                                    }
+                            if (failed) {
+                                Column(Modifier.fillMaxWidth().padding(24.dp).testTag("search_query_error"), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(stringResource(if (filterState.message == SearchFilterMessage.METADATA_FAILED) FilterR.string.search_filter_metadata_failed else FilterR.string.search_filter_failed))
+                                    CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }, modifier = Modifier.testTag("search_retry")) { Text(stringResource(FilterR.string.search_filter_retry)) }
                                 }
                             } else {
-                                item(key = "statistics_loading") {
-                                    Row(Modifier.padding(16.dp).testTag("search_statistics_loading"), verticalAlignment = Alignment.CenterVertically) {
-                                        CbCircularProgressIndicator(Modifier.size(20.dp))
-                                        Text(stringResource(R.string.data_in_loading), Modifier.padding(start = 12.dp))
-                                    }
+                                Row(Modifier.fillMaxWidth().padding(24.dp).testTag("search_query_loading"), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                                    CbCircularProgressIndicator(Modifier.size(24.dp))
+                                    Text(stringResource(R.string.data_in_loading), Modifier.padding(start = 12.dp))
                                 }
                             }
                         }
-                        if (recordList.itemCount == 0) {
-                            item(key = "empty") {
-                                Empty(hintText = stringResource(if (filtering) FilterR.string.search_filter_empty else if (filterState.mode == SearchMode.Initial) FilterR.string.search_filter_initial_hint else R.string.record_search_no_data_hint), modifier = Modifier.fillMaxWidth())
-                            }
-                        } else {
-                            items(recordList.itemCount, key = { recordList.peek(it)?.id ?: "placeholder_$it" }) { index ->
-                                recordList[index]?.let { record ->
-                                    if (filtering || keywordMode) {
-                                        SearchFilterRecordItem(record, { onRequestShowRecordDetailSheet(record) }, Modifier.testTag("search_record_${record.id}"))
-                                    } else {
-                                        RecordListItem(record, modifier = Modifier.testTag("search_record_${record.id}").clickable(onClick = rememberHapticOnClick { onRequestShowRecordDetailSheet(record) }))
+                    } else {
+                        LazyColumn(state = listState, modifier = Modifier.weight(1f).fillMaxWidth().testTag("search_results")) {
+                            if (filtering) {
+                                item(key = "filter_conditions") {
+                                    Column(Modifier.padding(16.dp)) {
+                                        Text(filterConditionsText(filterState.appliedFilter!!, filterState), Modifier.testTag("filter_conditions"), style = MaterialTheme.typography.bodySmall)
+                                        SearchFilterConstraintNotice(filterState.appliedFilter, filterState)
                                     }
                                 }
                             }
-                            if (recordList.loadState.append is LoadState.Error) {
-                                item(key = "append_error") { CbTextButton(onClick = recordList::retry) { Text(stringResource(FilterR.string.search_filter_retry)) } }
-                            } else if (recordList.loadState.append is LoadState.Loading) {
-                                item(key = "append_loading") { CbCircularProgressIndicator(Modifier.padding(16.dp)) }
-                            } else if (recordList.loadState.append.endOfPaginationReached) item(key = "footer") { Footer(stringResource(R.string.footer_hint_default)) }
+                            if (filterState.message == SearchFilterMessage.METADATA_FAILED || filterState.message == SearchFilterMessage.RESTORE_FAILED) {
+                                item(key = "metadata_error") {
+                                    Column(Modifier.padding(16.dp)) {
+                                        Text(filterMessageText(filterState.message), color = MaterialTheme.colorScheme.error)
+                                        CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }) { Text(stringResource(FilterR.string.search_filter_retry)) }
+                                    }
+                                }
+                            }
+                            if (filterState.mode != SearchMode.Initial) {
+                                if (readySummary != null) {
+                                    item(key = "filter_summary") { SearchFilterSummary(readySummary.summary, Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
+                                    searchResultDistribution(readyStatistics!!, distributionState)
+                                } else if (summaryFailed) {
+                                    item(key = "statistics_error") {
+                                        Column(Modifier.padding(16.dp).testTag("search_statistics_error")) {
+                                            Text(stringResource(FilterR.string.search_statistics_failed), color = MaterialTheme.colorScheme.error)
+                                            CbTextButton(onClick = { onFilterEvent(SearchFilterEvent.Retry) }, modifier = Modifier.testTag("search_statistics_retry")) { Text(stringResource(FilterR.string.search_filter_retry)) }
+                                        }
+                                    }
+                                } else {
+                                    item(key = "statistics_loading") {
+                                        Row(Modifier.padding(16.dp).testTag("search_statistics_loading"), verticalAlignment = Alignment.CenterVertically) {
+                                            CbCircularProgressIndicator(Modifier.size(20.dp))
+                                            Text(stringResource(R.string.data_in_loading), Modifier.padding(start = 12.dp))
+                                        }
+                                    }
+                                }
+                            }
+                            if (recordList.itemCount == 0) {
+                                item(key = "empty") {
+                                    Empty(hintText = stringResource(if (filtering) FilterR.string.search_filter_empty else if (filterState.mode == SearchMode.Initial) FilterR.string.search_filter_initial_hint else R.string.record_search_no_data_hint), modifier = Modifier.fillMaxWidth())
+                                }
+                            } else {
+                                items(recordList.itemCount, key = { recordList.peek(it)?.id ?: "placeholder_$it" }) { index ->
+                                    recordList[index]?.let { record ->
+                                        if (filtering || keywordMode) {
+                                            SearchFilterRecordItem(record, { onRequestShowRecordDetailSheet(record) }, Modifier.testTag("search_record_${record.id}"))
+                                        } else {
+                                            RecordListItem(record, modifier = Modifier.testTag("search_record_${record.id}").clickable(onClick = rememberHapticOnClick { onRequestShowRecordDetailSheet(record) }))
+                                        }
+                                    }
+                                }
+                                if (recordList.loadState.append is LoadState.Error) {
+                                    item(key = "append_error") { CbTextButton(onClick = recordList::retry) { Text(stringResource(FilterR.string.search_filter_retry)) } }
+                                } else if (recordList.loadState.append is LoadState.Loading) {
+                                    item(key = "append_loading") { CbCircularProgressIndicator(Modifier.padding(16.dp)) }
+                                } else if (recordList.loadState.append.endOfPaginationReached) item(key = "footer") { Footer(stringResource(R.string.footer_hint_default)) }
+                            }
                         }
                     }
-                }
-            }
-            if (filterState.drawerDraft != null) {
-                BoxWithConstraints(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.32f)).windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
-                    val drawerWidth = minOf(maxWidth * 0.92f, 600.dp)
-                    Box(Modifier.fillMaxHeight().width(maxWidth - drawerWidth).testTag("filter_scrim").clickable { onFilterEvent(SearchFilterEvent.CancelDrawer) })
-                    SearchFilterDrawer(filterState, onFilterEvent, Modifier.align(Alignment.CenterEnd).width(drawerWidth))
                 }
             }
         }

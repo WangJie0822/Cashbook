@@ -229,22 +229,28 @@ class SearchViewModel @Inject constructor(
         val state = filterState.value
         val draft = state.drawerDraft
         val selection = state.categoryDraft
+        val atRoot = state.categoryDraft == null && state.tagDraft == null
         val next = when (event) {
-            SearchFilterEvent.OpenDrawer -> if (state.metadataReady) state.copy(drawerDraft = state.appliedFilter ?: RecordFilter(), categoryDraft = null, message = null, removedTypeIds = emptySet()) else state
-            SearchFilterEvent.CancelDrawer -> state.copy(drawerDraft = null, categoryDraft = null, message = null, removedTypeIds = emptySet())
-            SearchFilterEvent.ResetDrawer -> if (draft != null) state.copy(drawerDraft = RecordFilter(), categoryDraft = null, message = null, removedTypeIds = emptySet()) else state
+            SearchFilterEvent.Back -> when {
+                state.categoryDraft != null -> state.copy(categoryDraft = null)
+                state.tagDraft != null -> state.copy(tagDraft = null)
+                else -> state.copy(drawerDraft = null, message = null, removedTypeIds = emptySet())
+            }
+            SearchFilterEvent.OpenDrawer -> if (state.metadataReady) state.copy(drawerDraft = state.appliedFilter ?: RecordFilter(), categoryDraft = null, tagDraft = null, message = null, removedTypeIds = emptySet()) else state
+            SearchFilterEvent.CancelDrawer -> state.copy(drawerDraft = null, categoryDraft = null, tagDraft = null, message = null, removedTypeIds = emptySet())
+            SearchFilterEvent.ResetDrawer -> if (draft != null && atRoot) state.copy(drawerDraft = RecordFilter(), categoryDraft = null, tagDraft = null, message = null, removedTypeIds = emptySet()) else state
             SearchFilterEvent.ApplyDrawer -> {
-                if (draft == null || !state.metadataReady) return
+                if (draft == null || !state.metadataReady || !atRoot) return
                 val request = runCatching { draft.toRequest(state.bookId!!, state.monthStartDay) }.getOrNull()
                 val validation = request?.let { recordFilterRepository.validate(it, state.submittedKeyword.isNotBlank()) } ?: RecordFilterValidation.InvalidRange
                 if (validation != RecordFilterValidation.Valid) {
                     updateState(state.copy(message = if (validation == RecordFilterValidation.InvalidRange) SearchFilterMessage.INVALID_DATE else SearchFilterMessage.TOO_MANY_CONDITIONS))
                     return
                 }
-                state.copy(appliedFilter = draft, drawerDraft = null, categoryDraft = null, message = null)
+                state.copy(appliedFilter = draft, drawerDraft = null, categoryDraft = null, tagDraft = null, message = null)
             }
-            is SearchFilterEvent.UpdateDate -> if (draft != null) state.copy(drawerDraft = draft.copy(dateSelection = event.date), message = null) else state
-            is SearchFilterEvent.UpdateTypes -> if (draft != null) {
+            is SearchFilterEvent.UpdateDate -> if (draft != null && atRoot) state.copy(drawerDraft = draft.copy(dateSelection = event.date), message = null) else state
+            is SearchFilterEvent.UpdateTypes -> if (draft != null && atRoot) {
                 val updated = changeFilterTypes(draft, event.types, state.catalog)
                 state.copy(
                     drawerDraft = updated.filter,
@@ -254,11 +260,22 @@ class SearchViewModel @Inject constructor(
             } else {
                 state
             }
-            is SearchFilterEvent.ToggleTag -> if (draft != null) state.copy(drawerDraft = draft.copy(tagIds = if (event.id in draft.tagIds) draft.tagIds - event.id else draft.tagIds + event.id)) else state
-            SearchFilterEvent.OpenCategories -> if (draft != null) {
+            is SearchFilterEvent.ToggleTag -> if (draft != null && atRoot) state.copy(drawerDraft = draft.copy(tagIds = if (event.id in draft.tagIds) draft.tagIds - event.id else draft.tagIds + event.id)) else state
+            SearchFilterEvent.OpenTags -> if (draft != null && atRoot) state.copy(tagDraft = draft.tagIds.toSet(), tagSearchQuery = "", showHiddenTags = false, categoryDraft = null) else state
+            SearchFilterEvent.CancelTags -> state.copy(tagDraft = null)
+            SearchFilterEvent.ConfirmTags -> if (draft != null && state.tagDraft != null) state.copy(drawerDraft = draft.copy(tagIds = state.tagDraft.toSet()), tagDraft = null) else state
+            is SearchFilterEvent.ToggleTagDraft -> if (draft != null && state.tagDraft != null && (event.id in state.tagDraft || state.tags.any { it.id == event.id })) {
+                state.copy(tagDraft = if (event.id in state.tagDraft) state.tagDraft - event.id else state.tagDraft + event.id)
+            } else {
+                state
+            }
+            SearchFilterEvent.ClearTagSelection -> if (state.tagDraft != null) state.copy(tagDraft = emptySet()) else state
+            is SearchFilterEvent.ChangeTagSearch -> if (state.tagDraft != null) state.copy(tagSearchQuery = event.keyword) else state
+            is SearchFilterEvent.ShowHiddenTags -> if (state.tagDraft != null) state.copy(showHiddenTags = event.show) else state
+            SearchFilterEvent.OpenCategories -> if (draft != null && atRoot) {
                 val allowed = draft.typeCategories
                 val browse = state.categoryBrowseType.takeIf { allowed.isEmpty() || it in allowed } ?: allowed.first()
-                state.copy(categoryDraft = draft.categories, categoryBrowseType = browse, categoryBrowseParentId = null, categorySearchQuery = "")
+                state.copy(categoryDraft = draft.categories, tagDraft = null, categoryBrowseType = browse, categoryBrowseParentId = null, categorySearchQuery = "")
             } else {
                 state
             }

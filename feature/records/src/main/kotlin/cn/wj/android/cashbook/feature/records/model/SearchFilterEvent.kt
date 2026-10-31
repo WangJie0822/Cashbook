@@ -24,11 +24,19 @@ enum class CategorySelectionKind { EXACT, GROUP, EXCLUDED }
 sealed interface SearchFilterEvent {
     data object OpenDrawer : SearchFilterEvent
     data object CancelDrawer : SearchFilterEvent
+    data object Back : SearchFilterEvent
     data object ResetDrawer : SearchFilterEvent
     data object ApplyDrawer : SearchFilterEvent
     data class UpdateDate(val date: DateSelectionEntity) : SearchFilterEvent
     data class UpdateTypes(val types: Set<RecordTypeCategoryEnum>) : SearchFilterEvent
     data class ToggleTag(val id: Long) : SearchFilterEvent
+    data object OpenTags : SearchFilterEvent
+    data object CancelTags : SearchFilterEvent
+    data object ConfirmTags : SearchFilterEvent
+    data class ToggleTagDraft(val id: Long) : SearchFilterEvent
+    data object ClearTagSelection : SearchFilterEvent
+    data class ChangeTagSearch(val keyword: String) : SearchFilterEvent
+    data class ShowHiddenTags(val show: Boolean) : SearchFilterEvent
     data object OpenCategories : SearchFilterEvent
     data object CancelCategories : SearchFilterEvent
     data object ConfirmCategories : SearchFilterEvent
